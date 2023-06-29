@@ -5,17 +5,16 @@ const {
   ChannelType,
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
-const { ManageRoles, ManageChannels, SendMessages, ViewChannel } =
-  PermissionsBitField.Flags;
+const { ManageRoles, ManageChannels, SendMessages, ViewChannel } = PermissionsBitField.Flags;
 
 module.exports = {
   subCommand: "ctftime.schedule",
   /**
    *
    * @param {ChatInputCommandInteraction} interaction
-   * @param {Client} client
+   * @param {Client} _client
    */
-  async execute(interaction, client) {
+  async execute(interaction, _client) {
     const { options } = interaction;
     const permissionAdmin = [ManageRoles, ManageChannels];
 

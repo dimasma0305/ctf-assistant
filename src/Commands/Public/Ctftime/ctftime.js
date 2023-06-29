@@ -22,5 +22,16 @@ module.exports = {
             .setName("day")
             .setDescription("Set closed schedule, (default: 1 day)")
         );
+    })
+    .addSubcommand((subCommand) => {
+      return subCommand
+        .setName('flush')
+        .setDescription('Flush role from specific message id')
+        .addStringOption((option) =>
+          option.setName("message_id").setDescription("message id")
+        )
+        .addStringOption((option) =>
+          option.setName("role_id").setDescription("role id")
+        )
     }),
 };
