@@ -31,7 +31,7 @@ module.exports = {
           option.setName("message_id").setDescription("message id")
         )
         .addStringOption((option) =>
-          option.setName("role_id").setDescription("role id")
+          option.setName("role_name").setDescription("role name")
         )
     }),
 };

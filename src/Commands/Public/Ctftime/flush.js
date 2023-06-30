@@ -1,7 +1,8 @@
-const { ChatInputCommandInteraction, Client, Permissions } = require("discord.js");
+const { ChatInputCommandInteraction, Client, PermissionsBitField } = require("discord.js");
+const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
 
 module.exports = {
-    subCommand: "ctftime.schedule",
+    subCommand: "ctftime.flush",
     /**
      *
      * @param {ChatInputCommandInteraction} interaction
@@ -11,7 +12,7 @@ module.exports = {
         const { options } = interaction;
 
         // Check if the user has the required permissions
-        if (!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_ROLES)) {
+        if (!interaction.member.permissions.has(ManageRoles, ManageChannels)) {
             return interaction.reply({
                 content: "This command is only available to administrators who can manage roles.",
                 ephemeral: true,
@@ -22,12 +23,16 @@ module.exports = {
         const messageId = options.getString("message_id");
 
         // Retrieve the role ID from the command options
-        const roleId = options.getString("role_id");
+        const roleId = options.getString("role_name");
 
         // Fetch the message by its ID
         const channel = interaction.channel;
-        const message = await channel.messages.fetch(messageId)
-            .catch(() => null); // Handle if the message could not be found
+        let message;
+        try {
+            message = await channel.messages.fetch(messageId);
+        } catch (e) {
+            message = null
+        }
 
         if (!message) {
             return interaction.reply({
@@ -37,7 +42,11 @@ module.exports = {
         }
 
         // Fetch the role by its ID
-        const role = interaction.guild.roles.cache.get(roleId);
+        const role = interaction.guild.roles.cache.find((value, _key, _collection) => {
+            if (value.name.toLowerCase().includes(roleId.toLowerCase())) {
+                return true
+            }
+        });
 
         if (!role) {
             return interaction.reply({
@@ -56,10 +65,15 @@ module.exports = {
         reactionUsers.forEach(async (user) => {
             if (!user.bot) {
                 const member = await interaction.guild.members.fetch(user);
-                member.roles.add(role);
+                if (!member.roles.cache.has(role)) {
+                    await member.roles.add(role);
+                }
             }
         });
 
-        interaction.reply("The role has been added to all users who reacted with a white check mark.");
+        return interaction.reply({
+            content: "The role has been added to all users who reacted with a white check mark.",
+            ephemeral: true
+        });
     },
 };
