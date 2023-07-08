@@ -5,6 +5,7 @@ const {
     ChannelType,
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
+const { contents } = require("cheerio/lib/api/traversing");
 const { ManageRoles, ManageChannels, SendMessages, ViewChannel } = PermissionsBitField.Flags;
 
 module.exports = {
@@ -42,8 +43,15 @@ module.exports = {
             await interaction.guild.channels.delete({
                 name: `${data.title} writeup`,
             });
+            await interaction.reply({
+                contents: "Successfuly delete the data",
+                ephemeral: true
+            })
         } catch (error) {
-            await interaction.reply(error)
+            await interaction.reply({
+                content: error,
+                ephemeral: true
+            })
         }
     },
 };
