@@ -19,7 +19,7 @@ module.exports = {
         const permissionAdmin = [ManageRoles, ManageChannels];    await interaction.deferReply();
         await interaction.deferReply();
         if (!interaction.member.permissions.has(permissionAdmin)) {
-            return interaction.reply({
+            return interaction.editReply({
                 content: "This command is only available to the admin",
                 ephemeral: true,
             });
@@ -29,7 +29,7 @@ module.exports = {
             const data = await infoEvents(id);
 
             if (data.length === 0) {
-                return interaction.reply({
+                return interaction.editReply({
                     content: "Invalid id CTFs",
                     ephemeral: true,
                 });
