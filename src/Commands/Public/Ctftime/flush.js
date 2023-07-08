@@ -10,6 +10,7 @@ module.exports = {
      */
     async execute(interaction, _client) {
         const { options } = interaction;
+        await interaction.deferReply({ ephemeral: true })
 
         // Check if the user has the required permissions
         if (!interaction.member.permissions.has(ManageRoles, ManageChannels)) {
@@ -70,10 +71,9 @@ module.exports = {
                 }
             }
         });
-
-        return interaction.reply({
+        return interaction.followUp({
             content: "The role has been added to all users who reacted with a white check mark.",
             ephemeral: true
-        });
+        })
     },
 };
