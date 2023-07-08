@@ -33,5 +33,13 @@ module.exports = {
         .addStringOption((option) =>
           option.setName("role_name").setDescription("role name")
         )
+    })
+    .addSubcommand((subcommand)=>{
+      return subcommand
+        .setName('delete')
+        .setDescription('delete all role and ')
+        .addStringOption((option)=>
+          option.setName("id").setDescription("id of the ctf event on ctftime")
+        )
     }),
 };
