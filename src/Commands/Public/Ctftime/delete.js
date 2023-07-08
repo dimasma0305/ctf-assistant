@@ -48,7 +48,7 @@ module.exports = {
             })
         } catch (error) {
             await interaction.reply({
-                content: error,
+                content: error.toString(),
                 ephemeral: true
             })
         }
