@@ -37,7 +37,7 @@ module.exports = {
     .addSubcommand((subcommand)=>{
       return subcommand
         .setName('delete')
-        .setDescription('delete all role and ')
+        .setDescription('delete all role and channel associate with ctf event')
         .addStringOption((option)=>
           option.setName("id").setDescription("id of the ctf event on ctftime")
         )

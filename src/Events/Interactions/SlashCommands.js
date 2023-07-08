@@ -17,7 +17,7 @@ module.exports = {
       });
     }
 
-    if (command.developer && interaction.user.id !== "816349743038988310") {
+    if (command.developer && interaction.user.id !== "663394727688798231") {
       return interaction.reply({
         content: "This command is only available to the developers",
         ephemeral: true,
