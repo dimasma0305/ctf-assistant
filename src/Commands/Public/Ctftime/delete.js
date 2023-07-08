@@ -16,7 +16,8 @@ module.exports = {
      */
     async execute(interaction, _client) {
         const { options } = interaction;
-        const permissionAdmin = [ManageRoles, ManageChannels];
+        const permissionAdmin = [ManageRoles, ManageChannels];    await interaction.deferReply();
+        await interaction.deferReply();
         if (!interaction.member.permissions.has(permissionAdmin)) {
             return interaction.reply({
                 content: "This command is only available to the admin",
@@ -42,12 +43,12 @@ module.exports = {
             await interaction.guild.channels.delete({
                 name: `${data.title} writeup`,
             });
-            await interaction.reply({
+            await interaction.editReply({
                 contents: "Successfuly delete the data",
                 ephemeral: true
             })
         } catch (error) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: error.toString(),
                 ephemeral: true
             })
