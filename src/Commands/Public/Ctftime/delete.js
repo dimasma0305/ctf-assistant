@@ -5,7 +5,6 @@ const {
     ChannelType,
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
-const { contents } = require("cheerio/lib/api/traversing");
 const { ManageRoles, ManageChannels, SendMessages, ViewChannel } = PermissionsBitField.Flags;
 
 module.exports = {
