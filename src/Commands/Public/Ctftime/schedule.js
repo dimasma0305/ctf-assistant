@@ -17,17 +17,17 @@ module.exports = {
   async execute(interaction, _client) {
     const { options } = interaction;
     const permissionAdmin = [ManageRoles, ManageChannels];
+    if (!interaction.member.permissions.has(permissionAdmin)) {
+      return interaction.reply({
+        content: "This command is only available to the admin",
+        ephemeral: true,
+      });
+    }
+    const id = options.getString("id");
+    const day = options.getNumber("day") || 1;
+
+    await interaction.deferReply()
     try {
-
-      if (!interaction.member.permissions.has(permissionAdmin)) {
-        return interaction.reply({
-          content: "This command is only available to the admin",
-          ephemeral: true,
-        });
-      }
-
-      const id = options.getString("id");
-      const day = options.getNumber("day") || 1;
       const data = await infoEvents(id);
 
       if (data.length === 0) {
@@ -61,7 +61,7 @@ module.exports = {
           c.type == ChannelType.GuildCategory
       );
 
-      const message = await interaction.reply({
+      const message = await interaction.editReply({
         embeds: [embed],
         fetchReply: true,
       });
@@ -134,7 +134,7 @@ module.exports = {
         });
       });
     } catch (error) {
-      await interaction.reply(error)
+      await interaction.editReply(error)
     }
   },
 };
