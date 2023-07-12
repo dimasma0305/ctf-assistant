@@ -7,7 +7,11 @@ const {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("echo")
-        .setDescription("will echo"),
+        .setDescription("will echo")
+        .addStringOption(option =>
+            option.setName("text")
+                .setDescription("text to echo")
+        ),
     /**
      *
      * @param {ChatInputCommandInteraction} interaction
