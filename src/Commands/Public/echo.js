@@ -1,8 +1,12 @@
 const {
     SlashCommandBuilder,
     ChatInputCommandInteraction,
-    Client
+    Client,
+    PermissionsBitField
 } = require("discord.js");
+
+const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
+
 
 module.exports = {
     data: new SlashCommandBuilder()
