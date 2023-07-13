@@ -12,6 +12,9 @@ module.exports = {
     for (const [key, value] of client.events)
       client.removeListener(`${key}`, value, true);
     loadEvents(client);
-    interaction.reply({ content: "Reloaded Events", epheral: true });
+    interaction.reply({
+      content: "Reloaded Events",
+      ephemeral: true
+    });
   },
 };

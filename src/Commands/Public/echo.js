@@ -5,41 +5,61 @@ const {
     PermissionsBitField
 } = require("discord.js");
 
-const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
+const { ManageMessages } = PermissionsBitField.Flags;
 
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("echo")
         .setDescription("will echo")
-        .addStringOption(option =>
-            option.setName("text")
-                .setDescription("text to echo")
-        ),
+        .addStringOption(option => option
+            .setName("text")
+            .setDescription("text to echo")
+            .setRequired(true)
+        )
+        .addStringOption(option => option
+            .setName("encoding")
+            .setDescription("encoding")
+            .addChoices(
+                { name: "base64", value: "base64" },
+                { name: "urlencode", value: "urlencode" }
+            ))
+        .setDefaultMemberPermissions(ManageMessages),
     /**
      *
      * @param {ChatInputCommandInteraction} interaction
      * @param {Client} _client
      */
     async execute(interaction, _client) {
-        const permissionAdmin = [ManageRoles, ManageChannels];
-        if (!interaction.member.permissions.has(permissionAdmin)) {
-            return interaction.reply({
-                content: "This command is only available to the admin",
-                ephemeral: true,
-            });
-        }
-
         const { options } = interaction;
-        const text = options.getString("text");
-        if (!text) {
+        const encoding = options.getString("encoding")
+        let text = options.getString("text")
+        try {
+            if (encoding) {
+                switch (encoding) {
+                    case "base64":
+                        text = atob(text)
+                        break;
+                    case "urlencode":
+                        text = decodeURIComponent(text)
+                        break
+                    default:
+                        return interaction.reply({
+                            content: "encoding not found!",
+                            ephemeral: true
+                        })
+                }
+            }
+        } catch (error) {
             return interaction.reply({
-                content: "you need to provide the text",
+                content: error,
                 ephemeral: true
             })
         }
-        interaction.reply(text)
-
-
+        await interaction.deferReply()
+        interaction.channel.send({
+            content: text
+        })
+        return interaction.deleteReply()
     },
 };

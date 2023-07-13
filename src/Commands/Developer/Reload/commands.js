@@ -10,6 +10,9 @@ module.exports = {
    */
   execute(interaction, client) {
     loadCommands(client);
-    interaction.reply({ content: "Reloaded Commands", epheral: true });
+    interaction.reply({
+      content: "Reloaded Commands",
+      ephemeral: true
+    });
   },
 };
