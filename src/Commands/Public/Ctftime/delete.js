@@ -3,6 +3,8 @@ const {
     Client,
     SlashCommandSubcommandBuilder,
 } = require("discord.js");
+
+const {translate} = require("../../../Functions/discord-utils")
 const { infoEvents } = require("../../../Functions/ctftime");
 
 module.exports = {
@@ -39,8 +41,8 @@ module.exports = {
                 }
             });
             interaction.guild.channels.cache.forEach((channel) => {
-                const chat_channel = data.title.toLowerCase().replace(/ /g, "-")
-                const writeup_channel = `${chat_channel} writeup`.toLowerCase().replace(/ /g, "-")
+                const chat_channel = translate(data.title)
+                const writeup_channel = translate(`${chat_channel} writeup`)
                 if (channel.name === chat_channel ||
                     channel.name === writeup_channel) {
                     channel.delete()

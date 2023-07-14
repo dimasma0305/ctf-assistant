@@ -6,6 +6,7 @@ const {
   SlashCommandSubcommandBuilder,
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
+const { translate } = require("../../../Functions/discord-utils");
 const { ManageRoles, ManageChannels, SendMessages, ViewChannel } = PermissionsBitField.Flags;
 
 module.exports = {
@@ -67,7 +68,7 @@ module.exports = {
       }
 
       const embed = {
-        title: `${data.title}${isPrivate?" (private)":""}`,
+        title: `${data.title}${isPrivate?" **(private)**":""}`,
         description: data.link,
         url: `https://ctftime.org/event/${id}`,
         thumbnail: {
@@ -140,8 +141,7 @@ module.exports = {
       });
 
       const discus_channel = interaction.guild.channels.cache.find((channel) => {
-        const target = data.title.toLowerCase().replace(/ /g, "-");
-        return channel.name === target;
+        return channel.name === translate(data.title);
       });
 
       // attending event
@@ -218,7 +218,7 @@ module.exports = {
         });
       });
     } catch (error) {
-      await interaction.editReply(error);
+      await interaction.channel.send(error.toString());
     }
   },
 };
