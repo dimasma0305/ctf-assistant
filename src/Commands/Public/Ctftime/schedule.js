@@ -213,10 +213,11 @@ module.exports = {
       });
 
       getUser.on("end", (_collected) => {
-        message.reply({
+        message.channel.send({
           content: `Thank you for participating in the event **${data.title}** CTF.`,
         });
       });
+
       interaction.editReply({
         content: "Success",
       })
