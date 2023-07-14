@@ -1,3 +1,5 @@
+const { Collection, SlashCommandBuilder } = require("discord.js");
+
 const loadCommands = async (client) => {
   const { loadFiles } = require("../Functions/fileLoader");
   const ascii = require("ascii-table");
@@ -12,14 +14,28 @@ const loadCommands = async (client) => {
 
   Files.forEach((file) => {
     const command = require(file);
-
-    if (command.subCommand)
+    /**
+     * @type {string}
+     */
+    const subCommand = command.subCommand
+    if (subCommand) {
+      if (command.data) {
+        /**
+         * @type {SlashCommandBuilder}
+         */
+        const parent_name = subCommand.split(".")[0]
+        const parent = client.commands.get(parent_name).data
+        const new_data = parent.addSubcommand(command.data)
+        client.commands.set(new_data)
+      }
       return client.subCommands.set(command.subCommand, command);
+    }
+    else {
+      client.commands.set(command.data.name, command);
 
-    client.commands.set(command.data.name, command);
-
-    commandsArray.push(command.data);
-    table.addRow(command.data.name, "✅");
+      commandsArray.push(command.data);
+      table.addRow(command.data.name, "✅");
+    }
   });
 
   client.application.commands.set(commandsArray);

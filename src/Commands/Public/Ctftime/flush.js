@@ -1,8 +1,17 @@
-const { ChatInputCommandInteraction, Client, PermissionsBitField } = require("discord.js");
+const { ChatInputCommandInteraction, Client, PermissionsBitField, SlashCommandSubcommandBuilder } = require("discord.js");
 const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
 
 module.exports = {
     subCommand: "ctftime.flush",
+    data: new SlashCommandSubcommandBuilder()
+        .setName('flush')
+        .setDescription('Flush role from specific message id')
+        .addStringOption((option) =>
+            option.setName("message_id").setDescription("message id")
+        )
+        .addStringOption((option) =>
+            option.setName("role_name").setDescription("role name")
+        ),
     /**
      *
      * @param {ChatInputCommandInteraction} interaction

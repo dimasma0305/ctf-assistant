@@ -1,8 +1,11 @@
-const { ChatInputCommandInteraction, Client } = require("discord.js");
+const { ChatInputCommandInteraction, Client, SlashCommandSubcommandBuilder } = require("discord.js");
 const { getEvents, infoEvents } = require("../../../Functions/ctftime");
 
 module.exports = {
   subCommand: "ctftime.upcoming",
+  data: new SlashCommandSubcommandBuilder()
+    .setName("upcoming")
+    .setDescription("Display upcoming CTFs"),
   /**
    *
    * @param {ChatInputCommandInteraction} interaction

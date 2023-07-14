@@ -3,12 +3,24 @@ const {
   Client,
   PermissionsBitField,
   ChannelType,
+  SlashCommandSubcommandBuilder,
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
 const { ManageRoles, ManageChannels, SendMessages, ViewChannel } = PermissionsBitField.Flags;
 
 module.exports = {
   subCommand: "ctftime.schedule",
+  data: new SlashCommandSubcommandBuilder()
+    .setName("schedule")
+    .setDescription("schedule CTFs")
+    .addStringOption((option) =>
+      option.setName("id").setDescription("id CTFs")
+    )
+    .addNumberOption((option) =>
+      option
+        .setName("day")
+        .setDescription("Set closed schedule, (default: 1 day)")
+    ),
   /**
    *
    * @param {ChatInputCommandInteraction} interaction

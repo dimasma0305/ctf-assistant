@@ -2,12 +2,21 @@ const {
     ChatInputCommandInteraction,
     Client,
     PermissionsBitField,
+    SlashCommandSubcommandBuilder,
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
 const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
 
 module.exports = {
     subCommand: "ctftime.delete",
+    data: new SlashCommandSubcommandBuilder()
+        .setName('delete')
+        .setDescription('delete all role and channel associate with ctf event')
+        .addStringOption((option) => option
+            .setName("id")
+            .setDescription("id of the ctf event on ctftime")
+            .setRequired(true)
+        ),
     /**
      *
      * @param {ChatInputCommandInteraction} interaction
@@ -15,13 +24,6 @@ module.exports = {
      */
     async execute(interaction, _client) {
         const { options } = interaction;
-        const permissionAdmin = [ManageRoles, ManageChannels];
-        if (!interaction.member.permissions.has(permissionAdmin)) {
-            return interaction.reply({
-                content: "This command is only available to the admin",
-                ephemeral: true,
-            });
-        }
         await interaction.deferReply({ ephemeral: true });
         try {
             const id = options.getString("id");
@@ -32,15 +34,15 @@ module.exports = {
                     ephemeral: true,
                 });
             }
-            await interaction.guild.roles.cache.find((role) => {
+            interaction.guild.roles.cache.find((role) => {
                 if (role.name === data.title) {
                     role.delete()
                     return true
                 }
             });
-            await interaction.guild.channels.cache.forEach((channel) => {
-                const chat_channel = data.title.toLowerCase().replace(" ", "-")
-                const writeup_channel = `${chat_channel} writeup`.toLowerCase().replace(" ", "-")
+            interaction.guild.channels.cache.forEach((channel) => {
+                const chat_channel = data.title.toLowerCase().replace(/ /g, "-")
+                const writeup_channel = `${chat_channel} writeup`.toLowerCase().replace(/ /g, "-")
                 if (channel.name === chat_channel ||
                     channel.name === writeup_channel) {
                     channel.delete()
