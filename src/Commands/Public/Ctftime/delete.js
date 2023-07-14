@@ -1,11 +1,9 @@
 const {
     ChatInputCommandInteraction,
     Client,
-    PermissionsBitField,
     SlashCommandSubcommandBuilder,
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
-const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
 
 module.exports = {
     subCommand: "ctftime.delete",

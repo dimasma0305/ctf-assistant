@@ -10,14 +10,14 @@ const {
 } = require("discord.js");
 const { loadEvents } = require("./Handlers/eventHandler");
 
-const { Guilds, GuildMembers, GuildMessages, GuildMessageReactions } =
+const { Guilds, GuildMembers, GuildMessages, GuildMessageReactions, MessageContent, DirectMessages } =
   GatewayIntentBits;
 
-const { User, Message, GuildMember } = Partials;
+const { User, Message, GuildMember, Channel } = Partials;
 
 const client = new Client({
-  intents: [Guilds, GuildMembers, GuildMessages, GuildMessageReactions],
-  partials: [User, Message, GuildMember],
+  intents: [Guilds, GuildMembers, GuildMessages, GuildMessageReactions, MessageContent, DirectMessages],
+  partials: [User, Message, GuildMember, Channel],
 });
 
 client.events = new Collection();

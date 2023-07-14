@@ -12,14 +12,20 @@ module.exports = {
   subCommand: "ctftime.schedule",
   data: new SlashCommandSubcommandBuilder()
     .setName("schedule")
-    .setDescription("schedule CTFs")
-    .addStringOption((option) =>
-      option.setName("id").setDescription("id CTFs")
-    )
-    .addNumberOption((option) =>
-      option
-        .setName("day")
-        .setDescription("Set closed schedule, (default: 1 day)")
+    .setDescription("Schedule CTFs")
+    .addStringOption(option => option
+      .setName("id")
+      .setDescription("CTFs ID")
+      .setRequired(true)
+    ).addBooleanOption(option => option
+      .setName("private")
+      .setDescription("Is this a private CTF event?")
+    ).addStringOption(option => option
+      .setName("password")
+      .setDescription("Password for the private CTF event")
+    ).addNumberOption(option => option
+      .setName("day")
+      .setDescription("Set closure time (default: 1 day)")
     ),
   /**
    *
@@ -28,23 +34,34 @@ module.exports = {
    */
   async execute(interaction, _client) {
     const { options } = interaction;
-    const permissionAdmin = [ManageRoles, ManageChannels];
-    if (!interaction.member.permissions.has(permissionAdmin)) {
+    const adminPermissions = [ManageRoles, ManageChannels];
+    if (!interaction.member.permissions.has(adminPermissions)) {
       return interaction.reply({
-        content: "This command is only available to the admin",
+        content: "This command is only available to admins",
         ephemeral: true,
       });
     }
     const id = options.getString("id");
     const day = options.getNumber("day") || 1;
+    const isPrivate = options.getBoolean("private");
+    const password = options.getString("password");
 
-    await interaction.deferReply()
+    if (isPrivate) {
+      if (!password) {
+        return interaction.reply({
+          content: "Password not provided",
+          ephemeral: true
+        });
+      }
+    }
+
+    await interaction.deferReply();
     try {
       const data = await infoEvents(id);
 
       if (data.length === 0) {
         return interaction.reply({
-          content: "Invalid id CTFs",
+          content: "Invalid CTF ID",
           ephemeral: true,
         });
       }
@@ -57,10 +74,10 @@ module.exports = {
           url: data.img,
         },
         fields: [
-          { name: "**id**", value: id, inline: true },
-          { name: "**format**", value: data.format, inline: true },
-          { name: "**location**", value: data.location, inline: false },
-          { name: "**weight**", value: data.weight, inline: true },
+          { name: "**ID**", value: id, inline: true },
+          { name: "**Format**", value: data.format, inline: true },
+          { name: "**Location**", value: data.location, inline: false },
+          { name: "**Weight**", value: data.weight, inline: true },
         ],
         footer: {
           text: data.date,
@@ -69,8 +86,8 @@ module.exports = {
 
       const category = interaction.guild.channels.cache.find(
         (c) =>
-          (c.name == "Text Channels" || c.name == "Text Channel") &&
-          c.type == ChannelType.GuildCategory
+          (c.name === "Text Channels" || c.name === "Text Channel") &&
+          c.type === ChannelType.GuildCategory
       );
 
       const message = await interaction.editReply({
@@ -114,39 +131,94 @@ module.exports = {
         ...channelSetting,
       });
 
-      const filter = (reaction, user) => {
-        return reaction.emoji.name == "✅";
-      };
-
       const getUser = message.createReactionCollector({
-        filter,
+        filter: (reaction, _user) => {
+          return reaction.emoji.name === "✅";
+        },
         dispose: true,
         time: day * 24 * 60 * 60 * 1000,
       });
 
-      // attending events
-      getUser.on("collect", (reaction, user) => {
+      const discus_channel = interaction.guild.channels.cache.find((channel) => {
+        const target = data.title.toLowerCase().replace(/ /g, "-");
+        return channel.name === target;
+      });
+
+      // attending event
+      getUser.on("collect", async (reaction, user) => {
         const guildMember = reaction.message.guild.members.cache.find(
           (member) => member.id === user.id
         );
-        guildMember.roles.add(filterRole.id);
+        const dmChannel = await user.createDM();
+
+        if (isPrivate) {
+          dmChannel.send("Input the password: ");
+          const collector = dmChannel.createMessageCollector(
+            {
+              filter: (message) => message.author.id === user.id,
+              max: 1,
+              time: 60000
+            }
+          );
+          collector.on("collect", async (message) => {
+            if (message.content === password) {
+              guildMember.roles.add(filterRole.id);
+              sendSuccessMessage(dmChannel);
+            } else {
+              sendFailureMessage(dmChannel);
+              reaction.users.remove(message.author.id);
+            }
+          });
+          collector.on("end", (collected) => {
+            if (collected.size === 0) {
+              dmChannel.send("Request timed out");
+              reaction.users.remove(user.id);
+            }
+          });
+        } else {
+          guildMember.roles.add(filterRole.id);
+          sendSuccessMessage(dmChannel);
+        }
+
+        function sendSuccessMessage(dmChannel) {
+          dmChannel.send({
+            content: `> Successfully added the role for "${data.title}".`,
+          });
+          dmChannel.send({
+            content: `Hello! Here's the channel for discussions. Good luck!`,
+          });
+          dmChannel.send({
+            content: ` <#${discus_channel.id}>`,
+          });
+        }
+
+        function sendFailureMessage(dmChannel) {
+          dmChannel.send({
+            content: `Authentication failed. Please provide the correct password to proceed.`,
+          });
+        }
       });
 
-      // not attending events
-      getUser.on("remove", (reaction, user) => {
+      // Not attending events
+      getUser.on("remove", async (reaction, user) => {
         const guildMember = reaction.message.guild.members.cache.find(
           (member) => member.id === user.id
         );
         guildMember.roles.remove(filterRole.id);
+        user.createDM().then((dmChannel) => {
+          dmChannel.send({
+            content: `> Successfully removed the role for "${data.title}".`
+          });
+        });
       });
 
-      getUser.on("end", (collected) => {
+      getUser.on("end", (_collected) => {
         message.reply({
-          content: `thanks for participating to attending event **${data.title}** CTFs`,
+          content: `Thank you for participating in the event **${data.title}** CTF.`,
         });
       });
     } catch (error) {
-      await interaction.editReply(error)
+      await interaction.editReply(error);
     }
   },
 };
