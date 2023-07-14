@@ -4,6 +4,7 @@ const {
   PermissionsBitField,
   ChannelType,
   SlashCommandSubcommandBuilder,
+  DMChannel
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
 const { translate } = require("../../../Functions/discord-utils");
@@ -18,15 +19,15 @@ module.exports = {
       .setName("id")
       .setDescription("CTFs ID")
       .setRequired(true)
+    ).addNumberOption(option => option
+      .setName("day")
+      .setDescription("Set closure time (default: 1 day)")
     ).addBooleanOption(option => option
       .setName("private")
       .setDescription("Is this a private CTF event?")
     ).addStringOption(option => option
       .setName("password")
       .setDescription("Password for the private CTF event")
-    ).addNumberOption(option => option
-      .setName("day")
-      .setDescription("Set closure time (default: 1 day)")
     ),
   /**
    *
@@ -35,13 +36,6 @@ module.exports = {
    */
   async execute(interaction, _client) {
     const { options } = interaction;
-    const adminPermissions = [ManageRoles, ManageChannels];
-    if (!interaction.member.permissions.has(adminPermissions)) {
-      return interaction.reply({
-        content: "This command is only available to admins",
-        ephemeral: true,
-      });
-    }
     const id = options.getString("id");
     const day = options.getNumber("day") || 1;
     const isPrivate = options.getBoolean("private");
@@ -56,7 +50,7 @@ module.exports = {
       }
     }
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
     try {
       const data = await infoEvents(id);
 
@@ -68,7 +62,7 @@ module.exports = {
       }
 
       const embed = {
-        title: `${data.title}${isPrivate?" **(private)**":""}`,
+        title: `${data.title}${isPrivate ? " **(private)**" : ""}`,
         description: data.link,
         url: `https://ctftime.org/event/${id}`,
         thumbnail: {
@@ -91,21 +85,18 @@ module.exports = {
           c.type === ChannelType.GuildCategory
       );
 
-      const message = await interaction.editReply({
+      const message = await interaction.channel.send({
         embeds: [embed],
         fetchReply: true,
       });
+
       await message.react("✅");
 
-      await interaction.guild.roles.create({
+      const ctfRole = await interaction.guild.roles.create({
         name: data.title,
         color: "#AF1257",
         permissions: [SendMessages, ViewChannel],
       });
-
-      const filterRole = interaction.guild.roles.cache.find(
-        (r) => r.name === data.title
-      );
 
       const channelSetting = {
         parent: category,
@@ -116,18 +107,18 @@ module.exports = {
             deny: [ViewChannel],
           },
           {
-            id: filterRole.id,
+            id: ctfRole.id,
             allow: [ViewChannel],
           },
         ],
       };
 
-      await interaction.guild.channels.create({
+      const discussChannel = await interaction.guild.channels.create({
         name: data.title,
         ...channelSetting,
       });
 
-      await interaction.guild.channels.create({
+      const writeupChannel = await interaction.guild.channels.create({
         name: `${data.title} writeup`,
         ...channelSetting,
       });
@@ -138,10 +129,6 @@ module.exports = {
         },
         dispose: true,
         time: day * 24 * 60 * 60 * 1000,
-      });
-
-      const discus_channel = interaction.guild.channels.cache.find((channel) => {
-        return channel.name === translate(data.title);
       });
 
       // attending event
@@ -162,7 +149,7 @@ module.exports = {
           );
           collector.on("collect", async (message) => {
             if (message.content === password) {
-              guildMember.roles.add(filterRole.id);
+              guildMember.roles.add(ctfRole.id);
               sendSuccessMessage(dmChannel);
             } else {
               sendFailureMessage(dmChannel);
@@ -176,22 +163,35 @@ module.exports = {
             }
           });
         } else {
-          guildMember.roles.add(filterRole.id);
+          guildMember.roles.add(ctfRole.id);
           sendSuccessMessage(dmChannel);
         }
 
+        /**
+         *
+         * @param {DMChannel} dmChannel
+         */
         function sendSuccessMessage(dmChannel) {
           dmChannel.send({
-            content: `> Successfully added the role for "${data.title}".`,
+            content: `Successfully added the role for "${data.title}"!`,
           });
           dmChannel.send({
-            content: `Hello! Here's the channel for discussions. Good luck!`,
+            content: `Here's the channel for the CTF event. Good luck!`,
           });
           dmChannel.send({
-            content: ` <#${discus_channel.id}>`,
+            embeds: [{
+              fields: [
+                { name: "**Discuss Channel**", value: `<#${discussChannel.id}>` },
+                { name: "**Writeup Channel**", value: `<#${writeupChannel.id}>` },
+              ]
+            }]
           });
         }
 
+        /**
+         *
+         * @param {DMChannel} dmChannel
+         */
         function sendFailureMessage(dmChannel) {
           dmChannel.send({
             content: `Authentication failed. Please provide the correct password to proceed.`,
@@ -204,7 +204,7 @@ module.exports = {
         const guildMember = reaction.message.guild.members.cache.find(
           (member) => member.id === user.id
         );
-        guildMember.roles.remove(filterRole.id);
+        guildMember.roles.remove(ctfRole.id);
         user.createDM().then((dmChannel) => {
           dmChannel.send({
             content: `> Successfully removed the role for "${data.title}".`
@@ -217,8 +217,13 @@ module.exports = {
           content: `Thank you for participating in the event **${data.title}** CTF.`,
         });
       });
+      interaction.editReply({
+        content: "Success",
+      })
     } catch (error) {
-      await interaction.channel.send(error.toString());
+      await interaction.channel.send({
+        content: error.toString(),
+      });
     }
   },
 };
