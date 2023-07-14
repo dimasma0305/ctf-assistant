@@ -62,7 +62,7 @@ module.exports = {
       }
 
       const embed = {
-        title: `${data.title}${isPrivate ? " **(private)**" : ""}`,
+        title: `${data.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
         description: data.link,
         url: `https://ctftime.org/event/${id}`,
         thumbnail: {
