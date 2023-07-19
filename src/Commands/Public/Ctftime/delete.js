@@ -34,9 +34,10 @@ module.exports = {
                     ephemeral: true,
                 });
             }
-            interaction.guild.roles.cache.find((role) => {
+            interaction.guild.roles.cache.forEach(async (role) => {
+                console.log(role.name, data.title)
                 if (role.name === data.title) {
-                    role.delete()
+                    await role.delete()
                     return true
                 }
             });

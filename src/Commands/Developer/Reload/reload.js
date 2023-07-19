@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 module.exports = {
   developer: true,
   data: new SlashCommandBuilder()
-    .setName("relod")
+    .setName("reload")
     .setDescription("Reload your commands/events.")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((options) =>

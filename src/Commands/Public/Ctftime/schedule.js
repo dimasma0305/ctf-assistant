@@ -140,13 +140,11 @@ module.exports = {
 
         if (isPrivate) {
           dmChannel.send("Input the password: ");
-          const collector = dmChannel.createMessageCollector(
-            {
-              filter: (message) => message.author.id === user.id,
-              max: 1,
-              time: 60000
-            }
-          );
+          const collector = dmChannel.createMessageCollector({
+            filter: (message) => message.author.id === user.id,
+            max: 1,
+            time: 60 * 1000
+          });
           collector.on("collect", async (message) => {
             if (message.content === password) {
               guildMember.roles.add(ctfRole.id);

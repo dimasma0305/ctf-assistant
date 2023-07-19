@@ -9,8 +9,9 @@ module.exports = {
    * @param {Client} client
    */
   execute(interaction, client) {
-    for (const [key, value] of client.events)
+    for (const [key, value] of client.events) {
       client.removeListener(`${key}`, value, true);
+    }
     loadEvents(client);
     interaction.reply({
       content: "Reloaded Events",
