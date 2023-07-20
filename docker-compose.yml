@@ -4,7 +4,7 @@ services:
     build: .
     restart: on-failure
     volumes:
-      - /home/ubuntu/.ssh/:~/.ssh/
+      - /home/ubuntu/.ssh/:/root/.ssh/
     networks:
       default:
       internal:
