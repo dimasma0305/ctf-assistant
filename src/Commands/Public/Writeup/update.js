@@ -19,8 +19,8 @@ module.exports = {
 		.setDescription('update writeup on repo')
 		.addAttachmentOption(option => option
 			.setName("file")
-			.description("File to upload")
-			.setRequired("true")
+			.setDescription("File to upload")
+			.setRequired(true)
 		),
 	/**
 	 *
