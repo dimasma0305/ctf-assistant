@@ -42,6 +42,7 @@ module.exports = {
 					.setCustomId('content')
 					.setLabel("content")
 					.setStyle(TextInputStyle.Paragraph)
+					.setMaxLength(1000000)
 			)
 		);
 
