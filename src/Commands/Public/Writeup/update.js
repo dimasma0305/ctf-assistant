@@ -16,7 +16,12 @@ module.exports = {
 	subCommand: "writeup.update",
 	data: new SlashCommandSubcommandBuilder()
 		.setName('update')
-		.setDescription('update writeup on repo'),
+		.setDescription('update writeup on repo')
+		.addAttachmentOption(option => option
+			.setName("file")
+			.description("File to upload")
+			.setRequired("true")
+		),
 	/**
 	 *
 	 * @param {ChatInputCommandInteraction} interaction
@@ -25,6 +30,8 @@ module.exports = {
 	async execute(interaction, _client) {
 		const repo = new GitHelper(REPO)
 		const jekly = new JekyllHelper(repo.getRepoName())
+
+		const file = interaction.options.getAttachment("file")
 
 		const modal = new ModalBuilder()
 			.setCustomId('modal')
@@ -37,13 +44,6 @@ module.exports = {
 					.setLabel("title")
 					.setStyle(TextInputStyle.Short),
 			),
-			new ActionRowBuilder().addComponents(
-				new TextInputBuilder()
-					.setCustomId('content')
-					.setLabel("content")
-					.setStyle(TextInputStyle.Paragraph)
-					.setMaxLength(1000000)
-			)
 		);
 
 
@@ -57,7 +57,7 @@ module.exports = {
 		repo.pullFromRepo()
 
 		const title = submission.fields.getTextInputValue('title')
-		const content = submission.fields.getTextInputValue('content')
+		const content = await (await fetch(file.url)).text()
 
 		jekly.createPost(title, content)
 		repo.pushToRepo(Date())
