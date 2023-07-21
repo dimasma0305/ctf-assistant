@@ -3,8 +3,6 @@ services:
   ctf-assistant:
     build: .
     restart: on-failure
-    volumes:
-      - /home/ubuntu/.ssh/:/root/.ssh/
     networks:
       default:
       internal:
