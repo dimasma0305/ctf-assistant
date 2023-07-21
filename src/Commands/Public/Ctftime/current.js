@@ -11,7 +11,7 @@ module.exports = {
    * @param {ChatInputCommandInteraction} interaction
    * @param {Client} client
    */
-  async execute(interaction, client) {
+  async execute(interaction, _client) {
     const time = "now=true";
     const event = await getEvents(time);
     const embedsSend = [];

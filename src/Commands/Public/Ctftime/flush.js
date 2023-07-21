@@ -1,6 +1,6 @@
-const { ChatInputCommandInteraction, Client, PermissionsBitField, SlashCommandSubcommandBuilder, Message } = require("discord.js");
-const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
+const { ChatInputCommandInteraction, Client, SlashCommandSubcommandBuilder, Message } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
+const { getEmbedCTFEvent } = require("./utils/utils");
 
 module.exports = {
     subCommand: "ctftime.flush",
@@ -20,22 +20,12 @@ module.exports = {
     async execute(interaction, _client) {
         const { options } = interaction;
 
-        await interaction.deferReply({ ephemeral: true })
+        interaction.deferReply({ ephemeral: true })
 
         const event_id = options.getNumber("event_id");
         const data = await infoEvents(event_id)
 
-        const messages = await interaction.channel.messages.fetch({ limit: 32 })
-        // get the embeded event
-        const message = messages.find((value) => {
-            if (value instanceof Message) {
-                if (value.author.bot &&
-                    value?.embeds[0]?.data?.title?.startsWith(data.title)) {
-                    return true
-                }
-            }
-            return false
-        })
+        const message = await getEmbedCTFEvent(interaction, data.title)
 
         if (!(message instanceof Message)) {
             return interaction.editReply({
