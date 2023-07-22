@@ -124,7 +124,11 @@ module.exports = {
         ...channelSetting,
       });
 
-      reactionCollectorCTFEvent(message, ctfRole, day, discussChannel, writeupChannel, isPrivate)
+      try {
+        reactionCollectorCTFEvent(message, ctfRole, day, discussChannel, writeupChannel, isPrivate, data.title)
+      } catch (error) {
+        console.error(error)
+      }
 
       interaction.editReply({
         content: "Success",

@@ -35,7 +35,6 @@ module.exports = {
                 });
             }
             interaction.guild.roles.cache.forEach(async (role) => {
-                console.log(role.name, data.title)
                 if (role.name === data.title) {
                     await role.delete()
                     return true

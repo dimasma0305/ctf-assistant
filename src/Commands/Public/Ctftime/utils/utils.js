@@ -31,7 +31,8 @@ function reactionCollectorCTFEvent(
     day,
     discussChannel,
     writeupChannel,
-    isPrivate
+    isPrivate,
+    ctfTitle
 ) {
     const getUser = message.createReactionCollector({
         filter: (reaction, _user) => {
@@ -81,7 +82,7 @@ function reactionCollectorCTFEvent(
          */
         function sendSuccessMessage(dmChannel) {
             dmChannel.send({
-                content: `Successfully added the role for "${data.title}"!`,
+                content: `Successfully added the role for "${ctfTitle}"!`,
             });
             dmChannel.send({
                 content: `Here's the channel for the CTF event. Good luck!`,
@@ -115,14 +116,14 @@ function reactionCollectorCTFEvent(
         guildMember.roles.remove(role.id);
         user.createDM().then((dmChannel) => {
             dmChannel.send({
-                content: `> Successfully removed the role for "${data.title}".`
+                content: `> Successfully removed the role for "${ctfTitle}".`
             });
         });
     });
 
     getUser.on("end", (_collected) => {
         message.channel.send({
-            content: `Thank you for participating in the event **${data.title}** CTF.`,
+            content: `Thank you for participating in the event **${ctfTitle}** CTF.`,
         });
     });
 }
