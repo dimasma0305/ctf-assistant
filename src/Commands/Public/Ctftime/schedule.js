@@ -96,7 +96,7 @@ module.exports = {
       const ctfRole = await interaction.guild.roles.create({
         name: data.title,
         color: "#AF1257",
-        permissions: [SendMessages, ViewChannel],
+        permissions: [],
       });
 
       const channelSetting = {
@@ -124,11 +124,7 @@ module.exports = {
         ...channelSetting,
       });
 
-      try {
-        reactionCollectorCTFEvent(message, ctfRole, day, discussChannel, writeupChannel, isPrivate, data.title)
-      } catch (error) {
-        console.error(error)
-      }
+      reactionCollectorCTFEvent(message, ctfRole, day, discussChannel, writeupChannel, isPrivate, data.title)
 
       interaction.editReply({
         content: "Success",
