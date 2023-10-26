@@ -46,7 +46,7 @@ module.exports = {
          */
         const embed = {
             title: `TCP1P Event Role`,
-            description: "Silahkan untuk mengambil role sesui challenge yang ingin di buat pada ctf event kali ini ya teman-teman!",
+            description: "Silahkan untuk mengambil role sesuai challenge yang ingin di buat pada ctf event kali ini ya teman-teman!",
             fields: (() => {
                 const result = []
                 for (const idx in rolesData) {
@@ -83,7 +83,7 @@ module.exports = {
                 })
             }
             await guildUser.roles.add(role)
-            dm.send(`Successfully adding role ${role.name}`)
+            dm.send(`Terima kasih banyak ${user.username} atas partisipasi Anda dalam event ${name} sebagai ${role.name}. Kami sungguh sangat senang memiliki Anda menjadi bagian dari acara kami!`)
         })
         collector.on("remove", async(reaction, user)=>{
             const dm = await user.createDM()
@@ -94,7 +94,7 @@ module.exports = {
             }
             let role = interaction.guild.roles.cache.find((r) => r.name == roleData.display)
             await guildUser.roles.remove(role)
-            dm.send(`Successfully remove role ${role.name}`)
+            dm.send(`Selamat jalan ${user.username}, kami sangat bersyukur telah memiliki kesempatan untuk bekerja sama dengan Anda dalam peran ${role.name} selama ${name}. Sekali lagi, selamat jalan... Harapan dan kenangan akan tetap mengalir seperti air mata, :'(`)
         })
         return interaction.deleteReply({ content: "Success!" })
     },
