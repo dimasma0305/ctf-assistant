@@ -2,6 +2,8 @@ const { ChatInputCommandInteraction, Client, SlashCommandSubcommandBuilder } = r
 const { getEvents, infoEvents } = require("../../../Functions/ctftime");
 const discord = require("../../../Functions/discord-utils")
 
+const sleep = (s)=>new Promise((r)=>setTimeout(r,s))
+
 class Role {
     constructor(name, icon, display) {
         this.name = name
@@ -83,8 +85,12 @@ module.exports = {
                 })
             }
             await guildUser.roles.add(role)
-            dm.send(`Terima kasih banyak ${user.username} atas partisipasi Anda dalam event ${name} sebagai ${role.name}. Kami sungguh sangat senang memiliki Anda menjadi bagian dari acara kami!`)
-        })
+            dm.sendTyping()
+            await dm.send(`Terima kasih banyak, ${user.username} 😊, atas partisipasi Anda dalam event ${name} sebagai ${role.name}!`)
+            dm.sendTyping()
+            await sleep(3000)
+            await dm.send(`Kami sangat senang memiliki Anda menjadi bagian dari acara kami! 🌟🎉`)
+                    })
         collector.on("remove", async(reaction, user)=>{
             const dm = await user.createDM()
             const guildUser = interaction.guild.members.cache.find((member) => member.id === user.id)
@@ -94,7 +100,13 @@ module.exports = {
             }
             let role = interaction.guild.roles.cache.find((r) => r.name == roleData.display)
             await guildUser.roles.remove(role)
-            dm.send(`Selamat jalan ${user.username}, kami sangat bersyukur telah memiliki kesempatan untuk bekerja sama dengan Anda dalam peran ${role.name} selama ${name}. Sekali lagi, selamat jalan... Harapan dan kenangan akan tetap mengalir seperti air mata, :'(`)
+            await dm.send(`Selamat jalan, ${user.username} 👋,`)
+            dm.sendTyping()
+            await sleep(3000)
+            await dm.send(`kami sangat bersyukur telah memiliki kesempatan untuk bekerja sama dengan Anda sebagai ${role.name} selama ${name}.`)
+            dm.sendTyping()
+            await sleep(2000)
+            await dm.send(`Sekali lagi, selamat jalan... Harapan dan kenangan akan tetap mengalir seperti air mata, 😢❤️`)
         })
         return interaction.deleteReply({ content: "Success!" })
     },
