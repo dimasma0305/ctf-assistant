@@ -33,8 +33,8 @@ module.exports = {
             return interaction.editReply({ content: "This command can only invoked at the channel" })
         }
         const { name } = channel
-        const roleNames = ["web", "pwn", "forensic", "reversing", "crypto", "mobile", "blockchain", "misc"]
-        const numIcon = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"]
+        const roleNames = ["web", "pwn", "forensic", "reversing", "crypto", "mobile", "blockchain", "misc", "boot2root"]
+        const numIcon = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
         /**
          * @type {Role[]}
          */
