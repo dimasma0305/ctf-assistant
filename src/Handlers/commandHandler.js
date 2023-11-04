@@ -1,4 +1,3 @@
-const { Collection, SlashCommandBuilder } = require("discord.js");
 const { loadInitFile, loadChildFiles } = require("../Functions/fileLoader");
 const ascii = require("ascii-table");
 
@@ -14,7 +13,6 @@ const loadCommands = async (client) => {
   initFiles.forEach((file) => {
     const command = require(file);
     client.commands.set(command.data.name, command);
-
     commandsArray.push(command.data);
     table.addRow(command.data.name, "✅");
   })

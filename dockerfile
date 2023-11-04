@@ -1,12 +1,3 @@
-FROM node:latest
-
-WORKDIR /app
-
-COPY package.json package.json
-
-RUN yarn install
-
+FROM oven/bun:latest
 COPY . .
-COPY .env .env
-
-CMD yarn start
+CMD bun run bun-start
