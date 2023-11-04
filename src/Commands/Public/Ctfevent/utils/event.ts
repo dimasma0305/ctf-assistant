@@ -122,7 +122,6 @@ export class Role {
 
         })
         collector.on("remove", async (reaction, user) => {
-            console.log("testing")
             const dm = await user.createDM()
             const guild = this.interaction.guild
             if (!guild) {

@@ -1,15 +1,10 @@
 const {
   ChatInputCommandInteraction,
   Client,
-  PermissionsBitField,
-  ChannelType,
   SlashCommandSubcommandBuilder,
-  DMChannel
 } = require("discord.js");
 const { infoEvents } = require("../../../Functions/ctftime");
-const { translate } = require("../../../Functions/discord-utils");
-const { reactionCollectorCTFEvent } = require("./utils/utils");
-const { ManageRoles, ManageChannels, SendMessages, ViewChannel } = PermissionsBitField.Flags;
+const { ReactionRoleEvent } = require("./utils/event");
 
 module.exports = {
   subCommand: "ctftime.schedule",
@@ -62,69 +57,35 @@ module.exports = {
         });
       }
 
-      const embed = {
-        title: `${data.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
-        description: data.link,
-        url: `https://ctftime.org/event/${id}`,
-        thumbnail: {
-          url: data.img,
-        },
-        fields: [
-          { name: "**ID**", value: id, inline: true },
-          { name: "**Format**", value: data.format, inline: true },
-          { name: "**Location**", value: data.location, inline: false },
-          { name: "**Weight**", value: data.weight, inline: true },
-        ],
-        footer: {
-          text: data.date,
-        },
-      };
-
-      const category = interaction.guild.channels.cache.find(
-        (c) =>
-          (c.name === "Text Channels" || c.name === "Text Channel") &&
-          c.type === ChannelType.GuildCategory
-      );
-
       const message = await interaction.channel.send({
-        embeds: [embed],
+        embeds: [{
+          title: `${data.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
+          description: data.link,
+          url: `https://ctftime.org/event/${id}`,
+          thumbnail: {
+            url: data.img,
+          },
+          fields: [
+            { name: "**ID**", value: id, inline: true },
+            { name: "**Format**", value: data.format, inline: true },
+            { name: "**Location**", value: data.location, inline: false },
+            { name: "**Weight**", value: data.weight, inline: true },
+          ],
+          footer: {
+            text: data.date,
+          },
+        }],
         fetchReply: true,
       });
 
       await message.react("✅");
 
-      const ctfRole = await interaction.guild.roles.create({
-        name: data.title,
-        color: "#AF1257",
-        permissions: [],
-      });
-
-      const channelSetting = {
-        parent: category,
-        type: ChannelType.GuildText,
-        permissionOverwrites: [
-          {
-            id: interaction.guild.id,
-            deny: [ViewChannel],
-          },
-          {
-            id: ctfRole.id,
-            allow: [ViewChannel],
-          },
-        ],
-      };
-
-      const discussChannel = await interaction.guild.channels.create({
-        name: data.title,
-        ...channelSetting,
-      });
-
-      const writeupChannel = await interaction.guild.channels.create({
-        name: `${data.title} writeup`,
-        ...channelSetting,
-      });
-
-      reactionCollectorCTFEvent(message, ctfRole, day, discussChannel, writeupChannel, isPrivate, data.title)
+      new ReactionRoleEvent(interaction).addEventListener(message, {
+        ctfName: data.title,
+        day,
+        isPrivate,
+        password
+      })
 
       interaction.editReply({
         content: "Success",
