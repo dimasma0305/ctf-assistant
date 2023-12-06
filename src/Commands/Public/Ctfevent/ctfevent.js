@@ -1,9 +1,0 @@
-const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
-const { ManageRoles } = PermissionsBitField.Flags;
-
-module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("ctfevent")
-    .setDescription("CTF Event Manager")
-    .setDefaultMemberPermissions(ManageRoles)
-};

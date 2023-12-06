@@ -1,18 +1,15 @@
-const { ChatInputCommandInteraction } = require("discord.js");
+import { ChatInputCommandInteraction, Client } from "discord.js";
+import { MyClient } from "../../Model/client";
 
 module.exports = {
   name: "interactionCreate",
-  /**
-   *
-   * @param {ChatInputCommandInteraction} interaction
-   */
-  execute(interaction, client) {
+  execute(interaction: ChatInputCommandInteraction, client: MyClient) {
     if (!interaction.isChatInputCommand()) return;
 
     const command = client.commands.get(interaction.commandName);
     if (!command) {
       return interaction.reply({
-        content: "This command is outdate",
+        content: "This command is outdated",
         ephemeral: true,
       });
     }
@@ -31,7 +28,7 @@ module.exports = {
       );
       if (!subCommandFile) {
         return interaction.reply({
-          content: "This Subcommand is outdate",
+          content: "This Subcommand is outdated",
           ephemeral: true,
         });
       }

@@ -1,13 +1,9 @@
-const {
-  ChatInputCommandInteraction,
-  Client,
-  SlashCommandSubcommandBuilder,
-} = require("discord.js");
-const { infoEvents } = require("../../../Functions/ctftime");
-const { ReactionRoleEvent } = require("./utils/event");
+import { SubCommand } from "../../../Model/command";
+import { SlashCommandSubcommandBuilder } from "discord.js";
+import { infoEvents } from "../../../Functions/ctftime";
+import { ReactionRoleEvent } from "./utils/event";
 
-module.exports = {
-  subCommand: "ctftime.schedule",
+export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
     .setName("schedule")
     .setDescription("Schedule CTFs")
@@ -32,10 +28,12 @@ module.exports = {
    */
   async execute(interaction, _client) {
     const { options } = interaction;
-    const id = options.getString("id");
+    const channel = interaction.channel
+    if (!channel) return
+    const id = options.getString("id", true);
     const day = options.getNumber("day") || 1;
-    const isPrivate = options.getBoolean("private");
-    const password = options.getString("password");
+    const isPrivate = options.getBoolean("private") || false;
+    const password = options.getString("password") || "";
 
     if (isPrivate) {
       if (!password) {
@@ -49,14 +47,6 @@ module.exports = {
     await interaction.deferReply({ ephemeral: true });
     try {
       const data = await infoEvents(id);
-
-      if (data.length === 0) {
-        return interaction.reply({
-          content: "Invalid CTF ID",
-          ephemeral: true,
-        });
-      }
-
       const message = await interaction.channel.send({
         embeds: [{
           title: `${data.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
@@ -75,7 +65,6 @@ module.exports = {
             text: data.date,
           },
         }],
-        fetchReply: true,
       });
 
       await message.react("✅");

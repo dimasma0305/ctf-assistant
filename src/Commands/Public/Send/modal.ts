@@ -1,24 +1,11 @@
-const {
-    ChatInputCommandInteraction,
-    Client,
-    SlashCommandSubcommandBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    TextInputStyle,
-    ModalBuilder,
-    TextInputBuilder,
-} = require("discord.js");
+import { SubCommand } from "../../../Model/command";
 
-module.exports = {
-    subCommand: "send.modal",
+import { SlashCommandSubcommandBuilder, ActionRowBuilder, TextInputStyle, ModalBuilder, TextInputBuilder } from "discord.js";
+
+export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
         .setName('modal')
         .setDescription('send a message with that get input from modal'),
-    /**
-     *
-     * @param {ChatInputCommandInteraction} interaction
-     * @param {Client} _client
-     */
     async execute(interaction, _client) {
 
         const modal = new ModalBuilder()
@@ -42,9 +29,11 @@ module.exports = {
         await submission.deferReply({ ephemeral: true })
 
         const text = submission.fields.getTextInputValue('text')
-
+        const channel = interaction.channel
+        if (!channel) {
+            return
+        }
         await interaction.channel.send(text)
-
-        await submission.deleteReply({ ephemeral: true })
+        await submission.deleteReply()
     },
 };

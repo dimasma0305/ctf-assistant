@@ -1,13 +1,33 @@
-const { request } = require("./requests");
-const cheerio = require("cheerio");
+import { request } from "./requests";
+import cheerio from "cheerio";
 
-const infoEvents = async (id) => {
+interface EventData {
+  title: string;
+  link: string;
+  img: string;
+  date: string;
+  location: string;
+  format: string;
+  weight: string;
+}
+
+interface CTFInfo {
+  id: string;
+  name: string;
+  date: string;
+  weight: string;
+  notes: string;
+  format: string;
+  location: string;
+}
+
+async function infoEvents(id: string): Promise<EventData> {
   const url = `https://ctftime.org/event/${id}`;
 
   try {
     const response = await request(url, "GET");
-
     const $ = cheerio.load(response.data);
+
     const link = $(".span10 > p > a[rel='nofollow']").text();
     const img = `https://ctftime.org/${$(".span2 > img").attr("src")}`;
     const title = $("h2").text().trim();
@@ -20,7 +40,7 @@ const infoEvents = async (id) => {
       .trim()
       .replace("Rating weight: ", "");
 
-    const info = {
+    return {
       title,
       link,
       img,
@@ -29,20 +49,18 @@ const infoEvents = async (id) => {
       format,
       weight,
     };
-
-    return info;
   } catch (error) {
-    return [];
+    throw error;
   }
-};
+}
 
-const getEvents = async (time) => {
+const getEvents = async (time: string): Promise<CTFInfo[]> => {
   const url = `https://ctftime.org/event/list/?year=${new Date().getFullYear()}&${time}`;
 
   try {
     const response = await request(url, "GET");
     const $ = cheerio.load(response.data);
-    const event = [];
+    const event: CTFInfo[] = [];
     const tableEvent = $("table > tbody > tr");
 
     if (tableEvent.length > 0) {
@@ -68,15 +86,15 @@ const getEvents = async (time) => {
           .trim();
 
         if (
-          idCTF == "" ||
-          nameCTF == "" ||
-          dateCTF == "" ||
-          weightCTF == "" ||
-          notesCTF == ""
+          !idCTF ||
+          !nameCTF ||
+          !dateCTF ||
+          !weightCTF ||
+          !notesCTF
         )
           return;
 
-        const infoCTF = {
+        const infoCTF: CTFInfo = {
           id: idCTF.replace(/\/event\//gm, ""),
           name: nameCTF,
           date: dateCTF,
@@ -85,7 +103,6 @@ const getEvents = async (time) => {
           format: formatCTF,
           location: locationCTF,
         };
-
         event.push(infoCTF);
       });
     }
@@ -96,4 +113,4 @@ const getEvents = async (time) => {
   }
 };
 
-module.exports = { getEvents, infoEvents };
+export { getEvents, infoEvents };

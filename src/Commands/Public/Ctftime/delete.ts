@@ -1,14 +1,9 @@
-const {
-    ChatInputCommandInteraction,
-    Client,
-    SlashCommandSubcommandBuilder,
-} = require("discord.js");
+import { SubCommand } from "../../../Model/command";
+import { SlashCommandSubcommandBuilder } from "discord.js";
+import { translate } from "../../../Functions/discord-utils";
+import { infoEvents } from "../../../Functions/ctftime";
 
-const {translate} = require("../../../Functions/discord-utils")
-const { infoEvents } = require("../../../Functions/ctftime");
-
-module.exports = {
-    subCommand: "ctftime.delete",
+export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
         .setName('delete')
         .setDescription('delete all role and channel associate with ctf event')
@@ -17,30 +12,23 @@ module.exports = {
             .setDescription("id of the ctf event on ctftime")
             .setRequired(true)
         ),
-    /**
-     *
-     * @param {ChatInputCommandInteraction} interaction
-     * @param {Client} _client
-     */
     async execute(interaction, _client) {
         const { options } = interaction;
         await interaction.deferReply({ ephemeral: true });
         try {
-            const id = options.getString("id");
+            const id = options.getString("id", true);
             const data = await infoEvents(id);
-            if (data.length === 0) {
-                return interaction.editReply({
-                    content: "Invalid id CTFs",
-                    ephemeral: true,
-                });
+            const guild = interaction.guild
+            if (!guild){
+                return
             }
-            interaction.guild.roles.cache.forEach(async (role) => {
+            guild.roles.cache.forEach(async (role) => {
                 if (role.name === data.title) {
                     await role.delete()
                     return true
                 }
             });
-            interaction.guild.channels.cache.forEach((channel) => {
+            guild.channels.cache.forEach((channel) => {
                 const chat_channel = translate(data.title)
                 const writeup_channel = translate(`${chat_channel} writeup`)
                 if (channel.name === chat_channel ||
@@ -51,13 +39,10 @@ module.exports = {
             })
             await interaction.editReply({
                 content: `Successfuly delete ${data.title}`,
-                ephemeral: true
             })
         } catch (error) {
-            console.error(error)
             await interaction.editReply({
                 content: error.toString(),
-                ephemeral: true
             })
         }
     },

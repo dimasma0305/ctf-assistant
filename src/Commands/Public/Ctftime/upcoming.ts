@@ -1,27 +1,17 @@
-const { ChatInputCommandInteraction, Client, SlashCommandSubcommandBuilder } = require("discord.js");
+import { APIEmbed, JSONEncodable } from "discord.js";
+import { SubCommand } from "../../../Model/command";
+
+const { SlashCommandSubcommandBuilder } = require("discord.js");
 const { getEvents, infoEvents } = require("../../../Functions/ctftime");
 
-module.exports = {
-  subCommand: "ctftime.upcoming",
+export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
     .setName("upcoming")
     .setDescription("Display upcoming CTFs"),
-  /**
-   *
-   * @param {ChatInputCommandInteraction} interaction
-   * @param {Client} client
-   */
-  async execute(interaction, client) {
+  async execute(interaction, _client) {
     const time = "upcoming=true";
     const event = await getEvents(time);
-    const embedsSend = [];
-
-    if (event.length === 0) {
-      return interaction.reply({
-        content: "Can't get upcoming CTFs",
-        ephemeral: true,
-      });
-    }
+    const embedsSend: Array<APIEmbed | JSONEncodable<APIEmbed>> = [];
 
     await interaction.deferReply();
     for (let i = 0; i < event.length; i++) {

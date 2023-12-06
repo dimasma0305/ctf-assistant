@@ -1,7 +1,9 @@
+import { Command } from "../../../Model/command";
+
 const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
 const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
 
-module.exports = {
+export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("ctftime")
     .setDescription("Display upcoming/current CTFs")

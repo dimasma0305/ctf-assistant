@@ -1,20 +1,16 @@
-const { ChatInputCommandInteraction, Client, SlashCommandSubcommandBuilder } = require("discord.js");
-const { getEvents, infoEvents } = require("../../../Functions/ctftime");
+import { SubCommand } from "../../../Model/command";
+import { SlashCommandSubcommandBuilder } from "discord.js";
+import { getEvents, infoEvents } from "../../../Functions/ctftime";
+import { APIEmbed, JSONEncodable } from "discord.js";
 
-module.exports = {
-  subCommand: "ctftime.current",
+export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
     .setName("current")
     .setDescription("Display current CTFs"),
-  /**
-   *
-   * @param {ChatInputCommandInteraction} interaction
-   * @param {Client} client
-   */
   async execute(interaction, _client) {
     const time = "now=true";
     const event = await getEvents(time);
-    const embedsSend = [];
+    const embedsSend: Array<APIEmbed | JSONEncodable<APIEmbed>> = [];
 
     if (event.length === 0) {
       return interaction.reply({

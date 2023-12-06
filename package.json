@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "bun-start":"bun src/index.js",
-    "bun-dev":"bun --watch ./src/",
+    "bun-start": "bun src/index.js",
+    "bun-dev": "bun --watch ./src/",
     "dev": "nodemon ."
   },
   "keywords": [],

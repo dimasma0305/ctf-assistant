@@ -1,6 +1,8 @@
+import { Command } from "../../../Model/command";
+
 const { SlashCommandBuilder } = require("discord.js");
 
-module.exports = {
+export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("join")
     .setDescription("Join CTF")
