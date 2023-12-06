@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "bun-start": "bun src/index.ts",
-    "bun-dev": "bun --watch ./src/",
+    "bun-dev": "bun --watch ./src/"
   },
   "keywords": [],
   "author": "",
