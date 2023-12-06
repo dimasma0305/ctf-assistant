@@ -4,10 +4,8 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "bun-start": "bun src/index.js",
+    "bun-start": "bun src/index.ts",
     "bun-dev": "bun --watch ./src/",
-    "dev": "nodemon ."
   },
   "keywords": [],
   "author": "",
