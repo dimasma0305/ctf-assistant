@@ -35,6 +35,7 @@ module.exports = {
         await interaction.deferReply({ephemeral: true})
         await execute(interaction, client)
       } catch (error) {
+        console.log(error)
         await interaction.editReply({ content: error?.toString() })
       }
     } else {
