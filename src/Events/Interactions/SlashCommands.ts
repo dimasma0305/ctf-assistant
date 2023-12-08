@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction, Client } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { MyClient } from "../../Model/client";
 
 module.exports = {
   name: "interactionCreate",
-  execute(interaction: ChatInputCommandInteraction, client: MyClient) {
+  async execute(interaction: ChatInputCommandInteraction, client: MyClient) {
     if (!interaction.isChatInputCommand()) return;
 
     const command = client.commands.get(interaction.commandName);
@@ -14,14 +14,8 @@ module.exports = {
       });
     }
 
-    if (command.developer && interaction.user.id !== "663394727688798231") {
-      return interaction.reply({
-        content: "This command is only available to the developers",
-        ephemeral: true,
-      });
-    }
-
     const subCommand = interaction.options.getSubcommand(false);
+    let execute;
     if (subCommand) {
       const subCommandFile = client.subCommands.get(
         `${interaction.commandName}.${subCommand}`
@@ -32,9 +26,18 @@ module.exports = {
           ephemeral: true,
         });
       }
-      subCommandFile.execute(interaction, client);
+      execute = subCommandFile.execute
     } else {
-      command.execute(interaction, client);
+      execute = command.execute
+    }
+    if (execute) {
+      try {
+        await execute(interaction, client)
+      } catch (error) {
+        interaction.reply({ content: error?.toString(), ephemeral: false })
+      }
+    } else {
+      interaction.reply({ content: "isn't a command", ephemeral: true })
     }
   },
 };

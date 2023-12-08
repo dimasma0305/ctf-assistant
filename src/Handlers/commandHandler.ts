@@ -2,7 +2,7 @@ import { loadInitFile, loadChildFiles } from "../Functions/fileLoader";
 import ascii from "ascii-table";
 import { MyClient } from "../Model/client";
 import { Command, SubCommand } from "../Model/command";
-import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 
 const loadCommands = async (client: MyClient) => {
   // @ts-ignore
@@ -15,7 +15,6 @@ const loadCommands = async (client: MyClient) => {
   const initFiles = await loadInitFile("Commands");
   initFiles.forEach((file: string) => {
     const command: Command = require(file).command;
-    console.log(file)
     client.commands.set(command.data.name, command);
     commandsArray.push(command.data);
     table.addRow(command.data.name, "✅");
@@ -24,21 +23,15 @@ const loadCommands = async (client: MyClient) => {
   const childFiles = await loadChildFiles("Commands");
   childFiles.forEach((file: string) => {
     const command: SubCommand = require(file).command;
-    if (!command){
-      return
-    }
+    if (!command) return
     const parts = file.split('/')
-    const parentName = parts[parts.length - 2];
-    const childName = parts[parts.length - 1]
-    if (command?.data) {
-      const parent = client.commands.get(parentName)?.data;
-      if (parent) {
-        parent.addSubcommand(command.data);
-      }
-    }
+    const parentName = parts[parts.length - 2].toLowerCase();
+    const childName = parts[parts.length - 1].replace(/\.(ts|js)$/, "")
+    const parent = client.commands.get(parentName);
+    parent?.data.addSubcommand(command.data)
     return client.subCommands.set(`${parentName}.${childName}`, command);
   });
-  if (client.application){
+  if (client.application) {
     await client.application.commands.set(commandsArray);
   }
   return console.log(table.toString(), "\nLoaded Commands");

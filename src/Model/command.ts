@@ -2,12 +2,12 @@ import { ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandSubcomman
 import { MyClient } from "./client";
 
 class Command {
-    data: SlashCommandBuilder;
+    data!: SlashCommandBuilder;
     execute?: (interaction: ChatInputCommandInteraction, client: MyClient) => any
 }
 
 class SubCommand {
-    data: SlashCommandSubcommandBuilder;
+    data!: SlashCommandSubcommandBuilder;
     execute?: (interaction: ChatInputCommandInteraction, client: MyClient) => any
 }
 

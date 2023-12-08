@@ -21,11 +21,6 @@ export const command: SubCommand = {
       .setName("password")
       .setDescription("Password for the private CTF event")
     ),
-  /**
-   *
-   * @param {ChatInputCommandInteraction} interaction
-   * @param {Client} _client
-   */
   async execute(interaction, _client) {
     const { options } = interaction;
     const channel = interaction.channel

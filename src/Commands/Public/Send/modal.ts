@@ -18,13 +18,14 @@ export const command: SubCommand = {
             .setStyle(TextInputStyle.Paragraph);
 
         modal.addComponents(
-            new ActionRowBuilder().addComponents(textInput)
+            new ActionRowBuilder()
+                .addComponents(textInput) as ActionRowBuilder<TextInputBuilder>
         );
 
 
         await interaction.showModal(modal);
 
-        const submission = await interaction.awaitModalSubmit({ time: 60 * 1000 });
+        const submission = await interaction.awaitModalSubmit({ time: 60 * 100 });
 
         await submission.deferReply({ ephemeral: true })
 

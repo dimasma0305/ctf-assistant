@@ -5,8 +5,8 @@ const { ManageRoles, ManageChannels } = PermissionsBitField.Flags;
 
 export const command: Command = {
   data: new SlashCommandBuilder()
-    .setName("ctftime")
-    .setDescription("Display upcoming/current CTFs")
+    .setName("mencari")
+    .setDescription("Mencari Team")
     .setDefaultMemberPermissions(ManageRoles)
     .setDefaultMemberPermissions(ManageChannels)
 };
