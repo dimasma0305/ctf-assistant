@@ -1,6 +1,9 @@
-import { Channel, ChannelType, DMChannel, Guild, Interaction, Message, Role, TextChannel } from "discord.js";
+import { ChannelType, DMChannel, Guild, GuildBasedChannel, Interaction, Message, Role, TextChannel } from "discord.js";
 
-interface EventListenerOptios {
+import { translate } from "../../../../Functions/discord-utils"
+import { sleep } from "bun";
+
+interface EventListenerOptions {
     ctfName: string;
     day: number;
     isPrivate?: boolean;
@@ -11,8 +14,13 @@ export class ReactionRoleEvent {
     interaction: Interaction
     channel: TextChannel
     guild: Guild;
-    constructor(interaction: Interaction) {
+    options: EventListenerOptions;
+    discussChannel?: GuildBasedChannel;
+    writeupChannel?: GuildBasedChannel;
+    role?: Role;
+    constructor(interaction: Interaction, options: EventListenerOptions) {
         this.interaction = interaction
+        this.options = options
         const channel = interaction.channel
         const guild = interaction.guild
         if (!(channel instanceof TextChannel)) {
@@ -23,6 +31,14 @@ export class ReactionRoleEvent {
         }
         this.channel = channel
         this.guild = guild
+        this.initializeChannelAndRole()
+    }
+    async initializeChannelAndRole(){
+        const ctfName = this.options.ctfName
+        const role = await this.createEventRoleIfNotExist(ctfName)
+        this.role = role
+        this.discussChannel = await this.createDefaultChannelIfNotExist(ctfName, role)
+        this.writeupChannel = await this.createDefaultChannelIfNotExist(`${ctfName} writeup`, role)
     }
     async createEventRoleIfNotExist(ctfName: string) {
         var role = this.guild.roles.cache.find((role) => role.name === ctfName)
@@ -36,6 +52,7 @@ export class ReactionRoleEvent {
         return role
     }
     async createDefaultChannelIfNotExist(name: string, role: Role) {
+        name = translate(name)
         var channel = this.guild.channels.cache.find((channel) => channel.name === name)
         if (!channel) {
             channel = await this.guild.channels.create({
@@ -55,21 +72,28 @@ export class ReactionRoleEvent {
         }
         return channel
     }
-    async addEventListener(message: Message, options: EventListenerOptios) {
-        const { ctfName, day, isPrivate, password } = options
-        const role = await this.createEventRoleIfNotExist(ctfName)
-        const discussChannel = await this.createDefaultChannelIfNotExist(ctfName, role)
-        const writeupChannel = await this.createDefaultChannelIfNotExist(`${ctfName} writeup`, role)
+    async addEventListener(message: Message) {
+        const { day, isPrivate, password } = this.options
+        const role = this.role
+        try{
+            if (!role) throw Error("Please wait until role has been created");
+        } catch{
+            await sleep(1000)
+            this.addEventListener(message)
+            return
+        }
         if (isPrivate) {
             if (!(typeof password == "string")) {
                 throw Error("Pasword isn't a string")
             }
         }
+
         const collector = message.createReactionCollector({
             filter: (reaction) => reaction.emoji.name === "✅",
             dispose: true,
             time: day * 24 * 60 * 60 * 1000,
         })
+
         collector.on("collect", async (reaction, user) => {
             const guild = reaction.message.guild
             if (!guild) {
@@ -92,9 +116,9 @@ export class ReactionRoleEvent {
                 collector.on("collect", async (message) => {
                     if (message.content === password) {
                         guildMember.roles.add(role);
-                        sendSuccessMessage(dm);
+                        this.sendSuccessMessage(dm);
                     } else {
-                        sendFailureMessage(dm);
+                        this.sendFailureMessage(dm);
                         reaction.users.remove(message.author.id);
                     }
                 });
@@ -106,30 +130,30 @@ export class ReactionRoleEvent {
                 });
             } else {
                 guildMember.roles.add(role);
-                sendSuccessMessage(dm);
+                this.sendSuccessMessage(dm);
             }
         })
-        function sendSuccessMessage(dmChannel: DMChannel) {
-            dmChannel.send({
-                content: `Successfully added the role for "${ctfName}"!`,
-            });
-            dmChannel.send({
-                content: `Here's the channel for the CTF event. Good luck!`,
-            });
-            dmChannel.send({
-                embeds: [{
-                    fields: [
-                        { name: "**Discuss Channel**", value: `<#${discussChannel.id}>` },
-                        { name: "**Writeup Channel**", value: `<#${writeupChannel.id}>` },
-                    ]
-                }]
-            });
-        }
+    }
+    sendFailureMessage(dmChannel: DMChannel) {
+        dmChannel.send({
+            content: `Authentication failed. Please provide the correct password to proceed.`,
+        });
+    }
+    sendSuccessMessage(dmChannel: DMChannel) {
 
-        function sendFailureMessage(dmChannel: DMChannel) {
-            dmChannel.send({
-                content: `Authentication failed. Please provide the correct password to proceed.`,
-            });
-        }
+        dmChannel.send({
+            content: `Successfully added the role for "${this.options.ctfName}"!`,
+        });
+        dmChannel.send({
+            content: `Here's the channel for the CTF event. Good luck!`,
+        });
+        dmChannel.send({
+            embeds: [{
+                fields: [
+                    { name: "**Discuss Channel**", value: `<#${this.discussChannel?.id}>` },
+                    { name: "**Writeup Channel**", value: `<#${this.writeupChannel?.id}>` },
+                ]
+            }]
+        });
     }
 }

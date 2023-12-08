@@ -32,9 +32,10 @@ module.exports = {
     }
     if (execute) {
       try {
+        await interaction.deferReply({ephemeral: true})
         await execute(interaction, client)
       } catch (error) {
-        interaction.reply({ content: error?.toString(), ephemeral: false })
+        await interaction.editReply({ content: error?.toString() })
       }
     } else {
       interaction.reply({ content: "isn't a command", ephemeral: true })

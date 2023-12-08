@@ -8,9 +8,8 @@ export const command: SubCommand = {
     .setName("events").setDescription("Reload your events"),
   execute(interaction, client) {
     loadCommands(client);
-    interaction.reply({
+    interaction.editReply({
       content: "Reloaded Commands",
-      ephemeral: true
     });
   },
 };

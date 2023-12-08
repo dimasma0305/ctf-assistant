@@ -40,44 +40,41 @@ export const command: SubCommand = {
     }
 
     await interaction.deferReply({ ephemeral: true });
-    try {
-      const data = await infoEvents(id);
-      const message = await interaction.channel.send({
-        embeds: [{
-          title: `${data.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
-          description: data.link,
-          url: `https://ctftime.org/event/${id}`,
-          thumbnail: {
-            url: data.img,
-          },
-          fields: [
-            { name: "**ID**", value: id, inline: true },
-            { name: "**Format**", value: data.format, inline: true },
-            { name: "**Location**", value: data.location, inline: false },
-            { name: "**Weight**", value: data.weight, inline: true },
-          ],
-          footer: {
-            text: data.date,
-          },
-        }],
-      });
+    const data = await infoEvents(id);
 
-      await message.react("✅");
+    const event = new ReactionRoleEvent(interaction, {
+      ctfName: data.title,
+      day,
+      isPrivate,
+      password
+    })
 
-      new ReactionRoleEvent(interaction).addEventListener(message, {
-        ctfName: data.title,
-        day,
-        isPrivate,
-        password
-      })
+    const message = await interaction.channel.send({
+      embeds: [{
+        title: `${data.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
+        description: data.link,
+        url: `https://ctftime.org/event/${id}`,
+        thumbnail: {
+          url: data.img,
+        },
+        fields: [
+          { name: "**ID**", value: id, inline: true },
+          { name: "**Format**", value: data.format, inline: true },
+          { name: "**Location**", value: data.location, inline: false },
+          { name: "**Weight**", value: data.weight, inline: true },
+        ],
+        footer: {
+          text: data.date,
+        },
+      }],
+    });
 
-      interaction.editReply({
-        content: "Success",
-      })
-    } catch (error) {
-      await interaction.channel.send({
-        content: error.toString(),
-      });
-    }
+    await message.react("✅");
+
+    event.addEventListener(message)
+
+    interaction.editReply({
+      content: "Success",
+    })
   },
 };
