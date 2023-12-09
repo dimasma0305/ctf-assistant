@@ -31,13 +31,13 @@ module.exports = {
       execute = command.execute
     }
     if (execute) {
-      try {
+      // try {
         await interaction.deferReply({ephemeral: true})
         await execute(interaction, client)
-      } catch (error) {
-        console.log(error)
-        await interaction.editReply({ content: error?.toString() })
-      }
+      // } catch (error) {
+        // console.log(error)
+        // await interaction.editReply({ content: error?.toString() })
+      // }
     } else {
       interaction.reply({ content: "isn't a command", ephemeral: true })
     }
