@@ -22,10 +22,12 @@ export const command: SubCommand = {
                 .addComponents(textInput) as ActionRowBuilder<TextInputBuilder>
         );
 
-
+        await interaction.deleteReply()
         await interaction.showModal(modal);
 
         const submission = await interaction.awaitModalSubmit({ time: 60 * 100 });
+
+        await submission.deferReply({ ephemeral: true })
 
         const text = submission.fields.getTextInputValue('text')
         const channel = interaction.channel
