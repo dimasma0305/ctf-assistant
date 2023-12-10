@@ -32,7 +32,6 @@ module.exports = {
     }
     if (execute) {
       try {
-        await interaction.deferReply({ephemeral: true})
         await execute(interaction, client)
       } catch (error) {
         console.log(error)
