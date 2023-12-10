@@ -9,7 +9,8 @@ import {
   GatewayIntentBits,
   Partials,
   Collection,
-  Events
+  Events,
+  ShardingManager
 } from "discord.js";
 
 import { loadEvents } from "./Handlers/eventHandler";
@@ -35,15 +36,9 @@ client.events = new Collection();
 client.commands = new Collection();
 client.subCommands = new Collection();
 
-client.on(Events.Error, (error) => {
-  console.log(error)
-})
 client.on(Events.Debug, (message)=>{
   console.log(message)
 })
-client.on(Events.ShardError, (error) => {
-  console.log(error)
-});
 
 loadEvents(client);
 

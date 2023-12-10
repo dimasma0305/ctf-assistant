@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "bun-start": "bun run src/index.ts",
-    "bun-dev": "bun --watch ./src/"
+    "start": "bun run index.ts",
+    "dev": "bun --watch ./"
   },
   "keywords": [],
   "author": "",

@@ -24,7 +24,7 @@ export const command: SubCommand = {
 
         await interaction.showModal(modal);
 
-        const submission = await interaction.awaitModalSubmit({ time: 60 * 100 });
+        const submission = await interaction.awaitModalSubmit({ time: 60 * 1000 });
 
         await submission.deferReply({ ephemeral: true })
 
