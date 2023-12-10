@@ -1,4 +1,4 @@
-require("./webserver");
+// require("./webserver");
 import { config } from "dotenv";
 config();
 
