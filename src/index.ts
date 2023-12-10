@@ -35,4 +35,9 @@ client.commands = new Collection();
 client.subCommands = new Collection();
 
 loadEvents(client);
-client.login(TOKEN);
+
+client.on("error", (error)=>{
+  console.log(error)
+})
+
+while (await client.login(TOKEN)) { }
