@@ -21,7 +21,6 @@ export const command: SubCommand = {
     const writeup = options.getString("writeup", true)
     const leaderboard = options.getString("leaderboard", true)
 
-    await interaction.deferReply();
     const data = await infoEvents(id);
 
     if (!data) {

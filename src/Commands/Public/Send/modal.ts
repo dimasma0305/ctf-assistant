@@ -27,8 +27,6 @@ export const command: SubCommand = {
 
         const submission = await interaction.awaitModalSubmit({ time: 60 * 100 });
 
-        await submission.deferReply({ ephemeral: true })
-
         const text = submission.fields.getTextInputValue('text')
         const channel = interaction.channel
         if (!channel) {
