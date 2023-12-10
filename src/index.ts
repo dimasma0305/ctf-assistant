@@ -1,4 +1,4 @@
-// require("./webserver");
+require("./webserver");
 import { config } from "dotenv";
 config();
 
@@ -40,4 +40,4 @@ client.on("error", (error)=>{
   console.log(error)
 })
 
-while (await client.login(TOKEN)) { }
+await client.login(TOKEN)
