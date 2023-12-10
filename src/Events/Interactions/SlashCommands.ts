@@ -35,7 +35,7 @@ module.exports = {
         await execute(interaction, client)
       } catch (error) {
         console.log(error)
-        await interaction.editReply({ content: error?.toString() })
+        await interaction.channel?.send({ content: error?.toString() })
       }
     } else {
       interaction.reply({ content: "isn't a command", ephemeral: true })
