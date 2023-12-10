@@ -39,7 +39,6 @@ export const command: SubCommand = {
       }
     }
 
-    await interaction.deferReply({ ephemeral: true });
     const data = await infoEvents(id);
 
     const event = new ReactionRoleEvent(interaction, {

@@ -14,7 +14,6 @@ export const command: SubCommand = {
         ),
     async execute(interaction, _client) {
         const { options } = interaction;
-        await interaction.deferReply({ ephemeral: true });
         try {
             const id = options.getString("id", true);
             const data = await infoEvents(id);
@@ -42,7 +41,7 @@ export const command: SubCommand = {
             })
         } catch (error) {
             await interaction.editReply({
-                content: error.toString(),
+                content: error?.toString(),
             })
         }
     },

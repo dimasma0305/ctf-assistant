@@ -17,7 +17,6 @@ export const command: SubCommand = {
         if (!(channel instanceof TextChannel)) {
             return
         }
-        await interaction.deferReply({ ephemeral: true })
         const id = options.getString("id")
         if (!id) return
         const message = await channel.messages.fetch(id)

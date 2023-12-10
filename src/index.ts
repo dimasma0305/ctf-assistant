@@ -34,10 +34,13 @@ client.events = new Collection();
 client.commands = new Collection();
 client.subCommands = new Collection();
 
-loadEvents(client);
-
-client.on("error", (error)=>{
+client.on("error", (error) => {
   console.log(error)
 })
+client.on('shardError', (error) => {
+  console.log(error)
+});
 
-await client.login(TOKEN)
+loadEvents(client);
+
+client.login(TOKEN);

@@ -5,7 +5,6 @@ import { Command, SubCommand } from "../Model/command";
 import { SlashCommandBuilder } from "discord.js";
 
 const loadCommands = async (client: MyClient) => {
-  // @ts-ignore
   const table = new ascii().setHeading("Commands", "Status");
   client.commands.clear();
   client.subCommands.clear();
