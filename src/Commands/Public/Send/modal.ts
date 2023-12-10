@@ -22,7 +22,6 @@ export const command: SubCommand = {
                 .addComponents(textInput) as ActionRowBuilder<TextInputBuilder>
         );
 
-        await interaction.deleteReply()
         await interaction.showModal(modal);
 
         const submission = await interaction.awaitModalSubmit({ time: 60 * 100 });
