@@ -1,7 +1,7 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, Message } from "discord.js";
 import { infoEvent } from "../../../Functions/ctftime-v2";
-import { getEmbedCTFEvent } from "./utils/utils";
+import { getEmbedCTFEvent } from "./utils/event";
 import { ReactionRoleEvent } from "./utils/event";
 
 export const command: SubCommand = {

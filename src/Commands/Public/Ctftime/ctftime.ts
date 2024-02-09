@@ -10,3 +10,5 @@ export const command: Command = {
     .setDefaultMemberPermissions(ManageRoles)
     .setDefaultMemberPermissions(ManageChannels)
 };
+
+

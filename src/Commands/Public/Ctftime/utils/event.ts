@@ -1,4 +1,4 @@
-import { ChannelType, DMChannel, Guild, GuildBasedChannel, Interaction, Message, Role, TextChannel } from "discord.js";
+import { CacheType, ChannelType, ChatInputCommandInteraction, DMChannel, Guild, GuildBasedChannel, Interaction, Message, Role, TextChannel } from "discord.js";
 
 import { translate } from "../../../../Functions/discord-utils"
 import { sleep } from "bun";
@@ -16,8 +16,8 @@ export class ReactionRoleEvent {
     channel: TextChannel
     guild: Guild;
     options: EventListenerOptions;
-    discussChannel?: GuildBasedChannel;
-    writeupChannel?: GuildBasedChannel;
+    discussChannel?: TextChannel;
+    writeupChannel?: TextChannel;
     role?: Role;
     constructor(interaction: Interaction, options: EventListenerOptions) {
         this.interaction = interaction
@@ -39,7 +39,16 @@ export class ReactionRoleEvent {
         const role = await this.createEventRoleIfNotExist(ctfName)
         this.role = role
         this.discussChannel = await this.createDefaultChannelIfNotExist(ctfName, role)
+
+        const credsMessage = await this.discussChannel.send({ content: `Halo temen-temen <@&${role.id}> silahkan untuk bergabung ke team bisa cek credensial yang akan diberikan Mas Dimas <@663394727688798231> XD` })
+        credsMessage.pin('CTF Credential')
+
         this.writeupChannel = await this.createDefaultChannelIfNotExist(`${ctfName} writeup`, role)
+
+        await this.writeupChannel.send({ content: `# 🌈 ${ctfName} Writeup 🚀
+
+Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${ctfName}! 😊 Ayo, mari kita berbagi pengetahuan dan kegembiraan setelah menyelesaikan CTF ini. Silakan bagikan Writeup (WU) kalian atau WU dari partisipan lain di channel ini. Jangan ragu untuk bertanya atau memberi saran jika ada yang perlu dibahas. Semoga kita semua bisa belajar dan tumbuh bersama! 🌟 UwU` })
+
     }
     async createEventRoleIfNotExist(ctfName: string) {
         var role = this.guild.roles.cache.find((role) => role.name === ctfName)
@@ -52,9 +61,9 @@ export class ReactionRoleEvent {
         }
         return role
     }
-    async createDefaultChannelIfNotExist(name: string, role: Role) {
+    async createDefaultChannelIfNotExist(name: string, role: Role): Promise<TextChannel> {
         name = translate(name)
-        var channel = this.guild.channels.cache.find((channel) => channel.name === name)
+        var channel = this.guild.channels.cache.find((channel) => channel.name === name) as TextChannel
         if (!channel) {
             channel = await this.guild.channels.create({
                 name: name,
@@ -157,4 +166,22 @@ export class ReactionRoleEvent {
             }]
         });
     }
+}
+
+export async function getEmbedCTFEvent(interaction: ChatInputCommandInteraction<CacheType>, ctfTitle: string) {
+    const channel = interaction.channel
+    if (!channel) {
+        return false
+    }
+    const messages = await channel.messages.fetch({ limit: 32 })
+    const message = messages.find((value) => {
+        if (value instanceof Message) {
+            if (value.author.bot &&
+                value?.embeds[0]?.data?.title?.startsWith(ctfTitle)) {
+                return true;
+            }
+        }
+        return false;
+    });
+    return message;
 }
