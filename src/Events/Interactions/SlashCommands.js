@@ -1,9 +1,6 @@
-import { ChatInputCommandInteraction } from "discord.js";
-import { MyClient } from "../../Model/client";
-
 module.exports = {
   name: "interactionCreate",
-  async execute(interaction: ChatInputCommandInteraction, client: MyClient) {
+  async execute(interaction, client) {
     if (!interaction.isChatInputCommand()) return;
 
     const command = client.commands.get(interaction.commandName);

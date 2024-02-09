@@ -8,5 +8,4 @@ import { ShardingManager } from "discord.js";
 const manager = new ShardingManager('./src/bot.ts', { token: TOKEN, respawn: true });
 
 manager.on('shardCreate', shard => console.log(`Launched shard ${shard.id}`));
-
 manager.spawn();

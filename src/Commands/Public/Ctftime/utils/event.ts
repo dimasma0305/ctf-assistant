@@ -5,7 +5,8 @@ import { sleep } from "bun";
 
 interface EventListenerOptions {
     ctfName: string;
-    day: number;
+    days: number;
+    hours: number;
     isPrivate?: boolean;
     password?: string;
 }
@@ -33,7 +34,7 @@ export class ReactionRoleEvent {
         this.guild = guild
         this.initializeChannelAndRole()
     }
-    async initializeChannelAndRole(){
+    async initializeChannelAndRole() {
         const ctfName = this.options.ctfName
         const role = await this.createEventRoleIfNotExist(ctfName)
         this.role = role
@@ -73,11 +74,11 @@ export class ReactionRoleEvent {
         return channel
     }
     async addEventListener(message: Message) {
-        const { day, isPrivate, password } = this.options
+        const { days, hours, isPrivate, password } = this.options
         const role = this.role
-        try{
+        try {
             if (!role) throw Error("Please wait until role has been created");
-        } catch{
+        } catch {
             await sleep(1000)
             this.addEventListener(message)
             return
@@ -91,7 +92,7 @@ export class ReactionRoleEvent {
         const collector = message.createReactionCollector({
             filter: (reaction) => reaction.emoji.name === "✅",
             dispose: true,
-            time: day * 24 * 60 * 60 * 1000,
+            time: (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000),
         })
 
         collector.on("collect", async (reaction, user) => {

@@ -9,6 +9,7 @@ export const command: SubCommand = {
     async execute(interaction: ChatInputCommandInteraction, _client: Client) {
         const channel = interaction.channel;
         const role = new Role(interaction);
+        await interaction.deferReply({ ephemeral: true })
 
         if (!channel) {
             return interaction.editReply({ content: "This command can only be invoked in a channel" });

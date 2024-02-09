@@ -14,35 +14,32 @@ export const command: SubCommand = {
         ),
     async execute(interaction, _client) {
         const { options } = interaction;
-        try {
-            const id = options.getString("id", true);
-            const data = await infoEvents(id);
-            const guild = interaction.guild
-            if (!guild){
-                return
-            }
-            guild.roles.cache.forEach(async (role) => {
-                if (role.name === data.title) {
-                    await role.delete()
-                    return true
-                }
-            });
-            guild.channels.cache.forEach((channel) => {
-                const chat_channel = translate(data.title)
-                const writeup_channel = translate(`${chat_channel} writeup`)
-                if (channel.name === chat_channel ||
-                    channel.name === writeup_channel) {
-                    channel.delete()
-                    return true
-                }
-            })
-            await interaction.editReply({
-                content: `Successfuly delete ${data.title}`,
-            })
-        } catch (error) {
-            await interaction.editReply({
-                content: error?.toString(),
-            })
+        interaction.deferReply({ ephemeral: true })
+
+
+        const id = options.getString("id", true);
+        const data = await infoEvents(id);
+        const guild = interaction.guild
+        if (!guild) {
+            return
         }
+        guild.roles.cache.forEach(async (role) => {
+            if (role.name === data.title) {
+                await role.delete()
+                return true
+            }
+        });
+        guild.channels.cache.forEach((channel) => {
+            const chat_channel = translate(data.title)
+            const writeup_channel = translate(`${chat_channel} writeup`)
+            if (channel.name === chat_channel ||
+                channel.name === writeup_channel) {
+                channel.delete()
+                return true
+            }
+        })
+        await interaction.editReply({
+            content: `Successfuly delete ${data.title}`,
+        })
     },
 };

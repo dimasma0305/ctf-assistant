@@ -3,12 +3,8 @@ import { SlashCommandSubcommandBuilder } from "discord.js";
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
-        .setName('username')
-        .setDescription('username')
-        .addStringOption((option) => option
-            .setName("username")
-            .setDescription("Delete by username")
-        )
+        .setName('all')
+        .setDescription('clean all message')
         .addIntegerOption((option) => option
             .setName("limit")
             .setDescription("Add limit message to fetch")
@@ -17,7 +13,6 @@ export const command: SubCommand = {
     async execute(interaction, _client) {
         await interaction.deferReply({ ephemeral: true })
         try {
-            const username = interaction.options.getString('username');
             const limit = interaction.options.getInteger('limit') || 10;
 
             const channels = await interaction.guild?.channels.fetch();
@@ -26,9 +21,7 @@ export const command: SubCommand = {
                     if (channel?.isTextBased()) {
                         const messages = await channel.messages.fetch({ limit });
                         messages.forEach(async (message) => {
-                            if (message.author.username === username) {
-                                await message.delete();
-                            }
+                            await message.delete();
                         });
                     }
                 });

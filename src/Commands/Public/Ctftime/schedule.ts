@@ -1,6 +1,6 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder } from "discord.js";
-import { infoEvents } from "../../../Functions/ctftime";
+import { infoEvent } from "../../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "./utils/event";
 
 export const command: SubCommand = {
@@ -25,45 +25,45 @@ export const command: SubCommand = {
     const { options } = interaction;
     const channel = interaction.channel
     if (!channel) return
+
+    await interaction.deferReply({ ephemeral: true })
     const id = options.getString("id", true);
-    const day = options.getNumber("day") || 1;
+    const ctf_event = await infoEvent(id);
     const isPrivate = options.getBoolean("private") || false;
     const password = options.getString("password") || "";
 
+
     if (isPrivate) {
       if (!password) {
-        return interaction.reply({
-          content: "Password not provided",
-          ephemeral: true
-        });
+        throw new Error("Password not provided");
       }
     }
 
-    const data = await infoEvents(id);
 
     const event = new ReactionRoleEvent(interaction, {
-      ctfName: data.title,
-      day,
+      ctfName: ctf_event.title,
+      days: ctf_event.duration.days,
+      hours: ctf_event.duration.hours,
       isPrivate,
       password
     })
 
     const message = await interaction.channel.send({
       embeds: [{
-        title: `${data.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
-        description: data.link,
+        title: `${ctf_event.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
+        description: ctf_event.ctftime_url,
         url: `https://ctftime.org/event/${id}`,
         thumbnail: {
-          url: data.img,
+          url: ctf_event.logo,
         },
         fields: [
           { name: "**ID**", value: id, inline: true },
-          { name: "**Format**", value: data.format, inline: true },
-          { name: "**Location**", value: data.location, inline: false },
-          { name: "**Weight**", value: data.weight, inline: true },
+          { name: "**Format**", value: ctf_event.format, inline: true },
+          { name: "**Location**", value: ctf_event.location, inline: false },
+          { name: "**Weight**", value: ctf_event.weight.toString(), inline: true },
         ],
         footer: {
-          text: data.date,
+          text: `${ctf_event.start} - ${ctf_event.finish}`,
         },
       }],
     });

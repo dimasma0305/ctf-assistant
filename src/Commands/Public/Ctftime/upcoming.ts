@@ -13,6 +13,7 @@ export const command: SubCommand = {
     const event = await getEvents(time);
     const embedsSend: Array<APIEmbed | JSONEncodable<APIEmbed>> = [];
 
+    await interaction.deferReply({ ephemeral: true })
     for (let i = 0; i < event.length; i++) {
       const data = event[i];
       const eventInfo = await infoEvents(data.id);

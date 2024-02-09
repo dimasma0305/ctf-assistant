@@ -1,6 +1,6 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, Message } from "discord.js";
-import { infoEvents } from "../../../Functions/ctftime";
+import { infoEvent } from "../../../Functions/ctftime-v2";
 import { getEmbedCTFEvent } from "./utils/utils";
 import { ReactionRoleEvent } from "./utils/event";
 
@@ -28,16 +28,19 @@ export const command: SubCommand = {
         if (!guild) throw Error("guild not found!")
 
         const event_id = options.getNumber("event_id", true);
-        const day = options.getNumber("day") || 1;
+        const ctf_event = await infoEvent(event_id.toString())
         const isPrivate = options.getBoolean("private") || false;
         const password = options.getString("password") || "";
-        const data = await infoEvents(event_id.toString())
 
-        const message = await getEmbedCTFEvent(interaction, data.title)
+        await interaction.deferReply({ ephemeral: true })
+
+
+        const message = await getEmbedCTFEvent(interaction, ctf_event.title)
 
         const event = new ReactionRoleEvent(interaction, {
-            ctfName: data.title,
-            day,
+            ctfName: ctf_event.title,
+            days: ctf_event.duration.days,
+            hours: ctf_event.duration.hours,
             isPrivate,
             password
         })
@@ -49,7 +52,7 @@ export const command: SubCommand = {
         }
 
         const role = guild.roles.cache.find((role) => {
-            return role.name === data.title
+            return role.name === ctf_event.title
         })
 
         if (!role) {
