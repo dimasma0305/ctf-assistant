@@ -2,6 +2,8 @@ import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder } from "discord.js";
 import { infoEvent } from "../../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "./utils/event";
+import { createRoleIfNotExist } from "./utils/event_utility";
+import { scheduleEmbedTemplate } from "./utils/template";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -24,11 +26,12 @@ export const command: SubCommand = {
   async execute(interaction, _client) {
     const { options } = interaction;
     const channel = interaction.channel
-    if (!channel) return
+    const guild = interaction.guild
+    if (!channel || !guild) return
 
     await interaction.deferReply({ ephemeral: true })
     const id = options.getString("id", true);
-    const ctf_event = await infoEvent(id);
+    const ctfEvent = await infoEvent(id);
     const isPrivate = options.getBoolean("private") || false;
     const password = options.getString("password") || "";
 
@@ -41,35 +44,21 @@ export const command: SubCommand = {
 
 
     const event = new ReactionRoleEvent(interaction, {
-      ctfName: ctf_event.title,
-      days: ctf_event.duration.days,
-      hours: ctf_event.duration.hours,
+      ctfEvent: ctfEvent,
       isPrivate,
-      password
+      password,
+      notificationRole: await createRoleIfNotExist({
+        name: "CTF Waiting Role",
+        guild: guild,
+        color: "#87CEEB"
+      })
     })
 
     const message = await interaction.channel.send({
-      embeds: [{
-        title: `${ctf_event.title}${isPrivate ? " **(PRIVATE)**" : ""}`,
-        description: ctf_event.ctftime_url,
-        url: `https://ctftime.org/event/${id}`,
-        thumbnail: {
-          url: ctf_event.logo,
-        },
-        fields: [
-          { name: "**ID**", value: id, inline: true },
-          { name: "**Format**", value: ctf_event.format, inline: true },
-          { name: "**Location**", value: ctf_event.location, inline: false },
-          { name: "**Weight**", value: ctf_event.weight.toString(), inline: true },
-        ],
-        footer: {
-          text: `${ctf_event.start} - ${ctf_event.finish}`,
-        },
-      }],
+      embeds: [scheduleEmbedTemplate({ctf_event: ctfEvent,isPrivate})],
     });
 
     await message.react("✅");
-
     event.addEventListener(message)
 
     interaction.editReply({

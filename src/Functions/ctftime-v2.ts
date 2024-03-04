@@ -8,7 +8,7 @@ interface Organizer {
     name: string;
 }
 
-interface CTFEvent {
+export interface CTFEvent {
     organizers: Organizer[];
     onsite: boolean;
     finish: Date;
