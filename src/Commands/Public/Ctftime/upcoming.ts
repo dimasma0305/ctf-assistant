@@ -14,6 +14,7 @@ export const command: SubCommand = {
       .setDescription("Check until n days")
       .setMinValue(1)
       .setMaxValue(100)
+      .setRequired(false)
     ),
   async execute(interaction, _client) {
     const { options } = interaction;
