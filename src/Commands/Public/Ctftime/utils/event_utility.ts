@@ -1,6 +1,5 @@
 import { ChannelType, ColorResolvable, Guild, Role, TextChannel } from "discord.js";
 import { translate } from "../../../../Functions/discord-utils";
-import { CTFEvent } from "../../../../Functions/ctftime-v2";
 
 interface CreateChannelProps {
     channelName: string;

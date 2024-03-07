@@ -1,8 +1,11 @@
-module.exports = {
-  name: "interactionCreate",
-  async execute(interaction, client) {
-    if (!interaction.isChatInputCommand()) return;
+import { ChatInputCommandInteraction } from "discord.js";
+import { Event } from "../../Handlers/eventHandler";
+import { MyClient } from "../../Model/client";
 
+export const event: Event = {
+  name: "interactionCreate",
+  async execute(interaction: ChatInputCommandInteraction, client: MyClient) {
+    if (!interaction.isChatInputCommand()) return;
     const command = client.commands.get(interaction.commandName);
     if (!command) {
       return interaction.reply({

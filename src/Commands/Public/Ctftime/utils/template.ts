@@ -1,5 +1,6 @@
 import { APIEmbed } from "discord.js";
 import { CTFEvent } from "../../../../Functions/ctftime-v2"
+import moment from "moment"
 
 interface ScheduleEmbedTemplateProps {
     ctf_event: CTFEvent;
@@ -24,7 +25,7 @@ export function scheduleEmbedTemplate(props: ScheduleEmbedTemplateProps): APIEmb
             { name: "**Weight**", value: props.ctf_event.weight.toString(), inline: true },
         ],
         footer: {
-            text: `${props.ctf_event.start.toUTCString()} - ${props.ctf_event.finish.toUTCString()}`,
+            text: `${moment(props.ctf_event.start).utcOffset(8).format('ddd, MMM D, YYYY, HH:mm UTC+8')} - ${moment(props.ctf_event.finish).utcOffset(8).format('ddd, MMM D, YYYY, HH:mm UTC+8')}`,
         },
     };
 }

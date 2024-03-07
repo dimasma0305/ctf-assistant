@@ -40,6 +40,13 @@ client.on(Events.Debug, (message)=>{
   console.log(message)
 })
 
-loadEvents(client);
+await loadEvents(client);
 
 client.login(TOKEN);
+
+client.on("ready", (client)=>{
+  const cronEvent = (client as MyClient).events.get("LoadCrontEvent")
+  if (cronEvent) cronEvent(client)
+})
+
+

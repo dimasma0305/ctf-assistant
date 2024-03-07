@@ -1,7 +1,6 @@
 import { SlashCommandSubcommandBuilder } from "discord.js";
 import { SubCommand } from "../../../Model/command";
-
-const { loadEvents } = require("../../../Handlers/eventHandler");
+import { loadEvents } from "../../../Handlers/eventHandler";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()

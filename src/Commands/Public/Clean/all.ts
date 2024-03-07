@@ -21,7 +21,7 @@ export const command: SubCommand = {
                     if (channel?.isTextBased()) {
                         const messages = await channel.messages.fetch({ limit });
                         messages.forEach(async (message) => {
-                            await message.delete();
+                            message.delete();
                         });
                     }
                 });

@@ -1,41 +1,36 @@
 import { APIEmbed, JSONEncodable } from "discord.js";
 import { SubCommand } from "../../../Model/command";
 
-const { SlashCommandSubcommandBuilder } = require("discord.js");
-const { getEvents, infoEvents } = require("../../../Functions/ctftime");
+import { SlashCommandSubcommandBuilder } from "discord.js";
+import { getUpcommingOnlineEvent, infoEvent } from "../../../Functions/ctftime-v2";
+import { scheduleEmbedTemplate } from "./utils/template";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
     .setName("upcoming")
-    .setDescription("Display upcoming CTFs"),
+    .setDescription("Display upcoming CTFs")
+    .addIntegerOption((input) => input
+      .setName("days")
+      .setDescription("Check until n days")
+      .setMinValue(1)
+      .setMaxValue(100)
+    ),
   async execute(interaction, _client) {
-    const time = "upcoming=true";
-    const event = await getEvents(time);
+    const { options } = interaction;
+    const days = options.getInteger("days") || 5
+
+    const event = await getUpcommingOnlineEvent(days);
     const embedsSend: Array<APIEmbed | JSONEncodable<APIEmbed>> = [];
 
     await interaction.deferReply({ ephemeral: true })
     for (let i = 0; i < event.length; i++) {
       const data = event[i];
-      const eventInfo = await infoEvents(data.id);
-      embedsSend.push({
-        title: data.name,
-        description: eventInfo.link,
-        url: `https://ctftime.org/event/${data.id}`,
-        thumbnail: {
-          url: eventInfo.img,
-        },
-        fields: [
-          { name: "**id**", value: data.id, inline: true },
-          { name: "**format**", value: data.format, inline: true },
-          { name: "**location**", value: data.location, inline: false },
-          { name: "**weight**", value: data.weight, inline: true },
-          { name: "**notes**", value: data.notes, inline: true },
-        ],
-        footer: {
-          text: data.date,
-        },
-      });
+      embedsSend.push(scheduleEmbedTemplate({
+        ctf_event: data,
+        isPrivate: false
+      }));
     }
-    return interaction.editReply({ embeds: embedsSend });
+    await interaction.deleteReply()
+    return interaction.channel?.send({ embeds: embedsSend });
   },
 };
