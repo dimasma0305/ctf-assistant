@@ -33,7 +33,7 @@ export const event: Event = {
                     channel.sendTyping()
                     await channel.send(randomMessage)
                     channel.sendTyping()
-                    await channel.send("Btw ini daftar CTF minggu ini:")
+                    await channel.send("Ini ya mas daftar CTF minggu ini:")
                     const event = await getUpcommingOnlineEvent(5);
                     const embedsSend: Array<APIEmbed> = [];
 

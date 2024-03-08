@@ -13,9 +13,6 @@ export const command: SubCommand = {
       .setName("id")
       .setDescription("CTFs ID")
       .setRequired(true)
-    ).addNumberOption(option => option
-      .setName("day")
-      .setDescription("Set closure time (default: 1 day)")
     ).addBooleanOption(option => option
       .setName("private")
       .setDescription("Is this a private CTF event?")
