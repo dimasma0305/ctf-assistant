@@ -28,12 +28,11 @@ export const event: Event = {
             })
             if (!channel) return
             if (channel instanceof BaseGuildTextChannel) {
-                cron.schedule("0 8 * * 5", async() => {
+                cron.schedule("26 18 * * 5", async() => {
                     const randomMessage = mabarMessages[Math.floor(Math.random() * mabarMessages.length)];
                     channel.sendTyping()
                     await channel.send(randomMessage)
                     channel.sendTyping()
-                    await channel.send("Ini ya mas daftar CTF minggu ini:")
                     const event = await getUpcommingOnlineEvent(5);
                     const embedsSend: Array<APIEmbed> = [];
 
@@ -44,6 +43,9 @@ export const event: Event = {
                         ctf_event: data,
                         isPrivate: false
                       }));
+                    }
+                    if (embedsSend.length > 0){
+                        await channel.send("Ini ya mas daftar CTF minggu ini:")
                     }
                     channel.send({embeds: embedsSend})
                 }, {

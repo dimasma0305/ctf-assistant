@@ -39,7 +39,6 @@ export const command: SubCommand = {
       }
     }
 
-
     const event = new ReactionRoleEvent(interaction, {
       ctfEvent: ctfEvent,
       isPrivate,
