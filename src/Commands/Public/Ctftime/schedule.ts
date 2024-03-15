@@ -32,7 +32,6 @@ export const command: SubCommand = {
     await interaction.deferReply({ ephemeral: true })
     const id = options.getString("id", true);
     const is_dummie = options.getBoolean("is_dummie");
-    console.log("is_dummie", is_dummie)
     let ctfEvent: CTFEvent;
     if (is_dummie) {
       ctfEvent = {
@@ -43,10 +42,10 @@ export const command: SubCommand = {
           days: 2,
           hours: 2 * 24,
         },
-        finish: new Date(Date.now() + 2 * 24 * 60 * 1000),
+        finish: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
         format: "placeholder",
         format_id: 0,
-        id: parseInt(id),
+        id: 0,
         is_votable_now: false,
         live_feed: "placeholder",
         location: "placeholder",
@@ -57,7 +56,7 @@ export const command: SubCommand = {
         public_votable: false,
         restrictions: "placeholder",
         start: new Date(Date.now()),
-        title: "dummy_" + id,
+        title: id,
         url: "placeholder",
         weight: 0
       }

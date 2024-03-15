@@ -8,8 +8,8 @@ export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
         .setName('rebind')
         .setDescription('Flush role from embed event message')
-        .addNumberOption((option) => option
-            .setName("event_id")
+        .addStringOption((option) => option
+            .setName("id")
             .setDescription("event id")
             .setRequired(true)
         ).addBooleanOption(option => option
@@ -30,39 +30,38 @@ export const command: SubCommand = {
         const guild = interaction.guild
         if (!guild) throw Error("guild not found!")
 
-        const event_id = options.getNumber("event_id", true);
+        const id = options.getString("id", true);
         const is_dummie = options.getBoolean("is_dummie");
-        let ctf_event: CTFEvent
+        let ctfEvent: CTFEvent;
         if (is_dummie) {
-            ctf_event = {
-                ctf_id: event_id,
-                ctftime_url: "placeholder",
-                description: "placeholder",
-                duration: {
-                    days: 2,
-                    hours: 2*24,
-                },
-                finish: new Date(Date.now()+2*24*60*1000),
-                format: "placeholder",
-                format_id: 0,
-                id: event_id,
-                is_votable_now: false,
-                live_feed: "placeholder",
-                location: "placeholder",
-                logo: "placeholder",
-                onsite: false,
-                organizers: [{id: 0, name: "placeholder"}],
-                participants: 0,
-                public_votable: false,
-                restrictions: "placeholder",
-                start: new Date(Date.now()),
-                title: "dummy_"+event_id,
-                url: "placeholder",
-                weight: 0
-            }
+          ctfEvent = {
+            ctf_id: 0,
+            ctftime_url: "placeholder",
+            description: "placeholder",
+            duration: {
+              days: 2,
+              hours: 2 * 24,
+            },
+            finish: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+            format: "placeholder",
+            format_id: 0,
+            id: 0,
+            is_votable_now: false,
+            live_feed: "placeholder",
+            location: "placeholder",
+            logo: "https://avatars.githubusercontent.com/u/109392350",
+            onsite: false,
+            organizers: [{ id: 0, name: "placeholder" }],
+            participants: 0,
+            public_votable: false,
+            restrictions: "placeholder",
+            start: new Date(Date.now()),
+            title: id,
+            url: "placeholder",
+            weight: 0
+          }
         } else {
-            ctf_event = await infoEvent(event_id.toString())
-
+          ctfEvent = await infoEvent(id)
         }
         const isPrivate = options.getBoolean("private") || false;
         const password = options.getString("password") || "";
@@ -70,10 +69,10 @@ export const command: SubCommand = {
         await interaction.deferReply({ ephemeral: true })
 
 
-        const message = await getEmbedCTFEvent(interaction, ctf_event.title)
+        const message = await getEmbedCTFEvent(interaction, ctfEvent.title)
 
         const event = new ReactionRoleEvent(interaction, {
-            ctfEvent: ctf_event,
+            ctfEvent: ctfEvent,
             isPrivate,
             password
         })
@@ -85,7 +84,7 @@ export const command: SubCommand = {
         }
 
         const role = guild.roles.cache.find((role) => {
-            return role.name === ctf_event.title
+            return role.name === ctfEvent.title
         })
 
         if (!role) {
