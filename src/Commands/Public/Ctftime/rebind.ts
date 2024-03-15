@@ -1,6 +1,6 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, Message } from "discord.js";
-import { infoEvent } from "../../../Functions/ctftime-v2";
+import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { getEmbedCTFEvent } from "./utils/event";
 import { ReactionRoleEvent } from "./utils/event";
 
@@ -12,6 +12,9 @@ export const command: SubCommand = {
             .setName("event_id")
             .setDescription("event id")
             .setRequired(true)
+        ).addBooleanOption(option => option
+            .setName("is_dummie")
+            .setDescription("Is CTF dummy?")
         ).addNumberOption(option => option
             .setName("day")
             .setDescription("Set closure time (default: 1 day)")
@@ -28,7 +31,39 @@ export const command: SubCommand = {
         if (!guild) throw Error("guild not found!")
 
         const event_id = options.getNumber("event_id", true);
-        const ctf_event = await infoEvent(event_id.toString())
+        const is_dummie = options.getBoolean("is_dummie");
+        let ctf_event: CTFEvent
+        if (is_dummie) {
+            ctf_event = {
+                ctf_id: event_id,
+                ctftime_url: "placeholder",
+                description: "placeholder",
+                duration: {
+                    days: 2,
+                    hours: 2*24,
+                },
+                finish: new Date(Date.now()+2*24*60*1000),
+                format: "placeholder",
+                format_id: 0,
+                id: event_id,
+                is_votable_now: false,
+                live_feed: "placeholder",
+                location: "placeholder",
+                logo: "placeholder",
+                onsite: false,
+                organizers: [{id: 0, name: "placeholder"}],
+                participants: 0,
+                public_votable: false,
+                restrictions: "placeholder",
+                start: new Date(Date.now()),
+                title: "dummy_"+event_id,
+                url: "placeholder",
+                weight: 0
+            }
+        } else {
+            ctf_event = await infoEvent(event_id.toString())
+
+        }
         const isPrivate = options.getBoolean("private") || false;
         const password = options.getString("password") || "";
 
@@ -38,9 +73,7 @@ export const command: SubCommand = {
         const message = await getEmbedCTFEvent(interaction, ctf_event.title)
 
         const event = new ReactionRoleEvent(interaction, {
-            ctfName: ctf_event.title,
-            days: ctf_event.duration.days,
-            hours: ctf_event.duration.hours,
+            ctfEvent: ctf_event,
             isPrivate,
             password
         })

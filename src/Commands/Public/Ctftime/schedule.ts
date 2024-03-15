@@ -1,6 +1,6 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder } from "discord.js";
-import { infoEvent } from "../../../Functions/ctftime-v2";
+import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "./utils/event";
 import { createRoleIfNotExist } from "./utils/event_utility";
 import { scheduleEmbedTemplate } from "./utils/template";
@@ -13,6 +13,9 @@ export const command: SubCommand = {
       .setName("id")
       .setDescription("CTFs ID")
       .setRequired(true)
+    ).addBooleanOption(option => option
+      .setName("is_dummie")
+      .setDescription("Is CTF dummy?")
     ).addBooleanOption(option => option
       .setName("private")
       .setDescription("Is this a private CTF event?")
@@ -28,7 +31,39 @@ export const command: SubCommand = {
 
     await interaction.deferReply({ ephemeral: true })
     const id = options.getString("id", true);
-    const ctfEvent = await infoEvent(id);
+    const is_dummie = options.getBoolean("is_dummie");
+    console.log("is_dummie", is_dummie)
+    let ctfEvent: CTFEvent;
+    if (is_dummie) {
+      ctfEvent = {
+        ctf_id: parseInt(id),
+        ctftime_url: "placeholder",
+        description: "placeholder",
+        duration: {
+          days: 2,
+          hours: 2 * 24,
+        },
+        finish: new Date(Date.now() + 2 * 24 * 60 * 1000),
+        format: "placeholder",
+        format_id: 0,
+        id: parseInt(id),
+        is_votable_now: false,
+        live_feed: "placeholder",
+        location: "placeholder",
+        logo: "https://avatars.githubusercontent.com/u/109392350",
+        onsite: false,
+        organizers: [{ id: 0, name: "placeholder" }],
+        participants: 0,
+        public_votable: false,
+        restrictions: "placeholder",
+        start: new Date(Date.now()),
+        title: "dummy_" + id,
+        url: "placeholder",
+        weight: 0
+      }
+    } else {
+      ctfEvent = await infoEvent(id)
+    }
     const isPrivate = options.getBoolean("private") || false;
     const password = options.getString("password") || "";
 
@@ -51,7 +86,7 @@ export const command: SubCommand = {
     })
 
     const message = await interaction.channel.send({
-      embeds: [scheduleEmbedTemplate({ctf_event: ctfEvent,isPrivate})],
+      embeds: [scheduleEmbedTemplate({ ctf_event: ctfEvent, isPrivate })],
     });
 
     await message.react("✅");
