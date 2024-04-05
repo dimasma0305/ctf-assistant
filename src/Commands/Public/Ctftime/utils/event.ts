@@ -1,4 +1,4 @@
-import { CacheType, Channel, ChatInputCommandInteraction, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, Message, Role, TextBasedChannel, TextChannel, User } from "discord.js";
+import { CacheType, Channel, ChatInputCommandInteraction, ComponentType, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, Message, Role, TextBasedChannel, TextChannel, User } from "discord.js";
 
 import { sleep } from "bun";
 import { createPrivateChannelIfNotExist, createRoleIfNotExist } from "./event_utility";
@@ -147,7 +147,8 @@ ${weight}
                 i.deferUpdate()
                 return i.user.id ? true : false
             },
-            time: this.options.ctfEvent.finish.getTime() - new Date().getTime()
+            time: this.options.ctfEvent.finish.getTime() - new Date().getTime(),
+            componentType: ComponentType.Button
         })
         colector.on("collect", async (interaction)=>{
             this.addRoleToUser(interaction.user)

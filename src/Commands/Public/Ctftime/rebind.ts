@@ -1,5 +1,5 @@
 import { SubCommand } from "../../../Model/command";
-import { SlashCommandSubcommandBuilder, Message } from "discord.js";
+import { SlashCommandSubcommandBuilder, Message, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { getEmbedCTFEvent } from "./utils/event";
 import { ReactionRoleEvent } from "./utils/event";
@@ -65,7 +65,14 @@ export const command: SubCommand = {
 
         const event = new ReactionRoleEvent(guild, {ctfEvent})
 
-        const message = await channel.send({"embeds": [scheduleEmbedTemplate({ctfEvent})]})
+        const button = new ButtonBuilder()
+            .setLabel('Join!')
+            .setStyle(ButtonStyle.Primary);
+
+        const message = await channel.send({"embeds": [scheduleEmbedTemplate({ctfEvent})], "components": [{
+            type: ComponentType.Button,
+            components: [button]
+        }]})
 
         await event.addEventListener(message)
 
