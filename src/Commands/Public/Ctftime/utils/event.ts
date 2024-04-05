@@ -142,7 +142,7 @@ ${weight}
                 await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
             })
             subsbefore = subs
-        }, 1000)
+        }, 5000)
     }
     async getRole(): Promise<Role> {
         const role = this.role
