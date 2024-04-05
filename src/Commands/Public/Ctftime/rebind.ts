@@ -65,14 +65,21 @@ export const command: SubCommand = {
 
         const event = new ReactionRoleEvent(guild, {ctfEvent})
 
-        const button = new ButtonBuilder()
-            .setLabel('Join!')
-            .setCustomId("join-btn")
+		const confirm = new ButtonBuilder()
+			.setCustomId('confirm')
+			.setLabel('Confirm Ban')
+			.setStyle(ButtonStyle.Danger);
 
-        const message = await channel.send({"embeds": [scheduleEmbedTemplate({ctfEvent})], "components": [{
-            type: ComponentType.Button,
-            components: [button],
-        }]})
+		const cancel = new ButtonBuilder()
+			.setCustomId('cancel')
+			.setLabel('Cancel')
+			.setStyle(ButtonStyle.Secondary);
+
+		const row = new ActionRowBuilder()
+			.addComponents(cancel, confirm);
+
+
+        const message = await channel.send({"embeds": [scheduleEmbedTemplate({ctfEvent})], components: [row]})
 
         await event.addEventListener(message)
 
