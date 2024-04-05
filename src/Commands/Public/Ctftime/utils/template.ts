@@ -4,7 +4,6 @@ import moment from "moment"
 
 interface ScheduleEmbedTemplateProps {
     ctf_event: CTFEvent;
-    isPrivate: boolean;
 }
 
 export function scheduleEmbedTemplate(props: ScheduleEmbedTemplateProps): APIEmbed {
@@ -12,7 +11,7 @@ export function scheduleEmbedTemplate(props: ScheduleEmbedTemplateProps): APIEmb
     const finishTimestamp = Math.floor(props.ctf_event.finish.getTime() / 1000);
 
     return {
-        title: `${props.ctf_event.title}${props.isPrivate ? " **(PRIVATE)**" : ""}`,
+        title: `${props.ctf_event.title}`,
         description: `${props.ctf_event.title} start <t:${startTimestamp}:R> and end <t:${finishTimestamp}:R>`,
         url: `https://ctftime.org/event/${props.ctf_event.id}`,
         thumbnail: {

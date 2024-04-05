@@ -1,15 +1,11 @@
-import { CacheType, Channel, ChatInputCommandInteraction, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, Message, Role, TextBasedChannel, TextChannel } from "discord.js";
+import { CacheType, Channel, ChatInputCommandInteraction, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, Message, Role, TextBasedChannel, TextChannel, User } from "discord.js";
 
 import { sleep } from "bun";
 import { createPrivateChannelIfNotExist, createRoleIfNotExist } from "./event_utility";
 import { CTFEvent } from "../../../../Functions/ctftime-v2";
-import { event } from "../../../../Events/Client/cron";
-import { MyClient } from "../../../../Model/client";
 
 interface EventListenerOptions {
     ctfEvent: CTFEvent;
-    isPrivate?: boolean;
-    password?: string;
     notificationRole?: Role;
 }
 
@@ -93,16 +89,16 @@ ${weight}
         }
         return event
     }
-    async addRoleToUser(guser: GuildScheduledEventUser<false>){
+    async addRoleToUser(iuser: User){
         const role = await this.getRole()
-        const user = this.guild.members.cache.find((user)=> user.id==guser.user.id)
+        const user = this.guild.members.cache.find((user)=> user.id==iuser.id)
         if (!user) return
         if (user.roles.cache.get(role.name)) return
         await user.roles.add(role)
     }
-    async removeRoleFromUser(guser: GuildScheduledEventUser<false>){
+    async removeRoleFromUser(iuser: User){
         const role = await this.getRole()
-        const user = this.guild.members.cache.find((user)=> user.id==guser.user.id)
+        const user = this.guild.members.cache.find((user)=> user.id==iuser.id)
         if (!user) return
         await user.roles.remove(role)
     }
@@ -116,7 +112,7 @@ ${weight}
             const user = members.find((user)=> user.id==guser.user.id)
             if (!user) return
             if (user.roles.cache.has(role.id)) return
-            await this.addRoleToUser(guser)
+            await this.addRoleToUser(guser.user)
             const dm = await guser.user.createDM()
             this.sendSuccessMessage(dm)
         })
@@ -132,17 +128,37 @@ ${weight}
                 if (!user) return
                 if (user.roles.cache.has(role.id)) return
                 const dm = await guser.user.createDM()
-                await this.addRoleToUser(guser)
+                await this.addRoleToUser(guser.user)
                 this.sendSuccessMessage(dm)
             })
             subsbefore.forEach(async (guser)=>{
                 if (subs.get(guser.user.id)) return
                 const dm = await guser.user.createDM()
-                await this.removeRoleFromUser(guser)
+                await this.removeRoleFromUser(guser.user)
                 await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
             })
             subsbefore = subs
         }, 5000)
+    }
+    async addEventListener(msg: Message){
+        this.__initializeChannelAndRole()
+        const colector = msg.createMessageComponentCollector({
+            filter: (i) => {
+                i.deferUpdate()
+                return i.user.id ? true : false
+            },
+            time: this.options.ctfEvent.finish.getTime() - new Date().getTime()
+        })
+        colector.on("collect", async (interaction)=>{
+            this.addRoleToUser(interaction.user)
+            const dm = await interaction.user.createDM()
+            this.sendSuccessMessage(dm)
+        })
+        colector.on("dispose", async (interaction)=>{
+            this.removeRoleFromUser(interaction.user)
+            const dm = await interaction.user.createDM()
+            await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
+        })
     }
     async getRole(): Promise<Role> {
         const role = this.role

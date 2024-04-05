@@ -18,12 +18,6 @@ export const command: SubCommand = {
         ).addNumberOption(option => option
             .setName("day")
             .setDescription("Set closure time (default: 1 day)")
-        ).addBooleanOption(option => option
-            .setName("private")
-            .setDescription("Is this a private CTF event?")
-        ).addStringOption(option => option
-            .setName("password")
-            .setDescription("Password for the private CTF event")
         ),
     async execute(interaction, _client) {
         const { options } = interaction;
@@ -63,18 +57,13 @@ export const command: SubCommand = {
         } else {
           ctfEvent = await infoEvent(id)
         }
-        const isPrivate = options.getBoolean("private") || false;
         const password = options.getString("password") || "";
 
         await interaction.deferReply({ ephemeral: true })
 
-        const event = new ReactionRoleEvent(guild, {
-            ctfEvent: ctfEvent,
-            isPrivate,
-            password
-        })
+        const event = new ReactionRoleEvent(guild, {ctfEvent})
 
-        await event.addEvent()
+        await event.addEvent
 
         return interaction.followUp({
             content: "The role has been added to all users who reacted with a white check mark.",

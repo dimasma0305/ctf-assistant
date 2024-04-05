@@ -75,8 +75,6 @@ export const command: SubCommand = {
 
     const event = new ReactionRoleEvent(guild, {
       ctfEvent: ctfEvent,
-      isPrivate,
-      password,
       notificationRole: await createRoleIfNotExist({
         name: "CTF Waiting Role",
         guild: guild,
