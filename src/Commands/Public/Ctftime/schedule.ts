@@ -86,7 +86,7 @@ export const command: SubCommand = {
 
     await event.addEvent()
 
-    interaction.editReply({
+    await interaction.editReply({
       content: "Success",
     })
   },
