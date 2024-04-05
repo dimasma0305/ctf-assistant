@@ -151,14 +151,16 @@ ${weight}
             componentType: ComponentType.Button,
         })
         colector.on("collect", async (interaction)=>{
-            this.addRoleToUser(interaction.user)
-            const dm = await interaction.user.createDM()
-            this.sendSuccessMessage(dm)
-        })
-        colector.on("dispose", async (interaction)=>{
-            this.removeRoleFromUser(interaction.user)
-            const dm = await interaction.user.createDM()
-            await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
+            console.log(interaction.id)
+            if (interaction.id == "join"){
+                this.addRoleToUser(interaction.user)
+                const dm = await interaction.user.createDM()
+                this.sendSuccessMessage(dm)
+            }else if (interaction.id == "leave"){
+                this.removeRoleFromUser(interaction.user)
+                const dm = await interaction.user.createDM()
+                await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
+            }
         })
     }
     async getRole(): Promise<Role> {
