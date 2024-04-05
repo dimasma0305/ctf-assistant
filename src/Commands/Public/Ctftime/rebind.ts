@@ -1,5 +1,5 @@
 import { SubCommand } from "../../../Model/command";
-import { SlashCommandSubcommandBuilder, Message, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType } from "discord.js";
+import { SlashCommandSubcommandBuilder, Message, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType, ActionRowData, JSONEncodable, APIActionRowComponent, APIMessageActionRowComponent } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { getEmbedCTFEvent } from "./utils/event";
 import { ReactionRoleEvent } from "./utils/event";
@@ -65,21 +65,20 @@ export const command: SubCommand = {
 
         const event = new ReactionRoleEvent(guild, {ctfEvent})
 
-		const confirm = new ButtonBuilder()
-			.setCustomId('confirm')
-			.setLabel('Confirm Ban')
+		const join = new ButtonBuilder()
+			.setCustomId('join')
+			.setLabel('Join!')
+			.setStyle(ButtonStyle.Primary);
+
+        const leave = new ButtonBuilder()
+			.setCustomId('leave')
+			.setLabel('Leave!')
 			.setStyle(ButtonStyle.Danger);
 
-		const cancel = new ButtonBuilder()
-			.setCustomId('cancel')
-			.setLabel('Cancel')
-			.setStyle(ButtonStyle.Secondary);
-
 		const row = new ActionRowBuilder()
-			.addComponents(cancel, confirm);
+			.addComponents(join, leave);
 
-
-        const message = await channel.send({"embeds": [scheduleEmbedTemplate({ctfEvent})], components: [row]})
+        const message = await channel.send({"embeds": [scheduleEmbedTemplate({ctfEvent})], components: [row as JSONEncodable<APIActionRowComponent<APIMessageActionRowComponent>>]})
 
         await event.addEventListener(message)
 
