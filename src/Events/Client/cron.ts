@@ -40,7 +40,7 @@ export const event: Event = {
                     for (let i = 0; i < event.length; i++) {
                       const data = event[i];
                       embedsSend.push(scheduleEmbedTemplate({
-                        ctf_event: data,
+                        ctfEvent: data,
                         isPrivate: false
                       }));
                     }

@@ -3,6 +3,7 @@ import { SlashCommandSubcommandBuilder, Message } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { getEmbedCTFEvent } from "./utils/event";
 import { ReactionRoleEvent } from "./utils/event";
+import { scheduleEmbedTemplate } from "./utils/template";
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
@@ -22,7 +23,9 @@ export const command: SubCommand = {
     async execute(interaction, _client) {
         const { options } = interaction;
         const guild = interaction.guild
+        const channel = interaction.channel
         if (!guild) throw Error("guild not found!")
+        if (!channel) throw Error("channel not found!")
 
         const id = options.getString("id", true);
         const is_dummie = options.getBoolean("is_dummie");
@@ -57,13 +60,14 @@ export const command: SubCommand = {
         } else {
           ctfEvent = await infoEvent(id)
         }
-        const password = options.getString("password") || "";
 
         await interaction.deferReply({ ephemeral: true })
 
         const event = new ReactionRoleEvent(guild, {ctfEvent})
 
-        await event.addEvent
+        const message = await channel.send({"embeds": [scheduleEmbedTemplate({ctfEvent})]})
+
+        await event.addEventListener(message)
 
         return interaction.followUp({
             content: "The role has been added to all users who reacted with a white check mark.",
