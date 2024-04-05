@@ -108,10 +108,16 @@ ${weight}
     }
     async addEvent() {
         this.__initializeChannelAndRole()
+        const role = await this.getRole()
         const event = await this.createEventIfNotExist()
         var subsbefore = await event.fetchSubscribers()
         subsbefore.forEach(async (guser)=>{
+            const user = this.guild.members.cache.find((user)=> user.id==guser.user.id)
+            if (!user) return
+            if (user.roles.cache.get(role.name)) return
             await this.addRoleToUser(guser)
+            const dm = await guser.user.createDM()
+            this.sendSuccessMessage(dm)
         })
         const interval_id = setInterval(async()=>{
             if (event.isCompleted()) {
