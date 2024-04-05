@@ -111,11 +111,11 @@ ${weight}
         const role = await this.getRole()
         const event = await this.createEventIfNotExist()
         var subsbefore = await event.fetchSubscribers()
-        await this.guild.members.fetch()
+        const members = await this.guild.members.fetch()
         subsbefore.forEach(async (guser)=>{
-            const user = this.guild.members.cache.find((user)=> user.id==guser.user.id)
+            const user = members.find((user)=> user.id==guser.user.id)
             if (!user) return
-            if (user.roles.cache.has(role.name)) return
+            if (user.roles.cache.has(role.id)) return
             await this.addRoleToUser(guser)
             const dm = await guser.user.createDM()
             this.sendSuccessMessage(dm)
@@ -126,10 +126,11 @@ ${weight}
                 return
             }
             const subs = await event.fetchSubscribers()
+            const members = await this.guild.members.fetch()
             subs.forEach(async (guser)=>{
-                const user = this.guild.members.cache.find((user)=> user.id==guser.user.id)
+                const user = members.find((user)=> user.id==guser.user.id)
                 if (!user) return
-                if (user.roles.cache.has(role.name)) return
+                if (user.roles.cache.has(role.id)) return
                 const dm = await guser.user.createDM()
                 await this.addRoleToUser(guser)
                 this.sendSuccessMessage(dm)
