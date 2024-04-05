@@ -127,7 +127,9 @@ ${weight}
             }
             const subs = await event.fetchSubscribers()
             subs.forEach(async (guser)=>{
-                if (subsbefore.get(guser.user.id)) return
+                const user = this.guild.members.cache.find((user)=> user.id==guser.user.id)
+                if (!user) return
+                if (user.roles.cache.has(role.name)) return
                 const dm = await guser.user.createDM()
                 await this.addRoleToUser(guser)
                 this.sendSuccessMessage(dm)
