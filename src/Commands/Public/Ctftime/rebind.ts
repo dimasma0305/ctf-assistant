@@ -68,47 +68,13 @@ export const command: SubCommand = {
 
         await interaction.deferReply({ ephemeral: true })
 
-
-        const message = await getEmbedCTFEvent(interaction, ctfEvent.title)
-
-        const event = new ReactionRoleEvent(interaction, {
+        const event = new ReactionRoleEvent(guild, {
             ctfEvent: ctfEvent,
             isPrivate,
             password
         })
 
-        if (!(message instanceof Message)) {
-            return interaction.editReply({
-                content: "Unable to find the specified message. Please provide a valid message ID.",
-            });
-        }
-
-        const role = guild.roles.cache.find((role) => {
-            return role.name === ctfEvent.title
-        })
-
-        if (!role) {
-            return interaction.editReply({
-                content: "Unable to find the specified role. Please provide a valid role ID.",
-            });
-        }
-
-        // Add the role to all users who reacted with a white check mark
-        const reactions = message.reactions.cache.get("✅");
-        if (!reactions) throw new Error("can't find reaction")
-        const reactionUsers = await reactions.users.fetch();
-        reactionUsers.forEach(async (user) => {
-            if (!user.bot) {
-                const member = await guild.members.fetch(user);
-                if (!member.roles.cache.has(role.name)) {
-                    const dmChannel = await member.createDM()
-                    await member.roles.add(role);
-                    event.sendSuccessMessage(dmChannel)
-                }
-            }
-        });
-
-        event.addEventListener(message)
+        await event.addEvent()
 
         return interaction.followUp({
             content: "The role has been added to all users who reacted with a white check mark.",

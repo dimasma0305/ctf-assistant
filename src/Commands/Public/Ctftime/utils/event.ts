@@ -1,8 +1,10 @@
-import { CacheType, ChatInputCommandInteraction, DMChannel, Guild, Interaction, Message, Role, TextChannel } from "discord.js";
+import { CacheType, Channel, ChatInputCommandInteraction, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, Message, Role, TextBasedChannel, TextChannel } from "discord.js";
 
 import { sleep } from "bun";
 import { createPrivateChannelIfNotExist, createRoleIfNotExist } from "./event_utility";
 import { CTFEvent } from "../../../../Functions/ctftime-v2";
+import { event } from "../../../../Events/Client/cron";
+import { MyClient } from "../../../../Model/client";
 
 interface EventListenerOptions {
     ctfEvent: CTFEvent;
@@ -12,25 +14,13 @@ interface EventListenerOptions {
 }
 
 export class ReactionRoleEvent {
-    interaction: Interaction
-    channel: TextChannel
     guild: Guild;
     options: EventListenerOptions;
     discussChannel?: TextChannel;
     writeupChannel?: TextChannel;
     role?: Role;
-    constructor(interaction: Interaction, options: EventListenerOptions) {
-        this.interaction = interaction
+    constructor(guild: Guild, options: EventListenerOptions) {
         this.options = options
-        const channel = interaction.channel
-        const guild = interaction.guild
-        if (!(channel instanceof TextChannel)) {
-            throw Error("Channel is not instance of TextChannel")
-        }
-        if (!(guild instanceof Guild)) {
-            throw Error("guild is not instace of Guild")
-        }
-        this.channel = channel
         this.guild = guild
     }
     async __initializeChannelAndRole() {
@@ -67,84 +57,90 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
             callback: callback
         })
     }
-    async addEventListener(message: Message) {
-        await this.__initializeChannelAndRole()
-        const { isPrivate, password } = this.options
+    async createEventIfNotExist(){
+        var event = this.guild.scheduledEvents.cache.find((event)=>event.name == this.options.ctfEvent.title && !event.isCanceled() && !event.isCompleted())
+
+        if (!event){
+            const description = this.options.ctfEvent.description
+            const ctftime_url = this.options.ctfEvent.ctftime_url
+            const url = this.options.ctfEvent.url
+            const organizers = this.options.ctfEvent.organizers
+            const format = this.options.ctfEvent.format
+            const weight = this.options.ctfEvent.weight
+
+            event = await this.guild.scheduledEvents.create({
+                name: this.options.ctfEvent.title,
+                scheduledStartTime: this.options.ctfEvent.start,
+                scheduledEndTime: this.options.ctfEvent.finish,
+                privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+                entityType: GuildScheduledEventEntityType.External,
+                description: `${description}
+
+:busts_in_silhouette: **Organizers**
+${organizers.map((organizer)=>organizer.name).join("\n")}
+
+:gear: **Format**
+${format}
+
+:dart: **Weight**
+${weight}
+`,
+                image: this.options.ctfEvent.logo,
+                entityMetadata: {
+                    location: `${ctftime_url} - ${url}`
+                }
+            })
+        }
+        return event
+    }
+    async addRoleToUser(guser: GuildScheduledEventUser<false>){
+        const role = await this.getRole()
+        const user = this.guild.members.cache.find((user)=> user.id==guser.user.id)
+        if (!user) return
+        if (user.roles.cache.get(role.name)) return
+        await user.roles.add(role)
+    }
+    async removeRoleFromUser(guser: GuildScheduledEventUser<false>){
+        const role = await this.getRole()
+        const user = this.guild.members.cache.find((user)=> user.id==guser.user.id)
+        if (!user) return
+        await user.roles.remove(role)
+    }
+    async addEvent() {
+        this.__initializeChannelAndRole()
+        const event = await this.createEventIfNotExist()
+        var subsbefore = await event.fetchSubscribers()
+        subsbefore.forEach(async (guser)=>{
+            await this.addRoleToUser(guser)
+        })
+        const interval_id = setInterval(async()=>{
+            if (event.isCompleted()) {
+                clearInterval(interval_id)
+                return
+            }
+            const subs = await event.fetchSubscribers()
+            subs.forEach(async (guser)=>{
+                if (subsbefore.get(guser.user.id)) return
+                const dm = await guser.user.createDM()
+                await this.addRoleToUser(guser)
+                this.sendSuccessMessage(dm)
+            })
+            subsbefore.forEach(async (guser)=>{
+                if (subs.get(guser.user.id)) return
+                const dm = await guser.user.createDM()
+                await this.removeRoleFromUser(guser)
+                await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
+            })
+            subsbefore = subs
+        }, 1000)
+    }
+    async getRole(): Promise<Role> {
         const role = this.role
-        try {
-            if (!role) throw Error("Please wait until role has been created");
-        } catch {
+        if (!role) {
             await sleep(1000)
-            this.addEventListener(message)
-            return
+            return this.getRole()
         }
-        if (isPrivate) {
-            if (!(typeof password == "string")) {
-                throw Error("Pasword isn't a string")
-            }
-        }
-
-        const collector = message.createReactionCollector({
-            filter: (reaction) => reaction.emoji.name === "✅",
-            dispose: true,
-            time: this.options.ctfEvent.finish.getTime() - Date.now(),
-        })
-
-        collector.on("collect", async (reaction, user) => {
-            const guild = reaction.message.guild
-            if (!guild) {
-                throw Error("Guild not found")
-            }
-            const guildMember = guild.members.cache.find((member) => member.id === user.id);
-            if (!guildMember) {
-                throw Error("Guild member not found")
-            }
-
-            const dm = await user.createDM();
-
-            if (isPrivate) {
-                dm.send("Input the password: ");
-                const collector = dm.createMessageCollector({
-                    filter: (message) => message.author.id === user.id,
-                    max: 1,
-                    time: 60 * 1000
-                });
-                collector.on("collect", async (message) => {
-                    if (message.content === password) {
-                        guildMember.roles.add(role);
-                        this.sendSuccessMessage(dm);
-                    } else {
-                        this.sendFailureMessage(dm);
-                        reaction.users.remove(message.author.id);
-                    }
-                });
-                collector.on("end", (collected) => {
-                    if (collected.size === 0) {
-                        dm.send("Request timed out");
-                        reaction.users.remove(user);
-                    }
-                });
-            } else {
-                guildMember.roles.add(role);
-                this.sendSuccessMessage(dm);
-            }
-        })
-        collector.on("remove", async (reaction, user) => {
-            const guild = reaction.message.guild
-            if (!guild) {
-                throw Error("Guild not found")
-            }
-            const guildMember = guild.members.cache.find((member) => member.id === user.id);
-            if (!guildMember) {
-                throw Error("Guild member not found")
-            }
-            const dm = await user.createDM();
-            await guildMember.roles.remove(role)
-            await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
-        })
-        collector.on("end", () => {
-            this.channel.send(`Yay! Akhirnya ${this.options.ctfEvent.title} sudah berakhir. Terima kasih, teman-teman, sudah bermain bersama aku di ${this.options.ctfEvent.title} <@&${role.id}>! Jangan lupa untuk bergabung di mabar selanjutnya ya, pasti seru! 😄🎉`)
-        })
+        return role
     }
 
     async sendNotification() {

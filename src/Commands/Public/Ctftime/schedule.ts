@@ -73,7 +73,7 @@ export const command: SubCommand = {
       }
     }
 
-    const event = new ReactionRoleEvent(interaction, {
+    const event = new ReactionRoleEvent(guild, {
       ctfEvent: ctfEvent,
       isPrivate,
       password,
@@ -84,12 +84,7 @@ export const command: SubCommand = {
       })
     })
 
-    const message = await interaction.channel.send({
-      embeds: [scheduleEmbedTemplate({ ctf_event: ctfEvent, isPrivate })],
-    });
-
-    await message.react("✅");
-    event.addEventListener(message)
+    await event.addEvent()
 
     interaction.editReply({
       content: "Success",

@@ -28,7 +28,7 @@ export const event: Event = {
             })
             if (!channel) return
             if (channel instanceof BaseGuildTextChannel) {
-                cron.schedule("26 18 * * 5", async() => {
+                cron.schedule("0 8 * * 5", async() => {
                     const randomMessage = mabarMessages[Math.floor(Math.random() * mabarMessages.length)];
                     channel.sendTyping()
                     await channel.send(randomMessage)

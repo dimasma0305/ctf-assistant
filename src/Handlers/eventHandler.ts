@@ -22,6 +22,7 @@ const loadEvents = async (client: MyClient) => {
 
     const execute = (...args: any[]) => event.execute(...args, client);
     client.events.set(event.name, execute);
+    console.log(event)
 
     if (event.rest) {
       if (event.once) client.rest.once(event.name as keyof RestEvents, execute);

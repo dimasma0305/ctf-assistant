@@ -2,6 +2,7 @@ import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder } from "discord.js";
 import { translate } from "../../../Functions/discord-utils";
 import { infoEvents } from "../../../Functions/ctftime";
+import { infoEvent } from "../../../Functions/ctftime-v2";
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
@@ -10,27 +11,37 @@ export const command: SubCommand = {
         .addStringOption((option) => option
             .setName("id")
             .setDescription("id of the ctf event on ctftime")
-            .setRequired(true)
-        ),
+            .setRequired(false)
+        )
+        .addStringOption((option)=> option
+            .setName("title")
+            .setDescription("Delete ctf by title")
+            .setRequired(false)
+    ),
     async execute(interaction, _client) {
         const { options } = interaction;
-        interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply({ ephemeral: true })
+        var title: string
+        const id = options.getString("id", false);
+        if (id){
+            const data = await infoEvent(id);
+            title = data.title
+        } else {
+            title = options.getString("title", true)
+        }
 
-
-        const id = options.getString("id", true);
-        const data = await infoEvents(id);
         const guild = interaction.guild
         if (!guild) {
             return
         }
         guild.roles.cache.forEach(async (role) => {
-            if (role.name === data.title) {
+            if (role.name === title) {
                 await role.delete()
                 return true
             }
         });
         guild.channels.cache.forEach((channel) => {
-            const chat_channel = translate(data.title)
+            const chat_channel = translate(title)
             const writeup_channel = translate(`${chat_channel} writeup`)
             if (channel.name === chat_channel ||
                 channel.name === writeup_channel) {
@@ -38,8 +49,12 @@ export const command: SubCommand = {
                 return true
             }
         })
+        guild.scheduledEvents.cache.forEach((event)=>{
+            if (!(event.name==title)) return
+            event.delete()
+        })
         await interaction.editReply({
-            content: `Successfuly delete ${data.title}`,
+            content: `Successfuly delete ${title}`,
         })
     },
 };
