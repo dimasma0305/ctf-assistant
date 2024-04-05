@@ -151,12 +151,11 @@ ${weight}
             componentType: ComponentType.Button,
         })
         colector.on("collect", async (interaction)=>{
-            console.log(interaction.id)
-            if (interaction.id == "join"){
+            if (interaction.customId == "join"){
                 this.addRoleToUser(interaction.user)
                 const dm = await interaction.user.createDM()
                 this.sendSuccessMessage(dm)
-            }else if (interaction.id == "leave"){
+            }else if (interaction.customId == "leave"){
                 this.removeRoleFromUser(interaction.user)
                 const dm = await interaction.user.createDM()
                 await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
