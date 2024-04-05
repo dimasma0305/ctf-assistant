@@ -148,7 +148,7 @@ ${weight}
                 return i.user.id ? true : false
             },
             time: this.options.ctfEvent.finish.getTime() - new Date().getTime(),
-            componentType: ComponentType.Button
+            componentType: ComponentType.Button,
         })
         colector.on("collect", async (interaction)=>{
             this.addRoleToUser(interaction.user)

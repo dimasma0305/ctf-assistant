@@ -67,11 +67,12 @@ export const command: SubCommand = {
 
         const button = new ButtonBuilder()
             .setLabel('Join!')
-            .setStyle(ButtonStyle.Primary);
+            .setStyle(ButtonStyle.Primary)
+            .setCustomId("join-btn")
 
         const message = await channel.send({"embeds": [scheduleEmbedTemplate({ctfEvent})], "components": [{
             type: ComponentType.Button,
-            components: [button]
+            components: [button],
         }]})
 
         await event.addEventListener(message)
