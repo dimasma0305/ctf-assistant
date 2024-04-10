@@ -28,7 +28,6 @@ export const command: SubCommand = {
       const data = event[i];
       embedsSend.push(scheduleEmbedTemplate({
         ctfEvent: data,
-        isPrivate: false
       }));
     }
     await interaction.deleteReply()

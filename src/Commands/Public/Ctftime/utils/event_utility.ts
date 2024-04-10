@@ -10,7 +10,8 @@ interface CreateChannelProps {
 
 export async function createPrivateChannelIfNotExist(props: CreateChannelProps) {
     const channelName = translate(props.channelName)
-    var channel = props.guild.channels.cache.find((channel) => channel.name === channelName) as TextChannel
+    const channels = await props.guild.channels.fetch()
+    var channel = channels.find((channel) => channel?.name === channelName) as TextChannel
     if (!channel) {
         channel = await props.guild.channels.create({
             name: channelName,
