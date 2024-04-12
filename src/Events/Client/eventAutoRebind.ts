@@ -10,7 +10,6 @@ export const event: Event = {
     async execute(client: MyClient) {
         client.guilds.cache.forEach((guild)=>{
             guild.scheduledEvents.cache.forEach(async (event) => {
-                console.log(event)
                 if (event.isCompleted() && event.isCanceled()) return
                 const location = event.entityMetadata?.location
                 if (!location) return

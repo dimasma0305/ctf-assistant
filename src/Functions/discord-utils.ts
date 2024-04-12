@@ -1,3 +1,9 @@
-function translate(text: string) { return text.replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "").toLowerCase(); }
+function translate(text: string) {
+    var result = text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9\-]/g, "")
+    while (result.includes("--")){
+        result = result.replace("--", "-")
+    }
+    return result;
+}
 
 export { translate }
