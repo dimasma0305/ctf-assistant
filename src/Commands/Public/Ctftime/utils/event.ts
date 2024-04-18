@@ -121,9 +121,9 @@ ${weight}
             const dm = await guser.user.createDM()
             this.sendSuccessMessage(dm)
         })
-        const interval_id = setInterval(async()=>{
+        const role_interval = setInterval(async()=>{
             if (event.isCompleted()) {
-                clearInterval(interval_id)
+                clearInterval(role_interval)
                 return
             }
             const subs = await event.fetchSubscribers()
@@ -144,6 +144,13 @@ ${weight}
             })
             subsbefore = subs
         }, 5000)
+
+        const is_complete_interval = setTimeout(async() => {
+            if (event.isCompleted()){
+                await this.discussChannel?.send(`Hai teman-teman, akhirnya <@&${role.id}> sudah berakhir, silahkan yang ingin menaruh writeup, bisa menaruh writeupnya di <@&${this.writeupChannel?.id}> :P`)
+                clearInterval(is_complete_interval)
+            }
+        }, 5000);
     }
     async addEventListener(msg: Message){
         this.__initializeChannelAndRole()
