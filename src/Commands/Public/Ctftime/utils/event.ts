@@ -86,11 +86,11 @@ ${weight}
                     location: `${ctftime_url} - ${url}`
                 }
             })
-        }
-        const mabar_channel = this.guild.channels.cache.find((channel)=>channel.name == "mabar-ctf") as TextChannel
-        if (mabar_channel){
-            await mabar_channel.send(`${event.url}`)
-            await mabar_channel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
+            const mabar_channel = this.guild.channels.cache.find((channel)=>channel.name == "mabar-ctf") as TextChannel
+            if (mabar_channel){
+                await mabar_channel.send(`${event.url}`)
+                await mabar_channel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
+            }
         }
         return event
     }
