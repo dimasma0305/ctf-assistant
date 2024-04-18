@@ -87,6 +87,11 @@ ${weight}
                 }
             })
         }
+        const mabar_channel = this.guild.channels.cache.find((channel)=>channel.name == "mabar-ctf") as TextChannel
+        if (mabar_channel){
+            await mabar_channel.send(`${event.url}`)
+            await mabar_channel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
+        }
         return event
     }
     async addRoleToUser(iuser: User){
@@ -106,11 +111,7 @@ ${weight}
         this.__initializeChannelAndRole()
         const role = await this.getRole()
         const event = await this.createEventIfNotExist()
-        const mabar_channel = this.guild.channels.cache.find((channel)=>channel.name == "mabar-ctf") as TextChannel
-        if (mabar_channel){
-            await mabar_channel.send(`${event.url}`)
-            await mabar_channel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
-        }
+
         var subsbefore = await event.fetchSubscribers()
         const members = await this.guild.members.fetch()
         subsbefore.forEach(async (guser)=>{
