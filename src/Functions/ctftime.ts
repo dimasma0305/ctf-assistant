@@ -1,5 +1,5 @@
 import { request } from "./requests";
-import cheerio from "cheerio";
+import {load} from "cheerio";
 
 interface EventData {
   title: string;
@@ -26,7 +26,7 @@ async function infoEvents(id: string): Promise<EventData> {
 
   try {
     const response = await request(url, "GET");
-    const $ = cheerio.load(response.data);
+    const $ = load(response.data);
 
     const link = $(".span10 > p > a[rel='nofollow']").text();
     const img = `https://ctftime.org/${$(".span2 > img").attr("src")}`;
@@ -59,7 +59,7 @@ const getEvents = async (time: string): Promise<CTFInfo[]> => {
 
   try {
     const response = await request(url, "GET");
-    const $ = cheerio.load(response.data);
+    const $ = load(response.data);
     const event: CTFInfo[] = [];
     const tableEvent = $("table > tbody > tr");
 
@@ -113,4 +113,21 @@ const getEvents = async (time: string): Promise<CTFInfo[]> => {
   }
 };
 
-export { getEvents, infoEvents };
+const getEventsParticipants = async (id: string) => {
+  const url = `https://ctftime.org/event/${id}`;
+
+  try {
+    const response = await request(url, "GET");
+    const $ = load(response.data);
+    var participants = $('tr > td')
+    var result: string[] = []
+    participants.each((_, el)=>{
+      result.push($(el).find('a').text())
+    })
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export { getEvents, infoEvents, getEventsParticipants };
