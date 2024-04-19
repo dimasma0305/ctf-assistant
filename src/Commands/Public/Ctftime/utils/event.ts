@@ -160,6 +160,7 @@ ${weight}
             componentType: ComponentType.Button,
         })
         colector.on("collect", async (interaction)=>{
+            await interaction.deferReply({ephemeral: true})
             if (interaction.customId == "join"){
                 this.addRoleToUser(interaction.user)
                 const dm = await interaction.user.createDM()
@@ -169,6 +170,7 @@ ${weight}
                 const dm = await interaction.user.createDM()
                 await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
             }
+            await interaction.editReply({message: "success!"})
         })
     }
     async getRole(): Promise<Role> {
