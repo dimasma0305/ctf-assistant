@@ -156,10 +156,6 @@ ${weight}
     async addEventListener(msg: Message){
         this.__initializeChannelAndRole()
         const colector = msg.createMessageComponentCollector({
-            filter: (i) => {
-                i.deferUpdate()
-                return i.user.id ? true : false
-            },
             time: this.options.ctfEvent.finish.getTime() - new Date().getTime(),
             componentType: ComponentType.Button,
         })
