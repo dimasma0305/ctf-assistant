@@ -41,7 +41,6 @@ export const event: Event = {
                       const data = event[i];
                       embedsSend.push(scheduleEmbedTemplate({
                         ctfEvent: data,
-                        isPrivate: false
                       }));
                     }
                     if (embedsSend.length > 0){
