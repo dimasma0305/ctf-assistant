@@ -108,7 +108,7 @@ ${weight}
         await user.roles.remove(role)
     }
     async addEvent() {
-        this.__initializeChannelAndRole()
+        await this.__initializeChannelAndRole()
         const role = await this.getRole()
         const event = await this.createEventIfNotExist()
 
