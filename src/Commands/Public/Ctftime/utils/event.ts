@@ -63,10 +63,14 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
             const organizers = this.options.ctfEvent.organizers
             const format = this.options.ctfEvent.format
             const weight = this.options.ctfEvent.weight
+            var startTime = this.options.ctfEvent.start
+            if (startTime.getTime() < new Date().getTime()){
+                startTime = new Date(new Date().getTime() + 60000)
+            }
 
             event = await this.guild.scheduledEvents.create({
                 name: this.options.ctfEvent.title,
-                scheduledStartTime: this.options.ctfEvent.start,
+                scheduledStartTime: startTime,
                 scheduledEndTime: this.options.ctfEvent.finish,
                 privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
                 entityType: GuildScheduledEventEntityType.External,
