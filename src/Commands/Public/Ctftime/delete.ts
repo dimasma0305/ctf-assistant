@@ -30,7 +30,7 @@ export const command: SubCommand = {
             title = options.getString("title", true)
         }
 
-        const guild = interaction.guild
+        const guild = await interaction.guild?.fetch()
         if (!guild) {
             return
         }
@@ -50,7 +50,7 @@ export const command: SubCommand = {
             }
         })
         guild.scheduledEvents.cache.forEach((event)=>{
-            if (!(event.name==title)) return
+            if (!(event.name.trim()==title.trim())) return
             event.delete()
         })
         await interaction.editReply({
