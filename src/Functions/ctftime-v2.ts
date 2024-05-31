@@ -51,6 +51,7 @@ async function getUpcommingOnlineEvent(days: number): Promise<CTFEvent[]> {
     ctfEvents.forEach((ctfEvent) => {
         ctfEvent.start = new Date(ctfEvent.start);
         ctfEvent.finish = new Date(ctfEvent.finish);
+        ctfEvent.title = ctfEvent.title.trim();
     })
     ctfEvents = ctfEvents.filter((ctfEvent)=>{
         return ctfEvent.location == "" && ctfEvent.onsite == false

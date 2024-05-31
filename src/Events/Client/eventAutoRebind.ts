@@ -17,7 +17,7 @@ export const event: Event = {
         client.guilds.cache.forEach(async (guild) => {
             const scheduledEvents = await guild.scheduledEvents.fetch()
             scheduledEvents.forEach(async (event) => {
-                if (event.isCompleted() && event.isCanceled()) return
+                if (event.isCompleted() || event.isCanceled()) return
                 const location = event.entityMetadata?.location
                 if (!location) return
                 const match = location.match(EVENT_ID_REGEX);

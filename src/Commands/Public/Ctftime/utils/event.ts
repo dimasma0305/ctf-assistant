@@ -54,7 +54,7 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
         })
     }
     async createEventIfNotExist(){
-        var event = this.guild.scheduledEvents.cache.find((event)=>get_event_id_from_url(event.entityMetadata?.location || "") == String(this.options.ctfEvent.id) && !event.isCanceled() && !event.isCompleted())
+        var event = this.guild.scheduledEvents.cache.find((event)=>event.name===this.options.ctfEvent.title && !event.isCanceled() && !event.isCompleted())
 
         if (!event){
             const description = this.options.ctfEvent.description
