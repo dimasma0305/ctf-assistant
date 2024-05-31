@@ -38,6 +38,7 @@ async function infoEvent(id: string): Promise<CTFEvent> {
 
     ctfEvent.start = new Date(ctfEvent.start);
     ctfEvent.finish = new Date(ctfEvent.finish);
+    ctfEvent.title = ctfEvent.title.trim()
 
     return ctfEvent;
 }

@@ -96,7 +96,7 @@ const getEvents = async (time: string): Promise<CTFInfo[]> => {
 
         const infoCTF: CTFInfo = {
           id: idCTF.replace(/\/event\//gm, ""),
-          name: nameCTF,
+          name: nameCTF.trim(),
           date: dateCTF,
           weight: weightCTF,
           notes: notesCTF,
