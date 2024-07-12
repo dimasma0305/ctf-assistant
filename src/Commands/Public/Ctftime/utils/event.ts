@@ -84,7 +84,7 @@ ${format}
 
 :dart: **Weight**
 ${weight}
-`.substr(0, 1000),
+`,
                 image: this.options.ctfEvent.logo,
                 entityMetadata: {
                     location: `${ctftime_url} - ${url}`
