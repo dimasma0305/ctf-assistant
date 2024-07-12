@@ -57,7 +57,7 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
         var event = this.guild.scheduledEvents.cache.find((event)=>event.name===this.options.ctfEvent.title && !event.isCanceled() && !event.isCompleted())
 
         if (!event){
-            const description = this.options.ctfEvent.description.length > 1000 ? this.options.ctfEvent.description.slice(0, 1000) : this.options.ctfEvent.description
+            const description = this.options.ctfEvent.description.length
             const ctftime_url = this.options.ctfEvent.ctftime_url
             const url = this.options.ctfEvent.url
             const organizers = this.options.ctfEvent.organizers
@@ -84,7 +84,7 @@ ${format}
 
 :dart: **Weight**
 ${weight}
-`,
+`.substr(0, 1000),
                 image: this.options.ctfEvent.logo,
                 entityMetadata: {
                     location: `${ctftime_url} - ${url}`
