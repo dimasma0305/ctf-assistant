@@ -13,4 +13,14 @@ function get_event_id_from_url(url: string) {
     return match[1];
 }
 
-export { translate, get_event_id_from_url }
+const dateToCron = (date: Date) => {
+    const minutes = date.getMinutes();
+    const hours = date.getHours();
+    const days = date.getDate();
+    const months = date.getMonth() + 1;
+    const dayOfWeek = date.getDay();
+
+    return `${minutes} ${hours} ${days} ${months} ${dayOfWeek}`;
+};
+
+export { translate, get_event_id_from_url, dateToCron }

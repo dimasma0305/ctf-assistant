@@ -22,7 +22,7 @@ export const command: SubCommand = {
     ),
   async execute(interaction, _client) {
     const { options } = interaction;
-    const guild = interaction.guild
+    const guild = await interaction.guild?.fetch()
     const channel = interaction.channel
     if (!guild) throw Error("guild not found!")
     if (!channel) throw Error("channel not found!")
@@ -33,7 +33,7 @@ export const command: SubCommand = {
     if (is_dummie) {
       ctfEvent = {
         ctf_id: 0,
-        ctftime_url: "placeholder",
+        ctftimeUrl: "placeholder",
         description: "placeholder",
         duration: {
           days: 2,

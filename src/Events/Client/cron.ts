@@ -19,7 +19,17 @@ export const event: Event = {
             "Aloha <@663394727688798231>! 🌺 Besok kita main CTF bareng lagi ya!?",
             "Yuk yuk yuk! 🎉 Besok mabar CTF, <@663394727688798231>",
             "Hai! Jangan lupa besok prepare mabar CTF, aku tunggu <@663394727688798231>!",
-            "Besok jangan lupa mabar CTF, <@663394727688798231> ayo dim gasskan!"
+            "Besok jangan lupa mabar CTF, <@663394727688798231> ayo dim gasskan!",
+            "Hey <@663394727688798231>! Siap-siap buat besok mabar CTF ya!",
+            "Hola <@663394727688798231>! 🌟 Kita seru-seruan mabar CTF besok!",
+            "Hey squad! Besok ada mabar CTF, siap-siap ya <@663394727688798231>!",
+            "Oi <@663394727688798231>! Jangan lupa besok mabar CTF bareng kita!",
+            "Cek-cek <@663394727688798231>! Siap-siap buat besok mabar CTF yuk!",
+            "Besok ada mabar CTF nih, <@663394727688798231> siap-siap yaa!",
+            "Hei <@663394727688798231>! Jangan lupa prepare buat mabar CTF besok!",
+            "Hello team! 🌟 <@663394727688798231> yuk besok kita mabar CTF lagi!",
+            "Ayo dong <@663394727688798231>, besok mabar CTF bareng lagi!",
+            "Hi hi! 🌼 <@663394727688798231> jangan lupa besok kita mabar CTF!"
         ];
 
         client.guilds.cache.forEach((guild) => {
@@ -30,23 +40,22 @@ export const event: Event = {
             if (channel instanceof BaseGuildTextChannel) {
                 cron.schedule("0 8 * * 5", async() => {
                     const randomMessage = mabarMessages[Math.floor(Math.random() * mabarMessages.length)];
-                    channel.sendTyping()
-                    await channel.send(randomMessage)
-                    channel.sendTyping()
                     const event = await getUpcommingOnlineEvent(5);
                     const embedsSend: Array<APIEmbed> = [];
 
-                    channel.sendTyping()
                     for (let i = 0; i < event.length; i++) {
                       const data = event[i];
                       embedsSend.push(scheduleEmbedTemplate({
                         ctfEvent: data,
                       }));
                     }
+                    await channel.send(randomMessage)
                     if (embedsSend.length > 0){
                         await channel.send("Ini ya mas daftar CTF minggu ini:")
+                        await channel.send({embeds: embedsSend})
+                    }else {
+                        await channel.send("Waduh ternyata nda ada CTF minggu ini :(")
                     }
-                    channel.send({embeds: embedsSend})
                 }, {
                     scheduled: true,
                     timezone: "Asia/Singapore"

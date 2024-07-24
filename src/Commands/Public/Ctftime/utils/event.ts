@@ -1,9 +1,13 @@
-import { CacheType, Channel, ChatInputCommandInteraction, ComponentType, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, Message, Role, TextBasedChannel, TextChannel, User } from "discord.js";
+import { CacheType, ChatInputCommandInteraction, ComponentType, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, Message, Role, TextBasedChannel, TextChannel, User } from "discord.js";
 
 import { sleep } from "bun";
 import { createPrivateChannelIfNotExist, createRoleIfNotExist } from "./event_utility";
 import { CTFEvent } from "../../../../Functions/ctftime-v2";
-import { get_event_id_from_url } from "../../../../Functions/discord-utils";
+import cron from 'node-cron';
+import { dateToCron } from "../../../../Functions/discord-utils";
+
+const { ENV } = process.env;
+
 interface EventListenerOptions {
     ctfEvent: CTFEvent;
     notificationRole?: Role;
@@ -26,7 +30,7 @@ export class ReactionRoleEvent {
         this.discussChannel = await this.createDefaultChannelIfNotExist(ctfName, role, async (channel) => {
             const credsMessage = await channel.send({ content: `Halo temen-temen <@&${role.id}> silahkan untuk bergabung ke team bisa cek credensial yang akan diberikan Mas Dimas <@663394727688798231> XD` },)
             credsMessage.pin('CTF Credential')
-            this.sendNotification()
+            if (ENV != 'development') this.sendNotification()
         })
 
         this.writeupChannel = await this.createDefaultChannelIfNotExist(`${ctfName} writeup`, role, async (channel) => {
@@ -58,7 +62,7 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
 
         if (!event){
             const description = this.options.ctfEvent.description.substr(0, 800)
-            const ctftime_url = this.options.ctfEvent.ctftime_url
+            const ctftimeUrl = this.options.ctfEvent.ctftimeUrl
             const url = this.options.ctfEvent.url
             const organizers = this.options.ctfEvent.organizers
             const format = this.options.ctfEvent.format
@@ -87,13 +91,13 @@ ${weight}
 `,
                 image: this.options.ctfEvent.logo,
                 entityMetadata: {
-                    location: `${ctftime_url} - ${url}`
+                    location: `${ctftimeUrl} - ${url}`
                 }
             })
-            const mabar_channel = this.guild.channels.cache.find((channel)=>channel.name == "mabar-ctf") as TextChannel
-            if (mabar_channel){
-                await mabar_channel.send(`${event.url}`)
-                await mabar_channel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
+            const mabarChannel = this.guild.channels.cache.find((channel)=>channel.name == "mabar-ctf") as TextChannel
+            if (mabarChannel){
+                await mabarChannel.send(`${event.url}`)
+                await mabarChannel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
             }
         }
         return event
@@ -116,50 +120,52 @@ ${weight}
         const role = await this.getRole()
         const event = await this.createEventIfNotExist()
 
-        var subsbefore = await event.fetchSubscribers()
+        var subsBefore = await event.fetchSubscribers()
         const members = await this.guild.members.fetch()
-        subsbefore.forEach(async (guser)=>{
-            const user = members.find((user)=> user.id==guser.user.id)
+        subsBefore.forEach(async (gUser)=>{
+            const user = members.find((user)=> user.id==gUser.user.id)
             if (!user) return
             if (user.roles.cache.has(role.id)) return
-            await this.addRoleToUser(guser.user)
-            const dm = await guser.user.createDM()
+            await this.addRoleToUser(gUser.user)
+            const dm = await gUser.user.createDM()
             this.sendSuccessMessage(dm)
         })
-        const role_interval = setInterval(async()=>{
-            if (event.isCompleted()) {
-                clearInterval(role_interval)
-                return
-            }
-            const subs = await event.fetchSubscribers()
-            const members = await this.guild.members.fetch()
-            subs.forEach(async (guser)=>{
-                const user = members.find((user)=> user.id==guser.user.id)
-                if (!user) return
-                if (user.roles.cache.has(role.id)) return
-                const dm = await guser.user.createDM()
-                await this.addRoleToUser(guser.user)
-                this.sendSuccessMessage(dm)
-            })
-            subsbefore.forEach(async (guser)=>{
-                if (subs.get(guser.user.id)) return
-                const dm = await guser.user.createDM()
-                await this.removeRoleFromUser(guser.user)
-                await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
-            })
-            subsbefore = subs
-        }, 5000)
 
-        const is_complete_interval = setTimeout(async() => {
-            if (event.isCompleted()){
-                await this.discussChannel?.send(`Hai teman-teman, akhirnya <@&${role.id}> sudah berakhir, silahkan yang ingin menaruh writeup, bisa menaruh writeupnya di <@&${this.writeupChannel?.id}> :P`)
-                clearInterval(is_complete_interval)
-            }
-        }, 5000);
+        const updateSubscribers = async () => {
+            const subs = await event.fetchSubscribers();
+            subs.forEach(async (gUser) => {
+                const user = members.find((user) => user.id == gUser.user.id);
+                if (!user) return;
+                if (user.roles.cache.has(role.id)) return;
+                const dm = await gUser.user.createDM();
+                await this.addRoleToUser(gUser.user);
+                this.sendSuccessMessage(dm);
+            });
+            subsBefore.forEach(async (gUser) => {
+                if (subs.get(gUser.user.id)) return;
+                const dm = await gUser.user.createDM();
+                await this.removeRoleFromUser(gUser.user);
+                await dm.send(`Successfully removed the role for "${this.options.ctfEvent.title}"`);
+            });
+            subsBefore = subs;
+        };
+
+        const scheduleEndMessage = async () => {
+            await this.discussChannel?.send(`Hai teman-teman, akhirnya <@&${role.id}> sudah berakhir, silahkan yang ingin menaruh writeup, bisa menaruh writeupnya di <#${this.writeupChannel?.id}> :P`);
+            stopTasks();
+        };
+
+        const updateTask = cron.schedule('*/5 * * * * *', updateSubscribers);
+        const endTask = cron.schedule(dateToCron(new Date(this.options.ctfEvent.finish)), scheduleEndMessage);
+
+        const stopTasks = () => {
+            updateTask.stop();
+            endTask.stop();
+        };
     }
     async addEventListener(msg: Message){
         this.__initializeChannelAndRole()
-        const colector = msg.createMessageComponentCollector({
+        const collector = msg.createMessageComponentCollector({
             filter: async (i) => {
                 await i.deferUpdate()
                 return i.user.id ? true : false
@@ -167,7 +173,7 @@ ${weight}
             time: this.options.ctfEvent.finish.getTime() - new Date().getTime(),
             componentType: ComponentType.Button,
         })
-        colector.on("collect", async (interaction)=>{
+        collector.on("collect", async (interaction)=>{
             if (interaction.customId == "join"){
                 this.addRoleToUser(interaction.user)
                 const dm = await interaction.user.createDM()
@@ -193,7 +199,7 @@ ${weight}
         if (notificationRole) {
             notificationRole.members.forEach(async (member) => {
                 const dmChannel = await member.createDM(true)
-                const notifikasiMabar = {
+                const mabarNotification = {
                     embeds: [{
                         title: "🎮 Notifikasi Mabar TCP1P",
                         description: `Hai teman-teman yang luar biasa!
@@ -203,7 +209,7 @@ Aku punya kabar seru nih! 🥳🎉 Kita akan mabar ${this.options.ctfEvent.title
 Ayo semangat belajar bareng-bareng dan tingkatkan skill cyber security kita di CTF kali ini! 🚀💻 Jangan sampe kelewat, ya! ❤️`
                     }]
                 };
-                dmChannel.send(notifikasiMabar);
+                dmChannel.send(mabarNotification);
             })
         }
     }
