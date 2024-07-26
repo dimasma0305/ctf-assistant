@@ -6,7 +6,7 @@ import { CTFEvent } from "../../../../Functions/ctftime-v2";
 import cron from 'node-cron';
 import { dateToCron } from "../../../../Functions/discord-utils";
 
-const { ENV } = process.env;
+const ENV = process.env.ENV || 'production';
 
 interface EventListenerOptions {
     ctfEvent: CTFEvent;
@@ -30,7 +30,9 @@ export class ReactionRoleEvent {
         this.discussChannel = await this.createDefaultChannelIfNotExist(ctfName, role, async (channel) => {
             const credsMessage = await channel.send({ content: `Halo temen-temen <@&${role.id}> silahkan untuk bergabung ke team bisa cek credensial yang akan diberikan Mas Dimas <@663394727688798231> XD` },)
             credsMessage.pin('CTF Credential')
-            if (ENV != 'development') this.sendNotification()
+            setTimeout(async() => {
+                if (ENV != 'development') await this.sendNotification()
+            }, 100);
         })
 
         this.writeupChannel = await this.createDefaultChannelIfNotExist(`${ctfName} writeup`, role, async (channel) => {
