@@ -21,7 +21,7 @@ export interface CTFEvent {
     format: string;
     start: Date;
     participants: number;
-    ctftimeUrl: string;
+    ctftime_url: string;
     location: string;
     live_feed: string;
     public_votable: boolean;

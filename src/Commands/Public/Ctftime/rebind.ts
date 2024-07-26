@@ -33,7 +33,7 @@ export const command: SubCommand = {
     if (is_dummie) {
       ctfEvent = {
         ctf_id: 0,
-        ctftimeUrl: "placeholder",
+        ctftime_url: "placeholder",
         description: "placeholder",
         duration: {
           days: 2,

@@ -64,7 +64,7 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
 
         if (!event){
             const description = this.options.ctfEvent.description.substr(0, 800)
-            const ctftimeUrl = this.options.ctfEvent.ctftimeUrl
+            const ctftimeUrl = this.options.ctfEvent.ctftime_url
             const url = this.options.ctfEvent.url
             const organizers = this.options.ctfEvent.organizers
             const format = this.options.ctfEvent.format

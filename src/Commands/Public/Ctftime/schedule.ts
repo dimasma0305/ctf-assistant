@@ -36,7 +36,7 @@ export const command: SubCommand = {
     if (is_dummie) {
       ctfEvent = {
         ctf_id: parseInt(id),
-        ctftimeUrl: "placeholder",
+        ctftime_url: "placeholder",
         description: "placeholder",
         duration: {
           days: 2,
