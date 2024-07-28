@@ -33,7 +33,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 app.get("/", async (_, res) => {
-    const sanitizedEvents = getSanitizeEvents()
+    const sanitizedEvents = await getSanitizeEvents()
     res.render("event-list", { events: sanitizedEvents });
 });
 
