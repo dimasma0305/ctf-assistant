@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Events</title>
     <link href="https://unpkg.com/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/jquery@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="container mt-5">
@@ -37,8 +39,8 @@
                     <td><%= event.restrictions.join(', ') %></td>
                     <td>
                         <a href="/admin/event/<%= event._id %>" class="btn btn-warning btn-sm">Edit</a>
-                        <form action="/admin/event/<%= event._id %>/delete" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        <form class="delete-form" action="/admin/event/<%= event._id %>/delete" method="post" style="display:inline;">
+                            <button type="button" class="btn btn-danger btn-sm delete-button">Delete</button>
                         </form>
                     </td>
                 </tr>
@@ -46,5 +48,28 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $('.delete-button').on('click', function(e) {
+                e.preventDefault();
+                const form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
