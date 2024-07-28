@@ -26,7 +26,13 @@
                 <tr>
                     <td><%= event.title %></td>
                     <td><%= event.organizer %></td>
-                    <td><%= new Date(event.timelines[0].startTime).toLocaleDateString() %> - <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %></td>
+                    <td>
+                        <% if (event.timelines && event.timelines.length > 0) { %>
+                            <%= new Date(event.timelines[0].startTime).toLocaleDateString() %> - <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %>
+                        <% } else { %>
+                            N/A
+                        <% } %>
+                    </td>
                     <td><%= event.format.join(', ') %></td>
                     <td><%= event.restrictions.join(', ') %></td>
                     <td>
