@@ -82,10 +82,14 @@
                     <div>
                         <strong><%= event.title %></strong>
                         <br>
-                        <small>
-                            <%= new Date(event.timelines[0].startTime).toLocaleDateString() %> -
-                            <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %>
-                        </small>
+                        <% if (event.timelines && event.timelines.length > 0) { %>
+                            <small>
+                                <%= new Date(event.timelines[0].startTime).toLocaleDateString() %> -
+                                <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %>
+                            </small>
+                        <% } else { %>
+                            <small>N/A</small>
+                        <% } %>
                     </div>
                     <div>
                         <span class="badge badge-primary"><%= event.format.join(', ') %></span>
@@ -155,10 +159,16 @@
             modal.find('#modalEventLogo').attr('src', event.logo);
             modal.find('#modalEventTitle').text(event.title);
             modal.find('#modalEventOrganizer').text(event.organizer);
-            modal.find('#modalEventDateRange').text(
-                new Date(event.timelines[0].startTime).toLocaleDateString() + ' - ' +
-                new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString()
-            );
+
+            if (event.timelines && event.timelines.length > 0) {
+                modal.find('#modalEventDateRange').text(
+                    new Date(event.timelines[0].startTime).toLocaleDateString() + ' - ' +
+                    new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString()
+                );
+            } else {
+                modal.find('#modalEventDateRange').text('N/A');
+            }
+
             modal.find('#modalEventFormat').text(event.format.join(', '));
             modal.find('#modalEventRestrictions').text(event.restrictions.join(', '));
             modal.find('#modalEventURL').text(event.url).attr('href', event.url);

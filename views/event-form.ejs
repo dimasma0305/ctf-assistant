@@ -12,7 +12,7 @@
         <% if (isAdmin) { %>
             <a href="/admin/events" class="btn btn-secondary mb-4">Back to Events</a>
         <% } %>
-        <form action="/admin/event/<%= event._id || '' %>" method="post">
+        <form action="<%= isAdmin ? '/admin/event/' : '/event/' %><%= event._id || '' %>" method="post">
             <div class="form-group">
                 <label for="organizer">Organizer</label>
                 <input type="text" class="form-control" id="organizer" name="organizer" placeholder="Enter organizer" value="<%= event.organizer || '' %>">
