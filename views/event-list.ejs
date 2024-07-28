@@ -68,6 +68,16 @@
         .event-logo {
             display: block;
             margin: 0 auto 20px;
+            max-width: 100%;
+            height: auto;
+        }
+        .timeline-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .timeline-table th, .timeline-table td {
+            padding: 5px;
+            border: 1px solid #444;
         }
     </style>
     <script src="https://unpkg.com/marked@latest/marked.min.js"></script>
@@ -139,6 +149,18 @@
                         </tr>
                     </table>
                     <div class="description" id="modalEventDescription"></div>
+                    <table class="timeline-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalEventTimelines">
+                            <!-- Timeline rows will be added here by JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -175,6 +197,20 @@
 
             var descriptionHtml = DOMPurify.sanitize(marked.parse(event.description));
             modal.find('#modalEventDescription').html(descriptionHtml);
+
+            var timelineRows = '';
+            if (event.timelines && event.timelines.length > 0) {
+                event.timelines.forEach(function(timeline) {
+                    timelineRows += '<tr>';
+                    timelineRows += '<td>' + DOMPurify.sanitize(timeline.name, { ALLOWED_TAGS: [] }) + '</td>';
+                    timelineRows += '<td>' + new Date(timeline.startTime).toLocaleString() + '</td>';
+                    timelineRows += '<td>' + new Date(timeline.endTime).toLocaleString() + '</td>';
+                    timelineRows += '</tr>';
+                });
+            } else {
+                timelineRows += '<tr><td colspan="3">No timelines available</td></tr>';
+            }
+            modal.find('#modalEventTimelines').html(timelineRows);
         });
     </script>
 </body>
