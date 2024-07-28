@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, TextChannel, Interaction, Message, User } from "discord.js"
+import { TextChannel, Interaction, Message, User } from "discord.js"
 import { translate } from "../../../../Functions/discord-utils"
 
 export class RoleModel {
@@ -6,7 +6,7 @@ export class RoleModel {
     icon: string
     display: string
 
-    constructor(name, icon, display) {
+    constructor(name: string, icon: string, display: string) {
         this.name = name
         this.icon = icon
         this.display = display
@@ -35,7 +35,7 @@ export class Role {
         }
     }
     getDefaultRoleData() {
-        const roleAndEmoji = {
+        const roleAndEmoji: any = {
             "web": '1️⃣',
             "pwn": '2️⃣',
             "forensic": '3️⃣',

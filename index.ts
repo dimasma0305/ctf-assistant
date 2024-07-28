@@ -1,9 +1,10 @@
 import { config } from "dotenv";
+import { ShardingManager } from "discord.js";
+import "./src/webserver"
 config();
 
 const { TOKEN } = process.env;
 
-import { ShardingManager } from "discord.js";
 
 const manager = new ShardingManager('./src/bot.ts', { token: TOKEN, respawn: true });
 

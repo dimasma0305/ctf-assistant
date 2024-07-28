@@ -3,7 +3,6 @@ import { SlashCommandSubcommandBuilder } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "./utils/event";
 import { createRoleIfNotExist } from "./utils/event_utility";
-import { scheduleEmbedTemplate } from "./utils/template";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()

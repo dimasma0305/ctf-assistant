@@ -13,7 +13,7 @@ interface Event {
 }
 
 const loadEvents = async (client: MyClient) => {
-  const table = new ascii().setHeading("Events", "Status");
+  const table = new ascii(undefined, undefined).setHeading("Events", "Status");
   client.events.clear();
 
   const Files: string[] = await loadFiles("Events");

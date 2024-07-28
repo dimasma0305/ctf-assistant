@@ -1,7 +1,6 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder } from "discord.js";
 import { translate } from "../../../Functions/discord-utils";
-import { infoEvents } from "../../../Functions/ctftime";
 import { infoEvent } from "../../../Functions/ctftime-v2";
 
 export const command: SubCommand = {

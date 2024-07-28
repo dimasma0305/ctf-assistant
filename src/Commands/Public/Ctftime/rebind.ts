@@ -1,7 +1,6 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, Message, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType, ActionRowData, JSONEncodable, APIActionRowComponent, APIMessageActionRowComponent } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
-import { getEmbedCTFEvent } from "./utils/event";
 import { ReactionRoleEvent } from "./utils/event";
 import { scheduleEmbedTemplate } from "./utils/template";
 

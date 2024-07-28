@@ -2,9 +2,21 @@ version: '3'
 services:
   ctf-assistant:
     build: .
-    restart: always
     networks:
       default:
+      internal:
+    volumes:
+      - ./src/:/app/src/
+      - ./volumes/db:/data/db
+    ports:
+      - 3000:3000
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
       internal:
 networks:
   default:

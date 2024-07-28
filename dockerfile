@@ -1,4 +1,6 @@
 FROM oven/bun:latest
-COPY . .
+WORKDIR /app
+COPY package.json package.json
 RUN bun install
-CMD bun run start
+COPY . .
+CMD sh ./run.sh

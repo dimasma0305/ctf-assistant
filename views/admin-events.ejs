@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Events</title>
+    <link href="https://unpkg.com/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Manage Events</h1>
+        <a href="/admin/event/new" class="btn btn-primary mb-3">Create New Event</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Organizer</th>
+                    <th>Date Range</th>
+                    <th>Format</th>
+                    <th>Restrictions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% events.forEach(event => { %>
+                <tr>
+                    <td><%= event.title %></td>
+                    <td><%= event.organizer %></td>
+                    <td><%= new Date(event.timelines[0].startTime).toLocaleDateString() %> - <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %></td>
+                    <td><%= event.format.join(', ') %></td>
+                    <td><%= event.restrictions.join(', ') %></td>
+                    <td>
+                        <a href="/admin/event/<%= event._id %>" class="btn btn-warning btn-sm">Edit</a>
+                        <form action="/admin/event/<%= event._id %>/delete" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
