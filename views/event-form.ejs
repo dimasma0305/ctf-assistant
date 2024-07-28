@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Form</title>
     <link href="https://unpkg.com/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Event Form</h1>
@@ -33,8 +35,8 @@
             <div class="form-group">
                 <label for="restrictions">Restrictions</label>
                 <div>
-                    <% const restrictions = ['SMA', 'SMK', 'Universitas', 'Politeknik', 'Umum']; %>
-                    <% restrictions.forEach(restriction => { %>
+                    <% const restrictions=['SMA', 'SMK' , 'Universitas' , 'Politeknik' , 'Umum' ]; %>
+                    <% restrictions.forEach(restriction=> { %>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="restriction<%= restriction %>" name="restrictions" value="<%= restriction %>" <%= event.restrictions && event.restrictions.includes(restriction) ? 'checked' : '' %>>
                             <label class="form-check-label" for="restriction<%= restriction %>"><%= restriction %></label>
@@ -45,8 +47,8 @@
             <div class="form-group">
                 <label for="format">Format</label>
                 <div>
-                    <% const formats = ['jeopardy', 'attack & defense']; %>
-                    <% formats.forEach(format => { %>
+                    <% const formats=['jeopardy', 'attack & defense' ]; %>
+                    <% formats.forEach(format=> { %>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="format<%= format %>" name="format" value="<%= format %>" <%= event.format && event.format.includes(format) ? 'checked' : '' %>>
                             <label class="form-check-label" for="format<%= format %>"><%= format %></label>
@@ -64,6 +66,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Timezone</th>
                             <th>Start Time</th>
                             <th>End Time</th>
                             <th>Action</th>
@@ -71,16 +74,23 @@
                     </thead>
                     <tbody id="timelineContainer">
                         <% if (event.timelines && event.timelines.length) { %>
-                            <% event.timelines.forEach((timeline, index) => { %>
+                            <% event.timelines.forEach((timeline, index)=> { %>
                                 <tr class="timeline-entry">
                                     <td>
                                         <input type="text" class="form-control" name="timelineName[]" placeholder="Enter timeline name" value="<%= timeline.name %>">
                                     </td>
                                     <td>
-                                        <input type="datetime-local" class="form-control" name="timelineStart[]" value="<%= new Date(timeline.startTime).toISOString().slice(0,16) %>">
+                                        <select class="form-control timezone-select" name="timezone[]">
+                                            <option value="WIB" <%= timeline.timezone === 'WIB' ? 'selected' : '' %>>WIB</option>
+                                            <option value="WITA" <%= timeline.timezone === 'WITA' ? 'selected' : '' %>>WITA</option>
+                                            <option value="WIT" <%= timeline.timezone === 'WIT' ? 'selected' : '' %>>WIT</option>
+                                        </select>
                                     </td>
                                     <td>
-                                        <input type="datetime-local" class="form-control" name="timelineEnd[]" value="<%= new Date(timeline.endTime).toISOString().slice(0,16) %>">
+                                        <input type="datetime-local" class="form-control datetime-input" name="timelineStart[]" data-timezone="<%= timeline.timezone %>" value="<%= new Date(timeline.startTime).toISOString().slice(0,16) %>">
+                                    </td>
+                                    <td>
+                                        <input type="datetime-local" class="form-control datetime-input" name="timelineEnd[]" data-timezone="<%= timeline.timezone %>" value="<%= new Date(timeline.endTime).toISOString().slice(0,16) %>">
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger remove-timeline">Remove</button>
@@ -93,10 +103,17 @@
                                     <input type="text" class="form-control" name="timelineName[]" placeholder="Enter timeline name">
                                 </td>
                                 <td>
-                                    <input type="datetime-local" class="form-control" name="timelineStart[]">
+                                    <select class="form-control timezone-select" name="timezone[]">
+                                        <option value="WIB">WIB</option>
+                                        <option value="WITA">WITA</option>
+                                        <option value="WIT">WIT</option>
+                                    </select>
                                 </td>
                                 <td>
-                                    <input type="datetime-local" class="form-control" name="timelineEnd[]">
+                                    <input type="datetime" class="form-control datetime-input" name="timelineStart[]" data-timezone="WIB">
+                                </td>
+                                <td>
+                                    <input type="datetime" class="form-control datetime-input" name="timelineEnd[]" data-timezone="WIB">
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-danger remove-timeline">Remove</button>
@@ -123,10 +140,17 @@
                             <input type="text" class="form-control" name="timelineName[]" placeholder="Enter timeline name">
                         </td>
                         <td>
-                            <input type="datetime-local" class="form-control" name="timelineStart[]">
+                            <select class="form-control timezone-select" name="timezone[]">
+                                <option value="WIB">WIB</option>
+                                <option value="WITA">WITA</option>
+                                <option value="WIT">WIT</option>
+                            </select>
                         </td>
                         <td>
-                            <input type="datetime-local" class="form-control" name="timelineEnd[]">
+                            <input type="datetime-local" class="form-control datetime-input" name="timelineStart[]" data-timezone="WIB">
+                        </td>
+                        <td>
+                            <input type="datetime-local" class="form-control datetime-input" name="timelineEnd[]" data-timezone="WIB">
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger remove-timeline">Remove</button>
@@ -162,4 +186,5 @@
         });
     </script>
 </body>
+
 </html>

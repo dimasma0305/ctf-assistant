@@ -49,17 +49,20 @@ export async function updateEvent(id: string, form: EventSchemaType) {
 
         for (const i in event.timelines) {
             const name = event.timelines[i].name;
-            const startTime = event.timelines[i].startTime
-            const endTime = event.timelines[i].endTime
+            const timezone = event.timelines[i].timezone
+            if (!timezone || !event.timelines[i].startTime || !event.timelines[i].endTime) return
+            const startTime = formatTimezone(event.timelines[i].startTime, timezones[timezone])
+            const endTime = formatTimezone(event.timelines[i].endTime, timezones[timezone])
             const discordEventId = event.timelines[i].discordEventId
 
             if (!name || !startTime || !endTime) {
                 return
             }
 
-            if (startTime < now || endTime < now) {
+            if (new Date(startTime) < now || new Date(endTime) < now) {
                 return
             }
+
             const eventOptions = {
                 name: `${event.title} - ${name}`,
                 scheduledStartTime: startTime,
@@ -140,7 +143,8 @@ export async function reqToForm(req: express.Request): Promise<EventSchemaType |
                 name,
                 startTime,
                 endTime,
-                discordEventId
+                discordEventId,
+                timezone: req.body.timezone[index]
             };
         } catch (error) {
             console.log(error)
@@ -148,6 +152,7 @@ export async function reqToForm(req: express.Request): Promise<EventSchemaType |
         }
         return resp;
     }).filter((item: any) => item !== undefined);
+    console.log(timelines)
     return {
         organizer: req.body.organizer,
         description: req.body.description,
@@ -158,4 +163,43 @@ export async function reqToForm(req: express.Request): Promise<EventSchemaType |
         logo: req.body.logo,
         timelines,
     }
+}
+
+export const formatTimezone = (datetime: Date, offset: number) => {
+    const sign = offset >= 0 ? '+' : '-';
+    const absOffset = Math.abs(offset);
+    const formattedOffset = `${sign}${absOffset.toString().padStart(2, '0')}00`;
+
+    return `${datetime.toUTCString()}${formattedOffset}`;
+};
+
+export const timezones :any= {
+    'WIB': 7,
+    'WITA': 8,
+    'WIT': 9
+};
+
+export async function sanitizeEvents(){
+
+    const events = await EventModel.find().sort({ "timelines.startTime": 1 }).lean().exec();
+
+    const sanitizedEvents = events.map(event => {
+        const { _id, ...rest } = event;
+
+        const sanitizedTimelines = rest.timelines.map(timeline => {
+            if (!timeline.timezone || !timeline.startTime || !timeline.endTime){
+                return
+            }
+            const { _id, discordEventId, ...timelineRest } = timeline;
+            const offset = timezones[timeline.timezone];
+            return {
+                ...timelineRest,
+                startTime: formatTimezone(timeline.startTime, offset),
+                endTime: formatTimezone(timeline.endTime, offset)
+            };
+        }).filter(val => val !== undefined)
+
+        return { ...rest, timelines: sanitizedTimelines };
+    });
+    return sanitizedEvents
 }

@@ -19,7 +19,11 @@ const eventSchema = {
         name: String,
         discordEventId: String,
         startTime: Date,
-        endTime: Date
+        endTime: Date,
+        timezone: {
+            type: String,
+            enum: ['WIB', 'WITA', 'WIT']
+        }
     }],
 }
 

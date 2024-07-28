@@ -57,7 +57,7 @@
             margin: 0;
         }
         .modal-body .description {
-            white-space: pre-wrap; /* Preserve newlines and spaces */
+            white-space: pre-wrap;
         }
         .event-details-table {
             width: 100%;
@@ -155,6 +155,7 @@
                                 <th>Name</th>
                                 <th>Start Time</th>
                                 <th>End Time</th>
+                                <th>Timezone</th>
                             </tr>
                         </thead>
                         <tbody id="modalEventTimelines">
@@ -205,10 +206,11 @@
                     timelineRows += '<td>' + DOMPurify.sanitize(timeline.name, { ALLOWED_TAGS: [] }) + '</td>';
                     timelineRows += '<td>' + new Date(timeline.startTime).toLocaleString() + '</td>';
                     timelineRows += '<td>' + new Date(timeline.endTime).toLocaleString() + '</td>';
+                    timelineRows += '<td>' + DOMPurify.sanitize(timeline.timezone, { ALLOWED_TAGS: [] }) + '</td>';
                     timelineRows += '</tr>';
                 });
             } else {
-                timelineRows += '<tr><td colspan="3">No timelines available</td></tr>';
+                timelineRows += '<tr><td colspan="4">No timelines available</td></tr>';
             }
             modal.find('#modalEventTimelines').html(timelineRows);
         });

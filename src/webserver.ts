@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import { EventModel } from "./Database/connect";
 import session from "express-session";
 import flash from "connect-flash";
-import { AuthenticatedRequest, reqToForm, updateEvent } from "./Server/utils";
+import { AuthenticatedRequest, reqToForm, sanitizeEvents as getSanitizeEvents, updateEvent } from "./Server/utils";
 import admin from "./Server/routers/admin";
 
 client.guilds.fetch();
@@ -33,18 +33,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 
 app.get("/", async (_, res) => {
-    const events = await EventModel.find().sort({ "timelines.startTime": 1 }).lean().exec();
-
-    const sanitizedEvents = events.map(event => {
-        const { _id, ...rest } = event;
-
-        const sanitizedTimelines = rest.timelines.map(timeline => {
-            const { _id, discordEventId, ...timelineRest } = timeline;
-            return timelineRest;
-        });
-        return { ...rest, timelines: sanitizedTimelines };
-    });
-
+    const sanitizedEvents = getSanitizeEvents()
     res.render("event-list", { events: sanitizedEvents });
 });
 
