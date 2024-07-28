@@ -1,5 +1,5 @@
 import { Session } from "express-session";
-import { eventSchemaType } from "../Database/eventSchema";
+import { EventSchemaType } from "../Database/eventSchema";
 import express, { NextFunction, Response, Request } from "express";
 import { EventModel } from "../Database/connect";
 import { GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from "discord.js";
@@ -36,7 +36,7 @@ export const checkAuth = (req: AuthenticatedRequest, res: Response, next: NextFu
     return res.redirect('/login');
 };
 
-export async function updateEvent(id: string, form: eventSchemaType) {
+export async function updateEvent(id: string, form: EventSchemaType) {
     try {
         await EventModel.findByIdAndUpdate(id, form);
         var event = await EventModel.findById(id)
@@ -66,7 +66,7 @@ export async function updateEvent(id: string, form: eventSchemaType) {
                 scheduledEndTime: endTime,
                 privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
                 entityType: GuildScheduledEventEntityType.External,
-                description: `${event.description}
+                description: `${event.description?.substring(0, 800)}
 
 :busts_in_silhouette: **Organizers**
 ${event.organizer}
@@ -116,7 +116,7 @@ export async function deleteEvent(id: string) {
     }
 }
 
-export async function reqToForm(req: express.Request): Promise<eventSchemaType | undefined> {
+export async function reqToForm(req: express.Request): Promise<EventSchemaType | undefined> {
     let event = await EventModel.findById(req.params.id)
     if (!(req.body.timelineName instanceof Array)) {
         return
