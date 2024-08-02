@@ -34,7 +34,9 @@ client.events = new Collection();
 client.commands = new Collection();
 client.subCommands = new Collection();
 
-db.connect()
+if (!process.env.NODB){
+  db.connect()
+}
 client.on(Events.Debug, (message) => {
     console.log(message)
 })
