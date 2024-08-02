@@ -170,7 +170,7 @@ export async function reqToForm(req: express.Request): Promise<EventSchemaType |
                 endTime,
                 discordEventId,
                 timezone: req.body.timezone ? req.body.timezone[index] : undefined,
-                isOnline: req.body.location ? req.body.location[index] : undefined
+                location: req.body.location ? req.body.location[index] : undefined
             };
         } catch (error) {
             console.log(error);
