@@ -78,7 +78,7 @@ ${event.organizer}
 :gear: **Format**
 ${event.format}
 
-:web: **URL**
+:link: **URL**
 ${event.url}`,
                 image: event.logo,
                 entityMetadata: {
