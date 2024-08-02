@@ -4,8 +4,9 @@ import bodyParser from 'body-parser';
 import { EventModel } from "./Database/connect";
 import session from "express-session";
 import flash from "connect-flash";
-import { AuthenticatedRequest, reqToForm, sanitizeEvents as getSanitizeEvents, updateEvent } from "./Server/utils";
+import { AuthenticatedRequest, reqToForm, sanitizeEvents as getSanitizeEvents, updateOrDeleteEvents } from "./Server/utils";
 import admin from "./Server/routers/admin";
+import { eventSchema } from "./Database/eventSchema";
 
 client.guilds.fetch();
 
@@ -58,19 +59,19 @@ app.get("/event/:id", async (req, res) => {
     if (id) {
         const event = await EventModel.findById(id).exec().catch();
         if (event) {
-            return res.render('event-form', { event, isAdmin: false });
+            return res.render('event-form', {
+                event,
+                eventSchema,
+                isAdmin: false
+            });
         }
     }
     res.send("ok");
 });
 
 app.post("/event/:id", async (req, res) => {
-    const id = req.params.id;
-    const form = await reqToForm(req);
-    if (form){
-        await updateEvent(id, form);
-    }
-    return res.redirect("/event/" + id);
+    await updateOrDeleteEvents(req);
+    return res.redirect("/event/" + req.params.id);
 });
 
 app.listen(3000, "0.0.0.0", () => {

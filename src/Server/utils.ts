@@ -14,18 +14,19 @@ interface AuthenticatedSession extends Session {
 export interface AuthenticatedRequest extends Request {
     session: AuthenticatedSession
 }
+
 export async function getTCP1P() {
-    let tcp1p = client.guilds.cache.find((g) => g.name == "TCP1P Server")
+    let tcp1p = client.guilds.cache.find((g) => g.name == "TCP1P Server");
     while (true) {
         if (!tcp1p) {
-            console.log("There's no TCP1P?")
-            tcp1p = client.guilds.cache.find((g) => g.name == "TCP1P Server")
+            console.log("There's no TCP1P?");
+            tcp1p = client.guilds.cache.find((g) => g.name == "TCP1P Server");
         } else {
-            break
+            break;
         }
-        await sleep(1000)
+        await sleep(1000);
     }
-    return tcp1p
+    return tcp1p;
 }
 
 export const checkAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -36,31 +37,31 @@ export const checkAuth = (req: AuthenticatedRequest, res: Response, next: NextFu
     return res.redirect('/login');
 };
 
-export async function updateEvent(id: string, form: EventSchemaType) {
+async function updateDiscordEvents(id: string) {
     try {
-        await EventModel.findByIdAndUpdate(id, form);
-        var event = await EventModel.findById(id)
+        const event = await EventModel.findById(id);
 
-        if (event == undefined) {
-            return
+        if (!event) {
+            return;
         }
 
         const now = new Date();
 
         for (const i in event.timelines) {
             const name = event.timelines[i].name;
-            const timezone = event.timelines[i].timezone
-            if (!timezone || !event.timelines[i].startTime || !event.timelines[i].endTime) return
-            const startTime = formatTimezone(event.timelines[i].startTime, timezones[timezone])
-            const endTime = formatTimezone(event.timelines[i].endTime, timezones[timezone])
-            const discordEventId = event.timelines[i].discordEventId
+            const timezone = event.timelines[i].timezone;
+            if (!timezone || !event.timelines[i].startTime || !event.timelines[i].endTime) return;
+            let startTime = formatTimezone(event.timelines[i].startTime, timezones[timezone]);
+            const endTime = formatTimezone(event.timelines[i].endTime, timezones[timezone]);
+            const discordEventId = event.timelines[i].discordEventId;
 
             if (!name || !startTime || !endTime) {
-                return
+                continue;
             }
 
             if (new Date(startTime) < now || new Date(endTime) < now) {
-                return
+                if (new Date(endTime) < now) continue;
+                if (new Date(startTime) < now) startTime = formatTimezone(new Date(Date.now()+30*1000), new Date().getTimezoneOffset())
             }
 
             const eventOptions = {
@@ -75,36 +76,39 @@ export async function updateEvent(id: string, form: EventSchemaType) {
 ${event.organizer}
 
 :gear: **Format**
-${event.format}`,
+${event.format}
+
+:web: **URL**
+${event.url}`,
                 image: event.logo,
                 entityMetadata: {
-                    location: `${event.url}`
+                    location: event.timelines[i].location
                 }
-            }
-            const tcp1p = await getTCP1P()
-            if (!tcp1p) return
+            };
+            const tcp1p = await getTCP1P();
+            if (!tcp1p) return;
             if (discordEventId) {
-                const discordEvent = tcp1p.scheduledEvents.cache.find((scheduledEvent) => scheduledEvent.id == discordEventId)
+                const discordEvent = tcp1p.scheduledEvents.cache.find((scheduledEvent) => scheduledEvent.id == discordEventId);
                 if (discordEvent) {
-                    await discordEvent.edit(eventOptions)
+                    await discordEvent.edit(eventOptions);
                 } else {
-                    const discordEvent = await tcp1p.scheduledEvents.create(eventOptions);
-                    event.timelines[i].discordEventId = discordEvent.id
+                    const newDiscordEvent = await tcp1p.scheduledEvents.create(eventOptions);
+                    event.timelines[i].discordEventId = newDiscordEvent.id;
                 }
             } else {
-                const discordEvent = await tcp1p.scheduledEvents.create(eventOptions);
-                event.timelines[i].discordEventId = discordEvent.id
+                const newDiscordEvent = await tcp1p.scheduledEvents.create(eventOptions);
+                event.timelines[i].discordEventId = newDiscordEvent.id;
             }
         }
-        await event.save()
+        await event.save();
     } catch (error) {
-        console.error(error)
+        console.error(error);
     }
 }
 
-export async function deleteEvent(id: string) {
+export async function deleteEvents(id: string) {
     const event = await EventModel.findById(id).exec();
-    const tcp1p = await getTCP1P()
+    const tcp1p = await getTCP1P();
     if (event) {
         for (const timeline of event.timelines) {
             const discordEventId = timeline.discordEventId;
@@ -119,40 +123,61 @@ export async function deleteEvent(id: string) {
     }
 }
 
+async function deleteEvent(discordEventId: string){
+    const tcp1p = await getTCP1P();
+    const discordEvent = tcp1p.scheduledEvents.cache.find((scheduledEvent) => scheduledEvent.id === discordEventId);
+    if (discordEvent) {
+        await discordEvent.delete().catch(console.error);
+    }
+}
+
+function isDate(date: string): boolean {
+    try {
+        new Date(date).toISOString();
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export async function reqToForm(req: express.Request): Promise<EventSchemaType | undefined> {
-    let event = await EventModel.findById(req.params.id)
-    if (!(req.body.timelineName instanceof Array)) {
+    if (typeof req.params.id != "string"){
         return
+    }
+    let event = await EventModel.findById(req.params.id);
+    if (!(req.body.timelineName instanceof Array)) {
+        return;
     }
     const timelines = req.body.timelineName.map((name: any, index: number) => {
         if (typeof index != "number") {
-            return
+            return;
         }
-        let resp = {};
+        let resp: any = {};
         try {
-            const startTime = new Date(req.body.timelineStart[index]).toISOString();
-            const endTime = new Date(req.body.timelineEnd[index]).toISOString();
-            if (!startTime || !endTime) {
-                return
-            }
-            let discordEventId = null
+            const timelineStart = req.body.timelineStart[index];
+            const timelineEnd = req.body.timelineEnd[index];
+            let startTime;
+            let endTime;
+            if (isDate(timelineStart)) startTime = new Date(timelineStart).toISOString();
+            if (isDate(timelineEnd)) endTime = new Date(timelineEnd).toISOString();
+            let discordEventId = null;
             if (event && event.timelines && event.timelines[index]) {
-                discordEventId = event.timelines[index].discordEventId
+                discordEventId = event.timelines[index].discordEventId;
             }
             resp = {
                 name,
                 startTime,
                 endTime,
                 discordEventId,
-                timezone: req.body.timezone[index]
+                timezone: req.body.timezone ? req.body.timezone[index] : undefined,
+                isOnline: req.body.location ? req.body.location[index] : undefined
             };
         } catch (error) {
-            console.log(error)
-            return
+            console.log(error);
+            return;
         }
         return resp;
     }).filter((item: any) => item !== undefined);
-    console.log(timelines)
     return {
         organizer: req.body.organizer,
         description: req.body.description,
@@ -165,7 +190,7 @@ export async function reqToForm(req: express.Request): Promise<EventSchemaType |
     }
 }
 
-export const formatTimezone = (datetime: Date, offset: number) => {
+export const formatTimezone = (datetime: Date, offset: number): string => {
     const sign = offset >= 0 ? '+' : '-';
     const absOffset = Math.abs(offset);
     const formattedOffset = `${sign}${absOffset.toString().padStart(2, '0')}00`;
@@ -173,13 +198,13 @@ export const formatTimezone = (datetime: Date, offset: number) => {
     return `${datetime.toUTCString()}${formattedOffset}`;
 };
 
-export const timezones :any= {
+export const timezones: { [key: string]: number } = {
     'WIB': 7,
     'WITA': 8,
     'WIT': 9
 };
 
-export async function sanitizeEvents(){
+export async function sanitizeEvents() {
 
     const events = await EventModel.find().sort({ "timelines.startTime": 1 }).lean().exec();
 
@@ -187,8 +212,8 @@ export async function sanitizeEvents(){
         const { _id, ...rest } = event;
 
         const sanitizedTimelines = rest.timelines.map(timeline => {
-            if (!timeline.timezone || !timeline.startTime || !timeline.endTime){
-                return
+            if (!timeline.timezone || !timeline.startTime || !timeline.endTime) {
+                return;
             }
             const { _id, discordEventId, ...timelineRest } = timeline;
             const offset = timezones[timeline.timezone];
@@ -197,9 +222,31 @@ export async function sanitizeEvents(){
                 startTime: formatTimezone(timeline.startTime, offset),
                 endTime: formatTimezone(timeline.endTime, offset)
             };
-        }).filter(val => val !== undefined)
+        }).filter(val => val !== undefined);
 
         return { ...rest, timelines: sanitizedTimelines };
     });
-    return sanitizedEvents
+    return sanitizedEvents;
+}
+
+export async function updateOrDeleteEvents(req: express.Request) {
+    const form = await reqToForm(req);
+    const id = req.params.id
+    if (!form || typeof id != "string") {
+        return;
+    }
+    const event = await EventModel.findById(id);
+    await EventModel.findByIdAndUpdate(id, form)
+    const newTimelines = form.timelines;
+    if (event && newTimelines.length != event.timelines.length) {
+        for (const i in event.timelines) {
+            if (newTimelines[i] == undefined) {
+                if (event.timelines[i]?.discordEventId){
+                    await deleteEvent(event.timelines[i].discordEventId);
+                }
+            }
+        }
+    }
+
+    await updateDiscordEvents(req.params.id);
 }

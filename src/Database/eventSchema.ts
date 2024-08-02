@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-const eventSchema = {
+export const eventSchema = {
     organizer: String,
     description: String,
     title: String,
@@ -20,10 +20,14 @@ const eventSchema = {
         discordEventId: String,
         startTime: Date,
         endTime: Date,
+        location: {
+            type: String,
+            default: "Online"
+        },
         timezone: {
             type: String,
             enum: ['WIB', 'WITA', 'WIT']
-        }
+        },
     }],
 }
 

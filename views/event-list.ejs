@@ -121,7 +121,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
@@ -165,6 +165,7 @@
                                 <th>Start Time</th>
                                 <th>End Time</th>
                                 <th>Timezone</th>
+                                <th>Location</th>
                             </tr>
                         </thead>
                         <tbody id="modalEventTimelines">
@@ -213,6 +214,7 @@
                     timelineRows += '<td>' + new Date(timeline.startTime).toLocaleString() + '</td>';
                     timelineRows += '<td>' + new Date(timeline.endTime).toLocaleString() + '</td>';
                     timelineRows += '<td>' + DOMPurify.sanitize(timeline.timezone, { ALLOWED_TAGS: [] }) + '</td>';
+                    timelineRows += '<td>' + DOMPurify.sanitize(timeline.location, { ALLOWED_TAGS: [] }) + '</td>';
                     timelineRows += '</tr>';
                 });
             } else {

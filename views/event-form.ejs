@@ -6,6 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Form</title>
     <link href="https://unpkg.com/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .table-container {
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .checkbox-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
 </head>
 
 <body>
@@ -35,8 +60,7 @@
             <div class="form-group">
                 <label for="restrictions">Restrictions</label>
                 <div>
-                    <% const restrictions=['SMA', 'SMK' , 'Universitas' , 'Politeknik' , 'Umum' ]; %>
-                    <% restrictions.forEach(restriction=> { %>
+                    <% eventSchema.restrictions.enum.forEach(restriction => { %>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="restriction<%= restriction %>" name="restrictions" value="<%= restriction %>" <%= event.restrictions && event.restrictions.includes(restriction) ? 'checked' : '' %>>
                             <label class="form-check-label" for="restriction<%= restriction %>"><%= restriction %></label>
@@ -47,8 +71,7 @@
             <div class="form-group">
                 <label for="format">Format</label>
                 <div>
-                    <% const formats=['jeopardy', 'attack & defense' ]; %>
-                    <% formats.forEach(format=> { %>
+                    <% eventSchema.format.enum.forEach(format => { %>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="format<%= format %>" name="format" value="<%= format %>" <%= event.format && event.format.includes(format) ? 'checked' : '' %>>
                             <label class="form-check-label" for="format<%= format %>"><%= format %></label>
@@ -69,12 +92,13 @@
                             <th>Timezone</th>
                             <th>Start Time</th>
                             <th>End Time</th>
+                            <th>Location</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="timelineContainer">
                         <% if (event.timelines && event.timelines.length) { %>
-                            <% event.timelines.forEach((timeline, index)=> { %>
+                            <% event.timelines.forEach((timeline, index) => { %>
                                 <tr class="timeline-entry">
                                     <td>
                                         <input type="text" class="form-control" name="timelineName[]" placeholder="Enter timeline name" value="<%= timeline.name %>">
@@ -87,10 +111,13 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <input type="datetime-local" class="form-control datetime-input" name="timelineStart[]" data-timezone="<%= timeline.timezone %>" value="<%= new Date(timeline.startTime).toISOString().slice(0,16) %>">
+                                        <input type="datetime-local" class="form-control datetime-input" name="timelineStart[]" data-timezone="<%= timeline.timezone %>" value="<%= timeline.startTime ? new Date(timeline.startTime).toISOString().slice(0, 16) : '' %>">
                                     </td>
                                     <td>
-                                        <input type="datetime-local" class="form-control datetime-input" name="timelineEnd[]" data-timezone="<%= timeline.timezone %>" value="<%= new Date(timeline.endTime).toISOString().slice(0,16) %>">
+                                        <input type="datetime-local" class="form-control datetime-input" name="timelineEnd[]" data-timezone="<%= timeline.timezone %>" value="<%= timeline.endTime ? new Date(timeline.endTime).toISOString().slice(0, 16) : '' %>">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="location[]" value="<%= timeline.location %>">
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger remove-timeline">Remove</button>
@@ -114,6 +141,9 @@
                                 </td>
                                 <td>
                                     <input type="datetime-local" class="form-control datetime-input" name="timelineEnd[]" data-timezone="WIB">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" name="location[]" value="Online">
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-danger remove-timeline">Remove</button>
@@ -151,6 +181,9 @@
                         </td>
                         <td>
                             <input type="datetime-local" class="form-control datetime-input" name="timelineEnd[]" data-timezone="WIB">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="location[]" value="Online">
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger remove-timeline">Remove</button>
