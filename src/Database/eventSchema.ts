@@ -12,7 +12,7 @@ export const eventSchema = {
     },
     format: {
         type: [String],
-        enum: ['jeopardy', 'attack & defense']
+        enum: ['jeopardy', 'attack & defense', 'speed ctf']
     },
     logo: String,
     timelines: [{
