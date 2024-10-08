@@ -57,7 +57,7 @@ interface ChatMessage {
 // Memory type to store an array of ChatMessages per user
 const memory: Record<string, ChatMessage[]> = {};
 
-client.once(Events.MessageCreate, async (message) => {
+client.on(Events.MessageCreate, async (message) => {
   console.log(message.author.username)
   if (message.author.bot) return;
 
