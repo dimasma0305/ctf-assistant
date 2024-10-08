@@ -6,7 +6,11 @@ config();
 const { TOKEN } = process.env;
 
 
-const manager = new ShardingManager('./src/bot.ts', { token: TOKEN, respawn: true });
+import "./src/bot.ts"
 
-manager.on('shardCreate', shard => console.log(`Launched shard ${shard.id}`));
-manager.spawn();
+// const manager = new ShardingManager('./src/bot.ts', { token: TOKEN, respawn: true, totalShards: 1 });
+
+// manager.on('shardCreate', shard => console.log(`Launched shard ${shard.id}`));
+
+// manager.spawn();
+// console.log(manager.shardList)
