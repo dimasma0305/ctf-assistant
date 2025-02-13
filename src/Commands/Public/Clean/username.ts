@@ -5,7 +5,7 @@ export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
         .setName('username')
         .setDescription('username')
-        .addStringOption((option) => option
+        .addUserOption((option) => option
             .setName("username")
             .setDescription("Delete by username")
         )
@@ -17,7 +17,7 @@ export const command: SubCommand = {
     async execute(interaction, _client) {
         await interaction.deferReply({ ephemeral: true })
         try {
-            const username = interaction.options.getString('username');
+            const username = interaction.options.getUser('username')?.username;
             const limit = interaction.options.getInteger('limit') || 10;
 
             const channels = await interaction.guild?.channels.fetch();

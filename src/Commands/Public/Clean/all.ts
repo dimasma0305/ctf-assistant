@@ -14,15 +14,20 @@ export const command: SubCommand = {
         await interaction.deferReply({ ephemeral: true })
         try {
             const limit = interaction.options.getInteger('limit') || 10;
-
+            const curent_channel = interaction.channel
             const channels = await interaction.guild?.channels.fetch();
+            if (curent_channel == null){
+                throw Error("channel not found")
+            }
             if (channels) {
                 channels.forEach(async (channel) => {
-                    if (channel?.isTextBased()) {
-                        const messages = await channel.messages.fetch({ limit });
-                        messages.forEach(async (message) => {
-                            message.delete();
-                        });
+                    if (channel?.id == curent_channel.id) {
+                        if (channel.isTextBased()){
+                            const messages = await channel.messages.fetch({ limit });
+                            messages.forEach(async (message) => {
+                                message.delete();
+                            });
+                        }
                     }
                 });
             }
