@@ -1,8 +1,8 @@
 import { SubCommand } from "../../../Model/command";
-import { SlashCommandSubcommandBuilder } from "discord.js";
+import { SlashCommandSubcommandBuilder, TextChannel } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "./utils/event";
-import { createRoleIfNotExist } from "./utils/event_utility";
+import { createRoleIfNotExist } from "./utils/event";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -27,6 +27,7 @@ export const command: SubCommand = {
     const channel = interaction.channel
     const guild = interaction.guild
     if (!channel || !guild) return
+    if (!(channel instanceof TextChannel)) return
 
     await interaction.deferReply({ ephemeral: true })
     const id = options.getString("id", true);
@@ -72,7 +73,7 @@ export const command: SubCommand = {
       }
     }
 
-    const event = new ReactionRoleEvent(guild, {
+    const event = new ReactionRoleEvent(guild, channel,{
       ctfEvent: ctfEvent,
       notificationRole: await createRoleIfNotExist({
         name: "CTF Waiting Role",

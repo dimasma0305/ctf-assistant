@@ -1,8 +1,7 @@
 import { SubCommand } from "../../../Model/command";
-import { SlashCommandSubcommandBuilder, Message, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType, ActionRowData, JSONEncodable, APIActionRowComponent, APIMessageActionRowComponent } from "discord.js";
+import { SlashCommandSubcommandBuilder, Message, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType, ActionRowData, JSONEncodable, APIActionRowComponent, APIMessageActionRowComponent, TextChannel, NewsChannel, DMChannel } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "./utils/event";
-import { scheduleEmbedTemplate } from "./utils/template";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -25,6 +24,7 @@ export const command: SubCommand = {
     const channel = interaction.channel
     if (!guild) throw Error("guild not found!")
     if (!channel) throw Error("channel not found!")
+    if (!(channel instanceof TextChannel)) throw Error("channel isn't text based channel!")
 
     const id = options.getString("id", true);
     const is_dummie = options.getBoolean("is_dummie");
@@ -62,24 +62,8 @@ export const command: SubCommand = {
 
     await interaction.deferReply({ ephemeral: true })
 
-    const event = new ReactionRoleEvent(guild, { ctfEvent })
-
-    const join = new ButtonBuilder()
-      .setCustomId('join')
-      .setLabel('Join!')
-      .setStyle(ButtonStyle.Primary);
-
-    const leave = new ButtonBuilder()
-      .setCustomId('leave')
-      .setLabel('Leave!')
-      .setStyle(ButtonStyle.Danger);
-
-    const row = new ActionRowBuilder()
-      .addComponents(join, leave);
-
-    const message = await channel.send({ "embeds": [scheduleEmbedTemplate({ ctfEvent })], components: [row as JSONEncodable<APIActionRowComponent<APIMessageActionRowComponent>>] })
-
-    await event.addEventListener(message)
+    const event = new ReactionRoleEvent(guild, channel, { ctfEvent })
+    await event.createMessageForRole()
 
     return interaction.followUp({
       content: "The role has been added to all users who reacted with a white check mark.",

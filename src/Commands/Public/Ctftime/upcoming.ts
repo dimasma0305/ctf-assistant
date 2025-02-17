@@ -1,9 +1,9 @@
-import { APIEmbed, JSONEncodable } from "discord.js";
+import { APIEmbed, JSONEncodable, TextChannel } from "discord.js";
 import { SubCommand } from "../../../Model/command";
 
 import { SlashCommandSubcommandBuilder } from "discord.js";
 import { getUpcommingOnlineEvent, infoEvent } from "../../../Functions/ctftime-v2";
-import { scheduleEmbedTemplate } from "./utils/template";
+import { scheduleEmbedTemplate } from "./utils/event";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -18,6 +18,7 @@ export const command: SubCommand = {
     ),
   async execute(interaction, _client) {
     const { options } = interaction;
+    if (!(interaction.channel instanceof TextChannel)) return
     const days = options.getInteger("days") || 5
 
     const event = await getUpcommingOnlineEvent(days);
