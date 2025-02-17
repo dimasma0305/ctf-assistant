@@ -10,6 +10,7 @@ services:
       - ./volumes/db:/data/db
     ports:
       - 3000:3000
+    restart: always
 
   mongo:
     image: mongo
