@@ -3,7 +3,7 @@ import { Event } from "../../Handlers/eventHandler"
 import { MyClient } from "../../Model/client";
 import cron from "node-cron"
 import { getUpcommingOnlineEvent } from "../../Functions/ctftime-v2";
-import { scheduleEmbedTemplate } from "../../Commands/Public/Ctftime/utils/template";
+import { scheduleEmbedTemplate } from "../../Commands/Public/Ctftime/utils/event";
 
 export const event: Event = {
     name: "LoadCrontEvent",

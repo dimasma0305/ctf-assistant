@@ -1,14 +1,14 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, TextChannel } from "discord.js";
-import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
+import { infoEvent } from "../../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "./utils/event";
-import { createRoleIfNotExist } from "./utils/event";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
-    .setName("schedule")
-    .setDescription("Schedule CTFs")
+    .setName("archive")
+    .setDescription("archive CTFs")
     .addStringOption(option => option
+      .setName("id")
       .setDescription("CTFs ID")
       .setRequired(true)
     ),
@@ -18,8 +18,8 @@ export const command: SubCommand = {
     const guild = interaction.guild
     if (!channel || !guild) return
     if (!(channel instanceof TextChannel)) return
-
     await interaction.deferReply({ ephemeral: true })
+
     const id = options.getString("id", true);
     let ctfEvent = await infoEvent(id)
     const event = new ReactionRoleEvent(guild, channel,{
@@ -31,3 +31,4 @@ export const command: SubCommand = {
     })
   },
 };
+

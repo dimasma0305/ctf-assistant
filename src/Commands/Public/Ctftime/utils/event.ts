@@ -146,12 +146,17 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
         })
     }
     async getDiscussChannel(){
-        var channel = this.guild.channels.cache.get(translate(this.options.ctfEvent.title))
+        const channels = await this.guild.channels.fetch()
+        const name = translate(this.options.ctfEvent.title)
+        var channel = channels.find((channel) => channel?.name === name) as TextChannel
         if (!(channel instanceof TextChannel)) return
         return channel
     }
     async getWriteupChannel(){
-        var channel = this.guild.channels.cache.get(translate(`${this.options.ctfEvent.title} writeup`))
+        const channels = await this.guild.channels.fetch()
+        const name = translate(`${this.options.ctfEvent.title} writeup`)
+        var channel = channels.find((channel) => channel?.name === name) as TextChannel
+        if (!(channel instanceof TextChannel)) return
         if (!(channel instanceof TextChannel)) return
         return channel
     }

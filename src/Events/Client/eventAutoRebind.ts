@@ -2,7 +2,7 @@ import { Event } from "../../Handlers/eventHandler"
 import { MyClient } from "../../Model/client";
 import { infoEvent } from "../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "../../Commands/Public/Ctftime/utils/event";
-import { createRoleIfNotExist } from "../../Commands/Public/Ctftime/utils/event_utility";
+import { createRoleIfNotExist } from "../../Commands/Public/Ctftime/utils/event";
 
 const EVENT_ID_REGEX = /\/event\/(\d+)\//;
 
