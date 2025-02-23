@@ -68,8 +68,9 @@ client.on(Events.MessageCreate, async (message) => {
   if (!memory[userId]) {
     memory[userId] = [];
   }
-  const referenceMessageUser = message.reference?.messageId ? await message.channel.messages.fetch(message.reference.messageId) : null
-  if (content.includes("<@1077393568647352320>") || content.toLowerCase().includes("hackerika") || referenceMessageUser?.id == client.user?.id) {
+  const messageReference = message.reference?.messageId ? await message.channel.messages.fetch(message.reference.messageId) : null
+  
+  if (content.includes("<@1077393568647352320>") || content.toLowerCase().includes("hackerika") || messageReference?.author.id == client.user?.id) {
     if (content.length > 1000) return;
 
     memory[userId].push({ role: 'user', name: author, content });
