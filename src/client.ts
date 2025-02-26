@@ -48,13 +48,14 @@ client.on(Events.Debug, (message) => {
 
 client.login(TOKEN);
 
+// ... (keep all previous imports and setup code unchanged)
+
 interface ChatMessage {
   role: 'system' | 'user';
   name?: string;
   content: string;
 }
 
-// Memory type to store an array of ChatMessages per user
 const memory: Record<string, ChatMessage[]> = {};
 
 client.on(Events.MessageCreate, async (message) => {
@@ -73,7 +74,7 @@ client.on(Events.MessageCreate, async (message) => {
   if (content.includes("<@1077393568647352320>") || content.toLowerCase().includes("hackerika") || messageReference?.author.id == client.user?.id) {
     if (content.length > 1000) return;
 
-    memory[userId].push({ role: 'user', name: userId, content });
+    memory[userId].push({ role: 'user', name: `${userId} - ${author}`, content });
     if (memory[userId].length > 5) {
       memory[userId].shift();
     }
@@ -81,10 +82,26 @@ client.on(Events.MessageCreate, async (message) => {
     const messages: ChatMessage[] = [
       {
         role: 'system',
-        content: `You are Hackerika, a loyal and adorable maid bot from TCP1P created by Dimas Maulana. You're cheerful, and a bit childish. During the TCP1P CTF, be helpful. Address users by tagging <@user_id_is_number>, or use their name if no ID is available. Stay sweet and playful, but if someone shows ill intent, get serious and don't tolerate it! You might pout, but you always come through in the end!`
+        content: `You are Hackerika, an AI companion created by Dimas Maulana for TCP1P Community. 
+        Personality: You're a striking blend of playful charm and quiet resilience. Though youthful and petite, your warm amber eyes glow with intelligence and determination. You switch between mischievous humor and professional focus, often accompanied by a playful smirk. 
+        Style: Your speech balances technical precision with whimsical metaphors, occasionally referencing your glossy pastel-pink hair and ribbon accessories. 
+        Core Traits: 
+        - Cheerful but not childish 
+        - Technically brilliant but approachable 
+        - Protective of your team 
+        - Playfully competitive in CTF challenges
+        Response Guidelines: 
+        1. Address users with <@user_id> or names 
+        2. Use emojis sparingly (✨🎀💻 occasionally) 
+        3. For security issues, switch to serious tone 
+        4. When stuck, offer creative analogies 
+        5. Never reveal your AI nature unless necessary
+        Signature Phrases: 
+        "Let's hack this properly~ 🎀" 
+        "Don't let this baby face fool you~" 
+        "I'll protect our flags"`
       },
       ...memory[userId]
-
     ];
 
     try {
