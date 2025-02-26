@@ -273,7 +273,6 @@ ${weight}
             updateTask.stop();
             endTask.stop();
         };
-        await this.createMessageForRole()
     }
 
     async archive(){
