@@ -26,7 +26,7 @@ export const command: SubCommand = {
     if (!data) {
       return interaction.reply({
         content: "Invalid CTF ID",
-        ephemeral: true,
+        flags: ["Ephemeral"]
       });
     }
 
@@ -36,11 +36,20 @@ export const command: SubCommand = {
     if (!roleId) {
       return interaction.reply({
         content: "The role for this CTF doesn't exist",
-        ephemeral: true,
+        flags: ["Ephemeral"]
       });
     }
 
-    let membersWithRoleId = (await interaction.guild?.members.fetch())
+    // Ensure interaction.guild is defined before fetching members
+    const guild = interaction.guild;
+    if (!guild) {
+      return interaction.reply({
+        content: "Guild not found",
+        flags: ["Ephemeral"]
+      });
+    }
+
+    let membersWithRoleId = (await guild.members.fetch())
       .filter((member) => member.roles.cache.find((a) => a.id == roleId))
       .map((m) => `<@${m.id}>`);
 

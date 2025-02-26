@@ -24,7 +24,7 @@ export const command: SubCommand = {
     const event = await getUpcommingOnlineEvent(days);
     const embedsSend: Array<APIEmbed | JSONEncodable<APIEmbed>> = [];
 
-    await interaction.deferReply({ ephemeral: true })
+    await interaction.deferReply({ flags: ["Ephemeral"] })
     for (let i = 0; i < event.length; i++) {
       const data = event[i];
       embedsSend.push(scheduleEmbedTemplate({

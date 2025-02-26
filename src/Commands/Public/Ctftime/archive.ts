@@ -18,7 +18,7 @@ export const command: SubCommand = {
     const guild = interaction.guild
     if (!channel || !guild) return
     if (!(channel instanceof TextChannel)) return
-    await interaction.deferReply({ ephemeral: true })
+    await interaction.deferReply({ flags: ["Ephemeral"] })
 
     const id = options.getString("id", true);
     let ctfEvent = await infoEvent(id)

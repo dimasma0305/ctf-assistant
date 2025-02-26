@@ -60,14 +60,14 @@ export const command: SubCommand = {
       ctfEvent = await infoEvent(id)
     }
 
-    await interaction.deferReply({ ephemeral: true })
+    await interaction.deferReply({ flags: ["Ephemeral"] })
 
     const event = new ReactionRoleEvent(guild, channel, { ctfEvent })
     await event.createMessageForRole()
 
     return interaction.followUp({
       content: "The role has been added to all users who reacted with a white check mark.",
-      ephemeral: true
+      flags: ["Ephemeral"]
     })
   },
 };

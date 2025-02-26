@@ -1,6 +1,6 @@
 import { SubCommand } from "../../../Model/command";
 
-import { SlashCommandSubcommandBuilder, ActionRowBuilder, TextInputStyle, ModalBuilder, TextInputBuilder } from "discord.js";
+import { SlashCommandSubcommandBuilder, ActionRowBuilder, TextInputStyle, ModalBuilder, TextInputBuilder, TextChannel } from "discord.js";
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
@@ -26,14 +26,14 @@ export const command: SubCommand = {
 
         const submission = await interaction.awaitModalSubmit({ time: 60 * 1000 });
 
-        await submission.deferReply({ ephemeral: true })
+        await submission.deferReply({ flags: ["Ephemeral"] })
 
         const text = submission.fields.getTextInputValue('text')
         const channel = interaction.channel
-        if (!channel) {
+        if (!channel || !(channel instanceof TextChannel)) {
             return
         }
-        await interaction.channel.send(text)
+        await channel.send(text)
         await submission.deleteReply()
     },
 };

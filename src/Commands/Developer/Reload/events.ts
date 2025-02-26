@@ -12,7 +12,7 @@ export const command: SubCommand = {
     loadEvents(client);
     interaction.reply({
       content: "Reloaded Events",
-      ephemeral: true
+      flags: ["Ephemeral"]
     });
   },
 };

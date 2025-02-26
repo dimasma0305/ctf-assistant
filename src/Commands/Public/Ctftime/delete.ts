@@ -19,7 +19,7 @@ export const command: SubCommand = {
     ),
     async execute(interaction, _client) {
         const { options } = interaction;
-        await interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply({ flags: ["Ephemeral"] })
         var title: string
         const id = options.getString("id", false);
         if (id){

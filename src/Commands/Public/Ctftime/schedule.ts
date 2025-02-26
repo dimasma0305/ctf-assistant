@@ -29,7 +29,7 @@ export const command: SubCommand = {
     if (!channel || !guild) return
     if (!(channel instanceof TextChannel)) return
 
-    await interaction.deferReply({ ephemeral: true })
+    await interaction.deferReply({ flags: ["Ephemeral"] })
     const id = options.getString("id", true);
     const is_dummie = options.getBoolean("is_dummie");
     let ctfEvent: CTFEvent;

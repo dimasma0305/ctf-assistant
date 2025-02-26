@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, TextChannel } from "discord.js";
 import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 
@@ -10,9 +10,10 @@ export const event: Event = {
     if (!command) {
       return interaction.reply({
         content: "This command is outdated",
-        ephemeral: true,
+        flags: ["Ephemeral"]
       });
     }
+    if (!(interaction.channel instanceof TextChannel)) return
 
     const subCommand = interaction.options.getSubcommand(false);
     let execute;
@@ -23,7 +24,7 @@ export const event: Event = {
       if (!subCommandFile) {
         return interaction.reply({
           content: "This Subcommand is outdated",
-          ephemeral: true,
+          flags: ["Ephemeral"],
         });
       }
       execute = subCommandFile.execute
@@ -38,7 +39,7 @@ export const event: Event = {
         await interaction.channel?.send({ content: error?.toString() })
       }
     } else {
-      interaction.reply({ content: "isn't a command", ephemeral: true })
+      interaction.reply({ content: "isn't a command", flags: ["Ephemeral"] })
     }
   },
 };

@@ -15,7 +15,7 @@ export const command: SubCommand = {
             .setRequired(false)
         ),
     async execute(interaction, _client) {
-        await interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply({ flags: ["Ephemeral"] })
         try {
             const username = interaction.options.getUser('username')?.username;
             const limit = interaction.options.getInteger('limit') || 10;

@@ -13,7 +13,7 @@ export const command: SubCommand = {
     const guild = interaction.guild
     if (!channel || !guild) return
 
-    await interaction.deferReply({ ephemeral: true })
+    await interaction.deferReply({ flags: ["Ephemeral"] })
     const event  = new EventModel()
     const id = (await event.save()).id
     await interaction.editReply({content: PUBLIC_URL + "/event/" + id})

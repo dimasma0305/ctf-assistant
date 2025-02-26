@@ -14,7 +14,7 @@ export const command: SubCommand = {
     async execute(interaction, _client) {
         const role = new Role(interaction)
         const { options, channel } = interaction
-        await interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply({ flags: ["Ephemeral"] })
         if (!(channel instanceof TextChannel)) {
             return
         }

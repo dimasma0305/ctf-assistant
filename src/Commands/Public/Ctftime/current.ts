@@ -15,7 +15,7 @@ export const command: SubCommand = {
     if (event.length === 0) {
       return interaction.reply({
         content: "Can't get current CTFs",
-        ephemeral: true,
+        flags: ["Ephemeral"]
       });
     }
 
