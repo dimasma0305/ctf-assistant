@@ -82,7 +82,7 @@ export const command: SubCommand = {
             .setTitle('Congratulations to the Winner!')
             .setDescription(`Congratulations to ${users.map(user => `<@${user}>`).join(', ')} for solving the challenge **${challengeName}**!`)
             .setTimestamp()
-            .setFooter({ text: 'CTF Event', iconURL: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExb29tdXoxdHY5cXg5anF4NnhocHN5dHlmYXFsdWQ0Y3UwZGh2bjBqMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iT8dhRCxfMIOWCsZ69/giphy.gif' });
+            .setFooter({ text: 'CTF Event', iconURL: 'https://tcp1p.team/favicon.ico' });
 
         await channel.send({ embeds: [winnerEmbed] });
     },

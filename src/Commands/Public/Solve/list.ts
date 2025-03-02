@@ -27,7 +27,7 @@ export const command: SubCommand = {
       .setTitle('Solved Challenges!')
       .setDescription(solves.map(solve => `**${solve.challenge}** solved by ${solve.users.map(user => `<@${user}>`).join(', ')}!`).join('\n'))
       .setTimestamp()
-    await channel.send({ embeds: [listEmbed] });
+    await interaction.reply({ embeds: [listEmbed]})
   },
 };
 
