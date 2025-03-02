@@ -3,6 +3,9 @@ import db from "./Database/connect";
 config();
 
 const { TOKEN, OPENAI_API_KEY } = process.env;
+if (!process.env.NODB){
+  db.connect()
+}
 
 import {
   Client,
@@ -39,9 +42,7 @@ client.events = new Collection();
 client.commands = new Collection();
 client.subCommands = new Collection();
 
-if (!process.env.NODB){
-  db.connect()
-}
+
 client.on(Events.Debug, (message) => {
     console.log(message)
 })
