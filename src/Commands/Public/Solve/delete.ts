@@ -19,7 +19,7 @@ export const command: SubCommand = {
             return
         }
         const data = JSON.parse(channel.topic || "{}") as any
-        if (!data.ctf_id){
+        if (!data.id){
             interaction.reply("This channel does not have a valid CTF event associated with it.");
             return
         }
@@ -27,7 +27,7 @@ export const command: SubCommand = {
             interaction.reply("Only the server owner can delete solve lists.");
             return
         }
-        await solveModel.deleteMany({ctf_id: data.ctf_id, challenge: challengeName});
+        await solveModel.deleteMany({ctf_id: data.id, challenge: challengeName});
         return interaction.reply({ content: "All solve list deleted", ephemeral: true });
     },
 };

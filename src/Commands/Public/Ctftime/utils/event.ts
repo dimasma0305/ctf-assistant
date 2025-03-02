@@ -145,7 +145,7 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
             channelName: name,
             guild: this.guild,
             role: role,
-            data: this.options.ctfEvent,
+            data: {id: this.options.ctfEvent.id},
             callback: callback
         })
     }

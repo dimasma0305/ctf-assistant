@@ -17,11 +17,11 @@ export const command: SubCommand = {
       return
     }
     const data = JSON.parse(channel.topic || "{}") as any
-    if (!data.ctf_id){
+    if (!data.id){
       interaction.reply("This channel does not have a valid CTF event associated with it.");
       return
     }
-    const solves = await solveModel.find({ctf_id: data.ctf_id})
+    const solves = await solveModel.find({ctf_id: data.id})
     var description;
     if (solves.length == 0){
         description = "No solved challenges found."

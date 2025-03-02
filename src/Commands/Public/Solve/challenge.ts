@@ -72,7 +72,7 @@ export const command: SubCommand = {
         }
         const solve = new solveModel({
             challenge: challengeName,
-            ctf_id: data.ctf_id,
+            ctf_id: data.id,
             users: users
         })
         await solve.save()
