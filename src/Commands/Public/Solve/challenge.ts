@@ -44,7 +44,7 @@ export const command: SubCommand = {
             users = [interaction.user.id]
         }else{
             const regex = /<@(\d+)>/g;
-            users = players.match(regex)?.map(match => match[1]);
+            users = players.match(regex)?.map(match => match.slice(2, -1));
             if (!users){
                 users = [interaction.user.id]
             }
