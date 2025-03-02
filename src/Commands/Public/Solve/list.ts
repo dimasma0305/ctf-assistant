@@ -22,10 +22,16 @@ export const command: SubCommand = {
       return
     }
     const solves = await solveModel.find({ctf_id: data.ctf_id})
+    var description;
+    if (solves.length == 0){
+        description = "No solved challenges found."
+    }else{
+        description = solves.map(solve => `**${solve.challenge}** solved by ${solve.users.map(user => `<@${user}>`).join(', ')}!`).join('\n')
+    }
     const listEmbed = new EmbedBuilder()
       .setColor('#0099ff')
       .setTitle('Solved Challenges!')
-      .setDescription(solves.map(solve => `**${solve.challenge}** solved by ${solve.users.map(user => `<@${user}>`).join(', ')}!`).join('\n'))
+      .setDescription(description)
       .setTimestamp()
     await interaction.reply({ embeds: [listEmbed]})
   },
