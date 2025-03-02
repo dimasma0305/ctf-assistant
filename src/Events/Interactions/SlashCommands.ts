@@ -13,7 +13,12 @@ export const event: Event = {
         flags: ["Ephemeral"]
       });
     }
-    if (!(interaction.channel instanceof TextChannel) || !(interaction.channel instanceof ThreadChannel)) return
+    if (!(interaction.channel instanceof TextChannel) || !(interaction.channel.isThread())) {
+      return interaction.reply({
+        content: "This command can only be used in a text channel or a thread.",
+        flags: ["Ephemeral"]
+      });
+    }
 
     const subCommand = interaction.options.getSubcommand(false);
     let execute;
