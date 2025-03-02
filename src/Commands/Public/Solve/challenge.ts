@@ -84,6 +84,7 @@ export const command: SubCommand = {
             .setTimestamp()
             .setFooter({ text: 'CTF Event', iconURL: 'https://tcp1p.team/favicon.ico' });
 
-        await interaction.reply({ embeds: [winnerEmbed] });
+        await channel.send({ embeds: [winnerEmbed] });
+        await interaction.reply({ content: "success", flags: ["Ephemeral"] });
     },
 };
