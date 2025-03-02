@@ -43,8 +43,8 @@ export const command: SubCommand = {
         if (!players){
             users = [interaction.user.id]
         }else{
-            const regex = /<@[^>]*>/g;
-            users = players.match(regex);
+            const regex = /<@(\d+)>/g;
+            users = players.match(regex)?.map(match => match[1]);
             if (!users){
                 users = [interaction.user.id]
             }
