@@ -13,7 +13,7 @@ export const event: Event = {
         flags: ["Ephemeral"]
       });
     }
-    if (!interaction.channel?.isTextBased() || !interaction.channel?.isThread()) {
+    if (!interaction.channel?.isTextBased() && !interaction.channel?.isThread()) {
       return interaction.reply({
         content: "This command can only be used in a text channel or a thread.",
         flags: ["Ephemeral"]
