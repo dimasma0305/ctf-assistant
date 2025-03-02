@@ -79,11 +79,11 @@ export const command: SubCommand = {
         
         const winnerEmbed = new EmbedBuilder()
             .setColor('#0099ff')
-            .setTitle('Congratulations to the Winner!')
+            .setTitle('Congratulations!')
             .setDescription(`Congratulations to ${users.map(user => `<@${user}>`).join(', ')} for solving the challenge **${challengeName}**!`)
             .setTimestamp()
             .setFooter({ text: 'CTF Event', iconURL: 'https://tcp1p.team/favicon.ico' });
 
-        await channel.send({ embeds: [winnerEmbed] });
+        await interaction.reply({ embeds: [winnerEmbed] });
     },
 };
