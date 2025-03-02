@@ -11,7 +11,7 @@ export const command: SubCommand = {
             .setRequired(false)
         ),
     async execute(interaction, _client) {
-        await interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply({ flags: ["Ephemeral"] })
         try {
             const limit = interaction.options.getInteger('limit') || 10;
             const curent_channel = interaction.channel

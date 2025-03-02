@@ -73,16 +73,18 @@ export const command: SubCommand = {
       }
     }
 
-    const event = new ReactionRoleEvent(guild, channel,{
+    const event = new ReactionRoleEvent(guild, channel, {
       ctfEvent: ctfEvent,
       notificationRole: await createRoleIfNotExist({
         name: "CTF Waiting Role",
         guild: guild,
         color: "#87CEEB"
-      })
+      }),
+      author: interaction.user
     })
 
     await event.addEvent()
+    await event.createMessageForRole()
 
     await interaction.editReply({
       content: "Success",

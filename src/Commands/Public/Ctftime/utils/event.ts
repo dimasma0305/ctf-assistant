@@ -14,6 +14,7 @@ interface CreateChannelProps {
     channelName: string;
     guild: Guild;
     role: Role;
+    data?: Object;
     callback?: ((channel: TextChannel) => Promise<void> | void)
 }
 
@@ -34,7 +35,8 @@ export async function createPrivateChannelIfNotExist(props: CreateChannelProps) 
                     id: props.role.id,
                     allow: ["ViewChannel"]
                 }
-            ]
+            ],
+            topic: JSON.stringify(props.data || {})
         })
         if (props.callback) await props.callback(channel)
     }
@@ -95,6 +97,7 @@ export async function createRoleIfNotExist(props: createRoleProps) {
 interface EventListenerOptions {
     ctfEvent: CTFEvent;
     notificationRole?: Role;
+    author?: User
 }
 
 export class ReactionRoleEvent {
@@ -114,7 +117,7 @@ export class ReactionRoleEvent {
         const role = await this.createEventRoleIfNotExist(ctfName)
         this.role = role
         this.discussChannel = await this.createDefaultChannelIfNotExist(ctfName, role, async (channel) => {
-            const credsMessage = await channel.send({ content: `Halo temen-temen <@&${role.id}> silahkan untuk bergabung ke team bisa cek credensial yang akan diberikan Mas Dimas <@663394727688798231> XD` },)
+            const credsMessage = await channel.send({ content: `Halo temen-temen <@&${role.id}> silahkan untuk bergabung ke team bisa cek credensial yang akan diberikan, tolong buatkan creds ya guys klo belum` },)
             credsMessage.pin('CTF Credential')
             setTimeout(async() => {
                 if (ENV != 'development') await this.sendNotification()
@@ -142,6 +145,7 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
             channelName: name,
             guild: this.guild,
             role: role,
+            data: this.options.ctfEvent,
             callback: callback
         })
     }
@@ -191,6 +195,9 @@ ${format}
 
 :dart: **Weight**
 ${weight}
+
+:person_frowning: **Invoked By**
+<@${this.options.author?.id || "Hackerika"}>
 `,
                 image: this.options.ctfEvent.logo,
                 entityMetadata: {
@@ -201,8 +208,6 @@ ${weight}
             if (mabarChannel){
                 await mabarChannel.send(`${event.url}`)
                 await mabarChannel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
-                // await mabarChannel.send(`Kalian juga bisa `)
-
             }
         }
         return event
