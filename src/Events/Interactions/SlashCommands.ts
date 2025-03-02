@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, TextChannel } from "discord.js";
+import { ChatInputCommandInteraction, TextChannel, ThreadChannel } from "discord.js";
 import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 
@@ -13,7 +13,7 @@ export const event: Event = {
         flags: ["Ephemeral"]
       });
     }
-    if (!(interaction.channel instanceof TextChannel)) return
+    if (!(interaction.channel instanceof TextChannel) || !(interaction.channel instanceof ThreadChannel)) return
 
     const subCommand = interaction.options.getSubcommand(false);
     let execute;
@@ -36,7 +36,7 @@ export const event: Event = {
         await execute(interaction, client)
       } catch (error) {
         console.log(error)
-        await interaction.channel?.send({ content: error?.toString() })
+        await interaction.reply({ content: error?.toString() })
       }
     } else {
       interaction.reply({ content: "isn't a command", flags: ["Ephemeral"] })
