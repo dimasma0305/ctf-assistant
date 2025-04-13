@@ -60,8 +60,20 @@ interface ChatMessage {
 const memory: Record<string, ChatMessage[]> = {};
 
 client.on(Events.MessageCreate, async (message) => {
-  console.log(message.author.username)
+  const phisingMessage = [
+    /50$ gift - /,
+  ]
   if (message.author.bot) return;
+
+  if (phisingMessage.some(regex => regex.test(message.content))) {
+    await message.delete();
+    // Ban the user from the guild
+    if (message.member && message.guild) {
+      await message.member.kick("Sending phishing messages");
+    }
+    await message.author.send("You have been banned for sending phishing messages.");
+    return;
+  }
 
   const author = message.author.username;
   const content = message.content;
