@@ -61,7 +61,7 @@ const memory: Record<string, ChatMessage[]> = {};
 
 client.on(Events.MessageCreate, async (message) => {
   const phisingMessage = [
-    /50$ gift - /,
+    /50\$ gift - /,
   ]
   if (message.author.bot) return;
 
