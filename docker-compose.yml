@@ -5,6 +5,8 @@ services:
     networks:
       default:
       internal:
+    env_file:
+      - stack.env
     ports:
       - 3000:3000
     restart: always
