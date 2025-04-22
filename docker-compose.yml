@@ -5,9 +5,6 @@ services:
     networks:
       default:
       internal:
-    volumes:
-      - ./src/:/app/src/
-      - ./volumes/db:/data/db
     ports:
       - 3000:3000
     restart: always
