@@ -117,8 +117,46 @@ export class ReactionRoleEvent {
         const role = await this.createEventRoleIfNotExist(ctfName)
         this.role = role
         this.discussChannel = await this.createDefaultChannelIfNotExist(ctfName, role, async (channel) => {
-            const credsMessage = await channel.send({ content: `Halo temen-temen <@&${role.id}> silahkan untuk bergabung ke team bisa cek credensial yang akan diberikan, tolong buatkan creds ya guys klo belum` },)
-            credsMessage.pin('CTF Credential')
+            const credsMessage = await channel.send({ content: `
+# 🎉 Selamat Datang di Ruang Diskusi ${ctfName}!
+
+<@&${role.id}> **Mari kolaborasi dan belajar bersama!** 💻✨
+
+## 🔑 **Manajemen Kredensial**
+⚠️ **PENTING:**  
+1. Buat credential dengan format:  
+   \`\`\`md
+   [Nama Tim/Individu] : [Password/Token]
+   \`\`\`
+2. Posting credential di channel ini **SAJA** (channel privat)
+3. Update credential jika ada perubahan
+
+> 🛡️ Channel ini hanya bisa diakses anggota <@&${role.id}>!
+
+## 📋 Panduan Diskusi
+### 🧵 Cara Membuat Thread
+1. **Format nama thread:**  
+   \`\`\`fix
+   [Kategori] Nama Challenge
+   \`\`\`
+   Contoh:  
+   \`\`\`md
+   [Web] Baby SQLi
+   [Forensic] Memory Analysis
+   \`\`\`
+
+2. **Manfaatkan thread untuk:**
+   - 🚧 Diskusi progress penyelesaian
+   - 💬 Brainstorming solusi bersama
+   - 📁 Sharing payload/exploit
+
+## 🛠️ Command Solve 
+\`\`\`bash
+# Auto-detect nama challenge dari thread
+/solve challenge @partisipan1 @partisipan2
+\`\`\`
+            `.trim() })
+            credsMessage.pin('Panduan Resmi CTF');
             setTimeout(async() => {
                 if (ENV != 'development') await this.sendNotification()
             }, 100);
