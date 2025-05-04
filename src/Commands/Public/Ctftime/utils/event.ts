@@ -242,7 +242,7 @@ ${weight}
                     location: `${ctftimeUrl} - ${url}`
                 }
             })
-            const mabarChannel = this.guild.channels.cache.find((channel)=>channel.name == "mabar-ctf") as TextChannel
+            const mabarChannel = this.guild.channels.cache.find((channel)=>channel.name.includes("mabar-ctf")) as TextChannel
             if (mabarChannel){
                 await mabarChannel.send(`${event.url}`)
                 await mabarChannel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
