@@ -66,7 +66,7 @@ export const command: SubCommand = {
             data = JSON.parse(channel.topic || "{}") as CTFEvent
         }
         
-        if (!data.ctf_id){
+        if (!data.id){
             interaction.reply("This channel does not have a valid CTF event associated with it.");
             return
         }
