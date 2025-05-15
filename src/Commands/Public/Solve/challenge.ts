@@ -70,12 +70,18 @@ export const command: SubCommand = {
             interaction.reply("This channel does not have a valid CTF event associated with it.");
             return
         }
-        const solve = new solveModel({
-            challenge: challengeName,
-            ctf_id: data.id,
-            users: users
-        })
-        await solve.save()
+        const existingSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: data.id });
+        if (existingSolve) {
+            existingSolve.users = users;
+            await existingSolve.save();
+        } else {
+            const newSolve = new solveModel({
+                challenge: challengeName,
+                ctf_id: data.id,
+                users: users
+            });
+            await newSolve.save();
+        }
         
         const winnerEmbed = new EmbedBuilder()
             .setColor('#0099ff')
