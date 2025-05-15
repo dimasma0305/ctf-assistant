@@ -153,7 +153,11 @@ export class ReactionRoleEvent {
 ## 🛠️ Command Solve 
 \`\`\`bash
 # Auto-detect nama challenge dari thread
-/solve challenge @partisipan1 @partisipan2
+/solve challenge players:@partisipan1 @partisipan2
+
+# nama challenge di spesifik
+/solve challenge players:@partisipan1 @partisipan2 name:[example] example
+
 \`\`\`
             `.trim() })
             credsMessage.pin('Panduan Resmi CTF');
