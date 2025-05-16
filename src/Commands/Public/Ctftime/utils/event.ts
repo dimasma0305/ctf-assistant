@@ -290,6 +290,7 @@ ${weight}
 
         const updateSubscribers = async () => {
             const subs = await event.fetchSubscribers();
+            const members = await this.guild.members.fetch();
             subs.forEach(async (gUser) => {
                 const user = members.find((user) => user.id == gUser.user.id);
                 if (!user) return;
