@@ -469,6 +469,7 @@ export async function getEmbedCTFEvent(interaction: ChatInputCommandInteraction<
 
 // Add a function to restore message listeners on bot restart
 export async function restoreEventMessageListeners(client: MyClient) {
+    console.log("Restoring event message listeners...")
     try {
         const storedMessages = await MessageModel.find({});
         
