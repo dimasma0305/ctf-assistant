@@ -1,8 +1,7 @@
 import { Event } from "../../Handlers/eventHandler"
 import { MyClient } from "../../Model/client";
 import { infoEvent } from "../../Functions/ctftime-v2";
-import { ReactionRoleEvent } from "../../Commands/Public/Ctftime/utils/event";
-import { createRoleIfNotExist } from "../../Commands/Public/Ctftime/utils/event";
+import { ReactionRoleEvent, createRoleIfNotExist, restoreEventMessageListeners } from "../../Commands/Public/Ctftime/utils/event";
 import { translate } from "../../Functions/discord-utils";
 import { TextChannel } from "discord.js";
 
@@ -12,6 +11,10 @@ export const event: Event = {
     name: "ready",
     once: true,
     async execute(client: MyClient) {
+        // First restore message listeners from database
+        await restoreEventMessageListeners(client);
+        
+        // Then process scheduled events
         client.guilds.cache.forEach(async (guild) => {
             const scheduledEvents = await guild.scheduledEvents.fetch()
             scheduledEvents.forEach(async (event) => {

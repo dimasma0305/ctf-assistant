@@ -1,9 +1,10 @@
 import { ActionRowBuilder, APIActionRowComponent, APIMessageActionRowComponent, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, ComponentType, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, JSONEncodable, Message, Role, TextBasedChannel, TextChannel, User } from "discord.js";
 
 import { sleep } from "bun";
-import { CTFEvent } from "../../../../Functions/ctftime-v2";
+import { CTFEvent, infoEvent } from "../../../../Functions/ctftime-v2";
 import cron from 'node-cron';
 import { dateToCron } from "../../../../Functions/discord-utils";
+import { MessageModel } from "../../../../Database/connect";
 
 const ENV = process.env.ENV || 'production';
 
@@ -45,6 +46,7 @@ export async function createPrivateChannelIfNotExist(props: CreateChannelProps) 
 
 import { APIEmbed } from "discord.js";
 import moment from "moment"
+import { MyClient } from "../../../../Model/client";
 
 interface ScheduleEmbedTemplateProps {
     ctfEvent: CTFEvent;
@@ -333,6 +335,14 @@ ${weight}
         const writeupChannel =  await this.getWriteupChannel()
         await discussChannel?.setParent(archivesCategory.id);
         await writeupChannel?.setParent(archivesCategory.id);
+        
+        // Clean up the message entries in database
+        try {
+            await MessageModel.deleteMany({ ctfEventId: this.options.ctfEvent.id });
+            console.log(`Cleaned up message records for CTF event: ${this.options.ctfEvent.title}`);
+        } catch (error) {
+            console.error(`Error cleaning up message records: ${error}`);
+        }
     }
 
     async addMessageRoleEventListener(msg: Message){
@@ -376,6 +386,15 @@ ${weight}
 
         const message = await this.initialChannel.send({ "embeds": [scheduleEmbedTemplate({ ctfEvent: this.options.ctfEvent })], components: [row as JSONEncodable<APIActionRowComponent<APIMessageActionRowComponent>>] });
         await this.addMessageRoleEventListener(message);
+        
+        // Save message to database
+        await MessageModel.create({
+            ctfEventId: this.options.ctfEvent.id,
+            messageId: message.id,
+            channelId: this.initialChannel.id,
+            guildId: this.guild.id,
+            expireAt: this.options.ctfEvent.finish
+        });
     }
 
     async getRole(): Promise<Role> {
@@ -446,4 +465,78 @@ export async function getEmbedCTFEvent(interaction: ChatInputCommandInteraction<
         return false;
     });
     return message;
+}
+
+// Add a function to restore message listeners on bot restart
+export async function restoreEventMessageListeners(client: MyClient) {
+    try {
+        const storedMessages = await MessageModel.find({});
+        
+        for (const storedMessage of storedMessages) {
+            try {
+                // Check for valid data
+                if (!storedMessage.guildId || !storedMessage.channelId || !storedMessage.messageId || !storedMessage.ctfEventId) {
+                    console.error('Invalid stored message data:', storedMessage);
+                    continue;
+                }
+                
+                // Fetch guild
+                const guild = await client.guilds.fetch(storedMessage.guildId);
+                if (!guild) {
+                    console.log(`Guild not found: ${storedMessage.guildId}`);
+                    continue;
+                }
+                
+                // Fetch channel
+                const channel = await guild.channels.fetch(storedMessage.channelId);
+                if (!channel || !(channel instanceof TextChannel)) {
+                    console.log(`Channel not found or not a text channel: ${storedMessage.channelId}`);
+                    continue;
+                }
+                
+                // Fetch message
+                try {
+                    const message = await channel.messages.fetch(storedMessage.messageId);
+                    
+                    // Fetch CTF event
+                    const ctfEvent = await infoEvent(String(storedMessage.ctfEventId));
+                    if (!ctfEvent) {
+                        console.log(`CTF event not found: ${storedMessage.ctfEventId}`);
+                        continue;
+                    }
+                    
+                    // Create notification role
+                    const notificationRole = await createRoleIfNotExist({
+                        name: "CTF Waiting Role",
+                        guild: guild,
+                        color: "#87CEEB"
+                    });
+                    
+                    // Create reaction role event
+                    const reactionRoleEvent = new ReactionRoleEvent(guild, channel, {
+                        ctfEvent: ctfEvent,
+                        notificationRole: notificationRole
+                    });
+                    
+                    // Initialize channels and roles, then add message listener
+                    await reactionRoleEvent.__initializeChannelAndRole();
+                    await reactionRoleEvent.addMessageRoleEventListener(message);
+                    
+                    console.log(`Restored event listener for message: ${message.id} (CTF Event: ${ctfEvent.title})`);
+                } catch (error: any) {
+                    console.error(`Error fetching message: ${error}`);
+                    
+                    // If message not found, delete the record
+                    if (error.code === 10008) { // Discord error code for unknown message
+                        await MessageModel.deleteOne({ messageId: storedMessage.messageId });
+                        console.log(`Deleted record for missing message: ${storedMessage.messageId}`);
+                    }
+                }
+            } catch (error) {
+                console.error(`Error processing stored message: ${error}`);
+            }
+        }
+    } catch (error) {
+        console.error(`Error fetching stored messages: ${error}`);
+    }
 }
