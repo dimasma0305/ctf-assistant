@@ -13,6 +13,8 @@ import {
   Partials,
   Collection,
   Events,
+  OmitPartialGroupDMChannel,
+  Message as DiscordMessage
 } from "discord.js";
 
 import { MyClient } from "./Model/client";
@@ -66,10 +68,13 @@ interface RecentMessage {
 const recentMessages: Record<string, RecentMessage[]> = {};
 
 // Spam detection function
-async function handleSpamDetection(message: any): Promise<boolean> {
+async function handleSpamDetection(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>): Promise<boolean> {
   const userId = message.author.id;
   const content = message.content;
   const now = Date.now();
+
+  // Check if message is only a sticker (has stickers and no/minimal text content)
+  const isOnlySticker = message.stickers?.size > 0 && (!content || content.trim().length === 0);
 
   // Initialize user's recent messages if not exists
   if (!recentMessages[userId]) {
@@ -86,15 +91,20 @@ async function handleSpamDetection(message: any): Promise<boolean> {
   const sameMessages = recentMessages[userId].filter(msg => msg.content === content);
   if (sameMessages.length >= 3) {
     await message.delete();
-    // Ban the user from the guild
-    if (message.member && message.guild) {
-      await message.member.kick("Spamming the same message multiple times");
+    
+    // Don't kick if it's only stickers
+    if (!isOnlySticker) {
+      // Ban the user from the guild
+      if (message.member && message.guild) {
+        await message.member.kick("Spamming the same message multiple times");
+      }
+      try {
+        await message.author.send("You have been banned for spamming the same message multiple times.");
+      } catch (error) {
+        console.log("Could not send DM to user");
+      }
     }
-    try {
-      await message.author.send("You have been banned for spamming the same message multiple times.");
-    } catch (error) {
-      console.log("Could not send DM to user");
-    }
+    
     // Clear user's message history to prevent further checks
     delete recentMessages[userId];
     return true; // Message was spam and handled
@@ -104,7 +114,7 @@ async function handleSpamDetection(message: any): Promise<boolean> {
 }
 
 // Phishing detection function
-async function handlePhishingDetection(message: any): Promise<boolean> {
+async function handlePhishingDetection(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>): Promise<boolean> {
   const phishingMessage = [
     /50\$ gift - /,
   ];
@@ -127,7 +137,7 @@ async function handlePhishingDetection(message: any): Promise<boolean> {
 }
 
 // AI chat function
-async function handleAIChat(message: any): Promise<void> {
+async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>): Promise<void> {
   const author = message.author.username;
   const content = message.content;
   const userId = message.author.id;
