@@ -63,6 +63,7 @@ const memory: Record<string, ChatMessage[]> = {};
 interface RecentMessage {
   content: string;
   timestamp: number;
+  messageId: string;
 }
 
 const recentMessages: Record<string, RecentMessage[]> = {};
@@ -85,12 +86,20 @@ async function handleSpamDetection(message: OmitPartialGroupDMChannel<DiscordMes
   recentMessages[userId] = recentMessages[userId].filter(msg => now - msg.timestamp < 60000);
 
   // Add current message
-  recentMessages[userId].push({ content, timestamp: now });
+  recentMessages[userId].push({ content, timestamp: now, messageId: message.id });
 
   // Check for spam: same message 3 times within 1 minute
   const sameMessages = recentMessages[userId].filter(msg => msg.content === content);
   if (sameMessages.length >= 3) {
-    await message.delete();
+    // Delete all spam messages (including previous ones)
+    for (const spamMessage of sameMessages) {
+      try {
+        const messageToDelete = await message.channel.messages.fetch(spamMessage.messageId);
+        await messageToDelete.delete();
+      } catch (error) {
+        console.log(`Could not delete message ${spamMessage.messageId}: ${error}`);
+      }
+    }
     
     // Don't kick if it's only stickers
     if (!isOnlySticker) {
