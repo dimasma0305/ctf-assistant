@@ -16,6 +16,8 @@ services:
       - "traefik.http.routers.ctf-assistant.entrypoints=web"
       - "traefik.http.routers.ctf-assistant.service=ctf-assistant"
       - "traefik.http.services.ctf-assistant.loadbalancer.server.port=3000"
+      - "traefik.http.routers.ctf-assistant.tls.certresolver=letsencrypt"
+
       
   mongo:
     image: mongo
