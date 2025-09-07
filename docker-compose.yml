@@ -3,8 +3,8 @@ services:
   ctf-assistant:
     build: .
     networks:
-      default:
       internal:
+      traefik:
     env_file:
       - stack.env
     restart: always
