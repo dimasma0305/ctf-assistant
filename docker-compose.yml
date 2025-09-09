@@ -18,7 +18,7 @@ services:
       - "traefik.http.services.ctf-assistant.loadbalancer.server.port=3000"
       - "traefik.http.routers.ctf-assistant.tls.certresolver=letsencrypt"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "curl", "-f", "node -e \"http=require('http');http.get('http://localhost:3000/health',r=>process.exit(r.statusCode==200?0:1)).on('error',()=>process.exit(1))\""]
       interval: 30s
       timeout: 10s
       retries: 3
