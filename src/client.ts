@@ -49,7 +49,24 @@ client.on(Events.Debug, (message) => {
     console.log(message)
 })
 
-client.login(TOKEN);
+// Add error handling
+client.on('error', (error) => {
+  console.error('Discord client error:', error);
+});
+
+client.on('disconnect', () => {
+  console.log('Bot disconnected');
+});
+
+client.on('ready', () => {
+  console.log(`Bot is ready! Logged in as ${client.user?.tag}`);
+});
+
+// Handle login with error catching
+client.login(TOKEN).catch(error => {
+  console.error('Failed to login:', error);
+  process.exit(1);
+});
 
 interface ChatMessage {
   role: 'system' | 'user';
