@@ -19,6 +19,7 @@ import {
 
 import { MyClient } from "./Model/client";
 import OpenAI from "openai";
+import { SessionScheduler } from "./Services/SessionScheduler";
 
 const openai = new OpenAI({
   "apiKey": OPENAI_API_KEY
@@ -43,6 +44,10 @@ const client = new Client({
 client.events = new Collection();
 client.commands = new Collection();
 client.subCommands = new Collection();
+
+// Initialize session scheduler
+const sessionScheduler = new SessionScheduler(client);
+client.sessionScheduler = sessionScheduler;
 
 
 // Reduced debug logging to prevent unnecessary session usage
@@ -72,46 +77,42 @@ client.on('ready', () => {
   console.log(`Bot is ready! Logged in as ${client.user?.tag}`);
 });
 
-// Enhanced login with session limit handling and exponential backoff
-async function loginWithRetry(maxRetries = 5) {
+// Enhanced login with session scheduler integration
+async function loginWithScheduler(maxRetries = 3) {
   let retryCount = 0;
   
   while (retryCount < maxRetries) {
     try {
+      console.log(`🔐 Attempting to login to Discord (attempt ${retryCount + 1}/${maxRetries})...`);
       await client.login(TOKEN);
-      console.log('Successfully logged in!');
-      return;
-    } catch (error: any) {
-      console.error(`Login attempt ${retryCount + 1} failed:`, error.message);
+      console.log('✅ Successfully logged in to Discord!');
       
-      // Handle session limit specifically
+      // Cancel any existing scheduled reconnection since we're now connected
+      await sessionScheduler.cancelScheduledReconnection();
+      return;
+      
+    } catch (error: any) {
+      console.error(`❌ Login attempt ${retryCount + 1} failed:`, error.message);
+      
+      // Handle session limit specifically with scheduler
       if (error.message?.includes('sessions remaining') || error.message?.includes('session_start_limit')) {
-        // Extract reset time from error message
-        const resetMatch = error.message.match(/resets at ([\d-T:.Z]+)/);
-        if (resetMatch) {
-          const resetTime = new Date(resetMatch[1]);
-          const waitTime = resetTime.getTime() - Date.now();
-          
-          if (waitTime > 0) {
-            const hours = Math.floor(waitTime / (1000 * 60 * 60));
-            const minutes = Math.floor((waitTime % (1000 * 60 * 60)) / (1000 * 60));
-            
-            console.error(`Session limit reached. Will retry after ${hours}h ${minutes}m (at ${resetTime.toISOString()})`);
-            
-            // For production, you might want to implement a proper scheduler
-            // For now, we'll exit gracefully and let the container restart handle it
-            console.log('Exiting gracefully. Container will restart and retry later.');
-            process.exit(0);
-          }
-        }
+        console.log('🚫 Session limit detected, delegating to session scheduler...');
         
-        // If we can't parse the reset time, wait a bit and retry
-        console.error('Session limit reached, waiting 5 minutes before retry...');
-        await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
+        const handled = await sessionScheduler.handleSessionLimitError(error);
+        if (handled) {
+          console.log('📅 Session scheduler has taken over. Bot will automatically reconnect when limit resets.');
+          // Don't exit - let the scheduler handle reconnection
+          return;
+        } else {
+          console.error('⚠️  Failed to parse session limit, falling back to manual retry...');
+          // Fallback: wait 5 minutes and retry
+          console.log('⏳ Waiting 5 minutes before manual retry...');
+          await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
+        }
       } else {
-        // For other errors, use exponential backoff
-        const waitTime = Math.min(1000 * Math.pow(2, retryCount), 30000); // Max 30 seconds
-        console.error(`Waiting ${waitTime/1000} seconds before retry...`);
+        // For other errors, use exponential backoff (but shorter retries)
+        const waitTime = Math.min(1000 * Math.pow(2, retryCount), 15000); // Max 15 seconds
+        console.error(`⏳ Network/API error, waiting ${waitTime/1000}s before retry...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
       }
       
@@ -119,25 +120,62 @@ async function loginWithRetry(maxRetries = 5) {
     }
   }
   
-  console.error('Max retry attempts reached. Exiting.');
-  process.exit(1);
+  console.error('💥 Max retry attempts reached. The bot will remain inactive until manual intervention.');
+  console.log('ℹ️  Check session scheduler status:', sessionScheduler.getStatus());
 }
 
 // Handle graceful shutdown
-process.on('SIGINT', () => {
-  console.log('Received SIGINT. Gracefully shutting down...');
+process.on('SIGINT', async () => {
+  console.log('📴 Received SIGINT. Gracefully shutting down...');
+  await sessionScheduler.cancelScheduledReconnection();
   client.destroy();
   process.exit(0);
 });
 
-process.on('SIGTERM', () => {
-  console.log('Received SIGTERM. Gracefully shutting down...');
+process.on('SIGTERM', async () => {
+  console.log('📴 Received SIGTERM. Gracefully shutting down...');
+  await sessionScheduler.cancelScheduledReconnection();
   client.destroy();
   process.exit(0);
 });
 
-// Start login process
-loginWithRetry();
+// Add monitoring for session scheduler status
+setInterval(() => {
+  const status = sessionScheduler.getStatus();
+  if (status.isWaitingForReset) {
+    console.log('🕐 Session Scheduler Status:', {
+      waitingForReset: status.isWaitingForReset,
+      nextReset: status.nextResetTime,
+      currentTime: new Date().toISOString()
+    });
+  }
+}, 10 * 60 * 1000); // Log every 10 minutes when waiting
+
+// Handle disconnection with session scheduler awareness
+client.on('disconnect', () => {
+  console.log('🔌 Bot disconnected');
+  if (!sessionScheduler.isWaitingForSessionReset()) {
+    console.log('⚡ Attempting automatic reconnection...');
+    setTimeout(() => loginWithScheduler(), 5000);
+  } else {
+    console.log('⏳ Session scheduler is active, not attempting immediate reconnection');
+  }
+});
+
+// Enhanced error handling with session scheduler
+client.on('error', async (error) => {
+  console.error('💥 Discord client error:', error);
+  
+  // Check if error is session-related
+  if (error.message?.includes('session_start_limit') || error.message?.includes('sessions remaining')) {
+    console.log('🚫 Session limit error detected in client error handler');
+    await sessionScheduler.handleSessionLimitError(error);
+  }
+});
+
+// Start login process with scheduler
+console.log('🚀 Starting CTF Assistant Bot...');
+loginWithScheduler();
 
 interface ChatMessage {
   role: 'system' | 'user';

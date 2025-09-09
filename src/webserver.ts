@@ -1,6 +1,8 @@
 import express from "express";
 import client from "./client";
+import { MyClient } from "./Model/client";
 import bodyParser from 'body-parser';
+import crypto from 'crypto';
 import { EventModel } from "./Database/connect";
 import session from "express-session";
 import flash from "connect-flash";
@@ -74,6 +76,68 @@ app.post("/event/:id", async (req, res) => {
     return res.redirect("/event/" + req.params.id);
 });
 
+// Session scheduler status endpoint
+app.get("/session-status", async (req, res) => {
+    try {
+        const myClient = client as MyClient;
+        
+        if (!myClient.sessionScheduler) {
+            res.status(500).json({ 
+                error: "Session scheduler not initialized",
+                timestamp: new Date().toISOString()
+            });
+            return;
+        }
+
+        const status = myClient.sessionScheduler.getStatus();
+        const sessionInfo = myClient.sessionScheduler.getSessionInfo();
+        
+        const response = {
+            bot: {
+                isReady: client.isReady(),
+                status: client.isReady() ? 'online' : 'offline',
+                uptime: client.uptime ? Math.floor(client.uptime / 1000) : null,
+                user: client.user ? {
+                    id: client.user.id,
+                    username: client.user.username,
+                    tag: client.user.tag
+                } : null
+            },
+            sessionScheduler: {
+                ...status,
+                sessionInfo: sessionInfo ? {
+                    resetTime: sessionInfo.resetTime.toISOString(),
+                    remainingSessions: sessionInfo.remainingSessions,
+                    totalSessions: sessionInfo.totalSessions,
+                    timeUntilReset: sessionInfo.resetTime.getTime() - Date.now()
+                } : null
+            },
+            timestamp: new Date().toISOString()
+        };
+        
+        res.json(response);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Health check endpoint with session awareness
+app.get("/health", (req, res) => {
+    const myClient = client as MyClient;
+    const isHealthy = client.isReady() || (myClient.sessionScheduler?.isWaitingForSessionReset() === true);
+    
+    res.status(isHealthy ? 200 : 503).json({
+        status: isHealthy ? 'healthy' : 'unhealthy',
+        bot: {
+            ready: client.isReady(),
+            waitingForSessionReset: myClient.sessionScheduler?.isWaitingForSessionReset() || false
+        },
+        timestamp: new Date().toISOString()
+    });
+});
+
 app.listen(3000, "0.0.0.0", () => {
-    console.log("serve @ http://localhost:3000");
+    console.log("🌐 Web server running @ http://localhost:3000");
+    console.log("📊 Session status: http://localhost:3000/session-status");
+    console.log("🏥 Health check: http://localhost:3000/health");
 });

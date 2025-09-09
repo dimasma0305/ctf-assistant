@@ -1,0 +1,322 @@
+import cron from 'node-cron';
+import { MyClient } from '../Model/client';
+import { promises as fs } from 'fs';
+import path from 'path';
+
+interface SessionLimitInfo {
+  resetTime: Date;
+  remainingSessions: number;
+  totalSessions: number;
+}
+
+interface PersistedSessionState {
+  sessionInfo: SessionLimitInfo | null;
+  isWaitingForReset: boolean;
+  savedAt: string;
+}
+
+interface SessionSchedulerStatus {
+  isWaitingForReset: boolean;
+  sessionInfo: SessionLimitInfo | null;
+  hasScheduledTask: boolean;
+  nextResetTime?: string;
+}
+
+export class SessionScheduler {
+  private client: MyClient;
+  private currentTask: cron.ScheduledTask | null = null;
+  private sessionInfo: SessionLimitInfo | null = null;
+  private isWaitingForReset: boolean = false;
+  private stateFilePath: string;
+
+  constructor(client: MyClient) {
+    this.client = client;
+    this.stateFilePath = path.join(process.cwd(), 'data', 'session-state.json');
+    this.initializeState();
+  }
+
+  /**
+   * Initialize scheduler state from persistent storage
+   */
+  private async initializeState(): Promise<void> {
+    try {
+      await this.loadState();
+      
+      // Check if we have a saved session limit that might still be active
+      if (this.sessionInfo && this.isWaitingForReset) {
+        const now = new Date();
+        const resetTime = new Date(this.sessionInfo.resetTime);
+        
+        if (resetTime > now) {
+          console.log('🔄 Restored session scheduler state from persistence');
+          console.log(`⏰ Session limit still active, resuming scheduled reconnection at ${resetTime.toISOString()}`);
+          this.scheduleReconnection(this.sessionInfo);
+        } else {
+          console.log('⏰ Saved session limit has expired, clearing state');
+          this.clearState();
+        }
+      }
+    } catch (error) {
+      console.log('ℹ️  No previous session state found or failed to load, starting fresh');
+    }
+  }
+
+  /**
+   * Save current state to persistent storage
+   */
+  private async saveState(): Promise<void> {
+    try {
+      // Ensure data directory exists
+      const dataDir = path.dirname(this.stateFilePath);
+      await fs.mkdir(dataDir, { recursive: true });
+
+      const state: PersistedSessionState = {
+        sessionInfo: this.sessionInfo,
+        isWaitingForReset: this.isWaitingForReset,
+        savedAt: new Date().toISOString()
+      };
+
+      await fs.writeFile(this.stateFilePath, JSON.stringify(state, null, 2));
+    } catch (error) {
+      console.error('Failed to save session state:', error);
+    }
+  }
+
+  /**
+   * Load state from persistent storage
+   */
+  private async loadState(): Promise<void> {
+    try {
+      const data = await fs.readFile(this.stateFilePath, 'utf-8');
+      const state: PersistedSessionState = JSON.parse(data);
+      
+      if (state.sessionInfo) {
+        // Convert resetTime string back to Date
+        this.sessionInfo = {
+          ...state.sessionInfo,
+          resetTime: new Date(state.sessionInfo.resetTime)
+        };
+      }
+      
+      this.isWaitingForReset = state.isWaitingForReset || false;
+    } catch (error) {
+      throw new Error(`Failed to load state: ${error}`);
+    }
+  }
+
+  /**
+   * Clear persistent state
+   */
+  private async clearState(): Promise<void> {
+    try {
+      await fs.unlink(this.stateFilePath);
+    } catch (error) {
+      // File might not exist, which is fine
+    }
+    this.sessionInfo = null;
+    this.isWaitingForReset = false;
+  }
+
+  /**
+   * Parse session limit information from Discord API error
+   */
+  parseSessionLimitError(errorMessage: string): SessionLimitInfo | null {
+    try {
+      // Extract reset time from error message
+      const resetMatch = errorMessage.match(/resets at ([\d-T:.Z]+)/);
+      // Extract remaining sessions from error message  
+      const remainingMatch = errorMessage.match(/only (\d+) remaining/);
+      // Extract total sessions from error message
+      const totalMatch = errorMessage.match(/spawn (\d+) shards/);
+
+      if (!resetMatch) return null;
+
+      const resetTime = new Date(resetMatch[1]);
+      const remainingSessions = remainingMatch ? parseInt(remainingMatch[1]) : 0;
+      const totalSessions = totalMatch ? parseInt(totalMatch[1]) : 1000; // Discord default
+
+      return {
+        resetTime,
+        remainingSessions,
+        totalSessions
+      };
+    } catch (error) {
+      console.error('Failed to parse session limit error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Schedule bot reconnection when session limit resets
+   */
+  async scheduleReconnection(sessionInfo: SessionLimitInfo): Promise<void> {
+    if (this.currentTask) {
+      this.currentTask.stop();
+      this.currentTask = null;
+    }
+
+    this.sessionInfo = sessionInfo;
+    this.isWaitingForReset = true;
+    
+    // Save state to persistence
+    await this.saveState();
+
+    const now = new Date();
+    const waitTime = sessionInfo.resetTime.getTime() - now.getTime();
+    
+    if (waitTime <= 0) {
+      console.log('Session limit should have already reset, attempting immediate reconnection...');
+      this.attemptReconnection();
+      return;
+    }
+
+    const hours = Math.floor(waitTime / (1000 * 60 * 60));
+    const minutes = Math.floor((waitTime % (1000 * 60 * 60)) / (1000 * 60));
+
+    console.log(`📅 Session limit reached. Scheduled reconnection in ${hours}h ${minutes}m at ${sessionInfo.resetTime.toISOString()}`);
+    console.log(`ℹ️  Remaining sessions: ${sessionInfo.remainingSessions}/${sessionInfo.totalSessions}`);
+
+    // Create a cron job to run at the exact reset time
+    const cronExpression = this.dateToCronExpression(sessionInfo.resetTime);
+    
+    try {
+      this.currentTask = cron.schedule(cronExpression, async () => {
+        console.log('🔄 Session limit reset time reached, attempting reconnection...');
+        await this.attemptReconnection();
+      }, {
+        scheduled: true,
+        timezone: 'UTC'
+      });
+      
+      console.log(`⏰ Cron scheduled: ${cronExpression} (UTC)`);
+    } catch (error) {
+      console.error('Failed to schedule cron task, falling back to setTimeout:', error);
+      // Fallback to setTimeout if cron fails
+      setTimeout(async () => {
+        console.log('🔄 Session limit reset time reached (setTimeout fallback), attempting reconnection...');
+        await this.attemptReconnection();
+      }, waitTime);
+    }
+  }
+
+  /**
+   * Convert Date to cron expression
+   */
+  private dateToCronExpression(date: Date): string {
+    const utcDate = new Date(date.getTime());
+    const minute = utcDate.getUTCMinutes();
+    const hour = utcDate.getUTCHours();
+    const day = utcDate.getUTCDate();
+    const month = utcDate.getUTCMonth() + 1; // getUTCMonth() returns 0-11
+
+    // Format: "minute hour day month *"
+    return `${minute} ${hour} ${day} ${month} *`;
+  }
+
+  /**
+   * Attempt to reconnect the bot
+   */
+  private async attemptReconnection(): Promise<void> {
+    try {
+      console.log('🚀 Attempting to reconnect Discord client...');
+      
+      // Clean up current task
+      if (this.currentTask) {
+        this.currentTask.stop();
+        this.currentTask = null;
+      }
+
+      // Reset waiting state
+      this.isWaitingForReset = false;
+      
+      // Clear persistent state since we're attempting reconnection
+      await this.clearState();
+
+      // Destroy current client connection if exists
+      if (this.client.isReady()) {
+        console.log('📴 Destroying current client connection...');
+        this.client.destroy();
+      }
+
+      // Wait a moment for cleanup
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Attempt login
+      console.log('🔐 Logging in to Discord...');
+      await this.client.login(process.env.TOKEN);
+      console.log('✅ Successfully reconnected to Discord!');
+      
+    } catch (error: any) {
+      console.error('❌ Failed to reconnect:', error.message);
+      
+      // Check if it's still a session limit error
+      if (error.message?.includes('sessions remaining')) {
+        const newSessionInfo = this.parseSessionLimitError(error.message);
+        if (newSessionInfo) {
+          console.log('🔁 Session limit still active, rescheduling...');
+          this.scheduleReconnection(newSessionInfo);
+        }
+      } else {
+        // For other errors, retry after a delay
+        console.log('⏳ Retrying reconnection in 5 minutes...');
+        setTimeout(() => this.attemptReconnection(), 5 * 60 * 1000);
+      }
+    }
+  }
+
+  /**
+   * Handle session limit error and schedule reconnection
+   */
+  async handleSessionLimitError(error: Error): Promise<boolean> {
+    const sessionInfo = this.parseSessionLimitError(error.message);
+    
+    if (!sessionInfo) {
+      console.log('⚠️  Could not parse session limit information from error');
+      return false;
+    }
+
+    await this.scheduleReconnection(sessionInfo);
+    return true;
+  }
+
+  /**
+   * Get current session information
+   */
+  getSessionInfo(): SessionLimitInfo | null {
+    return this.sessionInfo;
+  }
+
+  /**
+   * Check if currently waiting for session reset
+   */
+  isWaitingForSessionReset(): boolean {
+    return this.isWaitingForReset;
+  }
+
+  /**
+   * Cancel current scheduled task
+   */
+  async cancelScheduledReconnection(): Promise<void> {
+    if (this.currentTask) {
+      console.log('🛑 Cancelling scheduled reconnection');
+      this.currentTask.stop();
+      this.currentTask = null;
+    }
+    this.isWaitingForReset = false;
+    
+    // Clear persistent state
+    await this.clearState();
+  }
+
+  /**
+   * Get status information for logging/monitoring
+   */
+  getStatus(): SessionSchedulerStatus {
+    return {
+      isWaitingForReset: this.isWaitingForReset,
+      sessionInfo: this.sessionInfo,
+      hasScheduledTask: !!this.currentTask,
+      nextResetTime: this.sessionInfo?.resetTime?.toISOString()
+    };
+  }
+}
