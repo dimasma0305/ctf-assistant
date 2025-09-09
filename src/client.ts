@@ -45,13 +45,23 @@ client.commands = new Collection();
 client.subCommands = new Collection();
 
 
+// Reduced debug logging to prevent unnecessary session usage
 client.on(Events.Debug, (message) => {
-    console.log(message)
-})
+    // Only log important debug messages to reduce noise
+    if (message.includes('READY') || message.includes('RESUMED') || message.includes('error')) {
+        console.log(message);
+    }
+});
 
-// Add error handling
+// Enhanced error handling with session limit detection
 client.on('error', (error) => {
   console.error('Discord client error:', error);
+  
+  // Don't exit immediately on errors - let reconnection logic handle it
+  if (error.message?.includes('session_start_limit') || error.message?.includes('sessions remaining')) {
+    console.error('Session limit reached. Bot will wait for limit reset.');
+    return;
+  }
 });
 
 client.on('disconnect', () => {
@@ -62,11 +72,72 @@ client.on('ready', () => {
   console.log(`Bot is ready! Logged in as ${client.user?.tag}`);
 });
 
-// Handle login with error catching
-client.login(TOKEN).catch(error => {
-  console.error('Failed to login:', error);
+// Enhanced login with session limit handling and exponential backoff
+async function loginWithRetry(maxRetries = 5) {
+  let retryCount = 0;
+  
+  while (retryCount < maxRetries) {
+    try {
+      await client.login(TOKEN);
+      console.log('Successfully logged in!');
+      return;
+    } catch (error: any) {
+      console.error(`Login attempt ${retryCount + 1} failed:`, error.message);
+      
+      // Handle session limit specifically
+      if (error.message?.includes('sessions remaining') || error.message?.includes('session_start_limit')) {
+        // Extract reset time from error message
+        const resetMatch = error.message.match(/resets at ([\d-T:.Z]+)/);
+        if (resetMatch) {
+          const resetTime = new Date(resetMatch[1]);
+          const waitTime = resetTime.getTime() - Date.now();
+          
+          if (waitTime > 0) {
+            const hours = Math.floor(waitTime / (1000 * 60 * 60));
+            const minutes = Math.floor((waitTime % (1000 * 60 * 60)) / (1000 * 60));
+            
+            console.error(`Session limit reached. Will retry after ${hours}h ${minutes}m (at ${resetTime.toISOString()})`);
+            
+            // For production, you might want to implement a proper scheduler
+            // For now, we'll exit gracefully and let the container restart handle it
+            console.log('Exiting gracefully. Container will restart and retry later.');
+            process.exit(0);
+          }
+        }
+        
+        // If we can't parse the reset time, wait a bit and retry
+        console.error('Session limit reached, waiting 5 minutes before retry...');
+        await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
+      } else {
+        // For other errors, use exponential backoff
+        const waitTime = Math.min(1000 * Math.pow(2, retryCount), 30000); // Max 30 seconds
+        console.error(`Waiting ${waitTime/1000} seconds before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+      
+      retryCount++;
+    }
+  }
+  
+  console.error('Max retry attempts reached. Exiting.');
   process.exit(1);
+}
+
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Gracefully shutting down...');
+  client.destroy();
+  process.exit(0);
 });
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM. Gracefully shutting down...');
+  client.destroy();
+  process.exit(0);
+});
+
+// Start login process
+loginWithRetry();
 
 interface ChatMessage {
   role: 'system' | 'user';

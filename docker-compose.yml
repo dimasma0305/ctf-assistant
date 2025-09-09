@@ -7,7 +7,7 @@ services:
       traefik:
     env_file:
       - stack.env
-    restart: always
+    restart: unless-stopped
     environment:
       - MONGO_URI=mongodb://root:example@mongo/
     labels:
