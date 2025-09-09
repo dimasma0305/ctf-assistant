@@ -73,7 +73,7 @@ client.on('disconnect', () => {
   console.log('Bot disconnected');
 });
 
-client.on('ready', () => {
+client.on('clientReady', () => {
   console.log(`Bot is ready! Logged in as ${client.user?.tag}`);
 });
 

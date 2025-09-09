@@ -1,0 +1,24 @@
+import { Schema } from 'mongoose';
+
+const sessionStateSchema = new Schema({
+  // Using singleton pattern - only one document will exist
+  _id: { type: String, default: 'session_state' },
+  
+  sessionInfo: {
+    resetTime: { type: Date, required: false },
+    remainingSessions: { type: Number, required: false },
+    totalSessions: { type: Number, required: false }
+  },
+  
+  isWaitingForReset: { type: Boolean, default: false },
+  
+  savedAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Update the updatedAt field on save
+sessionStateSchema.pre('save', function() {
+  this.updatedAt = new Date();
+});
+
+export default sessionStateSchema;

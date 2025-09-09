@@ -1,5 +1,0 @@
-# Data Directory
-
-This directory stores persistent data for the CTF Assistant Bot:
-
-- `session-state.json`: Stores Discord session scheduler state across restarts

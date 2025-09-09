@@ -1,7 +1,6 @@
 import cron from 'node-cron';
 import { MyClient } from '../Model/client';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { SessionStateModel } from '../Database/connect';
 
 interface SessionLimitInfo {
   resetTime: Date;
@@ -9,11 +8,6 @@ interface SessionLimitInfo {
   totalSessions: number;
 }
 
-interface PersistedSessionState {
-  sessionInfo: SessionLimitInfo | null;
-  isWaitingForReset: boolean;
-  savedAt: string;
-}
 
 interface SessionSchedulerStatus {
   isWaitingForReset: boolean;
@@ -27,11 +21,9 @@ export class SessionScheduler {
   private currentTask: cron.ScheduledTask | null = null;
   private sessionInfo: SessionLimitInfo | null = null;
   private isWaitingForReset: boolean = false;
-  private stateFilePath: string;
 
   constructor(client: MyClient) {
     this.client = client;
-    this.stateFilePath = path.join(process.cwd(), 'data', 'session-state.json');
     this.initializeState();
   }
 
@@ -48,7 +40,7 @@ export class SessionScheduler {
         const resetTime = new Date(this.sessionInfo.resetTime);
         
         if (resetTime > now) {
-          console.log('🔄 Restored session scheduler state from persistence');
+          console.log('🔄 Restored session scheduler state from MongoDB');
           console.log(`⏰ Session limit still active, resuming scheduled reconnection at ${resetTime.toISOString()}`);
           this.scheduleReconnection(this.sessionInfo);
         } else {
@@ -66,19 +58,20 @@ export class SessionScheduler {
    */
   private async saveState(): Promise<void> {
     try {
-      // Ensure data directory exists
-      const dataDir = path.dirname(this.stateFilePath);
-      await fs.mkdir(dataDir, { recursive: true });
-
-      const state: PersistedSessionState = {
+      const state = {
+        _id: 'session_state',
         sessionInfo: this.sessionInfo,
         isWaitingForReset: this.isWaitingForReset,
-        savedAt: new Date().toISOString()
+        savedAt: new Date()
       };
 
-      await fs.writeFile(this.stateFilePath, JSON.stringify(state, null, 2));
+      await SessionStateModel.findOneAndUpdate(
+        { _id: 'session_state' },
+        state,
+        { upsert: true, new: true }
+      );
     } catch (error) {
-      console.error('Failed to save session state:', error);
+      console.error('Failed to save session state to MongoDB:', error);
     }
   }
 
@@ -87,20 +80,19 @@ export class SessionScheduler {
    */
   private async loadState(): Promise<void> {
     try {
-      const data = await fs.readFile(this.stateFilePath, 'utf-8');
-      const state: PersistedSessionState = JSON.parse(data);
+      const state = await SessionStateModel.findById('session_state');
       
-      if (state.sessionInfo) {
-        // Convert resetTime string back to Date
+      if (state && state.sessionInfo && state.sessionInfo.resetTime) {
+        // Convert resetTime back to Date if needed
         this.sessionInfo = {
-          ...state.sessionInfo,
-          resetTime: new Date(state.sessionInfo.resetTime)
+          resetTime: new Date(state.sessionInfo.resetTime),
+          remainingSessions: state.sessionInfo.remainingSessions || 0,
+          totalSessions: state.sessionInfo.totalSessions || 1000
         };
+        this.isWaitingForReset = state.isWaitingForReset || false;
       }
-      
-      this.isWaitingForReset = state.isWaitingForReset || false;
     } catch (error) {
-      throw new Error(`Failed to load state: ${error}`);
+      throw new Error(`Failed to load state from MongoDB: ${error}`);
     }
   }
 
@@ -109,9 +101,9 @@ export class SessionScheduler {
    */
   private async clearState(): Promise<void> {
     try {
-      await fs.unlink(this.stateFilePath);
+      await SessionStateModel.deleteOne({ _id: 'session_state' });
     } catch (error) {
-      // File might not exist, which is fine
+      console.error('Failed to clear session state from MongoDB:', error);
     }
     this.sessionInfo = null;
     this.isWaitingForReset = false;
