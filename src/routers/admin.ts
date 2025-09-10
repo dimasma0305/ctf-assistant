@@ -1,12 +1,12 @@
 import express, { Response, Router } from "express";
+import path from "path";
 import { EventModel } from "../Database/connect";
 import { AuthenticatedRequest, checkAuth, deleteEvents, reqToForm, updateOrDeleteEvents } from "../utils";
-import { eventSchema } from "../Database/eventSchema";
 
 const router: Router = express.Router()
 
 router.get("/events", checkAuth, async (req, res) => {
-    res.sendFile('/home/dimas/documents/project/ctf-assistant/public/admin-events.html');
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'admin-events.html'));
 });
 
 router.get("/event/new", checkAuth, async (req, res) => {

@@ -3,6 +3,7 @@ import client from "./client";
 import { MyClient } from "./Model/client";
 import bodyParser from 'body-parser';
 import crypto from 'crypto';
+import path from 'path';
 import { EventModel, solveModel } from "./Database/connect";
 import session from "express-session";
 import flash from "connect-flash";
@@ -84,7 +85,7 @@ app.post("/login", (req, res) => {
 
 // Public events list route
 app.get("/events", async (req, res) => {
-    res.sendFile('public/events.html');
+    res.sendFile(path.join(__dirname, '..', 'public', 'events.html'));
 });
 
 app.get("/event/:id", async (req, res) => {
@@ -115,22 +116,22 @@ function requireAuth(req: any, res: any, next: any) {
 
 // Dashboard route
 app.get("/dashboard", requireAuth, async (req, res) => {
-    res.sendFile('public/dashboard.html');
+    res.sendFile(path.join(__dirname, '..', 'public', 'dashboard.html'));
 });
 
 // Data management route
 app.get("/data", requireAuth, async (req, res) => {
-    res.sendFile('public/data.html');
+    res.sendFile(path.join(__dirname, '..', 'public', 'data.html'));
 });
 
 // Settings route
 app.get("/settings", requireAuth, async (req, res) => {
-    res.sendFile('public/settings.html');
+    res.sendFile(path.join(__dirname, '..', 'public', 'settings.html'));
 });
 
 // Profile route
 app.get("/profile", requireAuth, async (req, res) => {
-    res.sendFile('public/profile.html');
+    res.sendFile(path.join(__dirname, '..', 'public', 'profile.html'));
 });
 
 // Logout route
@@ -542,7 +543,7 @@ app.post("/api/export-data", requireAuth, async (req, res) => {
 
 // Session scheduler status HTML page
 app.get("/session-status", async (req, res) => {
-    res.sendFile('public/session-status.html');
+    res.sendFile(path.join(__dirname, '..', 'public', 'session-status.html'));
 });
 
 // Session scheduler status API endpoint  
