@@ -20,13 +20,13 @@ export const command: SubCommand = {
     async execute(interaction, _client) {
         const { options } = interaction;
         await interaction.deferReply({ flags: ["Ephemeral"] })
-        var title: string
+        var title: string | null = null
         const id = options.getString("id", false);
         if (id){
             const data = await infoEvent(id);
             title = data.title
         } else {
-            title = options.getString("title", true)
+            title = options.getString("title", false)
         }
 
         if (!title) {
@@ -54,6 +54,9 @@ export const command: SubCommand = {
             }
         }
 
+        // At this point, title is guaranteed to be a string
+        const ctfTitle: string = title;
+
         const guild = await interaction.guild?.fetch()
         if (!guild) {
             await interaction.editReply({
@@ -62,13 +65,13 @@ export const command: SubCommand = {
             return
         }
         guild.roles.cache.forEach(async (role) => {
-            if (role.name === title) {
+            if (role.name === ctfTitle) {
                 await role.delete()
                 return true
             }
         });
         guild.channels.cache.forEach((channel) => {
-            const chat_channel = translate(title)
+            const chat_channel = translate(ctfTitle)
             const writeup_channel = translate(`${chat_channel} writeup`)
             if (channel.name === chat_channel ||
                 channel.name === writeup_channel) {
@@ -77,11 +80,11 @@ export const command: SubCommand = {
             }
         })
         guild.scheduledEvents.cache.forEach((event)=>{
-            if (!(event.name.trim()==title.trim())) return
+            if (!(event.name.trim()==ctfTitle.trim())) return
             event.delete()
         })
         await interaction.editReply({
-            content: `Successfuly delete ${title}`,
+            content: `Successfully deleted ${ctfTitle}`,
         })
     },
 };
