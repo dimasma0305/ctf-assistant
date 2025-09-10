@@ -12,9 +12,6 @@ import { eventSchema } from "./Database/eventSchema";
 
 client.guilds.fetch();
 
-// Parse username:password from environment variable
-// Format: CREDENTIALS="username:password"
-// Example: CREDENTIALS="admin:mySecurePassword123"
 const parseCredentials = (credentials: string) => {
     const parts = credentials.split(':');
     

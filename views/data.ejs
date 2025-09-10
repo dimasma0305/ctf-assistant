@@ -157,41 +157,33 @@ const layoutData = {
                 const endIndex = startIndex + itemsPerPage;
                 const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
                 
-                tbody.innerHTML = paginatedEvents.map(event => \`
-                    <tr onclick="viewEventDetails('\${event.id}')" style="cursor: pointer;">
-                        <td>
-                            <div class="fw-bold">\${event.title}</div>
-                            <small class="text-muted">\${event.organizer || 'Unknown'}</small>
-                        </td>
-                        <td>
-                            <span class="badge status-\${event.status}">\${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
-                        </td>
-                        <td>\${new Date(event.start_date).toLocaleDateString()}</td>
-                        <td>\${new Date(event.finish_date).toLocaleDateString()}</td>
-                        <td>
-                            <span class="solve-badge">\${event.solves || 0} solves</span>
-                        </td>
-                        <td>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation()">
-                                    Actions
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="viewEventDetails('\${event.id}'); event.stopPropagation();">
-                                        <i class="bi bi-eye me-2"></i>View Details
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="exportEventData('\${event.id}'); event.stopPropagation();">
-                                        <i class="bi bi-download me-2"></i>Export
-                                    </a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteEvent('\${event.id}'); event.stopPropagation();">
-                                        <i class="bi bi-trash me-2"></i>Delete
-                                    </a></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                \`).join('');
+                tbody.innerHTML = paginatedEvents.map(event => 
+                    '<tr onclick="viewEventDetails(' + event.id + ')" style="cursor: pointer;">' +
+                        '<td>' +
+                            '<div class="fw-bold">' + event.title + '</div>' +
+                            '<small class="text-muted">' + (event.organizer || 'Unknown') + '</small>' +
+                        '</td>' +
+                        '<td>' +
+                            '<span class="badge status-' + event.status + '">' + event.status.charAt(0).toUpperCase() + event.status.slice(1) + '</span>' +
+                        '</td>' +
+                        '<td>' + new Date(event.start_date).toLocaleDateString() + '</td>' +
+                        '<td>' + new Date(event.finish_date).toLocaleDateString() + '</td>' +
+                        '<td>' +
+                            '<span class="solve-badge">' + (event.solves || 0) + ' solves</span>' +
+                        '</td>' +
+                        '<td>' +
+                            '<div class="dropdown">' +
+                                '<button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation()">Actions</button>' +
+                                '<ul class="dropdown-menu">' +
+                                    '<li><a class="dropdown-item" href="#" onclick="viewEventDetails(' + event.id + '); event.stopPropagation();"><i class="bi bi-eye me-2"></i>View Details</a></li>' +
+                                    '<li><a class="dropdown-item" href="#" onclick="exportEventData(' + event.id + '); event.stopPropagation();"><i class="bi bi-download me-2"></i>Export</a></li>' +
+                                    '<li><hr class="dropdown-divider"></li>' +
+                                    '<li><a class="dropdown-item text-danger" href="#" onclick="deleteEvent(' + event.id + '); event.stopPropagation();"><i class="bi bi-trash me-2"></i>Delete</a></li>' +
+                                '</ul>' +
+                            '</div>' +
+                        '</td>' +
+                    '</tr>'
+                ).join('');
                 
                 updatePagination(filteredEvents.length);
             }
@@ -207,11 +199,9 @@ const layoutData = {
                 
                 let paginationHTML = '';
                 for (let i = 1; i <= totalPages; i++) {
-                    paginationHTML += \`
-                        <li class="page-item \${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#" onclick="changePage(\${i}); return false;">\${i}</a>
-                        </li>
-                    \`;
+                    paginationHTML += '<li class="page-item ' + (i === currentPage ? 'active' : '') + '">' +
+                        '<a class="page-link" href="#" onclick="changePage(' + i + '); return false;">' + i + '</a>' +
+                    '</li>';
                 }
                 
                 pagination.innerHTML = paginationHTML;
@@ -252,7 +242,7 @@ const layoutData = {
                         const url = window.URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = \`ctf-data-\${new Date().toISOString().split('T')[0]}.json\`;
+                        a.download = 'ctf-data-' + new Date().toISOString().split('T')[0] + '.json';
                         document.body.appendChild(a);
                         a.click();
                         window.URL.revokeObjectURL(url);
@@ -276,16 +266,16 @@ const layoutData = {
             
             async function loadEventDetails(eventId) {
                 try {
-                    const response = await fetch(\`/api/events/\${eventId}\`);
+                    const response = await fetch('/api/events/' + eventId);
                     const event = await response.json();
                     
                     document.getElementById('modal-event-title').textContent = event.title;
                     document.getElementById('modal-event-description').textContent = event.description || 'No description available';
                     document.getElementById('modal-event-organizer').textContent = event.organizer || 'Unknown';
                     document.getElementById('modal-event-dates').textContent = 
-                        \`\${new Date(event.start_date).toLocaleString()} - \${new Date(event.finish_date).toLocaleString()}\`;
+                        new Date(event.start_date).toLocaleString() + ' - ' + new Date(event.finish_date).toLocaleString();
                     document.getElementById('modal-event-url').innerHTML = event.url ? 
-                        \`<a href="\${event.url}" target="_blank" class="btn btn-sm btn-primary">Visit Event</a>\` : 
+                        '<a href="' + event.url + '" target="_blank" class="btn btn-sm btn-primary">Visit Event</a>' : 
                         'No URL provided';
                     
                     // Load solves for this event
@@ -297,7 +287,7 @@ const layoutData = {
             
             async function loadEventSolves(eventId) {
                 try {
-                    const response = await fetch(\`/api/events/\${eventId}/solves\`);
+                    const response = await fetch('/api/events/' + eventId + '/solves');
                     const solves = await response.json();
                     
                     const solvesContainer = document.getElementById('modal-event-solves');
@@ -306,28 +296,27 @@ const layoutData = {
                         return;
                     }
                     
-                    solvesContainer.innerHTML = \`
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Challenge</th>
-                                        <th>Solver(s)</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    \${solves.map(solve => \`
-                                        <tr>
-                                            <td>\${solve.challenge}</td>
-                                            <td>\${solve.users.join(', ')}</td>
-                                            <td>\${new Date(solve.createdAt).toLocaleDateString()}</td>
-                                        </tr>
-                                    \`).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    \`;
+                    solvesContainer.innerHTML = 
+                        '<div class="table-responsive">' +
+                            '<table class="table table-sm">' +
+                                '<thead>' +
+                                    '<tr>' +
+                                        '<th>Challenge</th>' +
+                                        '<th>Solver(s)</th>' +
+                                        '<th>Date</th>' +
+                                    '</tr>' +
+                                '</thead>' +
+                                '<tbody>' +
+                                    solves.map(solve => 
+                                        '<tr>' +
+                                            '<td>' + solve.challenge + '</td>' +
+                                            '<td>' + solve.users.join(', ') + '</td>' +
+                                            '<td>' + new Date(solve.createdAt).toLocaleDateString() + '</td>' +
+                                        '</tr>'
+                                    ).join('') +
+                                '</tbody>' +
+                            '</table>' +
+                        '</div>';
                 } catch (error) {
                     console.error('Failed to load event solves:', error);
                 }
@@ -343,11 +332,9 @@ const layoutData = {
             
             function showAlert(message, type = 'info') {
                 const alertDiv = document.createElement('div');
-                alertDiv.className = \`alert alert-\${type} alert-dismissible fade show\`;
-                alertDiv.innerHTML = \`
-                    \${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                \`;
+                alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+                alertDiv.innerHTML = message + 
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
                 document.querySelector('.main-content').prepend(alertDiv);
                 setTimeout(() => alertDiv.remove(), 5000);
             }
