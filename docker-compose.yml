@@ -7,7 +7,7 @@ services:
       traefik:
     env_file:
       - stack.env
-    restart: no
+    restart: always
     environment:
       - MONGO_URI=mongodb://root:example@mongo/
     labels:
@@ -30,6 +30,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    restart: always
     volumes:
       - mongo_data:/data/db
     networks:
