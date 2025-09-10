@@ -7,7 +7,7 @@
 <script src="/main.js"></script>
 
 <!-- Page-specific JavaScript -->
-<% if (typeof jsFiles !== 'undefined' && jsFiles.length > 0) { %>
+    <% if (typeof jsFiles !== 'undefined' && jsFiles && jsFiles.length > 0) { %>
     <% jsFiles.forEach(function(jsFile) { %>
         <script src="/js/pages/<%= jsFile %>.js"></script>
     <% }); %>

@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/main.css">
     
     <!-- Page-specific CSS -->
-    <% if (typeof cssFiles !== 'undefined' && cssFiles.length > 0) { %>
+    <% if (typeof cssFiles !== 'undefined' && cssFiles && cssFiles.length > 0) { %>
         <% cssFiles.forEach(function(cssFile) { %>
             <link rel="stylesheet" href="/css/<%= cssFile %>.css">
         <% }); %>
