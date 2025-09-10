@@ -14,58 +14,12 @@ const layoutData = {
             <i class="bi bi-save me-2"></i>Save Event
         </button>
     `,
-    extraCSS: `
-        <style>
-            .table-container {
-                width: 100%;
-                background-color: var(--card-color);
-                border-radius: 8px;
-                padding: 1rem;
-            }
-            .timeline-table {
-                width: 100%;
-                border-collapse: separate;
-                border-spacing: 0;
-            }
-            .timeline-table td {
-                border: 1px solid var(--border-color);
-                padding: 12px;
-                text-align: center;
-                vertical-align: middle;
-                background-color: var(--surface-color);
-            }
-            .timeline-table th {
-                background-color: var(--primary-color);
-                color: black;
-                font-weight: 600;
-                padding: 12px;
-                text-align: center;
-                border: 1px solid var(--border-color);
-            }
-            .checkbox-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100%;
-            }
-            .form-check-input {
-                width: 20px;
-                height: 20px;
-            }
-            .timeline-section {
-                background-color: var(--card-color);
-                border: 1px solid var(--border-color);
-                border-radius: 12px;
-                padding: 1.5rem;
-                margin-bottom: 1.5rem;
-            }
-        </style>
-    `,
-    extraJS: ``
+    cssFiles: ['event-form'],
+    jsFiles: ['event-form']
 };
 %>
 
-<%- include('layout', { 
+<%- include('../../layout', { 
     ...layoutData, 
     body: `
         <div class="row">
@@ -219,69 +173,9 @@ const layoutData = {
                 <button type="button" class="btn btn-primary mt-3" id="addTimeline">Add Timeline</button>
             </div>
             <button type="submit" class="btn btn-success">Submit</button>
-        </form>
-    </div>
-
-    <script src="https://unpkg.com/jquery@latest"></script>
-    <script src="https://unpkg.com/@popperjs/core@latest"></script>
-    <script src="https://unpkg.com/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#addTimeline').click(function () {
-                let timelineEntry = `
-                    <tr class="timeline-entry">
-                        <td>
-                            <input type="text" class="form-control" name="timelineName[]" placeholder="Enter timeline name">
-                        </td>
-                        <td>
-                            <select class="form-control timezone-select" name="timezone[]">
-                                <option value="WIB">WIB</option>
-                                <option value="WITA">WITA</option>
-                                <option value="WIT">WIT</option>
-                            </select>
-                        </td>
-                        <td>
-                            <input type="datetime-local" class="form-control datetime-input" name="timelineStart[]" data-timezone="WIB">
-                        </td>
-                        <td>
-                            <input type="datetime-local" class="form-control datetime-input" name="timelineEnd[]" data-timezone="WIB">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="location[]" value="Online">
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger remove-timeline">Remove</button>
-                        </td>
-                    </tr>`;
-                $('#timelineContainer').append(timelineEntry);
-            });
-
-            $(document).on('click', '.remove-timeline', function () {
-                $(this).closest('.timeline-entry').remove();
-            });
-
-            $('#description').on('input', function () {
-                const charCount = $(this).val().length;
-                $('#charCount').text(charCount);
-                if (charCount > 800) {
-                    $('#descriptionHelp').addClass('text-danger');
-                } else {
-                    $('#descriptionHelp').removeClass('text-danger');
-                }
-            });
-
-            $('#eventForm').submit(function (event) {
-                const description = $('#description').val();
-                if (description.length > 800) {
-                    event.preventDefault();
-                    alert('Description must be 800 characters or fewer.');
-                }
-            });
-
-            const initialCharCount = $('#description').val().length;
-            $('#charCount').text(initialCharCount);
-        });
-    </script>
-</body>
-
-</html>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `
+}) %>

@@ -114,10 +114,7 @@ body {
     border: 1px solid var(--border-color);
 }
 
-.btn-custom:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-}
+/* Inherits from .hover-lift utility class */
 
 .btn-primary {
     background-color: var(--primary-color);
@@ -620,20 +617,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .login-card .form-control {
-    background-color: var(--surface-color);
-    border: 2px solid var(--border-color);
+    border-width: 2px;
     border-radius: 15px;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    color: var(--text-primary);
     transition: all 0.3s ease;
 }
 
 .login-card .form-control:focus {
-    background-color: var(--surface-color);
-    border-color: var(--primary-color);
-    color: var(--text-primary);
-    box-shadow: 0 0 0 0.2rem rgba(187, 134, 252, 0.25);
     transform: scale(1.02);
 }
 
@@ -704,6 +695,21 @@ h1, h2, h3, h4, h5, h6 {
    ======================================== */
 .text-center.py-4 {
     color: var(--text-secondary);
+}
+
+/* Hover Effects */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+/* Focus Ring Utility */
+.focus-ring:focus {
+    box-shadow: 0 0 0 0.25rem rgba(187, 134, 252, 0.25);
 }
 
 .loading-overlay {

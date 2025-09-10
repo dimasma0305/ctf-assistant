@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../../partials/head', { title: 'Login' }) %>
+<%- include('../../partials/head', { title: 'Login', cssFiles: ['login'] }) %>
 <body>
     <div class="container-fluid">
         <div class="row">
@@ -75,24 +75,5 @@
     </div>
     
     <%- include('../../partials/scripts') %>
-    
-    <style>
-    .login-card {
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        backdrop-filter: blur(10px);
-    }
-    
-    .login-card .card-body {
-        background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    }
-    
-    @media (max-width: 768px) {
-        .login-card .card-body {
-            padding: 2rem !important;
-        }
-    }
-    </style>
 </body>
 </html>

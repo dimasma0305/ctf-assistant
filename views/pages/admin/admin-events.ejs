@@ -9,40 +9,12 @@ const layoutData = {
             <i class="bi bi-plus-circle me-2"></i>Create New Event
         </a>
     `,
-    extraCSS: ``,
-    extraJS: `
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('.delete-button').forEach(button => {
-                    button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const form = this.closest('form');
-
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: "You won't be able to revert this!",
-                            icon: 'warning',
-                            background: 'var(--card-color)',
-                            color: 'var(--text-primary)',
-                            showCancelButton: true,
-                            confirmButtonColor: 'var(--primary-color)',
-                            cancelButtonColor: 'var(--danger-color)',
-                            confirmButtonText: 'Yes, delete it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                form.submit();
-                            }
-                        });
-                    });
-                });
-            });
-        </script>
-    `
+    jsFiles: ['admin-events'],
+    extraJS: `<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>`
 };
 %>
 
-<%- include('layout', { 
+<%- include('../../layout', { 
     ...layoutData, 
     body: `
         <div class="card">
