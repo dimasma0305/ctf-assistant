@@ -160,7 +160,20 @@ export class ReactionRoleEvent {
 # nama challenge di spesifik
 /solve challenge players:@partisipan1 @partisipan2 name:[example] example
 
+# Initialize challenges dari platform CTF
+/solve init json:"<JSON_DATA>" platform:ctfd
+
 \`\`\`
+
+## 📡 **CTF Platform JSON Endpoints**
+🔗 **Untuk auto-import challenges:**
+- **CTFd:** \`/api/v1/challenges\`
+- **rCTF:** \`/api/v1/challs\`  
+- **GzCTF:** \`/api/game/{id}/challenges\`
+- **picoCTF:** \`/api/challenges\`
+- **Contoh:** \`https://ctf.example.com/api/v1/challenges\`
+
+> 💡 Copy JSON dari endpoint tersebut, lalu gunakan \`/solve init\`
             `.trim() })
             credsMessage.pin('Panduan Resmi CTF');
             setTimeout(async() => {

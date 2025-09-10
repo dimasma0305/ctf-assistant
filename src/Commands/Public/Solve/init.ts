@@ -40,17 +40,18 @@ export const command: SubCommand = {
         .setDescription('Initialize challenges from CTF platform JSON (creates threads with ❌ prefix)')
         .addStringOption(option => option
             .setName("json")
-            .setDescription("JSON data from CTF platform (CTFd format)")
+            .setDescription("JSON data from CTF platform. CTFd: /api/v1/challenges, rCTF: /api/v1/challs, GzCTF: /api/game/{id}/challenges")
             .setRequired(true)
         )
         .addStringOption(option => option
             .setName("platform")
-            .setDescription("CTF platform type")
+            .setDescription("CTF platform type (default: ctfd)")
             .setRequired(false)
             .addChoices(
-                { name: 'CTFd', value: 'ctfd' },
-                { name: 'rCTF', value: 'rctf' },
-                { name: 'Generic', value: 'generic' }
+                { name: 'CTFd (/api/v1/challenges)', value: 'ctfd' },
+                { name: 'rCTF (/api/v1/challs)', value: 'rctf' },
+                { name: 'GzCTF (/api/game/{id}/challenges)', value: 'gzctf' },
+                { name: 'Generic (custom format)', value: 'generic' }
             )
         ),
     async execute(interaction, _client) {
@@ -202,6 +203,8 @@ async function parseChallenges(jsonData: string, platform: string): Promise<Pars
             return parseCTFdChallenges(data);
         case 'rctf':
             return parseRCTFChallenges(data);
+        case 'gzctf':
+            return parseGzCTFChallenges(data);
         case 'generic':
             return parseGenericChallenges(data);
         default:
@@ -230,6 +233,26 @@ function parseCTFdChallenges(data: CTFdResponse): ParsedChallenge[] {
 function parseRCTFChallenges(data: any): ParsedChallenge[] {
     // TODO: Implement rCTF parsing when format is provided
     throw new Error('rCTF format parsing not yet implemented');
+}
+
+// Parse GzCTF format
+function parseGzCTFChallenges(data: any): ParsedChallenge[] {
+    // GzCTF typically returns an array of challenges or data wrapped in an object
+    let challenges = Array.isArray(data) ? data : (data.data || data.challenges || []);
+    
+    if (!Array.isArray(challenges)) {
+        throw new Error('Invalid GzCTF response format - expected array of challenges');
+    }
+    
+    return challenges.map((challenge: any, index: number) => ({
+        id: challenge.id || index + 1,
+        name: challenge.title || challenge.name || `Challenge ${index + 1}`,
+        category: challenge.category || challenge.type || 'misc',
+        points: challenge.originalScore || challenge.points || challenge.score || 0,
+        solves: challenge.solved || challenge.solves || 0,
+        solved: challenge.isSolved || challenge.solved_by_me || false,
+        tags: challenge.tags || []
+    }));
 }
 
 // Parse generic format (placeholder - add actual format when needed)  
