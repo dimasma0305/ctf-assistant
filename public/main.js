@@ -9,6 +9,48 @@ window.CTFAssistant = {
     user: null
 };
 
+// Load user info on page load
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadUserInfo();
+});
+
+async function loadUserInfo() {
+    try {
+        const response = await fetch('/api/user');
+        if (response.ok) {
+            window.CTFAssistant.user = await response.json();
+            updateUserUI();
+        }
+    } catch (error) {
+        console.log('User not authenticated or error loading user info');
+    }
+}
+
+function updateUserUI() {
+    const user = window.CTFAssistant.user;
+    if (!user) return;
+    
+    // Update welcome message
+    const welcomeElements = document.querySelectorAll('#welcome-user');
+    welcomeElements.forEach(el => {
+        el.textContent = `Welcome, ${user.username}!`;
+    });
+    
+    // Update profile username
+    const profileUsername = document.getElementById('profile-username');
+    if (profileUsername) {
+        profileUsername.textContent = user.username;
+    }
+    
+    // Hide admin links if not admin
+    if (!user.isAdmin) {
+        const adminLinks = document.querySelectorAll('a[href*="/admin"]');
+        adminLinks.forEach(link => {
+            link.style.display = 'none';
+        });
+    }
+}
+
 /* ========================================
    Utility Functions
    ======================================== */

@@ -1,13 +1,12 @@
 import express, { Response, Router } from "express";
-import { EventModel } from "../../Database/connect";
+import { EventModel } from "../Database/connect";
 import { AuthenticatedRequest, checkAuth, deleteEvents, reqToForm, updateOrDeleteEvents } from "../utils";
-import { eventSchema } from "../../Database/eventSchema";
+import { eventSchema } from "../Database/eventSchema";
 
 const router: Router = express.Router()
 
 router.get("/events", checkAuth, async (req, res) => {
-    const events = await EventModel.find().exec();
-    res.render('pages/admin/admin-events', { events });
+    res.sendFile('/home/dimas/documents/project/ctf-assistant/public/admin-events.html');
 });
 
 router.get("/event/new", checkAuth, async (req, res) => {
@@ -21,11 +20,8 @@ router.get("/event/:id", checkAuth, async (req, res) => {
     if (id) {
         const event = await EventModel.findById(id).exec().catch();
         if (event) {
-            return res.render('pages/ctf/event-form', {
-                event,
-                eventSchema,
-                isAdmin: true
-            });
+            // For now, redirect to admin events list - we can create a separate admin event form page later
+            return res.redirect('/admin/events');
         }
     }
     res.send("ok")

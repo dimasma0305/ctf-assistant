@@ -46,7 +46,7 @@ client.on('messageCreate', _ => {
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('static')); // Serve static files
+app.use(express.static('public')); // Serve all static files and HTML from public
 app.use(session({
     secret: process.env.SECRET || crypto.randomUUID(),
     resave: false,
@@ -54,9 +54,6 @@ app.use(session({
 }));
 app.use(flash());
 app.use("/admin", admin);
-
-app.set('view engine', 'ejs');
-app.set('views', './views');
 
 app.get("/", async (req, res) => {
     // Check if user is logged in, redirect to dashboard, otherwise show login
@@ -67,8 +64,12 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    const error = req.flash('error');
-    res.render('pages/auth/login', { error });
+    const error = req.flash('error')[0];
+    let redirectUrl = '/login.html';
+    if (error) {
+        redirectUrl += `?error=${encodeURIComponent(error)}`;
+    }
+    res.redirect(redirectUrl);
 });
 
 app.post("/login", (req, res) => {
@@ -84,13 +85,7 @@ app.post("/login", (req, res) => {
 
 // Public events list route
 app.get("/events", async (req, res) => {
-    try {
-        const events = await EventModel.find().exec();
-        res.render('pages/ctf/event-list', { events });
-    } catch (error) {
-        console.error('❌ Failed to fetch events for public list:', error);
-        res.status(500).send('Failed to load events');
-    }
+    res.sendFile('public/events.html');
 });
 
 app.get("/event/:id", async (req, res) => {
@@ -98,14 +93,11 @@ app.get("/event/:id", async (req, res) => {
     if (id) {
         const event = await EventModel.findById(id).exec().catch();
         if (event) {
-            return res.render('pages/ctf/event-form', {
-                event,
-                eventSchema,
-                isAdmin: false
-            });
+            // For now, redirect to events list - we can create a separate event form page later
+            return res.redirect('/events');
         }
     }
-    res.send("ok");
+    res.redirect('/events');
 });
 
 app.post("/event/:id", async (req, res) => {
@@ -124,26 +116,22 @@ function requireAuth(req: any, res: any, next: any) {
 
 // Dashboard route
 app.get("/dashboard", requireAuth, async (req, res) => {
-    const user = (req as AuthenticatedRequest).session.user;
-    res.render('pages/dashboard', { user });
+    res.sendFile('public/dashboard.html');
 });
 
 // Data management route
 app.get("/data", requireAuth, async (req, res) => {
-    const user = (req as AuthenticatedRequest).session.user;
-    res.render('pages/ctf/data', { user });
+    res.sendFile('public/data.html');
 });
 
 // Settings route
 app.get("/settings", requireAuth, async (req, res) => {
-    const user = (req as AuthenticatedRequest).session.user;
-    res.render('pages/settings', { user });
+    res.sendFile('public/settings.html');
 });
 
 // Profile route
 app.get("/profile", requireAuth, async (req, res) => {
-    const user = (req as AuthenticatedRequest).session.user;
-    res.render('pages/profile', { user });
+    res.sendFile('public/profile.html');
 });
 
 // Logout route
@@ -378,6 +366,20 @@ app.get("/api/ctf-events", requireAuth, async (req, res) => {
 });
 
 
+// API route for current user info
+app.get("/api/user", requireAuth, async (req, res) => {
+    try {
+        const user = (req as AuthenticatedRequest).session.user;
+        res.json({
+            username: user,
+            isAuthenticated: true,
+            isAdmin: user === 'admin' // Simple admin check
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch user data' });
+    }
+});
+
 // API route for profile data
 app.get("/api/profile", requireAuth, async (req, res) => {
     try {
@@ -539,67 +541,57 @@ app.post("/api/export-data", requireAuth, async (req, res) => {
     }
 });
 
-// Session scheduler status endpoint  
+// Session scheduler status HTML page
 app.get("/session-status", async (req, res) => {
-    // Check if request wants JSON (API call) or HTML (web page)
-    const acceptsJson = req.headers.accept && req.headers.accept.includes('application/json');
-    
-    if (acceptsJson) {
-        // Return JSON for API calls
-        try {
-            const myClient = client as MyClient;
-            
-            if (!myClient.sessionScheduler) {
-                res.status(500).json({ 
-                    error: "Session scheduler not initialized",
-                    timestamp: new Date().toISOString()
-                });
-                return;
-            }
+    res.sendFile('public/session-status.html');
+});
 
-            const status = myClient.sessionScheduler.getStatus();
-            const sessionInfo = myClient.sessionScheduler.getSessionInfo();
-            
-            const response = {
-                bot: {
-                    isReady: client.isReady(),
-                    status: client.isReady() ? 'online' : 'offline',
-                    uptime: client.uptime ? Math.floor(client.uptime / 1000) : null,
-                    user: client.user ? {
-                        id: client.user.id,
-                        username: client.user.username,
-                        tag: client.user.tag
-                    } : null
-                },
-                sessionScheduler: {
-                    ...status,
-                    sessionInfo: sessionInfo ? {
-                        resetTime: sessionInfo.resetTime.toISOString(),
-                        remainingSessions: sessionInfo.remainingSessions,
-                        totalSessions: sessionInfo.totalSessions,
-                        timeUntilReset: sessionInfo.resetTime.getTime() - Date.now()
-                    } : null
-                },
-                timestamp: new Date().toISOString()
-            };
-            
-            res.json(response);
-            return;
-        } catch (error) {
-            console.error('Error getting session status:', error);
+// Session scheduler status API endpoint  
+app.get("/api/session-status", async (req, res) => {
+    try {
+        const myClient = client as MyClient;
+        
+        if (!myClient.sessionScheduler) {
             res.status(500).json({ 
-                error: 'Internal server error',
+                error: "Session scheduler not initialized",
                 timestamp: new Date().toISOString()
             });
             return;
         }
-    }
-    
-    // Return HTML page for browser visits
-    try {
-        res.render('pages/session-status');
+
+        const status = myClient.sessionScheduler.getStatus();
+        const sessionInfo = myClient.sessionScheduler.getSessionInfo();
+        
+        const response = {
+            bot: {
+                isReady: client.isReady(),
+                status: client.isReady() ? 'online' : 'offline',
+                uptime: client.uptime ? Math.floor(client.uptime / 1000) : null,
+                user: client.user ? {
+                    id: client.user.id,
+                    username: client.user.username,
+                    tag: client.user.tag
+                } : null
+            },
+            sessionScheduler: {
+                ...status,
+                sessionInfo: sessionInfo ? {
+                    resetTime: sessionInfo.resetTime.toISOString(),
+                    remainingSessions: sessionInfo.remainingSessions,
+                    totalSessions: sessionInfo.totalSessions,
+                    timeUntilReset: sessionInfo.resetTime.getTime() - Date.now()
+                } : null
+            },
+            timestamp: new Date().toISOString()
+        };
+        
+        res.json(response);
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Error getting session status:', error);
+        res.status(500).json({ 
+            error: 'Internal server error',
+            timestamp: new Date().toISOString()
+        });
     }
 });
 

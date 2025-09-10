@@ -1,9 +1,9 @@
 import { Session } from "express-session";
-import { EventSchemaType } from "../Database/eventSchema";
+import { EventSchemaType } from "./Database/eventSchema";
 import express, { NextFunction, Response, Request } from "express";
-import { EventModel } from "../Database/connect";
+import { EventModel } from "./Database/connect";
 import { GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from "discord.js";
-import client from "../client";
+import client from "./client";
 import { sleep } from "bun";
 
 interface AuthenticatedSession extends Session {

@@ -4,7 +4,7 @@ let statusData = null;
 async function refreshStatus() {
     try {
         showLoading('status-container', true);
-        const response = await fetch('/session-status');
+        const response = await fetch('/api/session-status');
         statusData = await response.json();
         updateStatusDisplay();
     } catch (error) {
