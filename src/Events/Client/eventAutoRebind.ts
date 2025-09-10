@@ -39,14 +39,26 @@ export const event: Event = {
                     });
 
                     if (!existingEvent) {
+                        // Extract organizer name properly - handle both string and object
+                        let organizerName = 'Unknown';
+                        if (ctfEvent.organizers?.[0]) {
+                            const org = ctfEvent.organizers[0];
+                            organizerName = typeof org === 'string' ? org : (org.name || 'Unknown');
+                        }
+
+                        // Normalize format to lowercase for database enum
+                        const formatValue = ctfEvent.format 
+                            ? [ctfEvent.format.toLowerCase()] 
+                            : ['jeopardy'];
+
                         const newEvent = new EventModel({
                             title: ctfEvent.title,
-                            organizer: ctfEvent.organizers?.[0] || 'Unknown',
+                            organizer: organizerName,
                             description: ctfEvent.description || '',
                             url: ctfEvent.url,
                             logo: ctfEvent.logo,
                             restrictions: [],
-                            format: ctfEvent.format ? [ctfEvent.format] : ['jeopardy'],
+                            format: formatValue,
                             timelines: [{
                                 name: 'Main Event',
                                 startTime: new Date(ctfEvent.start),
