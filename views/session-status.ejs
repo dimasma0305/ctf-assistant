@@ -1,0 +1,266 @@
+<% 
+const layoutData = {
+    title: 'Session Status',
+    user: null, // Public page
+    currentPage: 'status',
+    pageHeader: 'Bot Session Status',
+    headerActions: `
+        <button class="btn btn-primary btn-custom" onclick="refreshStatus()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+        </button>
+        <a href="/" class="btn btn-secondary btn-custom">
+            <i class="bi bi-house me-2"></i>Home
+        </a>
+    `,
+    extraCSS: `
+        <style>
+            .status-indicator {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                border-radius: 25px;
+                font-weight: 500;
+                font-size: 0.9rem;
+            }
+            .status-online {
+                background: linear-gradient(135deg, var(--success-color), #2e7d32);
+                color: white;
+            }
+            .status-offline {
+                background: linear-gradient(135deg, var(--danger-color), #c62828);
+                color: white;
+            }
+            .status-waiting {
+                background: linear-gradient(135deg, var(--warning-color), #ef6c00);
+                color: black;
+            }
+            .metric-value {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--primary-color);
+            }
+            .json-container {
+                background-color: var(--surface-color);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 1rem;
+                font-family: 'Courier New', monospace;
+                font-size: 0.9rem;
+                color: var(--text-primary);
+                overflow-x: auto;
+                white-space: pre-wrap;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+        </style>
+    `,
+    extraJS: `
+        <script>
+            let statusData = null;
+            
+            async function refreshStatus() {
+                try {
+                    showLoading('status-container', true);
+                    const response = await fetch('/session-status');
+                    statusData = await response.json();
+                    updateStatusDisplay();
+                } catch (error) {
+                    console.error('Failed to refresh status:', error);
+                    showAlert('Failed to refresh status', 'danger');
+                } finally {
+                    showLoading('status-container', false);
+                }
+            }
+            
+            function updateStatusDisplay() {
+                if (!statusData) return;
+                
+                // Update bot status
+                const botStatus = document.getElementById('bot-status');
+                const botUptime = document.getElementById('bot-uptime');
+                
+                if (botStatus) {
+                    const isOnline = statusData.bot.isReady;
+                    const statusClass = isOnline ? 'status-online' : 'status-offline';
+                    const statusText = isOnline ? 'Online' : 'Offline';
+                    const statusIcon = isOnline ? 'bi-check-circle' : 'bi-x-circle';
+                    
+                    botStatus.innerHTML = \`
+                        <span class="status-indicator \${statusClass}">
+                            <i class="bi \${statusIcon}"></i>
+                            \${statusText}
+                        </span>
+                    \`;
+                }
+                
+                if (botUptime) {
+                    const uptime = statusData.bot.uptime ? formatUptime(statusData.bot.uptime) : 'N/A';
+                    botUptime.textContent = uptime;
+                }
+                
+                // Update session scheduler status
+                const sessionStatus = document.getElementById('session-status');
+                const remainingSessions = document.getElementById('remaining-sessions');
+                const resetTime = document.getElementById('reset-time');
+                
+                if (sessionStatus && statusData.sessionScheduler) {
+                    const isActive = statusData.sessionScheduler.isActive;
+                    const isWaiting = statusData.sessionScheduler.isWaitingForSessionReset;
+                    
+                    let statusClass = 'status-offline';
+                    let statusText = 'Inactive';
+                    let statusIcon = 'bi-x-circle';
+                    
+                    if (isActive) {
+                        statusClass = 'status-online';
+                        statusText = 'Active';
+                        statusIcon = 'bi-check-circle';
+                    } else if (isWaiting) {
+                        statusClass = 'status-waiting';
+                        statusText = 'Waiting for Reset';
+                        statusIcon = 'bi-clock';
+                    }
+                    
+                    sessionStatus.innerHTML = \`
+                        <span class="status-indicator \${statusClass}">
+                            <i class="bi \${statusIcon}"></i>
+                            \${statusText}
+                        </span>
+                    \`;
+                }
+                
+                if (remainingSessions && statusData.sessionScheduler?.sessionInfo) {
+                    const remaining = statusData.sessionScheduler.sessionInfo.remainingSessions;
+                    const total = statusData.sessionScheduler.sessionInfo.totalSessions;
+                    remainingSessions.textContent = \`\${remaining}/\${total}\`;
+                }
+                
+                if (resetTime && statusData.sessionScheduler?.sessionInfo) {
+                    const resetTimeMs = statusData.sessionScheduler.sessionInfo.timeUntilReset;
+                    const resetTimeFormatted = resetTimeMs > 0 ? formatUptime(resetTimeMs / 1000) : 'Now';
+                    resetTime.textContent = resetTimeFormatted;
+                }
+                
+                // Update raw JSON
+                const jsonContainer = document.getElementById('raw-json');
+                if (jsonContainer) {
+                    jsonContainer.textContent = JSON.stringify(statusData, null, 2);
+                }
+                
+                // Update timestamp
+                const timestamp = document.getElementById('last-update');
+                if (timestamp) {
+                    timestamp.textContent = new Date().toLocaleString();
+                }
+            }
+            
+            function formatUptime(seconds) {
+                if (!seconds) return 'N/A';
+                
+                const days = Math.floor(seconds / 86400);
+                const hours = Math.floor((seconds % 86400) / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = Math.floor(seconds % 60);
+                
+                const parts = [];
+                if (days > 0) parts.push(\`\${days}d\`);
+                if (hours > 0) parts.push(\`\${hours}h\`);
+                if (minutes > 0) parts.push(\`\${minutes}m\`);
+                if (secs > 0 || parts.length === 0) parts.push(\`\${secs}s\`);
+                
+                return parts.join(' ');
+            }
+            
+            // Auto-refresh every 5 seconds
+            document.addEventListener('DOMContentLoaded', function() {
+                refreshStatus();
+                setInterval(refreshStatus, 5000);
+            });
+        </script>
+    `
+};
+%>
+
+<%- include('layout', { 
+    ...layoutData, 
+    body: `
+        <div id="status-container">
+            <!-- Bot Status Card -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-robot me-2"></i>Discord Bot Status
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="form-label">Status:</label>
+                                    <div id="bot-status" class="metric-value">
+                                        <div class="loading"></div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Uptime:</label>
+                                    <div id="bot-uptime" class="metric-value">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-clock me-2"></i>Session Scheduler
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Scheduler Status:</label>
+                                    <div id="session-status" class="metric-value">
+                                        <div class="loading"></div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Sessions:</label>
+                                    <div id="remaining-sessions" class="metric-value">Loading...</div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Reset In:</label>
+                                    <div id="reset-time" class="metric-value">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Information -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-info-square me-2"></i>System Information
+                            </h5>
+                            <small class="text-muted">
+                                Last updated: <span id="last-update">Never</span>
+                            </small>
+                        </div>
+                        <div class="card-body">
+                            <div class="json-container" id="raw-json">
+                                Loading system information...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+}) %>

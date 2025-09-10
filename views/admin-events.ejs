@@ -1,75 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Manage Events</title>
-    <link href="https://unpkg.com/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/jquery@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Manage Events</h1>
-        <a href="/admin/event/new" class="btn btn-primary mb-3">Create New Event</a>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Organizer</th>
-                    <th>Date Range</th>
-                    <th>Format</th>
-                    <th>Restrictions</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% events.forEach(event => { %>
-                <tr>
-                    <td><%= event.title %></td>
-                    <td><%= event.organizer %></td>
-                    <td>
-                        <% if (event.timelines && event.timelines.length > 0) { %>
-                            <%= new Date(event.timelines[0].startTime).toLocaleDateString() %> - <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %>
-                        <% } else { %>
-                            N/A
-                        <% } %>
-                    </td>
-                    <td><%= event.format.join(', ') %></td>
-                    <td><%= event.restrictions.join(', ') %></td>
-                    <td>
-                        <a href="/admin/event/<%= event._id %>" class="btn btn-warning btn-sm">Edit</a>
-                        <form class="delete-form" action="/admin/event/<%= event._id %>/delete" method="post" style="display:inline;">
-                            <button type="button" class="btn btn-danger btn-sm delete-button">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    </div>
+<% 
+const layoutData = {
+    title: 'Admin - Manage Events',
+    user: 'admin',
+    currentPage: 'admin',
+    pageHeader: 'Manage Events',
+    headerActions: `
+        <a href="/admin/event/new" class="btn btn-primary btn-custom">
+            <i class="bi bi-plus-circle me-2"></i>Create New Event
+        </a>
+    `,
+    extraCSS: ``,
+    extraJS: `
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.delete-button').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const form = this.closest('form');
 
-    <script>
-        $(document).ready(function() {
-            $('.delete-button').on('click', function(e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            background: 'var(--card-color)',
+                            color: 'var(--text-primary)',
+                            showCancelButton: true,
+                            confirmButtonColor: 'var(--primary-color)',
+                            cancelButtonColor: 'var(--danger-color)',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
                 });
             });
-        });
-    </script>
-</body>
-</html>
+        </script>
+    `
+};
+%>
+
+<%- include('layout', { 
+    ...layoutData, 
+    body: `
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-event me-2"></i>CTF Events Management
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>
+                                    <i class="bi bi-flag me-2"></i>Title
+                                </th>
+                                <th>
+                                    <i class="bi bi-building me-2"></i>Organizer
+                                </th>
+                                <th>
+                                    <i class="bi bi-calendar-range me-2"></i>Date Range
+                                </th>
+                                <th>
+                                    <i class="bi bi-gear me-2"></i>Format
+                                </th>
+                                <th>
+                                    <i class="bi bi-shield me-2"></i>Restrictions
+                                </th>
+                                <th>
+                                    <i class="bi bi-tools me-2"></i>Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% events.forEach(event => { %>
+                            <tr>
+                                <td>
+                                    <div class="fw-bold"><%= event.title %></div>
+                                </td>
+                                <td><%= event.organizer %></td>
+                                <td>
+                                    <% if (event.timelines && event.timelines.length > 0) { %>
+                                        <small>
+                                            <%= new Date(event.timelines[0].startTime).toLocaleDateString() %><br>
+                                            <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %>
+                                        </small>
+                                    <% } else { %>
+                                        <span class="text-muted">N/A</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% event.format.forEach(format => { %>
+                                        <span class="badge bg-info me-1"><%= format %></span>
+                                    <% }) %>
+                                </td>
+                                <td>
+                                    <% if (event.restrictions && event.restrictions.length > 0) { %>
+                                        <% event.restrictions.forEach(restriction => { %>
+                                            <span class="badge bg-warning me-1"><%= restriction %></span>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <span class="text-muted">None</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="/admin/event/<%= event._id %>" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form class="delete-form" action="/admin/event/<%= event._id %>/delete" method="post" style="display:inline;">
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-button">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `
+}) %>

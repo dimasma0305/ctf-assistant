@@ -1,54 +1,118 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Form</title>
-    <link href="https://unpkg.com/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .table-container {
-            width: 100%;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .checkbox-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-        .form-check-input {
-            width: 20px;
-            height: 20px;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Event Form</h1>
+<% 
+const layoutData = {
+    title: 'Event Form',
+    user: isAdmin ? 'admin' : 'user',
+    currentPage: isAdmin ? 'admin' : 'events',
+    pageHeader: event._id ? 'Edit Event' : 'Create Event',
+    headerActions: `
         <% if (isAdmin) { %>
-            <a href="/admin/events" class="btn btn-secondary mb-4">Back to Events</a>
+            <a href="/admin/events" class="btn btn-secondary btn-custom">
+                <i class="bi bi-arrow-left me-2"></i>Back to Events
+            </a>
         <% } %>
-        <form id="eventForm" action="<%= isAdmin ? '/admin/event/' : '/event/' %><%= event._id || '' %>" method="post">
-            <div class="form-group">
-                <label for="organizer">Organizer</label>
-                <input type="text" class="form-control" id="organizer" name="organizer" placeholder="Enter organizer" value="<%= event.organizer || '' %>">
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter description"><%= event.description || '' %></textarea>
-                <small id="descriptionHelp" class="form-text text-muted">Must be 800 characters or fewer. <span id="charCount">0</span>/800</small>
-            </div>
+        <button type="submit" form="eventForm" class="btn btn-primary btn-custom">
+            <i class="bi bi-save me-2"></i>Save Event
+        </button>
+    `,
+    extraCSS: `
+        <style>
+            .table-container {
+                width: 100%;
+                background-color: var(--card-color);
+                border-radius: 8px;
+                padding: 1rem;
+            }
+            .timeline-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+            .timeline-table td {
+                border: 1px solid var(--border-color);
+                padding: 12px;
+                text-align: center;
+                vertical-align: middle;
+                background-color: var(--surface-color);
+            }
+            .timeline-table th {
+                background-color: var(--primary-color);
+                color: black;
+                font-weight: 600;
+                padding: 12px;
+                text-align: center;
+                border: 1px solid var(--border-color);
+            }
+            .checkbox-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+            }
+            .form-check-input {
+                width: 20px;
+                height: 20px;
+            }
+            .timeline-section {
+                background-color: var(--card-color);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+        </style>
+    `,
+    extraJS: ``
+};
+%>
+
+<%- include('layout', { 
+    ...layoutData, 
+    body: `
+        <div class="row">
+            <div class="col-12">
+                <form id="eventForm" action="<%= isAdmin ? '/admin/event/' : '/event/' %><%= event._id || '' %>" method="post" class="needs-validation" novalidate>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-info-circle me-2"></i>Event Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="organizer" class="form-label">
+                                        <i class="bi bi-building me-2"></i>Organizer
+                                    </label>
+                                    <input type="text" class="form-control" id="organizer" name="organizer" 
+                                           placeholder="Enter organizer name" value="<%= event.organizer || '' %>" required>
+                                    <div class="invalid-feedback">
+                                        Please provide an organizer name.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="title" class="form-label">
+                                        <i class="bi bi-flag me-2"></i>Event Title
+                                    </label>
+                                    <input type="text" class="form-control" id="title" name="title" 
+                                           placeholder="Enter event title" value="<%= event.title || '' %>" required>
+                                    <div class="invalid-feedback">
+                                        Please provide an event title.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">
+                                    <i class="bi bi-text-paragraph me-2"></i>Description
+                                </label>
+                                <textarea class="form-control" id="description" name="description" rows="4" 
+                                          placeholder="Enter event description"><%= event.description || '' %></textarea>
+                                <div class="form-text">
+                                    Must be 800 characters or fewer. <span id="charCount" class="text-info">0</span>/800
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" class="form-control" id="title" name="title" placeholder="Enter title" value="<%= event.title || '' %>">

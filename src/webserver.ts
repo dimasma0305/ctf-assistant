@@ -530,8 +530,13 @@ app.post("/api/export-data", requireAuth, async (req, res) => {
     }
 });
 
-// Session scheduler status endpoint
+// Session scheduler status endpoint  
 app.get("/session-status", async (req, res) => {
+    // Check if request wants JSON (API call) or HTML (web page)
+    const acceptsJson = req.headers.accept && req.headers.accept.includes('application/json');
+    
+    if (acceptsJson) {
+        // Return JSON for API calls
     try {
         const myClient = client as MyClient;
         
@@ -570,6 +575,12 @@ app.get("/session-status", async (req, res) => {
         };
         
         res.json(response);
+        return;
+    }
+    
+    // Return HTML page for browser visits
+    try {
+        res.render('session-status');
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
