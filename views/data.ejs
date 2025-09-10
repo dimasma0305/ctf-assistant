@@ -123,7 +123,16 @@ const layoutData = {
                     const response = await fetch('/api/ctf-events');
                     const data = await response.json();
                     updateEventsTable(data);
-                    updateSolvesTable();
+                    
+                    // Update statistics
+                    document.getElementById('total-events-count').textContent = data.length;
+                    document.getElementById('events-count').textContent = data.length + ' events';
+                    
+                    // Calculate total solves and active solvers
+                    const totalSolves = data.reduce((sum, event) => sum + (event.solves || 0), 0);
+                    document.getElementById('total-solves-count').textContent = totalSolves;
+                    document.getElementById('active-solvers-count').textContent = '0'; // TODO: Calculate unique solvers
+                    
                 } catch (error) {
                     console.error('Failed to refresh data:', error);
                     showAlert('Failed to refresh data', 'danger');
