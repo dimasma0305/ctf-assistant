@@ -3,6 +3,7 @@ import { SlashCommandSubcommandBuilder, TextChannel } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { ReactionRoleEvent } from "./utils/event";
 import { createRoleIfNotExist } from "./utils/event";
+import { EventModel } from "../../../Database/connect";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -70,6 +71,54 @@ export const command: SubCommand = {
     if (isPrivate) {
       if (!password) {
         throw new Error("Password not provided");
+      }
+    }
+
+    // Save/update event in database (only for real CTF events)
+    if (!is_dummie) {
+      try {
+        const existingEvent = await EventModel.findOne({ 
+          title: ctfEvent.title,
+          url: ctfEvent.url 
+        });
+
+        if (!existingEvent) {
+          // Extract organizer name properly - handle both string and object
+          let organizerName = 'Unknown';
+          if (ctfEvent.organizers?.[0]) {
+            const org = ctfEvent.organizers[0];
+            organizerName = typeof org === 'string' ? org : (org.name || 'Unknown');
+          }
+
+          // Normalize format to lowercase for database enum
+          const formatValue = ctfEvent.format 
+            ? [ctfEvent.format.toLowerCase()] 
+            : ['jeopardy'];
+
+          const newEvent = new EventModel({
+            title: ctfEvent.title,
+            organizer: organizerName,
+            description: ctfEvent.description || '',
+            url: ctfEvent.url,
+            logo: ctfEvent.logo,
+            restrictions: [],
+            format: formatValue,
+            timelines: [{
+              name: 'Main Event',
+              startTime: new Date(ctfEvent.start),
+              endTime: new Date(ctfEvent.finish),
+              location: 'Online',
+              timezone: 'WIB'
+            }]
+          });
+
+          await newEvent.save();
+          console.log(`💾 Scheduled CTF event saved to database: ${ctfEvent.title}`);
+        } else {
+          console.log(`📋 Scheduled CTF event already exists in database: ${ctfEvent.title}`);
+        }
+      } catch (dbError) {
+        console.error(`❌ Failed to save scheduled CTF event to database:`, dbError);
       }
     }
 
