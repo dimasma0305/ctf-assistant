@@ -68,7 +68,7 @@ export const command: SubCommand = {
         const winnerEmbed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle('Congratulations!')
-            .setDescription(`Congratulations to ${users.map(user => `<@${user}>`).join(', ')} for solving the challenge **${challengeName}**!`)
+            .setDescription(`Congratulations to ${users.map(user => `<@${user}>`).join(', ')} for solving the **[${category}]** challenge **${challengeName}**!`)
             .setTimestamp()
             .setFooter({ text: 'CTF Event', iconURL: 'https://tcp1p.team/favicon.ico' });
 
