@@ -3,7 +3,7 @@ import client from "./client";
 import { MyClient } from "./Model/client";
 import bodyParser from 'body-parser';
 import crypto from 'crypto';
-import { EventModel } from "./Database/connect";
+import { EventModel, solveModel } from "./Database/connect";
 import session from "express-session";
 import flash from "connect-flash";
 import { AuthenticatedRequest, reqToForm, sanitizeEvents as getSanitizeEvents, updateOrDeleteEvents } from "./Server/utils";
@@ -145,19 +145,75 @@ app.get("/logout", (req, res) => {
 app.get("/api/dashboard-stats", requireAuth, async (req, res) => {
     try {
         const totalEvents = await EventModel.countDocuments();
+        const totalSolves = await solveModel.countDocuments();
         const myClient = client as MyClient;
+        
+        // Calculate active events (events that are currently running)
+        const now = new Date();
+        const events = await EventModel.find();
+        const activeEvents = events.filter(event => {
+            const timeline = (event as any).timelines?.[0];
+            if (!timeline) return false;
+            const start = timeline.startTime;
+            const end = timeline.endTime;
+            return start && end && new Date(start) <= now && new Date(end) >= now;
+        }).length;
+        
+        // Get recent activity (last 10 solves)
+        const recentSolves = await solveModel.find()
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .lean();
+            
+        const recentActivity = recentSolves.map(solve => ({
+            type: 'solve',
+            icon: 'trophy',
+            title: solve.challenge,
+            description: `Solved by ${solve.users.length} user(s) • CTF ID: ${solve.ctf_id}`,
+            timestamp: (solve as any).createdAt || new Date(),
+            challenge: solve.challenge,
+            users: solve.users,
+            ctf_id: solve.ctf_id
+        }));
+        
+        // Chart data for last 7 days (solve counts per day)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const recentSolvesChart = await solveModel.find({
+            createdAt: { $gte: sevenDaysAgo }
+        } as any).lean();
+        
+        const chartData = [];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            date.setHours(0, 0, 0, 0);
+            const nextDate = new Date(date);
+            nextDate.setDate(nextDate.getDate() + 1);
+            
+            const solveCount = recentSolvesChart.filter(solve => {
+                const solveDate = new Date((solve as any).createdAt || date);
+                return solveDate >= date && solveDate < nextDate;
+            }).length;
+            
+            chartData.push({
+                date: date.toISOString().split('T')[0],
+                solves: solveCount
+            });
+        }
         
         const stats = {
             totalEvents,
-            totalSolves: 0, // TODO: Get from solveModel
-            activeEvents: 0, // TODO: Calculate active events
+            totalSolves,
+            activeEvents,
             botOnline: client.isReady(),
-            recentActivity: [], // TODO: Get recent activity
-            chartData: [] // TODO: Get chart data for last 7 days
+            recentActivity,
+            chartData
         };
         
         res.json(stats);
     } catch (error) {
+        console.error('❌ Failed to fetch dashboard stats:', error);
         res.status(500).json({ error: 'Failed to fetch dashboard stats' });
     }
 });
@@ -166,14 +222,29 @@ app.get("/api/dashboard-stats", requireAuth, async (req, res) => {
 app.get("/api/ctf-events", requireAuth, async (req, res) => {
     try {
         const events = await EventModel.find().sort({ createdAt: -1 });
+        
+        // Get solve counts for each event
+        const eventSolveCounts = await solveModel.aggregate([
+            { $group: { _id: '$ctf_id', count: { $sum: 1 } } }
+        ]);
+        const solveCountMap = new Map(eventSolveCounts.map(item => [item._id, item.count]));
+        
         const sanitizedEvents = events.map(event => {
             // Get the first timeline entry for dates (assuming main event timeline)
             const firstTimeline = (event as any).timelines?.[0];
             const startTime = firstTimeline?.startTime;
             const endTime = firstTimeline?.endTime;
             
+            // Find CTFtime ID from the event data or URL
+            const ctftimeId = (event as any).url ? 
+                (event as any).url.match(/\/event\/(\d+)\//)?.[1] || 
+                (event as any).ctftime_id || 
+                event._id.toString() : 
+                event._id.toString();
+            
             return {
                 id: event._id,
+                ctftime_id: ctftimeId,
                 title: event.title,
                 organizer: (event as any).organizer || 'Unknown',
                 start_date: startTime || new Date(),
@@ -181,13 +252,13 @@ app.get("/api/ctf-events", requireAuth, async (req, res) => {
                 status: !startTime ? 'upcoming' : 
                        new Date() < new Date(startTime) ? 'upcoming' : 
                        new Date() > new Date(endTime || startTime) ? 'completed' : 'active',
-                solves: 0, // TODO: Get solve count for each event
+                solves: solveCountMap.get(ctftimeId) || 0,
                 url: (event as any).url || '',
                 description: (event as any).description || ''
             };
         });
         
-        console.log(`📊 Found ${events.length} events in database`);
+        console.log(`📊 Found ${events.length} events with solve data`);
         res.json(sanitizedEvents);
     } catch (error) {
         console.error('❌ Failed to fetch events:', error);
@@ -305,20 +376,155 @@ app.post("/api/test-webhook", requireAuth, async (req, res) => {
     }
 });
 
+// API route for individual event details
+app.get("/api/events/:id", requireAuth, async (req, res): Promise<void> => {
+    try {
+        const event = await EventModel.findById(req.params.id);
+        if (!event) {
+            res.status(404).json({ error: 'Event not found' });
+            return;
+        }
+        
+        const firstTimeline = (event as any).timelines?.[0];
+        const eventData = {
+            id: event._id,
+            title: event.title,
+            organizer: (event as any).organizer || 'Unknown',
+            description: (event as any).description || '',
+            url: (event as any).url || '',
+            start_date: firstTimeline?.startTime || new Date(),
+            finish_date: firstTimeline?.endTime || new Date(),
+            format: (event as any).format || [],
+            logo: (event as any).logo || ''
+        };
+        
+        res.json(eventData);
+    } catch (error) {
+        console.error('❌ Failed to fetch event details:', error);
+        res.status(500).json({ error: 'Failed to fetch event details' });
+    }
+});
+
+// API route for event solves
+app.get("/api/events/:id/solves", requireAuth, async (req, res): Promise<void> => {
+    try {
+        const event = await EventModel.findById(req.params.id);
+        if (!event) {
+            res.status(404).json({ error: 'Event not found' });
+            return;
+        }
+        
+        // Find CTFtime ID from the event
+        const ctftimeId = (event as any).url ? 
+            (event as any).url.match(/\/event\/(\d+)\//)?.[1] || 
+            (event as any).ctftime_id || 
+            event._id.toString() : 
+            event._id.toString();
+            
+        const solves = await solveModel.find({ ctf_id: ctftimeId }).sort({ createdAt: -1 });
+        
+        const formattedSolves = solves.map(solve => ({
+            id: solve._id,
+            challenge: solve.challenge,
+            users: solve.users,
+            createdAt: (solve as any).createdAt || new Date(),
+            ctf_id: solve.ctf_id
+        }));
+        
+        res.json(formattedSolves);
+    } catch (error) {
+        console.error('❌ Failed to fetch event solves:', error);
+        res.status(500).json({ error: 'Failed to fetch event solves' });
+    }
+});
+
+// API route for all solves
+app.get("/api/solves", requireAuth, async (req, res): Promise<void> => {
+    try {
+        const { ctf_id, challenge, user, limit = 50 } = req.query;
+        
+        // Build filter query
+        let filter: any = {};
+        if (ctf_id) filter.ctf_id = ctf_id;
+        if (challenge) filter.challenge = new RegExp(challenge as string, 'i');
+        if (user) filter.users = { $in: [user] };
+        
+        const solves = await solveModel.find(filter)
+            .sort({ createdAt: -1 })
+            .limit(parseInt(limit as string))
+            .lean();
+            
+        res.json(solves);
+    } catch (error) {
+        console.error('❌ Failed to fetch solves:', error);
+        res.status(500).json({ error: 'Failed to fetch solves' });
+    }
+});
+
+// API route for creating solve (for web interface)
+app.post("/api/solves", requireAuth, async (req, res): Promise<void> => {
+    try {
+        const { challenge, ctf_id, users } = req.body;
+        
+        if (!challenge || !ctf_id || !users || !Array.isArray(users)) {
+            res.status(400).json({ error: 'Missing required fields: challenge, ctf_id, users' });
+            return;
+        }
+        
+        const existingSolve = await solveModel.findOne({ challenge, ctf_id });
+        if (existingSolve) {
+            existingSolve.users = users;
+            await existingSolve.save();
+            res.json({ success: true, solve: existingSolve, updated: true });
+        } else {
+            const newSolve = new solveModel({ challenge, ctf_id, users });
+            await newSolve.save();
+            res.json({ success: true, solve: newSolve, created: true });
+        }
+    } catch (error) {
+        console.error('❌ Failed to create solve:', error);
+        res.status(500).json({ error: 'Failed to create solve' });
+    }
+});
+
+// API route for deleting solve
+app.delete("/api/solves/:id", requireAuth, async (req, res): Promise<void> => {
+    try {
+        const solve = await solveModel.findByIdAndDelete(req.params.id);
+        if (!solve) {
+            res.status(404).json({ error: 'Solve not found' });
+            return;
+        }
+        res.json({ success: true, message: 'Solve deleted successfully' });
+    } catch (error) {
+        console.error('❌ Failed to delete solve:', error);
+        res.status(500).json({ error: 'Failed to delete solve' });
+    }
+});
+
 // API route for exporting data
 app.post("/api/export-data", requireAuth, async (req, res) => {
     try {
         const events = await EventModel.find();
+        const solves = await solveModel.find();
+        
         const exportData = {
             exportDate: new Date().toISOString(),
             events: events,
-            // TODO: Add solve data and other relevant data
+            solves: solves,
+            statistics: {
+                totalEvents: events.length,
+                totalSolves: solves.length,
+                uniqueCtfIds: [...new Set(solves.map(s => s.ctf_id))].length,
+                uniqueUsers: [...new Set(solves.flatMap(s => s.users))].length
+            }
         };
         
         res.setHeader('Content-Type', 'application/json');
         res.setHeader('Content-Disposition', 'attachment; filename="ctf-data.json"');
         res.json(exportData);
     } catch (error) {
+        console.error('❌ Failed to export data:', error);
         res.status(500).json({ error: 'Failed to export data' });
     }
 });
