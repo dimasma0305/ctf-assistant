@@ -46,6 +46,7 @@ client.on('messageCreate', _ => {
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('static')); // Serve static files
 app.use(session({
     secret: process.env.SECRET || crypto.randomUUID(),
     resave: false,
