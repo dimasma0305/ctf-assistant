@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../../partials/head', { title: 'Login' }) %>
+<%- include('partials/head', { title: 'Login' }) %>
 <body>
     <div class="container-fluid">
         <div class="row">
@@ -28,7 +28,7 @@
                                         <% } %>
                                         
                                         <form action="/login" method="POST" class="needs-validation" novalidate>
-                                            <%- include('../../partials/form-input', {
+                                            <%- include('partials/form-input', {
                                                 id: 'username',
                                                 label: 'Username',
                                                 type: 'text',
@@ -37,7 +37,7 @@
                                                 required: true
                                             }) %>
                                             
-                                            <%- include('../../partials/form-input', {
+                                            <%- include('partials/form-input', {
                                                 id: 'password',
                                                 label: 'Password',
                                                 type: 'password',
@@ -74,7 +74,7 @@
         </div>
     </div>
     
-    <%- include('../../partials/scripts') %>
+    <%- include('partials/scripts') %>
     
     <style>
     .login-card {
