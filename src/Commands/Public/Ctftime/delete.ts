@@ -1,5 +1,5 @@
 import { SubCommand } from "../../../Model/command";
-import { SlashCommandSubcommandBuilder } from "discord.js";
+import { SlashCommandSubcommandBuilder, TextChannel } from "discord.js";
 import { translate } from "../../../Functions/discord-utils";
 import { infoEvent } from "../../../Functions/ctftime-v2";
 
@@ -29,8 +29,36 @@ export const command: SubCommand = {
             title = options.getString("title", true)
         }
 
+        if (!title) {
+            const channel = interaction.channel
+            if (!channel || !(channel instanceof TextChannel)) {
+                await interaction.editReply({
+                    content: "Can't get title from channel",
+                })
+                return
+            }
+            const topicContent = channel.topic || "{}";
+            try {
+                const data = JSON.parse(topicContent);
+                if (typeof data === 'object' && data !== null && 'title' in data && typeof data.title === 'string') {
+                    title = data.title;
+                }
+            } catch (e) {
+                console.error("Failed to parse channel topic as JSON:", e);
+            }
+            if (!title) {
+                await interaction.editReply({
+                    content: "Can't get title from channel",
+                })
+                return
+            }
+        }
+
         const guild = await interaction.guild?.fetch()
         if (!guild) {
+            await interaction.editReply({
+                content: "Guild not found",
+            })
             return
         }
         guild.roles.cache.forEach(async (role) => {

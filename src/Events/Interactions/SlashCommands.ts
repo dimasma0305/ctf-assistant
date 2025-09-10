@@ -41,10 +41,28 @@ export const event: Event = {
         await execute(interaction, client)
       } catch (error) {
         console.log(error)
-        await interaction.reply({ content: error?.toString() })
+        
+        // Handle error response based on interaction state
+        const errorMessage = error?.toString() || "An error occurred while executing the command.";
+        
+        try {
+          if (interaction.deferred) {
+            await interaction.editReply({ content: `❌ ${errorMessage}` });
+          } else if (interaction.replied) {
+            await interaction.followUp({ content: `❌ ${errorMessage}`, flags: ["Ephemeral"] });
+          } else {
+            await interaction.reply({ content: `❌ ${errorMessage}`, flags: ["Ephemeral"] });
+          }
+        } catch (replyError) {
+          console.error('Failed to send error response:', replyError);
+        }
       }
     } else {
-      interaction.reply({ content: "isn't a command", flags: ["Ephemeral"] })
+      try {
+        await interaction.reply({ content: "This isn't a valid command", flags: ["Ephemeral"] });
+      } catch (replyError) {
+        console.error('Failed to reply to invalid command:', replyError);
+      }
     }
   },
 };
