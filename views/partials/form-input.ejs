@@ -1,0 +1,36 @@
+<!-- Form Input Component -->
+<!--
+Usage: <%- include('partials/form-input', {
+    id: 'username',
+    label: 'Username',
+    type: 'text',
+    placeholder: 'Enter username',
+    required: true,
+    icon: 'bi-person',
+    helpText: 'Choose a unique username',
+    value: 'existing value'
+}) %>
+-->
+<div class="mb-3">
+    <label for="<%= id %>" class="form-label">
+        <% if (typeof icon !== 'undefined') { %>
+            <i class="<%= icon %> me-2"></i>
+        <% } %>
+        <%= label %>
+    </label>
+    <input type="<%= type || 'text' %>" 
+           class="form-control" 
+           id="<%= id %>" 
+           name="<%= name || id %>"
+           <% if (typeof placeholder !== 'undefined') { %>placeholder="<%= placeholder %>"<% } %>
+           <% if (typeof value !== 'undefined') { %>value="<%= value %>"<% } %>
+           <% if (required) { %>required<% } %>>
+    <% if (typeof helpText !== 'undefined') { %>
+        <div class="form-text"><%= helpText %></div>
+    <% } %>
+    <% if (required) { %>
+        <div class="invalid-feedback">
+            Please provide a valid <%= label.toLowerCase() %>.
+        </div>
+    <% } %>
+</div>

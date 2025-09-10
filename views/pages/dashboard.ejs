@@ -1,0 +1,129 @@
+<%
+const layoutData = {
+    title: 'Dashboard',
+    user: user,
+    currentPage: 'dashboard',
+    pageHeader: 'Dashboard',
+    headerActions: `
+        <button class="btn btn-primary btn-custom" onclick="refreshStats()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+        </button>
+    `
+};
+%>
+
+<%- include('../layout', { 
+    ...layoutData, 
+    body: `
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body metric-card">
+                        <div class="metric-icon text-white">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="metric-number text-white" id="total-events">-</div>
+                        <div class="text-white-50">Total CTF Events</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card success">
+                    <div class="card-body metric-card">
+                        <div class="metric-icon text-white">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <div class="metric-number text-white" id="total-solves">-</div>
+                        <div class="text-white-50">Total Solves</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card warning">
+                    <div class="card-body metric-card">
+                        <div class="metric-icon text-white">
+                            <i class="bi bi-lightning"></i>
+                        </div>
+                        <div class="metric-number text-white" id="active-events">-</div>
+                        <div class="text-white-50">Active Events</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card info">
+                    <div class="card-body metric-card">
+                        <div class="metric-icon text-white">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="metric-number text-white" id="team-members">-</div>
+                        <div class="text-white-50">Team Members</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-xl-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Solves Over Time</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="solvesChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Category Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="categoryChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="row">
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clock me-2"></i>Recent Events</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recent-events">
+                            <div class="text-center py-3">
+                                <div class="loading"></div>
+                                <p class="text-muted mt-2">Loading events...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Latest Solves</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="latest-solves">
+                            <div class="text-center py-3">
+                                <div class="loading"></div>
+                                <p class="text-muted mt-2">Loading solves...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+}) %>

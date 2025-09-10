@@ -1,0 +1,28 @@
+<!-- Flash Messages -->
+<% if (typeof success !== 'undefined' && success.length > 0) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error.length > 0) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+
+<% if (typeof warning !== 'undefined' && warning.length > 0) { %>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <%= warning %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+
+<% if (typeof info !== 'undefined' && info.length > 0) { %>
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <%= info %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>

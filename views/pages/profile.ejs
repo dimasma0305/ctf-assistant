@@ -1,0 +1,303 @@
+<%
+const layoutData = {
+    title: 'Profile',
+    user: user,
+    currentPage: 'profile',
+    pageHeader: 'User Profile',
+    headerActions: `
+        <button class="btn btn-primary btn-custom" onclick="saveProfile()">
+            <i class="bi bi-check-circle me-2"></i>Save Changes
+        </button>
+    `,
+    cssFiles: ['profile'],
+    jsFiles: ['profile']
+};
+%>
+
+<%- include('../layout', { 
+    ...layoutData, 
+    body: `
+        <div class="row">
+            <!-- Profile Information -->
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="profile-avatar" id="profile-avatar" onclick="uploadAvatar()">
+                            <i class="bi bi-person"></i>
+                            <div class="overlay">
+                                <i class="bi bi-camera"></i>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mb-1" id="profile-username">${user}</h4>
+                        <p class="text-muted mb-3">CTF Administrator</p>
+                        
+                        <div class="d-flex justify-content-center gap-2 mb-3">
+                            <span class="stat-badge">
+                                <i class="bi bi-trophy me-1"></i>
+                                <span id="total-solves">0</span> Solves
+                            </span>
+                            <span class="stat-badge">
+                                <i class="bi bi-calendar me-1"></i>
+                                <span id="events-participated">0</span> Events
+                            </span>
+                        </div>
+                        
+                        <button class="btn btn-outline-primary btn-custom w-100 mb-2" onclick="downloadData()">
+                            <i class="bi bi-download me-2"></i>Download My Data
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Statistics</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <h5 style="color: var(--primary-color)" id="challenges-created">0</h5>
+                                <small class="text-muted">Challenges Created</small>
+                            </div>
+                            <div class="col-6">
+                                <h5 style="color: var(--success-color)" id="success-rate">0%</h5>
+                                <small class="text-muted">Success Rate</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted">Success Rate</small>
+                                <small class="text-muted" id="success-rate-text">0%</small>
+                            </div>
+                            <div class="progress-custom">
+                                <div class="progress-bar-custom" id="success-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted">Activity Level</small>
+                                <small class="text-muted">Active</small>
+                            </div>
+                            <div class="progress-custom">
+                                <div class="progress-bar-custom" id="activity-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Settings -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <%- include('../partials/tab-navigation', {
+                            tabs: [
+                                { id: 'general', label: 'General', icon: 'bi-person', active: true },
+                                { id: 'preferences', label: 'Preferences', icon: 'bi-gear' },
+                                { id: 'security', label: 'Security', icon: 'bi-shield' },
+                                { id: 'activity', label: 'Activity', icon: 'bi-activity' }
+                            ]
+                        }) %>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- General Tab -->
+                            <div class="tab-pane fade show active" id="general" role="tabpanel">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <%- include('../partials/form-input', {
+                                                id: 'display-name',
+                                                label: 'Display Name',
+                                                type: 'text',
+                                                value: user
+                                            }) %>
+                                            
+                                            <%- include('../partials/form-input', {
+                                                id: 'email',
+                                                label: 'Email Address',
+                                                type: 'email',
+                                                placeholder: 'admin@example.com'
+                                            }) %>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="timezone" class="form-label">Timezone</label>
+                                                <select class="form-select" id="timezone">
+                                                    <option value="UTC">UTC</option>
+                                                    <option value="America/New_York">Eastern Time</option>
+                                                    <option value="America/Chicago">Central Time</option>
+                                                    <option value="America/Denver">Mountain Time</option>
+                                                    <option value="America/Los_Angeles">Pacific Time</option>
+                                                    <option value="Europe/London">London</option>
+                                                    <option value="Europe/Paris">Paris</option>
+                                                    <option value="Asia/Tokyo">Tokyo</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="theme" class="form-label">Theme</label>
+                                                <select class="form-select" id="theme">
+                                                    <option value="light">Light</option>
+                                                    <option value="dark">Dark</option>
+                                                    <option value="auto">Auto</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="bio" class="form-label">Bio</label>
+                                        <textarea class="form-control" id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Preferences Tab -->
+                            <div class="tab-pane fade" id="preferences" role="tabpanel">
+                                <h6>Notification Preferences</h6>
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="email-solves">
+                                            <label class="form-check-label" for="email-solves">
+                                                Email on solve notifications
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="email-events">
+                                            <label class="form-check-label" for="email-events">
+                                                Email on new CTF events
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="discord-dm">
+                                            <label class="form-check-label" for="discord-dm">
+                                                Discord DM notifications
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h6>Privacy Settings</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="show-email">
+                                            <label class="form-check-label" for="show-email">
+                                                Make email public
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="show-stats" checked>
+                                            <label class="form-check-label" for="show-stats">
+                                                Show statistics publicly
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="show-activity" checked>
+                                            <label class="form-check-label" for="show-activity">
+                                                Show activity publicly
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Security Tab -->
+                            <div class="tab-pane fade" id="security" role="tabpanel">
+                                <h6>Change Password</h6>
+                                <form onsubmit="event.preventDefault(); changePassword();">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <%- include('../partials/form-input', {
+                                                id: 'current-password',
+                                                label: 'Current Password',
+                                                type: 'password',
+                                                required: true
+                                            }) %>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <%- include('../partials/form-input', {
+                                                id: 'new-password',
+                                                label: 'New Password',
+                                                type: 'password',
+                                                required: true,
+                                                helpText: 'At least 8 characters'
+                                            }) %>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <%- include('../partials/form-input', {
+                                                id: 'confirm-password',
+                                                label: 'Confirm Password',
+                                                type: 'password',
+                                                required: true
+                                            }) %>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-warning btn-custom">
+                                        <i class="bi bi-key me-2"></i>Change Password
+                                    </button>
+                                </form>
+                                
+                                <hr>
+                                
+                                <h6>Login Sessions</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Device</th>
+                                                <th>Location</th>
+                                                <th>Last Active</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <i class="bi bi-laptop me-2"></i>Current Session
+                                                    <span class="badge bg-success ms-2">Active</span>
+                                                </td>
+                                                <td>-</td>
+                                                <td>Now</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Activity Tab -->
+                            <div class="tab-pane fade" id="activity" role="tabpanel">
+                                <h6>Recent Activity</h6>
+                                <div class="activity-timeline" id="recent-activity">
+                                    <div class="text-center py-4">
+                                        <div class="loading"></div>
+                                        <p class="text-muted mt-2">Loading activity...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+}) %>
