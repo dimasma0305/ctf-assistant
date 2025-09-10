@@ -368,6 +368,101 @@ app.get("/api/user", requireAuth, async (req, res) => {
     }
 });
 
+// API route for individual event details
+app.get("/api/event/:id", requireAuth, async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const event = await EventModel.findById(eventId).lean();
+        
+        if (!event) {
+            res.status(404).json({ error: 'Event not found' });
+            return;
+        }
+        
+        // Get solve count for this event
+        const ctftimeId = (event as any).url ? 
+            (event as any).url.match(/\/event\/(\d+)\//)?.[1] || 
+            (event as any).ctftime_id || 
+            event._id.toString() : 
+            event._id.toString();
+            
+        const solveCount = await solveModel.countDocuments({ ctf_id: ctftimeId });
+        
+        // Get the first timeline entry for dates
+        const firstTimeline = (event as any).timelines?.[0];
+        const startTime = firstTimeline?.startTime;
+        const endTime = firstTimeline?.endTime;
+        
+        const eventDetails = {
+            id: event._id,
+            ctftime_id: ctftimeId,
+            title: event.title,
+            organizer: (event as any).organizer || 'Unknown',
+            description: (event as any).description || '',
+            url: (event as any).url || '',
+            startTime: startTime || new Date(),
+            endTime: endTime || new Date(),
+            start_date: startTime || new Date(),
+            finish_date: endTime || new Date(),
+            status: !startTime ? 'upcoming' : 
+                   new Date() < new Date(startTime) ? 'upcoming' : 
+                   new Date() > new Date(endTime || startTime) ? 'completed' : 'active',
+            solves: solveCount,
+            format: (event as any).format || [],
+            restrictions: (event as any).restrictions || [],
+            logo: (event as any).logo || '',
+            timelines: (event as any).timelines || []
+        };
+        
+        res.json(eventDetails);
+        return;
+    } catch (error) {
+        console.error('❌ Failed to fetch event details:', error);
+        res.status(500).json({ error: 'Failed to fetch event details' });
+    }
+});
+
+// API route for event solves
+app.get("/api/event/:id/solves", requireAuth, async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        
+        // First get the event to find its ctftime_id
+        const event = await EventModel.findById(eventId).lean();
+        if (!event) {
+            res.status(404).json({ error: 'Event not found' });
+            return;
+        }
+        
+        // Get CTFtime ID for this event
+        const ctftimeId = (event as any).url ? 
+            (event as any).url.match(/\/event\/(\d+)\//)?.[1] || 
+            (event as any).ctftime_id || 
+            event._id.toString() : 
+            event._id.toString();
+        
+        // Find all solves for this event
+        const solves = await solveModel.find({ ctf_id: ctftimeId })
+            .sort({ createdAt: -1 })
+            .lean();
+        
+        const solvesData = solves.map(solve => ({
+            id: solve._id,
+            challenge: solve.challenge,
+            users: solve.users,
+            ctf_id: solve.ctf_id,
+            timestamp: (solve as any).createdAt || new Date(),
+            createdAt: (solve as any).createdAt || new Date()
+        }));
+        
+        res.json(solvesData);
+        return;
+    } catch (error) {
+        console.error('❌ Failed to fetch event solves:', error);
+        res.status(500).json({ error: 'Failed to fetch event solves' });
+    }
+});
+
 // API route for exporting data
 app.post("/api/export-data", requireAuth, async (req, res) => {
     try {

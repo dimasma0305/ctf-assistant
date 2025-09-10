@@ -159,6 +159,16 @@ async function getCTFEvents() {
     return await apiCall('/api/ctf-events');
 }
 
+// Get event details
+async function getEventDetails(eventId) {
+    return await apiCall(`/api/event/${eventId}`);
+}
+
+// Get event solves  
+async function getEventSolves(eventId) {
+    return await apiCall(`/api/event/${eventId}/solves`);
+}
+
 /* ========================================
    Dashboard Functions
    ======================================== */
@@ -282,135 +292,8 @@ function updateChart(data) {
 }
 
 /* ========================================
-   Data Page Functions
+   Data Page Functions (handled by data.js)
    ======================================== */
-
-let currentFilter = 'all';
-let currentPage = 1;
-let itemsPerPage = 10;
-
-async function refreshData() {
-    try {
-        showLoading('events-table', true);
-        const data = await getCTFEvents();
-        updateEventsTable(data);
-        
-        // Update statistics
-        const totalEventsElement = document.getElementById('total-events-count');
-        const eventsCountElement = document.getElementById('events-count');
-        
-        if (totalEventsElement) totalEventsElement.textContent = data.length;
-        if (eventsCountElement) eventsCountElement.textContent = `${data.length} events`;
-        
-        // Calculate total solves and active solvers
-        const totalSolves = data.reduce((sum, event) => sum + (event.solves || 0), 0);
-        const totalSolvesElement = document.getElementById('total-solves-count');
-        const activeSolversElement = document.getElementById('active-solvers-count');
-        
-        if (totalSolvesElement) totalSolvesElement.textContent = totalSolves;
-        if (activeSolversElement) activeSolversElement.textContent = '0'; // TODO: Calculate unique solvers
-        
-    } catch (error) {
-        console.error('Failed to refresh data:', error);
-        showAlert('Failed to refresh data', 'danger');
-    } finally {
-        showLoading('events-table', false);
-    }
-}
-
-function updateEventsTable(events) {
-    const tbody = document.getElementById('events-tbody');
-    if (!tbody) return;
-    
-    if (!events || events.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No events found</td></tr>';
-        return;
-    }
-    
-    // Filter events based on current filter
-    let filteredEvents = events;
-    if (currentFilter !== 'all') {
-        filteredEvents = events.filter(event => event.status === currentFilter);
-    }
-    
-    // Pagination
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
-    
-    tbody.innerHTML = paginatedEvents.map(event => `
-        <tr onclick="viewEventDetails('${event.id}')" style="cursor: pointer;">
-            <td>
-                <div class="fw-bold">${event.title}</div>
-                <small class="text-muted">${event.organizer || 'Unknown'}</small>
-            </td>
-            <td>
-                <span class="badge status-${event.status}">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
-            </td>
-            <td>${formatDate(event.start_date, { hour: undefined, minute: undefined })}</td>
-            <td>${formatDate(event.finish_date, { hour: undefined, minute: undefined })}</td>
-            <td>
-                <span class="solve-badge">${event.solves || 0} solves</span>
-            </td>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation()">Actions</button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#" onclick="viewEventDetails('${event.id}'); event.stopPropagation();"><i class="bi bi-eye me-2"></i>View Details</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="exportEventData('${event.id}'); event.stopPropagation();"><i class="bi bi-download me-2"></i>Export</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteEvent('${event.id}'); event.stopPropagation();"><i class="bi bi-trash me-2"></i>Delete</a></li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-    
-    updatePagination(filteredEvents.length);
-}
-
-function updatePagination(totalItems) {
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const pagination = document.getElementById('pagination');
-    if (!pagination) return;
-    
-    if (totalPages <= 1) {
-        pagination.innerHTML = '';
-        return;
-    }
-    
-    let paginationHTML = '';
-    for (let i = 1; i <= totalPages; i++) {
-        paginationHTML += `
-            <li class="page-item ${i === currentPage ? 'active' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
-            </li>
-        `;
-    }
-    
-    pagination.innerHTML = paginationHTML;
-}
-
-function changePage(page) {
-    currentPage = page;
-    refreshData();
-}
-
-function filterData(filter) {
-    currentFilter = filter;
-    currentPage = 1;
-    refreshData();
-}
-
-function searchEvents() {
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const rows = document.querySelectorAll('#events-tbody tr');
-    
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-}
 
 async function exportData() {
     try {
@@ -442,7 +325,7 @@ async function exportData() {
 
 async function viewEventDetails(eventId) {
     try {
-        const modal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+        const modal = new bootstrap.Modal(document.getElementById('eventModal'));
         await loadEventDetails(eventId);
         modal.show();
     } catch (error) {
@@ -454,31 +337,39 @@ async function loadEventDetails(eventId) {
     try {
         const event = await getEventDetails(eventId);
         
-        const elements = {
-            'modal-event-title': event.title,
-            'modal-event-description': event.description || 'No description available',
-            'modal-event-organizer': event.organizer || 'Unknown',
-            'modal-event-dates': `${formatDate(event.start_date)} - ${formatDate(event.finish_date)}`
-        };
+        if (!event) {
+            showAlert('Event not found', 'danger');
+            return;
+        }
         
-        Object.entries(elements).forEach(([id, value]) => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.textContent = value;
-            }
-        });
-        
-        const urlElement = document.getElementById('modal-event-url');
-        if (urlElement) {
-            urlElement.innerHTML = event.url ? 
-                `<a href="${event.url}" target="_blank" class="btn btn-sm btn-primary">Visit Event</a>` : 
-                'No URL provided';
+        // Update modal content
+        const modalBody = document.getElementById('eventModalBody');
+        if (modalBody) {
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Event Information</h6>
+                        <p><strong>Title:</strong> ${event.title || 'N/A'}</p>
+                        <p><strong>Organizer:</strong> ${event.organizer || 'Unknown'}</p>
+                        <p><strong>Status:</strong> <span class="badge status-${event.status}">${event.status}</span></p>
+                        <p><strong>Start Date:</strong> ${formatDate(event.start_date || event.startTime)}</p>
+                        <p><strong>End Date:</strong> ${formatDate(event.finish_date || event.endTime)}</p>
+                        <p><strong>Solves:</strong> ${event.solves || 0}</p>
+                        ${event.url ? `<p><strong>URL:</strong> <a href="${event.url}" target="_blank" class="btn btn-sm btn-primary">Visit Event</a></p>` : ''}
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Description</h6>
+                        <p>${event.description || 'No description available'}</p>
+                    </div>
+                </div>
+            `;
         }
         
         // Load solves for this event
         await loadEventSolves(eventId);
     } catch (error) {
         console.error('Failed to load event details:', error);
+        showAlert('Failed to load event details', 'danger');
     }
 }
 
@@ -486,36 +377,43 @@ async function loadEventSolves(eventId) {
     try {
         const solves = await getEventSolves(eventId);
         
-        const solvesContainer = document.getElementById('modal-event-solves');
-        if (!solvesContainer) return;
+        // Update the modal with solves information
+        const modalBody = document.getElementById('eventModalBody');
+        if (!modalBody) return;
         
-        if (solves.length === 0) {
-            solvesContainer.innerHTML = '<p class="text-muted">No solves recorded</p>';
-            return;
-        }
-        
-        solvesContainer.innerHTML = `
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Challenge</th>
-                            <th>Solver(s)</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${solves.map(solve => `
+        // Add solves section to the existing modal content
+        const solvesSection = document.createElement('div');
+        solvesSection.className = 'mt-4';
+        solvesSection.innerHTML = `
+            <h6>Challenge Solves (${solves.length})</h6>
+            ${solves.length === 0 ? 
+                '<p class="text-muted">No solves recorded for this event</p>' : 
+                `<div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
                             <tr>
-                                <td>${solve.challenge}</td>
-                                <td>${solve.users.join(', ')}</td>
-                                <td>${formatDate(solve.createdAt)}</td>
+                                <th>Challenge</th>
+                                <th>Solver(s)</th>
+                                <th>Date</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            ${solves.map(solve => `
+                                <tr>
+                                    <td>${solve.challenge}</td>
+                                    <td>${solve.users.join(', ')}</td>
+                                    <td>${formatDate(solve.createdAt)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`
+            }
         `;
+        
+        modalBody.appendChild(solvesSection);
+        
+        console.log('Loaded', solves.length, 'solves for event:', eventId);
     } catch (error) {
         console.error('Failed to load event solves:', error);
     }
@@ -534,6 +432,7 @@ function exportEventData(eventId) {
     console.log('Export event data:', eventId);
     showAlert('Event export functionality not yet implemented', 'warning');
 }
+
 
 /* ========================================
    Form Validation
@@ -618,14 +517,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (currentPath === '/dashboard') {
         refreshStats();
         setInterval(refreshStats, 30000); // Auto-refresh every 30 seconds
-    } else if (currentPath === '/data') {
-        refreshData();
-        
-        // Setup search with debounce
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', debounce(searchEvents, 300));
-        }
     } else if (currentPath === '/login') {
         initLoginPage();
     }
@@ -645,10 +536,6 @@ window.CTFAssistant = {
     showLoading,
     formatDate,
     refreshStats,
-    refreshData,
-    filterData,
-    searchEvents,
     exportData,
-    viewEventDetails,
-    changePage
+    viewEventDetails
 };
