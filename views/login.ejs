@@ -1,28 +1,164 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="https://unpkg.com/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Login</h1>
-        <% if (error.length) { %>
-        <div class="alert alert-danger"><%= error %></div>
-        <% } %>
-        <form action="/login" method="post">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+<% 
+const layoutData = {
+    title: 'Login',
+    user: null,
+    error: error,
+    extraCSS: `
+        <style>
+            body {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .login-card {
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+                overflow: hidden;
+                max-width: 400px;
+                width: 100%;
+                animation: slideUp 0.6s ease-out;
+            }
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(50px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .login-header {
+                background: linear-gradient(135deg, #6f42c1, #495057);
+                color: white;
+                text-align: center;
+                padding: 2rem;
+            }
+            .login-body {
+                padding: 2rem;
+            }
+            .form-control {
+                border-radius: 15px;
+                border: 2px solid #e9ecef;
+                padding: 0.75rem 1rem;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+            }
+            .form-control:focus {
+                border-color: #6f42c1;
+                box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+                transform: scale(1.02);
+            }
+            .btn-login {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: none;
+                border-radius: 15px;
+                padding: 0.75rem 2rem;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                width: 100%;
+            }
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            }
+            .brand-logo {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+        </style>
+    `
+};
+%>
+
+<%- include('layout', { 
+    ...layoutData, 
+    body: `
+        <div class="container-fluid">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="brand-logo">
+                        <i class="bi bi-flag-fill"></i>
+                    </div>
+                    <h2 class="mb-0">CTF Assistant</h2>
+                    <p class="mb-0 opacity-75">Admin Panel Access</p>
+                </div>
+                
+                <div class="login-body">
+                    <form action="/login" method="post" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="bi bi-person me-2"></i>Username
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="username" 
+                                name="username" 
+                                placeholder="Enter your username"
+                                required
+                                autocomplete="username"
+                            >
+                            <div class="invalid-feedback">
+                                Please provide a valid username.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock me-2"></i>Password
+                            </label>
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Enter your password"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <div class="invalid-feedback">
+                                Please provide a valid password.
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-login text-white">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Sign In
+                        </button>
+                        
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Secure admin access
+                            </small>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-    </div>
-</body>
-</html>
+        </div>
+    `
+}) %>
+
+<script>
+// Bootstrap form validation
+(() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+
+// Auto-focus username field
+document.getElementById('username').focus();
+</script>

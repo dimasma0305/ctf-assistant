@@ -1,0 +1,410 @@
+<% 
+const layoutData = {
+    title: 'Dashboard',
+    user: user,
+    currentPage: 'dashboard',
+    pageHeader: 'Dashboard',
+    headerActions: `
+        <button class="btn btn-primary btn-custom" onclick="refreshStats()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+        </button>
+    `,
+    extraCSS: `
+        <style>
+            .metric-card {
+                background: white;
+                border-radius: 15px;
+                padding: 1.5rem;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .metric-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+            }
+            
+            .metric-number {
+                font-size: 2.5rem;
+                font-weight: bold;
+                margin: 0.5rem 0;
+            }
+            
+            .metric-icon {
+                font-size: 2rem;
+                opacity: 0.7;
+            }
+            
+            .recent-activity {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            
+            .activity-item {
+                display: flex;
+                align-items: center;
+                padding: 1rem;
+                border-left: 4px solid transparent;
+                transition: all 0.3s ease;
+            }
+            
+            .activity-item:hover {
+                background-color: #f8f9fa;
+                border-left-color: var(--primary-color);
+            }
+            
+            .activity-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 1rem;
+                font-size: 1.2rem;
+            }
+            
+            .activity-solve {
+                background-color: #d4edda;
+                color: #155724;
+            }
+            
+            .activity-event {
+                background-color: #d1ecf1;
+                color: #0c5460;
+            }
+            
+            .activity-error {
+                background-color: #f8d7da;
+                color: #721c24;
+            }
+            
+            .chart-container {
+                position: relative;
+                height: 300px;
+                width: 100%;
+            }
+        </style>
+    `,
+    extraJS: `
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            let statsChart;
+            
+            async function refreshStats() {
+                try {
+                    const response = await fetch('/api/dashboard-stats');
+                    const data = await response.json();
+                    updateDashboard(data);
+                } catch (error) {
+                    console.error('Failed to refresh stats:', error);
+                    showAlert('Failed to refresh stats', 'danger');
+                }
+            }
+            
+            function updateDashboard(data) {
+                // Update metric cards
+                document.getElementById('total-events').textContent = data.totalEvents || 0;
+                document.getElementById('total-solves').textContent = data.totalSolves || 0;
+                document.getElementById('active-events').textContent = data.activeEvents || 0;
+                document.getElementById('bot-status').textContent = data.botOnline ? 'Online' : 'Offline';
+                
+                // Update bot status color
+                const statusElement = document.getElementById('bot-status');
+                statusElement.className = \`metric-number \${data.botOnline ? 'text-success' : 'text-danger'}\`;
+                
+                // Update recent activity
+                updateRecentActivity(data.recentActivity || []);
+                
+                // Update chart
+                updateChart(data.chartData || []);
+            }
+            
+            function updateRecentActivity(activities) {
+                const container = document.getElementById('recent-activity');
+                if (activities.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-4">No recent activity</p>';
+                    return;
+                }
+                
+                container.innerHTML = activities.map(activity => \`
+                    <div class="activity-item">
+                        <div class="activity-icon activity-\${activity.type}">
+                            <i class="bi bi-\${activity.icon}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">\${activity.title}</div>
+                            <div class="text-muted small">\${activity.description}</div>
+                            <div class="text-muted small">\${new Date(activity.timestamp).toLocaleString()}</div>
+                        </div>
+                    </div>
+                \`).join('');
+            }
+            
+            function updateChart(data) {
+                const ctx = document.getElementById('statsChart').getContext('2d');
+                
+                if (statsChart) {
+                    statsChart.destroy();
+                }
+                
+                statsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.date) || [],
+                        datasets: [{
+                            label: 'Solves',
+                            data: data.map(d => d.solves) || [],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.1)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(0,0,0,0.1)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function showAlert(message, type = 'info') {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = \`alert alert-\${type} alert-dismissible fade show\`;
+                alertDiv.innerHTML = \`
+                    \${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                \`;
+                document.querySelector('.main-content').prepend(alertDiv);
+                setTimeout(() => alertDiv.remove(), 5000);
+            }
+            
+            // Initialize dashboard
+            document.addEventListener('DOMContentLoaded', function() {
+                refreshStats();
+                
+                // Auto-refresh every 30 seconds
+                setInterval(refreshStats, 30000);
+            });
+        </script>
+    `
+};
+%>
+
+<%- include('layout', { 
+    ...layoutData, 
+    body: `
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body metric-card">
+                        <div class="metric-icon text-white">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="metric-number text-white" id="total-events">-</div>
+                        <div class="text-white-50">Total CTF Events</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card success">
+                    <div class="card-body metric-card">
+                        <div class="metric-icon text-white">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <div class="metric-number text-white" id="total-solves">-</div>
+                        <div class="text-white-50">Total Solves</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card warning">
+                    <div class="card-body metric-card">
+                        <div class="metric-icon text-white">
+                            <i class="bi bi-lightning"></i>
+                        </div>
+                        <div class="metric-number text-white" id="active-events">-</div>
+                        <div class="text-white-50">Active Events</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card info">
+                    <div class="card-body metric-card">
+                        <div class="metric-icon text-white">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div class="metric-number" id="bot-status">-</div>
+                        <div class="text-white-50">Bot Status</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts and Activity Row -->
+        <div class="row">
+            <!-- Solves Chart -->
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bar-chart me-2"></i>Solves Over Time
+                        </h5>
+                        <small class="text-muted">Last 7 days</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="statsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-activity me-2"></i>Recent Activity
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="recent-activity" id="recent-activity">
+                            <div class="text-center py-4">
+                                <div class="loading"></div>
+                                <p class="text-muted mt-2">Loading activity...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightning-charge me-2"></i>Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <a href="/data" class="btn btn-outline-primary btn-custom w-100">
+                                    <i class="bi bi-database me-2"></i>View CTF Data
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="/admin/events" class="btn btn-outline-success btn-custom w-100">
+                                    <i class="bi bi-plus-circle me-2"></i>Create Event
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="/settings" class="btn btn-outline-warning btn-custom w-100">
+                                    <i class="bi bi-gear me-2"></i>Settings
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="/session-status" target="_blank" class="btn btn-outline-info btn-custom w-100">
+                                    <i class="bi bi-activity me-2"></i>Bot Status
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Information -->
+        <div class="row mt-4">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-info-circle me-2"></i>System Information
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Server Uptime</strong></td>
+                                <td id="server-uptime">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bot Uptime</strong></td>
+                                <td id="bot-uptime">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Memory Usage</strong></td>
+                                <td id="memory-usage">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Version</strong></td>
+                                <td>CTF Assistant v1.0</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-graph-up me-2"></i>Performance Metrics
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Response Time</span>
+                            <span class="badge bg-success" id="response-time">< 100ms</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>API Calls Today</span>
+                            <span class="badge bg-info" id="api-calls">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Error Rate</span>
+                            <span class="badge bg-success" id="error-rate">0%</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Session Usage</span>
+                            <span class="badge bg-warning" id="session-usage">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+}) %>
