@@ -42,13 +42,6 @@ function updateUserUI() {
         profileUsername.textContent = user.username;
     }
     
-    // Hide admin links if not admin
-    if (!user.isAdmin) {
-        const adminLinks = document.querySelectorAll('a[href*="/admin"]');
-        adminLinks.forEach(link => {
-            link.style.display = 'none';
-        });
-    }
 }
 
 /* ========================================

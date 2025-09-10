@@ -8,7 +8,6 @@ import { EventModel, solveModel } from "./Database/connect";
 import session from "express-session";
 import flash from "connect-flash";
 import { AuthenticatedRequest, reqToForm, sanitizeEvents as getSanitizeEvents, updateOrDeleteEvents } from "./utils";
-import admin from "./routers/admin";
 
 client.guilds.fetch();
 
@@ -53,7 +52,6 @@ app.use(session({
     saveUninitialized: true
 }));
 app.use(flash());
-app.use("/admin", admin);
 
 app.get("/", async (req, res) => {
     // Check if user is logged in, redirect to dashboard, otherwise show login
@@ -122,16 +120,6 @@ app.get("/dashboard", requireAuth, async (req, res) => {
 // Data management route
 app.get("/data", requireAuth, async (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'data.html'));
-});
-
-// Settings route
-app.get("/settings", requireAuth, async (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'settings.html'));
-});
-
-// Profile route
-app.get("/profile", requireAuth, async (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'profile.html'));
 });
 
 // Logout route
@@ -379,140 +367,6 @@ app.get("/api/user", requireAuth, async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch user data' });
     }
 });
-
-// API route for profile data
-app.get("/api/profile", requireAuth, async (req, res) => {
-    try {
-        const user = (req as AuthenticatedRequest).session.user;
-        // TODO: Get actual profile data from database
-        const profileData = {
-            displayName: user,
-            email: '',
-            bio: '',
-            timezone: 'UTC',
-            theme: 'light',
-            notifications: {
-                emailSolves: false,
-                emailEvents: false,
-                discordDM: false
-            },
-            privacy: {
-                showEmail: false,
-                showStats: true,
-                showActivity: true
-            },
-            stats: {
-                totalSolves: 0,
-                eventsParticipated: 0,
-                challengesCreated: 0,
-                successRate: 0
-            },
-            recentActivity: []
-        };
-        
-        res.json(profileData);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch profile data' });
-    }
-});
-
-// API route for saving settings
-app.post("/api/settings", requireAuth, async (req, res) => {
-    try {
-        // TODO: Save settings to database
-        console.log('Settings to save:', req.body);
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to save settings' });
-    }
-});
-
-// API route for saving profile
-app.post("/api/profile", requireAuth, async (req, res) => {
-    try {
-        // TODO: Save profile to database
-        console.log('Profile to save:', req.body);
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to save profile' });
-    }
-});
-
-// API route for changing password
-app.post("/api/change-password", requireAuth, (req, res) => {
-    try {
-        const { currentPassword, newPassword } = req.body;
-        
-        // Verify current password
-        if (currentPassword !== user.password) {
-            res.status(400).json({ error: 'Current password is incorrect' });
-            return;
-        }
-        
-        // TODO: Hash the password before storing in production
-        // For now, just update the in-memory user object
-        user.password = newPassword;
-        
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to change password' });
-    }
-});
-
-// API route for testing webhook
-app.post("/api/test-webhook", requireAuth, async (req, res) => {
-    try {
-        const { webhookUrl } = req.body;
-        // TODO: Implement webhook testing
-        console.log('Testing webhook:', webhookUrl);
-        res.json({ success: true, message: 'Webhook test completed' });
-    } catch (error) {
-        res.status(500).json({ error: 'Webhook test failed' });
-    }
-});
-
-// API route for resetting settings sections
-app.post("/api/settings/:section/reset", requireAuth, async (req, res) => {
-    try {
-        const section = req.params.section;
-        console.log(`Resetting ${section} settings to defaults`);
-        // TODO: Implement section-specific settings reset
-        res.json({ success: true, message: `${section} settings reset to defaults` });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to reset settings' });
-    }
-});
-
-// API route for avatar upload
-app.post("/api/upload-avatar", requireAuth, async (req, res) => {
-    try {
-        // TODO: Implement avatar upload functionality
-        console.log('Avatar upload requested');
-        res.json({ success: true, message: 'Avatar upload feature coming soon' });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to upload avatar' });
-    }
-});
-
-// API route for downloading user data
-app.post("/api/download-user-data", requireAuth, async (req, res) => {
-    try {
-        const user = (req as AuthenticatedRequest).session.user;
-        // TODO: Implement user data download
-        const userData = {
-            user: user,
-            exportDate: new Date().toISOString(),
-            message: 'User data export feature coming soon'
-        };
-        
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Content-Disposition', `attachment; filename="user-data-${user}.json"`);
-        res.json(userData);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to export user data' });
-    }
-});
-
 
 // API route for exporting data
 app.post("/api/export-data", requireAuth, async (req, res) => {

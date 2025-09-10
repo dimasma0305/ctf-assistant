@@ -17,15 +17,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadEventsData() {
     try {
-        showLoading('eventsTableBody', true);
+        showTableLoading(true);
         const response = await fetch('/api/ctf-events');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         eventsData = await response.json();
         
         renderEvents();
         updatePagination();
     } catch (error) {
         console.error('Failed to load events:', error);
-        showAlert('Failed to load events data', 'danger');
+        showErrorState();
+        showAlert('Failed to load events data. Please check your connection and try again.', 'danger');
     }
 }
 
@@ -98,7 +104,7 @@ function getFilteredEvents() {
 function renderTableView(events) {
     const tbody = document.getElementById('eventsTableBody');
     
-    if (events.length === 0) {
+    if (!Array.isArray(events) || events.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="6" class="text-center py-4">
@@ -293,7 +299,43 @@ async function exportData() {
 
 async function refreshData() {
     await loadEventsData();
-    showAlert('Data refreshed successfully!', 'success');
+}
+
+function showTableLoading(show = true) {
+    const tbody = document.getElementById('eventsTableBody');
+    if (!tbody) return;
+    
+    if (show) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-4">
+                    <div class="loading"></div>
+                    <p class="text-muted mt-2">Loading events...</p>
+                </td>
+            </tr>
+        `;
+    }
+    // When show = false, renderEvents() or showErrorState() will replace the content
+}
+
+function showErrorState() {
+    const tbody = document.getElementById('eventsTableBody');
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-5">
+                    <div class="text-danger mb-3">
+                        <i class="bi bi-exclamation-triangle display-1"></i>
+                    </div>
+                    <h4 class="text-danger">Failed to Load Events</h4>
+                    <p class="text-muted mb-3">Unable to connect to the server or load event data.</p>
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Try Again
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
 }
 
 // Utility functions
