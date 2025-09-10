@@ -166,21 +166,51 @@ app.get("/api/dashboard-stats", requireAuth, async (req, res) => {
 app.get("/api/ctf-events", requireAuth, async (req, res) => {
     try {
         const events = await EventModel.find().sort({ createdAt: -1 });
-        const sanitizedEvents = events.map(event => ({
-            id: event._id,
-            title: event.title,
-            organizer: (event as any).organizer,
-            start_date: (event as any).startDate || (event as any).start,
-            finish_date: (event as any).endDate || (event as any).finish,
-            status: new Date() < new Date((event as any).startDate || (event as any).start) ? 'upcoming' : 
-                   new Date() > new Date((event as any).endDate || (event as any).finish) ? 'completed' : 'active',
-            solves: 0, // TODO: Get solve count for each event
-            url: (event as any).url
-        }));
+        const sanitizedEvents = events.map(event => {
+            // Get the first timeline entry for dates (assuming main event timeline)
+            const firstTimeline = (event as any).timelines?.[0];
+            const startTime = firstTimeline?.startTime;
+            const endTime = firstTimeline?.endTime;
+            
+            return {
+                id: event._id,
+                title: event.title,
+                organizer: (event as any).organizer || 'Unknown',
+                start_date: startTime || new Date(),
+                finish_date: endTime || new Date(),
+                status: !startTime ? 'upcoming' : 
+                       new Date() < new Date(startTime) ? 'upcoming' : 
+                       new Date() > new Date(endTime || startTime) ? 'completed' : 'active',
+                solves: 0, // TODO: Get solve count for each event
+                url: (event as any).url || '',
+                description: (event as any).description || ''
+            };
+        });
         
+        console.log(`📊 Found ${events.length} events in database`);
         res.json(sanitizedEvents);
     } catch (error) {
+        console.error('❌ Failed to fetch events:', error);
         res.status(500).json({ error: 'Failed to fetch events' });
+    }
+});
+
+// Debug API route to check raw events in database
+app.get("/api/debug/events", requireAuth, async (req, res) => {
+    try {
+        const events = await EventModel.find().lean();
+        res.json({
+            count: events.length,
+            events: events.map(event => ({
+                _id: event._id,
+                title: event.title,
+                organizer: event.organizer,
+                timelines: event.timelines
+            }))
+        });
+    } catch (error) {
+        console.error('❌ Failed to fetch debug events:', error);
+        res.status(500).json({ error: 'Failed to fetch debug events' });
     }
 });
 
