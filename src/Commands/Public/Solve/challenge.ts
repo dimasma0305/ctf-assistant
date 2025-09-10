@@ -10,7 +10,7 @@ const regex = /<@[^>]*>/g;
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
         .setName('challenge')
-        .setDescription('delete all role and channel associate with ctf event')
+        .setDescription('Mark a challenge as solved and update thread name')
         .addStringOption(input=>input
             .setName("players")
             .setDescription("Players that contribute, use @ tag")
@@ -33,7 +33,14 @@ export const command: SubCommand = {
         
         if (!challengeName) {
             if (channel.isThread()) {
-                challengeName = channel.name;
+                // Extract challenge name from thread format: "❌ [CATEGORY] Challenge Name" or "✅ [CATEGORY] Challenge Name"
+                let threadName = channel.name;
+                const formatMatch = threadName.match(/^[❌✅]\s*\[([^\]]+)\]\s*(.+)$/);
+                if (formatMatch) {
+                    challengeName = formatMatch[2].trim(); // Extract the challenge name part
+                } else {
+                    challengeName = threadName; // Fallback to full thread name
+                }
             }else{
                 interaction.reply("Please specify the challenge name or use this command in a thread.");
                 return
@@ -91,6 +98,32 @@ export const command: SubCommand = {
             .setFooter({ text: 'CTF Event', iconURL: 'https://tcp1p.team/favicon.ico' });
 
         await channel.send({ embeds: [winnerEmbed] });
+        
+        // Update thread name to show solved status
+        try {
+            const originalChannel = interaction.channel;
+            if (originalChannel && 'name' in originalChannel && originalChannel.name && originalChannel.isThread()) {
+                const currentName = originalChannel.name;
+                let newName = currentName;
+                
+                // Check if thread follows init.ts format: "❌ [CATEGORY] Challenge Name"
+                if (currentName.startsWith('❌')) {
+                    newName = currentName.replace('❌', '✅');
+                } else if (!currentName.includes('✅')) {
+                    // For threads not following init.ts format, add ✅ prefix
+                    newName = `✅ ${currentName}`;
+                }
+                
+                // Only rename if the name actually changed
+                if (newName !== currentName) {
+                    await originalChannel.setName(newName);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to update thread name:", error);
+            // Don't fail the command if renaming fails
+        }
+        
         await interaction.reply({ content: "success", flags: ["Ephemeral"] });
     },
 };
