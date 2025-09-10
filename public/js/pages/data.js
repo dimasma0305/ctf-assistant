@@ -25,13 +25,17 @@ async function loadEventsData() {
         }
         
         eventsData = await response.json();
+        console.log('Loaded events data:', eventsData);
         
         renderEvents();
         updatePagination();
     } catch (error) {
         console.error('Failed to load events:', error);
+        console.log('Fetch error details:', error);
         showErrorState();
         showAlert('Failed to load events data. Please check your connection and try again.', 'danger');
+    } finally {
+        showTableLoading(false);
     }
 }
 
@@ -104,6 +108,8 @@ function getFilteredEvents() {
 function renderTableView(events) {
     const tbody = document.getElementById('eventsTableBody');
     
+    console.log('Rendering table view with events:', events);
+    
     if (!Array.isArray(events) || events.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -123,22 +129,19 @@ function renderTableView(events) {
     tbody.innerHTML = pageEvents.map(event => `
         <tr onclick="showEventDetails('${event.id}')" style="cursor: pointer;">
             <td>
-                <div class="fw-bold">${event.title}</div>
-                <small class="text-muted">${formatDate(event.startTime)} - ${formatDate(event.endTime)}</small>
+                <div class="fw-bold">${event.title || 'Untitled Event'}</div>
+                <small class="text-muted">${event.organizer || 'Unknown Organizer'}</small>
             </td>
-            <td>${event.organizer}</td>
             <td>
                 <span class="event-status status-${event.status}">${capitalize(event.status)}</span>
             </td>
-            <td>${calculateDuration(event.startTime, event.endTime)}</td>
+            <td>${formatDate(event.start_date || event.startTime)}</td>
+            <td>${formatDate(event.finish_date || event.endTime)}</td>
             <td>
                 <span class="solve-badge">${event.solves || 0} solves</span>
             </td>
             <td>
                 <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-primary" onclick="editEvent('${event.id}')" title="Edit">
-                        <i class="bi bi-pencil"></i>
-                    </button>
                     <button class="btn btn-outline-danger" onclick="deleteEvent('${event.id}')" title="Delete">
                         <i class="bi bi-trash"></i>
                     </button>
@@ -340,11 +343,17 @@ function showErrorState() {
 
 // Utility functions
 function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
+    if (!dateString) return '-';
+    try {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    } catch (error) {
+        console.error('Invalid date:', dateString);
+        return '-';
+    }
 }
 
 function calculateDuration(start, end) {

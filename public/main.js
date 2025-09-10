@@ -434,6 +434,7 @@ function exportEventData(eventId) {
 }
 
 
+
 /* ========================================
    Form Validation
    ======================================== */
@@ -537,5 +538,7 @@ window.CTFAssistant = {
     formatDate,
     refreshStats,
     exportData,
-    viewEventDetails
+    viewEventDetails,
+    deleteEvent,
+    exportEventData
 };
