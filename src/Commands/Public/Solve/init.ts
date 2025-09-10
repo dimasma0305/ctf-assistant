@@ -40,7 +40,7 @@ export const command: SubCommand = {
         .setDescription('Initialize challenges from CTF platform JSON (creates threads with ❌ prefix)')
         .addStringOption(option => option
             .setName("json")
-            .setDescription("JSON data from CTF platform. CTFd: /api/v1/challenges, rCTF: /api/v1/challs, GzCTF: /api/game/{id}/challenges")
+            .setDescription("JSON data from CTF platform API endpoint")
             .setRequired(true)
         )
         .addStringOption(option => option
@@ -48,10 +48,10 @@ export const command: SubCommand = {
             .setDescription("CTF platform type (default: ctfd)")
             .setRequired(false)
             .addChoices(
-                { name: 'CTFd (/api/v1/challenges)', value: 'ctfd' },
-                { name: 'rCTF (/api/v1/challs)', value: 'rctf' },
-                { name: 'GzCTF (/api/game/{id}/challenges)', value: 'gzctf' },
-                { name: 'Generic (custom format)', value: 'generic' }
+                { name: 'CTFd', value: 'ctfd' },
+                { name: 'rCTF', value: 'rctf' },
+                { name: 'GzCTF', value: 'gzctf' },
+                { name: 'Generic', value: 'generic' }
             )
         ),
     async execute(interaction, _client) {
