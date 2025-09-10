@@ -537,45 +537,53 @@ app.get("/session-status", async (req, res) => {
     
     if (acceptsJson) {
         // Return JSON for API calls
-    try {
-        const myClient = client as MyClient;
-        
-        if (!myClient.sessionScheduler) {
+        try {
+            const myClient = client as MyClient;
+            
+            if (!myClient.sessionScheduler) {
+                res.status(500).json({ 
+                    error: "Session scheduler not initialized",
+                    timestamp: new Date().toISOString()
+                });
+                return;
+            }
+
+            const status = myClient.sessionScheduler.getStatus();
+            const sessionInfo = myClient.sessionScheduler.getSessionInfo();
+            
+            const response = {
+                bot: {
+                    isReady: client.isReady(),
+                    status: client.isReady() ? 'online' : 'offline',
+                    uptime: client.uptime ? Math.floor(client.uptime / 1000) : null,
+                    user: client.user ? {
+                        id: client.user.id,
+                        username: client.user.username,
+                        tag: client.user.tag
+                    } : null
+                },
+                sessionScheduler: {
+                    ...status,
+                    sessionInfo: sessionInfo ? {
+                        resetTime: sessionInfo.resetTime.toISOString(),
+                        remainingSessions: sessionInfo.remainingSessions,
+                        totalSessions: sessionInfo.totalSessions,
+                        timeUntilReset: sessionInfo.resetTime.getTime() - Date.now()
+                    } : null
+                },
+                timestamp: new Date().toISOString()
+            };
+            
+            res.json(response);
+            return;
+        } catch (error) {
+            console.error('Error getting session status:', error);
             res.status(500).json({ 
-                error: "Session scheduler not initialized",
+                error: 'Internal server error',
                 timestamp: new Date().toISOString()
             });
             return;
         }
-
-        const status = myClient.sessionScheduler.getStatus();
-        const sessionInfo = myClient.sessionScheduler.getSessionInfo();
-        
-        const response = {
-            bot: {
-                isReady: client.isReady(),
-                status: client.isReady() ? 'online' : 'offline',
-                uptime: client.uptime ? Math.floor(client.uptime / 1000) : null,
-                user: client.user ? {
-                    id: client.user.id,
-                    username: client.user.username,
-                    tag: client.user.tag
-                } : null
-            },
-            sessionScheduler: {
-                ...status,
-                sessionInfo: sessionInfo ? {
-                    resetTime: sessionInfo.resetTime.toISOString(),
-                    remainingSessions: sessionInfo.remainingSessions,
-                    totalSessions: sessionInfo.totalSessions,
-                    timeUntilReset: sessionInfo.resetTime.getTime() - Date.now()
-                } : null
-            },
-            timestamp: new Date().toISOString()
-        };
-        
-        res.json(response);
-        return;
     }
     
     // Return HTML page for browser visits
