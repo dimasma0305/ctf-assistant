@@ -68,7 +68,7 @@ app.get("/", async (req, res) => {
 
 app.get("/login", (req, res) => {
     const error = req.flash('error');
-    res.render('login', { error });
+    res.render('pages/auth/login', { error });
 });
 
 app.post("/login", (req, res) => {
@@ -87,7 +87,7 @@ app.get("/event/:id", async (req, res) => {
     if (id) {
         const event = await EventModel.findById(id).exec().catch();
         if (event) {
-            return res.render('event-form', {
+            return res.render('pages/ctf/event-form', {
                 event,
                 eventSchema,
                 isAdmin: false
@@ -114,25 +114,25 @@ function requireAuth(req: any, res: any, next: any) {
 // Dashboard route
 app.get("/dashboard", requireAuth, async (req, res) => {
     const user = (req as AuthenticatedRequest).session.user;
-    res.render('dashboard', { user });
+    res.render('pages/dashboard', { user });
 });
 
 // Data management route
 app.get("/data", requireAuth, async (req, res) => {
     const user = (req as AuthenticatedRequest).session.user;
-    res.render('data', { user });
+    res.render('pages/ctf/data', { user });
 });
 
 // Settings route
 app.get("/settings", requireAuth, async (req, res) => {
     const user = (req as AuthenticatedRequest).session.user;
-    res.render('settings', { user });
+    res.render('pages/settings', { user });
 });
 
 // Profile route
 app.get("/profile", requireAuth, async (req, res) => {
     const user = (req as AuthenticatedRequest).session.user;
-    res.render('profile', { user });
+    res.render('pages/profile', { user });
 });
 
 // Logout route
@@ -588,7 +588,7 @@ app.get("/session-status", async (req, res) => {
     
     // Return HTML page for browser visits
     try {
-        res.render('session-status');
+        res.render('pages/session-status');
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
