@@ -143,11 +143,10 @@ app.get("/logout", (req, res) => {
 });
 
 // API Routes for dashboard data
-app.get("/api/dashboard-stats", requireAuth, async (req, res) => {
+app.get("/api/dashboard/stats", requireAuth, async (req, res) => {
     try {
         const totalEvents = await EventModel.countDocuments();
         const totalSolves = await solveModel.countDocuments();
-        const myClient = client as MyClient;
         
         // Calculate active events (events that are currently running)
         const now = new Date();
@@ -160,31 +159,36 @@ app.get("/api/dashboard-stats", requireAuth, async (req, res) => {
             return start && end && new Date(start) <= now && new Date(end) >= now;
         }).length;
         
-        // Get recent activity (last 10 solves)
-        const recentSolves = await solveModel.find()
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .lean();
-            
-        const recentActivity = recentSolves.map(solve => ({
-            type: 'solve',
-            icon: 'trophy',
-            title: solve.challenge,
-            description: `Solved by ${solve.users.length} user(s) • CTF ID: ${solve.ctf_id}`,
-            timestamp: (solve as any).createdAt || new Date(),
-            challenge: solve.challenge,
-            users: solve.users,
-            ctf_id: solve.ctf_id
-        }));
+        // Calculate team members (unique users from solves)
+        const uniqueUsers = await solveModel.distinct('users');
+        const teamMembers = uniqueUsers.length;
         
+        const stats = {
+            totalEvents,
+            totalSolves,
+            activeEvents,
+            teamMembers
+        };
+        
+        res.json(stats);
+    } catch (error) {
+        console.error('❌ Failed to fetch dashboard stats:', error);
+        res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+    }
+});
+
+app.get("/api/dashboard/solves-chart", requireAuth, async (req, res) => {
+    try {
         // Chart data for last 7 days (solve counts per day)
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const recentSolvesChart = await solveModel.find({
+        const recentSolves = await solveModel.find({
             createdAt: { $gte: sevenDaysAgo }
         } as any).lean();
         
-        const chartData = [];
+        const labels = [];
+        const values = [];
+        
         for (let i = 6; i >= 0; i--) {
             const date = new Date();
             date.setDate(date.getDate() - i);
@@ -192,30 +196,123 @@ app.get("/api/dashboard-stats", requireAuth, async (req, res) => {
             const nextDate = new Date(date);
             nextDate.setDate(nextDate.getDate() + 1);
             
-            const solveCount = recentSolvesChart.filter(solve => {
+            const solveCount = recentSolves.filter(solve => {
                 const solveDate = new Date((solve as any).createdAt || date);
                 return solveDate >= date && solveDate < nextDate;
             }).length;
             
-            chartData.push({
-                date: date.toISOString().split('T')[0],
-                solves: solveCount
-            });
+            labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+            values.push(solveCount);
         }
         
-        const stats = {
-            totalEvents,
-            totalSolves,
-            activeEvents,
-            botOnline: client.isReady(),
-            recentActivity,
-            chartData
-        };
-        
-        res.json(stats);
+        res.json({ labels, values });
     } catch (error) {
-        console.error('❌ Failed to fetch dashboard stats:', error);
-        res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+        console.error('❌ Failed to fetch solves chart data:', error);
+        res.status(500).json({ error: 'Failed to fetch solves chart data' });
+    }
+});
+
+app.get("/api/dashboard/category-chart", requireAuth, async (req, res) => {
+    try {
+        // Get challenge categories from solves (this is a mock implementation)
+        // In a real system, you'd have categories stored with challenges
+        const solves = await solveModel.find().lean();
+        
+        // Extract categories from challenge names (heuristic approach)
+        const categoryMap = new Map();
+        solves.forEach(solve => {
+            // Try to extract category from challenge name (common patterns)
+            const challengeName = (solve.challenge || '').toLowerCase();
+            let category = 'Misc';
+            
+            if (challengeName.includes('web') || challengeName.includes('http')) category = 'Web';
+            else if (challengeName.includes('pwn') || challengeName.includes('buffer')) category = 'Pwn';
+            else if (challengeName.includes('crypto') || challengeName.includes('cipher')) category = 'Crypto';
+            else if (challengeName.includes('reverse') || challengeName.includes('rev')) category = 'Reverse';
+            else if (challengeName.includes('forensic') || challengeName.includes('steg')) category = 'Forensics';
+            else if (challengeName.includes('osint') || challengeName.includes('recon')) category = 'OSINT';
+            
+            categoryMap.set(category, (categoryMap.get(category) || 0) + 1);
+        });
+        
+        const labels = Array.from(categoryMap.keys());
+        const values = Array.from(categoryMap.values());
+        
+        res.json({ labels, values });
+    } catch (error) {
+        console.error('❌ Failed to fetch category chart data:', error);
+        res.status(500).json({ error: 'Failed to fetch category chart data' });
+    }
+});
+
+app.get("/api/dashboard/recent-events", requireAuth, async (req, res) => {
+    try {
+        const events = await EventModel.find().sort({ createdAt: -1 }).limit(10).lean();
+        
+        const recentEvents = events.map(event => {
+            const firstTimeline = (event as any).timelines?.[0];
+            const startTime = firstTimeline?.startTime;
+            const endTime = firstTimeline?.endTime;
+            const now = new Date();
+            
+            let status = 'upcoming';
+            if (startTime && endTime) {
+                if (new Date() < new Date(startTime)) {
+                    status = 'upcoming';
+                } else if (new Date() > new Date(endTime)) {
+                    status = 'completed';
+                } else {
+                    status = 'active';
+                }
+            }
+            
+            return {
+                id: event._id,
+                title: event.title,
+                organizer: (event as any).organizer || 'Unknown',
+                startTime: startTime || new Date(),
+                status
+            };
+        });
+        
+        res.json(recentEvents);
+    } catch (error) {
+        console.error('❌ Failed to fetch recent events:', error);
+        res.status(500).json({ error: 'Failed to fetch recent events' });
+    }
+});
+
+app.get("/api/dashboard/latest-solves", requireAuth, async (req, res) => {
+    try {
+        const solves = await solveModel.find().sort({ createdAt: -1 }).limit(10).lean();
+        
+        const latestSolves = solves.map(solve => {
+            // Try to extract category from challenge name (heuristic approach)
+            const challengeName = (solve.challenge || '').toLowerCase();
+            let category = 'Misc';
+            
+            if (challengeName.includes('web') || challengeName.includes('http')) category = 'Web';
+            else if (challengeName.includes('pwn') || challengeName.includes('buffer')) category = 'Pwn';
+            else if (challengeName.includes('crypto') || challengeName.includes('cipher')) category = 'Crypto';
+            else if (challengeName.includes('reverse') || challengeName.includes('rev')) category = 'Reverse';
+            else if (challengeName.includes('forensic') || challengeName.includes('steg')) category = 'Forensics';
+            else if (challengeName.includes('osint') || challengeName.includes('recon')) category = 'OSINT';
+            
+            return {
+                id: solve._id,
+                challengeName: solve.challenge,
+                category: category,
+                points: 100, // Mock points value since we don't store points
+                timestamp: (solve as any).createdAt || new Date(),
+                users: solve.users,
+                ctf_id: solve.ctf_id
+            };
+        });
+        
+        res.json(latestSolves);
+    } catch (error) {
+        console.error('❌ Failed to fetch latest solves:', error);
+        res.status(500).json({ error: 'Failed to fetch latest solves' });
     }
 });
 
