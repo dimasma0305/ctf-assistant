@@ -8,7 +8,11 @@ export const solveSchema = {
     users: {
         type: [String],
     },
-    challenge: String
+    challenge: String,
+    category: {
+        type: String,
+        default: "Unknown"
+    }
 }
 
 export type SolveSchemaType = typeof solveSchema;

@@ -8,37 +8,6 @@ import flash from "connect-flash";
 
 client.guilds.fetch();
 
-const parseCredentials = (credentials: string) => {
-    const parts = credentials.split(':');
-    
-    if (parts.length !== 2) {
-        console.warn('⚠️  CREDENTIALS format should be "username:password". Using defaults.');
-        return {
-            username: "admin",
-            password: "password"
-        };
-    }
-    
-    const [username, password] = parts;
-    
-    if (!username || !password) {
-        console.warn('⚠️  Username or password is empty in CREDENTIALS. Using defaults.');
-        return {
-            username: username || "admin",
-            password: password || "password"
-        };
-    }
-    
-    return { username, password };
-};
-
-const user = parseCredentials(process.env.CREDENTIALS || "admin:password");
-console.log(`🔐 Web panel credentials: ${user.username}:${'*'.repeat(user.password.length)}`);
-
-client.on('messageCreate', _ => {
-    return;
-});
-
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -49,6 +18,8 @@ app.use(session({
     saveUninitialized: true
 }));
 app.use(flash());
+
+
 
 // Health check endpoint with session awareness
 app.get("/health", (req, res) => {

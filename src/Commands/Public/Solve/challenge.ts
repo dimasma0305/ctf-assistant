@@ -1,11 +1,15 @@
 
 import { SubCommand } from "../../../Model/command";
-import { Embed, EmbedBuilder, SlashCommandSubcommandBuilder, TextChannel } from "discord.js";
-import { translate } from "../../../Functions/discord-utils";
-import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
+import { EmbedBuilder, SlashCommandSubcommandBuilder } from "discord.js";
+import { CTFEvent } from "../../../Functions/ctftime-v2";
 import { solveModel } from "../../../Database/connect";
-
-const regex = /<@[^>]*>/g;
+import { 
+    getChallengeInfo, 
+    getChannelAndCTFData, 
+    validateCTFEvent, 
+    extractUserIdsFromMentions, 
+    markThreadAsSolved 
+} from "./utils";
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
@@ -15,76 +19,47 @@ export const command: SubCommand = {
             .setName("players")
             .setDescription("Players that contribute, use @ tag")
             .setRequired(false)
-        )
-        .addStringOption(input=>input
-            .setName("name")
-            .setDescription("Challenge name")
-            .setRequired(false)
         ),
     async execute(interaction, _client) {
-        var channel = interaction.channel;
-        if (!channel){
+        const channel = interaction.channel;
+        if (!channel) {
             interaction.reply("This command can only be used in a channel.");
-            return
-        }
-        const players = interaction.options.getString("players");
-        var challengeName = interaction.options.getString("name");
-        var users, data;
-        
-        if (!challengeName) {
-            if (channel.isThread()) {
-                // Extract challenge name from thread format: "❌ [CATEGORY] Challenge Name" or "✅ [CATEGORY] Challenge Name"
-                let threadName = channel.name;
-                const formatMatch = threadName.match(/^[❌✅]\s*\[([^\]]+)\]\s*(.+)$/);
-                if (formatMatch) {
-                    challengeName = formatMatch[2].trim(); // Extract the challenge name part
-                } else {
-                    challengeName = threadName; // Fallback to full thread name
-                }
-            }else{
-                interaction.reply("Please specify the challenge name or use this command in a thread.");
-                return
-            }
+            return;
         }
 
-        if (!players){
-            users = [interaction.user.id]
-        }else{
-            const regex = /<@(\d+)>/g;
-            users = players.match(regex)?.map(match => match.slice(2, -1));
-            if (!users){
-                users = [interaction.user.id]
-            }
-        }
-        if (!(channel instanceof TextChannel)){
-            if (channel.isThread()){
-                if (channel.parent instanceof TextChannel){
-                    channel = channel.parent
-                    data = JSON.parse(channel.topic || "{}") as CTFEvent
-                }else{
-                    interaction.reply("This command can only be used in a server.");
-                    return
-                }
-            }else{
-                interaction.reply("This command can only be used in a server.");
-                return
-            }
-        }else{
-            data = JSON.parse(channel.topic || "{}") as CTFEvent
+        const challengeInfo = getChallengeInfo(interaction);
+        if (!challengeInfo) {
+            interaction.reply("This command can only be used in a thread.");
+            return;
         }
         
-        if (!data.id){
-            interaction.reply("This channel does not have a valid CTF event associated with it.");
-            return
+        const { challengeName, category } = challengeInfo;
+
+        const players = interaction.options.getString("players");
+        const users = extractUserIdsFromMentions(players, interaction.user.id);
+
+        const result = await getChannelAndCTFData(channel);
+        if (!result) {
+            interaction.reply("This command can only be used in a server.");
+            return;
         }
-        const existingSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: data.id });
+
+        const { textChannel, ctfData } = result;
+        
+        if (!validateCTFEvent(ctfData)) {
+            interaction.reply("This channel does not have a valid CTF event associated with it.");
+            return;
+        }
+        const existingSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: ctfData.id });
         if (existingSolve) {
             existingSolve.users = users;
+            existingSolve.category = category; // Update category in case it changed
             await existingSolve.save();
         } else {
             const newSolve = new solveModel({
                 challenge: challengeName,
-                ctf_id: data.id,
+                ctf_id: ctfData.id,
+                category: category,
                 users: users
             });
             await newSolve.save();
@@ -97,32 +72,10 @@ export const command: SubCommand = {
             .setTimestamp()
             .setFooter({ text: 'CTF Event', iconURL: 'https://tcp1p.team/favicon.ico' });
 
-        await channel.send({ embeds: [winnerEmbed] });
+        await textChannel.send({ embeds: [winnerEmbed] });
         
         // Update thread name to show solved status
-        try {
-            const originalChannel = interaction.channel;
-            if (originalChannel && 'name' in originalChannel && originalChannel.name && originalChannel.isThread()) {
-                const currentName = originalChannel.name;
-                let newName = currentName;
-                
-                // Check if thread follows init.ts format: "❌ [CATEGORY] Challenge Name"
-                if (currentName.startsWith('❌')) {
-                    newName = currentName.replace('❌', '✅');
-                } else if (!currentName.includes('✅')) {
-                    // For threads not following init.ts format, add ✅ prefix
-                    newName = `✅ ${currentName}`;
-                }
-                
-                // Only rename if the name actually changed
-                if (newName !== currentName) {
-                    await originalChannel.setName(newName);
-                }
-            }
-        } catch (error) {
-            console.error("Failed to update thread name:", error);
-            // Don't fail the command if renaming fails
-        }
+        await markThreadAsSolved(interaction.channel!);
         
         await interaction.reply({ content: "success", flags: ["Ephemeral"] });
     },

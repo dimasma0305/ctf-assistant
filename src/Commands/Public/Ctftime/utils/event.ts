@@ -157,9 +157,6 @@ export class ReactionRoleEvent {
 # Auto-detect nama challenge dari thread
 /solve challenge players:@partisipan1 @partisipan2
 
-# nama challenge di spesifik
-/solve challenge players:@partisipan1 @partisipan2 name:[example] example
-
 # Initialize challenges dari platform CTF
 /solve init json:"<JSON_DATA>" platform:ctfd
 

@@ -1,34 +1,61 @@
-import { SlashCommandSubcommandBuilder, TextChannel } from "discord.js";
+import { SlashCommandSubcommandBuilder } from "discord.js";
 import { SubCommand } from "../../../Model/command";
 import { solveModel } from "../../../Database/connect";
+import { 
+    getChallengeInfo, 
+    getChannelAndCTFData, 
+    validateCTFEvent, 
+    markThreadAsUnsolved 
+} from "./utils";
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
         .setName('delete')
-        .setDescription('delete a specific challenge by name')
+        .setDescription('Delete a challenge solve and update thread name')
         .addStringOption(input=>input
             .setName("name")
             .setDescription("Challenge name")
-            .setRequired(true)
+            .setRequired(false)
         ),
     async execute(interaction, _client) {
-        var channel = interaction.channel;
-        var challengeName = interaction.options.getString("name")
-        if (!channel || !(channel instanceof TextChannel)){
+        const channel = interaction.channel;
+        if (!channel) {
             interaction.reply("This command can only be used in a channel.");
-            return
+            return;
         }
-        const data = JSON.parse(channel.topic || "{}") as any
-        if (!data.id){
+
+        const challengeInfo = getChallengeInfo(interaction);
+        if (!challengeInfo) {
+            interaction.reply("This command can only be used in a thread.");
+            return;
+        }
+        
+        const { challengeName, category } = challengeInfo;
+
+        const result = await getChannelAndCTFData(channel);
+        if (!result) {
+            interaction.reply("This command can only be used in a server.");
+            return;
+        }
+
+        const { ctfData } = result;
+        
+        if (!validateCTFEvent(ctfData)) {
             interaction.reply("This channel does not have a valid CTF event associated with it.");
-            return
+            return;
         }
+        
         if (interaction.guild?.ownerId !== interaction.user.id) {
             interaction.reply("Only the server owner can delete solve lists.");
             return
         }
-        await solveModel.deleteMany({ctf_id: data.id, challenge: challengeName});
-        return interaction.reply({ content: "All solve list deleted", ephemeral: true });
+        
+        await solveModel.deleteOne({ctf_id: ctfData.id, challenge: challengeName, category: category});
+        
+        // Update thread name to show unsolved status
+        await markThreadAsUnsolved(interaction.channel!);
+        
+        return interaction.reply({ content: `Challenge solve for "[${category}] ${challengeName}" has been deleted`, ephemeral: true });
     },
 };
 

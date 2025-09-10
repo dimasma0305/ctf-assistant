@@ -26,7 +26,27 @@ export const command: SubCommand = {
     if (solves.length == 0){
         description = "No solved challenges found."
     }else{
-        description = solves.map(solve => `**${solve.challenge}** solved by ${solve.users.map(user => `<@${user}>`).join(', ')}!`).join('\n')
+        // Group solves by category
+        const solvesByCategory = solves.reduce((acc: any, solve: any) => {
+            const category = solve.category || "Legacy"; // Use "Legacy" for old solves without category
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(solve);
+            return acc;
+        }, {});
+
+        // Format the description by category
+        description = Object.keys(solvesByCategory)
+            .sort() // Sort categories alphabetically
+            .map(category => {
+                const categoryHeader = `**[${category}]**`;
+                const challengesList = solvesByCategory[category]
+                    .map((solve: any) => `• **${solve.challenge}** solved by ${solve.users.map((user: string) => `<@${user}>`).join(', ')}`)
+                    .join('\n');
+                return `${categoryHeader}\n${challengesList}`;
+            })
+            .join('\n\n');
     }
     const listEmbed = new EmbedBuilder()
       .setColor('#0099ff')
