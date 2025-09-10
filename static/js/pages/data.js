@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadEventsData() {
     try {
         showLoading('eventsTableBody', true);
-        const response = await fetch('/api/events');
+        const response = await fetch('/api/ctf-events');
         eventsData = await response.json();
         
         renderEvents();
@@ -268,7 +268,7 @@ function showEventDetails(eventId) {
 
 async function exportData() {
     try {
-        const response = await fetch('/api/export/events', {
+        const response = await fetch('/api/export-data', {
             method: 'POST'
         });
         

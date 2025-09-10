@@ -1,228 +1,166 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event List</title>
+<%
+const layoutData = {
+    title: 'CTF Events',
+    user: null, // Public page
+    currentPage: 'events',
+    pageHeader: 'Public CTF Events',
+    headerActions: `
+        <button class="btn btn-primary btn-custom" onclick="refreshEvents()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+        </button>
+    `,
+    cssFiles: ['event-list'],
+    jsFiles: ['event-list']
+};
+%>
 
-    <link rel="icon" href="https://avatarfiles.alphacoders.com/342/thumb-150-342852.png" type="image/x-icon">
-
-    <meta property="og:title" content="Hackerika's Local Event Schedule">
-    <meta property="og:description" content="Explore the schedule of local CTF events attended by Hackerika. Stay updated and join the fun!">
-    <meta property="og:image" content="https://i.pinimg.com/736x/92/57/5b/92575b09fefd62c6ad1cb6763b017c28.jpg">
-    <meta property="og:url" content="https://event.tcp1p.team">
-    <meta property="og:type" content="website">
-
-    <link href="https://unpkg.com/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #2c2f33;
-            color: #fff;
-        }
-        .container {
-            background-color: #23272a;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .list-group-item {
-            background-color: #2c2f33;
-            color: #fff;
-            border: none;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .list-group-item:hover {
-            background-color: #7289da;
-            color: #fff;
-        }
-        .modal-content {
-            background-color: #2c2f33;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-        }
-        .modal-header {
-            border-bottom: none;
-        }
-        .modal-footer {
-            border-top: none;
-        }
-        .btn-secondary {
-            background-color: #7289da;
-            border: none;
-        }
-        .btn-secondary:hover {
-            background-color: #5b6eae;
-        }
-        .modal-body {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .modal-body p {
-            margin: 0;
-        }
-        .modal-body .description {
-            white-space: pre-wrap;
-        }
-        .event-details-table {
-            width: 100%;
-        }
-        .event-details-table td {
-            padding: 5px 0;
-        }
-        .event-logo {
-            display: block;
-            margin: 0 auto 20px;
-            max-width: 100%;
-            max-width: 200px;
-            height: auto;
-        }
-        .timeline-table {
-            width: 100%;
-            margin-top: 20px;
-        }
-        .timeline-table th, .timeline-table td {
-            padding: 5px;
-            border: 1px solid #444;
-        }
-    </style>
-    <script src="https://unpkg.com/marked@latest/marked.min.js"></script>
-    <script src="https://unpkg.com/dompurify@latest/dist/purify.min.js"></script>
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Events</h1>
-        <div class="list-group">
-            <% events.forEach(event => { %>
-                <a href="#" class="list-group-item list-group-item-action" data-toggle="modal" data-target="#eventModal" data-event='<%= JSON.stringify(event) %>'>
-                    <div>
-                        <strong><%= event.title %></strong>
-                        <br>
-                        <% if (event.timelines && event.timelines.length > 0) { %>
-                            <small>
-                                <%= new Date(event.timelines[0].startTime).toLocaleDateString() %> -
-                                <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %>
-                            </small>
+<%- include('../../layout', { 
+    ...layoutData, 
+    body: `
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-event me-2"></i>Available CTF Events
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <% if (events && events.length > 0) { %>
+                            <div class="list-group list-group-flush">
+                                <% events.forEach(event => { %>
+                                    <a href="#" class="list-group-item list-group-item-action event-item" 
+                                       data-bs-toggle="modal" data-bs-target="#eventModal" 
+                                       data-event='<%= JSON.stringify(event).replace(/'/g, "&apos;") %>'>
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-1">
+                                                    <% if (event.logo) { %>
+                                                        <img src="<%= event.logo %>" alt="Event Logo" class="event-logo-small me-2">
+                                                    <% } else { %>
+                                                        <div class="event-logo-placeholder me-2">
+                                                            <i class="bi bi-flag"></i>
+                                                        </div>
+                                                    <% } %>
+                                                    <h6 class="mb-0 fw-bold"><%= event.title %></h6>
+                                                </div>
+                                                <p class="mb-1 text-muted">
+                                                    <i class="bi bi-building me-1"></i><%= event.organizer || 'Unknown Organizer' %>
+                                                </p>
+                                                <% if (event.timelines && event.timelines.length > 0) { %>
+                                                    <p class="mb-1 text-muted">
+                                                        <i class="bi bi-calendar me-1"></i>
+                                                        <%= new Date(event.timelines[0].startTime).toLocaleDateString() %> - 
+                                                        <%= new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString() %>
+                                                    </p>
+                                                <% } %>
+                                            </div>
+                                            <div class="text-end">
+                                                <% if (event.format && event.format.length > 0) { %>
+                                                    <% event.format.forEach(format => { %>
+                                                        <span class="badge bg-primary me-1 mb-1"><%= format %></span>
+                                                    <% }) %>
+                                                <% } %>
+                                                <% if (event.restrictions && event.restrictions.length > 0) { %>
+                                                    <div>
+                                                        <% event.restrictions.forEach(restriction => { %>
+                                                            <span class="badge bg-warning me-1"><%= restriction %></span>
+                                                        <% }) %>
+                                                    </div>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </a>
+                                <% }) %>
+                            </div>
                         <% } else { %>
-                            <small>N/A</small>
+                            <div class="text-center py-5">
+                                <i class="bi bi-calendar-x display-1 text-muted"></i>
+                                <h4 class="mt-3 text-muted">No events found</h4>
+                                <p class="text-muted">There are currently no CTF events available.</p>
+                            </div>
                         <% } %>
                     </div>
-                    <div>
-                        <span class="badge badge-primary"><%= event.format.join(', ') %></span>
-                        <span class="badge badge-secondary"><%= event.restrictions.join(', ') %></span>
-                    </div>
-                </a>
-            <% }) %>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <img alt="Event Logo" id="modalEventLogo" class="event-logo">
-                    <table class="event-details-table">
-                        <tr>
-                            <td><strong>Title:</strong></td>
-                            <td><span id="modalEventTitle"></span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Organizer:</strong></td>
-                            <td><span id="modalEventOrganizer"></span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Date:</strong></td>
-                            <td><span id="modalEventDateRange"></span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Format:</strong></td>
-                            <td><span id="modalEventFormat"></span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Restrictions:</strong></td>
-                            <td><span id="modalEventRestrictions"></span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>URL:</strong></td>
-                            <td><a id="modalEventURL" href="#" target="_blank"></a></td>
-                        </tr>
-                    </table>
-                    <div class="description" id="modalEventDescription"></div>
-                    <table class="timeline-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Start Time</th>
-                                <th>End Time</th>
-                                <th>Timezone</th>
-                                <th>Location</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modalEventTimelines">
-                            <!-- Timeline rows will be added here by JavaScript -->
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
-    </div>
-
-    <script src="https://unpkg.com/jquery@latest"></script>
-    <script src="https://unpkg.com/@popperjs/core@latest"></script>
-    <script src="https://unpkg.com/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
-    <script>
-        $('#eventModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var event = button.data('event');
-
-            var modal = $(this);
-            modal.find('#modalEventLogo').attr('src', event.logo);
-            modal.find('#modalEventTitle').text(event.title);
-            modal.find('#modalEventOrganizer').text(event.organizer);
-
-            if (event.timelines && event.timelines.length > 0) {
-                modal.find('#modalEventDateRange').text(
-                    new Date(event.timelines[0].startTime).toLocaleDateString() + ' - ' +
-                    new Date(event.timelines[event.timelines.length - 1].endTime).toLocaleDateString()
-                );
-            } else {
-                modal.find('#modalEventDateRange').text('N/A');
-            }
-
-            modal.find('#modalEventFormat').text(event.format.join(', '));
-            modal.find('#modalEventRestrictions').text(event.restrictions.join(', '));
-            modal.find('#modalEventURL').text(event.url).attr('href', event.url);
-
-            var descriptionHtml = DOMPurify.sanitize(marked.parse(event.description));
-            modal.find('#modalEventDescription').html(descriptionHtml);
-
-            var timelineRows = '';
-            if (event.timelines && event.timelines.length > 0) {
-                event.timelines.forEach(function(timeline) {
-                    timelineRows += '<tr>';
-                    timelineRows += '<td>' + DOMPurify.sanitize(timeline.name, { ALLOWED_TAGS: [] }) + '</td>';
-                    timelineRows += '<td>' + new Date(timeline.startTime).toLocaleString() + '</td>';
-                    timelineRows += '<td>' + new Date(timeline.endTime).toLocaleString() + '</td>';
-                    timelineRows += '<td>' + DOMPurify.sanitize(timeline.timezone, { ALLOWED_TAGS: [] }) + '</td>';
-                    timelineRows += '<td>' + DOMPurify.sanitize(timeline.location, { ALLOWED_TAGS: [] }) + '</td>';
-                    timelineRows += '</tr>';
-                });
-            } else {
-                timelineRows += '<tr><td colspan="4">No timelines available</td></tr>';
-            }
-            modal.find('#modalEventTimelines').html(timelineRows);
-        });
-    </script>
-</body>
-</html>
+        
+        <!-- Event Details Modal -->
+        <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <img id="modalEventLogo" alt="Event Logo" class="event-logo-large">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td width="150"><strong>Title:</strong></td>
+                                        <td id="modalEventTitle"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Organizer:</strong></td>
+                                        <td id="modalEventOrganizer"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Date Range:</strong></td>
+                                        <td id="modalEventDateRange"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Format:</strong></td>
+                                        <td id="modalEventFormat"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Restrictions:</strong></td>
+                                        <td id="modalEventRestrictions"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Website:</strong></td>
+                                        <td>
+                                            <a id="modalEventURL" href="#" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-link-45deg me-1"></i>Visit Event
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6><i class="bi bi-info-circle me-2"></i>Description</h6>
+                            <div id="modalEventDescription" class="border rounded p-3 bg-light"></div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6><i class="bi bi-clock me-2"></i>Event Timeline</h6>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Phase</th>
+                                            <th>Start Time</th>
+                                            <th>End Time</th>
+                                            <th>Timezone</th>
+                                            <th>Location</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalEventTimelines"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+}) %>

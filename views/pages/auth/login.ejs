@@ -1,79 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<%- include('../../partials/head', { title: 'Login', cssFiles: ['login'] }) %>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Full width for login page -->
-            <main class="col-12">
-                <div class="main-content">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-md-6 col-lg-5">
-                                <div class="card login-card">
-                                    <div class="card-body p-5">
-                                        <div class="text-center mb-4">
-                                            <h2 class="fw-bold mb-2">
-                                                <i class="bi bi-flag-fill me-2" style="color: var(--primary-color);"></i>
-                                                CTF Assistant
-                                            </h2>
-                                            <p class="text-muted">Sign in to access your dashboard</p>
-                                        </div>
-                                        
-                                        <% if (typeof error !== 'undefined' && error.length > 0) { %>
-                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                <%= error %>
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                            </div>
-                                        <% } %>
-                                        
-                                        <form action="/login" method="POST" class="needs-validation" novalidate>
-                                            <%- include('../../partials/form-input', {
-                                                id: 'username',
-                                                label: 'Username',
-                                                type: 'text',
-                                                icon: 'bi-person',
-                                                placeholder: 'Enter your username',
-                                                required: true
-                                            }) %>
-                                            
-                                            <%- include('../../partials/form-input', {
-                                                id: 'password',
-                                                label: 'Password',
-                                                type: 'password',
-                                                icon: 'bi-lock',
-                                                placeholder: 'Enter your password',
-                                                required: true
-                                            }) %>
-                                            
-                                            <div class="form-check mb-4">
-                                                <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                                                <label class="form-check-label" for="remember">
-                                                    Remember me
-                                                </label>
-                                            </div>
-                                            
-                                            <button type="submit" class="btn btn-primary btn-custom w-100 mb-3">
-                                                <i class="bi bi-box-arrow-in-right me-2"></i>
-                                                Sign In
-                                            </button>
-                                        </form>
-                                        
-                                        <div class="text-center">
-                                            <small class="text-muted">
-                                                Need help? Contact your administrator
-                                            </small>
-                                        </div>
-                                    </div>
+<%
+const layoutData = {
+    title: 'Login',
+    user: null, // No user for login page
+    currentPage: 'login',
+    cssFiles: ['login']
+};
+%>
+
+<%- include('../../layout', { 
+    ...layoutData, 
+    body: `
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card login-card">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <h2 class="fw-bold mb-2">
+                                    <i class="bi bi-flag-fill me-2" style="color: var(--primary-color);"></i>
+                                    CTF Assistant
+                                </h2>
+                                <p class="text-muted">Sign in to access your dashboard</p>
+                            </div>
+                            
+                            <% if (typeof error !== 'undefined' && error.length > 0) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
+                            <% } %>
+                            
+                            <form action="/login" method="POST" class="needs-validation" novalidate>
+                                <%- include('../../partials/form-input', {
+                                    id: 'username',
+                                    label: 'Username',
+                                    type: 'text',
+                                    icon: 'bi-person',
+                                    placeholder: 'Enter your username',
+                                    required: true
+                                }) %>
+                                
+                                <%- include('../../partials/form-input', {
+                                    id: 'password',
+                                    label: 'Password',
+                                    type: 'password',
+                                    icon: 'bi-lock',
+                                    placeholder: 'Enter your password',
+                                    required: true
+                                }) %>
+                                
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                    <label class="form-check-label" for="remember">
+                                        Remember me
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-custom w-100 mb-3">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                                    Sign In
+                                </button>
+                            </form>
+                            
+                            <div class="text-center">
+                                <small class="text-muted">
+                                    Need help? Contact your administrator
+                                </small>
                             </div>
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
-    </div>
-    
-    <%- include('../../partials/scripts') %>
-</body>
-</html>
+    `
+}) %>

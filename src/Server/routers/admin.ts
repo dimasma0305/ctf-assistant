@@ -7,7 +7,7 @@ const router: Router = express.Router()
 
 router.get("/events", checkAuth, async (req, res) => {
     const events = await EventModel.find().exec();
-    res.render('admin-events', { events });
+    res.render('pages/admin/admin-events', { events });
 });
 
 router.get("/event/new", checkAuth, async (req, res) => {
@@ -21,7 +21,7 @@ router.get("/event/:id", checkAuth, async (req, res) => {
     if (id) {
         const event = await EventModel.findById(id).exec().catch();
         if (event) {
-            return res.render('event-form', {
+            return res.render('pages/ctf/event-form', {
                 event,
                 eventSchema,
                 isAdmin: true

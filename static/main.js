@@ -116,22 +116,12 @@ async function apiCall(endpoint, options = {}) {
 
 // Get dashboard statistics
 async function getDashboardStats() {
-    return await apiCall('/api/dashboard-stats');
+    return await apiCall('/api/dashboard/stats');
 }
 
 // Get CTF events
 async function getCTFEvents() {
     return await apiCall('/api/ctf-events');
-}
-
-// Get event details
-async function getEventDetails(eventId) {
-    return await apiCall(`/api/events/${eventId}`);
-}
-
-// Get event solves
-async function getEventSolves(eventId) {
-    return await apiCall(`/api/events/${eventId}/solves`);
 }
 
 /* ========================================
@@ -142,14 +132,12 @@ let statsChart = null;
 
 async function refreshStats() {
     try {
-        showLoading('dashboard-stats', true);
         const data = await getDashboardStats();
         updateDashboard(data);
+        showAlert('Dashboard refreshed successfully!', 'success');
     } catch (error) {
         console.error('Failed to refresh stats:', error);
         showAlert('Failed to refresh stats', 'danger');
-    } finally {
-        showLoading('dashboard-stats', false);
     }
 }
 

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run index.ts",
-    "dev": "bun --watch ./src/*"
+    "dev": "bun --watch index.ts"
   },
   "keywords": [],
   "author": "",
