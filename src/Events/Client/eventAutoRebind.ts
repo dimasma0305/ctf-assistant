@@ -4,6 +4,7 @@ import { infoEvent } from "../../Functions/ctftime-v2";
 import { ReactionRoleEvent, createRoleIfNotExist, restoreEventMessageListeners } from "../../Commands/Public/Ctftime/utils/event";
 import { translate } from "../../Functions/discord-utils";
 import { TextChannel } from "discord.js";
+import { EventModel } from "../../Database/connect";
 
 const EVENT_ID_REGEX = /\/event\/(\d+)\//;
 
@@ -26,9 +27,43 @@ export const event: Event = {
                 if (!match) return
                 const id = match[1]
                 const ctfEvent = await infoEvent(id)
-                 const translatedEventName = translate(eventName)
-                 const channel = guild.channels.cache.find(channel => channel.name === translatedEventName)
+                const translatedEventName = translate(eventName)
+                const channel = guild.channels.cache.find(channel => channel.name === translatedEventName)
                 if (!(channel instanceof TextChannel)) return;
+
+                // Save/update event in database
+                try {
+                    const existingEvent = await EventModel.findOne({ 
+                        title: ctfEvent.title,
+                        url: ctfEvent.url 
+                    });
+
+                    if (!existingEvent) {
+                        const newEvent = new EventModel({
+                            title: ctfEvent.title,
+                            organizer: ctfEvent.organizers?.[0] || 'Unknown',
+                            description: ctfEvent.description || '',
+                            url: ctfEvent.url,
+                            logo: ctfEvent.logo,
+                            restrictions: [],
+                            format: ctfEvent.format ? [ctfEvent.format] : ['jeopardy'],
+                            timelines: [{
+                                name: 'Main Event',
+                                startTime: new Date(ctfEvent.start),
+                                endTime: new Date(ctfEvent.finish),
+                                location: 'Online',
+                                timezone: 'WIB'
+                            }]
+                        });
+
+                        await newEvent.save();
+                        console.log(`💾 Saved CTF event to database: ${ctfEvent.title}`);
+                    } else {
+                        console.log(`📋 CTF event already exists in database: ${ctfEvent.title}`);
+                    }
+                } catch (dbError) {
+                    console.error(`❌ Failed to save CTF event to database:`, dbError);
+                }
 
                 const reactionRoleEvent = new ReactionRoleEvent(guild, channel, {
                     ctfEvent: ctfEvent,
