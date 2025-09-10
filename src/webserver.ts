@@ -12,10 +12,35 @@ import { eventSchema } from "./Database/eventSchema";
 
 client.guilds.fetch();
 
-const user = {
-    username: process.env.USERNAME || "admin",
-    password: process.env.PASSWORD || "password"
+// Parse username:password from environment variable
+// Format: CREDENTIALS="username:password"
+// Example: CREDENTIALS="admin:mySecurePassword123"
+const parseCredentials = (credentials: string) => {
+    const parts = credentials.split(':');
+    
+    if (parts.length !== 2) {
+        console.warn('⚠️  CREDENTIALS format should be "username:password". Using defaults.');
+        return {
+            username: "admin",
+            password: "password"
+        };
+    }
+    
+    const [username, password] = parts;
+    
+    if (!username || !password) {
+        console.warn('⚠️  Username or password is empty in CREDENTIALS. Using defaults.');
+        return {
+            username: username || "admin",
+            password: password || "password"
+        };
+    }
+    
+    return { username, password };
 };
+
+const user = parseCredentials(process.env.CREDENTIALS || "admin:password");
+console.log(`🔐 Web panel credentials: ${user.username}:${'*'.repeat(user.password.length)}`);
 
 client.on('messageCreate', _ => {
     return;
@@ -227,7 +252,8 @@ app.post("/api/change-password", requireAuth, (req, res) => {
         
         // Verify current password
         if (currentPassword !== user.password) {
-            return res.status(400).json({ error: 'Current password is incorrect' });
+            res.status(400).json({ error: 'Current password is incorrect' });
+            return;
         }
         
         // TODO: Hash the password before storing in production
