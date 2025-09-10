@@ -1,86 +1,98 @@
-<%
-const layoutData = {
-    title: 'Login',
-    user: null // No user for login page
-};
-%>
-
-<%- include('../../layout', { 
-    ...layoutData, 
-    body: `
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-6 col-lg-5">
-                    <div class="card login-card">
-                        <div class="card-body p-5">
-                            <div class="text-center mb-4">
-                                <h2 class="fw-bold mb-2">
-                                    <i class="bi bi-flag-fill me-2" style="color: var(--primary-color);"></i>
-                                    CTF Assistant
-                                </h2>
-                                <p class="text-muted">Sign in to access your dashboard</p>
-                            </div>
-                            
-                            <form action="/login" method="POST" class="needs-validation" novalidate>
-                                <%- include('../../partials/form-input', {
-                                    id: 'username',
-                                    label: 'Username',
-                                    type: 'text',
-                                    icon: 'bi-person',
-                                    placeholder: 'Enter your username',
-                                    required: true
-                                }) %>
-                                
-                                <%- include('../../partials/form-input', {
-                                    id: 'password',
-                                    label: 'Password',
-                                    type: 'password',
-                                    icon: 'bi-lock',
-                                    placeholder: 'Enter your password',
-                                    required: true
-                                }) %>
-                                
-                                <div class="form-check mb-4">
-                                    <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                                    <label class="form-check-label" for="remember">
-                                        Remember me
-                                    </label>
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../../partials/head', { title: 'Login' }) %>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Full width for login page -->
+            <main class="col-12">
+                <div class="main-content">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-md-6 col-lg-5">
+                                <div class="card login-card">
+                                    <div class="card-body p-5">
+                                        <div class="text-center mb-4">
+                                            <h2 class="fw-bold mb-2">
+                                                <i class="bi bi-flag-fill me-2" style="color: var(--primary-color);"></i>
+                                                CTF Assistant
+                                            </h2>
+                                            <p class="text-muted">Sign in to access your dashboard</p>
+                                        </div>
+                                        
+                                        <% if (typeof error !== 'undefined' && error.length > 0) { %>
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                <%= error %>
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                            </div>
+                                        <% } %>
+                                        
+                                        <form action="/login" method="POST" class="needs-validation" novalidate>
+                                            <%- include('../../partials/form-input', {
+                                                id: 'username',
+                                                label: 'Username',
+                                                type: 'text',
+                                                icon: 'bi-person',
+                                                placeholder: 'Enter your username',
+                                                required: true
+                                            }) %>
+                                            
+                                            <%- include('../../partials/form-input', {
+                                                id: 'password',
+                                                label: 'Password',
+                                                type: 'password',
+                                                icon: 'bi-lock',
+                                                placeholder: 'Enter your password',
+                                                required: true
+                                            }) %>
+                                            
+                                            <div class="form-check mb-4">
+                                                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                                <label class="form-check-label" for="remember">
+                                                    Remember me
+                                                </label>
+                                            </div>
+                                            
+                                            <button type="submit" class="btn btn-primary btn-custom w-100 mb-3">
+                                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                                Sign In
+                                            </button>
+                                        </form>
+                                        
+                                        <div class="text-center">
+                                            <small class="text-muted">
+                                                Need help? Contact your administrator
+                                            </small>
+                                        </div>
+                                    </div>
                                 </div>
-                                
-                                <button type="submit" class="btn btn-primary btn-custom w-100 mb-3">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i>
-                                    Sign In
-                                </button>
-                            </form>
-                            
-                            <div class="text-center">
-                                <small class="text-muted">
-                                    Need help? Contact your administrator
-                                </small>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
-        
-        <style>
-        .login-card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-        
+    </div>
+    
+    <%- include('../../partials/scripts') %>
+    
+    <style>
+    .login-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .login-card .card-body {
+        background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    }
+    
+    @media (max-width: 768px) {
         .login-card .card-body {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            padding: 2rem !important;
         }
-        
-        @media (max-width: 768px) {
-            .login-card .card-body {
-                padding: 2rem !important;
-            }
-        }
-        </style>
-    `
-}) %>
+    }
+    </style>
+</body>
+</html>
