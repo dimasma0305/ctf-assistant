@@ -12,11 +12,13 @@
     --card-color: #252525;
     --text-primary: #ffffff;
     --text-secondary: #b3b3b3;
+    --text-muted: #888888;
     --success-color: #4caf50;
     --danger-color: #f44336;
     --warning-color: #ff9800;
     --info-color: #2196f3;
     --border-color: #333333;
+    --hover-bg: #2a2a2a;
 }
 
 /* ========================================
@@ -119,7 +121,8 @@ body {
 .btn-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
-    color: black;
+    color: #000000;
+    font-weight: 600;
 }
 
 .btn-primary:hover {
@@ -145,7 +148,8 @@ body {
 .btn-outline-primary:hover {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
-    color: black;
+    color: #000000;
+    font-weight: 600;
 }
 
 .btn-outline-secondary {
@@ -171,20 +175,76 @@ body {
 .table {
     color: var(--text-primary);
     --bs-table-bg: var(--card-color);
+    margin-bottom: 0;
 }
 
 .table-hover tbody tr:hover {
-    --bs-table-hover-bg: var(--surface-color);
+    --bs-table-hover-bg: var(--hover-bg);
+    cursor: pointer;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .table thead th {
     background-color: var(--surface-color);
     border-color: var(--border-color);
     color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem;
 }
 
 .table td, .table th {
     border-color: var(--border-color);
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:first-child td {
+    border-top: none;
+}
+
+/* Event Title Styling in Table */
+.table .fw-bold {
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.table .text-muted {
+    color: var(--text-muted) !important;
+    font-size: 0.875rem;
+}
+
+/* Action Button Styling in Table */
+.table .btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+}
+
+.table .btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Table Loading and Empty States */
+.table tbody tr.loading-row td {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.table tbody tr.empty-row td {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
 }
 
 /* ========================================
@@ -305,7 +365,8 @@ body {
 .pagination .page-item.active .page-link {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
-    color: black;
+    color: #000000;
+    font-weight: 600;
 }
 
 /* ========================================
@@ -485,49 +546,62 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .event-status {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
     font-size: 0.75rem;
     font-weight: 600;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .status-active {
     background: linear-gradient(45deg, #28a745, #20c997);
     color: white;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
 }
 
 .status-completed {
     background: linear-gradient(45deg, #6c757d, #495057);
     color: white;
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
 }
 
 .status-upcoming {
     background: linear-gradient(45deg, #007bff, #6610f2);
     color: white;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
 }
 
 .solve-badge {
-    background: linear-gradient(45deg, #ffc107, #fd7e14);
-    color: #212529;
+    background: linear-gradient(45deg, #f39c12, #e67e22);
+    color: #ffffff;
     border-radius: 20px;
     padding: 0.3rem 0.8rem;
     font-size: 0.8rem;
     font-weight: 600;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .search-box {
     border-radius: 25px;
-    border: 2px solid #e9ecef;
+    border: 2px solid var(--border-color);
     padding: 0.75rem 1.25rem;
+    background-color: var(--surface-color);
+    color: var(--text-primary);
     transition: all 0.3s ease;
 }
 
 .search-box:focus {
-    border-color: #6f42c1;
-    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(187, 134, 252, 0.25);
+    outline: none;
+    background-color: var(--card-color);
+}
+
+.search-box::placeholder {
+    color: var(--text-muted);
 }
 
 .pagination-custom .page-link {
