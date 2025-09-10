@@ -42,6 +42,9 @@ export const command: SubCommand = {
                 const data = JSON.parse(topicContent);
                 if (typeof data === 'object' && data !== null && 'title' in data && typeof data.title === 'string') {
                     title = data.title;
+                } else {
+                    const info = await infoEvent(data.id)
+                    title = info.title
                 }
             } catch (e) {
                 console.error("Failed to parse channel topic as JSON:", e);
