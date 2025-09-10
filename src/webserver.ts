@@ -6,9 +6,8 @@ import crypto from 'crypto';
 import { EventModel, solveModel } from "./Database/connect";
 import session from "express-session";
 import flash from "connect-flash";
-import { AuthenticatedRequest, reqToForm, sanitizeEvents as getSanitizeEvents, updateOrDeleteEvents } from "./Server/utils";
-import admin from "./Server/routers/admin";
-import { eventSchema } from "./Database/eventSchema";
+import { AuthenticatedRequest, reqToForm, sanitizeEvents as getSanitizeEvents, updateOrDeleteEvents } from "./utils";
+import admin from "./routers/admin";
 
 client.guilds.fetch();
 
