@@ -179,7 +179,7 @@ console.log('🚀 Starting CTF Assistant Bot...');
 loginWithScheduler();
 
 interface ChatMessage {
-  role: 'system' | 'user';
+  role: 'system' | 'user' | 'assistant';
   name?: string;
   content: string;
 }
@@ -278,6 +278,8 @@ async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<bo
   const content = message.content;
   const userId = message.author.id;
 
+  const MAX_MEMORY = 20;
+
   if (!memory[userId]) {
     memory[userId] = [];
   }
@@ -297,7 +299,7 @@ async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<bo
       content 
     });
     
-    if (memory[userId].length > 5) {
+    if (memory[userId].length > MAX_MEMORY) {
       memory[userId].shift();
     }
 
@@ -328,6 +330,11 @@ async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<bo
         model: 'deepseek-reasoner',
         messages: messages,
         n: 1,
+      });
+
+      memory[userId].push({
+        role: 'assistant',
+        content: completion.choices[0].message.content || ""
       });
 
       await message.reply({content: completion.choices[0].message.content || ""});
