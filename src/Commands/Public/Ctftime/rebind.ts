@@ -19,7 +19,7 @@ export const command: SubCommand = {
       .setName("day")
       .setDescription("Set closure time (default: 1 day)")
     ),
-  allowedRoles: ["Mabar Manager", "Gas Mabar"],
+  allowedRoles: ["Mabar Manager"],
   async execute(interaction, _client) {
     const { options } = interaction;
     const guild = await interaction.guild?.fetch()
