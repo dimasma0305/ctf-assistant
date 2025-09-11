@@ -42,7 +42,7 @@ export class FairScoringSystem {
         // Then multiply by CTF weight as the only differentiating factor
         // This makes all CTFs equal in base scoring, with only weight as multiplier
         const normalizedScore = challengePoints / ctfTotalPoints;
-        return (normalizedScore * ctfWeight) * 10;
+        return (normalizedScore * ctfWeight);
     }
 
     /**

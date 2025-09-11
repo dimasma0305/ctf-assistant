@@ -108,7 +108,7 @@ export const command: SubCommand = {
                 const position = i + 1;
                 const medal = i < 3 ? medals[i] : `**${position}.**`;
                 
-                description += `${medal} <@${entry.userId}> - **${Math.round(entry.totalScore)}** pts (${entry.solveCount} solves)\n`;
+                description += `${medal} <@${entry.userId}> - **${entry.totalScore.toFixed(2)}** pts (${entry.solveCount} solves)\n`;
                 
                 // Add detailed stats for top 3
                 if (i < 3) {
@@ -133,7 +133,7 @@ export const command: SubCommand = {
             // Add total statistics
             const totalUniquePlayers = leaderboard.length;
             const totalSolves = leaderboard.reduce((sum, entry) => sum + entry.solveCount, 0);
-            const totalScore = Math.round(leaderboard.reduce((sum, entry) => sum + entry.totalScore, 0));
+            const totalScore = leaderboard.reduce((sum, entry) => sum + entry.totalScore, 0).toFixed(2);
             const uniqueCTFs = new Set(leaderboard.flatMap(entry => Array.from(entry.ctfBreakdown.keys()))).size;
 
             embed.addFields(
@@ -174,7 +174,7 @@ export const command: SubCommand = {
                     const leaderboardHash = crypto.createHash('md5')
                         .update(JSON.stringify(leaderboard.map(entry => ({
                             userId: entry.userId,
-                            totalScore: Math.round(entry.totalScore),
+                            totalScore: entry.totalScore.toFixed(2),
                             solveCount: entry.solveCount
                         }))))
                         .digest('hex');
