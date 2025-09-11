@@ -77,6 +77,7 @@ export class FairScoringSystem {
 
             if (solve.challenge_ref && typeof solve.challenge_ref === 'object' && solve.challenge_ref !== null && 'points' in solve.challenge_ref) {
                 const challengeRef = solve.challenge_ref as any;
+                console.log("challengeRef", challengeRef);
                 challengeName = challengeRef.name || challengeName;
                 challengeCategory = challengeRef.category || challengeCategory;
                 challengePoints = challengeRef.points || 100;
