@@ -1,7 +1,6 @@
 
 import { SubCommand } from "../../../Model/command";
 import { EmbedBuilder, SlashCommandSubcommandBuilder } from "discord.js";
-import { CTFEvent } from "../../../Functions/ctftime-v2";
 import { solveModel } from "../../../Database/connect";
 import { 
     getChallengeInfo, 

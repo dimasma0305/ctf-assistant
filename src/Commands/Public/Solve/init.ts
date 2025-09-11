@@ -1,38 +1,10 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, TextChannel, ThreadAutoArchiveDuration } from "discord.js";
 import { CTFEvent } from "../../../Functions/ctftime-v2";
-import { solveModel } from "../../../Database/connect";
+import { solveModel, FetchCommandModel } from "../../../Database/connect";
+import { parseChallenges, ParsedChallenge } from "./challengeUtils";
 
-// Interface for CTFd challenge format
-interface CTFdChallenge {
-    id: number;
-    type: string;
-    name: string;
-    value: number;
-    solves: number;
-    solved_by_me: boolean;
-    category: string;
-    tags: Array<{ value: string }>;
-    template: string;
-    script: string;
-}
-
-// Interface for CTFd API response
-interface CTFdResponse {
-    success: boolean;
-    data: CTFdChallenge[];
-}
-
-// Generic challenge interface for different platforms
-interface ParsedChallenge {
-    id: string | number;
-    name: string;
-    category: string;
-    points: number;
-    solves: number;
-    solved: boolean;
-    tags?: string[];
-}
+// Moved to challengeUtils.ts
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
@@ -40,8 +12,8 @@ export const command: SubCommand = {
         .setDescription('Initialize challenges from CTF platform JSON (creates threads with ❌ prefix)')
         .addStringOption(option => option
             .setName("json")
-            .setDescription("JSON data from CTF platform API endpoint")
-            .setRequired(true)
+            .setDescription("JSON data from CTF platform API endpoint (optional if fetch_command is provided)")
+            .setRequired(false)
         )
         .addStringOption(option => option
             .setName("platform")
@@ -51,8 +23,14 @@ export const command: SubCommand = {
                 { name: 'CTFd', value: 'ctfd' },
                 { name: 'rCTF', value: 'rctf' },
                 { name: 'GzCTF', value: 'gzctf' },
+                { name: 'picoCTF', value: 'picoctf' },
                 { name: 'Generic', value: 'generic' }
             )
+        )
+        .addStringOption(option => option
+            .setName("fetch_command")
+            .setDescription("JavaScript fetch command to run every 5 minutes for auto-updates (optional)")
+            .setRequired(false)
         ),
     async execute(interaction, _client) {
         await interaction.deferReply({ flags: ["Ephemeral"] });
@@ -63,8 +41,15 @@ export const command: SubCommand = {
             return;
         }
 
-        const jsonData = interaction.options.getString("json", true);
-        const platform = interaction.options.getString("platform") || "ctfd";
+        const jsonData = interaction.options.getString("json");
+        const platform = interaction.options.getString("platform") || "";
+        const fetchCommand = interaction.options.getString("fetch_command");
+
+        // Validate that either JSON data or fetch command is provided
+        if (!jsonData && !fetchCommand) {
+            await interaction.editReply("❌ You must provide either `json` data or a `fetch_command`.");
+            return;
+        }
 
         // Parse channel topic to get CTF event data
         let ctfData: CTFEvent;
@@ -79,12 +64,56 @@ export const command: SubCommand = {
             return;
         }
 
+        // Get JSON data either from user input or fetch command
+        let finalJsonData: string;
+        let parsedFetch: ParsedFetchCommand | null = null;
+        
+        if (fetchCommand) {
+            try {
+                // Parse and execute the fetch command to get JSON data
+                parsedFetch = parseFetchCommand(fetchCommand);
+                
+                // Execute the fetch command
+                const response = await fetch(parsedFetch.url, {
+                    method: parsedFetch.method,
+                    headers: parsedFetch.headers as any,
+                    body: parsedFetch.body || undefined
+                });
+
+                if (!response.ok) {
+                    await interaction.editReply(`❌ Fetch command failed: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                finalJsonData = await response.text();
+                
+                // Use provided JSON data as fallback if fetch fails to return data
+                if (!finalJsonData.trim() && jsonData) {
+                    finalJsonData = jsonData;
+                }
+            } catch (error) {
+                if (jsonData) {
+                    // Fallback to provided JSON data if fetch fails
+                    finalJsonData = jsonData;
+                    await interaction.followUp({ 
+                        content: `⚠️ Fetch command failed (${error}), using provided JSON data as fallback.`, 
+                        ephemeral: true 
+                    });
+                } else {
+                    await interaction.editReply(`❌ Fetch command failed and no JSON fallback provided: ${error}`);
+                    return;
+                }
+            }
+        } else {
+            finalJsonData = jsonData!; // We know it exists due to validation above
+        }
+
         // Parse challenges based on platform
         let challenges: ParsedChallenge[];
         try {
-            challenges = await parseChallenges(jsonData, platform);
+            challenges = await parseChallenges(finalJsonData, platform);
         } catch (error) {
-            await interaction.editReply(`Failed to parse JSON data: ${error}`);
+            await interaction.editReply(`❌ Failed to parse JSON data: ${error}`);
             return;
         }
 
@@ -191,85 +220,179 @@ export const command: SubCommand = {
         }
 
         await interaction.editReply(summary.join('\n'));
+        
+        // Handle fetch command if provided - save it for periodic updates
+        if (fetchCommand && parsedFetch) {
+            try {
+                await saveFetchCommand(parsedFetch, ctfData, channel.id, platform);
+                await interaction.followUp({ 
+                    content: "✅ Auto-update fetch command saved! The bot will now fetch updates every 5 minutes until the CTF ends.", 
+                    ephemeral: true 
+                });
+            } catch (error) {
+                await interaction.followUp({ 
+                    content: `⚠️ Failed to save fetch command for auto-updates: ${error}`, 
+                    ephemeral: true 
+                });
+            }
+        }
     },
 };
 
-// Parse challenges based on platform type
-async function parseChallenges(jsonData: string, platform: string): Promise<ParsedChallenge[]> {
-    const data = JSON.parse(jsonData);
-    
-    switch (platform.toLowerCase()) {
-        case 'ctfd':
-            return parseCTFdChallenges(data);
-        case 'rctf':
-            return parseRCTFChallenges(data);
-        case 'gzctf':
-            return parseGzCTFChallenges(data);
-        case 'generic':
-            return parseGenericChallenges(data);
-        default:
-            throw new Error(`Unsupported platform: ${platform}`);
+// Interface for parsed fetch command
+interface ParsedFetchCommand {
+    url: string;
+    method: string;
+    headers?: Record<string, string>;
+    body?: string;
+}
+
+// Parse fetch command from user input
+function parseFetchCommand(fetchCommand: string): ParsedFetchCommand {
+    try {
+        // Clean the input string and extract fetch parameters
+        const cleanCommand = fetchCommand.trim();
+        
+        // Extract URL from fetch("url", ...)
+        const urlMatch = cleanCommand.match(/fetch\s*\(\s*["'](.*?)["']/);
+        if (!urlMatch) {
+            throw new Error("Could not extract URL from fetch command");
+        }
+        const url = urlMatch[1];
+        
+        // Extract options object
+        const optionsMatch = cleanCommand.match(/fetch\s*\([^,]+,\s*(\{[\s\S]*\})\s*\)/);
+        let method = 'GET';
+        let headers: Record<string, string> = {};
+        let body: string | undefined;
+        
+        if (optionsMatch) {
+            try {
+                // Parse the options object safely
+                const optionsStr = optionsMatch[1];
+                
+                // Try to parse as JSON first (most common case)
+                let options;
+                try {
+                    options = JSON.parse(optionsStr);
+                } catch (jsonError) {
+                    // If JSON parsing fails, try to extract values using regex
+                    options = parseJavaScriptObject(optionsStr);
+                }
+                
+                method = options.method || 'GET';
+                headers = options.headers || {};
+                body = options.body;
+                
+            } catch (error) {
+                // If we can't parse options, just use defaults
+                console.warn("Could not parse fetch options, using defaults:", error);
+            }
+        }
+        
+        return {
+            url,
+            method,
+            headers,
+            body
+        };
+    } catch (error) {
+        throw new Error(`Failed to parse fetch command: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
 
-// Parse CTFd format
-function parseCTFdChallenges(data: CTFdResponse): ParsedChallenge[] {
-    if (!data.success || !Array.isArray(data.data)) {
-        throw new Error('Invalid CTFd response format');
+// Safely parse JavaScript object without using eval
+function parseJavaScriptObject(objectStr: string): any {
+    const result: any = {};
+    
+    // Extract method
+    const methodMatch = objectStr.match(/"method"\s*:\s*"([^"]+)"/);
+    if (methodMatch) {
+        result.method = methodMatch[1];
     }
     
-    return data.data.map(challenge => ({
-        id: challenge.id,
-        name: challenge.name,
-        category: challenge.category,
-        points: challenge.value,
-        solves: challenge.solves,
-        solved: challenge.solved_by_me,
-        tags: challenge.tags?.map(tag => tag.value)
-    }));
-}
-
-// Parse rCTF format (placeholder - add actual format when needed)
-function parseRCTFChallenges(data: any): ParsedChallenge[] {
-    // TODO: Implement rCTF parsing when format is provided
-    throw new Error('rCTF format parsing not yet implemented');
-}
-
-// Parse GzCTF format
-function parseGzCTFChallenges(data: any): ParsedChallenge[] {
-    // GzCTF typically returns an array of challenges or data wrapped in an object
-    let challenges = Array.isArray(data) ? data : (data.data || data.challenges || []);
-    
-    if (!Array.isArray(challenges)) {
-        throw new Error('Invalid GzCTF response format - expected array of challenges');
+    // Extract body
+    const bodyMatch = objectStr.match(/"body"\s*:\s*(null|"[^"]*")/);
+    if (bodyMatch) {
+        result.body = bodyMatch[1] === 'null' ? null : bodyMatch[1].slice(1, -1); // Remove quotes
     }
     
-    return challenges.map((challenge: any, index: number) => ({
-        id: challenge.id || index + 1,
-        name: challenge.title || challenge.name || `Challenge ${index + 1}`,
-        category: challenge.category || challenge.type || 'misc',
-        points: challenge.originalScore || challenge.points || challenge.score || 0,
-        solves: challenge.solved || challenge.solves || 0,
-        solved: challenge.isSolved || challenge.solved_by_me || false,
-        tags: challenge.tags || []
-    }));
-}
-
-// Parse generic format (placeholder - add actual format when needed)  
-function parseGenericChallenges(data: any): ParsedChallenge[] {
-    // TODO: Implement generic parsing when format is provided
-    // Expected format: array of challenges with name, category, points, etc.
-    if (!Array.isArray(data)) {
-        throw new Error('Generic format expects an array of challenges');
+    // Extract headers (more complex parsing to handle nested quotes)
+    const headersMatch = objectStr.match(/"headers"\s*:\s*\{([\s\S]*?)\}(?:\s*,|\s*$|\s*\})/);
+    if (headersMatch) {
+        const headersStr = headersMatch[1];
+        const headers: Record<string, string> = {};
+        
+        // More sophisticated regex to handle escaped quotes in header values
+        // This regex matches "key": "value" where value can contain escaped quotes
+        const headerMatches = headersStr.match(/"([^"]+)"\s*:\s*"((?:[^"\\]|\\.)*)"/g);
+        if (headerMatches) {
+            headerMatches.forEach(match => {
+                const keyValueMatch = match.match(/"([^"]+)"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+                if (keyValueMatch) {
+                    // Unescape the header value
+                    const key = keyValueMatch[1];
+                    const value = keyValueMatch[2].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                    headers[key] = value;
+                }
+            });
+        }
+        result.headers = headers;
     }
     
-    return data.map((challenge: any, index: number) => ({
-        id: challenge.id || index + 1,
-        name: challenge.name || `Challenge ${index + 1}`,
-        category: challenge.category || 'misc',
-        points: challenge.points || challenge.value || 0,
-        solves: challenge.solves || 0,
-        solved: challenge.solved || false,
-        tags: challenge.tags || []
-    }));
+    return result;
+}
+
+// Save fetch command to database
+async function saveFetchCommand(
+    parsedFetch: ParsedFetchCommand, 
+    ctfData: CTFEvent, 
+    channelId: string, 
+    platform: string
+) {
+    try {
+        // Calculate CTF end time
+        const ctfEndTime = new Date(ctfData.finish);
+        
+        // Check if there's already a fetch command for this CTF
+        const existingCommand = await FetchCommandModel.findOne({ 
+            ctf_id: ctfData.id.toString(),
+            channel_id: channelId 
+        });
+        
+        if (existingCommand) {
+            // Update existing command
+            existingCommand.url = parsedFetch.url;
+            existingCommand.method = parsedFetch.method;
+            existingCommand.headers = parsedFetch.headers;
+            if (parsedFetch.body) {
+                existingCommand.body = parsedFetch.body;
+            }
+            existingCommand.platform = platform;
+            existingCommand.ctf_end_time = ctfEndTime;
+            existingCommand.is_active = true;
+            await existingCommand.save();
+        } else {
+            // Create new fetch command
+            const fetchCommandData: any = {
+                ctf_id: ctfData.id.toString(),
+                channel_id: channelId,
+                url: parsedFetch.url,
+                method: parsedFetch.method,
+                headers: parsedFetch.headers,
+                platform: platform,
+                ctf_end_time: ctfEndTime,
+                is_active: true
+            };
+            
+            if (parsedFetch.body) {
+                fetchCommandData.body = parsedFetch.body;
+            }
+            
+            const fetchCommandDoc = new FetchCommandModel(fetchCommandData);
+            await fetchCommandDoc.save();
+        }
+    } catch (error) {
+        throw new Error(`Failed to save fetch command: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 }
