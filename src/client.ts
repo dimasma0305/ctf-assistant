@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import db from "./Database/connect";
 config();
 
-const { TOKEN, OPENAI_API_KEY } = process.env;
+const { TOKEN } = process.env;
 if (!process.env.NODB){
   db.connect()
 }
@@ -18,13 +18,8 @@ import {
 } from "discord.js";
 
 import { MyClient } from "./Model/client";
-import OpenAI from "openai";
 import { SessionScheduler } from "./Services/SessionScheduler";
-
-const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY,
-  baseURL: "https://api.deepseek.com"
-})
+import { openai } from "./utils/openai";
 
 const {
   Guilds,
