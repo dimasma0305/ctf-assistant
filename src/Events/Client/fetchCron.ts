@@ -3,6 +3,7 @@ import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 import cron from "node-cron";
 import { FetchCommandModel } from "../../Database/connect";
+import { parseChallenges, updateThreadStatus } from "../../Commands/Public/Solve/utils/parser";
 
 export const event: Event = {
     name: "clientReady",
@@ -83,10 +84,6 @@ export const event: Event = {
 // Function to update challenges from fetch result
 async function updateChallengesFromFetch(jsonData: string, fetchCmd: any, channel: TextChannel) {
     try {
-        // Import the challenge parsing functions from challengeUtils
-        const { parseChallenges, updateThreadStatus } = await import("../../Commands/Public/Solve/challengeUtils");
-        
-        // Parse challenges using the same logic
         const challenges = await parseChallenges(jsonData, fetchCmd.platform);
         
         if (challenges.length === 0) {

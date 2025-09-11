@@ -1,5 +1,5 @@
 import { TextChannel, ThreadAutoArchiveDuration } from "discord.js";
-import { solveModel } from "../../../Database/connect";
+import { solveModel } from "../../../../Database/connect";
 
 // Generic challenge interface for different platforms
 export interface ParsedChallenge {
@@ -116,13 +116,12 @@ export async function updateThreadStatus(challenges: ParsedChallenge[], channel:
         const existingSolves = await solveModel.find({ ctf_id: ctfId });
         const solvedChallenges = new Set(existingSolves.filter(solve => solve.challenge).map(solve => solve.challenge!.toLowerCase()));
 
-        let updatedThreads = 0;
+        let updatedMessages = 0;
         const errors: string[] = [];
 
         for (const challenge of challenges) {
             try {
                 const isSolved = solvedChallenges.has(challenge.name.toLowerCase());
-                const correctPrefix = isSolved ? '✅' : '❌';
                 const category = challenge.category.toUpperCase();
 
                 // Find existing thread with any prefix
@@ -133,23 +132,43 @@ export async function updateThreadStatus(challenges: ParsedChallenge[], channel:
                 });
 
                 if (existingThread) {
-                    const currentPrefix = existingThread.name.startsWith('✅') ? '✅' : '❌';
+                    // Fetch the first message (bot's initial message)
+                    const messages = await existingThread.messages.fetch({ limit: 1 });
+                    const firstMessage = messages.first();
                     
-                    // Only update if prefix needs to change
-                    if (currentPrefix !== correctPrefix) {
-                        const newName = `${correctPrefix} [${category}] ${challenge.name}`;
-                        await existingThread.setName(newName);
-                        updatedThreads++;
-                        console.log(`Updated thread: ${existingThread.name} -> ${newName}`);
+                    if (firstMessage && firstMessage.author.bot) {
+                        // Create updated challenge info
+                        const solveStatus = isSolved ? '🎉 **SOLVED!** 🎉' : '🔍 **Unsolved**';
+                        const challengeInfo = [
+                            `# ${challenge.name}`,
+                            `**Status:** ${solveStatus}`,
+                            `**Category:** ${challenge.category}`,
+                            `**Points:** ${challenge.points}`,
+                            `**Solves:** ${challenge.solves}`,
+                            challenge.tags && challenge.tags.length > 0 ? `**Tags:** ${challenge.tags.join(', ')}` : '',
+                            '',
+                            '💡 **Use this thread to discuss and solve this challenge!**',
+                            isSolved ? '✅ This challenge has been marked as solved!' : '📝 When solved, use `/solve challenge` to mark it as complete.',
+                            '',
+                            '---',
+                            `*Challenge ID: ${challenge.id}*`
+                        ].filter(line => line !== '').join('\n');
+
+                        // Check if the message content needs updating
+                        if (firstMessage.content !== challengeInfo) {
+                            await firstMessage.edit(challengeInfo);
+                            updatedMessages++;
+                            console.log(`Updated first message in thread: ${existingThread.name}`);
+                        }
                     }
                 }
             } catch (error) {
                 errors.push(`${challenge.name}: ${error}`);
-                console.error(`Failed to update thread for ${challenge.name}:`, error);
+                console.error(`Failed to update thread message for ${challenge.name}:`, error);
             }
         }
 
-        console.log(`Thread status update complete: ${updatedThreads} threads updated`);
+        console.log(`Thread message update complete: ${updatedMessages} messages updated`);
         if (errors.length > 0) {
             console.warn(`Thread update errors:`, errors);
         }

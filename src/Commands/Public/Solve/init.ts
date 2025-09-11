@@ -1,8 +1,9 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, TextChannel, ThreadAutoArchiveDuration } from "discord.js";
-import { CTFEvent } from "../../../Functions/ctftime-v2";
-import { solveModel, FetchCommandModel } from "../../../Database/connect";
-import { parseChallenges, ParsedChallenge } from "./challengeUtils";
+import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
+import { solveModel } from "../../../Database/connect";
+import { parseChallenges, ParsedChallenge } from "./utils/parser";
+import { parseFetchCommand, ParsedFetchCommand, saveFetchCommand } from "./utils/init";
 
 // Moved to challengeUtils.ts
 
@@ -54,7 +55,14 @@ export const command: SubCommand = {
         // Parse channel topic to get CTF event data
         let ctfData: CTFEvent;
         try {
-            ctfData = JSON.parse(channel.topic || "{}") as CTFEvent;
+            const id = JSON.parse(channel.topic || "{}").id;
+
+            if (!id) {
+                await interaction.editReply("This channel does not have a valid CTF event associated with it.");
+                return;
+            }
+
+            ctfData = await infoEvent(id);
             if (!ctfData.id) {
                 await interaction.editReply("This channel does not have a valid CTF event associated with it.");
                 return;
@@ -239,199 +247,3 @@ export const command: SubCommand = {
     },
 };
 
-// Interface for parsed fetch command
-interface ParsedFetchCommand {
-    url: string;
-    method: string;
-    headers?: Record<string, string>;
-    body?: string;
-}
-
-// Parse fetch command from user input
-function parseFetchCommand(fetchCommand: string): ParsedFetchCommand {
-    try {
-        // Clean the input string and extract fetch parameters
-        const cleanCommand = fetchCommand.trim();
-        
-        // Extract URL from fetch("url", ...)
-        const urlMatch = cleanCommand.match(/fetch\s*\(\s*["'](.*?)["']/);
-        if (!urlMatch) {
-            throw new Error("Could not extract URL from fetch command");
-        }
-        const url = urlMatch[1];
-        
-        // Extract options object
-        const optionsMatch = cleanCommand.match(/fetch\s*\([^,]+,\s*(\{[\s\S]*\})\s*\)/);
-        let method = 'GET';
-        let headers: Record<string, string> = {};
-        let body: string | undefined;
-        
-        if (optionsMatch) {
-            try {
-                // Parse the options object safely
-                const optionsStr = optionsMatch[1];
-                
-                // Try to parse as JSON first (most common case)
-                let options;
-                try {
-                    options = JSON.parse(optionsStr);
-                } catch (jsonError) {
-                    // If JSON parsing fails, try to extract values using regex
-                    options = parseJavaScriptObject(optionsStr);
-                }
-                
-                method = options.method || 'GET';
-                headers = options.headers || {};
-                body = options.body;
-                
-            } catch (error) {
-                // If we can't parse options, just use defaults
-                console.warn("Could not parse fetch options, using defaults:", error);
-            }
-        }
-        
-        return {
-            url,
-            method,
-            headers,
-            body
-        };
-    } catch (error) {
-        throw new Error(`Failed to parse fetch command: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-}
-
-// Safely parse JavaScript object without using eval
-function parseJavaScriptObject(objectStr: string): any {
-    const result: any = {};
-    
-    // Extract method
-    const methodMatch = objectStr.match(/"method"\s*:\s*"([^"]+)"/);
-    if (methodMatch) {
-        result.method = methodMatch[1];
-    }
-    
-    // Extract body
-    const bodyMatch = objectStr.match(/"body"\s*:\s*(null|"[^"]*")/);
-    if (bodyMatch) {
-        result.body = bodyMatch[1] === 'null' ? null : bodyMatch[1].slice(1, -1); // Remove quotes
-    }
-    
-    // Extract headers (more complex parsing to handle nested quotes)
-    const headersMatch = objectStr.match(/"headers"\s*:\s*\{([\s\S]*?)\}(?:\s*,|\s*$|\s*\})/);
-    if (headersMatch) {
-        const headersStr = headersMatch[1];
-        const headers: Record<string, string> = {};
-        
-        // More sophisticated regex to handle escaped quotes in header values
-        // This regex matches "key": "value" where value can contain escaped quotes
-        const headerMatches = headersStr.match(/"([^"]+)"\s*:\s*"((?:[^"\\]|\\.)*)"/g);
-        if (headerMatches) {
-            headerMatches.forEach(match => {
-                const keyValueMatch = match.match(/"([^"]+)"\s*:\s*"((?:[^"\\]|\\.)*)"/);
-                if (keyValueMatch) {
-                    // Unescape the header value
-                    const key = keyValueMatch[1];
-                    const value = keyValueMatch[2].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-                    headers[key] = value;
-                }
-            });
-        }
-        result.headers = headers;
-    }
-    
-    return result;
-}
-
-// Save fetch command to database
-async function saveFetchCommand(
-    parsedFetch: ParsedFetchCommand, 
-    ctfData: CTFEvent, 
-    channelId: string, 
-    platform: string
-) {
-    try {
-        // Calculate CTF end time with validation
-        let ctfEndTime: Date;
-        
-        if (!ctfData.finish) {
-            // If no end time provided, default to 7 days from now
-            ctfEndTime = new Date();
-            ctfEndTime.setDate(ctfEndTime.getDate() + 7);
-            console.warn("No CTF end time found, defaulting to 7 days from now");
-        } else {
-            ctfEndTime = new Date(ctfData.finish);
-            
-            // Validate the date
-            if (isNaN(ctfEndTime.getTime())) {
-                // Try parsing different date formats
-                try {
-                    const timestamp = parseInt(String(ctfData.finish));
-                    if (!isNaN(timestamp)) {
-                        // Try as seconds timestamp
-                        const timestampDate = new Date(timestamp * 1000);
-                        if (!isNaN(timestampDate.getTime())) {
-                            ctfEndTime = timestampDate;
-                        } else {
-                            // Try as milliseconds timestamp
-                            const msTimestampDate = new Date(timestamp);
-                            if (!isNaN(msTimestampDate.getTime())) {
-                                ctfEndTime = msTimestampDate;
-                            }
-                        }
-                    }
-                } catch (error) {
-                    // Still invalid, use default
-                }
-                
-                // Final fallback if still invalid
-                if (isNaN(ctfEndTime.getTime())) {
-                    ctfEndTime = new Date();
-                    ctfEndTime.setDate(ctfEndTime.getDate() + 7);
-                    console.warn(`Invalid CTF end time format: ${ctfData.finish}, defaulting to 7 days from now`);
-                }
-            }
-        }
-        
-        // Check if there's already a fetch command for this CTF
-        const existingCommand = await FetchCommandModel.findOne({ 
-            ctf_id: ctfData.id.toString(),
-            channel_id: channelId 
-        });
-        
-        if (existingCommand) {
-            // Update existing command
-            existingCommand.url = parsedFetch.url;
-            existingCommand.method = parsedFetch.method;
-            existingCommand.headers = parsedFetch.headers;
-            if (parsedFetch.body) {
-                existingCommand.body = parsedFetch.body;
-            }
-            existingCommand.platform = platform;
-            existingCommand.ctf_end_time = ctfEndTime;
-            existingCommand.is_active = true;
-            await existingCommand.save();
-        } else {
-            // Create new fetch command
-            const fetchCommandData: any = {
-                ctf_id: ctfData.id.toString(),
-                channel_id: channelId,
-                url: parsedFetch.url,
-                method: parsedFetch.method,
-                headers: parsedFetch.headers,
-                platform: platform,
-                ctf_end_time: ctfEndTime,
-                is_active: true
-            };
-            
-            if (parsedFetch.body) {
-                fetchCommandData.body = parsedFetch.body;
-            }
-            
-            const fetchCommandDoc = new FetchCommandModel(fetchCommandData);
-            await fetchCommandDoc.save();
-        }
-    } catch (error) {
-        throw new Error(`Failed to save fetch command: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-}
