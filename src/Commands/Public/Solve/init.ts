@@ -351,8 +351,47 @@ async function saveFetchCommand(
     platform: string
 ) {
     try {
-        // Calculate CTF end time
-        const ctfEndTime = new Date(ctfData.finish);
+        // Calculate CTF end time with validation
+        let ctfEndTime: Date;
+        
+        if (!ctfData.finish) {
+            // If no end time provided, default to 7 days from now
+            ctfEndTime = new Date();
+            ctfEndTime.setDate(ctfEndTime.getDate() + 7);
+            console.warn("No CTF end time found, defaulting to 7 days from now");
+        } else {
+            ctfEndTime = new Date(ctfData.finish);
+            
+            // Validate the date
+            if (isNaN(ctfEndTime.getTime())) {
+                // Try parsing different date formats
+                try {
+                    const timestamp = parseInt(String(ctfData.finish));
+                    if (!isNaN(timestamp)) {
+                        // Try as seconds timestamp
+                        const timestampDate = new Date(timestamp * 1000);
+                        if (!isNaN(timestampDate.getTime())) {
+                            ctfEndTime = timestampDate;
+                        } else {
+                            // Try as milliseconds timestamp
+                            const msTimestampDate = new Date(timestamp);
+                            if (!isNaN(msTimestampDate.getTime())) {
+                                ctfEndTime = msTimestampDate;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    // Still invalid, use default
+                }
+                
+                // Final fallback if still invalid
+                if (isNaN(ctfEndTime.getTime())) {
+                    ctfEndTime = new Date();
+                    ctfEndTime.setDate(ctfEndTime.getDate() + 7);
+                    console.warn(`Invalid CTF end time format: ${ctfData.finish}, defaulting to 7 days from now`);
+                }
+            }
+        }
         
         // Check if there's already a fetch command for this CTF
         const existingCommand = await FetchCommandModel.findOne({ 
