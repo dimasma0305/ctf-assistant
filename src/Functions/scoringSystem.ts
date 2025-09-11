@@ -51,7 +51,6 @@ export class FairScoringSystem {
     static async calculateUserScores(globalQuery: any = {}): Promise<Map<string, UserScore>> {
         const solves = await solveModel.find(globalQuery).lean();
         const userScores = new Map<string, UserScore>();
-        const ctfCache = new Map<string, any>();
 
         // Calculate total points for each CTF for normalization
         const ctfTotalPoints = new Map<string, number>();

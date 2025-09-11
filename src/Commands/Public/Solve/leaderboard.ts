@@ -1,6 +1,7 @@
 import { SubCommand } from "../../../Model/command";
-import { EmbedBuilder, SlashCommandSubcommandBuilder } from "discord.js";
-import { solveModel } from "../../../Database/connect";
+import { EmbedBuilder, SlashCommandSubcommandBuilder, Message } from "discord.js";
+import crypto from 'crypto';
+import { solveModel, LeaderboardTrackingModel } from "../../../Database/connect";
 import { getChannelAndCTFData, validateCTFEvent } from "./utils";
 import FairScoringSystem from "../../../Functions/scoringSystem";
 
@@ -29,10 +30,16 @@ export const command: SubCommand = {
             .setMinValue(1)
             .setMaxValue(25)
             .setRequired(false)
+        )
+        .addBooleanOption(option => option
+            .setName('auto_update')
+            .setDescription('Enable hourly auto-updates for this leaderboard (default: false)')
+            .setRequired(false)
         ),
     async execute(interaction, _client) {
         const isGlobal = interaction.options.getBoolean('global') ?? true;
         const limit = interaction.options.getInteger('limit') ?? 10;
+        const autoUpdate = interaction.options.getBoolean('auto_update') ?? false;
 
         let query: any = {};
 
@@ -149,7 +156,47 @@ export const command: SubCommand = {
 
             embed.setDescription((embed.data.description || '') + '\n' + description);
 
-            await interaction.reply({ embeds: [embed] });
+            // Add footer indicator if auto-update is enabled
+            if (autoUpdate) {
+                const currentFooter = embed.data.footer?.text || 'CTF Assistant';
+                embed.setFooter({ 
+                    text: `${currentFooter} • Auto-updating hourly`, 
+                    iconURL: embed.data.footer?.icon_url || 'https://tcp1p.team/favicon.ico' 
+                });
+            }
+
+            const response = await interaction.reply({ embeds: [embed], fetchReply: true }) as Message;
+
+            // Set up auto-updating if enabled
+            if (autoUpdate) {
+                try {
+                    // Create hash of current leaderboard data for change detection
+                    const leaderboardHash = crypto.createHash('md5')
+                        .update(JSON.stringify(leaderboard.map(entry => ({
+                            userId: entry.userId,
+                            totalScore: Math.round(entry.totalScore),
+                            solveCount: entry.solveCount
+                        }))))
+                        .digest('hex');
+
+                    await LeaderboardTrackingModel.create({
+                        messageId: response.id,
+                        channelId: interaction.channelId!,
+                        guildId: interaction.guildId!,
+                        isGlobal,
+                        limit,
+                        ctfId: query.ctf_id || null,
+                        lastHash: leaderboardHash,
+                        lastUpdated: new Date(),
+                        isActive: true
+                    });
+
+                    console.log(`✅ Auto-update enabled for leaderboard in ${interaction.guildId}/${interaction.channelId}`);
+                } catch (error) {
+                    console.error('Error setting up auto-update:', error);
+                    // Don't fail the command, just log the error
+                }
+            }
 
         } catch (error) {
             console.error('Error fetching leaderboard:', error);
