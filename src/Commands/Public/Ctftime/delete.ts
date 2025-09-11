@@ -17,6 +17,7 @@ export const command: SubCommand = {
             .setDescription("Delete ctf by title")
             .setRequired(false)
     ),
+    allowedRoles: ["Mabar Manager", "Gas Mabar"],
     async execute(interaction, _client) {
         const { options } = interaction;
         await interaction.deferReply({ flags: ["Ephemeral"] })

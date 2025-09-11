@@ -12,6 +12,7 @@ export const command: SubCommand = {
       .setDescription("CTFs ID")
       .setRequired(true)
     ),
+  allowedRoles: ["Mabar Manager", "Gas Mabar"],
   async execute(interaction, _client) {
     const { options } = interaction;
     const channel = interaction.channel

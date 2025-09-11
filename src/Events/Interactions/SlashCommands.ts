@@ -22,6 +22,8 @@ export const event: Event = {
 
     const subCommand = interaction.options.getSubcommand(false);
     let execute;
+    let commandToCheck = null;
+    
     if (subCommand) {
       const subCommandFile = client.subCommands.get(
         `${interaction.commandName}.${subCommand}`
@@ -32,9 +34,44 @@ export const event: Event = {
           flags: ["Ephemeral"],
         });
       }
-      execute = subCommandFile.execute
+      execute = subCommandFile.execute;
+      commandToCheck = subCommandFile;
     } else {
-      execute = command.execute
+      execute = command.execute;
+      commandToCheck = command;
+    }
+
+    // Check allowedRoles if defined
+    if (commandToCheck?.allowedRoles && commandToCheck.allowedRoles.length > 0) {
+      if (!interaction.member || !interaction.guild) {
+        return interaction.reply({
+          content: "❌ This command can only be used in a server.",
+          flags: ["Ephemeral"]
+        });
+      }
+
+      const memberRoles = interaction.member.roles;
+      const hasRequiredRole = commandToCheck.allowedRoles.some((roleName: string) => {
+        if (Array.isArray(memberRoles)) {
+          // APIGuildMember - roles is string array
+          const guildRoles = interaction.guild!.roles.cache;
+          return memberRoles.some((roleId: string) => {
+            const role = guildRoles.get(roleId);
+            return role && role.name === roleName;
+          });
+        } else {
+          // GuildMember - roles is GuildMemberRoleManager
+          return memberRoles.cache.some((role: any) => role.name === roleName);
+        }
+      });
+
+      if (!hasRequiredRole) {
+        const requiredRoles = commandToCheck.allowedRoles.join(', ');
+        return interaction.reply({
+          content: `❌ You need one of these roles to use this command: **${requiredRoles}**`,
+          flags: ["Ephemeral"]
+        });
+      }
     }
     if (execute) {
       try {

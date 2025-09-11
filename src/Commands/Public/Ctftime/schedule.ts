@@ -23,6 +23,7 @@ export const command: SubCommand = {
       .setName("password")
       .setDescription("Password for the private CTF event")
     ),
+  allowedRoles: ["Mabar Manager", "Gas Mabar"],
   async execute(interaction, _client) {
     const { options } = interaction;
     const channel = interaction.channel
