@@ -1,4 +1,4 @@
-import { SlashCommandSubcommandBuilder } from "discord.js";
+import { SlashCommandSubcommandBuilder, EmbedBuilder } from "discord.js";
 import { SubCommand } from "../../../Model/command";
 import { solveModel } from "../../../Database/connect";
 import { 
@@ -47,7 +47,7 @@ export const command: SubCommand = {
         
         if (interaction.guild?.ownerId !== interaction.user.id) {
             interaction.reply("Only the server owner can delete solve lists.");
-            return
+            return;
         }
         
         await solveModel.deleteOne({ctf_id: ctfData.id, challenge: challengeName, category: category});
@@ -55,9 +55,18 @@ export const command: SubCommand = {
         // Update thread name to show unsolved status
         await markThreadAsUnsolved(interaction.channel!);
         
-        return interaction.reply({ content: `Challenge solve for "[${category}] ${challengeName}" has been deleted`, ephemeral: true });
+        // Send notification in the thread
+        if (interaction.channel && interaction.channel.isThread()) {
+            const threadNotificationEmbed = new EmbedBuilder()
+                .setColor('#ff6600')
+                .setTitle('↩️ Challenge Solve Revoked')
+                .setDescription(`The solve status for this challenge has been revoked by <@${interaction.user.id}>`)
+                .setTimestamp()
+                .setFooter({ text: 'Challenge Status Update', iconURL: 'https://tcp1p.team/favicon.ico' });
+            
+            await interaction.reply({ embeds: [threadNotificationEmbed] });
+        }
+        
+        await interaction.reply({ content: `Challenge solve for "[${category}] ${challengeName}" has been deleted`, flags: ["Ephemeral"] });
     },
 };
-
-
-

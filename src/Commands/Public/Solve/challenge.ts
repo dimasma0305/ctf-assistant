@@ -77,6 +77,18 @@ export const command: SubCommand = {
         // Update thread name to show solved status
         await markThreadAsSolved(interaction.channel!);
         
+        // Send notification in the thread
+        if (interaction.channel && interaction.channel.isThread()) {
+            const threadNotificationEmbed = new EmbedBuilder()
+                .setColor('#00ff00')
+                .setTitle('🎉 Challenge Solved!')
+                .setDescription(`This challenge has been marked as solved by ${users.map(user => `<@${user}>`).join(', ')}`)
+                .setTimestamp()
+                .setFooter({ text: 'Challenge Status Update', iconURL: 'https://tcp1p.team/favicon.ico' });
+            
+            await interaction.reply({ embeds: [threadNotificationEmbed] });
+        }
+        
         await interaction.reply({ content: "success", flags: ["Ephemeral"] });
     },
 };
