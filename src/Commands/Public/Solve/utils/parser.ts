@@ -133,8 +133,7 @@ export async function updateThreadStatus(challenges: ParsedChallenge[], channel:
 
                 if (existingThread) {
                     // Fetch the first message (bot's initial message)
-                    const messages = await existingThread.messages.fetch({ limit: 1 });
-                    const firstMessage = messages.first();
+                    const firstMessage = await existingThread.fetchStarterMessage()
                     
                     if (firstMessage && firstMessage.author.bot) {
                         // Create updated challenge info
