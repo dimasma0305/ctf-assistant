@@ -22,7 +22,8 @@ import OpenAI from "openai";
 import { SessionScheduler } from "./Services/SessionScheduler";
 
 const openai = new OpenAI({
-  "apiKey": OPENAI_API_KEY
+  "apiKey": OPENAI_API_KEY,
+  baseURL: "https://api.deepseek.com"
 })
 
 const {
