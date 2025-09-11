@@ -27,78 +27,39 @@ interface UserScore {
 }
 
 /**
- * Calculate fair score based on:
- * - Challenge points
- * - CTF weight (difficulty multiplier)
- * - Diversity bonus (solving challenges from multiple CTFs)
- * - Category diversity bonus
- * - Diminishing returns for same CTF
+ * Calculate normalized score based on:
+ * - Challenge points normalized by total CTF points (percentage of CTF completion)
+ * - CTF weight as the only differentiating multiplier
+ * - Makes all CTFs equal in base scoring regardless of their internal point systems
  */
 export class FairScoringSystem {
     
     /**
-     * Calculate base score for a solve
+     * Calculate normalized score for a solve
      */
-    private static calculateBaseScore(challengePoints: number, ctfWeight: number): number {
-        // Base formula: points * (weight / 25) where 25 is average CTF weight
-        // This ensures that higher weight CTFs give proportionally more points
-        return challengePoints * (ctfWeight / 25.0);
+    private static calculateBaseScore(challengePoints: number, ctfWeight: number, ctfTotalPoints: number): number {
+        // Normalize challenge score by dividing by total CTF points (percentage of CTF)
+        // Then multiply by CTF weight as the only differentiating factor
+        // This makes all CTFs equal in base scoring, with only weight as multiplier
+        const normalizedScore = challengePoints / ctfTotalPoints;
+        return normalizedScore * ctfWeight;
     }
 
     /**
-     * Apply diminishing returns for multiple solves in same CTF
-     */
-    private static applyDiminishingReturns(baseScore: number, solveCountInCTF: number): number {
-        // Diminishing returns: 1.0, 0.9, 0.8, 0.7, 0.6, 0.5 (minimum)
-        const multiplier = Math.max(0.5, 1.0 - (solveCountInCTF - 1) * 0.1);
-        return baseScore * multiplier;
-    }
-
-    /**
-     * Calculate diversity bonus based on number of unique CTFs and categories
-     */
-    private static calculateDiversityBonus(
-        totalScore: number, 
-        ctfCount: number, 
-        categoryCount: number
-    ): number {
-        // CTF diversity: bonus for participating in multiple CTFs
-        const ctfDiversityBonus = Math.min(ctfCount * 0.05, 0.3); // Max 30% bonus
-        
-        // Category diversity: bonus for solving different types of challenges
-        const categoryDiversityBonus = Math.min(categoryCount * 0.02, 0.2); // Max 20% bonus
-        
-        return totalScore * (ctfDiversityBonus + categoryDiversityBonus);
-    }
-
-    /**
-     * Calculate time bonus for early solves (within first 24 hours of CTF)
-     */
-    private static calculateTimeBonus(
-        solve: UserSolve, 
-        ctfStartTime: Date, 
-        baseScore: number
-    ): number {
-        const solveTime = solve.solved_at.getTime();
-        const startTime = ctfStartTime.getTime();
-        const hoursFromStart = (solveTime - startTime) / (1000 * 60 * 60);
-        
-        // Early solve bonus: decreases from 20% to 0% over first 24 hours
-        if (hoursFromStart <= 24) {
-            const timeMultiplier = Math.max(0, 0.2 * (1 - hoursFromStart / 24));
-            return baseScore * timeMultiplier;
-        }
-        
-        return 0;
-    }
-
-    /**
-     * Get user scores with fair scoring algorithm
+     * Get user scores with normalized scoring algorithm
      */
     static async calculateUserScores(globalQuery: any = {}): Promise<Map<string, UserScore>> {
         const solves = await solveModel.find(globalQuery).lean();
         const userScores = new Map<string, UserScore>();
         const ctfCache = new Map<string, any>();
+
+        // Calculate total points for each CTF for normalization
+        const ctfTotalPoints = new Map<string, number>();
+        for (const solve of solves) {
+            const ctfId = solve.ctf_id || '';
+            const points = solve.points || 100;
+            ctfTotalPoints.set(ctfId, (ctfTotalPoints.get(ctfId) || 0) + points);
+        }
 
         // Group solves by user
         for (const solve of solves) {
@@ -129,39 +90,15 @@ export class FairScoringSystem {
 
         // Calculate scores for each user
         for (const [userId, userScore] of userScores) {
-            const ctfSolveCounts = new Map<string, number>();
-            
             for (const solve of userScore.recentSolves) {
-                // Get CTF data (cached or fetch)
-                let ctfData;
-                if (!ctfCache.has(solve.ctf_id)) {
-                    try {
-                        ctfData = await infoEvent(solve.ctf_id);
-                        ctfCache.set(solve.ctf_id, ctfData);
-                    } catch (error) {
-                        console.error(`Error fetching CTF ${solve.ctf_id}:`, error);
-                        // Use default values if fetch fails
-                        ctfData = { weight: 25, title: `CTF ${solve.ctf_id}`, start: new Date() };
-                        ctfCache.set(solve.ctf_id, ctfData);
-                    }
-                } else {
-                    ctfData = ctfCache.get(solve.ctf_id);
+                const ctfData = await infoEvent(solve.ctf_id);
+                if (ctfData.weight === 0) {
+                    ctfData.weight = 10;
                 }
 
-                // Track solve count for this CTF (for diminishing returns)
-                const currentCtfSolves = ctfSolveCounts.get(solve.ctf_id) || 0;
-                ctfSolveCounts.set(solve.ctf_id, currentCtfSolves + 1);
-
-                // Calculate base score
-                const baseScore = this.calculateBaseScore(solve.points, ctfData.weight);
-                
-                // Apply diminishing returns
-                const diminishedScore = this.applyDiminishingReturns(baseScore, currentCtfSolves + 1);
-                
-                // Calculate time bonus
-                const timeBonus = this.calculateTimeBonus(solve, ctfData.start, baseScore);
-                
-                const totalSolveScore = diminishedScore + timeBonus;
+                // Calculate normalized score
+                const ctfTotal = ctfTotalPoints.get(solve.ctf_id) || solve.points;
+                const totalSolveScore = this.calculateBaseScore(solve.points, ctfData.weight, ctfTotal);
                 
                 // Update user stats
                 userScore.totalScore += totalSolveScore;
@@ -185,15 +122,7 @@ export class FairScoringSystem {
                 ctfBreakdown.score += totalSolveScore;
             }
 
-            // Calculate diversity bonuses
             userScore.ctfCount = userScore.ctfBreakdown.size;
-            const diversityBonus = this.calculateDiversityBonus(
-                userScore.totalScore,
-                userScore.ctfCount,
-                userScore.categories.size
-            );
-            
-            userScore.totalScore += diversityBonus;
             
             // Sort recent solves by score descending
             userScore.recentSolves = userScore.recentSolves

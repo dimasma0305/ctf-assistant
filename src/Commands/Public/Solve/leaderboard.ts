@@ -137,7 +137,7 @@ export const command: SubCommand = {
                 },
                 {
                     name: 'Scoring System',
-                    value: `📊 Challenge points × CTF weight\n🔄 Diminishing returns per CTF\n🌟 Diversity bonuses\n⏰ Early solve bonuses`,
+                    value: `📊 Normalized challenge score × CTF weight\n⚖️ All CTFs weighted equally regardless of point system`,
                     inline: true
                 }
             );

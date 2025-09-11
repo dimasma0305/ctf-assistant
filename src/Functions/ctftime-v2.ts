@@ -45,17 +45,6 @@ async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent
         }
 
         if (cachedEvent && useCache) {
-            // Check if weight is 0 and handle fallback
-            let finalWeight = cachedEvent.weight;
-            
-            if (cachedEvent.weight === 0) {
-                // Check if we should use fallback weight (past retry period)
-                const retryEntry = await WeightRetryModel.findOne({ ctf_id: id });
-                if (retryEntry && new Date() > retryEntry.retry_until) {
-                    finalWeight = 10; // Use fallback weight
-                }
-            }
-            
             // Return cached data in CTFEvent format
             return {
                 organizers: (cachedEvent.organizers || []).map((org: any) => ({
@@ -65,7 +54,7 @@ async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent
                 onsite: cachedEvent.onsite || false,
                 finish: cachedEvent.finish,
                 description: cachedEvent.description || '',
-                weight: finalWeight,
+                weight: cachedEvent.weight,
                 title: cachedEvent.title,
                 url: cachedEvent.url || '',
                 is_votable_now: false,
