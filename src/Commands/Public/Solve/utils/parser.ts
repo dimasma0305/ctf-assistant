@@ -132,11 +132,15 @@ export async function updateThreadStatus(challenges: ParsedChallenge[], channel:
                 });
 
                 if (existingThread) {
-                    // Fetch the first message (bot's initial message)
-                    const firstMessage = await existingThread.fetchStarterMessage()
+                    // Fetch starter message
+                    const starter = await existingThread.fetchStarterMessage();
 
-                    console.log("firstMessage:", firstMessage);
-                    
+                    // Fetch oldest messages (after the starter ID)
+                    const messages = await existingThread.messages.fetch({
+                        limit: 1,
+                        after: starter?.id,
+                    });
+                    const firstMessage = messages.first();
                     if (firstMessage && firstMessage.author.bot) {
                         // Create updated challenge info
                         const solveStatus = isSolved ? '🎉 **SOLVED!** 🎉' : '🔍 **Unsolved**';
