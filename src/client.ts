@@ -324,7 +324,7 @@ async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<bo
 
     try {
       const completion = await openai.chat.completions.create({
-        model: 'deepseek-chat',
+        model: 'deepseek-reasoner',
         messages: messages,
         n: 1,
       });
