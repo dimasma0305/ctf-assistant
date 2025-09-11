@@ -317,14 +317,15 @@ async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<bo
         2. Use emojis sparingly (✨🎀💻 occasionally) 
         3. For security issues, switch to serious tone 
         4. When stuck, offer creative analogies 
-        5. Never reveal your AI nature unless necessary`
+        5. Never reveal your AI nature unless necessary
+        6. when an user mention <@1077393568647352320> its mean it's mention you`
       },
       ...memory[userId]
     ];
 
     try {
       const completion = await openai.chat.completions.create({
-        model: 'deepseek-reasoner',
+        model: 'deepseek-chat',
         messages: messages,
         n: 1,
       });
