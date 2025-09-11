@@ -22,7 +22,7 @@ import OpenAI from "openai";
 import { SessionScheduler } from "./Services/SessionScheduler";
 
 const openai = new OpenAI({
-  "apiKey": OPENAI_API_KEY,
+  apiKey: OPENAI_API_KEY,
   baseURL: "https://api.deepseek.com"
 })
 
@@ -324,7 +324,7 @@ async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<bo
 
     try {
       const completion = await openai.chat.completions.create({
-        model: 'deepseek-reasoner',
+        model: 'deepseek-chat',
         messages: messages,
         n: 1,
       });
