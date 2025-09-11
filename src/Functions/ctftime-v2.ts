@@ -1,4 +1,4 @@
-import { CTFCacheModel } from '../Database/connect';
+import { CTFCacheModel, WeightRetryModel } from '../Database/connect';
 
 interface Duration {
     hours: number;
@@ -45,6 +45,17 @@ async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent
         }
 
         if (cachedEvent && useCache) {
+            // Check if weight is 0 and handle fallback
+            let finalWeight = cachedEvent.weight;
+            
+            if (cachedEvent.weight === 0) {
+                // Check if we should use fallback weight (past retry period)
+                const retryEntry = await WeightRetryModel.findOne({ ctf_id: id });
+                if (retryEntry && new Date() > retryEntry.retry_until) {
+                    finalWeight = 10; // Use fallback weight
+                }
+            }
+            
             // Return cached data in CTFEvent format
             return {
                 organizers: (cachedEvent.organizers || []).map((org: any) => ({
@@ -54,7 +65,7 @@ async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent
                 onsite: cachedEvent.onsite || false,
                 finish: cachedEvent.finish,
                 description: cachedEvent.description || '',
-                weight: cachedEvent.weight,
+                weight: finalWeight,
                 title: cachedEvent.title,
                 url: cachedEvent.url || '',
                 is_votable_now: false,
@@ -110,6 +121,9 @@ async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent
             { upsert: true, new: true }
         );
 
+        // Handle weight = 0 (not assigned yet)
+        await handleWeightRetry(ctfEvent, id);
+
         return ctfEvent;
     } catch (error) {
         console.error(`Error fetching/caching CTF event ${id}:`, error);
@@ -131,6 +145,39 @@ async function getUpcommingOnlineEvent(days: number): Promise<CTFEvent[]> {
         return ctfEvent.location == "" && ctfEvent.onsite == false
     })
     return ctfEvents
+}
+
+/**
+ * Handle weight retry logic for CTFs with weight = 0
+ */
+async function handleWeightRetry(ctfEvent: CTFEvent, id: string) {
+    if (ctfEvent.weight === 0) {
+        const oneWeekAfterEnd = new Date(ctfEvent.finish);
+        oneWeekAfterEnd.setDate(oneWeekAfterEnd.getDate() + 7);
+        
+        // Create or update weight retry entry
+        await WeightRetryModel.findOneAndUpdate(
+            { ctf_id: id },
+            {
+                ctf_id: id,
+                ctf_title: ctfEvent.title,
+                ctf_end_time: ctfEvent.finish,
+                retry_until: oneWeekAfterEnd,
+                last_retry: new Date(),
+                $inc: { retry_count: 1 },
+                is_active: new Date() <= oneWeekAfterEnd
+            },
+            { upsert: true, new: true }
+        );
+        
+        console.log(`📊 CTF ${ctfEvent.title} (${id}) has weight 0 - scheduled for daily retry until ${oneWeekAfterEnd.toDateString()}`);
+    } else {
+        // Weight is assigned, deactivate retry if exists
+        await WeightRetryModel.updateOne(
+            { ctf_id: id },
+            { $set: { is_active: false } }
+        );
+    }
 }
 
 export { infoEvent, getUpcommingOnlineEvent };

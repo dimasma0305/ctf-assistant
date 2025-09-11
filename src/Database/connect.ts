@@ -5,6 +5,7 @@ import messageSchema from './messageSchema';
 import sessionStateSchema from './sessionStateSchema';
 import fetchCommandSchema from './fetchCommandSchema';
 import ctfCacheSchema from './ctfCacheSchema';
+import weightRetrySchema from './weightRetrySchema';
 
 const MONGO_URI = process.env.MONGO_URI || ""
 
@@ -18,5 +19,6 @@ export const MessageModel = mongoose.model("Message", messageSchema)
 export const SessionStateModel = mongoose.model("SessionState", sessionStateSchema)
 export const FetchCommandModel = mongoose.model("FetchCommand", fetchCommandSchema)
 export const CTFCacheModel = mongoose.model("CTFCache", ctfCacheSchema)
+export const WeightRetryModel = mongoose.model("WeightRetry", weightRetrySchema)
 
-export default { connect, EventModel, solveModel, MessageModel, SessionStateModel, FetchCommandModel, CTFCacheModel }
+export default { connect, EventModel, solveModel, MessageModel, SessionStateModel, FetchCommandModel, CTFCacheModel, WeightRetryModel }
