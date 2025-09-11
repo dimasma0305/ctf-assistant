@@ -1,7 +1,7 @@
 
 import { SubCommand } from "../../../Model/command";
 import { EmbedBuilder, SlashCommandSubcommandBuilder } from "discord.js";
-import { solveModel } from "../../../Database/connect";
+import { solveModel, ChallengeModel } from "../../../Database/connect";
 import { 
     getChallengeInfo, 
     getChannelAndCTFData, 
@@ -9,6 +9,38 @@ import {
     extractUserIdsFromMentions, 
     markThreadAsSolved 
 } from "./utils";
+
+// Helper function to create or update challenge data
+async function createOrUpdateChallenge(challengeName: string, category: string, ctfId: string, points: number = 100) {
+    // Try to find existing challenge
+    let challenge = await ChallengeModel.findOne({
+        ctf_id: ctfId,
+        name: challengeName
+    });
+
+    if (challenge) {
+        // Update existing challenge
+        challenge.category = category;
+        challenge.updated_at = new Date();
+        await challenge.save();
+        return challenge;
+    } else {
+        // Create new challenge
+        challenge = new ChallengeModel({
+            challenge_id: `${ctfId}-${challengeName.replace(/[^a-zA-Z0-9]/g, '-')}`,
+            name: challengeName,
+            category: category,
+            points: points,
+            ctf_id: ctfId,
+            is_solved: false,
+            solves: 0,
+            created_at: new Date(),
+            updated_at: new Date()
+        });
+        await challenge.save();
+        return challenge;
+    }
+}
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
@@ -49,20 +81,30 @@ export const command: SubCommand = {
             interaction.reply("This channel does not have a valid CTF event associated with it.");
             return;
         }
-        const existingSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: ctfData.id });
+
+        // Create or update challenge in database
+        const challengeData = await createOrUpdateChallenge(challengeName, category, ctfData.id.toString(), 100);
+        
+        const existingSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: ctfData.id.toString() });
         if (existingSolve) {
             existingSolve.users = users;
             existingSolve.category = category; // Update category in case it changed
+            existingSolve.challenge_ref = challengeData._id; // Update challenge reference
             await existingSolve.save();
         } else {
             const newSolve = new solveModel({
                 challenge: challengeName,
-                ctf_id: ctfData.id,
+                ctf_id: ctfData.id.toString(),
                 category: category,
-                users: users
+                users: users,
+                challenge_ref: challengeData._id,
             });
             await newSolve.save();
         }
+
+        // Mark challenge as solved
+        challengeData.is_solved = true;
+        await challengeData.save();
         
         const winnerEmbed = new EmbedBuilder()
             .setColor('#0099ff')

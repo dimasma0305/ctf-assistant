@@ -2,7 +2,7 @@ import { BaseGuildTextChannel, TextChannel } from "discord.js";
 import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 import cron from "node-cron";
-import { FetchCommandModel, WeightRetryModel } from "../../Database/connect";
+import { FetchCommandModel, WeightRetryModel, ChallengeModel } from "../../Database/connect";
 import { parseChallenges, updateThreadStatus } from "../../Commands/Public/Solve/utils/parser";
 import { infoEvent } from "../../Functions/ctftime-v2";
 
@@ -102,6 +102,9 @@ async function updateChallengesFromFetch(jsonData: string, fetchCmd: any, channe
             return;
         }
 
+        // Save/update challenges in database
+        await saveChallengesFromFetch(challenges, fetchCmd.ctf_id);
+
         // Update thread status for each challenge
         await updateThreadStatus(challenges, channel, fetchCmd.ctf_id);
         
@@ -109,6 +112,63 @@ async function updateChallengesFromFetch(jsonData: string, fetchCmd: any, channe
         
     } catch (error) {
         console.error("Error updating challenges from fetch:", error);
+    }
+}
+
+// Helper function to save/update challenges from fetch data
+async function saveChallengesFromFetch(challenges: any[], ctfId: string) {
+    for (const challengeData of challenges) {
+        try {
+            // Find existing challenge or create new one
+            let challenge = await ChallengeModel.findOne({
+                ctf_id: ctfId,
+                name: challengeData.name
+            });
+
+            if (challenge) {
+                // Update existing challenge
+                challenge.category = challengeData.category;
+                challenge.points = challengeData.points;
+                challenge.solves = challengeData.solves;
+                challenge.is_solved = challengeData.solved;
+                challenge.tags = challengeData.tags || [];
+                challenge.updated_at = new Date();
+                
+                if (challengeData.description) {
+                    challenge.description = challengeData.description;
+                }
+                
+                // Store platform-specific data
+                challenge.platform_data = {
+                    id: challengeData.id,
+                    ...challenge.platform_data
+                };
+
+                await challenge.save();
+            } else {
+                // Create new challenge
+                challenge = new ChallengeModel({
+                    challenge_id: `${ctfId}-${challengeData.name.replace(/[^a-zA-Z0-9]/g, '-')}`,
+                    name: challengeData.name,
+                    category: challengeData.category,
+                    points: challengeData.points,
+                    description: challengeData.description || "",
+                    solves: challengeData.solves,
+                    tags: challengeData.tags || [],
+                    ctf_id: ctfId,
+                    is_solved: challengeData.solved,
+                    platform_data: {
+                        id: challengeData.id
+                    },
+                    created_at: new Date(),
+                    updated_at: new Date()
+                });
+
+                await challenge.save();
+            }
+        } catch (error) {
+            console.error(`Error saving challenge ${challengeData.name}:`, error);
+        }
     }
 }
 

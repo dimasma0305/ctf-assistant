@@ -1,4 +1,4 @@
-import { solveModel, CTFCacheModel } from '../Database/connect';
+import { solveModel, CTFCacheModel, ChallengeModel } from '../Database/connect';
 import { infoEvent } from './ctftime-v2';
 
 interface UserSolve {
@@ -49,19 +49,39 @@ export class FairScoringSystem {
      * Get user scores with normalized scoring algorithm
      */
     static async calculateUserScores(globalQuery: any = {}): Promise<Map<string, UserScore>> {
-        const solves = await solveModel.find(globalQuery).lean();
+        // Get solves with populated challenge data
+        const solves = await solveModel.find(globalQuery).populate('challenge_ref').lean();
         const userScores = new Map<string, UserScore>();
 
         // Calculate total points for each CTF for normalization
         const ctfTotalPoints = new Map<string, number>();
         for (const solve of solves) {
             const ctfId = solve.ctf_id || '';
-            const points = solve.points || 100;
+            
+            // Get points from challenge reference or fallback to default
+            let points = 100; // default fallback
+            if (solve.challenge_ref && typeof solve.challenge_ref === 'object' && solve.challenge_ref !== null && 'points' in solve.challenge_ref) {
+                const challengeRef = solve.challenge_ref as any;
+                points = challengeRef.points || 100;
+            }
+            
             ctfTotalPoints.set(ctfId, (ctfTotalPoints.get(ctfId) || 0) + points);
         }
 
         // Group solves by user
         for (const solve of solves) {
+            // Get challenge data from populated reference
+            let challengeName = solve.challenge || 'Unknown';
+            let challengeCategory = solve.category || 'Unknown';
+            let challengePoints = 100;
+
+            if (solve.challenge_ref && typeof solve.challenge_ref === 'object' && solve.challenge_ref !== null && 'points' in solve.challenge_ref) {
+                const challengeRef = solve.challenge_ref as any;
+                challengeName = challengeRef.name || challengeName;
+                challengeCategory = challengeRef.category || challengeCategory;
+                challengePoints = challengeRef.points || 100;
+            }
+
             for (const userId of solve.users) {
                 if (!userScores.has(userId)) {
                     userScores.set(userId, {
@@ -78,9 +98,9 @@ export class FairScoringSystem {
                 const userScore = userScores.get(userId)!;
                 userScore.recentSolves.push({
                     ctf_id: solve.ctf_id || '',
-                    challenge: solve.challenge || 'Unknown',
-                    category: solve.category || 'Unknown',
-                    points: solve.points || 100,
+                    challenge: challengeName,
+                    category: challengeCategory,
+                    points: challengePoints,
                     solved_at: solve.solved_at || new Date(),
                     users: solve.users || []
                 });
