@@ -107,7 +107,6 @@ export class ReactionRoleEvent {
     initialChannel: TextChannel;
     options: EventListenerOptions;
     discussChannel?: TextChannel;
-    writeupChannel?: TextChannel;
     role?: Role;
     constructor(guild: Guild, initialChannel: TextChannel, options: EventListenerOptions) {
         this.options = options
@@ -178,13 +177,6 @@ export class ReactionRoleEvent {
             }, 100);
         })
 
-        this.writeupChannel = await this.createDefaultChannelIfNotExist(`${ctfName} writeup`, role, async (channel) => {
-            await channel.send({
-                content: `# ${ctfName} Writeup 🚀
-
-Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${ctfName}! 😊 Ayo, mari kita berbagi pengetahuan dan kegembiraan setelah menyelesaikan CTF ini. Silakan bagikan Writeup (WU) kalian atau WU dari partisipan lain di channel ini. Jangan ragu untuk bertanya atau memberi saran jika ada yang perlu dibahas. Semoga kita semua bisa belajar dan tumbuh bersama! 🌟 UwU`
-            })
-        })
     }
 
     async createEventRoleIfNotExist(ctfName: string) {
@@ -207,14 +199,6 @@ Selamat datang di channel ini, tempatnya untuk berbagi writeup seru dari CTF ${c
         const channels = await this.guild.channels.fetch()
         const name = translate(this.options.ctfEvent.title)
         var channel = channels.find((channel) => channel?.name === name) as TextChannel
-        if (!(channel instanceof TextChannel)) return
-        return channel
-    }
-    async getWriteupChannel(){
-        const channels = await this.guild.channels.fetch()
-        const name = translate(`${this.options.ctfEvent.title} writeup`)
-        var channel = channels.find((channel) => channel?.name === name) as TextChannel
-        if (!(channel instanceof TextChannel)) return
         if (!(channel instanceof TextChannel)) return
         return channel
     }
@@ -321,7 +305,7 @@ ${weight}
         };
 
         const scheduleEndMessage = async () => {
-            await this.discussChannel?.send(`Hai teman-teman, akhirnya <@&${role.id}> sudah berakhir, silahkan yang ingin menaruh writeup, bisa menaruh writeupnya di <#${this.writeupChannel?.id}> :P`);
+            await this.discussChannel?.send(`Hai teman-teman, akhirnya <@&${role.id}> sudah berakhir! :P`);
             stopTasks();
             await this.archive()
         };
@@ -342,9 +326,7 @@ ${weight}
         }
         if (!archivesCategory) return;
         const discussChannel =  await this.getDiscussChannel()
-        const writeupChannel =  await this.getWriteupChannel()
         await discussChannel?.setParent(archivesCategory.id);
-        await writeupChannel?.setParent(archivesCategory.id);
         
         // Clean up the message entries in database
         try {
@@ -452,7 +434,6 @@ Ayo semangat belajar bareng-bareng dan tingkatkan skill cyber security kita di C
             embeds: [{
                 fields: [
                     { name: "**Discuss Channel**", value: `<#${this.discussChannel?.id}>` },
-                    { name: "**Writeup Channel**", value: `<#${this.writeupChannel?.id}>` },
                 ]
             }]
         });

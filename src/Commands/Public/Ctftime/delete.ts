@@ -76,9 +76,7 @@ export const command: SubCommand = {
         });
         guild.channels.cache.forEach((channel) => {
             const chat_channel = translate(ctfTitle)
-            const writeup_channel = translate(`${chat_channel} writeup`)
-            if (channel.name === chat_channel ||
-                channel.name === writeup_channel) {
+            if (channel.name === chat_channel) {
                 channel.delete()
                 return true
             }
