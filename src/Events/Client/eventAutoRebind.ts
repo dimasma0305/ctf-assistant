@@ -26,7 +26,7 @@ export const event: Event = {
                 const match = location.match(EVENT_ID_REGEX);
                 if (!match) return
                 const id = match[1]
-                const ctfEvent = await infoEvent(id)
+                const ctfEvent = await infoEvent(id, false)
                 const translatedEventName = translate(eventName)
                 const channel = guild.channels.cache.find(channel => channel.name === translatedEventName)
                 if (!(channel instanceof TextChannel)) return;

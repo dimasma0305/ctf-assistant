@@ -4,6 +4,7 @@ import solveSchema from './solveSchema';
 import messageSchema from './messageSchema';
 import sessionStateSchema from './sessionStateSchema';
 import fetchCommandSchema from './fetchCommandSchema';
+import ctfCacheSchema from './ctfCacheSchema';
 
 const MONGO_URI = process.env.MONGO_URI || ""
 
@@ -16,5 +17,6 @@ export const solveModel = mongoose.model("Solve", solveSchema)
 export const MessageModel = mongoose.model("Message", messageSchema)
 export const SessionStateModel = mongoose.model("SessionState", sessionStateSchema)
 export const FetchCommandModel = mongoose.model("FetchCommand", fetchCommandSchema)
+export const CTFCacheModel = mongoose.model("CTFCache", ctfCacheSchema)
 
-export default { connect, EventModel, solveModel, MessageModel, SessionStateModel, FetchCommandModel }
+export default { connect, EventModel, solveModel, MessageModel, SessionStateModel, FetchCommandModel, CTFCacheModel }

@@ -24,7 +24,7 @@ export const command: SubCommand = {
         var title: string | null = null
         const id = options.getString("id", false);
         if (id){
-            const data = await infoEvent(id);
+            const data = await infoEvent(id, false);
             title = data.title
         } else {
             title = options.getString("title", false)
@@ -44,7 +44,7 @@ export const command: SubCommand = {
                 if (typeof data === 'object' && data !== null && 'title' in data && typeof data.title === 'string') {
                     title = data.title;
                 } else {
-                    const info = await infoEvent(data.id)
+                    const info = await infoEvent(data.id, false)
                     title = info.title
                 }
             } catch (e) {

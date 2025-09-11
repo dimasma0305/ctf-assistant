@@ -2,11 +2,16 @@ import { SubCommand } from "../../../Model/command";
 import { EmbedBuilder, SlashCommandSubcommandBuilder } from "discord.js";
 import { solveModel } from "../../../Database/connect";
 import { getChannelAndCTFData, validateCTFEvent } from "./utils";
+import FairScoringSystem from "../../../Functions/scoringSystem";
 
 interface LeaderboardEntry {
     userId: string;
-    solves: number;
-    challenges: string[];
+    totalScore: number;
+    solveCount: number;
+    ctfCount: number;
+    categories: Set<string>;
+    recentSolves: any[];
+    ctfBreakdown: Map<string, any>;
 }
 
 export const command: SubCommand = {
@@ -56,10 +61,10 @@ export const command: SubCommand = {
         }
 
         try {
-            // Aggregate solves by user
-            const solves = await solveModel.find(query).lean();
+            // Get leaderboard using fair scoring system
+            const leaderboard = await FairScoringSystem.getLeaderboard(query, limit);
             
-            if (solves.length === 0) {
+            if (leaderboard.length === 0) {
                 const embed = new EmbedBuilder()
                     .setColor('#ff9900')
                     .setTitle(`${isGlobal ? 'Global ' : ''}Leaderboard`)
@@ -71,30 +76,6 @@ export const command: SubCommand = {
                 return;
             }
 
-            // Create a map to track user solve counts and challenges
-            const userStats = new Map<string, LeaderboardEntry>();
-
-            for (const solve of solves) {
-                for (const userId of solve.users) {
-                    if (!userStats.has(userId)) {
-                        userStats.set(userId, {
-                            userId,
-                            solves: 0,
-                            challenges: []
-                        });
-                    }
-                    
-                    const entry = userStats.get(userId)!;
-                    entry.solves += 1;
-                    entry.challenges.push(`**[${solve.category || 'Unknown'}]** ${solve.challenge}`);
-                }
-            }
-
-            // Sort by number of solves (descending)
-            const leaderboard = Array.from(userStats.values())
-                .sort((a, b) => b.solves - a.solves)
-                .slice(0, limit);
-
             // Create embed
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
@@ -102,10 +83,13 @@ export const command: SubCommand = {
                 .setTimestamp()
                 .setFooter({ text: 'CTF Assistant', iconURL: 'https://tcp1p.team/favicon.ico' });
 
-            if (!isGlobal && solves.length > 0) {
-                // Get CTF name from first solve
-                const firstSolve = solves[0];
-                embed.setDescription(`Showing results for CTF ID: \`${firstSolve.ctf_id}\``);
+            if (!isGlobal && leaderboard.length > 0) {
+                // Show CTF-specific description if available
+                const firstEntry = leaderboard[0];
+                if (firstEntry.ctfBreakdown.size === 1) {
+                    const ctfInfo = Array.from(firstEntry.ctfBreakdown.values())[0];
+                    embed.setDescription(`Showing results for **${ctfInfo.ctfTitle}** (Weight: ${ctfInfo.weight})`);
+                }
             }
 
             // Create leaderboard description
@@ -117,27 +101,44 @@ export const command: SubCommand = {
                 const position = i + 1;
                 const medal = i < 3 ? medals[i] : `**${position}.**`;
                 
-                description += `${medal} <@${entry.userId}> - **${entry.solves}** solve${entry.solves !== 1 ? 's' : ''}\n`;
+                description += `${medal} <@${entry.userId}> - **${Math.round(entry.totalScore)}** pts (${entry.solveCount} solves)\n`;
                 
-                // Add some challenge details for top 3
-                if (i < 3 && entry.challenges.length > 0) {
-                    const challengeList = entry.challenges.slice(0, 3).join(', ');
-                    const extraChallenges = entry.challenges.length > 3 ? ` (+${entry.challenges.length - 3} more)` : '';
-                    description += `   └ *Recent:* ${challengeList}${extraChallenges}\n`;
+                // Add detailed stats for top 3
+                if (i < 3) {
+                    const diversityStats = [];
+                    if (entry.ctfCount > 1) diversityStats.push(`${entry.ctfCount} CTFs`);
+                    if (entry.categories.size > 1) diversityStats.push(`${entry.categories.size} categories`);
+                    
+                    if (diversityStats.length > 0) {
+                        description += `   └ *Diversity:* ${diversityStats.join(', ')}\n`;
+                    }
+                    
+                    // Show recent high-value solves
+                    if (entry.recentSolves.length > 0) {
+                        const topSolves = entry.recentSolves.slice(0, 3);
+                        const solveList = topSolves.map(s => `**[${s.category}]** ${s.challenge} (${s.points}pts)`).join(', ');
+                        description += `   └ *Top solves:* ${solveList}\n`;
+                    }
                 }
                 description += '\n';
             }
 
             // Add total statistics
-            const totalUniquePlayers = userStats.size;
-            const totalSolves = Array.from(userStats.values()).reduce((sum, entry) => sum + entry.solves, 0);
-            const uniqueChallenges = new Set(solves.map(solve => solve.challenge)).size;
+            const totalUniquePlayers = leaderboard.length;
+            const totalSolves = leaderboard.reduce((sum, entry) => sum + entry.solveCount, 0);
+            const totalScore = Math.round(leaderboard.reduce((sum, entry) => sum + entry.totalScore, 0));
+            const uniqueCTFs = new Set(leaderboard.flatMap(entry => Array.from(entry.ctfBreakdown.keys()))).size;
 
             embed.addFields(
                 { 
-                    name: 'Statistics', 
-                    value: `👥 **${totalUniquePlayers}** players\n🎯 **${totalSolves}** total solves\n🏁 **${uniqueChallenges}** unique challenges`, 
+                    name: 'Competition Stats', 
+                    value: `👥 **${totalUniquePlayers}** players\n🎯 **${totalSolves}** total solves\n🏆 **${totalScore}** total points\n🏁 **${uniqueCTFs}** unique CTFs`, 
                     inline: true 
+                },
+                {
+                    name: 'Scoring System',
+                    value: `📊 Challenge points × CTF weight\n🔄 Diminishing returns per CTF\n🌟 Diversity bonuses\n⏰ Early solve bonuses`,
+                    inline: true
                 }
             );
 

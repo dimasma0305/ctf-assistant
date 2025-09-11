@@ -12,6 +12,14 @@ export const solveSchema = {
     category: {
         type: String,
         default: "Unknown"
+    },
+    points: {
+        type: Number,
+        default: 100  // Default points for challenges without specified points
+    },
+    solved_at: {
+        type: Date,
+        default: Date.now
     }
 }
 

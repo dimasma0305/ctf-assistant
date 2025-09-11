@@ -62,7 +62,7 @@ export const command: SubCommand = {
                 return;
             }
 
-            ctfData = await infoEvent(id);
+            ctfData = await infoEvent(id, false);
             if (!ctfData.id) {
                 await interaction.editReply("This channel does not have a valid CTF event associated with it.");
                 return;

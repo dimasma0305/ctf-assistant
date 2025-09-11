@@ -22,7 +22,7 @@ export const command: SubCommand = {
     await interaction.deferReply({ flags: ["Ephemeral"] })
 
     const id = options.getString("id", true);
-    let ctfEvent = await infoEvent(id)
+    let ctfEvent = await infoEvent(id, false)
     const event = new ReactionRoleEvent(guild, channel,{
       ctfEvent: ctfEvent,
     })

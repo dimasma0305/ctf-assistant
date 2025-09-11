@@ -63,7 +63,7 @@ export const command: SubCommand = {
         weight: 0
       }
     } else {
-      ctfEvent = await infoEvent(id)
+      ctfEvent = await infoEvent(id, false)
     }
     const isPrivate = options.getBoolean("private") || false;
     const password = options.getString("password") || "";
