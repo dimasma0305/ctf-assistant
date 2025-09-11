@@ -128,6 +128,7 @@ export const command: SubCommand = {
                 .setFooter({ text: 'Challenge Status Update', iconURL: 'https://tcp1p.team/favicon.ico' });
             
             await interaction.reply({ embeds: [threadNotificationEmbed] });
+            return;
         }
         
         await interaction.reply({ content: "success", flags: ["Ephemeral"] });
