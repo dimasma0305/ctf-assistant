@@ -1,5 +1,5 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
-import { getChannelCache, updateChannelCache } from "./cache";
+import { getChannelCache, updateChannelCache, SimplifiedMessage } from "./cache";
 
 
 // Generate unique separator to prevent prompt injection
@@ -20,7 +20,7 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
     // Use cache if it has a reasonable number of preceding messages
     if (relevantCachedMessages.length >= 5) {
       console.log(`[Cache] HIT for channel ${channelId}. Using ${relevantCachedMessages.length} cached messages for context.`);
-      contextMessages = relevantCachedMessages.map((msg: any) => {
+      contextMessages = relevantCachedMessages.map((msg: SimplifiedMessage) => {
         const timestamp = new Date(msg.createdTimestamp).toLocaleTimeString('id-ID');
         const authorName = msg.member?.displayName || msg.author.username;
         const content = msg.content || '[attachment/embed]';
