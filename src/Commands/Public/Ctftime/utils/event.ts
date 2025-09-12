@@ -47,6 +47,7 @@ export async function createPrivateChannelIfNotExist(props: CreateChannelProps) 
 import { APIEmbed } from "discord.js";
 import moment from "moment"
 import { MyClient } from "../../../../Model/client";
+import { openai, isOpenAIConfigured } from "../../../../utils/openai";
 
 interface ScheduleEmbedTemplateProps {
     ctfEvent: CTFEvent;
@@ -93,6 +94,70 @@ export async function createRoleIfNotExist(props: createRoleProps) {
         })
     }
     return role
+}
+
+// Template messages for CTF end notifications
+const ctfEndMessageTemplates = [
+    `Hai teman-teman, akhirnya <@&{roleId}> sudah berakhir! :P`,
+    `Yeay! CTF <@&{roleId}> telah selesai! Semoga kalian dapat banyak ilmu baru! 🎉`,
+    `Selamat! <@&{roleId}> sudah berakhir. Time to celebrate! 🥳`,
+    `Well done everyone! <@&{roleId}> telah usai. Great job! 👏`,
+    `Horee! <@&{roleId}> sudah selesai. Kalian luar biasa! 💪`
+];
+
+// Function to generate dynamic CTF end messages using OpenAI with template fallback
+async function generateCtfEndMessage(ctfTitle: string, roleId: string): Promise<string> {
+    if (!isOpenAIConfigured()) {
+        console.log('🔄 OpenAI not configured, using template fallback');
+        const randomTemplate = ctfEndMessageTemplates[Math.floor(Math.random() * ctfEndMessageTemplates.length)];
+        return randomTemplate.replace('{roleId}', roleId);
+    }
+
+    try {
+        const completion = await openai.chat.completions.create({
+            model: 'deepseek-reasoner',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are Hackerika, an AI companion for the TCP1P Community. Generate a friendly, celebratory message in Indonesian to announce that a CTF competition has ended. The message should be encouraging, congratulatory, and mention the role. Use casual, fun language with emojis. Only return the message, nothing else. Use Indonesian language mixed with some English terms where appropriate.'
+                },
+                {
+                    role: 'user',
+                    content: `Generate an end message for CTF "${ctfTitle}" that just finished. Include <@&${roleId}> to mention the participants. Make it celebratory and encouraging.`
+                }
+            ],
+            max_tokens: 200,
+            temperature: 0.8,
+            n: 1,
+        });
+
+        const aiMessage = completion.choices[0].message.content;
+        if (aiMessage && aiMessage.trim().length > 0) {
+            console.log('✅ Generated dynamic CTF end message with OpenAI');
+            return aiMessage;
+        } else {
+            throw new Error('Empty response from OpenAI');
+        }
+    } catch (error) {
+        console.error('❌ Error generating CTF end message with OpenAI:', error);
+        
+        // Check if it's a token limit or rate limit error
+        if (error instanceof Error && (
+            error.message.includes('quota') || 
+            error.message.includes('limit') || 
+            error.message.includes('token') ||
+            error.message.includes('rate')
+        )) {
+            console.log('🔄 OpenAI token/rate limit reached, using template fallback');
+        } else {
+            console.log('🔄 OpenAI unavailable, using template fallback');
+        }
+        
+        // Fallback to random template message
+        const randomTemplate = ctfEndMessageTemplates[Math.floor(Math.random() * ctfEndMessageTemplates.length)];
+        console.log('📝 Using template message as fallback');
+        return randomTemplate.replace('{roleId}', roleId);
+    }
 }
 
 
@@ -305,7 +370,8 @@ ${weight}
         };
 
         const scheduleEndMessage = async () => {
-            await this.discussChannel?.send(`Hai teman-teman, akhirnya <@&${role.id}> sudah berakhir! :P`);
+            const endMessage = await generateCtfEndMessage(this.options.ctfEvent.title, role.id);
+            await this.discussChannel?.send(endMessage);
             stopTasks();
             await this.archive()
         };
