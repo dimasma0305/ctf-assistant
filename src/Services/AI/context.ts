@@ -23,7 +23,23 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
       contextMessages = relevantCachedMessages.map((msg: SimplifiedMessage) => {
         const timestamp = new Date(msg.createdTimestamp).toLocaleTimeString('id-ID');
         const authorName = msg.member?.displayName || msg.author.username;
-        const content = msg.content || '[attachment/embed]';
+        
+        let content = msg.content;
+        if (!content) {
+          if (msg.system || msg.type !== 0) {
+            // System messages (like welcome messages, pins, etc.)
+            content = '[system message]';
+          } else if (msg.attachments && msg.embeds) {
+            content = '[attachment & embed]';
+          } else if (msg.attachments) {
+            content = '[attachment]';
+          } else if (msg.embeds) {
+            content = '[embed]';
+          } else {
+            content = '[empty message]';
+          }
+        }
+        
         return `[${timestamp}] ${authorName}: ${content}`;
       });
     } else {
@@ -40,7 +56,23 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
       contextMessages = messageArray.map(msg => {
         const timestamp = new Date(msg.createdTimestamp).toLocaleTimeString('id-ID');
         const authorName = msg.member?.displayName || msg.author.username;
-        const content = msg.content || '[attachment/embed]';
+        
+        let content = msg.content;
+        if (!content) {
+          if (msg.system || msg.type !== 0) {
+            // System messages (like welcome messages, pins, etc.)
+            content = '[system message]';
+          } else if (msg.attachments.size > 0 && msg.embeds.length > 0) {
+            content = '[attachment & embed]';
+          } else if (msg.attachments.size > 0) {
+            content = '[attachment]';
+          } else if (msg.embeds.length > 0) {
+            content = '[embed]';
+          } else {
+            content = '[empty message]';
+          }
+        }
+        
         return `[${timestamp}] ${authorName}: ${content}`;
       });
     }

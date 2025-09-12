@@ -7,6 +7,8 @@ export interface SimplifiedMessage {
     id: string;
     content: string;
     createdTimestamp: number;
+    type: number;
+    system: boolean;
     author: {
         id: string;
         username: string;
@@ -16,6 +18,8 @@ export interface SimplifiedMessage {
         displayName: string;
         nickname: string | null;
     } | null;
+    attachments: boolean;
+    embeds: boolean;
 }
 
 export async function updateChannelCache(message: DiscordMessage) {
@@ -26,6 +30,8 @@ export async function updateChannelCache(message: DiscordMessage) {
         id: message.id,
         content: message.content,
         createdTimestamp: message.createdTimestamp,
+        type: message.type,
+        system: message.system,
         author: {
             id: message.author.id,
             username: message.author.username,
@@ -34,7 +40,9 @@ export async function updateChannelCache(message: DiscordMessage) {
         member: message.member ? {
             displayName: message.member.displayName,
             nickname: message.member.nickname
-        } : null
+        } : null,
+        attachments: message.attachments.size > 0,
+        embeds: message.embeds.length > 0
     };
     
     await MessageCache.findOneAndUpdate(
