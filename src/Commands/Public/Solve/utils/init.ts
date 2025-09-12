@@ -1,5 +1,5 @@
 import { CTFEvent } from "../../../../Functions/ctftime-v2";
-import { FetchCommandModel } from "../../../../Database/connect";
+import { FetchCommandModel, CTFCacheModel } from "../../../../Database/connect";
 
 // Interface for parsed fetch command
 interface ParsedFetchCommand {
@@ -113,10 +113,14 @@ async function saveFetchCommand(
     platform: string
 ) {
     try {
-        const ctfEndTime= new Date(ctfData.finish);
+        // Find the CTF in the cache to get its ObjectId
+        const ctfCache = await CTFCacheModel.findOne({ ctf_id: ctfData.id.toString() });
+        if (!ctfCache) {
+            throw new Error(`CTF with id ${ctfData.id} not found in cache`);
+        }
         
         const existingCommand = await FetchCommandModel.findOne({ 
-            ctf_id: ctfData.id.toString(),
+            ctf: ctfCache._id,
             channel_id: channelId 
         });
         
@@ -128,18 +132,16 @@ async function saveFetchCommand(
                 existingCommand.body = parsedFetch.body;
             }
             existingCommand.platform = platform;
-            existingCommand.ctf_end_time = ctfEndTime;
             existingCommand.is_active = true;
             await existingCommand.save();
         } else {
             const fetchCommandData: any = {
-                ctf_id: ctfData.id.toString(),
+                ctf: ctfCache._id,
                 channel_id: channelId,
                 url: parsedFetch.url,
                 method: parsedFetch.method,
                 headers: parsedFetch.headers,
                 platform: platform,
-                ctf_end_time: ctfEndTime,
                 is_active: true
             };
             

@@ -2,8 +2,9 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 export const fetchCommandSchema = {
-    ctf_id: {
-        type: String,
+    ctf: {
+        type: Schema.Types.ObjectId,
+        ref: 'CTFCache',
         required: true,
     },
     channel_id: {
@@ -31,10 +32,6 @@ export const fetchCommandSchema = {
         type: String,
         required: false,
         default: ''
-    },
-    ctf_end_time: {
-        type: Date,
-        required: true,
     },
     is_active: {
         type: Boolean,

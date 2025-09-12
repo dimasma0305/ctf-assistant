@@ -16,11 +16,18 @@ export const event: Event = {
         async function executeFetchCommands() {
             try {
                 const activeFetchCommands = await FetchCommandModel.find({
-                    is_active: true,
-                    ctf_end_time: { $gt: new Date() }
+                    is_active: true
+                }).populate({
+                    path: 'ctf',
+                    match: { finish: { $gt: new Date() } }
                 });
 
                 for (const fetchCmd of activeFetchCommands) {
+                    // Skip if CTF has finished (populate match will make ctf null if finished)
+                    if (!fetchCmd.ctf) {
+                        continue;
+                    }
+
                     try {
                         // Find the channel
                         const channel = client.channels.cache.get(fetchCmd.channel_id) as TextChannel;
@@ -55,11 +62,24 @@ export const event: Event = {
                     }
                 }
 
-                // Clean up expired fetch commands
-                await FetchCommandModel.updateMany(
-                    { ctf_end_time: { $lt: new Date() }, is_active: true },
-                    { $set: { is_active: false } }
-                );
+                // Clean up expired fetch commands by finding those with finished CTFs
+                const expiredCommands = await FetchCommandModel.find({
+                    is_active: true
+                }).populate({
+                    path: 'ctf',
+                    match: { finish: { $lt: new Date() } }
+                });
+
+                const expiredCommandIds = expiredCommands
+                    .filter(cmd => cmd.ctf) // Only commands where CTF is populated (meaning it matches the finished condition)
+                    .map(cmd => cmd._id);
+
+                if (expiredCommandIds.length > 0) {
+                    await FetchCommandModel.updateMany(
+                        { _id: { $in: expiredCommandIds } },
+                        { $set: { is_active: false } }
+                    );
+                }
                 
             } catch (error) {
                 console.error("Error in fetch cron job:", error);
@@ -103,12 +123,12 @@ async function updateChallengesFromFetch(jsonData: string, fetchCmd: any, channe
         }
 
         // Save/update challenges in database
-        await saveChallengesFromFetch(challenges, fetchCmd.ctf_id);
+        await saveChallengesFromFetch(challenges, fetchCmd.ctf.ctf_id);
 
         // Update thread status for each challenge
-        await updateThreadStatus(challenges, channel, fetchCmd.ctf_id);
+        await updateThreadStatus(challenges, channel, fetchCmd.ctf.ctf_id);
         
-        console.log(`Updated ${challenges.length} challenges for CTF ${fetchCmd.ctf_id}`);
+        console.log(`Updated ${challenges.length} challenges for CTF ${fetchCmd.ctf.ctf_id}`);
         
     } catch (error) {
         console.error("Error updating challenges from fetch:", error);
