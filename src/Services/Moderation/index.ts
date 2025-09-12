@@ -85,3 +85,30 @@ export async function handlePhishingDetection(message: OmitPartialGroupDMChannel
   
   return false; // Not phishing
 }
+
+// Recursively sanitize content to remove @everyone and @here mentions
+export function sanitizeMentions(content: string | object | any[]): any {
+  // Handle strings
+  if (typeof content === 'string') {
+    return content
+      .replace(/@everyone/gi, '@\u200beveryone') // Insert zero-width space
+      .replace(/@here/gi, '@\u200bhere'); // Insert zero-width space
+  }
+  
+  // Handle arrays
+  if (Array.isArray(content)) {
+    return content.map(item => sanitizeMentions(item));
+  }
+  
+  // Handle objects (including null)
+  if (content && typeof content === 'object') {
+    const sanitized: any = {};
+    for (const [key, value] of Object.entries(content)) {
+      sanitized[key] = sanitizeMentions(value);
+    }
+    return sanitized;
+  }
+  
+  // Return primitive values unchanged
+  return content;
+}

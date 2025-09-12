@@ -3,6 +3,7 @@ import { openai } from "../../utils/openai";
 import { MyClient } from "../../Model/client";
 import { getChannelContext, getUserInfo, getReplyContext, getEnvironmentContext, generateUniqueSeparator } from "./context";
 import { memory, ChatMessage } from "./memory";
+import { sanitizeMentions } from "../Moderation";
 
 // AI chat function
 export async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, client: MyClient): Promise<void> {
@@ -137,12 +138,15 @@ Remember: Use the Channel Purpose and Channel Topic information to understand wh
             const responseContent = completion.choices[0].message.content || "";
 
             if (responseContent.trim()) {
+                // Sanitize the response content to remove @everyone and @here mentions
+                const sanitizedContent = sanitizeMentions(responseContent);
+                
                 memory[userId].messages.push({
                     role: 'assistant',
-                    content: responseContent
+                    content: sanitizedContent
                 });
 
-                await message.reply({ content: responseContent });
+                await message.reply({ content: sanitizedContent });
                 console.log(`✅ AI responded to ${author} (${userId}) with enhanced context`);
             } else {
                 console.warn('⚠️ Empty response from AI, not replying');
@@ -153,7 +157,8 @@ Remember: Use the Channel Purpose and Channel Topic information to understand wh
 
             // Fallback response for API errors
             const fallbackMessage = "Maaf, aku lagi agak bingung nih 😅 Coba tanya lagi nanti ya!";
-            await message.reply({ content: fallbackMessage });
+            const sanitizedFallback = sanitizeMentions(fallbackMessage);
+            await message.reply({ content: sanitizedFallback });
         }
     }
 }
