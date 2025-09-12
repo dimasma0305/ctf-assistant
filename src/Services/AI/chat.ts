@@ -129,10 +129,7 @@ Remember: Use the Channel Purpose and Channel Topic information to understand wh
             const completion = await openai.chat.completions.create({
                 model: 'deepseek-reasoner',
                 messages: messages,
-                max_tokens: 512, // Lowered max_tokens for cost optimization
-                temperature: 0.7,
                 n: 1,
-                user: userId,
             });
 
             const responseContent = completion.choices[0].message.content || "";
