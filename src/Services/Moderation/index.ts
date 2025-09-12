@@ -1,4 +1,4 @@
-import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
+import { OmitPartialGroupDMChannel, Message as DiscordMessage, Guild } from "discord.js";
 
 // Spam detection: track recent messages by user
 interface RecentMessage {
@@ -86,25 +86,45 @@ export async function handlePhishingDetection(message: OmitPartialGroupDMChannel
   return false; // Not phishing
 }
 
-// Recursively sanitize content to remove @everyone and @here mentions
-export function sanitizeMentions(content: string | object | any[]): any {
+// Recursively sanitize content to remove @everyone, @here, and role mentions
+export function sanitizeMentions(content: string | object | any[], guild?: Guild | null): any {
   // Handle strings
   if (typeof content === 'string') {
-    return content
+    let sanitized = content
       .replace(/@everyone/gi, '@\u200beveryone') // Insert zero-width space
       .replace(/@here/gi, '@\u200bhere'); // Insert zero-width space
+    
+    // Handle role mentions: <@&roleId> -> @<rolet>
+    if (guild) {
+      sanitized = sanitized.replace(/<@&(\d+)>/g, (match, roleId) => {
+        try {
+          const role = guild.roles.cache.get(roleId);
+          if (role) {
+            return `@${role.name}`;
+          }
+          return '@rolet'; // Fallback if role not found
+        } catch (error) {
+          return '@rolet'; // Fallback on error
+        }
+      });
+    } else {
+      // If no guild provided, just replace with generic placeholder
+      sanitized = sanitized.replace(/<@&\d+>/g, '@<rolet>');
+    }
+    
+    return sanitized;
   }
   
   // Handle arrays
   if (Array.isArray(content)) {
-    return content.map(item => sanitizeMentions(item));
+    return content.map(item => sanitizeMentions(item, guild));
   }
   
   // Handle objects (including null)
   if (content && typeof content === 'object') {
     const sanitized: any = {};
     for (const [key, value] of Object.entries(content)) {
-      sanitized[key] = sanitizeMentions(value);
+      sanitized[key] = sanitizeMentions(value, guild);
     }
     return sanitized;
   }

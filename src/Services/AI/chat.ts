@@ -138,8 +138,8 @@ Remember: Use the Channel Purpose and Channel Topic information to understand wh
             const responseContent = completion.choices[0].message.content || "";
 
             if (responseContent.trim()) {
-                // Sanitize the response content to remove @everyone and @here mentions
-                const sanitizedContent = sanitizeMentions(responseContent);
+                // Sanitize the response content to remove @everyone, @here, and role mentions
+                const sanitizedContent = sanitizeMentions(responseContent, message.guild);
                 
                 memory[userId].messages.push({
                     role: 'assistant',
@@ -157,7 +157,7 @@ Remember: Use the Channel Purpose and Channel Topic information to understand wh
 
             // Fallback response for API errors
             const fallbackMessage = "Maaf, aku lagi agak bingung nih 😅 Coba tanya lagi nanti ya!";
-            const sanitizedFallback = sanitizeMentions(fallbackMessage);
+            const sanitizedFallback = sanitizeMentions(fallbackMessage, message.guild);
             await message.reply({ content: sanitizedFallback });
         }
     }
