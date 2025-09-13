@@ -2,11 +2,13 @@ import { TextChannel } from "discord.js";
 import { solveModel } from "../../../../Database/connect";
 import { ParsedChallenge } from './parsers/types';
 import fg from 'fast-glob';
+import path from 'path';
 
 export * from './parsers/types';
 
-const parsers = fg.sync('./parsers/*.ts');
-console.log(parsers);
+const currentScriptPath = import.meta.path;
+const currentScriptDir = path.dirname(currentScriptPath);
+const parsers = fg.sync(`${currentScriptDir}/parsers/*.ts`);
 const parserFunctions: ((data: any) => ParsedChallenge[])[] | null[] = parsers.map(parser => {
     const p = require(parser);
     console.log(p);
