@@ -84,6 +84,8 @@ export async function parseChallenges(jsonData: string, platform: string): Promi
             return parsePicoCTFChallenges(data);
         case 'generic':
             return parseGenericChallenges(data);
+        case '07ctf':
+            return parse07CTFChallenges(data);
         default:
             try {
                 return parseGenericChallenges(data);
