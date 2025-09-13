@@ -28,11 +28,6 @@ export const fetchCommandSchema = {
         type: String,
         required: false,
     },
-    platform: {
-        type: String,
-        required: false,
-        default: ''
-    },
     is_active: {
         type: Boolean,
         default: true,

@@ -16,19 +16,6 @@ export const command: SubCommand = {
             .setRequired(false)
         )
         .addStringOption(option => option
-            .setName("platform")
-            .setDescription("CTF platform type (default: ctfd)")
-            .setRequired(false)
-            .addChoices(
-                { name: 'CTFd', value: 'ctfd' },
-                { name: 'rCTF', value: 'rctf' },
-                { name: 'GzCTF', value: 'gzctf' },
-                { name: 'picoCTF', value: 'picoctf' },
-                { name: 'Generic', value: 'generic' },
-                { name: '07CTF', value: '07ctf' }
-            )
-        )
-        .addStringOption(option => option
             .setName("fetch_command")
             .setDescription("JavaScript fetch command to run every 5 minutes for auto-updates (optional)")
             .setRequired(false)
@@ -43,7 +30,6 @@ export const command: SubCommand = {
         }
 
         const jsonData = interaction.options.getString("json");
-        const platform = interaction.options.getString("platform") || "";
         const fetchCommand = interaction.options.getString("fetch_command");
 
         // Validate that either JSON data or fetch command is provided
@@ -119,7 +105,7 @@ export const command: SubCommand = {
         // Parse challenges based on platform
         let challenges: ParsedChallenge[];
         try {
-            challenges = await parseChallenges(finalJsonData, platform);
+            challenges = await parseChallenges(finalJsonData);
         } catch (error) {
             await interaction.editReply(`❌ Failed to parse JSON data: ${error}`);
             return;
@@ -151,7 +137,7 @@ export const command: SubCommand = {
         // Create threads for each challenge
         for (const [category, categoryChallenges] of Object.entries(challengesByCategory)) {
             // Sort challenges by points (ascending)
-            const sortedChallenges = categoryChallenges.sort((a, b) => a.points - b.points);
+            const sortedChallenges = (categoryChallenges as ParsedChallenge[]).sort((a, b) => a.points - b.points);
             
             for (const challenge of sortedChallenges) {
                 try {
@@ -232,7 +218,7 @@ export const command: SubCommand = {
         // Handle fetch command if provided - save it for periodic updates
         if (fetchCommand && parsedFetch) {
             try {
-                await saveFetchCommand(parsedFetch, ctfData, channel.id, platform);
+                await saveFetchCommand(parsedFetch, ctfData, channel.id);
                 await interaction.followUp({ 
                     content: "✅ Auto-update fetch command saved! The bot will now fetch updates every 5 minutes until the CTF ends.", 
                     ephemeral: true 

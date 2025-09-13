@@ -110,7 +110,6 @@ async function saveFetchCommand(
     parsedFetch: ParsedFetchCommand, 
     ctfData: CTFEvent, 
     channelId: string, 
-    platform: string
 ) {
     try {
         // Find the CTF in the cache to get its ObjectId
@@ -131,7 +130,6 @@ async function saveFetchCommand(
             if (parsedFetch.body) {
                 existingCommand.body = parsedFetch.body;
             }
-            existingCommand.platform = platform;
             existingCommand.is_active = true;
             await existingCommand.save();
         } else {
@@ -141,7 +139,6 @@ async function saveFetchCommand(
                 url: parsedFetch.url,
                 method: parsedFetch.method,
                 headers: parsedFetch.headers,
-                platform: platform,
                 is_active: true
             };
             
