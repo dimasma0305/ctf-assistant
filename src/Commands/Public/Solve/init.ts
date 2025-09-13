@@ -24,7 +24,8 @@ export const command: SubCommand = {
                 { name: 'rCTF', value: 'rctf' },
                 { name: 'GzCTF', value: 'gzctf' },
                 { name: 'picoCTF', value: 'picoctf' },
-                { name: 'Generic', value: 'generic' }
+                { name: 'Generic', value: 'generic' },
+                { name: '07CTF', value: '07ctf' }
             )
         )
         .addStringOption(option => option
