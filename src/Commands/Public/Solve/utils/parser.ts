@@ -100,7 +100,11 @@ export async function parseChallenges(jsonData: string, platform: string): Promi
                             try {
                                 return parsePicoCTFChallenges(data);
                             } catch (error) {
-                                throw new Error(`Invalid response format - unable to parse with any known CTF platform format. Last error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                                try {
+                                    return parse07CTFChallenges(data);
+                                } catch (error) {
+                                    throw new Error(`Invalid response format - unable to parse with any known CTF platform format. Last error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                                }
                             }
                         }
                     }
@@ -314,10 +318,6 @@ function parseGzCTFChallenges(data: any): ParsedChallenge[] {
 
 // Parse picoCTF format
 function parsePicoCTFChallenges(data: any): ParsedChallenge[] {
-    // picoCTF typically returns challenges in different formats:
-    // 1. Direct array of problems
-    // 2. Object with 'problems' property
-    // 3. Object with 'data' property containing problems
     let challenges: any[];
     
     if (Array.isArray(data)) {
@@ -386,9 +386,6 @@ function parsePicoCTFChallenges(data: any): ParsedChallenge[] {
 
 // Parse generic format - handles multiple common formats
 function parseGenericChallenges(data: any): ParsedChallenge[] {
-    // Generic format can be:
-    // 1. Direct array of challenges
-    // 2. Object with common wrapper properties
     let challenges: any[];
     
     if (Array.isArray(data)) {
@@ -466,6 +463,50 @@ function parseGenericChallenges(data: any): ParsedChallenge[] {
         } else if (typeof challenge.tags === 'string') {
             // Handle comma-separated tags
             tags = challenge.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0);
+        }
+        
+        return validateAndSanitizeChallenge({
+            id,
+            name,
+            category,
+            points,
+            solves,
+            solved,
+            tags
+        }, index);
+    });
+}
+
+// Parse 07CTF format
+function parse07CTFChallenges(data: any): ParsedChallenge[] {
+    // 07CTF returns data with challenges array
+    let challenges: any[];
+    
+    if (data.challenges && Array.isArray(data.challenges)) {
+        challenges = data.challenges;
+    } else if (Array.isArray(data)) {
+        challenges = data;
+    } else {
+        throw new Error('Invalid 07CTF response format - expected object with challenges array or direct array');
+    }
+    
+    return challenges.map((challenge: any, index: number) => {
+        // 07CTF field mappings
+        const id = challenge.id || index + 1;
+        const name = challenge.title || `Challenge ${index + 1}`;
+        const category = challenge.category || 'misc';
+        
+        // Dynamic points calculation: start at 500, reduce by 10 per solve, minimum 100
+        const solveCount = challenge.solve_count || 0;
+        const points = Math.max(100, 500 - (solveCount * 10));
+        
+        const solves = solveCount;
+        const solved = challenge.solved || false;
+        
+        // No specific tags in 07CTF format, but we can derive from difficulty
+        const tags: string[] = [];
+        if (challenge.difficulty) {
+            tags.push(challenge.difficulty.toLowerCase());
         }
         
         return validateAndSanitizeChallenge({
