@@ -2,8 +2,7 @@ import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, TextChannel, ThreadAutoArchiveDuration } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { solveModel } from "../../../Database/connect";
-import { parseChallenges, ParsedChallenge } from "./utils/parser";
-import { parseFetchCommand, ParsedFetchCommand, saveFetchCommand } from "./utils/init";
+import { parseChallenges, ParsedChallenge, parseFetchCommand, ParsedFetchCommand, saveFetchCommand } from "./utils";
 
 // Moved to challengeUtils.ts
 
