@@ -1,9 +1,10 @@
-import { TextChannel, EmbedBuilder, Message } from "discord.js";
+import { TextChannel, Message } from "discord.js";
 import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 import cron from "node-cron";
-import { LeaderboardTrackingModel, solveModel } from "../../Database/connect";
+import { LeaderboardTrackingModel } from "../../Database/connect";
 import FairScoringSystem from "../../Functions/scoringSystem";
+import { createLeaderboardEmbed } from "../../Commands/Public/Solve/utils";
 import crypto from 'crypto';
 
 export const event: Event = {
@@ -55,7 +56,7 @@ export const event: Event = {
                         const newLeaderboardHash = crypto.createHash('md5')
                             .update(JSON.stringify(leaderboard.map(entry => ({
                                 userId: entry.userId,
-                                totalScore: entry.totalScore.toFixed(2),
+                                totalScore: entry.totalScore,
                                 solveCount: entry.solveCount
                             }))))
                             .digest('hex');
@@ -68,8 +69,8 @@ export const event: Event = {
 
                         console.log(`Changes detected in leaderboard ${leaderboardTrack.messageId}, updating...`);
 
-                        // Create updated embed using the same logic as the original command
-                        const updatedEmbed = await createLeaderboardEmbed(leaderboard, leaderboardTrack.isGlobal, leaderboardTrack.limit);
+                        // Create updated embed using the shared utility function
+                        const updatedEmbed = createLeaderboardEmbed(leaderboard, leaderboardTrack.isGlobal, leaderboardTrack.limit, true);
                         
                         // Update the message
                         await message.edit({ embeds: [updatedEmbed] });
@@ -108,89 +109,3 @@ export const event: Event = {
         }, 10000); // Wait 10 seconds after startup
     },
 };
-
-// Helper function to create leaderboard embed (extracted from the main command)
-async function createLeaderboardEmbed(leaderboard: any[], isGlobal: boolean, limit: number): Promise<EmbedBuilder> {
-    const embed = new EmbedBuilder()
-        .setColor('#0099ff')
-        .setTitle(`${isGlobal ? 'Global ' : ''}Leaderboard 🏆`)
-        .setTimestamp()
-        .setFooter({ 
-            text: 'CTF Assistant • Auto-updating hourly', 
-            iconURL: 'https://tcp1p.team/favicon.ico' 
-        });
-
-    if (leaderboard.length === 0) {
-        embed.setColor('#ff9900')
-            .setDescription('No solves found yet!');
-        return embed;
-    }
-
-    if (!isGlobal && leaderboard.length > 0) {
-        // Show CTF-specific description if available
-        const firstEntry = leaderboard[0];
-        if (firstEntry.ctfBreakdown.size === 1) {
-            const ctfInfo = Array.from(firstEntry.ctfBreakdown.values())[0] as { ctfTitle: string; weight: number; };
-            embed.setDescription(`Showing results for **${ctfInfo.ctfTitle}** (Weight: ${ctfInfo.weight})`);
-        }
-    }
-
-    // Create leaderboard description
-    let description = '';
-    const medals = ['🥇', '🥈', '🥉'];
-    
-    for (let i = 0; i < leaderboard.length; i++) {
-        const entry = leaderboard[i];
-        const position = i + 1;
-        const medal = i < 3 ? medals[i] : `**${position}.**`;
-        
-        description += `${medal} <@${entry.userId}> - **${entry.totalScore.toFixed(2)}** pts (${entry.solveCount} solves)\n`;
-        
-        // Add detailed stats for top 3
-        if (i < 3) {
-            const diversityStats = [];
-            if (entry.ctfCount > 1) diversityStats.push(`${entry.ctfCount} CTFs`);
-            if (entry.categories.size > 1) diversityStats.push(`${entry.categories.size} categories`);
-            
-            if (diversityStats.length > 0) {
-                description += `   └ *Diversity:* ${diversityStats.join(', ')}\n`;
-            }
-            
-            // Show recent high-value solves
-            if (entry.recentSolves.length > 0) {
-                const topSolves = entry.recentSolves.slice(0, 3);
-                const solveList = topSolves.map((s: any) => `**[${s.category}]** ${s.challenge} (${s.points}pts)`).join(', ');
-                description += `   └ *Top solves:* ${solveList}\n`;
-            }
-        }
-        description += '\n';
-    }
-
-    // Add total statistics
-    const totalUniquePlayers = leaderboard.length;
-    const totalSolves = leaderboard.reduce((sum, entry) => sum + entry.solveCount, 0);
-    const totalScore = leaderboard.reduce((sum, entry) => sum + entry.totalScore, 0).toFixed(2);
-    const uniqueCTFs = new Set(leaderboard.flatMap(entry => Array.from(entry.ctfBreakdown.keys()))).size;
-
-    embed.addFields(
-        { 
-            name: 'Competition Stats', 
-            value: `👥 **${totalUniquePlayers}** players\n🎯 **${totalSolves}** total solves\n🏆 **${totalScore}** total points\n🏁 **${uniqueCTFs}** unique CTFs`, 
-            inline: true 
-        },
-        {
-            name: 'Scoring System',
-            value: `📊 Normalized challenge score × CTF weight\n⚖️ All CTFs weighted equally regardless of point system`,
-            inline: true
-        }
-    );
-
-    if (description.length > 4096) {
-        // Truncate if too long
-        description = description.substring(0, 4000) + '\n... (truncated)';
-    }
-
-    embed.setDescription((embed.data.description || '') + '\n' + description);
-
-    return embed;
-}

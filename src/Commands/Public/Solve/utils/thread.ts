@@ -1,5 +1,5 @@
 import { TextChannel, CommandInteraction, Channel } from "discord.js";
-import { CTFEvent } from "../../../Functions/ctftime-v2";
+import { CTFEvent } from "../../../../Functions/ctftime-v2";
 
 /**
  * Extracts challenge name from thread name format
@@ -127,13 +127,6 @@ export function getChallengeInfo(interaction: CommandInteraction): { category: s
     }
     
     return null;
-}
-
-/**
- * Validates that the channel has a valid CTF event
- */
-export function validateCTFEvent(ctfData: CTFEvent): boolean {
-    return !!ctfData.id;
 }
 
 /**
