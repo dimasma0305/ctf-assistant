@@ -30,6 +30,7 @@ export async function parseChallenges(jsonData: string): Promise<ParsedChallenge
 
     for (const parser of parserFunctions) {
         try {
+            console.log(parser);
             if (parser) {   
                 return parser(data);
             }
