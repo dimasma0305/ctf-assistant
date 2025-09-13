@@ -192,29 +192,14 @@ export class ReactionRoleEvent {
 ⚠️ **PENTING:**  
 1. Buat credential dengan format:  
    \`\`\`md
+   # Credential
    [Nama Tim/Individu] : [Password/Token]
+   Link: <LINK>
    \`\`\`
 2. Posting credential di channel ini **SAJA** (channel privat)
 3. Update credential jika ada perubahan
 
 > 🛡️ Channel ini hanya bisa diakses anggota <@&${role.id}>!
-
-## 📋 Panduan Diskusi
-### 🧵 Cara Membuat Thread
-1. **Format nama thread:**  
-   \`\`\`fix
-   [Kategori] Nama Challenge
-   \`\`\`
-   Contoh:  
-   \`\`\`md
-   [Web] Baby SQLi
-   [Forensic] Memory Analysis
-   \`\`\`
-
-2. **Manfaatkan thread untuk:**
-   - 🚧 Diskusi progress penyelesaian
-   - 💬 Brainstorming solusi bersama
-   - 📁 Sharing payload/exploit
 
 ## 🛠️ Command Solve 
 \`\`\`bash
@@ -222,7 +207,7 @@ export class ReactionRoleEvent {
 /solve challenge players:@partisipan1 @partisipan2
 
 # Initialize challenges dari platform CTF
-/solve init json:"<JSON_DATA>" platform:ctfd
+/solve init fetch_command:'fetch("<URL>", {method: "GET", headers: {Authorization: "Bearer <TOKEN>"}})'
 
 \`\`\`
 

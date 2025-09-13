@@ -1,6 +1,45 @@
 import { solveModel, CTFCacheModel, ChallengeModel } from '../Database/connect';
 import { infoEvent } from './ctftime-v2';
 
+/**
+ * Get total possible points for a CTF by summing all challenges in that CTF
+ */
+export async function getCTFTotalPoints(ctfId: string): Promise<number> {
+    try {
+        const challenges = await ChallengeModel.find({ ctf_id: ctfId }).lean();
+        const totalPoints = challenges.reduce((sum, challenge) => sum + (challenge.points || 100), 0);
+        return totalPoints;
+    } catch (error) {
+        console.error(`Error calculating CTF total points for ${ctfId}:`, error);
+        return 0;
+    }
+}
+
+/**
+ * Get total possible points for multiple CTFs at once
+ */
+export async function getBulkCTFTotalPoints(ctfIds: string[]): Promise<Map<string, number>> {
+    try {
+        const challenges = await ChallengeModel.find({ ctf_id: { $in: ctfIds } }).lean();
+        const ctfTotalPoints = new Map<string, number>();
+        
+        // Initialize all CTFs with 0 points
+        ctfIds.forEach(ctfId => ctfTotalPoints.set(ctfId, 0));
+        
+        // Sum up points for each CTF
+        challenges.forEach(challenge => {
+            const ctfId = challenge.ctf_id;
+            const points = challenge.points || 100;
+            ctfTotalPoints.set(ctfId, (ctfTotalPoints.get(ctfId) || 0) + points);
+        });
+        
+        return ctfTotalPoints;
+    } catch (error) {
+        console.error('Error calculating bulk CTF total points:', error);
+        return new Map();
+    }
+}
+
 interface UserSolve {
     ctf_id: string;
     challenge: string;
@@ -53,20 +92,11 @@ export class FairScoringSystem {
         const solves = await solveModel.find(globalQuery).populate('challenge_ref').lean();
         const userScores = new Map<string, UserScore>();
 
-        // Calculate total points for each CTF for normalization
-        const ctfTotalPoints = new Map<string, number>();
-        for (const solve of solves) {
-            const ctfId = solve.ctf_id || '';
-            
-            // Get points from challenge reference or fallback to default
-            let points = 100; // default fallback
-            if (solve.challenge_ref && typeof solve.challenge_ref === 'object' && solve.challenge_ref !== null && 'points' in solve.challenge_ref) {
-                const challengeRef = solve.challenge_ref as any;
-                points = challengeRef.points || 100;
-            }
-            
-            ctfTotalPoints.set(ctfId, (ctfTotalPoints.get(ctfId) || 0) + points);
-        }
+        // Get unique CTF IDs from solves
+        const ctfIds = Array.from(new Set(solves.map(solve => solve.ctf_id || '').filter(id => id)));
+        
+        // Calculate total possible points for each CTF (not just solved challenges)
+        const ctfTotalPoints = await getBulkCTFTotalPoints(ctfIds);
 
         // Group solves by user
         for (const solve of solves) {
@@ -108,14 +138,14 @@ export class FairScoringSystem {
         }
 
         // Calculate scores for each user
-        for (const [userId, userScore] of userScores) {
+        for (const [_userId, userScore] of userScores) {
             for (const solve of userScore.recentSolves) {
                 const ctfData = await infoEvent(solve.ctf_id);
                 if (ctfData.weight === 0) {
                     ctfData.weight = 10;
                 }
 
-                // Calculate normalized score
+                // Calculate normalized score using actual CTF total points
                 const ctfTotal = ctfTotalPoints.get(solve.ctf_id) || solve.points;
                 const totalSolveScore = this.calculateBaseScore(solve.points, ctfData.weight, ctfTotal);
                 
