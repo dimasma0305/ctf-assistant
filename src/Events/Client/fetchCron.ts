@@ -3,7 +3,7 @@ import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 import cron from "node-cron";
 import { FetchCommandModel, WeightRetryModel, ChallengeModel } from "../../Database/connect";
-import { parseChallenges, updateThreadStatus } from "../../Commands/Public/Solve/utils/parser";
+import { parseChallenges, updateThreadStatus } from "../../Commands/Public/Solve/utils";
 import { infoEvent } from "../../Functions/ctftime-v2";
 
 export const event: Event = {
