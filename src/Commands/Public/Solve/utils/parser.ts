@@ -6,6 +6,7 @@ import fg from 'fast-glob';
 export * from './parsers/types';
 
 const parsers = fg.sync('./parsers/*.ts');
+console.log(parsers);
 const parserFunctions: ((data: any) => ParsedChallenge[])[] | null[] = parsers.map(parser => {
     const p = require(parser);
     console.log(p);
