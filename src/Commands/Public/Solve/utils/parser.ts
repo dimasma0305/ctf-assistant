@@ -11,7 +11,6 @@ const currentScriptDir = path.dirname(currentScriptPath);
 const parsers = fg.sync(`${currentScriptDir}/parsers/*.ts`);
 const parserFunctions: ((data: any) => ParsedChallenge[])[] | null[] = parsers.map(parser => {
     const p = require(parser);
-    console.log(p);
     if (p.parse) {
         return p.parse;
     }
@@ -34,7 +33,6 @@ export async function parseChallenges(jsonData: string): Promise<ParsedChallenge
 
     for (const parser of parserFunctions) {
         try {
-            console.log(parser);
             if (parser) {   
                 return parser(data);
             }
