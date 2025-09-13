@@ -88,7 +88,6 @@ export const event: Event = {
 
         // Run every 5 minutes
         cron.schedule("*/5 * * * *", async () => {
-            console.log("Executing fetch commands...");
             await executeFetchCommands();
         }, {
             scheduled: true,
@@ -97,7 +96,6 @@ export const event: Event = {
 
         // Daily weight retry job - runs at 2 AM daily
         cron.schedule("0 2 * * *", async () => {
-            console.log("Running daily weight retry job...");
             await retryWeightFetch();
         }, {
             scheduled: true,
