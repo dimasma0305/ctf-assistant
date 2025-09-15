@@ -29,6 +29,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ui
+      args:
+        NEXT_PUBLIC_API_BASE_URL: https://api.assistant.dimasc.tf
     networks:
       internal:
       traefik:
@@ -39,9 +41,6 @@ services:
       - "traefik.http.routers.ui.service=ui"
       - "traefik.http.services.ui.loadbalancer.server.port=3000"
       - "traefik.http.routers.ui.tls.certresolver=letsencrypt"
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL=https://api.assistant.dimasc.tf
-
   mongo:
     image: mongo
     environment:
