@@ -362,6 +362,7 @@ app.get("/api/scoreboard", async (req, res) => {
         // Response metadata
         const metadata = {
             total: totalFilteredUsers,
+            totalUsers: userScores.size,
             limit,
             offset,
             returned: formattedLeaderboard.length,

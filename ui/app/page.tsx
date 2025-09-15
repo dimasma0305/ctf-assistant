@@ -62,7 +62,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-primary">
-                {leaderboardData?.metadata.total.toLocaleString() || "—"}
+                {leaderboardData?.metadata.totalUsers.toLocaleString() || "—"}
               </div>
               <p className="text-xs text-muted-foreground">Active community members</p>
             </CardContent>

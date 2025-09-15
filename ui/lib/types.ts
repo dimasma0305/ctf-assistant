@@ -42,6 +42,7 @@ export interface LeaderboardEntry {
 export interface ScoreboardResponse {
   metadata: {
     total: number
+    totalUsers: number
     limit: number
     offset: number
     returned: number

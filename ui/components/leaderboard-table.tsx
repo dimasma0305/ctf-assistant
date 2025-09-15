@@ -43,16 +43,6 @@ export function LeaderboardTable() {
     })
   }
 
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size)
-    setCurrentPage(1) // Reset to first page
-    updateParams({
-      offset: 0,
-      limit: size,
-      search: searchTerm || undefined
-    })
-  }
-
   // Debounce search input to avoid excessive API calls
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -179,9 +169,6 @@ export function LeaderboardTable() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="global">Global Rankings</SelectItem>
-              <SelectItem value="ctf_2024_001">Winter CTF 2024</SelectItem>
-              <SelectItem value="ctf_2024_002">Crypto Challenge</SelectItem>
-              <SelectItem value="ctf_2024_003">Web Security CTF</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -364,7 +351,7 @@ export function LeaderboardTable() {
                 profileData={{
                   user: selectedUser.user,
                   globalRank: selectedUser.rank,
-                  totalUsers: leaderboardData?.metadata.total || 1000,
+                  totalUsers: leaderboardData?.metadata.totalUsers || 1000,
                   stats: {
                     totalScore: selectedUser.totalScore,
                     solveCount: selectedUser.solveCount,
