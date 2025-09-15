@@ -13,7 +13,7 @@ import {
 } from './types'
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.assistant.dimasc.tf/'
 
 // Generic API fetch wrapper with error handling
 async function fetchAPI<T>(
