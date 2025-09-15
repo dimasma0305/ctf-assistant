@@ -50,6 +50,10 @@ export interface ScoreboardResponse {
     ctfId: string | null
     searchTerm: string | null
     isFiltered: boolean
+    month?: string | null
+    year?: number | null
+    availableMonths?: string[]
+    availableYears?: number[]
     timestamp: string
   }
   data: LeaderboardEntry[]

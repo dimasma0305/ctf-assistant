@@ -325,8 +325,8 @@ export function LeaderboardTable() {
       )}
 
       {leaderboardData?.metadata &&
-        (leaderboardData.metadata.availableMonths?.length > 0 ||
-          leaderboardData.metadata.availableYears?.length > 0) && (
+        ((leaderboardData.metadata.availableMonths?.length ?? 0) > 0 ||
+          (leaderboardData.metadata.availableYears?.length ?? 0) > 0) && (
           <div className="text-xs text-muted-foreground">
             Data available from{" "}
             {leaderboardData.metadata.availableMonths?.[leaderboardData.metadata.availableMonths.length - 1]}
