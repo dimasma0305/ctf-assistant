@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Trophy, Medal, Award, ChevronLeft, ChevronRight, Search, Filter, AlertCircle } from "lucide-react"
@@ -202,7 +202,12 @@ export function LeaderboardTable() {
                       onClick={() => handleUserClick(entry)}
                     >
                       <Avatar className="w-8 h-8">
-                        <AvatarImage src={entry.user.avatar || `/abstract-geometric-shapes.png?height=32&width=32&query=${entry.user.userId}`} />
+                        <CachedAvatarImage 
+                          src={entry.user.avatar || `/abstract-geometric-shapes.png?height=32&width=32&query=${entry.user.userId}`}
+                          loadingPlaceholder={
+                            <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                          }
+                        />
                         <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
                           {getUserInitials(entry.user)}
                         </AvatarFallback>

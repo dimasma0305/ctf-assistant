@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Trophy, TrendingUp } from "lucide-react"
@@ -161,7 +161,12 @@ export function UserProfileCard({ user, profileData }: UserProfileCardProps) {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="w-16 h-16 flex-shrink-0">
-              <AvatarImage src={user.user.avatar || `/abstract-geometric-shapes.png?key=profile&height=64&width=64&query=${user.user.userId}`} />
+              <CachedAvatarImage 
+                src={user.user.avatar || `/abstract-geometric-shapes.png?key=profile&height=64&width=64&query=${user.user.userId}`}
+                loadingPlaceholder={
+                  <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                }
+              />
               <AvatarFallback className="text-lg bg-primary/20 text-foreground font-medium">
                 {getUserInitials(user.user)}
               </AvatarFallback>
