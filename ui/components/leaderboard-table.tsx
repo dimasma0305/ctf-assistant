@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,7 @@ import { LeaderboardEntry } from "@/lib/types"
 export function LeaderboardTable() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [searchInput, setSearchInput] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCtf, setSelectedCtf] = useState<string>("global")
   const [selectedUser, setSelectedUser] = useState<LeaderboardEntry | null>(null)
@@ -52,14 +53,25 @@ export function LeaderboardTable() {
     })
   }
 
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value)
-    setCurrentPage(1) // Reset to first page when searching
-    updateParams({
-      offset: 0,
-      limit: pageSize,
-      search: value || undefined
-    })
+  // Debounce search input to avoid excessive API calls
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchInput !== searchTerm) {
+        setSearchTerm(searchInput)
+        setCurrentPage(1) // Reset to first page when searching
+        updateParams({
+          offset: 0,
+          limit: pageSize,
+          search: searchInput || undefined
+        })
+      }
+    }, 500) // 500ms debounce delay
+
+    return () => clearTimeout(timeoutId)
+  }, [searchInput, searchTerm, pageSize, updateParams])
+
+  const handleSearchInputChange = (value: string) => {
+    setSearchInput(value)
   }
 
   const handleCtfChange = (ctfId: string) => {
@@ -145,14 +157,19 @@ export function LeaderboardTable() {
     <div className="space-y-6">
       {/* Filters and Search */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center gap-2">
           <Search className="w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            value={searchInput}
+            onChange={(e) => handleSearchInputChange(e.target.value)}
             className="w-64"
           />
+          {searchInput && searchInput !== searchTerm && (
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-muted-foreground" />
