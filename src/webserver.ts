@@ -309,25 +309,37 @@ app.get("/api/scoreboard", async (req, res) => {
         }
 
         // Get leaderboard data using cache
-        let userScores = await getCachedUserScores(query);
+        let allUserScores = await getCachedUserScores(query);
+        
+        // Sort all users to establish true rankings
+        const allSortedUsers = Array.from(allUserScores.values())
+            .sort((a, b) => b.totalScore - a.totalScore);
+        
+        // Create a map of userId to true rank for all users
+        const userRankMap = new Map<string, number>();
+        allSortedUsers.forEach((user, index) => {
+            userRankMap.set(user.userId, index + 1);
+        });
         
         // Apply search filtering if search term is provided
+        let filteredUserScores = allUserScores;
         if (searchTerm) {
-            userScores = filterUsersBySearch(userScores, searchTerm);
+            filteredUserScores = filterUsersBySearch(allUserScores, searchTerm);
         }
         
-        // Sort and prepare full leaderboard
-        const sortedLeaderboard = Array.from(userScores.values())
+        // Sort filtered users (this is for pagination, not ranking)
+        const sortedLeaderboard = Array.from(filteredUserScores.values())
             .sort((a, b) => b.totalScore - a.totalScore);
         
         const totalFilteredUsers = sortedLeaderboard.length;
+        const totalUsers = allUserScores.size;
         
         // Apply pagination after filtering
         const paginatedLeaderboard = sortedLeaderboard.slice(offset, offset + limit);
         
         // Format data for JSON response (convert Sets and Maps to arrays/objects)
         const formattedLeaderboard = paginatedLeaderboard.map((entry, index) => ({
-            rank: offset + index + 1,
+            rank: userRankMap.get(entry.userId) || 1, // Use true rank from complete dataset
             user: {
                 userId: entry.userId,
                 username: entry.username,
@@ -362,7 +374,7 @@ app.get("/api/scoreboard", async (req, res) => {
         // Response metadata
         const metadata = {
             total: totalFilteredUsers,
-            totalUsers: userScores.size,
+            totalUsers: totalUsers, // Use the actual total count of all users
             limit,
             offset,
             returned: formattedLeaderboard.length,
@@ -380,121 +392,6 @@ app.get("/api/scoreboard", async (req, res) => {
 
     } catch (error) {
         console.error("Error fetching scoreboard:", error);
-        res.status(500).json({
-            error: "Internal server error",
-            message: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
-        });
-    }
-});
-
-// User profile API endpoint
-app.get("/api/profile/:id", async (req, res) => {
-    try {
-        const userId = req.params.id;
-        
-        if (!userId) {
-            res.status(400).json({
-                error: "User ID is required"
-            });
-            return;
-        }
-
-        // Get all user scores to find the specific user (using cache)
-        const userScores = await getCachedUserScores();
-        const userProfile = userScores.get(userId);
-        
-        if (!userProfile) {
-            res.status(404).json({
-                error: "User not found",
-                message: `No profile data found for user ID: ${userId}`
-            });
-            return;
-        }
-
-        // Calculate user's global rank
-        const allUsers = Array.from(userScores.values())
-            .sort((a, b) => b.totalScore - a.totalScore);
-        const userRank = allUsers.findIndex(user => user.userId === userId) + 1;
-
-        // Get category statistics
-        const categoryStats = Array.from(userProfile.categories).map(category => {
-            const categorySolves = userProfile.recentSolves.filter((solve: UserSolve) => solve.category === category);
-            const categoryPoints = categorySolves.reduce((sum: number, solve: UserSolve) => sum + solve.points, 0);
-            return {
-                name: category,
-                solves: categorySolves.length,
-                totalPoints: categoryPoints,
-                avgPoints: categorySolves.length > 0 ? Math.round(categoryPoints / categorySolves.length) : 0
-            };
-        }).sort((a, b) => b.solves - a.solves);
-
-        // Format CTF breakdown for better readability
-        const ctfBreakdownArray = Array.from(userProfile.ctfBreakdown.entries()).map(([ctfId, breakdown]: [string, any]) => ({
-            ctfId,
-            ctfTitle: breakdown.ctfTitle,
-            weight: breakdown.weight,
-            solves: breakdown.solves,
-            points: breakdown.points,
-            score: Math.round(breakdown.score * 100) / 100,
-            contribution: Math.round((breakdown.score / userProfile.totalScore) * 100 * 100) / 100 // percentage contribution
-        })).sort((a: any, b: any) => b.score - a.score);
-
-        // Recent activity (last 10 solves sorted by date)
-        const recentActivity = userProfile.recentSolves
-            .sort((a: UserSolve, b: UserSolve) => new Date(b.solved_at).getTime() - new Date(a.solved_at).getTime())
-            .slice(0, 10)
-            .map((solve: UserSolve) => ({
-                ctf_id: solve.ctf_id,
-                challenge: solve.challenge,
-                category: solve.category,
-                points: solve.points,
-                solved_at: solve.solved_at,
-                isTeamSolve: solve.users.length > 1,
-                teammates: solve.users.filter((id: string) => id !== userId)
-            }));
-
-        // Calculate achievements and milestones
-        const achievements = [];
-        
-        if (userProfile.solveCount >= 100) achievements.push({ name: "Century Solver", description: "Solved 100+ challenges", icon: "🎯" });
-        if (userProfile.solveCount >= 50) achievements.push({ name: "Power Solver", description: "Solved 50+ challenges", icon: "⚡" });
-        if (userProfile.ctfCount >= 10) achievements.push({ name: "CTF Explorer", description: "Participated in 10+ CTFs", icon: "🗺️" });
-        if (userProfile.categories.size >= 5) achievements.push({ name: "Well Rounded", description: "Solved challenges in 5+ categories", icon: "🌟" });
-        if (userRank <= 3) achievements.push({ name: "Podium Finisher", description: `Global rank #${userRank}`, icon: userRank === 1 ? "🥇" : userRank === 2 ? "🥈" : "🥉" });
-        if (userRank <= 10) achievements.push({ name: "Top 10", description: `Global rank #${userRank}`, icon: "🏆" });
-
-        // Response data
-        const profileData = {
-            user: {
-                userId,
-                username: userProfile.username,
-                displayName: userProfile.displayName,
-                avatar: userProfile.avatar
-            },
-            globalRank: userRank,
-            totalUsers: allUsers.length,
-            stats: {
-                totalScore: Math.round(userProfile.totalScore * 100) / 100,
-                solveCount: userProfile.solveCount,
-                ctfCount: userProfile.ctfCount,
-                categoriesCount: userProfile.categories.size,
-                averageScorePerSolve: Math.round((userProfile.totalScore / userProfile.solveCount) * 100) / 100,
-                averageSolvesPerCTF: Math.round((userProfile.solveCount / userProfile.ctfCount) * 100) / 100
-            },
-            categoryBreakdown: categoryStats,
-            ctfParticipation: ctfBreakdownArray,
-            recentActivity,
-            achievements,
-            metadata: {
-                profileGenerated: new Date().toISOString(),
-                dataSource: "Fair Scoring System"
-            }
-        };
-
-        res.json(profileData);
-
-    } catch (error) {
-        console.error("Error fetching user profile:", error);
         res.status(500).json({
             error: "Internal server error",
             message: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
@@ -671,31 +568,6 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
         console.error("Error fetching CTF user profile:", error);
         res.status(500).json({
             error: "Internal server error",
-            message: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
-        });
-    }
-});
-
-// Cache management endpoints
-app.get("/api/cache/status", (req, res) => {
-    try {
-        const stats = cache.getStats();
-        res.json({
-            status: "active",
-            statistics: {
-                ...stats,
-                hitRate: Math.round(stats.hitRate * 100 * 100) / 100 // Convert to percentage with 2 decimals
-            },
-            settings: {
-                defaultTTL: "10 minutes",
-                cleanupInterval: "5 minutes"
-            },
-            timestamp: new Date().toISOString()
-        });
-    } catch (error) {
-        console.error("Error getting cache status:", error);
-        res.status(500).json({
-            error: "Failed to get cache status",
             message: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
         });
     }
