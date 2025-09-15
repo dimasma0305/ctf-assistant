@@ -47,6 +47,8 @@ export interface ScoreboardResponse {
     returned: number
     isGlobal: boolean
     ctfId: string | null
+    searchTerm: string | null
+    isFiltered: boolean
     timestamp: string
   }
   data: LeaderboardEntry[]
@@ -265,6 +267,7 @@ export interface ScoreboardParams {
   offset?: number
   ctf_id?: string
   global?: boolean
+  search?: string
 }
 
 export interface CTFsParams {

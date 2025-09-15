@@ -153,6 +153,37 @@ function generateCacheKey(prefix: string, query: any = {}): string {
     return `${prefix}:${crypto.createHash('md5').update(queryString).digest('hex')}`;
 }
 
+// Helper function to filter users by search term
+function filterUsersBySearch(userScores: Map<string, UserProfile>, searchTerm: string): Map<string, UserProfile> {
+    if (!searchTerm || searchTerm.trim() === '') {
+        return userScores;
+    }
+    
+    const searchLower = searchTerm.toLowerCase().trim();
+    const filteredUsers = new Map<string, UserProfile>();
+    
+    for (const [discordId, profile] of userScores) {
+        const username = profile.username.toLowerCase();
+        const displayName = profile.displayName.toLowerCase();
+        const userId = profile.userId.toLowerCase();
+        
+        // Check if search term matches user info or categories
+        const matchesUser = username.includes(searchLower) || 
+                           displayName.includes(searchLower) || 
+                           userId.includes(searchLower);
+        
+        const matchesCategory = Array.from(profile.categories).some(category => 
+            category.toLowerCase().includes(searchLower)
+        );
+        
+        if (matchesUser || matchesCategory) {
+            filteredUsers.set(discordId, profile);
+        }
+    }
+    
+    return filteredUsers;
+}
+
 // Cached version of FairScoringSystem.calculateUserScores with user profile enrichment
 async function getCachedUserScores(query: any = {}, ttl?: number): Promise<Map<string, UserProfile>> {
     const cacheKey = generateCacheKey('userScores', query);
@@ -246,7 +277,7 @@ app.get("/health", (req, res) => {
     });
 });
 
-// Scoreboard API endpoint with range filtering
+// Scoreboard API endpoint with range filtering and search
 app.get("/api/scoreboard", async (req, res) => {
     try {
         // Parse query parameters
@@ -254,6 +285,7 @@ app.get("/api/scoreboard", async (req, res) => {
         const offset = parseInt(req.query.offset as string) || 0;
         const ctfId = req.query.ctf_id as string;
         const isGlobal = req.query.global !== 'false'; // default to true unless explicitly set to false
+        const searchTerm = req.query.search as string; // new search parameter
         
         // Validate parameters
         if (limit < 1 || limit > 100) {
@@ -276,14 +308,22 @@ app.get("/api/scoreboard", async (req, res) => {
             query.ctf_id = ctfId;
         }
 
-        // Get leaderboard data using cache (we need to get more than requested for proper pagination)
-        const userScores = await getCachedUserScores(query);
-        const fullLeaderboard = Array.from(userScores.values())
-            .sort((a, b) => b.totalScore - a.totalScore)
-            .slice(0, limit + offset);
+        // Get leaderboard data using cache
+        let userScores = await getCachedUserScores(query);
         
-        // Apply range filtering
-        const paginatedLeaderboard = fullLeaderboard.slice(offset, offset + limit);
+        // Apply search filtering if search term is provided
+        if (searchTerm) {
+            userScores = filterUsersBySearch(userScores, searchTerm);
+        }
+        
+        // Sort and prepare full leaderboard
+        const sortedLeaderboard = Array.from(userScores.values())
+            .sort((a, b) => b.totalScore - a.totalScore);
+        
+        const totalFilteredUsers = sortedLeaderboard.length;
+        
+        // Apply pagination after filtering
+        const paginatedLeaderboard = sortedLeaderboard.slice(offset, offset + limit);
         
         // Format data for JSON response (convert Sets and Maps to arrays/objects)
         const formattedLeaderboard = paginatedLeaderboard.map((entry, index) => ({
@@ -321,12 +361,14 @@ app.get("/api/scoreboard", async (req, res) => {
 
         // Response metadata
         const metadata = {
-            total: fullLeaderboard.length,
+            total: totalFilteredUsers,
             limit,
             offset,
             returned: formattedLeaderboard.length,
             isGlobal,
             ctfId: ctfId || null,
+            searchTerm: searchTerm || null,
+            isFiltered: !!searchTerm,
             timestamp: new Date().toISOString()
         };
 

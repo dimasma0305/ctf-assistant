@@ -29,6 +29,7 @@ export function LeaderboardTable() {
     offset: (currentPage - 1) * pageSize,
     global: selectedCtf === "global",
     ctf_id: selectedCtf !== "global" ? selectedCtf : undefined,
+    search: searchTerm || undefined, // Add search parameter
   })
 
   // Update API params when page, size, or CTF selection changes
@@ -36,7 +37,8 @@ export function LeaderboardTable() {
     setCurrentPage(page)
     updateParams({
       offset: (page - 1) * pageSize,
-      limit: pageSize
+      limit: pageSize,
+      search: searchTerm || undefined
     })
   }
 
@@ -45,7 +47,18 @@ export function LeaderboardTable() {
     setCurrentPage(1) // Reset to first page
     updateParams({
       offset: 0,
-      limit: size
+      limit: size,
+      search: searchTerm || undefined
+    })
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+    setCurrentPage(1) // Reset to first page when searching
+    updateParams({
+      offset: 0,
+      limit: pageSize,
+      search: value || undefined
     })
   }
 
@@ -137,7 +150,7 @@ export function LeaderboardTable() {
           <Input
             placeholder="Search users..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="w-64"
           />
         </div>
@@ -173,7 +186,8 @@ export function LeaderboardTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {leaderboardData?.data.map((entry) => (
+              {leaderboardData && leaderboardData.data.length > 0 ? (
+                leaderboardData.data.map((entry) => (
                 <TableRow key={entry.user.userId} className="hover:bg-muted/50">
                   <TableCell className="font-medium">
                     <div className="flex items-center justify-center">{getRankIcon(entry.rank)}</div>
@@ -237,19 +251,49 @@ export function LeaderboardTable() {
                     )}
                   </TableCell>
                 </TableRow>
-              ))}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    <div className="text-muted-foreground">
+                      {searchTerm ? (
+                        <>
+                          <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p>No players found matching "{searchTerm}"</p>
+                          <p className="text-sm mt-1">Try a different search term</p>
+                        </>
+                      ) : (
+                        <p>No players found</p>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing {(currentPage - 1) * pageSize + 1} to{" "}
-          {Math.min(currentPage * pageSize, leaderboardData?.metadata.total || 0)} of{" "}
-          {leaderboardData?.metadata.total || 0} players
-        </div>
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            {searchTerm ? (
+              <>
+                Showing {leaderboardData?.data.length || 0} of {leaderboardData?.metadata.total || 0} players
+                {(leaderboardData?.data.length || 0) > 0 && (
+                  <span className="text-primary ml-1">
+                    (filtered by "{searchTerm}")
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                Showing {(currentPage - 1) * pageSize + 1} to{" "}
+                {Math.min(currentPage * pageSize, leaderboardData?.metadata.total || 0)} of{" "}
+                {leaderboardData?.metadata.total || 0} players
+              </>
+            )}
+          </div>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
