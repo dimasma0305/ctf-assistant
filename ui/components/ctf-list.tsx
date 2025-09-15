@@ -147,7 +147,12 @@ export function CTFList() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
                   <Avatar className="h-12 w-12">
-                    <CachedAvatarImage src={ctf.logo || "/placeholder.svg"} alt={ctf.title} />
+                    <CachedAvatarImage 
+                      src={ctf.logo || "/placeholder.svg"} alt={ctf.title} 
+                      loadingPlaceholder={
+                        <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                      }
+                    />
                     <AvatarFallback className="bg-primary/20 text-foreground">
                       {ctf.title.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -219,7 +224,12 @@ export function CTFList() {
                 <DialogHeader>
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
-                      <CachedAvatarImage src={selectedCTFDetails.logo || "/placeholder.svg"} alt={selectedCTFDetails.title} />
+                      <CachedAvatarImage 
+                        src={selectedCTFDetails.logo || "/placeholder.svg"} alt={selectedCTFDetails.title} 
+                        loadingPlaceholder={
+                          <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                        }
+                      />
                       <AvatarFallback className="bg-primary/20 text-foreground text-lg">
                         {selectedCTFDetails.title.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
