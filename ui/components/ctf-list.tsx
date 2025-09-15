@@ -148,7 +148,7 @@ export function CTFList() {
                 <div className="flex items-start gap-4 flex-1">
                   <Avatar className="h-12 w-12">
                     <CachedAvatarImage 
-                      src={ctf.logo || "/placeholder.svg"} alt={ctf.title} 
+                      src={ctf.logo || "/placeholder.svg"}
                       loadingPlaceholder={
                         <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
                       }
@@ -225,7 +225,7 @@ export function CTFList() {
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
                       <CachedAvatarImage 
-                        src={selectedCTFDetails.logo || "/placeholder.svg"} alt={selectedCTFDetails.title} 
+                        src={selectedCTFDetails.logo || "/placeholder.svg"}
                         loadingPlaceholder={
                           <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
                         }
