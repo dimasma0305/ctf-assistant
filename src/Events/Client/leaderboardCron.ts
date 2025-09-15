@@ -63,7 +63,6 @@ export const event: Event = {
 
                         // Check if there are changes
                         if (newLeaderboardHash === leaderboardTrack.lastHash) {
-                            console.log(`No changes in leaderboard ${leaderboardTrack.messageId}, skipping update`);
                             continue;
                         }
 
