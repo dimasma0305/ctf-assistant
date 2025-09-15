@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage, CachedAvatarImage } from "@/components/ui/avatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Calendar, Users, Trophy, ExternalLink, Search, MapPin, AlertCircle } from "lucide-react"
 import { useCTFs, useCTFDetails } from "@/hooks/useAPI"
@@ -147,7 +147,7 @@ export function CTFList() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={ctf.logo || "/placeholder.svg"} alt={ctf.title} />
+                    <CachedAvatarImage src={ctf.logo || "/placeholder.svg"} alt={ctf.title} />
                     <AvatarFallback className="bg-primary/20 text-foreground">
                       {ctf.title.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -219,7 +219,7 @@ export function CTFList() {
                 <DialogHeader>
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={selectedCTFDetails.logo || "/placeholder.svg"} alt={selectedCTFDetails.title} />
+                      <CachedAvatarImage src={selectedCTFDetails.logo || "/placeholder.svg"} alt={selectedCTFDetails.title} />
                       <AvatarFallback className="bg-primary/20 text-foreground text-lg">
                         {selectedCTFDetails.title.substring(0, 2).toUpperCase()}
                       </AvatarFallback>

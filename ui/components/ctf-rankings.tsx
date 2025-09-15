@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Trophy, Medal, Award, Users, Target, Calendar } from "lucide-react"
 import { APIClient } from "@/lib/api"
@@ -180,7 +180,7 @@ export function CTFRankings() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={ctf.logo || "/placeholder.svg"} alt={ctf.title} />
+                    <CachedAvatarImage src={ctf.logo || "/placeholder.svg"} alt={ctf.title} />
                     <AvatarFallback className="bg-primary/20 text-foreground">
                       {ctf.title.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -233,7 +233,7 @@ export function CTFRankings() {
                           onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
                         >
                           <Avatar className="w-8 h-8">
-                            <AvatarImage
+                            <CachedAvatarImage
                               src={player.user.avatar || `/abstract-geometric-shapes.png?height=32&width=32&query=${player.user.userId}`}
                             />
                             <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
@@ -293,7 +293,7 @@ export function CTFRankings() {
                 <DialogHeader>
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage
+                      <CachedAvatarImage
                         src={selectedUser.user.avatar || `/abstract-geometric-shapes.png?height=64&width=64&query=${selectedUser.user.userId}`}
                       />
                       <AvatarFallback className="bg-primary/20 text-foreground text-lg">

@@ -5,10 +5,11 @@ import { useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage, CachedAvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Trophy, Star, Users, Clock } from "lucide-react"
+
 import Link from "next/link"
 
 interface UserProfileData {
@@ -230,8 +231,11 @@ export default function UserProfilePage() {
           <CardHeader>
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <Avatar className="w-24 h-24">
-                <AvatarImage
+                <CachedAvatarImage
                   src={`/abstract-geometric-shapes.png?key=profile&height=96&width=96&query=${profileData.userId}`}
+                  loadingPlaceholder={
+                    <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                  }
                 />
                 <AvatarFallback className="text-2xl bg-primary/10 text-primary">
                   {getUserInitials(profileData.userId)}
