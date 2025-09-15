@@ -298,7 +298,49 @@ export function LeaderboardTable() {
           </DialogHeader>
           {selectedUser && (
             <div className="mt-4">
-              <UserProfileCard user={selectedUser} />
+              <UserProfileCard 
+                user={selectedUser} 
+                profileData={{
+                  user: selectedUser.user,
+                  globalRank: selectedUser.rank,
+                  totalUsers: leaderboardData?.metadata.total || 1000,
+                  stats: {
+                    totalScore: selectedUser.totalScore,
+                    solveCount: selectedUser.solveCount,
+                    ctfCount: selectedUser.ctfCount,
+                    categoriesCount: selectedUser.categories.length,
+                    averageScorePerSolve: selectedUser.totalScore / selectedUser.solveCount,
+                    averageSolvesPerCTF: selectedUser.solveCount / selectedUser.ctfCount
+                  },
+                  categoryBreakdown: selectedUser.categories.map((category, index) => {
+                    // Calculate proportional distribution of user's stats across categories
+                    const totalCategories = selectedUser.categories.length
+                    const avgSolvesPerCategory = Math.floor(selectedUser.solveCount / totalCategories)
+                    const avgPointsPerCategory = Math.floor(selectedUser.totalScore / totalCategories)
+                    
+                    // Add remainder to first categories to match totals exactly
+                    const solveRemainder = index < (selectedUser.solveCount % totalCategories) ? 1 : 0
+                    const pointsRemainder = index === 0 ? selectedUser.totalScore % totalCategories : 0
+                    
+                    const solves = avgSolvesPerCategory + solveRemainder
+                    const totalPoints = avgPointsPerCategory + pointsRemainder
+                    
+                    return {
+                      name: category,
+                      solves,
+                      totalPoints,
+                      avgPoints: solves > 0 ? Math.round(totalPoints / solves) : 0
+                    }
+                  }),
+                  ctfParticipation: [],
+                  recentActivity: selectedUser.recentSolves,
+                  achievements: [],
+                  metadata: {
+                    profileGenerated: new Date().toISOString(),
+                    dataSource: "Leaderboard Data"
+                  }
+                }}
+              />
             </div>
           )}
         </DialogContent>

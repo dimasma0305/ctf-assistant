@@ -21,17 +21,71 @@ interface CategoryStat {
   avgPoints: number
 }
 
-import type { LeaderboardEntry } from "@/lib/types"
+import type { LeaderboardEntry, UserProfileResponse } from "@/lib/types"
 
-export function UserProfileCard({ user }: { user: LeaderboardEntry }) {
+interface UserProfileCardProps {
+  user: LeaderboardEntry
+  profileData?: UserProfileResponse
+}
+
+export function UserProfileCard({ user, profileData }: UserProfileCardProps) {
   const [selectedTab, setSelectedTab] = useState("overview")
 
-  const categoryBreakdown: CategoryStat[] = user.categories.map((category) => ({
-    name: category,
-    solves: Math.floor(user.solveCount / user.categories.length) + Math.floor(Math.random() * 10),
-    totalPoints: Math.floor(user.totalScore / user.categories.length) + Math.floor(Math.random() * 100),
-    avgPoints: 20 + Math.floor(Math.random() * 15),
-  }))
+  // Calculate category breakdown from actual solve data
+  const calculateCategoryBreakdown = (): CategoryStat[] => {
+    // Use real category data from profileData if available
+    if (profileData?.categoryBreakdown && profileData.categoryBreakdown.length > 0) {
+      return profileData.categoryBreakdown
+    }
+
+    // Calculate from user's recent solves data
+    const categoryStats = new Map<string, { solves: number; totalPoints: number; points: number[] }>()
+    
+    // Process recent solves to get actual stats
+    user.recentSolves.forEach(solve => {
+      const category = solve.category || 'misc'
+      if (!categoryStats.has(category)) {
+        categoryStats.set(category, { solves: 0, totalPoints: 0, points: [] })
+      }
+      
+      const stats = categoryStats.get(category)!
+      stats.solves += 1
+      stats.totalPoints += solve.points || 0
+      stats.points.push(solve.points || 0)
+    })
+    
+    // If we have no solve data, distribute the user's stats proportionally across categories
+    if (categoryStats.size === 0 && user.categories.length > 0) {
+      const avgSolvesPerCategory = Math.floor(user.solveCount / user.categories.length)
+      const avgPointsPerCategory = Math.floor(user.totalScore / user.categories.length)
+      
+      return user.categories.map((category, index) => {
+        // Add remainder to first categories to match total exactly
+        const remainder = index < (user.solveCount % user.categories.length) ? 1 : 0
+        const pointsRemainder = index < (user.totalScore % user.categories.length) ? user.totalScore % user.categories.length : 0
+        
+        const solves = avgSolvesPerCategory + remainder
+        const totalPoints = avgPointsPerCategory + pointsRemainder
+        
+        return {
+          name: category,
+          solves,
+          totalPoints,
+          avgPoints: solves > 0 ? Math.round(totalPoints / solves) : 0
+        }
+      })
+    }
+    
+    // Convert to CategoryStat format from actual solve data
+    return Array.from(categoryStats.entries()).map(([name, stats]) => ({
+      name,
+      solves: stats.solves,
+      totalPoints: stats.totalPoints,
+      avgPoints: stats.solves > 0 ? Math.round(stats.totalPoints / stats.solves) : 0
+    })).filter(stat => stat.solves > 0) // Only show categories with actual solves
+  }
+
+  const categoryBreakdown: CategoryStat[] = calculateCategoryBreakdown()
 
   const achievements: Achievement[] = [
     ...(user.solveCount >= 100 ? [{ name: "Century Solver", description: "Solved 100+ challenges", icon: "🎯" }] : []),
@@ -69,7 +123,7 @@ export function UserProfileCard({ user }: { user: LeaderboardEntry }) {
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
   }
 
-  const getPercentile = (rank: number, total = 1247) => {
+  const getPercentile = (rank: number, total: number) => {
     return Math.round((1 - (rank - 1) / total) * 100)
   }
 
@@ -118,9 +172,11 @@ export function UserProfileCard({ user }: { user: LeaderboardEntry }) {
               </CardTitle>
               <CardDescription className="flex items-center gap-2 mt-1 flex-wrap">
                 <Trophy className="w-4 h-4 flex-shrink-0" />
-                <span className="whitespace-nowrap">Rank #{user.rank} of 1,247</span>
+                <span className="whitespace-nowrap">
+                  Rank #{user.rank}{profileData ? ` of ${profileData.totalUsers.toLocaleString()}` : ''}
+                </span>
                 <Badge variant="secondary" className="text-foreground whitespace-nowrap">
-                  Top {getPercentile(user.rank)}%
+                  Top {profileData ? getPercentile(user.rank, profileData.totalUsers) : getPercentile(user.rank, 1000)}%
                 </Badge>
               </CardDescription>
             </div>
@@ -206,7 +262,10 @@ export function UserProfileCard({ user }: { user: LeaderboardEntry }) {
                       {category.solves} solves • {category.totalPoints} pts
                     </div>
                   </div>
-                  <Progress value={(category.solves / user.solveCount) * 100} className="h-2" />
+                  <Progress 
+                    value={user.solveCount > 0 ? (category.solves / user.solveCount) * 100 : 0} 
+                    className="h-2" 
+                  />
                   <div className="text-xs text-muted-foreground">Average: {category.avgPoints} points per solve</div>
                 </div>
               ))}
