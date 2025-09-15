@@ -8,6 +8,7 @@ import fetchCommandSchema from './fetchCommandSchema';
 import ctfCacheSchema from './ctfCacheSchema';
 import weightRetrySchema from './weightRetrySchema';
 import leaderboardTrackingSchema from './leaderboardTrackingSchema';
+import userSchema from './userSchema';
 
 const MONGO_URI = process.env.MONGO_URI || ""
 
@@ -24,5 +25,6 @@ export const FetchCommandModel = mongoose.model("FetchCommand", fetchCommandSche
 export const CTFCacheModel = mongoose.model("CTFCache", ctfCacheSchema)
 export const WeightRetryModel = mongoose.model("WeightRetry", weightRetrySchema)
 export const LeaderboardTrackingModel = mongoose.model("LeaderboardTracking", leaderboardTrackingSchema)
+export const UserModel = mongoose.model("User", userSchema)
 
-export default { connect, EventModel, ChallengeModel, solveModel, MessageModel, SessionStateModel, FetchCommandModel, CTFCacheModel, WeightRetryModel, LeaderboardTrackingModel }
+export default { connect, EventModel, ChallengeModel, solveModel, MessageModel, SessionStateModel, FetchCommandModel, CTFCacheModel, WeightRetryModel, LeaderboardTrackingModel, UserModel }

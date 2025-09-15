@@ -50,7 +50,7 @@ interface UserSolve {
 }
 
 interface UserScore {
-    userId: string;
+    userId: string; // This will be the discord_id for Discord mentions
     totalScore: number;
     solveCount: number;
     ctfCount: number;
@@ -88,8 +88,8 @@ export class FairScoringSystem {
      * Get user scores with normalized scoring algorithm
      */
     static async calculateUserScores(globalQuery: any = {}): Promise<Map<string, UserScore>> {
-        // Get solves with populated challenge data
-        const solves = await solveModel.find(globalQuery).populate('challenge_ref').lean();
+        // Get solves with populated challenge data and user data
+        const solves = await solveModel.find(globalQuery).populate('challenge_ref').populate('users').lean();
         const userScores = new Map<string, UserScore>();
 
         // Get unique CTF IDs from solves
@@ -112,10 +112,26 @@ export class FairScoringSystem {
                 challengePoints = challengeRef.points || 100;
             }
 
-            for (const userId of solve.users) {
-                if (!userScores.has(userId)) {
-                    userScores.set(userId, {
-                        userId,
+            // Extract discord_ids from populated users
+            const userDiscordIds: string[] = [];
+            if (Array.isArray(solve.users)) {
+                for (const user of solve.users) {
+                    if (typeof user === 'object' && user !== null && 'discord_id' in user) {
+                        // User is populated
+                        const populatedUser = user as any;
+                        userDiscordIds.push(populatedUser.discord_id);
+                    } else if (typeof user === 'string') {
+                        // Fallback: if not populated, assume it's a discord_id (shouldn't happen with new system)
+                        console.warn('User not populated in solve:', solve._id);
+                        userDiscordIds.push(user);
+                    }
+                }
+            }
+
+            for (const discordId of userDiscordIds) {
+                if (!userScores.has(discordId)) {
+                    userScores.set(discordId, {
+                        userId: discordId,
                         totalScore: 0,
                         solveCount: 0,
                         ctfCount: 0,
@@ -125,14 +141,14 @@ export class FairScoringSystem {
                     });
                 }
 
-                const userScore = userScores.get(userId)!;
+                const userScore = userScores.get(discordId)!;
                 userScore.recentSolves.push({
                     ctf_id: solve.ctf_id || '',
                     challenge: challengeName,
                     category: challengeCategory,
                     points: challengePoints,
                     solved_at: solve.solved_at || new Date(),
-                    users: solve.users || []
+                    users: userDiscordIds
                 });
             }
         }

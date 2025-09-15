@@ -6,7 +6,7 @@ import {
     getChallengeInfo, 
     getChannelAndCTFData, 
     validateCTFEvent, 
-    extractUserIdsFromMentions, 
+    extractAndProcessUserIds, 
     markThreadAsSolved 
 } from "./utils";
 
@@ -67,7 +67,7 @@ export const command: SubCommand = {
         const { challengeName, category } = challengeInfo;
 
         const players = interaction.options.getString("players");
-        const users = extractUserIdsFromMentions(players, interaction.user.id);
+        const userObjectIds = await extractAndProcessUserIds(players, interaction.user.id, interaction);
 
         const result = await getChannelAndCTFData(channel);
         if (!result) {
@@ -87,7 +87,7 @@ export const command: SubCommand = {
         
         const existingSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: ctfData.id.toString() });
         if (existingSolve) {
-            existingSolve.users = users;
+            existingSolve.users = userObjectIds;
             existingSolve.category = category; // Update category in case it changed
             existingSolve.challenge_ref = challengeData._id; // Update challenge reference
             await existingSolve.save();
@@ -96,7 +96,7 @@ export const command: SubCommand = {
                 challenge: challengeName,
                 ctf_id: ctfData.id.toString(),
                 category: category,
-                users: users,
+                users: userObjectIds,
                 challenge_ref: challengeData._id,
             });
             await newSolve.save();
@@ -106,10 +106,14 @@ export const command: SubCommand = {
         challengeData.is_solved = true;
         await challengeData.save();
         
+        // Get Discord IDs for mentions by populating the users
+        const populatedSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: ctfData.id.toString() }).populate('users');
+        const discordIds = populatedSolve?.users?.map((user: any) => user.discord_id) || [];
+        
         const winnerEmbed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle('Congratulations!')
-            .setDescription(`Congratulations to ${users.map(user => `<@${user}>`).join(', ')} for solving the **[${category}]** challenge **${challengeName}**!`)
+            .setDescription(`Congratulations to ${discordIds.map(id => `<@${id}>`).join(', ')} for solving the **[${category}]** challenge **${challengeName}**!`)
             .setTimestamp()
             .setFooter({ text: 'CTF Event', iconURL: 'https://tcp1p.team/favicon.ico' });
 
@@ -123,7 +127,7 @@ export const command: SubCommand = {
             const threadNotificationEmbed = new EmbedBuilder()
                 .setColor('#00ff00')
                 .setTitle('🎉 Challenge Solved!')
-                .setDescription(`This challenge has been marked as solved by ${users.map(user => `<@${user}>`).join(', ')}`)
+                .setDescription(`This challenge has been marked as solved by ${discordIds.map(id => `<@${id}>`).join(', ')}`)
                 .setTimestamp()
                 .setFooter({ text: 'Challenge Status Update', iconURL: 'https://tcp1p.team/favicon.ico' });
             

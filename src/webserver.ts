@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import session from "express-session";
 import flash from "connect-flash";
 import FairScoringSystem from "./Functions/scoringSystem";
-import { CTFCacheModel, solveModel } from "./Database/connect";
+import { CTFCacheModel, solveModel, UserModel } from "./Database/connect";
 
 // Type definitions for user profile data
 interface UserSolve {
@@ -16,11 +16,21 @@ interface UserSolve {
     category: string;
     points: number;
     solved_at: Date;
-    users: string[];
+    users: string[]; // Discord IDs for consistency
+}
+
+interface UserInfo {
+    userId: string; // Discord ID for mentions
+    username: string;
+    displayName: string;
+    avatar?: string;
 }
 
 interface UserProfile {
-    userId: string;
+    userId: string; // Discord ID for Discord mentions and consistency
+    username: string;
+    displayName: string;
+    avatar?: string;
     totalScore: number;
     solveCount: number;
     ctfCount: number;
@@ -143,7 +153,7 @@ function generateCacheKey(prefix: string, query: any = {}): string {
     return `${prefix}:${crypto.createHash('md5').update(queryString).digest('hex')}`;
 }
 
-// Cached version of FairScoringSystem.calculateUserScores
+// Cached version of FairScoringSystem.calculateUserScores with user profile enrichment
 async function getCachedUserScores(query: any = {}, ttl?: number): Promise<Map<string, UserProfile>> {
     const cacheKey = generateCacheKey('userScores', query);
     
@@ -151,9 +161,49 @@ async function getCachedUserScores(query: any = {}, ttl?: number): Promise<Map<s
     let userScores = cache.getCached<Map<string, UserProfile>>(cacheKey);
     
     if (!userScores) {
-        // Calculate fresh data
-        userScores = await FairScoringSystem.calculateUserScores(query) as Map<string, UserProfile>;
-        // Cache the result
+        // Calculate fresh scoring data
+        const scoringData = await FairScoringSystem.calculateUserScores(query);
+        
+        // Get all unique Discord IDs from the scoring data
+        const discordIds = Array.from(scoringData.keys());
+        
+        // Fetch user profile data for all users in bulk
+        const userProfiles = await UserModel.find({ 
+            discord_id: { $in: discordIds } 
+        }).lean();
+        
+        // Create a lookup map for user profile data
+        const userLookup = new Map<string, any>();
+        userProfiles.forEach(user => {
+            userLookup.set(user.discord_id, {
+                username: user.username,
+                displayName: user.display_name,
+                avatar: user.avatar
+            });
+        });
+        
+        // Enrich scoring data with user profile information
+        userScores = new Map<string, UserProfile>();
+        
+        for (const [discordId, scoreData] of scoringData) {
+            const userInfo = userLookup.get(discordId);
+            const enrichedProfile: UserProfile = {
+                userId: discordId,
+                username: userInfo?.username || `User_${discordId}`,
+                displayName: userInfo?.displayName || userInfo?.username || `User_${discordId}`,
+                avatar: userInfo?.avatar,
+                totalScore: scoreData.totalScore,
+                solveCount: scoreData.solveCount,
+                ctfCount: scoreData.ctfCount,
+                categories: scoreData.categories,
+                recentSolves: scoreData.recentSolves,
+                ctfBreakdown: scoreData.ctfBreakdown
+            };
+            
+            userScores.set(discordId, enrichedProfile);
+        }
+        
+        // Cache the enriched result
         cache.set(cacheKey, userScores, ttl);
     }
     
@@ -238,7 +288,12 @@ app.get("/api/scoreboard", async (req, res) => {
         // Format data for JSON response (convert Sets and Maps to arrays/objects)
         const formattedLeaderboard = paginatedLeaderboard.map((entry, index) => ({
             rank: offset + index + 1,
-            userId: entry.userId,
+            user: {
+                userId: entry.userId,
+                username: entry.username,
+                displayName: entry.displayName,
+                avatar: entry.avatar
+            },
             totalScore: Math.round(entry.totalScore * 100) / 100, // round to 2 decimal places
             solveCount: entry.solveCount,
             ctfCount: entry.ctfCount,
@@ -367,7 +422,12 @@ app.get("/api/profile/:id", async (req, res) => {
 
         // Response data
         const profileData = {
-            userId,
+            user: {
+                userId,
+                username: userProfile.username,
+                displayName: userProfile.displayName,
+                avatar: userProfile.avatar
+            },
             globalRank: userRank,
             totalUsers: allUsers.length,
             stats: {
@@ -522,7 +582,12 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
 
         // Response data
         const ctfProfileData = {
-            userId,
+            user: {
+                userId,
+                username: userProfile.username,
+                displayName: userProfile.displayName,
+                avatar: userProfile.avatar
+            },
             ctfId,
             ctfInfo: {
                 title: ctfInfo.ctfTitle,
@@ -887,7 +952,12 @@ app.get("/api/ctfs/rankings", async (req, res) => {
                 .slice(0, 5) // Top 5 for rankings view
                 .map((user, index) => ({
                     rank: index + 1,
-                    userId: user.userId,
+                    user: {
+                        userId: user.userId,
+                        username: user.username,
+                        displayName: user.displayName,
+                        avatar: user.avatar
+                    },
                     score: Math.round(user.totalScore * 100) / 100,
                     solves: user.solveCount
                 }));
@@ -1026,7 +1096,12 @@ app.get("/api/ctfs/:ctfId", async (req, res) => {
             .slice(0, 10)
             .map((user, index) => ({
                 rank: index + 1,
-                userId: user.userId,
+                user: {
+                    userId: user.userId,
+                    username: user.username,
+                    displayName: user.displayName,
+                    avatar: user.avatar
+                },
                 score: Math.round(user.totalScore * 100) / 100,
                 solves: user.solveCount
             }));

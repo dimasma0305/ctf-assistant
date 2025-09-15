@@ -12,7 +12,7 @@
  * Usage: bun run scripts/populate-db.ts [--clear] [--help]
  */
 
-import { connect, EventModel, ChallengeModel, solveModel, MessageModel, CTFCacheModel } from '../src/Database/connect.ts';
+import { connect, EventModel, ChallengeModel, solveModel, MessageModel, CTFCacheModel, UserModel } from '../src/Database/connect.ts';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -341,14 +341,24 @@ class DatabasePopulator {
     async populateSolves(challenges: any[]) {
         this.log('Populating Sample Solves...');
         
-        // Sample Discord user IDs
-        const sampleUsers = [
-            "123456789012345678", // user1
-            "234567890123456789", // user2  
-            "345678901234567890", // user3
-            "456789012345678901", // user4
-            "567890123456789012"  // user5
+        // Sample Discord user data (with IDs, usernames, display names)
+        const sampleUserData = [
+            { discord_id: "123456789012345678", username: "ctf_player1", display_name: "CTF Player 1" },
+            { discord_id: "234567890123456789", username: "hacker_elite", display_name: "Elite Hacker" },
+            { discord_id: "345678901234567890", username: "crypto_master", display_name: "Crypto Master" },
+            { discord_id: "456789012345678901", username: "pwn_king", display_name: "PWN King" },
+            { discord_id: "567890123456789012", username: "web_wizard", display_name: "Web Wizard" }
         ];
+
+        // Create or find User documents
+        const sampleUserObjects = [];
+        for (const userData of sampleUserData) {
+            let user = await UserModel.findOne({ discord_id: userData.discord_id });
+            if (!user) {
+                user = await UserModel.create(userData);
+            }
+            sampleUserObjects.push(user);
+        }
 
         const sampleSolves = [];
         
@@ -356,12 +366,12 @@ class DatabasePopulator {
         const solvedChallenges = challenges.filter(c => c.is_solved || c.points <= 100);
         
         for (const challenge of solvedChallenges) {
-            const numSolvers = Math.min(Math.floor(Math.random() * 3) + 1, sampleUsers.length);
-            const solvers = sampleUsers.slice(0, numSolvers);
+            const numSolvers = Math.min(Math.floor(Math.random() * 3) + 1, sampleUserObjects.length);
+            const solvers = sampleUserObjects.slice(0, numSolvers);
             
             const solve = {
                 ctf_id: challenge.ctf_id,
-                users: solvers,
+                users: solvers.map(user => user._id), // Use ObjectId references
                 challenge_ref: challenge._id,
                 challenge: challenge.name,
                 category: challenge.category,
@@ -373,7 +383,7 @@ class DatabasePopulator {
 
         if (sampleSolves.length > 0) {
             const solves = await solveModel.insertMany(sampleSolves);
-            this.success(`Created ${solves.length} solve records`);
+            this.success(`Created ${solves.length} solve records with ${sampleUserObjects.length} users`);
             return solves;
         } else {
             this.log('No solves to create');

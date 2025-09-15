@@ -21,7 +21,7 @@ export const command: SubCommand = {
       interaction.reply("This channel does not have a valid CTF event associated with it.");
       return
     }
-    const solves = await solveModel.find({ctf_id: data.id})
+    const solves = await solveModel.find({ctf_id: data.id}).populate('users')
     var description;
     if (solves.length == 0){
         description = "No solved challenges found."
@@ -42,7 +42,19 @@ export const command: SubCommand = {
             .map(category => {
                 const categoryHeader = `**[${category}]**`;
                 const challengesList = solvesByCategory[category]
-                    .map((solve: any) => `• **${solve.challenge}** solved by ${solve.users.map((user: string) => `<@${user}>`).join(', ')}`)
+                    .map((solve: any) => {
+                        // Extract discord_ids from populated users
+                        const userMentions = solve.users.map((user: any) => {
+                            if (typeof user === 'object' && user !== null && 'discord_id' in user) {
+                                return `<@${user.discord_id}>`;
+                            } else if (typeof user === 'string') {
+                                // Fallback for old data
+                                return `<@${user}>`;
+                            }
+                            return '<@unknown>';
+                        }).join(', ');
+                        return `• **${solve.challenge}** solved by ${userMentions}`;
+                    })
                     .join('\n');
                 return `${categoryHeader}\n${challengesList}`;
             })

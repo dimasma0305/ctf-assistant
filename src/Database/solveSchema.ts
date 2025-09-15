@@ -6,10 +6,11 @@ export const solveSchema = {
         type: String,
         required: true,
     },
-    users: {
-        type: [String],
-        required: true,
-    },
+    users: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }],
     // Reference to Challenge model
     challenge_ref: {
         type: mongoose.Schema.Types.ObjectId,
