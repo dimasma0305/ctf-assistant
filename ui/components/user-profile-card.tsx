@@ -21,23 +21,9 @@ interface CategoryStat {
   avgPoints: number
 }
 
-interface UserProfile {
-  rank: number
-  userId: string
-  totalScore: number
-  solveCount: number
-  ctfCount: number
-  categories: string[]
-  recentSolves: Array<{
-    ctf_id: string
-    challenge: string
-    category: string
-    points: number
-    solved_at: string
-  }>
-}
+import type { LeaderboardEntry } from "@/lib/types"
 
-export function UserProfileCard({ user }: { user: UserProfile }) {
+export function UserProfileCard({ user }: { user: LeaderboardEntry }) {
   const [selectedTab, setSelectedTab] = useState("overview")
 
   const categoryBreakdown: CategoryStat[] = user.categories.map((category) => ({
@@ -65,8 +51,18 @@ export function UserProfileCard({ user }: { user: UserProfile }) {
     ...(user.rank <= 10 ? [{ name: "Elite Player", description: "Top 10 global ranking", icon: "⭐" }] : []),
   ]
 
-  const getUserInitials = (userId: string) => {
-    return userId.replace("user_", "").toUpperCase().slice(0, 2)
+  const getUserInitials = (user: LeaderboardEntry['user']) => {
+    // Use display name for initials
+    const name = user.displayName || user.username
+    const parts = name.split(' ')
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
+
+  const getUserDisplayName = (user: LeaderboardEntry['user']) => {
+    return user.displayName || user.username
   }
 
   const formatScore = (score: number) => {
@@ -111,14 +107,14 @@ export function UserProfileCard({ user }: { user: UserProfile }) {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="w-16 h-16 flex-shrink-0">
-              <AvatarImage src={`/abstract-geometric-shapes.png?key=profile&height=64&width=64&query=${user.userId}`} />
+              <AvatarImage src={user.user.avatar || `/abstract-geometric-shapes.png?key=profile&height=64&width=64&query=${user.user.userId}`} />
               <AvatarFallback className="text-lg bg-primary/20 text-foreground font-medium">
-                {getUserInitials(user.userId)}
+                {getUserInitials(user.user)}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
               <CardTitle className="text-2xl font-[family-name:var(--font-playfair)] truncate">
-                {user.userId.replace("user_", "Player ")}
+                {getUserDisplayName(user.user)}
               </CardTitle>
               <CardDescription className="flex items-center gap-2 mt-1 flex-wrap">
                 <Trophy className="w-4 h-4 flex-shrink-0" />

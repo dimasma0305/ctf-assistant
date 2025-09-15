@@ -1,5 +1,12 @@
 // API Response Types
 
+export interface UserInfo {
+  userId: string
+  username: string
+  displayName: string
+  avatar?: string
+}
+
 export interface UserSolve {
   ctf_id: string
   challenge: string
@@ -23,7 +30,7 @@ export interface CTFBreakdown {
 // Scoreboard API Types
 export interface LeaderboardEntry {
   rank: number
-  userId: string
+  user: UserInfo
   totalScore: number
   solveCount: number
   ctfCount: number
@@ -63,7 +70,7 @@ export interface CategoryStats {
 }
 
 export interface UserProfileResponse {
-  userId: string
+  user: UserInfo
   globalRank: number
   totalUsers: number
   stats: {
@@ -86,7 +93,7 @@ export interface UserProfileResponse {
 
 // CTF-specific Profile API Types
 export interface CTFProfileResponse {
-  userId: string
+  user: UserInfo
   ctfId: string
   ctfInfo: {
     title: string
@@ -218,7 +225,7 @@ export interface CTFDetailsResponse extends Omit<CTFResponse, 'communityParticip
   }
   leaderboard: Array<{
     rank: number
-    userId: string
+    user: UserInfo
     score: number
     solves: number
   }>
@@ -273,7 +280,7 @@ export interface CTFsParams {
 // CTF Rankings API Types
 export interface CTFRankingLeaderboardEntry {
   rank: number
-  userId: string
+  user: UserInfo
   score: number
   solves: number
 }

@@ -223,25 +223,27 @@ export function CTFRankings() {
                 </TableHeader>
                 <TableBody>
                   {ctf.leaderboard.map((player) => (
-                    <TableRow key={player.userId} className="hover:bg-muted/50">
+                    <TableRow key={player.user.userId} className="hover:bg-muted/50">
                       <TableCell className="font-medium">
                         <div className="flex items-center justify-center">{getRankIcon(player.rank)}</div>
                       </TableCell>
                       <TableCell>
                         <div
                           className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-colors"
-                          onClick={() => handleUserClick(ctf.ctf_id, player.userId)}
+                          onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
                         >
                           <Avatar className="w-8 h-8">
                             <AvatarImage
-                              src={`/abstract-geometric-shapes.png?height=32&width=32&query=${player.userId}`}
+                              src={player.user.avatar || `/abstract-geometric-shapes.png?height=32&width=32&query=${player.user.userId}`}
                             />
                             <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
-                              {player.userId.substring(0, 2).toUpperCase()}
+                              {(player.user.displayName || player.user.username).substring(0, 2).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <div className="font-medium hover:text-primary transition-colors">{player.userId}</div>
+                            <div className="font-medium hover:text-primary transition-colors">
+                              {player.user.displayName || player.user.username}
+                            </div>
                             <div className="text-sm text-muted-foreground">
                               {player.rank <= 3 ? "Elite" : player.rank <= 10 ? "Advanced" : "Intermediate"}
                             </div>
@@ -292,15 +294,15 @@ export function CTFRankings() {
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
                       <AvatarImage
-                        src={`/abstract-geometric-shapes.png?height=64&width=64&query=${selectedUser.userId}`}
+                        src={selectedUser.user.avatar || `/abstract-geometric-shapes.png?height=64&width=64&query=${selectedUser.user.userId}`}
                       />
                       <AvatarFallback className="bg-primary/20 text-foreground text-lg">
-                        {selectedUser.userId.substring(0, 2).toUpperCase()}
+                        {(selectedUser.user.displayName || selectedUser.user.username).substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <DialogTitle className="text-2xl font-[family-name:var(--font-playfair)]">
-                        {selectedUser.userId}
+                        {selectedUser.user.displayName || selectedUser.user.username}
                       </DialogTitle>
                       <DialogDescription className="text-base flex items-center gap-2">
                         <Trophy className="w-4 h-4" />

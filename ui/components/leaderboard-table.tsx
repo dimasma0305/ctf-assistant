@@ -76,19 +76,18 @@ export function LeaderboardTable() {
     }
   }
 
-  const getUserInitials = (userId: string) => {
-    // Handle different user ID formats
-    if (userId.startsWith("user_")) {
-      return userId.replace("user_", "").toUpperCase().slice(0, 2)
+  const getUserInitials = (user: LeaderboardEntry['user']) => {
+    // Use display name for initials
+    const name = user.displayName || user.username
+    const parts = name.split(' ')
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
     }
-    return userId.slice(0, 2).toUpperCase()
+    return name.slice(0, 2).toUpperCase()
   }
 
-  const getUserDisplayName = (userId: string) => {
-    if (userId.startsWith("user_")) {
-      return userId.replace("user_", "Player ")
-    }
-    return userId
+  const getUserDisplayName = (user: LeaderboardEntry['user']) => {
+    return user.displayName || user.username
   }
 
   const formatScore = (score: number) => {
@@ -174,64 +173,64 @@ export function LeaderboardTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {leaderboardData?.data.map((user) => (
-                <TableRow key={user.userId} className="hover:bg-muted/50">
+              {leaderboardData?.data.map((entry) => (
+                <TableRow key={entry.user.userId} className="hover:bg-muted/50">
                   <TableCell className="font-medium">
-                    <div className="flex items-center justify-center">{getRankIcon(user.rank)}</div>
+                    <div className="flex items-center justify-center">{getRankIcon(entry.rank)}</div>
                   </TableCell>
                   <TableCell>
                     <div
                       className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-colors"
-                      onClick={() => handleUserClick(user)}
+                      onClick={() => handleUserClick(entry)}
                     >
                       <Avatar className="w-8 h-8">
-                        <AvatarImage src={`/abstract-geometric-shapes.png?height=32&width=32&query=${user.userId}`} />
+                        <AvatarImage src={entry.user.avatar || `/abstract-geometric-shapes.png?height=32&width=32&query=${entry.user.userId}`} />
                         <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
-                          {getUserInitials(user.userId)}
+                          {getUserInitials(entry.user)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="font-medium hover:text-primary transition-colors">
-                          {getUserDisplayName(user.userId)}
+                          {getUserDisplayName(entry.user)}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {user.rank <= 10 ? "Elite" : user.rank <= 50 ? "Advanced" : "Intermediate"}
+                          {entry.rank <= 10 ? "Elite" : entry.rank <= 50 ? "Advanced" : "Intermediate"}
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="font-mono font-bold text-primary">{formatScore(user.totalScore)}</div>
+                    <div className="font-mono font-bold text-primary">{formatScore(entry.totalScore)}</div>
                   </TableCell>
                   <TableCell className="text-right">
                     <Badge variant="secondary" className="font-mono text-foreground">
-                      {user.solveCount}
+                      {entry.solveCount}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <Badge variant="outline" className="font-mono">
-                      {user.ctfCount}
+                      {entry.ctfCount}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {user.categories.slice(0, 3).map((category) => (
+                      {entry.categories.slice(0, 3).map((category) => (
                         <Badge key={category} variant="secondary" className="text-xs text-foreground">
                           {category}
                         </Badge>
                       ))}
-                      {user.categories.length > 3 && (
+                      {entry.categories.length > 3 && (
                         <Badge variant="secondary" className="text-xs text-foreground">
-                          +{user.categories.length - 3}
+                          +{entry.categories.length - 3}
                         </Badge>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    {user.recentSolves.length > 0 ? (
+                    {entry.recentSolves.length > 0 ? (
                       <div className="text-sm">
-                        <div className="font-medium truncate max-w-32">{user.recentSolves[0].challenge}</div>
-                        <div className="text-muted-foreground">{user.recentSolves[0].points} pts</div>
+                        <div className="font-medium truncate max-w-32">{entry.recentSolves[0].challenge}</div>
+                        <div className="text-muted-foreground">{entry.recentSolves[0].points} pts</div>
                       </div>
                     ) : (
                       <span className="text-muted-foreground text-sm">No recent activity</span>
@@ -294,7 +293,7 @@ export function LeaderboardTable() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-[family-name:var(--font-playfair)]">
-              {selectedUser ? `${getUserDisplayName(selectedUser.userId)} Profile` : "User Profile"}
+              {selectedUser ? `${getUserDisplayName(selectedUser.user)} Profile` : "User Profile"}
             </DialogTitle>
           </DialogHeader>
           {selectedUser && (
