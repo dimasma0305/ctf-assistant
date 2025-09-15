@@ -14,7 +14,7 @@ services:
       - MONGO_URI=mongodb://root:example@mongo/
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ctf-assistant.rule=Host(`assistant.dimasc.tf`)"
+      - "traefik.http.routers.ctf-assistant.rule=Host(`api.assistant.dimasc.tf`)"
       - "traefik.http.routers.ctf-assistant.entrypoints=websecure"
       - "traefik.http.routers.ctf-assistant.service=ctf-assistant"
       - "traefik.http.services.ctf-assistant.loadbalancer.server.port=3000"
@@ -34,7 +34,7 @@ services:
       traefik:
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ui.rule=Host(`api.assistant.dimasc.tf`)"
+      - "traefik.http.routers.ui.rule=Host(`assistant.dimasc.tf`)"
       - "traefik.http.routers.ui.entrypoints=websecure"
       - "traefik.http.routers.ui.service=ui"
       - "traefik.http.services.ui.loadbalancer.server.port=3001"
