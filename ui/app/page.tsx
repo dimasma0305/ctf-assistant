@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,7 +14,29 @@ import Image from "next/image"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("leaderboard")
-  
+  const router = useRouter()
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) // Remove the #
+      if (hash === "leaderboard" || hash === "ctfs" || hash === "ctf-rankings") {
+        setActiveTab(hash)
+      }
+    }
+
+    // Set initial tab from hash
+    handleHashChange()
+
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashChange)
+    return () => window.removeEventListener("hashchange", handleHashChange)
+  }, [])
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    window.location.hash = value
+  }
+
   // Get data for stats overview
   const { data: leaderboardData } = useScoreboard({ limit: 1 }) // Just need metadata
   const { data: ctfsData } = useCTFs({ limit: 1 }) // Just need metadata
@@ -97,7 +120,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="leaderboard">Global Leaderboard</TabsTrigger>
             <TabsTrigger value="ctfs">CTFs</TabsTrigger>

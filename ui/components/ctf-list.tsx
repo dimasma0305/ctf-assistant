@@ -7,11 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage, CachedAvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Calendar, Users, Trophy, ExternalLink, Search, MapPin, AlertCircle } from "lucide-react"
 import { useCTFs, useCTFDetails } from "@/hooks/useAPI"
-import { CTFResponse, CTFDetailsResponse } from "@/lib/types"
 
 export function CTFList() {
   const [selectedCTFId, setSelectedCTFId] = useState<string | null>(null)
@@ -20,10 +19,15 @@ export function CTFList() {
   const [formatFilter, setFormatFilter] = useState<string>("all")
 
   // Use API hooks
-  const { data: ctfsData, loading, error, updateParams } = useCTFs({
+  const {
+    data: ctfsData,
+    loading,
+    error,
+    updateParams,
+  } = useCTFs({
     limit: 50, // Get more CTFs for filtering
     hasParticipation: true, // Only show CTFs we participated in by default
-    sortBy: 'start_desc'
+    sortBy: "start_desc",
   })
 
   const { data: selectedCTFDetails, loading: detailLoading, error: detailError } = useCTFDetails(selectedCTFId)
@@ -54,9 +58,9 @@ export function CTFList() {
       case "upcoming":
         return "bg-blue-500/20 text-blue-400 border-blue-500/30"
       case "completed":
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30"
+        return "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/30"
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30"
+        return "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/30"
     }
   }
 
@@ -91,9 +95,7 @@ export function CTFList() {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Failed to load CTF data: {error}
-        </AlertDescription>
+        <AlertDescription>Failed to load CTF data: {error}</AlertDescription>
       </Alert>
     )
   }
@@ -147,7 +149,7 @@ export function CTFList() {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
                   <Avatar className="h-12 w-12">
-                    <CachedAvatarImage 
+                    <CachedAvatarImage
                       src={ctf.logo || "/placeholder.svg"}
                       loadingPlaceholder={
                         <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
@@ -213,9 +215,7 @@ export function CTFList() {
             <div className="p-8 text-center">
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Failed to load CTF details: {detailError}
-                </AlertDescription>
+                <AlertDescription>Failed to load CTF details: {detailError}</AlertDescription>
               </Alert>
             </div>
           ) : (
@@ -224,7 +224,7 @@ export function CTFList() {
                 <DialogHeader>
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
-                      <CachedAvatarImage 
+                      <CachedAvatarImage
                         src={selectedCTFDetails.logo || "/placeholder.svg"}
                         loadingPlaceholder={
                           <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
@@ -239,7 +239,8 @@ export function CTFList() {
                         {selectedCTFDetails.title}
                       </DialogTitle>
                       <DialogDescription className="text-base">
-                        {selectedCTFDetails.organizer} • {selectedCTFDetails.format} • Weight: {selectedCTFDetails.weight}
+                        {selectedCTFDetails.organizer} • {selectedCTFDetails.format} • Weight:{" "}
+                        {selectedCTFDetails.weight}
                       </DialogDescription>
                     </div>
                   </div>

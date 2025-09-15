@@ -36,7 +36,7 @@ export interface LeaderboardEntry {
   ctfCount: number
   categories: string[]
   recentSolves: UserSolve[]
-  ctfBreakdown: Record<string, Omit<CTFBreakdown, 'ctfId'>>
+  ctfBreakdown: Record<string, Omit<CTFBreakdown, "ctfId">>
 }
 
 export interface ScoreboardResponse {
@@ -50,10 +50,6 @@ export interface ScoreboardResponse {
     ctfId: string | null
     searchTerm: string | null
     isFiltered: boolean
-    month: string | null  // YYYY-MM format
-    year: number | null
-    availableMonths: string[]  // Array of YYYY-MM strings
-    availableYears: number[]   // Array of available years
     timestamp: string
   }
   data: LeaderboardEntry[]
@@ -176,7 +172,7 @@ export interface CTFResponse {
   schedule: {
     start: string
     finish: string
-    status: 'upcoming' | 'active' | 'completed'
+    status: "upcoming" | "active" | "completed"
     durationHours: number
     timeUntilStart?: number
     timeUntilEnd?: number
@@ -218,7 +214,7 @@ export interface CTFsResponse {
 }
 
 // CTF Details API Types
-export interface CTFDetailsResponse extends Omit<CTFResponse, 'communityParticipation'> {
+export interface CTFDetailsResponse extends Omit<CTFResponse, "communityParticipation"> {
   communityStats: {
     participated: boolean
     totalSolves: number
@@ -273,16 +269,18 @@ export interface ScoreboardParams {
   ctf_id?: string
   global?: boolean
   search?: string
+  month?: string // YYYY-MM format
+  year?: number
 }
 
 export interface CTFsParams {
   limit?: number
   offset?: number
-  status?: 'upcoming' | 'active' | 'completed'
+  status?: "upcoming" | "active" | "completed"
   format?: string
   organizer?: string
   hasParticipation?: boolean
-  sortBy?: 'start_desc' | 'start_asc' | 'title' | 'participants'
+  sortBy?: "start_desc" | "start_asc" | "title" | "participants"
 }
 
 // CTF Rankings API Types
@@ -301,7 +299,7 @@ export interface CTFRanking {
   schedule: {
     start: string
     finish: string
-    status: 'upcoming' | 'active' | 'completed'
+    status: "upcoming" | "active" | "completed"
   }
   communityStats: {
     uniqueParticipants: number
@@ -325,6 +323,6 @@ export interface CTFRankingsResponse {
 
 export interface CTFRankingsParams {
   limit?: number
-  status?: 'upcoming' | 'active' | 'completed'
+  status?: "upcoming" | "active" | "completed"
   hasParticipation?: boolean
 }

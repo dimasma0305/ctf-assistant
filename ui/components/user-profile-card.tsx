@@ -40,49 +40,52 @@ export function UserProfileCard({ user, profileData }: UserProfileCardProps) {
 
     // Calculate from user's recent solves data
     const categoryStats = new Map<string, { solves: number; totalPoints: number; points: number[] }>()
-    
+
     // Process recent solves to get actual stats
-    user.recentSolves.forEach(solve => {
-      const category = solve.category || 'misc'
+    user.recentSolves.forEach((solve) => {
+      const category = solve.category || "misc"
       if (!categoryStats.has(category)) {
         categoryStats.set(category, { solves: 0, totalPoints: 0, points: [] })
       }
-      
+
       const stats = categoryStats.get(category)!
       stats.solves += 1
       stats.totalPoints += solve.points || 0
       stats.points.push(solve.points || 0)
     })
-    
+
     // If we have no solve data, distribute the user's stats proportionally across categories
     if (categoryStats.size === 0 && user.categories.length > 0) {
       const avgSolvesPerCategory = Math.floor(user.solveCount / user.categories.length)
       const avgPointsPerCategory = Math.floor(user.totalScore / user.categories.length)
-      
+
       return user.categories.map((category, index) => {
         // Add remainder to first categories to match total exactly
-        const remainder = index < (user.solveCount % user.categories.length) ? 1 : 0
-        const pointsRemainder = index < (user.totalScore % user.categories.length) ? user.totalScore % user.categories.length : 0
-        
+        const remainder = index < user.solveCount % user.categories.length ? 1 : 0
+        const pointsRemainder =
+          index < user.totalScore % user.categories.length ? user.totalScore % user.categories.length : 0
+
         const solves = avgSolvesPerCategory + remainder
         const totalPoints = avgPointsPerCategory + pointsRemainder
-        
+
         return {
           name: category,
           solves,
           totalPoints,
-          avgPoints: solves > 0 ? Math.round(totalPoints / solves) : 0
+          avgPoints: solves > 0 ? Math.round(totalPoints / solves) : 0,
         }
       })
     }
-    
+
     // Convert to CategoryStat format from actual solve data
-    return Array.from(categoryStats.entries()).map(([name, stats]) => ({
-      name,
-      solves: stats.solves,
-      totalPoints: stats.totalPoints,
-      avgPoints: stats.solves > 0 ? Math.round(stats.totalPoints / stats.solves) : 0
-    })).filter(stat => stat.solves > 0) // Only show categories with actual solves
+    return Array.from(categoryStats.entries())
+      .map(([name, stats]) => ({
+        name,
+        solves: stats.solves,
+        totalPoints: stats.totalPoints,
+        avgPoints: stats.solves > 0 ? Math.round(stats.totalPoints / stats.solves) : 0,
+      }))
+      .filter((stat) => stat.solves > 0) // Only show categories with actual solves
   }
 
   const categoryBreakdown: CategoryStat[] = calculateCategoryBreakdown()
@@ -105,17 +108,17 @@ export function UserProfileCard({ user, profileData }: UserProfileCardProps) {
     ...(user.rank <= 10 ? [{ name: "Elite Player", description: "Top 10 global ranking", icon: "⭐" }] : []),
   ]
 
-  const getUserInitials = (user: LeaderboardEntry['user']) => {
+  const getUserInitials = (user: LeaderboardEntry["user"]) => {
     // Use display name for initials
     const name = user.displayName || user.username
-    const parts = name.split(' ')
+    const parts = name.split(" ")
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase()
     }
     return name.slice(0, 2).toUpperCase()
   }
 
-  const getUserDisplayName = (user: LeaderboardEntry['user']) => {
+  const getUserDisplayName = (user: LeaderboardEntry["user"]) => {
     return user.displayName || user.username
   }
 
@@ -124,7 +127,7 @@ export function UserProfileCard({ user, profileData }: UserProfileCardProps) {
   }
 
   const getPercentile = (rank: number, total: number) => {
-    return Math.round((1 - (rank - 1) / total) * 100)
+    return Math.round((rank / total) * 100)
   }
 
   const getCategoryColor = (category: string) => {
@@ -161,8 +164,11 @@ export function UserProfileCard({ user, profileData }: UserProfileCardProps) {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="w-16 h-16 flex-shrink-0">
-              <CachedAvatarImage 
-                src={user.user.avatar || `/abstract-geometric-shapes.png?key=profile&height=64&width=64&query=${user.user.userId}`}
+              <CachedAvatarImage
+                src={
+                  user.user.avatar ||
+                  `/abstract-geometric-shapes.png?key=profile&height=64&width=64&query=${user.user.userId}`
+                }
                 loadingPlaceholder={
                   <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
                 }
@@ -178,7 +184,8 @@ export function UserProfileCard({ user, profileData }: UserProfileCardProps) {
               <CardDescription className="flex items-center gap-2 mt-1 flex-wrap">
                 <Trophy className="w-4 h-4 flex-shrink-0" />
                 <span className="whitespace-nowrap">
-                  Rank #{user.rank}{profileData ? ` of ${profileData.totalUsers.toLocaleString()}` : ''}
+                  Rank #{user.rank}
+                  {profileData ? ` of ${profileData.totalUsers.toLocaleString()}` : ""}
                 </span>
                 <Badge variant="secondary" className="text-foreground whitespace-nowrap">
                   Top {profileData ? getPercentile(user.rank, profileData.totalUsers) : getPercentile(user.rank, 1000)}%
@@ -267,9 +274,9 @@ export function UserProfileCard({ user, profileData }: UserProfileCardProps) {
                       {category.solves} solves • {category.totalPoints} pts
                     </div>
                   </div>
-                  <Progress 
-                    value={user.solveCount > 0 ? (category.solves / user.solveCount) * 100 : 0} 
-                    className="h-2" 
+                  <Progress
+                    value={user.solveCount > 0 ? (category.solves / user.solveCount) * 100 : 0}
+                    className="h-2"
                   />
                   <div className="text-xs text-muted-foreground">Average: {category.avgPoints} points per solve</div>
                 </div>
