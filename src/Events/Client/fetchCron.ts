@@ -113,7 +113,7 @@ export const event: Event = {
 // Function to update challenges from fetch result
 async function updateChallengesFromFetch(jsonData: string, fetchCmd: any, channel: TextChannel) {
     try {
-        const challenges = await parseChallenges(jsonData, fetchCmd.platform);
+        const challenges = await parseChallenges(jsonData);
         
         if (challenges.length === 0) {
             console.log("No challenges found in fetch result");

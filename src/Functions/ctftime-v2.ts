@@ -142,7 +142,8 @@ async function getUpcommingOnlineEvent(days: number): Promise<CTFEvent[]> {
 async function handleWeightRetry(ctfEvent: CTFEvent, id: string) {
     if (ctfEvent.weight === 0) {
         const oneWeekAfterEnd = new Date(ctfEvent.finish);
-        oneWeekAfterEnd.setDate(oneWeekAfterEnd.getDate() + 7);
+        const week = 7
+        oneWeekAfterEnd.setDate(oneWeekAfterEnd.getDate() + week*2);
         
         // Create or update weight retry entry
         await WeightRetryModel.findOneAndUpdate(
