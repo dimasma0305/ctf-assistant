@@ -301,7 +301,7 @@ export function CTFList() {
                     <div className="space-y-2">
                       {selectedCTFDetails.leaderboard.map((player) => (
                         <div
-                          key={player.userId}
+                          key={player.user.userId}
                           className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
                         >
                           <div className="flex items-center gap-3">
@@ -311,7 +311,7 @@ export function CTFList() {
                             >
                               {player.rank}
                             </Badge>
-                            <span className="font-medium">{player.userId}</span>
+                            <span className="font-medium">{player.user.displayName || player.user.username}</span>
                           </div>
                           <div className="text-right">
                             <div className="font-semibold text-primary">{player.score.toFixed(1)}</div>
