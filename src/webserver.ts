@@ -241,6 +241,75 @@ async function getCachedUserScores(query: any = {}, ttl?: number): Promise<Map<s
     return userScores;
 }
 
+// Function to get available months and years from solve data
+async function getAvailableTimeRanges(): Promise<{
+    months: string[]; // Array of YYYY-MM strings
+    years: number[];  // Array of years
+}> {
+    try {
+        // Use cache to avoid repeated expensive queries
+        const cacheKey = 'available_time_ranges';
+        let cached = cache.get<{ months: string[]; years: number[] }>(cacheKey);
+        
+        if (cached) {
+            return cached;
+        }
+
+        // Query for min and max solve dates
+        const dateRange = await solveModel.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    minDate: { $min: "$solved_at" },
+                    maxDate: { $max: "$solved_at" }
+                }
+            }
+        ]);
+
+        if (!dateRange || dateRange.length === 0) {
+            // No solves in database
+            return { months: [], years: [] };
+        }
+
+        const minDate = new Date(dateRange[0].minDate);
+        const maxDate = new Date(dateRange[0].maxDate);
+        
+        // Generate available months and years
+        const availableMonths: string[] = [];
+        const availableYears: Set<number> = new Set();
+        
+        // Start from the first month with data
+        const currentDate = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+        const endDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+        
+        while (currentDate <= endDate) {
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const monthString = `${year}-${month}`;
+            
+            availableMonths.push(monthString);
+            availableYears.add(year);
+            
+            // Move to next month
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+        
+        const result = {
+            months: availableMonths.reverse(), // Most recent first
+            years: Array.from(availableYears).sort((a, b) => b - a) // Most recent first
+        };
+
+        // Cache for 1 hour (data doesn't change frequently)
+        cache.set(cacheKey, result, 60 * 60 * 1000);
+        
+        return result;
+        
+    } catch (error) {
+        console.error('Error getting available time ranges:', error);
+        return { months: [], years: [] };
+    }
+}
+
 client.guilds.fetch();
 
 const app = express();
@@ -402,6 +471,9 @@ app.get("/api/scoreboard", async (req, res) => {
         // Apply pagination after filtering
         const paginatedLeaderboard = sortedLeaderboard.slice(offset, offset + limit);
         
+        // Get available months and years for metadata
+        const availableTimeRanges = await getAvailableTimeRanges();
+
         // Format data for JSON response (convert Sets and Maps to arrays/objects)
         const formattedLeaderboard = paginatedLeaderboard.map((entry, index) => ({
             rank: userRankMap.get(entry.userId) || 1, // Use rank from appropriate dataset (monthly/yearly separate rankings, global for overall)
@@ -449,6 +521,8 @@ app.get("/api/scoreboard", async (req, res) => {
             isFiltered: !!(searchTerm || month || year),
             month: month || null,
             year: year || null,
+            availableMonths: availableTimeRanges.months,
+            availableYears: availableTimeRanges.years,
             timestamp: new Date().toISOString()
         };
 
