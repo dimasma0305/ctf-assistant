@@ -1,152 +1,27 @@
 "use client"
-
-import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage, CachedAvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Trophy, Star, Users, Clock } from "lucide-react"
+import { CertificateGenerator } from "@/components/certificate-generator"
 
 import Link from "next/link"
-
-interface UserProfileData {
-  userId: string
-  globalRank: number
-  totalUsers: number
-  stats: {
-    totalScore: number
-    solveCount: number
-    ctfCount: number
-    categoriesCount: number
-    averageScorePerSolve: number
-    averageSolvesPerCTF: number
-  }
-  categoryBreakdown: Array<{
-    name: string
-    solves: number
-    totalPoints: number
-    avgPoints: number
-  }>
-  ctfParticipation: Array<{
-    ctfId: string
-    ctfTitle: string
-    weight: number
-    solves: number
-    points: number
-    score: number
-    contribution: number
-  }>
-  recentActivity: Array<{
-    ctf_id: string
-    challenge: string
-    category: string
-    points: number
-    solved_at: string
-    isTeamSolve: boolean
-    teammates: string[]
-  }>
-  achievements: Array<{
-    name: string
-    description: string
-    icon: string
-  }>
-}
+import { useUserProfile } from "@/hooks/useAPI"
+import type { UserProfileResponse } from "@/lib/types"
 
 export default function UserProfilePage() {
   const params = useParams()
   const userId = params.userId as string
-  const [profileData, setProfileData] = useState<UserProfileData | null>(null)
-  const [loading, setLoading] = useState(true)
 
-  // Mock data for demonstration
-  const mockProfile: UserProfileData = {
-    userId: userId || "user_001",
-    globalRank: 1,
-    totalUsers: 1247,
-    stats: {
-      totalScore: 2847.5,
-      solveCount: 156,
-      ctfCount: 23,
-      categoriesCount: 5,
-      averageScorePerSolve: 18.3,
-      averageSolvesPerCTF: 6.8,
-    },
-    categoryBreakdown: [
-      { name: "web", solves: 45, totalPoints: 1250, avgPoints: 28 },
-      { name: "crypto", solves: 38, totalPoints: 980, avgPoints: 26 },
-      { name: "pwn", solves: 32, totalPoints: 890, avgPoints: 28 },
-      { name: "reverse", solves: 25, totalPoints: 675, avgPoints: 27 },
-      { name: "forensics", solves: 16, totalPoints: 420, avgPoints: 26 },
-    ],
-    ctfParticipation: [
-      {
-        ctfId: "ctf_2024_001",
-        ctfTitle: "Winter CTF 2024",
-        weight: 1.2,
-        solves: 12,
-        points: 3400,
-        score: 425.8,
-        contribution: 15.0,
-      },
-      {
-        ctfId: "ctf_2024_002",
-        ctfTitle: "Crypto Challenge",
-        weight: 1.0,
-        solves: 8,
-        points: 2100,
-        score: 312.5,
-        contribution: 11.0,
-      },
-    ],
-    recentActivity: [
-      {
-        ctf_id: "ctf_2024_001",
-        challenge: "Advanced SQL Injection",
-        category: "web",
-        points: 500,
-        solved_at: "2024-01-15T10:30:00Z",
-        isTeamSolve: false,
-        teammates: [],
-      },
-      {
-        ctf_id: "ctf_2024_002",
-        challenge: "Buffer Overflow Basics",
-        category: "pwn",
-        points: 300,
-        solved_at: "2024-01-14T15:45:00Z",
-        isTeamSolve: true,
-        teammates: ["user_005", "user_012"],
-      },
-    ],
-    achievements: [
-      { name: "Century Solver", description: "Solved 100+ challenges", icon: "🎯" },
-      { name: "CTF Explorer", description: "Participated in 10+ CTFs", icon: "🗺️" },
-      { name: "Well Rounded", description: "Solved challenges in 5+ categories", icon: "🌟" },
-      { name: "Podium Finisher", description: "Global rank #1", icon: "🥇" },
-    ],
-  }
+  console.log("[v0] Profile page loading for userId:", userId)
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true)
-      // In real implementation:
-      // const response = await fetch(`/api/profile/${userId}`)
-      // const data = await response.json()
+  const { data: profileData, loading, error } = useUserProfile(userId)
 
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      setProfileData(mockProfile)
-      setLoading(false)
-    }
-
-    fetchProfile()
-  }, [userId])
-
-  const getUserInitials = (userId: string) => {
-    return userId.replace("user_", "").toUpperCase().slice(0, 2)
-  }
+  console.log("[v0] Profile API response:", { profileData, loading, error })
 
   const formatScore = (score: number) => {
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
@@ -181,6 +56,51 @@ export default function UserProfilePage() {
     }
   }
 
+  function getUserInitials(user: UserProfileResponse["user"]) {
+    const name = user.displayName || user.username
+    const parts = name.split(" ")
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
+
+  const mockCertificates = [
+    {
+      id: "cert-2024-12",
+      type: "monthly" as const,
+      period: "2024-12",
+      rank: 1,
+      totalParticipants: 156,
+      score: 2847.5,
+      solves: 23,
+      categories: ["web", "crypto", "pwn", "reverse"],
+      issuedDate: "2024-12-31T23:59:59Z",
+    },
+    {
+      id: "cert-2024-11",
+      type: "monthly" as const,
+      period: "2024-11",
+      rank: 2,
+      totalParticipants: 142,
+      score: 2156.3,
+      solves: 18,
+      categories: ["web", "crypto", "forensics"],
+      issuedDate: "2024-11-30T23:59:59Z",
+    },
+    {
+      id: "cert-2024",
+      type: "yearly" as const,
+      period: "2024",
+      rank: 3,
+      totalParticipants: 1247,
+      score: 15432.8,
+      solves: 187,
+      categories: ["web", "crypto", "pwn", "reverse", "forensics", "misc"],
+      issuedDate: "2024-12-31T23:59:59Z",
+    },
+  ]
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -194,6 +114,22 @@ export default function UserProfilePage() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    console.log("[v0] Profile error details:", error)
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">Error Loading Profile</h1>
+          <p className="text-muted-foreground mb-4">HTTP 404</p>
+          <p className="text-sm text-muted-foreground mb-4">Debug: {error}</p>
+          <Link href="/">
+            <Button>Return to Dashboard</Button>
+          </Link>
         </div>
       </div>
     )
@@ -232,18 +168,21 @@ export default function UserProfilePage() {
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <Avatar className="w-24 h-24">
                 <CachedAvatarImage
-                  src={`/abstract-geometric-shapes.png?key=profile&height=96&width=96&query=${profileData.userId}`}
+                  src={
+                    profileData.user.avatar ||
+                    `/abstract-geometric-shapes.png?key=profile&height=96&width=96&query=${profileData.user.userId}`
+                  }
                   loadingPlaceholder={
                     <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
                   }
                 />
                 <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                  {getUserInitials(profileData.userId)}
+                  {getUserInitials(profileData.user)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <CardTitle className="text-3xl font-[family-name:var(--font-playfair)] mb-2">
-                  {profileData.userId.replace("user_", "Player ")}
+                  {profileData.user.displayName || profileData.user.username}
                 </CardTitle>
                 <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
                   <div className="flex items-center gap-2">
@@ -303,10 +242,11 @@ export default function UserProfilePage() {
 
         {/* Detailed Tabs */}
         <Tabs defaultValue="categories" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="categories">Category Breakdown</TabsTrigger>
             <TabsTrigger value="ctfs">CTF Participation</TabsTrigger>
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="certificates">Certificates</TabsTrigger>
             <TabsTrigger value="activity">Recent Activity</TabsTrigger>
           </TabsList>
 
@@ -404,6 +344,10 @@ export default function UserProfilePage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="certificates">
+            <CertificateGenerator user={profileData.user} certificates={mockCertificates} />
+          </TabsContent>
+
           <TabsContent value="activity">
             <Card>
               <CardHeader>
@@ -426,7 +370,7 @@ export default function UserProfilePage() {
                               <span>{activity.points} points</span>
                               {activity.isTeamSolve && (
                                 <Badge variant="secondary" className="text-xs">
-                                  Team solve with {activity.teammates.length} others
+                                  Team solve with {activity.teammates?.length || 0} others
                                 </Badge>
                               )}
                             </div>

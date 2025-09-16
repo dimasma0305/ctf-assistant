@@ -19,8 +19,18 @@ export default function Dashboard() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1) // Remove the #
+      console.log("[v0] Main page hash changed to:", hash)
+
       if (hash === "leaderboard" || hash === "ctfs" || hash === "ctf-rankings") {
         setActiveTab(hash)
+      } else if (
+        hash.startsWith("month-") ||
+        hash.startsWith("year-") ||
+        ["all-time", "this-month", "last-month", "this-year", "last-year"].includes(hash)
+      ) {
+        // These are leaderboard time period hashes, switch to leaderboard tab
+        console.log("[v0] Switching to leaderboard tab for time period:", hash)
+        setActiveTab("leaderboard")
       }
     }
 

@@ -19,13 +19,6 @@ interface UserSolve {
     users: string[]; // Discord IDs for consistency
 }
 
-interface UserInfo {
-    userId: string; // Discord ID for mentions
-    username: string;
-    displayName: string;
-    avatar?: string;
-}
-
 interface UserProfile {
     userId: string; // Discord ID for Discord mentions and consistency
     username: string;
@@ -146,6 +139,265 @@ const cache = new MemoryCache();
 setInterval(() => {
     cache.cleanup();
 }, 5 * 60 * 1000);
+
+// ===== UTILITY FUNCTIONS FOR COMMON OPERATIONS =====
+
+interface UserRankingResult {
+    rank: number;
+    totalUsers: number;
+    percentile: number;
+}
+
+interface GlobalStats {
+    totalSolves: number;
+    totalPoints: number;
+    avgScore: number;
+    medianScore: number;
+}
+
+interface PerformanceComparison {
+    scoreVsAverage: {
+        user: number;
+        average: number;
+        percentageDiff: number;
+    };
+    scoreVsMedian: {
+        user: number;
+        median: number;
+        percentageDiff: number;
+    };
+    solvesVsAverage: {
+        user: number;
+        average: number;
+        percentageDiff: number;
+    };
+}
+
+interface CategoryStat {
+    name: string;
+    solves: number;
+    totalPoints: number;
+    avgPoints: number;
+    rankInCategory: number;
+    totalInCategory: number;
+    percentile: number;
+}
+
+interface Achievement {
+    name: string;
+    description: string;
+    icon: string;
+}
+
+/**
+ * Calculate user's rank among a collection of users
+ */
+function calculateUserRank(userId: string, userScores: Map<string, UserProfile>): UserRankingResult {
+    const allUsers = Array.from(userScores.values())
+        .sort((a, b) => b.totalScore - a.totalScore);
+    const userRank = allUsers.findIndex(user => user.userId === userId) + 1;
+    const totalUsers = allUsers.length;
+    const percentile = Math.round((1 - (userRank - 1) / totalUsers) * 100);
+    
+    return { rank: userRank, totalUsers, percentile };
+}
+
+/**
+ * Calculate global statistics from user scores
+ */
+function calculateGlobalStats(userScores: Map<string, UserProfile>): GlobalStats {
+    const allUsers = Array.from(userScores.values());
+    const totalSolves = allUsers.reduce((sum, user) => sum + user.solveCount, 0);
+    const totalPoints = allUsers.reduce((sum, user) => sum + user.totalScore, 0);
+    const avgScore = totalPoints / allUsers.length;
+    const sortedUsers = allUsers.sort((a, b) => b.totalScore - a.totalScore);
+    const medianScore = sortedUsers[Math.floor(allUsers.length / 2)]?.totalScore || 0;
+    
+    return { totalSolves, totalPoints, avgScore, medianScore };
+}
+
+/**
+ * Calculate performance comparison against averages
+ */
+function calculatePerformanceComparison(
+    userProfile: UserProfile, 
+    globalStats: GlobalStats, 
+    totalUsers: number
+): PerformanceComparison {
+    return {
+        scoreVsAverage: {
+            user: Math.round(userProfile.totalScore * 100) / 100,
+            average: Math.round(globalStats.avgScore * 100) / 100,
+            percentageDiff: Math.round(((userProfile.totalScore - globalStats.avgScore) / globalStats.avgScore) * 100)
+        },
+        scoreVsMedian: {
+            user: Math.round(userProfile.totalScore * 100) / 100,
+            median: Math.round(globalStats.medianScore * 100) / 100,
+            percentageDiff: Math.round(((userProfile.totalScore - globalStats.medianScore) / globalStats.medianScore) * 100)
+        },
+        solvesVsAverage: {
+            user: userProfile.solveCount,
+            average: Math.round(globalStats.totalSolves / totalUsers * 100) / 100,
+            percentageDiff: Math.round(((userProfile.solveCount - (globalStats.totalSolves / totalUsers)) / (globalStats.totalSolves / totalUsers)) * 100)
+        }
+    };
+}
+
+/**
+ * Calculate category statistics for a user
+ */
+function calculateCategoryStats(
+    userProfile: UserProfile,
+    allUsers: UserProfile[],
+    solveFilter?: (solve: UserSolve) => boolean
+): CategoryStat[] {
+    return Array.from(userProfile.categories).map(category => {
+        const filteredSolves = userProfile.recentSolves.filter(solve => 
+            solve.category === category && (!solveFilter || solveFilter(solve))
+        );
+        const categoryPoints = filteredSolves.reduce((sum, solve) => sum + solve.points, 0);
+        
+        // Calculate category ranking
+        const categoryParticipants = allUsers.filter(p => p.categories.has(category));
+        const userCategoryScore = filteredSolves.length;
+        const categoryRank = categoryParticipants
+            .map(p => p.recentSolves.filter(s => 
+                s.category === category && (!solveFilter || solveFilter(s))
+            ).length)
+            .filter(score => score > userCategoryScore).length + 1;
+        
+        return {
+            name: category,
+            solves: filteredSolves.length,
+            totalPoints: categoryPoints,
+            avgPoints: filteredSolves.length > 0 ? Math.round(categoryPoints / filteredSolves.length) : 0,
+            rankInCategory: categoryRank,
+            totalInCategory: categoryParticipants.length,
+            percentile: Math.round((1 - (categoryRank - 1) / categoryParticipants.length) * 100)
+        };
+    }).sort((a, b) => b.solves - a.solves);
+}
+
+/**
+ * Generate achievements based on user performance
+ */
+function generateAchievements(
+    userProfile: UserProfile,
+    userRank: number,
+    totalUsers: number,
+    globalStats: GlobalStats,
+    allCategories: Set<string>,
+    scope: 'global' | 'ctf' = 'global',
+    ctfTitle?: string
+): Achievement[] {
+    const achievements: Achievement[] = [];
+    const solvePercentage = (userProfile.solveCount / globalStats.totalSolves) * 100;
+    
+    // Ranking achievements
+    if (userRank === 1) {
+        achievements.push({ 
+            name: scope === 'global' ? "Global Champion" : "CTF Champion", 
+            description: scope === 'global' ? "#1 worldwide" : `#1 in ${ctfTitle}`, 
+            icon: "👑" 
+        });
+    } else if (userRank <= 3) {
+        const rankIcon = userRank === 2 ? "🥈" : "🥉";
+        achievements.push({ 
+            name: scope === 'global' ? "Global Podium" : "CTF Podium", 
+            description: scope === 'global' ? `#${userRank} worldwide` : `#${userRank} in ${ctfTitle}`, 
+            icon: rankIcon 
+        });
+    } else if (userRank <= Math.ceil(totalUsers * 0.05)) {
+        achievements.push({ 
+            name: "Elite", 
+            description: scope === 'global' ? "Top 5% globally" : `Top 5% in ${ctfTitle}`, 
+            icon: "⭐" 
+        });
+    } else if (userRank <= Math.ceil(totalUsers * 0.1)) {
+        achievements.push({ 
+            name: "Top 10%", 
+            description: scope === 'global' ? "Top 10% globally" : `Top 10% in ${ctfTitle}`, 
+            icon: "🌟" 
+        });
+    } else if (userRank <= Math.ceil(totalUsers * 0.25)) {
+        achievements.push({ 
+            name: "Top 25%", 
+            description: scope === 'global' ? "Top 25% globally" : `Top 25% in ${ctfTitle}`, 
+            icon: "⭐" 
+        });
+    }
+    
+    // Solve count achievements
+    if (scope === 'global') {
+        if (userProfile.solveCount >= 100) achievements.push({ name: "Century Club", description: "Solved 100+ challenges", icon: "💯" });
+        else if (userProfile.solveCount >= 50) achievements.push({ name: "Veteran Solver", description: "Solved 50+ challenges", icon: "🎯" });
+        else if (userProfile.solveCount >= 20) achievements.push({ name: "Active Solver", description: "Solved 20+ challenges", icon: "🔥" });
+    } else {
+        if (userProfile.solveCount >= 10) achievements.push({ name: "CTF Solver", description: "Solved 10+ challenges", icon: "🎯" });
+    }
+    
+    // CTF participation achievements (global only)
+    if (scope === 'global') {
+        if (userProfile.ctfCount >= 10) achievements.push({ name: "CTF Explorer", description: "Participated in 10+ CTFs", icon: "🗺️" });
+        else if (userProfile.ctfCount >= 5) achievements.push({ name: "Multi-CTF Player", description: "Participated in 5+ CTFs", icon: "🏆" });
+    }
+    
+    // Category diversity achievements
+    if (userProfile.categories.size >= Math.ceil(allCategories.size * 0.75)) {
+        achievements.push({ 
+            name: scope === 'global' ? "Polymath" : "Category Master", 
+            description: scope === 'global' ? "Master of multiple categories" : "Solved challenges in most categories", 
+            icon: "🧩" 
+        });
+    } else if (userProfile.categories.size >= Math.ceil(allCategories.size * 0.5)) {
+        achievements.push({ name: "Versatile", description: "Active in many categories", icon: "🔧" });
+    }
+    
+    // Contribution achievements
+    const contributionThreshold = scope === 'global' ? 5 : 10;
+    if (solvePercentage >= contributionThreshold) {
+        achievements.push({ 
+            name: scope === 'global' ? "Major Contributor" : "Active Participant", 
+            description: `${Math.round(solvePercentage)}% of total ${scope === 'global' ? 'community' : 'CTF'} solves`, 
+            icon: scope === 'global' ? "🌟" : "🔥" 
+        });
+    }
+    
+    return achievements;
+}
+
+/**
+ * Format error response consistently
+ */
+function formatErrorResponse(status: number, error: string, message?: string, req?: any): any {
+    return {
+        error,
+        message,
+        ...(process.env.NODE_ENV === 'development' && req ? { 
+            endpoint: `${req.method} ${req.path}`,
+            params: req.params,
+            query: req.query 
+        } : {})
+    };
+}
+
+/**
+ * Validate common parameters
+ */
+function validatePaginationParams(limit?: string, offset?: string): { isValid: boolean; error?: string; limit: number; offset: number } {
+    const parsedLimit = parseInt(limit as string) || 10;
+    const parsedOffset = parseInt(offset as string) || 0;
+    
+    if (parsedLimit < 1 || parsedLimit > 100) {
+        return { isValid: false, error: "Limit must be between 1 and 100", limit: parsedLimit, offset: parsedOffset };
+    }
+    
+    if (parsedOffset < 0) {
+        return { isValid: false, error: "Offset must be non-negative", limit: parsedLimit, offset: parsedOffset };
+    }
+    
+    return { isValid: true, limit: parsedLimit, offset: parsedOffset };
+}
 
 // Helper function to generate cache keys
 function generateCacheKey(prefix: string, query: any = {}): string {
@@ -349,41 +601,28 @@ app.get("/health", (req, res) => {
 app.get("/api/scoreboard", async (req, res) => {
     try {
         // Parse query parameters
-        const limit = parseInt(req.query.limit as string) || 10;
-        const offset = parseInt(req.query.offset as string) || 0;
         const ctfId = req.query.ctf_id as string;
         const isGlobal = req.query.global !== 'false'; // default to true unless explicitly set to false
         const searchTerm = req.query.search as string; // new search parameter
         const month = req.query.month as string; // YYYY-MM format
         const year = req.query.year ? parseInt(req.query.year as string) : undefined;
         
-        // Validate parameters
-        if (limit < 1 || limit > 100) {
-            res.status(400).json({
-                error: "Limit must be between 1 and 100"
-            });
+        // Validate parameters using utility function
+        const validation = validatePaginationParams(req.query.limit as string, req.query.offset as string);
+        if (!validation.isValid) {
+            res.status(400).json(formatErrorResponse(400, validation.error!, undefined, req));
             return;
         }
-        
-        if (offset < 0) {
-            res.status(400).json({
-                error: "Offset must be non-negative"
-            });
-            return;
-        }
+        const { limit, offset } = validation;
 
         // Validate monthly parameters
         if (month && !/^\d{4}-\d{2}$/.test(month)) {
-            res.status(400).json({
-                error: "Month must be in YYYY-MM format"
-            });
+            res.status(400).json(formatErrorResponse(400, "Month must be in YYYY-MM format", undefined, req));
             return;
         }
 
         if (year && (year < 2020 || year > 2100)) {
-            res.status(400).json({
-                error: "Year must be between 2020 and 2030"
-            });
+            res.status(400).json(formatErrorResponse(400, "Year must be between 2020 and 2030", undefined, req));
             return;
         }
 
@@ -533,10 +772,12 @@ app.get("/api/scoreboard", async (req, res) => {
 
     } catch (error) {
         console.error("Error fetching scoreboard:", error);
-        res.status(500).json({
-            error: "Internal server error",
-            message: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
-        });
+        res.status(500).json(formatErrorResponse(
+            500,
+            "Internal server error",
+            process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+            req
+        ));
     }
 });
 
@@ -546,9 +787,7 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
         const { ctfId, userId } = req.params;
         
         if (!ctfId || !userId) {
-            res.status(400).json({
-                error: "Both CTF ID and User ID are required"
-            });
+            res.status(400).json(formatErrorResponse(400, "Both CTF ID and User ID are required", undefined, req));
             return;
         }
 
@@ -558,66 +797,49 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
         const userProfile = ctfUserScores.get(userId);
         
         if (!userProfile) {
-            res.status(404).json({
-                error: "User not found in this CTF",
-                message: `No participation data found for user ${userId} in CTF ${ctfId}`
-            });
+            res.status(404).json(formatErrorResponse(
+                404, 
+                "User not found in this CTF", 
+                `No participation data found for user ${userId} in CTF ${ctfId}`,
+                req
+            ));
             return;
         }
 
         // Get CTF information from the user's breakdown
         const ctfInfo = userProfile.ctfBreakdown.get(ctfId);
         if (!ctfInfo) {
-            res.status(404).json({
-                error: "CTF data not found",
-                message: `No CTF data found for ${ctfId}`
-            });
+            res.status(404).json(formatErrorResponse(
+                404, 
+                "CTF data not found", 
+                `No CTF data found for ${ctfId}`,
+                req
+            ));
             return;
         }
 
-        // Calculate user's rank within this CTF
-        const ctfParticipants = Array.from(ctfUserScores.values())
-            .sort((a, b) => b.totalScore - a.totalScore);
-        const userRank = ctfParticipants.findIndex(user => user.userId === userId) + 1;
+        // Calculate user's rank within this CTF using utility function
+        const { rank: userRank, totalUsers: totalParticipants, percentile } = calculateUserRank(userId, ctfUserScores);
 
-        // Calculate CTF statistics for comparison
-        const totalParticipants = ctfParticipants.length;
-        const totalSolves = ctfParticipants.reduce((sum, user) => sum + user.solveCount, 0);
-        const totalPoints = ctfParticipants.reduce((sum, user) => sum + user.totalScore, 0);
-        const avgScore = totalPoints / totalParticipants;
-        const medianScore = ctfParticipants[Math.floor(totalParticipants / 2)]?.totalScore || 0;
+        // Calculate CTF statistics using utility function
+        const ctfStats = calculateGlobalStats(ctfUserScores);
 
-        // Get all categories in this CTF
+        // Get all participants and categories in this CTF
+        const ctfParticipants = Array.from(ctfUserScores.values());
         const allCategories = new Set<string>();
         ctfParticipants.forEach(participant => {
             participant.categories.forEach(cat => allCategories.add(cat));
         });
 
-        // User's category performance within this CTF
-        const ctfSolves = userProfile.recentSolves.filter(solve => solve.ctf_id === ctfId);
-        const categoryStats = Array.from(userProfile.categories).map(category => {
-            const categorySolves = ctfSolves.filter(solve => solve.category === category);
-            const categoryPoints = categorySolves.reduce((sum, solve) => sum + solve.points, 0);
-            
-            // Calculate how user ranks in this category within the CTF
-            const categoryParticipants = ctfParticipants.filter(p => p.categories.has(category));
-            const userCategoryScore = categorySolves.length;
-            const categoryRank = categoryParticipants
-                .map(p => p.recentSolves.filter(s => s.category === category).length)
-                .filter(score => score > userCategoryScore).length + 1;
-            
-            return {
-                name: category,
-                solves: categorySolves.length,
-                totalPoints: categoryPoints,
-                avgPoints: categorySolves.length > 0 ? Math.round(categoryPoints / categorySolves.length) : 0,
-                rankInCategory: categoryRank,
-                totalInCategory: categoryParticipants.length,
-                percentile: Math.round((1 - (categoryRank - 1) / categoryParticipants.length) * 100)
-            };
-        }).sort((a, b) => b.solves - a.solves);
+        // User's category performance within this CTF using utility function with filter
+        const categoryStats = calculateCategoryStats(
+            userProfile, 
+            ctfParticipants,
+            (solve) => solve.ctf_id === ctfId
+        );
 
         // All solves in this CTF (not just recent ones)
+        const ctfSolves = userProfile.recentSolves.filter(solve => solve.ctf_id === ctfId);
         const allCtfSolves = ctfSolves
             .sort((a, b) => new Date(b.solved_at).getTime() - new Date(a.solved_at).getTime())
             .map(solve => ({
@@ -629,37 +851,19 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
                 teammates: solve.users.filter(id => id !== userId)
             }));
 
-        // CTF-specific achievements
-        const ctfAchievements = [];
-        const solvePercentage = (userProfile.solveCount / totalSolves) * 100;
-        
-        if (userRank === 1) ctfAchievements.push({ name: "CTF Champion", description: `#1 in ${ctfInfo.ctfTitle}`, icon: "👑" });
-        else if (userRank <= 3) ctfAchievements.push({ name: "CTF Podium", description: `#${userRank} in ${ctfInfo.ctfTitle}`, icon: userRank === 2 ? "🥈" : "🥉" });
-        else if (userRank <= Math.ceil(totalParticipants * 0.1)) ctfAchievements.push({ name: "Top 10%", description: `Top 10% in ${ctfInfo.ctfTitle}`, icon: "🌟" });
-        else if (userRank <= Math.ceil(totalParticipants * 0.25)) ctfAchievements.push({ name: "Top 25%", description: `Top 25% in ${ctfInfo.ctfTitle}`, icon: "⭐" });
-        
-        if (userProfile.solveCount >= 10) ctfAchievements.push({ name: "CTF Solver", description: "Solved 10+ challenges", icon: "🎯" });
-        if (userProfile.categories.size >= Math.ceil(allCategories.size * 0.75)) ctfAchievements.push({ name: "Category Master", description: "Solved challenges in most categories", icon: "🧩" });
-        if (solvePercentage >= 10) ctfAchievements.push({ name: "Active Participant", description: `${Math.round(solvePercentage)}% of total CTF solves`, icon: "🔥" });
+        // CTF-specific achievements using utility function
+        const ctfAchievements = generateAchievements(
+            userProfile,
+            userRank,
+            totalParticipants,
+            ctfStats,
+            allCategories,
+            'ctf',
+            ctfInfo.ctfTitle
+        );
 
-        // Performance comparison
-        const performanceComparison = {
-            scoreVsAverage: {
-                user: Math.round(userProfile.totalScore * 100) / 100,
-                average: Math.round(avgScore * 100) / 100,
-                percentageDiff: Math.round(((userProfile.totalScore - avgScore) / avgScore) * 100)
-            },
-            scoreVsMedian: {
-                user: Math.round(userProfile.totalScore * 100) / 100,
-                median: Math.round(medianScore * 100) / 100,
-                percentageDiff: Math.round(((userProfile.totalScore - medianScore) / medianScore) * 100)
-            },
-            solvesVsAverage: {
-                user: userProfile.solveCount,
-                average: Math.round(totalSolves / totalParticipants * 100) / 100,
-                percentageDiff: Math.round(((userProfile.solveCount - (totalSolves / totalParticipants)) / (totalSolves / totalParticipants)) * 100)
-            }
-        };
+        // Performance comparison using utility function
+        const performanceComparison = calculatePerformanceComparison(userProfile, ctfStats, totalParticipants);
 
         // Response data
         const ctfProfileData = {
@@ -676,13 +880,13 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
             },
             ctfRank: userRank,
             totalParticipants,
-            percentile: Math.round((1 - (userRank - 1) / totalParticipants) * 100),
+            percentile: percentile,
             stats: {
                 score: Math.round(userProfile.totalScore * 100) / 100,
                 solveCount: userProfile.solveCount,
                 categoriesCount: userProfile.categories.size,
                 averagePointsPerSolve: Math.round((ctfSolves.reduce((sum, solve) => sum + solve.points, 0) / ctfSolves.length) * 100) / 100,
-                contributionToTotal: Math.round((userProfile.solveCount / totalSolves) * 100 * 100) / 100
+                contributionToTotal: Math.round((userProfile.solveCount / ctfStats.totalSolves) * 100 * 100) / 100
             },
             categoryBreakdown: categoryStats,
             allSolves: allCtfSolves,
@@ -690,9 +894,9 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
             performanceComparison,
             ctfOverview: {
                 totalParticipants,
-                totalSolves,
-                averageScore: Math.round(avgScore * 100) / 100,
-                medianScore: Math.round(medianScore * 100) / 100,
+                totalSolves: ctfStats.totalSolves,
+                averageScore: Math.round(ctfStats.avgScore * 100) / 100,
+                medianScore: Math.round(ctfStats.medianScore * 100) / 100,
                 totalCategories: allCategories.size,
                 categories: Array.from(allCategories)
             },
@@ -707,10 +911,12 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
 
     } catch (error) {
         console.error("Error fetching CTF user profile:", error);
-        res.status(500).json({
-            error: "Internal server error",
-            message: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
-        });
+        res.status(500).json(formatErrorResponse(
+            500,
+            "Internal server error",
+            process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+            req
+        ));
     }
 });
 
@@ -1213,6 +1419,137 @@ app.get("/api/ctfs/:ctfId", async (req, res) => {
             error: "Internal server error",
             message: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
         });
+    }
+});
+
+// Global user profile API endpoint
+app.get("/api/profile/:id", async (req, res) => {
+    try {
+        const { id: userId } = req.params;
+        
+        if (!userId) {
+            res.status(400).json(formatErrorResponse(400, "User ID is required", undefined, req));
+            return;
+        }
+
+        // Get global user scores (using cache)
+        const globalUserScores = await getCachedUserScores({});
+        const userProfile = globalUserScores.get(userId);
+        
+        if (!userProfile) {
+            res.status(404).json(formatErrorResponse(
+                404, 
+                "User not found", 
+                `No participation data found for user ${userId}`,
+                req
+            ));
+            return;
+        }
+
+        // Calculate user's global rank using utility function
+        const { rank: userRank, totalUsers, percentile } = calculateUserRank(userId, globalUserScores);
+        
+        // Calculate global statistics using utility function
+        const globalStats = calculateGlobalStats(globalUserScores);
+        
+        // Get all users and categories for additional calculations
+        const allUsers = Array.from(globalUserScores.values());
+        const allCategories = new Set<string>();
+        allUsers.forEach(user => {
+            user.categories.forEach(cat => allCategories.add(cat));
+        });
+
+        // User's category performance across all CTFs using utility function
+        const categoryStats = calculateCategoryStats(userProfile, allUsers);
+
+        // Recent solves across all CTFs (sorted by date)
+        const recentSolves = userProfile.recentSolves
+            .sort((a, b) => new Date(b.solved_at).getTime() - new Date(a.solved_at).getTime())
+            .slice(0, 20) // Show last 20 solves
+            .map(solve => ({
+                ctf_id: solve.ctf_id,
+                challenge: solve.challenge,
+                category: solve.category,
+                points: solve.points,
+                solved_at: solve.solved_at,
+                isTeamSolve: solve.users.length > 1,
+                teammates: solve.users.filter(id => id !== userId)
+            }));
+
+        // CTF breakdown (convert Map to sorted array)
+        const ctfBreakdown = Array.from(userProfile.ctfBreakdown.entries())
+            .map(([ctfId, breakdown]) => ({
+                ctf_id: ctfId,
+                ctfTitle: breakdown.ctfTitle,
+                weight: breakdown.weight,
+                solves: breakdown.solves,
+                points: breakdown.points,
+                score: Math.round(breakdown.score * 100) / 100
+            }))
+            .sort((a, b) => b.score - a.score);
+
+        // Global achievements using utility function
+        const achievements = generateAchievements(
+            userProfile, 
+            userRank, 
+            totalUsers, 
+            globalStats, 
+            allCategories, 
+            'global'
+        );
+
+        // Performance comparison using utility function
+        const performanceComparison = calculatePerformanceComparison(userProfile, globalStats, totalUsers);
+
+        // Response data
+        const globalProfileData = {
+            user: {
+                userId,
+                username: userProfile.username,
+                displayName: userProfile.displayName,
+                avatar: userProfile.avatar
+            },
+            globalRank: userRank,
+            totalUsers: totalUsers,
+            percentile: percentile,
+            stats: {
+                totalScore: Math.round(userProfile.totalScore * 100) / 100,
+                solveCount: userProfile.solveCount,
+                ctfCount: userProfile.ctfCount,
+                categoriesCount: userProfile.categories.size,
+                averagePointsPerSolve: userProfile.solveCount > 0 ? Math.round((userProfile.recentSolves.reduce((sum, solve) => sum + solve.points, 0) / userProfile.solveCount) * 100) / 100 : 0,
+                contributionToTotal: Math.round((userProfile.solveCount / globalStats.totalSolves) * 100 * 100) / 100
+            },
+            categoryBreakdown: categoryStats,
+            ctfBreakdown: ctfBreakdown,
+            recentSolves: recentSolves,
+            achievements: achievements,
+            performanceComparison: performanceComparison,
+            globalOverview: {
+                totalUsers: totalUsers,
+                totalSolves: globalStats.totalSolves,
+                averageScore: Math.round(globalStats.avgScore * 100) / 100,
+                medianScore: Math.round(globalStats.medianScore * 100) / 100,
+                totalCategories: allCategories.size,
+                categories: Array.from(allCategories)
+            },
+            metadata: {
+                profileGenerated: new Date().toISOString(),
+                dataSource: "Fair Scoring System",
+                scope: "global"
+            }
+        };
+
+        res.json(globalProfileData);
+
+    } catch (error) {
+        console.error("Error fetching global user profile:", error);
+        res.status(500).json(formatErrorResponse(
+            500,
+            "Internal server error",
+            process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+            req
+        ));
     }
 });
 

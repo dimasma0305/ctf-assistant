@@ -95,12 +95,46 @@ export function LeaderboardTable() {
   }
 
   useEffect(() => {
+    const initializeFromHash = () => {
+      const hash = window.location.hash.slice(1)
+      console.log("[v0] Initializing from hash:", hash)
+
+      if (!hash) return
+
+      // Handle leaderboard tab with time period
+      if (hash === "leaderboard") {
+        setTimePeriod("all-time")
+        return
+      }
+
+      // Handle direct time period hashes
+      const validPeriods = ["all-time", "this-month", "last-month", "this-year", "last-year"]
+      const isDynamicMonth = hash.startsWith("month-") && hash.match(/^month-\d{4}-\d{2}$/)
+      const isDynamicYear = hash.startsWith("year-") && hash.match(/^year-\d{4}$/)
+
+      if (validPeriods.includes(hash) || isDynamicMonth || isDynamicYear) {
+        console.log("[v0] Setting initial time period to:", hash)
+        setTimePeriod(hash)
+        setCurrentPage(1)
+      }
+    }
+
+    // Initialize from current hash only once
+    initializeFromHash()
+  }, []) // Remove dependencies to run only once on mount
+
+  useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1) // Remove the #
-      const validPeriods = ["all-time", "this-month", "last-month", "this-year", "last-year"]
+      console.log("[v0] Hash changed to:", hash)
 
-      // Check if hash matches a time period
-      if (validPeriods.includes(hash)) {
+      const validPeriods = ["all-time", "this-month", "last-month", "this-year", "last-year"]
+      const isDynamicMonth = hash.startsWith("month-") && hash.match(/^month-\d{4}-\d{2}$/)
+      const isDynamicYear = hash.startsWith("year-") && hash.match(/^year-\d{4}$/)
+
+      // Check if hash matches a time period (static or dynamic)
+      if (validPeriods.includes(hash) || isDynamicMonth || isDynamicYear) {
+        console.log("[v0] Setting time period to:", hash)
         setTimePeriod(hash)
         setCurrentPage(1)
         const timeParams = getTimeParams(hash)
@@ -114,22 +148,24 @@ export function LeaderboardTable() {
       }
     }
 
-    // Set initial time period from hash if on leaderboard tab
-    if (window.location.hash.startsWith("#leaderboard")) {
-      const parts = window.location.hash.split("-")
-      if (parts.length > 1) {
-        const period = window.location.hash.slice(1) // Remove the #
-        const validPeriods = ["all-time", "this-month", "last-month", "this-year", "last-year"]
-        if (validPeriods.includes(period)) {
-          setTimePeriod(period)
-        }
-      }
-    }
-
     // Listen for hash changes
     window.addEventListener("hashchange", handleHashChange)
     return () => window.removeEventListener("hashchange", handleHashChange)
-  }, [selectedCtf, pageSize, updateParams])
+  }, [selectedCtf, pageSize, updateParams]) // Keep dependencies for hash change handler
+
+  useEffect(() => {
+    if (timePeriod) {
+      console.log("[v0] Time period changed, updating API params:", timePeriod)
+      const timeParams = getTimeParams(timePeriod)
+      updateParams({
+        offset: (currentPage - 1) * pageSize,
+        limit: pageSize,
+        global: selectedCtf === "global",
+        ctf_id: selectedCtf !== "global" ? selectedCtf : undefined,
+        ...timeParams,
+      })
+    }
+  }, [timePeriod, currentPage, pageSize, selectedCtf, updateParams])
 
   const handleTimePeriodChange = (period: string) => {
     setTimePeriod(period)
@@ -141,15 +177,6 @@ export function LeaderboardTable() {
     } else {
       window.location.hash = period
     }
-
-    const timeParams = getTimeParams(period)
-    updateParams({
-      offset: 0,
-      limit: pageSize,
-      global: selectedCtf === "global",
-      ctf_id: selectedCtf !== "global" ? selectedCtf : undefined,
-      ...timeParams,
-    })
   }
 
   const getTimeParams = (period: string) => {

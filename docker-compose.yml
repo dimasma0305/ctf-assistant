@@ -34,6 +34,7 @@ services:
     networks:
       internal:
       traefik:
+    restart: always
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ui.rule=Host(`assistant.dimasc.tf`)"
