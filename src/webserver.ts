@@ -747,10 +747,14 @@ app.get("/api/scoreboard", async (req, res) => {
             )
         }));
 
+        // Calculate global stats for metadata
+        const globalStats = calculateGlobalStats(allUserScores);
+        
         // Response metadata
         const metadata = {
             total: totalFilteredUsers,
             totalUsers: totalUsers, // Use the actual total count of all users
+            totalSolves: globalStats.totalSolves, // Add total solves for contribution calculations
             limit,
             offset,
             returned: formattedLeaderboard.length,

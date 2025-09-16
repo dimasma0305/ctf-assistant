@@ -18,7 +18,7 @@ export interface UserSolve {
 }
 
 export interface CTFBreakdown {
-  ctfId: string
+  ctf_id: string
   ctfTitle: string
   weight: number
   solves: number
@@ -43,6 +43,7 @@ export interface ScoreboardResponse {
   metadata: {
     total: number
     totalUsers: number
+    totalSolves: number
     limit: number
     offset: number
     returned: number
@@ -80,21 +81,48 @@ export interface UserProfileResponse {
   user: UserInfo
   globalRank: number
   totalUsers: number
+  percentile: number
   stats: {
     totalScore: number
     solveCount: number
     ctfCount: number
     categoriesCount: number
-    averageScorePerSolve: number
-    averageSolvesPerCTF: number
+    averagePointsPerSolve: number
+    contributionToTotal: number
   }
   categoryBreakdown: CategoryStats[]
-  ctfParticipation: CTFBreakdown[]
-  recentActivity: UserSolve[]
+  ctfBreakdown: CTFBreakdown[]
+  recentSolves: UserSolve[]
   achievements: Achievement[]
+  performanceComparison: {
+    scoreVsAverage: {
+      user: number
+      average: number
+      percentageDiff: number
+    }
+    scoreVsMedian: {
+      user: number
+      median: number
+      percentageDiff: number
+    }
+    solvesVsAverage: {
+      user: number
+      average: number
+      percentageDiff: number
+    }
+  }
+  globalOverview: {
+    totalUsers: number
+    totalSolves: number
+    averageScore: number
+    medianScore: number
+    totalCategories: number
+    categories: string[]
+  }
   metadata: {
     profileGenerated: string
     dataSource: string
+    scope: string
   }
 }
 

@@ -288,8 +288,8 @@ export default function UserProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {profileData.ctfParticipation.map((ctf) => (
-                    <Card key={ctf.ctfId} className="p-4">
+                  {profileData.ctfBreakdown.map((ctf) => (
+                    <Card key={ctf.ctf_id} className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <h3 className="font-semibold">{ctf.ctfTitle}</h3>
@@ -356,7 +356,7 @@ export default function UserProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {profileData.recentActivity.map((activity, index) => (
+                  {profileData.recentSolves.map((activity, index) => (
                     <Card key={index} className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">

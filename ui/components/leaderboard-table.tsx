@@ -527,13 +527,16 @@ export function LeaderboardTable() {
                   user: selectedUser.user,
                   globalRank: selectedUser.rank,
                   totalUsers: leaderboardData?.metadata.totalUsers || 1000,
+                  percentile: Math.round((1 - (selectedUser.rank - 1) / (leaderboardData?.metadata.totalUsers || 1000)) * 100),
                   stats: {
                     totalScore: selectedUser.totalScore,
                     solveCount: selectedUser.solveCount,
                     ctfCount: selectedUser.ctfCount,
                     categoriesCount: selectedUser.categories.length,
-                    averageScorePerSolve: selectedUser.totalScore / selectedUser.solveCount,
-                    averageSolvesPerCTF: selectedUser.solveCount / selectedUser.ctfCount,
+                    averagePointsPerSolve: selectedUser.totalScore / selectedUser.solveCount,
+                    contributionToTotal: leaderboardData?.metadata.totalSolves 
+                      ? Math.round((selectedUser.solveCount / leaderboardData.metadata.totalSolves) * 100 * 100) / 100
+                      : 0
                   },
                   categoryBreakdown: selectedUser.categories.map((category, index) => {
                     const totalCategories = selectedUser.categories.length
@@ -553,12 +556,26 @@ export function LeaderboardTable() {
                       avgPoints: solves > 0 ? Math.round(totalPoints / solves) : 0,
                     }
                   }),
-                  ctfParticipation: [],
-                  recentActivity: selectedUser.recentSolves,
+                  ctfBreakdown: [],
+                  recentSolves: selectedUser.recentSolves,
                   achievements: [],
+                  performanceComparison: {
+                    scoreVsAverage: { user: selectedUser.totalScore, average: 0, percentageDiff: 0 },
+                    scoreVsMedian: { user: selectedUser.totalScore, median: 0, percentageDiff: 0 },
+                    solvesVsAverage: { user: selectedUser.solveCount, average: 0, percentageDiff: 0 }
+                  },
+                  globalOverview: {
+                    totalUsers: leaderboardData?.metadata.totalUsers || 1000,
+                    totalSolves: leaderboardData?.metadata.totalSolves || 0,
+                    averageScore: 0,
+                    medianScore: 0,
+                    totalCategories: selectedUser.categories.length,
+                    categories: selectedUser.categories
+                  },
                   metadata: {
                     profileGenerated: new Date().toISOString(),
                     dataSource: "Leaderboard Data",
+                    scope: "leaderboard"
                   },
                 }}
               />

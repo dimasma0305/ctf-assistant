@@ -70,88 +70,10 @@ export async function fetchScoreboard(params: ScoreboardParams = {}): Promise<Sc
 }
 
 /**
- * Fetch user profile data
- * Updated to use a mock response since the global profile endpoint doesn't exist
+ * Fetch user profile data from the global profile endpoint
  */
 export async function fetchUserProfile(userId: string): Promise<UserProfileResponse> {
-  console.log("[v0] Fetching user profile for:", userId)
-
-  // Since the API only has CTF-specific profiles, we'll create a mock global profile
-  // In a real implementation, you'd either have a global profile endpoint or aggregate CTF data
-  const mockProfile: UserProfileResponse = {
-    user: {
-      userId: userId,
-      username: `user_${userId}`,
-      displayName: `User ${userId}`,
-      avatar: null,
-    },
-    globalRank: Math.floor(Math.random() * 1000) + 1,
-    totalUsers: 5000,
-    stats: {
-      totalScore: Math.floor(Math.random() * 10000) + 1000,
-      solveCount: Math.floor(Math.random() * 100) + 10,
-      ctfCount: Math.floor(Math.random() * 20) + 5,
-      categoriesCount: Math.floor(Math.random() * 6) + 3,
-    },
-    categoryBreakdown: [
-      { name: "web", solves: 15, totalPoints: 2500, avgPoints: 167 },
-      { name: "crypto", solves: 8, totalPoints: 1200, avgPoints: 150 },
-      { name: "pwn", solves: 12, totalPoints: 1800, avgPoints: 150 },
-      { name: "reverse", solves: 6, totalPoints: 900, avgPoints: 150 },
-      { name: "forensics", solves: 10, totalPoints: 1500, avgPoints: 150 },
-    ],
-    ctfParticipation: [
-      {
-        ctfId: "ctf1",
-        ctfTitle: "Example CTF 2024",
-        points: 1500,
-        score: 2250,
-        weight: 1.5,
-        solves: 12,
-        contribution: 22.5,
-      },
-      {
-        ctfId: "ctf2",
-        ctfTitle: "Another CTF 2024",
-        points: 1200,
-        score: 1200,
-        weight: 1.0,
-        solves: 8,
-        contribution: 12.0,
-      },
-    ],
-    achievements: [
-      {
-        name: "First Blood",
-        description: "First to solve a challenge",
-        icon: "🩸",
-      },
-      {
-        name: "Category Master",
-        description: "Solved challenges in all categories",
-        icon: "🏆",
-      },
-    ],
-    recentActivity: [
-      {
-        challenge: "Web Challenge 1",
-        category: "web",
-        points: 200,
-        solved_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        isTeamSolve: false,
-      },
-      {
-        challenge: "Crypto Challenge 2",
-        category: "crypto",
-        points: 300,
-        solved_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        isTeamSolve: true,
-        teammates: ["teammate1", "teammate2"],
-      },
-    ],
-  }
-
-  return Promise.resolve(mockProfile)
+  return fetchAPI<UserProfileResponse>(`/api/profile/${userId}`)
 }
 
 /**
