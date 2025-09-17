@@ -23,7 +23,7 @@ interface Achievement {
 interface CategoryStat {
   name: string
   solves: number
-  totalPoints: number
+  totalScore: number
   avgPoints: number
   rankInCategory?: number
   percentile?: number
@@ -54,17 +54,17 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
       return profileData.categoryBreakdown
     }
 
-    const categoryStats = new Map<string, { solves: number; totalPoints: number; points: number[] }>()
+    const categoryStats = new Map<string, { solves: number; totalScore: number; points: number[] }>()
 
     user.recentSolves.forEach((solve) => {
       const category = solve.category || "misc"
       if (!categoryStats.has(category)) {
-        categoryStats.set(category, { solves: 0, totalPoints: 0, points: [] })
+        categoryStats.set(category, { solves: 0, totalScore: 0, points: [] })
       }
 
       const stats = categoryStats.get(category)!
       stats.solves += 1
-      stats.totalPoints += solve.points || 0
+      stats.totalScore += solve.points || 0
       stats.points.push(solve.points || 0)
     })
 
@@ -78,13 +78,13 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
           index < user.totalScore % user.categories.length ? user.totalScore % user.categories.length : 0
 
         const solves = avgSolvesPerCategory + remainder
-        const totalPoints = avgPointsPerCategory + pointsRemainder
+        const totalScore = avgPointsPerCategory + pointsRemainder
 
         return {
           name: category,
           solves,
-          totalPoints: Number(totalPoints.toFixed(2)),
-          avgPoints: solves > 0 ? (totalPoints / solves) : 0,
+          totalScore: Number(totalScore.toFixed(2)),
+          avgPoints: solves > 0 ? (totalScore / solves) : 0,
         }
       })
     }
@@ -94,8 +94,8 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
       .map(([name, stats]) => ({
         name,
         solves: stats.solves,
-        totalPoints: Number(stats.totalPoints.toFixed(2)),
-        avgPoints: stats.solves > 0 ? (stats.totalPoints / stats.solves) : 0,
+        totalScore: Number(stats.totalScore.toFixed(2)),
+        avgPoints: stats.solves > 0 ? (stats.totalScore / stats.solves) : 0,
       }))
       .filter((stat) => stat.solves > 0)
   }
@@ -359,7 +359,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
                           )}
                         </div>
                         <div className="text-sm text-muted-foreground whitespace-nowrap">
-                          {category.solves} • {category.totalPoints}pts
+                          {category.solves} • {category.totalScore}pts
                         </div>
                       </div>
                       <Progress

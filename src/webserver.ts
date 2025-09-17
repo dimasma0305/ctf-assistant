@@ -151,7 +151,7 @@ interface UserRankingResult {
 
 interface GlobalStats {
     totalSolves: number;
-    totalPoints: number;
+    totalScore: number;
     avgScore: number;
     medianScore: number;
 }
@@ -177,7 +177,7 @@ interface PerformanceComparison {
 interface CategoryStat {
     name: string;
     solves: number;
-    totalPoints: number;
+    totalScore: number;
     avgPoints: number;
     rankInCategory: number;
     totalInCategory: number;
@@ -209,12 +209,12 @@ function calculateUserRank(userId: string, userScores: Map<string, UserProfile>)
 function calculateGlobalStats(userScores: Map<string, UserProfile>): GlobalStats {
     const allUsers = Array.from(userScores.values());
     const totalSolves = allUsers.reduce((sum, user) => sum + user.solveCount, 0);
-    const totalPoints = allUsers.reduce((sum, user) => sum + user.totalScore, 0);
-    const avgScore = totalPoints / allUsers.length;
+    const totalScore = allUsers.reduce((sum, user) => sum + user.totalScore, 0);
+    const avgScore = totalScore / allUsers.length;
     const sortedUsers = allUsers.sort((a, b) => b.totalScore - a.totalScore);
     const medianScore = sortedUsers[Math.floor(allUsers.length / 2)]?.totalScore || 0;
     
-    return { totalSolves, totalPoints, avgScore, medianScore };
+    return { totalSolves, totalScore, avgScore, medianScore };
 }
 
 /**
@@ -270,7 +270,7 @@ function calculateCategoryStats(
         return {
             name: category,
             solves: filteredSolves.length,
-            totalPoints: categoryPoints,
+            totalScore: categoryPoints,
             avgPoints: filteredSolves.length > 0 ? Math.round((categoryPoints / filteredSolves.length) * 100) / 100 : 0,
             rankInCategory: categoryRank,
             totalInCategory: categoryParticipants.length,

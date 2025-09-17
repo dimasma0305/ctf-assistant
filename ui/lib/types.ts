@@ -25,6 +25,7 @@ export interface CTFBreakdown {
   points: number
   score: number
   contribution?: number
+  logo: string
 }
 
 // Scoreboard API Types
@@ -70,7 +71,7 @@ export interface Achievement {
 export interface CategoryStats {
   name: string
   solves: number
-  totalPoints: number
+  totalScore: number
   avgPoints: number
   rankInCategory?: number
   totalInCategory?: number

@@ -301,7 +301,7 @@ export default function UserProfilePage() {
                       </div>
                       <div className="text-right">
                         <div className="font-bold">{category.solves} solves</div>
-                        <div className="text-sm text-muted-foreground">{category.totalPoints} total points</div>
+                        <div className="text-sm text-muted-foreground">{category.totalScore} total score</div>
                       </div>
                     </div>
                     <Progress value={(category.solves / profileData.stats.solveCount) * 100} className="h-3" />
