@@ -198,7 +198,7 @@ function calculateUserRank(userId: string, userScores: Map<string, UserProfile>)
         .sort((a, b) => b.totalScore - a.totalScore);
     const userRank = allUsers.findIndex(user => user.userId === userId) + 1;
     const totalUsers = allUsers.length;
-    const percentile = Math.round((1 - (userRank - 1) / totalUsers) * 100);
+    const percentile = Math.round((userRank / totalUsers) * 100);
     
     return { rank: userRank, totalUsers, percentile };
 }
@@ -247,36 +247,102 @@ function calculatePerformanceComparison(
 /**
  * Calculate category statistics for a user
  */
-function calculateCategoryStats(
+async function calculateCategoryStats(
     userProfile: UserProfile,
     allUsers: UserProfile[],
     solveFilter?: (solve: UserSolve) => boolean
-): CategoryStat[] {
-    return Array.from(userProfile.categories).map(category => {
-        const filteredSolves = userProfile.recentSolves.filter(solve => 
-            solve.category === category && (!solveFilter || solveFilter(solve))
-        );
-        const categoryPoints = filteredSolves.reduce((sum, solve) => sum + solve.points, 0);
+): Promise<CategoryStat[]> {
+    // Get all solves for this user from database to ensure we have complete data
+    const allSolvesQuery: any = { users: userProfile.userId };
+    if (solveFilter) {
+        // If there's a CTF filter, apply it
+        const sampleSolve = userProfile.recentSolves.find(s => solveFilter(s));
+        if (sampleSolve) {
+            allSolvesQuery.ctf_id = sampleSolve.ctf_id;
+        }
+    }
+
+    const allSolves = await solveModel.find(allSolvesQuery).populate('challenge_ref').lean();
+    
+    // Process all solves to calculate scores per category
+    const categoryStats = new Map<string, { solves: number; totalScore: number; solveList: any[] }>();
+    
+    for (const solve of allSolves) {
+        // Get challenge data
+        let challengeCategory = solve.category || 'misc';
+        let challengePoints = 100;
         
-        // Calculate category ranking
-        const categoryParticipants = allUsers.filter(p => p.categories.has(category));
-        const userCategoryScore = filteredSolves.length;
-        const categoryRank = categoryParticipants
-            .map(p => p.recentSolves.filter(s => 
-                s.category === category && (!solveFilter || solveFilter(s))
-            ).length)
-            .filter(score => score > userCategoryScore).length + 1;
+        if (solve.challenge_ref && typeof solve.challenge_ref === 'object' && solve.challenge_ref !== null && 'points' in solve.challenge_ref) {
+            const challengeRef = solve.challenge_ref as any;
+            challengeCategory = challengeRef.category || challengeCategory;
+            challengePoints = challengeRef.points || 100;
+        }
+
+        // Apply filter if provided
+        const mockSolve = { category: challengeCategory, ctf_id: solve.ctf_id };
+        if (solveFilter && !solveFilter(mockSolve as any)) {
+            continue;
+        }
+
+        // Get CTF data for scoring calculation
+        const ctfBreakdown = userProfile.ctfBreakdown.get(solve.ctf_id);
+        if (!ctfBreakdown) continue;
+
+        // Calculate the score for this individual solve using the same logic as FairScoringSystem
+        // Get the average score per solve for this CTF
+        const ctfSolveCount = allSolves.filter(s => s.ctf_id === solve.ctf_id).length;
+        if (ctfSolveCount === 0) continue;
         
-        return {
-            name: category,
-            solves: filteredSolves.length,
-            totalScore: userCategoryScore,
-            avgPoints: filteredSolves.length > 0 ? Math.round((userCategoryScore / filteredSolves.length) * 100) / 100 : 0,
-            rankInCategory: categoryRank,
-            totalInCategory: categoryParticipants.length,
-            percentile: Math.round((1 - (categoryRank - 1) / categoryParticipants.length) * 100)
-        };
-    }).sort((a, b) => b.solves - a.solves);
+        const scorePerSolve = ctfBreakdown.score / ctfSolveCount;
+
+        // Initialize category if not exists
+        if (!categoryStats.has(challengeCategory)) {
+            categoryStats.set(challengeCategory, { solves: 0, totalScore: 0, solveList: [] });
+        }
+
+        const categoryStat = categoryStats.get(challengeCategory)!;
+        categoryStat.solves += 1;
+        categoryStat.totalScore += scorePerSolve;
+        categoryStat.solveList.push(solve);
+    }
+
+    // Convert to CategoryStat array
+    return Array.from(categoryStats.entries())
+        .filter(([_category, stats]) => stats.solves > 0)
+        .map(([category, stats]) => {
+            // Calculate category ranking
+            const categoryParticipants = allUsers.filter(p => p.categories.has(category));
+            const categoryRank = categoryParticipants
+                .map(p => {
+                    // Calculate score for this category for comparison
+                    let pCategoryScore = 0;
+                    const pCategorySolves = p.recentSolves.filter(s => 
+                        s.category === category && (!solveFilter || solveFilter(s))
+                    );
+                    for (const solve of pCategorySolves) {
+                        const ctfBreakdown = p.ctfBreakdown.get(solve.ctf_id);
+                        if (ctfBreakdown) {
+                            const ctfSolveCount = p.recentSolves.filter(s => s.ctf_id === solve.ctf_id).length;
+                            if (ctfSolveCount > 0) {
+                                pCategoryScore += ctfBreakdown.score / ctfSolveCount;
+                            }
+                        }
+                    }
+                    return pCategoryScore;
+                })
+                .filter(score => score > stats.totalScore).length + 1;
+
+            return {
+                name: category,
+                solves: stats.solves,
+                totalScore: Math.round(stats.totalScore * 100) / 100,
+                avgPoints: stats.solves > 0 ? Math.round((stats.totalScore / stats.solves) * 100) / 100 : 0,
+                rankInCategory: categoryRank,
+                totalInCategory: categoryParticipants.length,
+                percentile: Math.round((categoryRank / categoryParticipants.length) * 100)  
+            };
+        })
+        .sort((a, b) => b.totalScore - a.totalScore);
 }
 
 /**
@@ -837,7 +903,7 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
         });
 
         // User's category performance within this CTF using utility function with filter
-        const categoryStats = calculateCategoryStats(
+        const categoryStats = await calculateCategoryStats(
             userProfile, 
             ctfParticipants,
             (solve) => solve.ctf_id === ctfId
@@ -1465,7 +1531,7 @@ app.get("/api/profile/:id", async (req, res) => {
         });
 
         // User's category performance across all CTFs using utility function
-        const categoryStats = calculateCategoryStats(userProfile, allUsers);
+        const categoryStats = await calculateCategoryStats(userProfile, allUsers);
 
         // Recent solves across all CTFs (sorted by date)
         const recentSolves = userProfile.recentSolves
