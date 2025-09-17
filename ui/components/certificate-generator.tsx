@@ -109,7 +109,7 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
       if (navigator.share) {
         await navigator.share({
           title: `${user.username}'s TCP1P Certificate`,
-          text: `Check out this TCP1P CTF achievement certificate!`,
+          text: `Check out this TCP1P Community achievement certificate!`,
           url: shareUrl,
         })
       } else {

@@ -63,7 +63,7 @@ export default function PublicCertificatePage() {
       if (navigator.share) {
         await navigator.share({
           title: `${profileData?.user.displayName || profileData?.user.username}'s TCP1P Certificate`,
-          text: `Check out this TCP1P CTF achievement certificate!`,
+          text: `Check out this TCP1P Community achievement certificate!`,
           url: shareUrl,
         })
       } else {
@@ -178,7 +178,7 @@ export default function PublicCertificatePage() {
         <div className="text-center px-4">
           <p className="text-sm sm:text-base text-muted-foreground">
             This certificate recognizes {profileData.user.displayName || profileData.user.username}'s achievement as #
-            {profileData.globalRank} in the TCP1P CTF {formatPeriod(period)} leaderboard.
+            {profileData.globalRank} in the TCP1P Community {formatPeriod(period)} leaderboard.
           </p>
         </div>
       </div>

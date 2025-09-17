@@ -14,7 +14,7 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: "TCP1P CTF Scoring Dashboard",
+  title: "TCP1P Community Scoring Dashboard",
   description: "Competitive cybersecurity scoring platform",
   generator: "v0.app",
   icons: {

@@ -262,7 +262,7 @@ export async function generateCertificate(
                     style={tw("w-10 h-10 rounded-lg mr-3 border-2 border-border")}
                   />
                   <View style={tw("flex flex-col")}>
-                    <Text style={tw("text-sm text-foreground font-semibold")}>TCP1P CTF Platform</Text>
+                    <Text style={tw("text-sm text-foreground font-semibold")}>TCP1P Community Platform</Text>
                     <Text style={tw("text-xs text-muted-foreground")}>Elite Cybersecurity Competition</Text>
                   </View>
                 </View>
