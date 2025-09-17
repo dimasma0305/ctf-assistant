@@ -806,19 +806,7 @@ app.get("/api/scoreboard", async (req, res) => {
                 category: solve.category,
                 points: solve.points,
                 solved_at: solve.solved_at
-            })),
-            ctfBreakdown: Object.fromEntries(
-                Array.from(entry.ctfBreakdown.entries()).map(([ctfId, breakdown]: [string, any]) => [
-                    ctfId,
-                    {
-                        ctfTitle: breakdown.ctfTitle,
-                        weight: breakdown.weight,
-                        solves: breakdown.solves,
-                        points: breakdown.points,
-                        score: Math.round(breakdown.score * 100) / 100
-                    }
-                ])
-            )
+            }))
         }));
 
         // Calculate global stats for metadata
