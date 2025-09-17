@@ -433,18 +433,18 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     icon: '👥',
     category: 'contribution'
   },
+  TEAM_SOLVER: {
+    id: 'TEAM_SOLVER',
+    name: 'Team Solver',
+    description: 'Solved challenges with others',
+    icon: '👫',
+    category: 'contribution'
+  },
   MENTOR: {
     id: 'MENTOR',
     name: 'Mentor',
-    description: 'Helped newcomers succeed',
+    description: 'Solved 5+ challenges collaboratively with others',
     icon: '🎓',
-    category: 'contribution'
-  },
-  COMMUNITY_BUILDER: {
-    id: 'COMMUNITY_BUILDER',
-    name: 'Community Builder',
-    description: 'Contributed to community growth',
-    icon: '🏗️',
     category: 'contribution'
   },
   LONG_HAULER: {
@@ -461,46 +461,11 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     icon: '🏆',
     category: 'contribution'
   },
-  FOUNDING_MEMBER: {
-    id: 'FOUNDING_MEMBER',
-    name: 'Founding Member',
-    description: 'Early platform adopter',
-    icon: '⭐',
-    category: 'contribution'
-  },
-  CHALLENGER: {
-    id: 'CHALLENGER',
-    name: 'Challenger',
-    description: 'Created challenges for community',
-    icon: '⚡',
-    category: 'contribution'
-  },
-  WRITEUP_AUTHOR: {
-    id: 'WRITEUP_AUTHOR',
-    name: 'Writeup Author',
-    description: 'Published detailed writeups',
-    icon: '📝',
-    category: 'contribution'
-  },
-  HELPFUL_SOUL: {
-    id: 'HELPFUL_SOUL',
-    name: 'Helpful Soul',
-    description: 'Provided hints and guidance',
+  COLLABORATIVE: {
+    id: 'COLLABORATIVE',
+    name: 'Collaborative',
+    description: 'Solved 10+ challenges with teammates',
     icon: '🤝',
-    category: 'contribution'
-  },
-  SOCIAL_BUTTERFLY: {
-    id: 'SOCIAL_BUTTERFLY',
-    name: 'Social Butterfly',
-    description: 'Active in community discussions',
-    icon: '🦋',
-    category: 'contribution'
-  },
-  ORGANIZER: {
-    id: 'ORGANIZER',
-    name: 'Organizer',
-    description: 'Helped organize CTF events',
-    icon: '📋',
     category: 'contribution'
   }
 };
@@ -892,21 +857,28 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
     checkGlobal: ({ userProfile }) => (userProfile.teamCTFs || 0) >= 10
   },
 
-  // Mentor (Note: Requires mentoring/helping data)
+  // Team Solver (Note: First collaborative solve)
+  {
+    id: 'TEAM_SOLVER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.helpedUsers || 0) >= 1
+  },
+
+  // Collaborative (Note: Team solves)
+  {
+    id: 'COLLABORATIVE',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.helpedUsers || 0) >= 10
+  },
+
+  // Mentor (Note: Requires collaborative solving)
   {
     id: 'MENTOR',
     scope: 'global',
     checkGlobal: ({ userProfile }) => (userProfile.helpedUsers || 0) >= 5
   },
 
-  // Community Builder (Note: Requires community contribution metrics)
-  {
-    id: 'COMMUNITY_BUILDER',
-    scope: 'global',
-    checkGlobal: ({ userProfile }) => (userProfile.communityScore || 0) >= 100
-  },
-
-  // Long Hauler (Note: Requires membership duration data)
+  // Long Hauler (membership duration data)
   {
     id: 'LONG_HAULER',
     scope: 'global',
@@ -916,7 +888,7 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
     }
   },
 
-  // Veteran Member (Note: Requires membership duration data)
+  // Veteran Member (membership duration data)
   {
     id: 'VETERAN_MEMBER',
     scope: 'global',
@@ -924,48 +896,6 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
       const membershipDays = userProfile.membershipDays || 0;
       return membershipDays >= 730; // 2+ years
     }
-  },
-
-  // Founding Member (Note: Requires early adoption data)
-  {
-    id: 'FOUNDING_MEMBER',
-    scope: 'global',
-    checkGlobal: ({ userProfile }) => userProfile.isEarlyAdopter === true
-  },
-
-  // Challenger (Note: Requires challenge creation data)
-  {
-    id: 'CHALLENGER',
-    scope: 'global',
-    checkGlobal: ({ userProfile }) => (userProfile.challengesCreated || 0) >= 1
-  },
-
-  // Writeup Author (Note: Requires writeup publication data)
-  {
-    id: 'WRITEUP_AUTHOR',
-    scope: 'global',
-    checkGlobal: ({ userProfile }) => (userProfile.writeupCount || 0) >= 5
-  },
-
-  // Helpful Soul (Note: Requires help/hint data)
-  {
-    id: 'HELPFUL_SOUL',
-    scope: 'global',
-    checkGlobal: ({ userProfile }) => (userProfile.hintsGiven || 0) >= 20
-  },
-
-  // Social Butterfly (Note: Requires discussion/comment data)
-  {
-    id: 'SOCIAL_BUTTERFLY',
-    scope: 'global',
-    checkGlobal: ({ userProfile }) => (userProfile.discussionPosts || 0) >= 50
-  },
-
-  // Organizer (Note: Requires event organization data)
-  {
-    id: 'ORGANIZER',
-    scope: 'global',
-    checkGlobal: ({ userProfile }) => (userProfile.eventsOrganized || 0) >= 1
   }
 ];
 

@@ -2,8 +2,8 @@ import { UserModel, solveModel } from "../../src/Database/connect";
 import FairScoringSystem from "../../src/Functions/scoringSystem";
 import { cache } from '../utils/cache';
 import { generateCacheKey } from '../utils/common';
-import { UserProfile, AvailableTimeRanges } from '../types';
-import { calculateExtendedMetricsForUsers } from '../utils/statistics';
+import { UserProfile, AvailableTimeRanges, MonthlyRank } from '../types';
+import { calculateExtendedMetricsForUsers, calculateRankImprovement } from '../utils/statistics';
 
 /**
  * Data Service Functions
@@ -83,13 +83,38 @@ export async function getCachedUserScores(
             // Conditionally calculate extended metrics
             const extendedMetricsMap = await calculateExtendedMetricsForUsers(baseProfiles, includeExtendedMetrics);
             
-            // Enrich profiles with extended metrics
+            // Calculate rank improvement for users if extended metrics are enabled
+            const rankImprovementMap = new Map<string, number>();
+            if (includeExtendedMetrics) {
+                // Process rank improvement in batches to avoid performance issues
+                const userIds = Array.from(baseProfiles.keys());
+                const batchSize = 10; // Process 10 users at a time
+                
+                for (let i = 0; i < userIds.length; i += batchSize) {
+                    const batch = userIds.slice(i, i + batchSize);
+                    const batchPromises = batch.map(async (userId) => {
+                        const monthlyRanks = await getMonthlyRankHistory(userId);
+                        const improvement = calculateRankImprovement(monthlyRanks);
+                        return { userId, improvement };
+                    });
+                    
+                    const batchResults = await Promise.all(batchPromises);
+                    batchResults.forEach(({ userId, improvement }) => {
+                        rankImprovementMap.set(userId, improvement);
+                    });
+                }
+            }
+            
+            // Enrich profiles with extended metrics and rank improvement
             userScores = new Map<string, UserProfile>();
             for (const [discordId, baseProfile] of baseProfiles) {
                 const extendedMetrics = extendedMetricsMap.get(discordId) || {};
+                const rankImprovement = rankImprovementMap.get(discordId) || extendedMetrics.rankImprovement || 0;
+                
                 const enrichedProfile: UserProfile = {
                     ...baseProfile,
-                    ...extendedMetrics
+                    ...extendedMetrics,
+                    rankImprovement // Override with real data when available
                 };
                 
                 userScores.set(discordId, enrichedProfile);
@@ -176,3 +201,101 @@ export async function getAvailableTimeRanges(): Promise<AvailableTimeRanges> {
         return { months: [], years: [] };
     }
 }
+
+/**
+ * Calculate monthly ranks for all users for a specific month
+ */
+export async function calculateMonthlyRanks(month: string): Promise<Map<string, number>> {
+    const cacheKey = `monthly_ranks_${month}`;
+    
+    // Try to get from cache first
+    let monthlyRanks = cache.getCached<Map<string, number>>(cacheKey);
+    
+    if (!monthlyRanks) {
+        try {
+            // Parse month string (YYYY-MM)
+            const [yearStr, monthStr] = month.split('-');
+            const targetYear = parseInt(yearStr);
+            const targetMonth = parseInt(monthStr) - 1; // JavaScript months are 0-indexed
+            
+            // Create start and end dates for the month
+            const startDate = new Date(targetYear, targetMonth, 1);
+            const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59, 999);
+            
+            const monthQuery = {
+                solved_at: {
+                    $gte: startDate,
+                    $lte: endDate
+                }
+            };
+
+            // Calculate user scores for this specific month
+            const monthlyUserScores = await FairScoringSystem.calculateUserScores(monthQuery);
+            
+            // Convert to ranked list
+            const sortedUsers = Array.from(monthlyUserScores.values())
+                .sort((a, b) => b.totalScore - a.totalScore);
+            
+            // Create rank map
+            monthlyRanks = new Map<string, number>();
+            sortedUsers.forEach((user, index) => {
+                monthlyRanks!.set(user.userId, index + 1);
+            });
+            
+            // Cache for 24 hours (monthly data doesn't change often)
+            cache.set(cacheKey, monthlyRanks, 24 * 60 * 60 * 1000);
+            
+        } catch (error) {
+            console.error(`Error calculating monthly ranks for ${month}:`, error);
+            return new Map();
+        }
+    }
+    
+    return monthlyRanks;
+}
+
+/**
+ * Get monthly rank history for a user using scoring system calculations
+ */
+export async function getMonthlyRankHistory(userId: string): Promise<MonthlyRank[]> {
+    try {
+        // Get available months from solve data
+        const availableTimeRanges = await getAvailableTimeRanges();
+        
+        // Only process last 12 months for performance (can be adjusted)
+        const recentMonths = availableTimeRanges.months.slice(0, 12);
+        
+        if (recentMonths.length === 0) {
+            return [];
+        }
+        
+        const rankHistory: MonthlyRank[] = [];
+        
+        // Calculate ranks for each month (in parallel for better performance)
+        const monthlyRankPromises = recentMonths.map(async (month) => {
+            const monthlyRanks = await calculateMonthlyRanks(month);
+            const userRank = monthlyRanks.get(userId);
+            
+            if (userRank) {
+                return { month, rank: userRank };
+            }
+            return null;
+        });
+        
+        const results = await Promise.all(monthlyRankPromises);
+        
+        // Filter out null results and sort by month
+        for (const result of results) {
+            if (result) {
+                rankHistory.push(result);
+            }
+        }
+        
+        return rankHistory.sort((a, b) => a.month.localeCompare(b.month));
+        
+    } catch (error) {
+        console.error('Error getting monthly rank history:', error);
+        return [];
+    }
+}
+

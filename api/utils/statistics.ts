@@ -5,13 +5,11 @@ import {
     GlobalStats, 
     PerformanceComparison, 
     CategoryStat, 
-    UserSolve 
+    UserSolve,
+    MonthlyRank 
 } from '../types';
 import { 
-    ACHIEVEMENTS, 
     ACHIEVEMENT_CRITERIA, 
-    getAchievement, 
-    getRankAchievement,
 } from '../../ui/lib/achievements';
 
 /**
@@ -264,7 +262,7 @@ export async function calculateExtendedMetricsForUsers(
             const batchPromises = batch.map(async (discordId) => {
                 const userProfile = userProfiles.get(discordId)!;
                 const userSolves = solvesByUser.get(discordId) || [];
-                const metrics = calculateExtendedMetricsSync(userProfile, userSolves);
+                const metrics = await calculateExtendedMetricsSync(userProfile, userSolves);
                 return { discordId, metrics };
             });
             
@@ -295,8 +293,8 @@ export async function calculateExtendedMetrics(userProfile: UserProfile, allSolv
 /**
  * Synchronous version of extended metrics calculation when data is already available
  */
-export function calculateExtendedMetricsSync(userProfile: UserProfile, allSolves: any[]): Partial<UserProfile> {
-    return calculateExtendedMetricsCore(userProfile, allSolves);
+export async function calculateExtendedMetricsSync(userProfile: UserProfile, allSolves: any[]): Promise<Partial<UserProfile>> {
+    return await calculateExtendedMetricsCore(userProfile, allSolves);
 }
 
 /**
@@ -326,7 +324,7 @@ async function calculateExtendedMetricsForSingleUser(userProfile: UserProfile, a
 /**
  * Core calculation logic for extended metrics - optimized and synchronous
  */
-function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves: any[]): Partial<UserProfile> {
+async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves: any[]): Promise<Partial<UserProfile>> {
     // Early return for empty solves
     if (!allSolves || allSolves.length === 0) {
         return {
@@ -344,13 +342,6 @@ function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves: any[]
             teamCTFs: 0,
             membershipDays: 365, // Default
             helpedUsers: 0,
-            communityScore: Math.floor(userProfile.totalScore / 10),
-            isEarlyAdopter: false,
-            challengesCreated: 0,
-            writeupCount: 0,
-            hintsGiven: 0,
-            discussionPosts: 0,
-            eventsOrganized: 0,
             rankImprovement: 0
         };
     }
@@ -365,10 +356,27 @@ function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves: any[]
     let hardSolves = 0;
     let expertSolves = 0;
     let firstBloods = 0;
-    let teamCTFs = 0;
+    let helpedUsers = 0; // Count of challenges solved together with others
     
     const solveDates: number[] = []; // Use timestamps for better performance
     const challengeTypes = new Set<string>();
+    // get user by discord id
+    const user = await UserModel.findOne({ discord_id: userProfile.userId }, { _id: 1, created_at: 1 }).lean();
+    if (!user) {
+        return {};
+    }
+    const membershipDays = Math.floor((new Date().getTime() - user.created_at.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Calculate rank improvement from monthly rank history
+    // Note: This is now calculated in the bulk processing function above for efficiency
+    // Individual calculations will use placeholder logic to avoid expensive calls
+    let rankImprovement = 0;
+    if (userProfile.solveCount > 50) {
+        // Estimate rank improvement based on solve activity and scoring patterns
+        const recentActivity = userProfile.recentSolves.length;
+        const avgScore = userProfile.totalScore / Math.max(userProfile.solveCount, 1);
+        rankImprovement = Math.floor((recentActivity * avgScore) / 100); // Rough estimate
+    }
     
     // Single pass through all solves for efficiency
     for (const solve of allSolves) {
@@ -408,12 +416,12 @@ function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves: any[]
             firstBloods++; // High-point challenges might be first bloods
         }
         
-        // Team solve detection
+        // Team solve detection - count challenges solved together with others
         if (solve.users && solve.users.length > 1) {
-            teamCTFs++;
+            helpedUsers++; // Each challenge solved with others counts as helping/being helped
         }
     }
-    
+
     // Calculate consecutive solving streak efficiently
     let longestStreak = 0;
     if (solveDates.length > 0) {
@@ -452,20 +460,35 @@ function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves: any[]
         hardSolves,
         expertSolves,
         uniqueChallengeTypes: challengeTypes.size,
-        teamCTFs: Math.max(1, Math.floor(teamCTFs / 5)), // Rough estimate, minimum 1
-        membershipDays: 365, // Default to 1 year
+        teamCTFs: Math.max(1, Math.floor(helpedUsers / 3)), // Estimate team CTFs from collaborative solves
+        membershipDays,
         
-        // Default values for community-based metrics
-        helpedUsers: 0,
-        communityScore: Math.floor(userProfile.totalScore / 10),
-        isEarlyAdopter: false,
-        challengesCreated: 0,
-        writeupCount: 0,
-        hintsGiven: 0,
-        discussionPosts: 0,
-        eventsOrganized: 0,
-        rankImprovement: 0
+        // Community-based metrics
+        helpedUsers,
+        rankImprovement
     };
+}
+
+/**
+ * Calculate rank improvement from monthly rank history data
+ * This function should be called with actual monthly rank data when available
+ */
+export function calculateRankImprovement(monthlyRanks: MonthlyRank[]): number {
+    if (!monthlyRanks || monthlyRanks.length < 2) {
+        return 0;
+    }
+    
+    // Sort by month to ensure chronological order
+    const sortedRanks = monthlyRanks.sort((a, b) => a.month.localeCompare(b.month));
+    
+    // Calculate improvement from first to last recorded rank
+    const firstRank = sortedRanks[0].rank;
+    const lastRank = sortedRanks[sortedRanks.length - 1].rank;
+    
+    // Rank improvement is positive when rank number goes down (better position)
+    const improvement = firstRank - lastRank;
+    
+    return Math.max(0, improvement); // Return 0 if rank got worse
 }
 
 /**
@@ -503,7 +526,7 @@ export function generateAchievementIds(
                 userProfile,
                 userRank,
                 totalUsers,
-                ctfStats: globalStats, // In CTF context, this should be ctfStats
+                ctfStats: globalStats,
                 allCategories,
                 ctfTitle
             });

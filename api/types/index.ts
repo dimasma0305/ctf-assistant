@@ -35,7 +35,7 @@ export interface UserProfile {
     }>;
     
     // Extended fields for achievements
-    rankImprovement?: number; // How many ranks improved over time
+    rankImprovement?: number; // How many ranks improved over time (from monthly calculations)
     fastSolves?: number; // Number of solves completed in under 1 hour
     ultraFastSolves?: number; // Number of solves completed in under 5 minutes  
     longestStreak?: number; // Longest consecutive solving streak in days
@@ -48,15 +48,8 @@ export interface UserProfile {
     expertSolves?: number; // Number of expert-difficulty solves
     uniqueChallengeTypes?: number; // Number of unique challenge types solved
     teamCTFs?: number; // Number of team-based CTF participations
-    helpedUsers?: number; // Number of users helped/mentored
-    communityScore?: number; // Overall community contribution score
+    helpedUsers?: number; // Number of collaborative challenge solves
     membershipDays?: number; // Days since joining the platform
-    isEarlyAdopter?: boolean; // Whether user was an early platform adopter
-    challengesCreated?: number; // Number of challenges created
-    writeupCount?: number; // Number of writeups published
-    hintsGiven?: number; // Number of hints provided to other users
-    discussionPosts?: number; // Number of discussion forum posts
-    eventsOrganized?: number; // Number of events organized
 }
 
 // ===== RANKING AND STATISTICS TYPES =====
@@ -118,4 +111,11 @@ export interface ValidationResult {
 export interface AvailableTimeRanges {
     months: string[]; // Array of YYYY-MM strings
     years: number[];  // Array of years
+}
+
+// ===== RANK HISTORY TYPES =====
+
+export interface MonthlyRank {
+    month: string; // YYYY-MM format
+    rank: number;
 }
