@@ -11,12 +11,7 @@ import {
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
         .setName('delete')
-        .setDescription('Delete a challenge solve and update thread name')
-        .addStringOption(input=>input
-            .setName("name")
-            .setDescription("Challenge name")
-            .setRequired(false)
-        ),
+        .setDescription('Delete a challenge solve and update thread name'),
     async execute(interaction, _client) {
         const channel = interaction.channel;
         if (!channel) {

@@ -142,13 +142,13 @@ export function CTFRankings() {
   return (
     <div className="space-y-6">
       {/* CTF Filter */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">CTF-Specific Rankings</h3>
           <p className="text-sm text-muted-foreground">View leaderboards for individual competitions</p>
         </div>
         <Select value={selectedCTF} onValueChange={setSelectedCTF} disabled={ctfRankings.length === 0}>
-          <SelectTrigger className="w-64">
+          <SelectTrigger className="w-full sm:w-64">
             <SelectValue placeholder="Select CTF" />
           </SelectTrigger>
           <SelectContent>
@@ -176,9 +176,9 @@ export function CTFRankings() {
           filteredRankings.map((ctf) => (
             <Card key={ctf.ctf_id}>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-12 w-12">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <Avatar className="h-12 w-12 flex-shrink-0">
                       <CachedAvatarImage
                         src={ctf.logo || "/placeholder.svg"}
                         loadingPlaceholder={
@@ -189,91 +189,95 @@ export function CTFRankings() {
                         {ctf.title.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <CardTitle className="font-[family-name:var(--font-playfair)]">{ctf.title}</CardTitle>
-                      <CardDescription className="flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="font-[family-name:var(--font-playfair)] truncate">{ctf.title}</CardTitle>
+                      <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-2">
                         <span>by {ctf.organizer}</span>
-                        <Badge className={`text-xs ${getStatusColor(ctf.schedule.status)}`}>
+                        <Badge className={`text-xs ${getStatusColor(ctf.schedule.status)} w-fit`}>
                           {ctf.schedule.status}
                         </Badge>
                       </CardDescription>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="w-full sm:w-auto">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {ctf.communityStats.uniqueParticipants} players
+                        <span className="whitespace-nowrap">{ctf.communityStats.uniqueParticipants} players</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Target className="h-4 w-4" />
-                        {ctf.communityStats.totalSolves} solves
+                        <span className="whitespace-nowrap">{ctf.communityStats.totalSolves} solves</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        {formatDate(ctf.schedule.start)}
+                        <span className="whitespace-nowrap">{formatDate(ctf.schedule.start)}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="w-16">Rank</TableHead>
-                      <TableHead>Player</TableHead>
-                      <TableHead className="text-right">Score</TableHead>
-                      <TableHead className="text-right">Solves</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {ctf.leaderboard.map((player) => (
-                      <TableRow key={player.user.userId} className="hover:bg-muted/50">
-                        <TableCell className="font-medium">
-                          <div className="flex items-center justify-center">{getRankIcon(player.rank)}</div>
-                        </TableCell>
-                        <TableCell>
-                          <div
-                            className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-colors"
-                            onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
-                          >
-                            <Avatar className="w-8 h-8">
-                              <CachedAvatarImage
-                                src={
-                                  player.user.avatar ||
-                                  `/abstract-geometric-shapes.png?height=32&width=32&query=${player.user.userId}`
-                                }
-                                loadingPlaceholder={
-                                  <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                                }
-                              />
-                              <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
-                                {(player.user.displayName || player.user.username).substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium hover:text-primary transition-colors">
-                                {player.user.displayName || player.user.username}
-                              </div>
-                              <div className="text-sm text-muted-foreground">
-                                {player.rank <= 3 ? "Elite" : player.rank <= 10 ? "Advanced" : "Intermediate"}
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="w-16">Rank</TableHead>
+                        <TableHead className="min-w-[150px]">Player</TableHead>
+                        <TableHead className="text-right min-w-[80px]">Score</TableHead>
+                        <TableHead className="text-right min-w-[70px]">Solves</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {ctf.leaderboard.map((player) => (
+                        <TableRow key={player.user.userId} className="hover:bg-muted/50">
+                          <TableCell className="font-medium">
+                            <div className="flex items-center justify-center">{getRankIcon(player.rank)}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div
+                              className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-colors"
+                              onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
+                            >
+                              <Avatar className="w-8 h-8 flex-shrink-0">
+                                <CachedAvatarImage
+                                  src={
+                                    player.user.avatar ||
+                                    `/abstract-geometric-shapes.png?height=32&width=32&query=${player.user.userId}`
+                                  }
+                                  loadingPlaceholder={
+                                    <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                                  }
+                                />
+                                <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
+                                  {(player.user.displayName || player.user.username).substring(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0 flex-1">
+                                <div className="font-medium hover:text-primary transition-colors truncate">
+                                  {player.user.displayName || player.user.username}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {player.rank <= 3 ? "Elite" : player.rank <= 10 ? "Advanced" : "Intermediate"}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="font-mono font-bold text-primary">{player.score.toFixed(1)}</div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="secondary" className="font-mono text-foreground">
-                            {player.solves}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="font-mono font-bold text-primary text-sm sm:text-base">
+                              {player.score.toFixed(1)}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant="secondary" className="font-mono text-foreground text-xs">
+                              {player.solves}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           ))
@@ -282,7 +286,7 @@ export function CTFRankings() {
 
       {/* CTF-Specific User Profile Modal */}
       <Dialog open={showUserProfile} onOpenChange={setShowUserProfile}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
           {profileLoading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
@@ -303,8 +307,8 @@ export function CTFRankings() {
             selectedUser && (
               <>
                 <DialogHeader>
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <Avatar className="h-16 w-16 flex-shrink-0">
                       <CachedAvatarImage
                         src={
                           selectedUser.user.avatar ||
@@ -318,14 +322,17 @@ export function CTFRankings() {
                         {(selectedUser.user.displayName || selectedUser.user.username).substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <DialogTitle className="text-2xl font-[family-name:var(--font-playfair)]">
+                    <div className="min-w-0 flex-1">
+                      <DialogTitle className="text-xl sm:text-2xl font-[family-name:var(--font-playfair)]">
                         {selectedUser.user.displayName || selectedUser.user.username}
                       </DialogTitle>
-                      <DialogDescription className="text-base flex items-center gap-2">
-                        <Trophy className="w-4 h-4" />
-                        Rank #{selectedUser.ctfRank} of {selectedUser.totalParticipants} in {selectedUser.ctfInfo.title}
-                        <Badge variant="secondary" className="ml-2 text-foreground">
+                      <DialogDescription className="text-sm sm:text-base flex flex-col sm:flex-row sm:items-center gap-2">
+                        <div className="flex items-center gap-2">
+                          <Trophy className="w-4 h-4" />
+                          Rank #{selectedUser.ctfRank} of {selectedUser.totalParticipants} in{" "}
+                          {selectedUser.ctfInfo.title}
+                        </div>
+                        <Badge variant="secondary" className="text-foreground w-fit">
                           Top {selectedUser.percentile}%
                         </Badge>
                       </DialogDescription>
@@ -337,28 +344,34 @@ export function CTFRankings() {
                   {/* CTF Stats */}
                   <div>
                     <h4 className="font-semibold mb-3">CTF Performance</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                       <Card>
                         <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary">{selectedUser.stats.score.toFixed(1)}</div>
+                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                            {selectedUser.stats.score.toFixed(1)}
+                          </div>
                           <div className="text-xs text-muted-foreground">Total Score</div>
                         </CardContent>
                       </Card>
                       <Card>
                         <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary">{selectedUser.stats.solveCount}</div>
+                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                            {selectedUser.stats.solveCount}
+                          </div>
                           <div className="text-xs text-muted-foreground">Solves</div>
                         </CardContent>
                       </Card>
                       <Card>
                         <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary">{selectedUser.stats.categoriesCount}</div>
+                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                            {selectedUser.stats.categoriesCount}
+                          </div>
                           <div className="text-xs text-muted-foreground">Categories</div>
                         </CardContent>
                       </Card>
                       <Card>
                         <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-primary">
                             {selectedUser.stats.averagePointsPerSolve.toFixed(1)}
                           </div>
                           <div className="text-xs text-muted-foreground">Avg Points</div>
@@ -374,17 +387,17 @@ export function CTFRankings() {
                       {selectedUser.categoryBreakdown.map((category) => (
                         <div
                           key={category.name}
-                          className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-muted/50 rounded-lg gap-2"
                         >
-                          <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="capitalize">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                            <Badge variant="outline" className="capitalize w-fit">
                               {category.name}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
                               #{category.rankInCategory} of {category.totalInCategory}
                             </span>
                           </div>
-                          <div className="text-right">
+                          <div className="text-left sm:text-right">
                             <div className="font-semibold text-primary">{category.solves} solves</div>
                             <div className="text-xs text-muted-foreground">
                               {category.totalPoints} pts • Top {category.percentile}%
@@ -398,12 +411,12 @@ export function CTFRankings() {
                   {/* Achievements */}
                   <div>
                     <h4 className="font-semibold mb-3">CTF Achievements</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {selectedUser.achievements.map((achievement) => (
                         <Card key={achievement.name} className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="text-2xl">{achievement.icon}</div>
-                            <div>
+                            <div className="text-2xl flex-shrink-0">{achievement.icon}</div>
+                            <div className="min-w-0 flex-1">
                               <div className="font-medium">{achievement.name}</div>
                               <div className="text-sm text-muted-foreground">{achievement.description}</div>
                             </div>

@@ -85,11 +85,14 @@ export default function UserProfilePage() {
         solves: profileData.stats.solveCount,
         categories: profileData.categoryBreakdown.map((cat) => cat.name),
         issuedDate: `${currentYear}-12-31T23:59:59Z`,
+        isPending: true, // Yearly certificates are pending until year end
+        issuedAt: null, // Will be set when certificate is officially issued
       })
 
       // Generate monthly certificate for current month if we're past the first week
       if (currentDate.getDate() > 7) {
         const monthStr = currentMonth.toString().padStart(2, "0")
+        const isCurrentMonth = true // This month's certificate is always pending
         certificates.push({
           id: `cert-${currentYear}-${monthStr}`,
           type: "monthly" as const,
@@ -100,6 +103,10 @@ export default function UserProfilePage() {
           solves: profileData.stats.solveCount,
           categories: profileData.categoryBreakdown.map((cat) => cat.name),
           issuedDate: `${currentYear}-${monthStr}-${new Date(currentYear, currentMonth, 0).getDate()}T23:59:59Z`,
+          isPending: isCurrentMonth, // Current month certificates are pending
+          issuedAt: isCurrentMonth
+            ? null
+            : `${currentYear}-${monthStr}-${new Date(currentYear, currentMonth, 0).getDate()}T23:59:59Z`,
         })
       }
     }
@@ -171,8 +178,8 @@ export default function UserProfilePage() {
         {/* Profile Header */}
         <Card className="mb-8">
           <CardHeader>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <Avatar className="w-24 h-24">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+              <Avatar className="w-20 h-20 sm:w-24 sm:h-24 mx-auto sm:mx-0 flex-shrink-0">
                 <CachedAvatarImage
                   src={
                     profileData.user.avatar ||
@@ -182,25 +189,27 @@ export default function UserProfilePage() {
                     <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
                   }
                 />
-                <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                <AvatarFallback className="text-xl sm:text-2xl bg-primary/10 text-primary">
                   {getUserInitials(profileData.user)}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <CardTitle className="text-3xl font-[family-name:var(--font-playfair)] mb-2">
+              <div className="flex-1 text-center sm:text-left min-w-0">
+                <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-[family-name:var(--font-playfair)] mb-2 break-words hyphens-auto">
                   {profileData.user.displayName || profileData.user.username}
                 </CardTitle>
-                <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4" />
+                <div className="flex flex-col sm:flex-row sm:flex-wrap items-center sm:items-start gap-2 sm:gap-4 text-sm sm:text-base text-muted-foreground">
+                  <div className="flex items-center gap-2 whitespace-nowrap">
+                    <Trophy className="w-4 h-4 flex-shrink-0" />
                     Global Rank #{profileData.globalRank}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    Top {getPercentile(profileData.globalRank, profileData.totalUsers)}% of{" "}
-                    {profileData.totalUsers.toLocaleString()} players
+                  <div className="flex items-center gap-2 text-center sm:text-left">
+                    <Users className="w-4 h-4 flex-shrink-0" />
+                    <span className="break-words">
+                      Top {getPercentile(profileData.globalRank, profileData.totalUsers)}% of{" "}
+                      {profileData.totalUsers.toLocaleString()} players
+                    </span>
                   </div>
-                  <Badge variant="secondary" className="gap-1">
+                  <Badge variant="secondary" className="gap-1 whitespace-nowrap">
                     <Star className="w-3 h-3" />
                     Elite Player
                   </Badge>
@@ -211,49 +220,72 @@ export default function UserProfilePage() {
         </Card>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Total Score</CardTitle>
+              <CardTitle className="text-xs sm:text-sm text-muted-foreground text-center">Total Score</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{formatScore(profileData.stats.totalScore)}</div>
+            <CardContent className="pt-0">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-primary text-center break-all">
+                {formatScore(profileData.stats.totalScore)}
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Challenges Solved</CardTitle>
+              <CardTitle className="text-xs sm:text-sm text-muted-foreground text-center">Challenges Solved</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{profileData.stats.solveCount}</div>
+            <CardContent className="pt-0">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-primary text-center">
+                {profileData.stats.solveCount}
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">CTFs Participated</CardTitle>
+              <CardTitle className="text-xs sm:text-sm text-muted-foreground text-center">CTFs Participated</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{profileData.stats.ctfCount}</div>
+            <CardContent className="pt-0">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-primary text-center">
+                {profileData.stats.ctfCount}
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Categories Mastered</CardTitle>
+              <CardTitle className="text-xs sm:text-sm text-muted-foreground text-center">
+                Categories Mastered
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{profileData.stats.categoriesCount}</div>
+            <CardContent className="pt-0">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-primary text-center">
+                {profileData.stats.categoriesCount}
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Detailed Tabs */}
         <Tabs defaultValue="categories" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="categories">Category Breakdown</TabsTrigger>
-            <TabsTrigger value="ctfs">CTF Participation</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
-            <TabsTrigger value="certificates">Certificates</TabsTrigger>
-            <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto">
+            <TabsTrigger value="categories" className="text-xs sm:text-sm px-2 py-2 data-[state=active]:text-primary">
+              Categories
+            </TabsTrigger>
+            <TabsTrigger value="ctfs" className="text-xs sm:text-sm px-2 py-2 data-[state=active]:text-primary">
+              CTFs
+            </TabsTrigger>
+            <TabsTrigger value="achievements" className="text-xs sm:text-sm px-2 py-2 data-[state=active]:text-primary">
+              Awards
+            </TabsTrigger>
+            <TabsTrigger value="certificates" className="text-xs sm:text-sm px-2 py-2 data-[state=active]:text-primary">
+              Certificates
+            </TabsTrigger>
+            <TabsTrigger
+              value="activity"
+              className="text-xs sm:text-sm px-2 py-2 data-[state=active]:text-primary col-span-2 sm:col-span-1"
+            >
+              Activity
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="categories">
@@ -295,28 +327,77 @@ export default function UserProfilePage() {
               <CardContent>
                 <div className="space-y-4">
                   {profileData.ctfBreakdown.map((ctf) => (
-                    <Card key={ctf.ctf_id} className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <h3 className="font-semibold">{ctf.ctfTitle}</h3>
-                          <div className="text-sm text-muted-foreground">
-                            Weight: {ctf.weight}x • {ctf.contribution}% of total score
+                    <Card key={ctf.ctf_id} className="p-4 sm:p-6 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                        {/* CTF Logo and Title Row for Mobile */}
+                        <div className="flex items-center gap-3 sm:flex-col sm:items-center sm:gap-2">
+                          <Avatar className="w-10 h-10 sm:w-12 sm:h-12 border-2 border-border flex-shrink-0">
+                            <CachedAvatarImage
+                              src={ctf.logo || `/placeholder.svg?height=48&width=48&query=CTF+logo+${ctf.ctfTitle}`}
+                              loadingPlaceholder={
+                                <div className="w-4 h-4 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                              }
+                            />
+                            <AvatarFallback className="text-xs sm:text-sm font-semibold bg-primary/10 text-primary">
+                              {ctf.ctfTitle
+                                .split(" ")
+                                .map((word) => word[0])
+                                .join("")
+                                .slice(0, 2)
+                                .toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          {/* Mobile: Title next to logo, Desktop: Title below logo */}
+                          <div className="flex-1 sm:hidden">
+                            <h3 className="font-semibold text-base text-balance leading-tight">{ctf.ctfTitle}</h3>
+                          </div>
+
+                          {/* Score - Mobile: Right side, Desktop: Below details */}
+                          <div className="text-right sm:hidden flex-shrink-0">
+                            <div className="text-xs text-muted-foreground">Score</div>
+                            <div className="font-bold text-lg text-primary">{formatScore(ctf.score)}</div>
                           </div>
                         </div>
-                        <Badge variant="outline">{ctf.solves} solves</Badge>
-                      </div>
-                      <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <div className="text-muted-foreground">Raw Points</div>
-                          <div className="font-medium">{ctf.points}</div>
-                        </div>
-                        <div>
-                          <div className="text-muted-foreground">Weighted Score</div>
-                          <div className="font-medium">{formatScore(ctf.score)}</div>
-                        </div>
-                        <div>
-                          <div className="text-muted-foreground">Contribution</div>
-                          <div className="font-medium">{ctf.contribution}%</div>
+
+                        {/* CTF Details */}
+                        <div className="flex-1 min-w-0">
+                          {/* Desktop Title */}
+                          <div className="hidden sm:block mb-3">
+                            <h3 className="font-semibold text-lg text-balance leading-tight mb-1">{ctf.ctfTitle}</h3>
+                          </div>
+
+                          {/* Stats Row */}
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs sm:text-sm text-muted-foreground">Weight:</span>
+                              <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                                {ctf.weight}x
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs sm:text-sm text-muted-foreground">Solves:</span>
+                              <Badge variant="outline" className="text-xs px-2 py-0.5">
+                                {ctf.solves}
+                              </Badge>
+                            </div>
+
+                            {/* Desktop Score */}
+                            <div className="hidden sm:block ml-auto text-right">
+                              <div className="text-xs text-muted-foreground">Score</div>
+                              <div className="font-bold text-xl text-primary">{formatScore(ctf.score)}</div>
+                            </div>
+                          </div>
+
+                          {/* Progress Bar */}
+                          <div className="w-full bg-muted rounded-full h-1.5 sm:h-2">
+                            <div
+                              className="bg-primary rounded-full h-1.5 sm:h-2 transition-all duration-300"
+                              style={{
+                                width: `${Math.min((ctf.score / Math.max(...profileData.ctfBreakdown.map((c) => c.score))) * 100, 100)}%`,
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
                     </Card>

@@ -24,7 +24,6 @@ export interface CTFBreakdown {
   solves: number
   points: number
   score: number
-  logo: string
   contribution?: number
 }
 
@@ -358,4 +357,35 @@ export interface CTFRankingsParams {
   limit?: number
   status?: "upcoming" | "active" | "completed"
   hasParticipation?: boolean
+}
+
+// Certificate Types
+export interface Certificate {
+  id: string
+  userId: string
+  period: string // "monthly" | "yearly"
+  periodValue: string // "2024-01" for monthly, "2024" for yearly
+  rank: number // 1, 2, or 3
+  title: string
+  description: string
+  score: number
+  totalParticipants: number
+  issuedAt: string | null // null if pending
+  isPending: boolean
+  stats: {
+    totalScore: number
+    challenges: number
+    categories: number
+  }
+}
+
+export interface CertificateGenerationData {
+  user: UserInfo
+  certificate: Certificate
+  leaderboardData: {
+    rank: number
+    totalParticipants: number
+    score: number
+    percentile: number
+  }
 }

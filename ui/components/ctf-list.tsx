@@ -103,7 +103,7 @@ export function CTFList() {
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
@@ -113,28 +113,30 @@ export function CTFList() {
             className="pl-10"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="upcoming">Upcoming</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={formatFilter} onValueChange={setFormatFilter}>
-          <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Format" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Formats</SelectItem>
-            <SelectItem value="jeopardy">Jeopardy</SelectItem>
-            <SelectItem value="attack-defense">Attack-Defense</SelectItem>
-            <SelectItem value="mixed">Mixed</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="upcoming">Upcoming</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={formatFilter} onValueChange={setFormatFilter}>
+            <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectValue placeholder="Format" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Formats</SelectItem>
+              <SelectItem value="jeopardy">Jeopardy</SelectItem>
+              <SelectItem value="attack-defense">Attack-Defense</SelectItem>
+              <SelectItem value="mixed">Mixed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* CTF List */}
@@ -145,10 +147,10 @@ export function CTFList() {
             className="hover:bg-muted/50 transition-colors cursor-pointer"
             onClick={() => handleCTFClick(ctf.ctf_id)}
           >
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4 flex-1">
-                  <Avatar className="h-12 w-12">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <Avatar className="h-12 w-12 flex-shrink-0">
                     <CachedAvatarImage
                       src={ctf.logo || "/placeholder.svg"}
                       loadingPlaceholder={
@@ -161,37 +163,41 @@ export function CTFList() {
                   </Avatar>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
                       <h3 className="font-semibold text-lg text-foreground truncate">{ctf.title}</h3>
-                      <Badge className={`text-xs ${getStatusColor(ctf.schedule.status)}`}>{ctf.schedule.status}</Badge>
+                      <Badge className={`text-xs ${getStatusColor(ctf.schedule.status)} w-fit`}>
+                        {ctf.schedule.status}
+                      </Badge>
                     </div>
 
                     <p className="text-sm text-muted-foreground mb-2">by {ctf.organizer}</p>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        {formatDate(ctf.schedule.start)} - {formatDate(ctf.schedule.finish)}
+                        <span className="whitespace-nowrap">
+                          {formatDate(ctf.schedule.start)} - {formatDate(ctf.schedule.finish)}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-3 w-3" />
-                        {ctf.participants.toLocaleString()} participants
+                        <span className="whitespace-nowrap">{ctf.participants.toLocaleString()} participants</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Trophy className="h-3 w-3" />
-                        Weight: {ctf.weight}
+                        <span className="whitespace-nowrap">Weight: {ctf.weight}</span>
                       </div>
                       {ctf.location && (
                         <div className="flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
-                          {ctf.location}
+                          <span className="truncate max-w-[150px]">{ctf.location}</span>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="text-right">
+                <div className="text-left sm:text-right w-full sm:w-auto">
                   <div className="text-sm font-medium text-foreground">
                     {ctf.communityParticipation.uniqueParticipants} players
                   </div>
@@ -205,7 +211,7 @@ export function CTFList() {
 
       {/* CTF Detail Modal */}
       <Dialog open={!!selectedCTFId} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
           {detailLoading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
@@ -222,8 +228,8 @@ export function CTFList() {
             selectedCTFDetails && (
               <>
                 <DialogHeader>
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <Avatar className="h-16 w-16 flex-shrink-0">
                       <CachedAvatarImage
                         src={selectedCTFDetails.logo || "/placeholder.svg"}
                         loadingPlaceholder={
@@ -234,11 +240,11 @@ export function CTFList() {
                         {selectedCTFDetails.title.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <DialogTitle className="text-2xl font-[family-name:var(--font-playfair)]">
+                    <div className="min-w-0 flex-1">
+                      <DialogTitle className="text-xl sm:text-2xl font-[family-name:var(--font-playfair)]">
                         {selectedCTFDetails.title}
                       </DialogTitle>
-                      <DialogDescription className="text-base">
+                      <DialogDescription className="text-sm sm:text-base">
                         {selectedCTFDetails.organizer} • {selectedCTFDetails.format} • Weight:{" "}
                         {selectedCTFDetails.weight}
                       </DialogDescription>
@@ -251,17 +257,17 @@ export function CTFList() {
                   {selectedCTFDetails.description && (
                     <div>
                       <h4 className="font-semibold mb-2">Description</h4>
-                      <p className="text-muted-foreground">{selectedCTFDetails.description}</p>
+                      <p className="text-muted-foreground text-sm">{selectedCTFDetails.description}</p>
                     </div>
                   )}
 
                   {/* Community Stats */}
                   <div>
                     <h4 className="font-semibold mb-3">Community Participation</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                       <Card>
                         <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-primary">
                             {selectedCTFDetails.communityStats.uniqueParticipants}
                           </div>
                           <div className="text-xs text-muted-foreground">Participants</div>
@@ -269,7 +275,7 @@ export function CTFList() {
                       </Card>
                       <Card>
                         <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-primary">
                             {selectedCTFDetails.communityStats.totalSolves}
                           </div>
                           <div className="text-xs text-muted-foreground">Total Solves</div>
@@ -277,7 +283,7 @@ export function CTFList() {
                       </Card>
                       <Card>
                         <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-primary">
                             {selectedCTFDetails.communityStats.challengesSolved}
                           </div>
                           <div className="text-xs text-muted-foreground">Challenges</div>
@@ -285,7 +291,7 @@ export function CTFList() {
                       </Card>
                       <Card>
                         <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-primary">
                             {selectedCTFDetails.communityStats.categoriesCovered}
                           </div>
                           <div className="text-xs text-muted-foreground">Categories</div>
@@ -315,16 +321,18 @@ export function CTFList() {
                           key={player.user.userId}
                           className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
                             <Badge
                               variant="outline"
-                              className="w-8 h-8 rounded-full flex items-center justify-center p-0"
+                              className="w-8 h-8 rounded-full flex items-center justify-center p-0 flex-shrink-0"
                             >
                               {player.rank}
                             </Badge>
-                            <span className="font-medium">{player.user.displayName || player.user.username}</span>
+                            <span className="font-medium truncate">
+                              {player.user.displayName || player.user.username}
+                            </span>
                           </div>
-                          <div className="text-right">
+                          <div className="text-right flex-shrink-0">
                             <div className="font-semibold text-primary">{player.score.toFixed(1)}</div>
                             <div className="text-xs text-muted-foreground">{player.solves} solves</div>
                           </div>
@@ -334,7 +342,7 @@ export function CTFList() {
                   </div>
 
                   {/* External Link */}
-                  <div className="flex justify-end">
+                  <div className="flex justify-center sm:justify-end">
                     <Button variant="outline" asChild>
                       <a
                         href={selectedCTFDetails.url}
