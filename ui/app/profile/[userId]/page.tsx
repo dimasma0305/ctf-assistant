@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Trophy, Star, Users, Clock, Award, Target, Zap, TrendingUp, Crown } from "lucide-react"
+import { ArrowLeft, Trophy, Star, Users, Clock, Award, Target, Zap, TrendingUp, Crown, Lock } from "lucide-react"
 import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/utils"
 import { CertificateGenerator } from "@/components/certificate-generator"
+import { ACHIEVEMENTS } from "@/lib/achievements"
 
 import Link from "next/link"
 import { useUserProfile } from "@/hooks/useAPI"
@@ -19,6 +20,79 @@ export default function UserProfilePage() {
   const userId = params.userId as string
 
   const { data: profileData, loading, error } = useUserProfile(userId)
+
+  const getUnlockedAchievementsWithHierarchy = (achievementIds: string[]) => {
+    const unlockedSet = new Set(achievementIds)
+
+    // Define achievement hierarchies (higher tier -> lower tiers)
+    const hierarchies = {
+      // Global ranking hierarchy
+      GLOBAL_CHAMPION: ["GLOBAL_PODIUM", "ELITE_GLOBAL", "TOP_10_GLOBAL", "TOP_25_GLOBAL", "TOP_50_GLOBAL"],
+      GLOBAL_PODIUM: ["ELITE_GLOBAL", "TOP_10_GLOBAL", "TOP_25_GLOBAL", "TOP_50_GLOBAL"],
+      ELITE_GLOBAL: ["TOP_10_GLOBAL", "TOP_25_GLOBAL", "TOP_50_GLOBAL"],
+      TOP_10_GLOBAL: ["TOP_25_GLOBAL", "TOP_50_GLOBAL"],
+      TOP_25_GLOBAL: ["TOP_50_GLOBAL"],
+
+      // CTF ranking hierarchy
+      CTF_CHAMPION: ["CTF_PODIUM", "ELITE_CTF", "TOP_10_CTF", "TOP_25_CTF", "TOP_50_CTF"],
+      CTF_PODIUM: ["ELITE_CTF", "TOP_10_CTF", "TOP_25_CTF", "TOP_50_CTF"],
+      ELITE_CTF: ["TOP_10_CTF", "TOP_25_CTF", "TOP_50_CTF"],
+      TOP_10_CTF: ["TOP_25_CTF", "TOP_50_CTF"],
+      TOP_25_CTF: ["TOP_50_CTF"],
+
+      // Participation hierarchy (solve count)
+      LEGENDARY: [
+        "UNSTOPPABLE",
+        "CENTURY_CLUB",
+        "VETERAN_SOLVER",
+        "DEDICATED",
+        "ACTIVE_SOLVER",
+        "CTF_SOLVER",
+        "GETTING_STARTED",
+        "FIRST_STEPS",
+      ],
+      UNSTOPPABLE: [
+        "CENTURY_CLUB",
+        "VETERAN_SOLVER",
+        "DEDICATED",
+        "ACTIVE_SOLVER",
+        "CTF_SOLVER",
+        "GETTING_STARTED",
+        "FIRST_STEPS",
+      ],
+      CENTURY_CLUB: ["VETERAN_SOLVER", "DEDICATED", "ACTIVE_SOLVER", "CTF_SOLVER", "GETTING_STARTED", "FIRST_STEPS"],
+      VETERAN_SOLVER: ["DEDICATED", "ACTIVE_SOLVER", "CTF_SOLVER", "GETTING_STARTED", "FIRST_STEPS"],
+      DEDICATED: ["ACTIVE_SOLVER", "CTF_SOLVER", "GETTING_STARTED", "FIRST_STEPS"],
+      ACTIVE_SOLVER: ["CTF_SOLVER", "GETTING_STARTED", "FIRST_STEPS"],
+      CTF_SOLVER: ["GETTING_STARTED", "FIRST_STEPS"],
+      GETTING_STARTED: ["FIRST_STEPS"],
+
+      // CTF participation hierarchy
+      CTF_VETERAN: ["CTF_EXPLORER", "MULTI_CTF_PLAYER", "CTF_NEWCOMER"],
+      CTF_EXPLORER: ["MULTI_CTF_PLAYER", "CTF_NEWCOMER"],
+      MULTI_CTF_PLAYER: ["CTF_NEWCOMER"],
+
+      // Skill hierarchy
+      POLYMATH: ["CATEGORY_MASTER", "VERSATILE"],
+      CATEGORY_MASTER: ["VERSATILE"],
+      SERIAL_SOLVER: ["FIRST_BLOOD"],
+
+      // Contribution hierarchy
+      VETERAN_MEMBER: ["LONG_HAULER"],
+      COLLABORATIVE: ["TEAM_SOLVER"],
+      MENTOR: ["TEAM_SOLVER"],
+    }
+
+    // Auto-unlock lower tier achievements
+    for (const achievementId of achievementIds) {
+      if (hierarchies[achievementId as keyof typeof hierarchies]) {
+        const lowerTiers = hierarchies[achievementId as keyof typeof hierarchies]
+        lowerTiers.forEach((lowerId) => unlockedSet.add(lowerId))
+      }
+    }
+
+    return unlockedSet
+  }
 
   const formatScore = (score: number) => {
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
@@ -92,6 +166,8 @@ export default function UserProfilePage() {
   }
 
   const achievements: Achievement[] = getAchievements(profileData?.achievementIds || [])
+  const allAchievements = Object.values(ACHIEVEMENTS)
+  const unlockedAchievementIds = getUnlockedAchievementsWithHierarchy(profileData?.achievementIds || [])
 
   if (loading) {
     return (
@@ -169,118 +245,100 @@ export default function UserProfilePage() {
         </div>
 
         <Card className="mb-8 border-2 border-primary/20 shadow-xl">
-          <CardHeader className="pb-4 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
-              <div className="relative mx-auto lg:mx-0 flex-shrink-0">
-                <Avatar className="w-24 h-24 lg:w-32 lg:h-32 ring-4 ring-primary/30 shadow-lg">
-                  <CachedAvatarImage
-                    src={
-                      profileData.user.avatar ||
-                      `/abstract-geometric-shapes.png?key=profile&height=128&width=128&query=${profileData.user.userId}`
-                    }
-                    loadingPlaceholder={
-                      <div className="w-6 h-6 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                    }
-                  />
-                  <AvatarFallback className="text-2xl lg:text-3xl bg-primary/20 text-primary font-bold">
-                    {getUserInitials(profileData.user)}
-                  </AvatarFallback>
-                </Avatar>
-                {profileData.globalRank <= 3 && (
-                  <div className="absolute -top-2 -right-2">
-                    <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 p-2 rounded-full shadow-lg border-2 border-yellow-300">
-                      <Crown className="w-5 h-5 text-yellow-900" />
+          <CardHeader className="pb-6 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+            <div className="flex flex-col gap-6">
+              {/* Top row: Avatar, Name, and Primary Stats */}
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                {/* Avatar with rank indicator */}
+                <div className="relative flex-shrink-0">
+                  <Avatar className="w-24 h-24 ring-4 ring-primary/30 shadow-lg">
+                    <CachedAvatarImage
+                      src={
+                        profileData.user.avatar ||
+                        `/abstract-geometric-shapes.png?key=profile&height=128&width=128&query=${profileData.user.userId}`
+                      }
+                      loadingPlaceholder={
+                        <div className="w-6 h-6 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                      }
+                    />
+                    <AvatarFallback className="text-2xl bg-primary/20 text-primary font-bold">
+                      {getUserInitials(profileData.user)}
+                    </AvatarFallback>
+                  </Avatar>
+                  {profileData.globalRank <= 3 && (
+                    <div className="absolute -top-2 -right-2">
+                      <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 p-2 rounded-full shadow-lg border-2 border-yellow-300">
+                        <Crown className="w-4 h-4 text-yellow-900" />
+                      </div>
                     </div>
+                  )}
+                </div>
+
+                {/* User info and rank badges */}
+                <div className="flex-1 text-center sm:text-left">
+                  <CardTitle className="text-2xl sm:text-3xl font-bold mb-3 text-primary">
+                    {profileData.user.displayName || profileData.user.username}
+                  </CardTitle>
+
+                  {/* Rank badges in a clean row */}
+                  <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/15 rounded-full border border-primary/30">
+                      <Trophy className="w-4 h-4 text-primary" />
+                      <span className="font-medium text-primary text-sm">Global Rank #{profileData.globalRank}</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-chart-2/15 rounded-full border border-chart-2/30">
+                      <Users className="w-4 h-4 text-chart-2" />
+                      <span className="text-chart-2 font-medium text-sm">
+                        Top {calculatePercentile(profileData.globalRank, profileData.totalUsers)}%
+                      </span>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="gap-1 px-3 py-1.5 bg-chart-3/15 text-chart-3 border-chart-3/30 text-sm"
+                    >
+                      Elite Player
+                    </Badge>
                   </div>
-                )}
+                </div>
               </div>
 
-              <div className="flex-1 text-center lg:text-left min-w-0 space-y-4">
-                <CardTitle className="text-2xl lg:text-4xl font-bold break-words text-primary">
-                  {profileData.user.displayName || profileData.user.username}
-                </CardTitle>
-
-                <div className="flex flex-col lg:flex-row lg:flex-wrap items-center lg:items-start gap-3">
-                  <div className="flex items-center gap-3 px-4 py-2 bg-primary/15 rounded-lg border border-primary/30">
-                    <Trophy className="w-5 h-5 text-primary" />
-                    <span className="font-medium text-primary">Global Rank #{profileData.globalRank}</span>
+              {/* Bottom row: Stats in a clean grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-primary/10 rounded-lg border border-primary/20">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Target className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium text-primary">Total Score</span>
                   </div>
+                  <div className="text-xl font-bold text-primary">{formatScore(profileData.stats.totalScore)}</div>
+                </div>
 
-                  <div className="flex items-center gap-3 px-4 py-2 bg-chart-2/15 rounded-lg border border-chart-2/30">
-                    <Users className="w-5 h-5 text-chart-2" />
-                    <span className="text-chart-2 font-medium">
-                      Top {calculatePercentile(profileData.globalRank, profileData.totalUsers)}%
-                    </span>
+                <div className="text-center p-4 bg-chart-3/10 rounded-lg border border-chart-3/20">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Zap className="w-4 h-4 text-chart-3" />
+                    <span className="text-sm font-medium text-chart-3">Challenges</span>
                   </div>
+                  <div className="text-xl font-bold text-chart-3">{profileData.stats.solveCount}</div>
+                </div>
 
-                  <Badge variant="secondary" className="gap-2 px-4 py-2 bg-chart-3/15 text-chart-3 border-chart-3/30">
-                    Elite Player
-                  </Badge>
+                <div className="text-center p-4 bg-chart-2/10 rounded-lg border border-chart-2/20">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Trophy className="w-4 h-4 text-chart-2" />
+                    <span className="text-sm font-medium text-chart-2">CTFs</span>
+                  </div>
+                  <div className="text-xl font-bold text-chart-2">{profileData.stats.ctfCount}</div>
+                </div>
+
+                <div className="text-center p-4 bg-chart-4/10 rounded-lg border border-chart-4/20">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Award className="w-4 h-4 text-chart-4" />
+                    <span className="text-sm font-medium text-chart-4">Categories</span>
+                  </div>
+                  <div className="text-xl font-bold text-chart-4">{profileData.stats.categoriesCount}</div>
                 </div>
               </div>
             </div>
           </CardHeader>
         </Card>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="border border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-center mb-1">
-                <div className="p-2 bg-primary/20 rounded-lg">
-                  <Target className="w-4 h-4 text-primary" />
-                </div>
-              </div>
-              <CardTitle className="text-xs text-primary/90 text-center font-medium">Total Score</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-lg font-bold text-primary text-center">
-                {formatScore(profileData.stats.totalScore)}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-chart-3/20 bg-gradient-to-br from-chart-3/10 to-chart-3/5 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-center mb-1">
-                <div className="p-2 bg-chart-3/20 rounded-lg">
-                  <Zap className="w-4 h-4 text-chart-3" />
-                </div>
-              </div>
-              <CardTitle className="text-xs text-chart-3/90 text-center font-medium">Challenges Solved</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-lg font-bold text-chart-3 text-center">{profileData.stats.solveCount}</div>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-chart-2/20 bg-gradient-to-br from-chart-2/10 to-chart-2/5 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-center mb-1">
-                <div className="p-2 bg-chart-2/20 rounded-lg">
-                  <Trophy className="w-4 h-4 text-chart-2" />
-                </div>
-              </div>
-              <CardTitle className="text-xs text-chart-2/90 text-center font-medium">CTFs Participated</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-lg font-bold text-chart-2 text-center">{profileData.stats.ctfCount}</div>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-chart-4/20 bg-gradient-to-br from-chart-4/10 to-chart-4/5 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-center mb-1">
-                <div className="p-2 bg-chart-4/20 rounded-lg">
-                  <Award className="w-4 h-4 text-chart-4" />
-                </div>
-              </div>
-              <CardTitle className="text-xs text-chart-4/90 text-center font-medium">Categories Mastered</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="text-lg font-bold text-chart-4 text-center">{profileData.stats.categoriesCount}</div>
-            </CardContent>
-          </Card>
-        </div>
 
         <Tabs defaultValue="categories" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto bg-muted/50 p-1">
@@ -451,22 +509,83 @@ export default function UserProfilePage() {
                 <CardDescription>Recognition for exceptional performance and participation</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {achievements.map((achievement) => (
-                    <Card
-                      key={achievement.name}
-                      className="p-4 border border-primary/20 bg-gradient-to-br from-primary/10 to-chart-3/5 hover:shadow-md transition-all duration-300"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="text-3xl p-3 bg-white/20 rounded-lg">{achievement.icon}</div>
-                        <div>
-                          <h3 className="font-bold text-foreground mb-1">{achievement.name}</h3>
-                          <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
+                <div className="mb-6 p-4 bg-muted/30 rounded-lg border border-primary/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-foreground">Achievement Progress</span>
+                    <span className="text-sm text-muted-foreground">
+                      {achievements.length} / {allAchievements.length}
+                    </span>
+                  </div>
+                  <Progress value={(achievements.length / allAchievements.length) * 100} className="h-2" />
                 </div>
+
+                {["ranking", "participation", "skill", "contribution"].map((category) => {
+                  const categoryAchievements = allAchievements.filter(
+                    (achievement) => achievement.category === category,
+                  )
+                  const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
+
+                  return (
+                    <div key={category} className="mb-8">
+                      <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                        {category === "ranking" && <Trophy className="w-4 h-4" />}
+                        {category === "participation" && <Target className="w-4 h-4" />}
+                        {category === "skill" && <Zap className="w-4 h-4" />}
+                        {category === "contribution" && <Users className="w-4 h-4" />}
+                        {categoryName}
+                      </h3>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {categoryAchievements.map((achievement) => {
+                          const isUnlocked = unlockedAchievementIds.has(achievement.id)
+                          return (
+                            <Card
+                              key={achievement.id}
+                              className={`p-4 border transition-all duration-300 ${
+                                isUnlocked
+                                  ? "border-primary/20 bg-gradient-to-br from-primary/10 to-chart-3/5 hover:shadow-md"
+                                  : "border-muted/20 bg-muted/10 opacity-60"
+                              }`}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div
+                                  className={`text-3xl p-3 rounded-lg ${isUnlocked ? "bg-white/20" : "bg-muted/20"}`}
+                                >
+                                  {isUnlocked ? achievement.icon : <Lock className="w-6 h-6 text-muted-foreground" />}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h3
+                                      className={`font-bold ${
+                                        isUnlocked ? "text-foreground" : "text-muted-foreground"
+                                      }`}
+                                    >
+                                      {achievement.name}
+                                    </h3>
+                                    {isUnlocked && (
+                                      <Badge
+                                        variant="secondary"
+                                        className="px-2 py-1 bg-primary/15 text-primary border-primary/20 text-xs"
+                                      >
+                                        Unlocked
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p
+                                    className={`text-sm ${
+                                      isUnlocked ? "text-muted-foreground" : "text-muted-foreground/70"
+                                    }`}
+                                  >
+                                    {achievement.description}
+                                  </p>
+                                </div>
+                              </div>
+                            </Card>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
               </CardContent>
             </Card>
           </TabsContent>

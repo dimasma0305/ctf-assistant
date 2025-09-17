@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Trophy, Medal, Award, Users, Target, Calendar } from "lucide-react"
+import { Trophy, Medal, Award, Users, Target, Calendar, ExternalLink } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { getCTFRankings, getCTFProfile } from "@/lib/actions"
 import { getAchievements } from "@/lib/utils"
 import type { CTFRanking, CTFProfileResponse } from "@/lib/types"
@@ -295,7 +296,7 @@ export function CTFRankings() {
 
       {/* CTF-Specific User Profile Modal */}
       <Dialog open={showUserProfile} onOpenChange={setShowUserProfile}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4 shadow-2xl border-2 border-primary/20">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto mx-4 shadow-2xl border-2 border-primary/20">
           {profileLoading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
@@ -315,122 +316,147 @@ export function CTFRankings() {
           ) : (
             selectedUser && (
               <>
-                <DialogHeader className="pb-4 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <Avatar className="h-16 w-16 flex-shrink-0 ring-4 ring-primary/30 shadow-lg">
-                      <CachedAvatarImage
-                        src={
-                          selectedUser.user.avatar ||
-                          `/abstract-geometric-shapes.png?height=64&width=64&query=${selectedUser.user.userId}`
-                        }
-                        loadingPlaceholder={
-                          <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                        }
-                      />
-                      <AvatarFallback className="bg-primary/20 text-foreground text-lg">
-                        {(selectedUser.user.displayName || selectedUser.user.username).substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <DialogTitle className="text-xl sm:text-2xl font-bold text-primary font-[family-name:var(--font-playfair)]">
-                        {selectedUser.user.displayName || selectedUser.user.username}
-                      </DialogTitle>
-                      <DialogDescription className="text-sm sm:text-base flex flex-col sm:flex-row sm:items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <Trophy className="w-4 h-4" />
-                          Rank #{selectedUser.ctfRank} of {selectedUser.totalParticipants} in{" "}
-                          {selectedUser.ctfInfo.title}
+                <DialogHeader className="pb-6 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+                  <div className="flex items-start justify-between gap-6">
+                    {/* Left side - User info */}
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <Avatar className="h-20 w-20 flex-shrink-0 ring-4 ring-primary/30 shadow-lg">
+                        <CachedAvatarImage
+                          src={
+                            selectedUser.user.avatar ||
+                            `/abstract-geometric-shapes.png?height=80&width=80&query=${selectedUser.user.userId}`
+                          }
+                          loadingPlaceholder={
+                            <div className="w-4 h-4 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                          }
+                        />
+                        <AvatarFallback className="bg-primary/20 text-foreground text-xl">
+                          {(selectedUser.user.displayName || selectedUser.user.username).substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <DialogTitle className="text-2xl font-bold text-primary font-[family-name:var(--font-playfair)] mb-2">
+                          {selectedUser.user.displayName || selectedUser.user.username}
+                        </DialogTitle>
+                        <div className="flex flex-wrap items-center gap-3 mb-3">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Trophy className="w-4 h-4 text-yellow-500" />
+                            <span className="font-semibold">Rank #{selectedUser.ctfRank}</span>
+                            <span className="text-muted-foreground">of {selectedUser.totalParticipants}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-foreground bg-primary/10 border-primary/20">
+                            Top {selectedUser.percentile}%
+                          </Badge>
                         </div>
-                        <Badge variant="secondary" className="text-foreground w-fit">
-                          Top {selectedUser.percentile}%
-                        </Badge>
-                      </DialogDescription>
+                        <DialogDescription className="text-sm text-muted-foreground">
+                          Performance in {selectedUser.ctfInfo.title}
+                        </DialogDescription>
+                      </div>
+                    </div>
+
+                    {/* Right side - Quick stats and action */}
+                    <div className="flex flex-col items-end gap-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2 hover:bg-primary/10 border-primary/20 bg-transparent"
+                        onClick={() => {
+                          window.open(`/profile/${selectedUser.user.userId}`, "_blank")
+                        }}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Full Profile
+                      </Button>
+                      <div className="text-right text-sm">
+                        <div className="font-bold text-2xl text-primary">{selectedUser.stats.score.toFixed(1)}</div>
+                        <div className="text-xs text-muted-foreground">Total Score</div>
+                      </div>
                     </div>
                   </div>
                 </DialogHeader>
 
-                <div className="space-y-6">
-                  {/* CTF Stats */}
+                <div className="space-y-6 p-1">
                   <div>
-                    <h4 className="font-semibold mb-3 text-primary">CTF Performance</h4>
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                      <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
-                        <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-primary">
-                            {selectedUser.stats.score.toFixed(1)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Total Score</div>
-                        </CardContent>
-                      </Card>
+                    <h4 className="font-semibold mb-4 text-primary flex items-center gap-2">
+                      <Trophy className="w-5 h-5" />
+                      Performance Overview
+                    </h4>
+                    <div className="grid grid-cols-3 gap-4">
                       <Card className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 border border-chart-3/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-chart-3">
-                            {selectedUser.stats.solveCount}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Solves</div>
+                          <div className="text-2xl font-bold text-chart-3 mb-1">{selectedUser.stats.solveCount}</div>
+                          <div className="text-xs text-muted-foreground">Challenges Solved</div>
                         </CardContent>
                       </Card>
                       <Card className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 border border-chart-2/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-chart-2">
+                          <div className="text-2xl font-bold text-chart-2 mb-1">
                             {selectedUser.stats.categoriesCount}
                           </div>
-                          <div className="text-xs text-muted-foreground">Categories</div>
+                          <div className="text-xs text-muted-foreground">Categories Mastered</div>
                         </CardContent>
                       </Card>
                       <Card className="bg-gradient-to-br from-chart-4/10 to-chart-4/5 border border-chart-4/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-chart-4">
-                            {selectedUser.stats.averagePointsPerSolve.toFixed(1)}
+                          <div className="text-2xl font-bold text-chart-4 mb-1">
+                            {selectedUser.stats.averagePointsPerSolve.toFixed(0)}
                           </div>
-                          <div className="text-xs text-muted-foreground">Avg Points</div>
+                          <div className="text-xs text-muted-foreground">Avg Points/Solve</div>
                         </CardContent>
                       </Card>
                     </div>
                   </div>
 
-                  {/* Category Breakdown */}
                   <div>
-                    <h4 className="font-semibold mb-3 text-primary">Category Performance</h4>
-                    <div className="space-y-3">
+                    <h4 className="font-semibold mb-4 text-primary flex items-center gap-2">
+                      <Target className="w-5 h-5" />
+                      Category Breakdown
+                    </h4>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                       {selectedUser.categoryBreakdown.map((category) => (
-                        <div
+                        <Card
                           key={category.name}
-                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg gap-2 border border-primary/10"
+                          className="p-4 bg-gradient-to-r from-muted/30 to-muted/10 border border-primary/10 hover:border-primary/20 transition-all duration-200"
                         >
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                            <Badge variant="outline" className="capitalize w-fit">
-                              {category.name}
-                            </Badge>
-                            <span className="text-sm text-muted-foreground">
-                              #{category.rankInCategory} of {category.totalInCategory}
-                            </span>
-                          </div>
-                          <div className="text-left sm:text-right">
-                            <div className="font-semibold text-primary">{category.solves} solves</div>
-                            <div className="text-xs text-muted-foreground">
-                              {category.totalScore} pts • Top {category.percentile}%
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="capitalize font-medium">
+                                {category.name}
+                              </Badge>
+                              <span className="text-sm text-muted-foreground">
+                                #{category.rankInCategory}/{category.totalInCategory}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold text-primary">{category.solves}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {category.totalScore}pts • Top {category.percentile}%
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        </Card>
                       ))}
                     </div>
                   </div>
 
-                  {/* Achievements */}
                   <div>
-                    <h4 className="font-semibold mb-3 text-primary">CTF Achievements</h4>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <h4 className="font-semibold mb-4 text-primary flex items-center gap-2">
+                      <Award className="w-5 h-5" />
+                      Achievements ({getAchievements(selectedUser.achievementIds).length})
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {getAchievements(selectedUser.achievementIds).map((achievement, index) => (
                         <Card
                           key={`${achievement.id || achievement.name}-${index}`}
-                          className="p-4 border border-primary/10 hover:border-primary/20 transition-colors"
+                          className="p-3 border border-primary/10 hover:border-primary/20 transition-colors bg-gradient-to-br from-primary/5 to-transparent"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="text-2xl flex-shrink-0">{achievement.icon}</div>
+                            <div className="text-xl flex-shrink-0">{achievement.icon}</div>
                             <div className="min-w-0 flex-1">
-                              <div className="font-medium">{achievement.name}</div>
-                              <div className="text-sm text-muted-foreground">{achievement.description}</div>
+                              <div className="font-medium text-sm leading-tight">{achievement.name}</div>
+                              <div className="text-xs text-muted-foreground line-clamp-2">
+                                {achievement.description}
+                              </div>
                             </div>
                           </div>
                         </Card>
