@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Trophy, Medal, Award, Users, Target, Calendar } from "lucide-react"
-import { APIClient } from "@/lib/api"
+import { getCTFRankings, getCTFProfile } from "@/lib/actions"
 import type { CTFRanking, CTFProfileResponse } from "@/lib/types"
 
 export function CTFRankings() {
@@ -27,7 +27,7 @@ export function CTFRankings() {
       setLoading(true)
       setError(null)
 
-      const response = await APIClient.getCTFRankings({
+      const response = await getCTFRankings({
         limit: 10,
         hasParticipation: true,
       })
@@ -53,7 +53,7 @@ export function CTFRankings() {
     setSelectedUser(null)
 
     try {
-      const profileData = await APIClient.getCTFProfile(ctfId, userId)
+      const profileData = await getCTFProfile(ctfId, userId)
       setSelectedUser(profileData)
     } catch (err) {
       console.error("Error fetching user profile:", err)
@@ -400,7 +400,7 @@ export function CTFRankings() {
                           <div className="text-left sm:text-right">
                             <div className="font-semibold text-primary">{category.solves} solves</div>
                             <div className="text-xs text-muted-foreground">
-                              {category.totalPoints} pts • Top {category.percentile}%
+                              {category.totalScore} pts • Top {category.percentile}%
                             </div>
                           </div>
                         </div>
