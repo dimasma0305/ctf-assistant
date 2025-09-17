@@ -36,7 +36,7 @@ export interface LeaderboardEntry {
   solveCount: number
   ctfCount: number
   categories: string[]
-  achievements: Achievement[]
+  achievementIds: string[]
   recentSolves: UserSolve[]
   ctfBreakdown: Record<string, Omit<CTFBreakdown, "ctfId">>
 }
