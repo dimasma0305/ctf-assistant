@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Trophy, Star, Users, Clock } from "lucide-react"
 import { CertificateGenerator } from "@/components/certificate-generator"
+import { calculatePercentile } from "@/lib/utils"
 
 import Link from "next/link"
 import { useUserProfile } from "@/hooks/useAPI"
@@ -25,10 +26,6 @@ export default function UserProfilePage() {
 
   const formatScore = (score: number) => {
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-  }
-
-  const getPercentile = (rank: number, total: number) => {
-    return Math.round((1 - (rank - 1) / total) * 100)
   }
 
   const getCategoryColor = (category: string) => {
@@ -205,7 +202,7 @@ export default function UserProfilePage() {
                   <div className="flex items-center gap-2 text-center sm:text-left">
                     <Users className="w-4 h-4 flex-shrink-0" />
                     <span className="break-words">
-                      Top {getPercentile(profileData.globalRank, profileData.totalUsers)}% of{" "}
+                      Top {calculatePercentile(profileData.globalRank, profileData.totalUsers)}% of{" "}
                       {profileData.totalUsers.toLocaleString()} players
                     </span>
                   </div>

@@ -27,6 +27,10 @@ export const weightRetrySchema = {
         type: Number,
         default: 0
     },
+    current_weight: {
+        type: Number,
+        default: 0
+    },
     is_active: {
         type: Boolean,
         default: true

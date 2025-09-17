@@ -190,7 +190,7 @@ async function saveChallengesFromFetch(challenges: any[], ctfId: string) {
     }
 }
 
-// Function to retry fetching weights for CTFs with weight = 0
+// Function to monitor vote changes for all CTFs during the 2-week period
 async function retryWeightFetch() {
     try {
         // Get active weight retry entries
@@ -199,37 +199,39 @@ async function retryWeightFetch() {
             retry_until: { $gt: new Date() } // Still within retry period
         });
 
-        console.log(`Found ${activeRetries.length} CTFs pending weight retry`);
+        console.log(`Found ${activeRetries.length} CTFs being monitored for vote changes`);
 
         for (const retry of activeRetries) {
             try {
-                console.log(`🔄 Retrying weight fetch for CTF: ${retry.ctf_title} (${retry.ctf_id})`);
+                console.log(`🔄 Checking for vote changes for CTF: ${retry.ctf_title} (${retry.ctf_id})`);
                 
                 // Fetch fresh data (no cache)
                 const ctfEvent = await infoEvent(retry.ctf_id, false);
                 
-                if (ctfEvent.weight > 0) {
-                    // Weight has been assigned!
-                    console.log(`✅ Weight assigned for CTF ${retry.ctf_title}: ${ctfEvent.weight}`);
+                const previousWeight = (retry as any).current_weight || 0;
+                const currentWeight = ctfEvent.weight;
+                
+                if (currentWeight !== previousWeight) {
+                    // Weight has changed!
+                    console.log(`📊 Weight changed for CTF ${retry.ctf_title}: ${previousWeight} → ${currentWeight}`);
                     
-                    // Deactivate retry
-                    retry.is_active = false;
-                    await retry.save();
+                    // Update stored weight
+                    (retry as any).current_weight = currentWeight;
                 } else {
-                    // Still weight 0, update retry info
-                    retry.last_retry = new Date();
-                    retry.retry_count += 1;
-                    await retry.save();
-                    
-                    console.log(`⏳ CTF ${retry.ctf_title} still has weight 0 (retry #${retry.retry_count})`);
+                    console.log(`⏳ CTF ${retry.ctf_title} weight unchanged: ${currentWeight} (retry #${retry.retry_count + 1})`);
                 }
                 
+                // Always update retry info
+                retry.last_retry = new Date();
+                retry.retry_count += 1;
+                await retry.save();
+                
             } catch (error) {
-                console.error(`Error retrying weight fetch for ${retry.ctf_id}:`, error);
+                console.error(`Error checking vote changes for ${retry.ctf_id}:`, error);
             }
         }
 
-        // Clean up expired retries (past one week after CTF end)
+        // Clean up expired retries (past 2 weeks after CTF end)
         const expiredCount = await WeightRetryModel.updateMany(
             { 
                 retry_until: { $lt: new Date() },
@@ -241,10 +243,10 @@ async function retryWeightFetch() {
         );
 
         if (expiredCount.modifiedCount > 0) {
-            console.log(`🗑️ Deactivated ${expiredCount.modifiedCount} expired weight retry entries`);
+            console.log(`🗑️ Deactivated ${expiredCount.modifiedCount} expired vote monitoring entries`);
         }
 
     } catch (error) {
-        console.error("Error in weight retry job:", error);
+        console.error("Error in vote monitoring job:", error);
     }
 }

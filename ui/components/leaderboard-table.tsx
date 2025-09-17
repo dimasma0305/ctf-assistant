@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { SearchLeaderboard } from "@/components/search-leaderboard"
 import { useScoreboard } from "@/hooks/useAPI"
 import type { LeaderboardEntry } from "@/lib/types"
+import { calculatePercentile } from "@/lib/utils"
 
 export function LeaderboardTable() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -269,10 +270,6 @@ export function LeaderboardTable() {
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
   }
 
-  const getPercentile = (rank: number, total: number) => {
-    return Math.round((rank / total) * 100)
-  }
-
   const totalPages = leaderboardData ? Math.ceil(leaderboardData.metadata.total / pageSize) : 0
 
   const handleUserClick = (user: LeaderboardEntry) => {
@@ -414,7 +411,7 @@ export function LeaderboardTable() {
                                 {entry.rank <= 10 ? "Elite" : entry.rank <= 50 ? "Advanced" : "Intermediate"}
                               </span>
                               <Badge variant="outline" className="text-xs">
-                                Top {getPercentile(entry.rank, leaderboardData?.metadata.total || 1000)}%
+                                Top {calculatePercentile(entry.rank, leaderboardData?.metadata.total || 1000)}%
                               </Badge>
                             </div>
                           </div>
@@ -536,9 +533,7 @@ export function LeaderboardTable() {
                 user: selectedUser.user,
                 globalRank: selectedUser.rank,
                 totalUsers: leaderboardData?.metadata.totalUsers || 1000,
-                percentile: Math.round(
-                  (1 - (selectedUser.rank - 1) / (leaderboardData?.metadata.totalUsers || 1000)) * 100,
-                ),
+                percentile: calculatePercentile(selectedUser.rank, leaderboardData?.metadata.totalUsers || 1000),
                 stats: {
                   totalScore: selectedUser.totalScore,
                   solveCount: selectedUser.solveCount,

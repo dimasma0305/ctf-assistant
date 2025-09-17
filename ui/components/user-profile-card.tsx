@@ -10,6 +10,7 @@ import { Trophy, TrendingUp, ExternalLink, Star, Target, AwardIcon } from "lucid
 import { useCTFProfile } from "@/hooks/useAPI"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { calculatePercentile } from "@/lib/utils"
 
 import type { LeaderboardEntry, UserProfileResponse } from "@/lib/types"
 
@@ -142,10 +143,6 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
   }
 
-  const getPercentile = (rank: number, total: number) => {
-    return Math.round((rank / total) * 100)
-  }
-
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
       web: "bg-blue-500",
@@ -216,7 +213,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
                   </span>
                 </div>
                 <Badge variant="secondary" className="w-fit">
-                  Top {getPercentile(displayRank, displayTotalUsers)}%
+                  Top {calculatePercentile(displayRank, displayTotalUsers)}%
                 </Badge>
               </div>
 

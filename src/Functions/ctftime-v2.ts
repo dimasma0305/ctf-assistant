@@ -110,7 +110,6 @@ async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent
             { upsert: true, new: true }
         );
 
-        // Handle weight = 0 (not assigned yet)
         await handleWeightRetry(ctfEvent, id);
 
         return ctfEvent;
@@ -137,37 +136,30 @@ async function getUpcommingOnlineEvent(days: number): Promise<CTFEvent[]> {
 }
 
 /**
- * Handle weight retry logic for CTFs with weight = 0
+ * Handle weight retry logic for all CTFs to check for vote changes
  */
 async function handleWeightRetry(ctfEvent: CTFEvent, id: string) {
-    if (ctfEvent.weight === 0) {
-        const oneWeekAfterEnd = new Date(ctfEvent.finish);
-        const week = 7
-        oneWeekAfterEnd.setDate(oneWeekAfterEnd.getDate() + week*2);
-        
-        // Create or update weight retry entry
-        await WeightRetryModel.findOneAndUpdate(
-            { ctf_id: id },
-            {
-                ctf_id: id,
-                ctf_title: ctfEvent.title,
-                ctf_end_time: ctfEvent.finish,
-                retry_until: oneWeekAfterEnd,
-                last_retry: new Date(),
-                $inc: { retry_count: 1 },
-                is_active: new Date() <= oneWeekAfterEnd
-            },
-            { upsert: true, new: true }
-        );
-        
-        console.log(`📊 CTF ${ctfEvent.title} (${id}) has weight 0 - scheduled for daily retry until ${oneWeekAfterEnd.toDateString()}`);
-    } else {
-        // Weight is assigned, deactivate retry if exists
-        await WeightRetryModel.updateOne(
-            { ctf_id: id },
-            { $set: { is_active: false } }
-        );
-    }
+    const twoWeeksAfterEnd = new Date(ctfEvent.finish);
+    const week = 7
+    twoWeeksAfterEnd.setDate(twoWeeksAfterEnd.getDate() + week*2);
+    
+    // Always create or update weight retry entry to monitor vote changes
+    await WeightRetryModel.findOneAndUpdate(
+        { ctf_id: id },
+        {
+            ctf_id: id,
+            ctf_title: ctfEvent.title,
+            ctf_end_time: ctfEvent.finish,
+            retry_until: twoWeeksAfterEnd,
+            last_retry: new Date(),
+            current_weight: ctfEvent.weight,
+            $inc: { retry_count: 1 },
+            is_active: new Date() <= twoWeeksAfterEnd
+        },
+        { upsert: true, new: true }
+    );
+    
+    console.log(`📊 CTF ${ctfEvent.title} (${id}) - monitoring for vote changes until ${twoWeeksAfterEnd.toDateString()} (current weight: ${ctfEvent.weight})`);
 }
 
 export { infoEvent, getUpcommingOnlineEvent };
