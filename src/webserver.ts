@@ -270,8 +270,8 @@ function calculateCategoryStats(
         return {
             name: category,
             solves: filteredSolves.length,
-            totalScore: categoryPoints,
-            avgPoints: filteredSolves.length > 0 ? Math.round((categoryPoints / filteredSolves.length) * 100) / 100 : 0,
+            totalScore: userCategoryScore,
+            avgPoints: filteredSolves.length > 0 ? Math.round((userCategoryScore / filteredSolves.length) * 100) / 100 : 0,
             rankInCategory: categoryRank,
             totalInCategory: categoryParticipants.length,
             percentile: Math.round((1 - (categoryRank - 1) / categoryParticipants.length) * 100)

@@ -18,7 +18,6 @@ interface CertificateProps {
 export function Certificate({
   username,
   rank,
-  totalParticipants,
   score,
   solves,
   categories,
