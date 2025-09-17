@@ -33,6 +33,30 @@ export interface UserProfile {
         score: number;
         logo: string;
     }>;
+    
+    // Extended fields for achievements
+    rankImprovement?: number; // How many ranks improved over time
+    fastSolves?: number; // Number of solves completed in under 1 hour
+    ultraFastSolves?: number; // Number of solves completed in under 5 minutes  
+    longestStreak?: number; // Longest consecutive solving streak in days
+    weekendSolveRatio?: number; // Ratio of weekend solves (0-1)
+    nightSolves?: number; // Number of solves after midnight
+    morningSolves?: number; // Number of solves before 8 AM
+    categorySolves?: Record<string, number>; // Solve counts per category
+    firstBloods?: number; // Number of first blood achievements
+    hardSolves?: number; // Number of hard-difficulty solves
+    expertSolves?: number; // Number of expert-difficulty solves
+    uniqueChallengeTypes?: number; // Number of unique challenge types solved
+    teamCTFs?: number; // Number of team-based CTF participations
+    helpedUsers?: number; // Number of users helped/mentored
+    communityScore?: number; // Overall community contribution score
+    membershipDays?: number; // Days since joining the platform
+    isEarlyAdopter?: boolean; // Whether user was an early platform adopter
+    challengesCreated?: number; // Number of challenges created
+    writeupCount?: number; // Number of writeups published
+    hintsGiven?: number; // Number of hints provided to other users
+    discussionPosts?: number; // Number of discussion forum posts
+    eventsOrganized?: number; // Number of events organized
 }
 
 // ===== RANKING AND STATISTICS TYPES =====

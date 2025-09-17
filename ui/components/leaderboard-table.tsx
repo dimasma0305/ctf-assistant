@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trophy, Medal, Award, ChevronLeft, ChevronRight, Filter, AlertCircle, Calendar } from "lucide-react"
+import { Trophy, Medal, Award, ChevronLeft, ChevronRight, Filter, AlertCircle, Calendar, Users } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { UserProfileCard } from "@/components/user-profile-card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -35,13 +35,29 @@ export function LeaderboardTable() {
     global: true,
   })
 
-  const getTimePeriodOptions = () => {
+  const formatScore = (score: number) => {
+    return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  }
+
+  const getUserInitials = (user: LeaderboardEntry["user"]) => {
+    const name = user.displayName || user.username
+    const parts = name.split(" ")
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
+
+  const getUserDisplayName = (user: LeaderboardEntry["user"]) => {
+    return user.displayName || user.username
+  }
+
+  const memoizedTimePeriodOptions = useMemo(() => {
     const options = [{ value: "all-time", label: "All Time" }]
 
     if (leaderboardData?.metadata) {
       const { availableYears, availableMonths } = leaderboardData.metadata
 
-      // Add year options
       if (availableYears && availableYears.length > 0) {
         availableYears.forEach((year) => {
           options.push({
@@ -51,10 +67,8 @@ export function LeaderboardTable() {
         })
       }
 
-      // Add month options (most recent first)
       if (availableMonths && availableMonths.length > 0) {
         availableMonths.slice(0, 12).forEach((month) => {
-          // Show last 12 months
           const [year, monthNum] = month.split("-")
           const monthName = new Date(Number.parseInt(year), Number.parseInt(monthNum) - 1).toLocaleString("default", {
             month: "long",
@@ -68,7 +82,25 @@ export function LeaderboardTable() {
     }
 
     return options
-  }
+  }, [leaderboardData?.metadata])
+
+  const handleUserClick = useCallback((user: LeaderboardEntry) => {
+    setSelectedUser(user)
+    setShowUserProfile(true)
+  }, [])
+
+  const formattedLeaderboardData = useMemo(() => {
+    if (!leaderboardData?.data) return []
+
+    return leaderboardData.data.map((entry) => ({
+      ...entry,
+      formattedScore: formatScore(entry.totalScore),
+      userInitials: getUserInitials(entry.user),
+      displayName: getUserDisplayName(entry.user),
+      skillLevel: entry.rank <= 10 ? "Elite" : entry.rank <= 50 ? "Advanced" : "Intermediate",
+      percentile: calculatePercentile(entry.rank, leaderboardData?.metadata.total || 1000),
+    }))
+  }, [leaderboardData])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -102,13 +134,11 @@ export function LeaderboardTable() {
 
       if (!hash) return
 
-      // Handle leaderboard tab with time period
       if (hash === "leaderboard") {
         setTimePeriod("all-time")
         return
       }
 
-      // Handle direct time period hashes
       const validPeriods = ["all-time", "this-month", "last-month", "this-year", "last-year"]
       const isDynamicMonth = hash.startsWith("month-") && hash.match(/^month-\d{4}-\d{2}$/)
       const isDynamicYear = hash.startsWith("year-") && hash.match(/^year-\d{4}$/)
@@ -120,20 +150,18 @@ export function LeaderboardTable() {
       }
     }
 
-    // Initialize from current hash only once
     initializeFromHash()
-  }, []) // Remove dependencies to run only once on mount
+  }, [])
 
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.slice(1) // Remove the #
+      const hash = window.location.hash.slice(1)
       console.log("[v0] Hash changed to:", hash)
 
       const validPeriods = ["all-time", "this-month", "last-month", "this-year", "last-year"]
       const isDynamicMonth = hash.startsWith("month-") && hash.match(/^month-\d{4}-\d{2}$/)
       const isDynamicYear = hash.startsWith("year-") && hash.match(/^year-\d{4}$/)
 
-      // Check if hash matches a time period (static or dynamic)
       if (validPeriods.includes(hash) || isDynamicMonth || isDynamicYear) {
         console.log("[v0] Setting time period to:", hash)
         setTimePeriod(hash)
@@ -149,10 +177,9 @@ export function LeaderboardTable() {
       }
     }
 
-    // Listen for hash changes
     window.addEventListener("hashchange", handleHashChange)
     return () => window.removeEventListener("hashchange", handleHashChange)
-  }, [selectedCtf, pageSize, updateParams]) // Keep dependencies for hash change handler
+  }, [selectedCtf, pageSize, updateParams])
 
   useEffect(() => {
     if (timePeriod) {
@@ -172,7 +199,6 @@ export function LeaderboardTable() {
     setTimePeriod(period)
     setCurrentPage(1)
 
-    // Update URL hash
     if (period === "all-time") {
       window.location.hash = "leaderboard"
     } else {
@@ -189,7 +215,6 @@ export function LeaderboardTable() {
       return { year: yearValue }
     }
 
-    // Legacy support for old format
     const now = new Date()
     switch (period) {
       case "this-month":
@@ -202,7 +227,7 @@ export function LeaderboardTable() {
       case "last-year":
         return { year: now.getFullYear() - 1 }
       default:
-        return {} // all-time
+        return {}
     }
   }
 
@@ -219,7 +244,6 @@ export function LeaderboardTable() {
       return yearValue
     }
 
-    // Legacy support
     const now = new Date()
     switch (period) {
       case "this-month":
@@ -253,29 +277,9 @@ export function LeaderboardTable() {
     }
   }
 
-  const getUserInitials = (user: LeaderboardEntry["user"]) => {
-    const name = user.displayName || user.username
-    const parts = name.split(" ")
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase()
-    }
-    return name.slice(0, 2).toUpperCase()
-  }
-
-  const getUserDisplayName = (user: LeaderboardEntry["user"]) => {
-    return user.displayName || user.username
-  }
-
-  const formatScore = (score: number) => {
-    return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-  }
-
   const totalPages = leaderboardData ? Math.ceil(leaderboardData.metadata.total / pageSize) : 0
 
-  const handleUserClick = (user: LeaderboardEntry) => {
-    setSelectedUser(user)
-    setShowUserProfile(true)
-  }
+  const getTimePeriodOptions = () => memoizedTimePeriodOptions
 
   if (loading) {
     return (
@@ -304,51 +308,61 @@ export function LeaderboardTable() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <SearchLeaderboard onUserClick={handleUserClick} />
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Calendar className="w-4 h-4 text-muted-foreground" />
-            <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Time Period" />
-              </SelectTrigger>
-              <SelectContent>
-                {getTimePeriodOptions().map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+          <div className="flex-1 max-w-md">
+            <SearchLeaderboard onUserClick={handleUserClick} />
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Filter className="w-4 h-4 text-muted-foreground" />
-            <Select value={selectedCtf} onValueChange={handleCtfChange}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Select CTF" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="global">Global Rankings</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Calendar className="w-4 h-4 text-primary" />
+              </div>
+              <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
+                <SelectTrigger className="w-full sm:w-48 h-10">
+                  <SelectValue placeholder="Time Period" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getTimePeriodOptions().map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="p-2 bg-chart-3/10 rounded-lg">
+                <Filter className="w-4 h-4 text-chart-3" />
+              </div>
+              <Select value={selectedCtf} onValueChange={handleCtfChange}>
+                <SelectTrigger className="w-full sm:w-48 h-10">
+                  <SelectValue placeholder="Select CTF" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="global">Global Rankings</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
-      </div>
 
-      {timePeriod !== "all-time" && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span>
-              Showing rankings for: <strong>{getTimePeriodText(timePeriod)}</strong>
-            </span>
+        {timePeriod !== "all-time" && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+            <div className="flex items-center gap-2">
+              <div className="p-1 bg-primary/20 rounded">
+                <Calendar className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-sm font-medium">
+                Showing rankings for: <strong className="text-primary">{getTimePeriodText(timePeriod)}</strong>
+              </span>
+            </div>
+            <Badge variant="outline" className="text-xs border-primary/30 text-primary">
+              Shareable Link: #{timePeriod}
+            </Badge>
           </div>
-          <Badge variant="outline" className="text-xs">
-            Shareable Link: #{timePeriod}
-          </Badge>
-        </div>
-      )}
+        )}
+      </div>
 
       {leaderboardData?.metadata &&
         ((leaderboardData.metadata.availableMonths?.length ?? 0) > 0 ||
@@ -361,83 +375,84 @@ export function LeaderboardTable() {
           </div>
         )}
 
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-16">Rank</TableHead>
-                  <TableHead className="min-w-[200px]">Player</TableHead>
-                  <TableHead className="text-right min-w-[80px]">Score</TableHead>
-                  <TableHead className="text-right min-w-[70px]">Solves</TableHead>
-                  <TableHead className="text-right min-w-[60px] hidden sm:table-cell">CTFs</TableHead>
-                  <TableHead className="min-w-[120px] hidden md:table-cell">Categories</TableHead>
-                  <TableHead className="min-w-[140px] hidden lg:table-cell">Recent Activity</TableHead>
+                <TableRow className="hover:bg-transparent border-b-2 border-primary/10">
+                  <TableHead className="w-16 font-semibold">Rank</TableHead>
+                  <TableHead className="min-w-[200px] font-semibold">Player</TableHead>
+                  <TableHead className="text-right min-w-[80px] font-semibold">Score</TableHead>
+                  <TableHead className="text-right min-w-[70px] font-semibold">Solves</TableHead>
+                  <TableHead className="text-right min-w-[60px] hidden sm:table-cell font-semibold">CTFs</TableHead>
+                  <TableHead className="min-w-[120px] hidden md:table-cell font-semibold">Categories</TableHead>
+                  <TableHead className="min-w-[140px] hidden lg:table-cell font-semibold">Recent Activity</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {leaderboardData && leaderboardData.data.length > 0 ? (
-                  leaderboardData.data.map((entry) => (
-                    <TableRow key={entry.user.userId} className="hover:bg-muted/50">
-                      <TableCell className="font-medium">
+                {formattedLeaderboardData.length > 0 ? (
+                  formattedLeaderboardData.map((entry) => (
+                    <TableRow
+                      key={entry.user.userId}
+                      className="hover:bg-muted/50 transition-colors border-b border-border/50"
+                    >
+                      <TableCell className="font-medium py-4">
                         <div className="flex items-center justify-center">{getRankIcon(entry.rank)}</div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-4">
                         <div
-                          className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-colors"
+                          className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-all duration-200 hover:scale-[1.02]"
                           onClick={() => handleUserClick(entry)}
                         >
-                          <Avatar className="w-8 h-8 flex-shrink-0">
+                          <Avatar className="w-10 h-10 flex-shrink-0 ring-2 ring-primary/20">
                             <CachedAvatarImage
                               src={
                                 entry.user.avatar ||
-                                `/abstract-geometric-shapes.png?height=32&width=32&query=user-${entry.user.userId}`
+                                `/abstract-geometric-shapes.png?height=40&width=40&query=user-${entry.user.userId}`
                               }
                               loadingPlaceholder={
-                                <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                               }
                             />
-                            <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
-                              {getUserInitials(entry.user)}
+                            <AvatarFallback className="text-sm bg-primary/20 text-foreground font-medium">
+                              {entry.userInitials}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium hover:text-primary transition-colors truncate">
-                              {getUserDisplayName(entry.user)}
+                            <div className="font-medium hover:text-primary transition-colors truncate text-base">
+                              {entry.displayName}
                             </div>
                             <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
-                              <span className="whitespace-nowrap">
-                                {entry.rank <= 10 ? "Elite" : entry.rank <= 50 ? "Advanced" : "Intermediate"}
-                              </span>
-                              <Badge variant="outline" className="text-xs">
-                                Top {calculatePercentile(entry.rank, leaderboardData?.metadata.total || 1000)}%
+                              <span className="whitespace-nowrap">{entry.skillLevel}</span>
+                              <Badge variant="outline" className="text-xs border-primary/30">
+                                Top {entry.percentile}%
                               </Badge>
                             </div>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="font-mono font-bold text-primary text-sm sm:text-base">
-                          {formatScore(entry.totalScore)}
-                        </div>
+                      <TableCell className="text-right py-4">
+                        <div className="font-mono font-bold text-primary text-base">{entry.formattedScore}</div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="secondary" className="font-mono text-foreground text-xs">
+                      <TableCell className="text-right py-4">
+                        <Badge variant="secondary" className="font-mono text-foreground">
                           {entry.solveCount}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right hidden sm:table-cell">
-                        <Badge variant="outline" className="font-mono text-xs">
+                      <TableCell className="text-right hidden sm:table-cell py-4">
+                        <Badge variant="outline" className="font-mono">
                           {entry.ctfCount}
                         </Badge>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="hidden md:table-cell py-4">
                         <div className="flex flex-wrap gap-1">
                           {entry.categories.slice(0, 2).map((category) => (
-                            <Badge key={category} variant="secondary" className="text-xs text-foreground">
-                              {category}
-                            </Badge>
+                            <div key={category} className="flex items-center gap-1.5">
+                              <Badge variant="secondary" className="text-xs text-foreground">
+                                {category}
+                              </Badge>
+                            </div>
                           ))}
                           {entry.categories.length > 2 && (
                             <Badge variant="secondary" className="text-xs text-foreground">
@@ -446,11 +461,11 @@ export function LeaderboardTable() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="hidden lg:table-cell">
+                      <TableCell className="hidden lg:table-cell py-4">
                         {entry.recentSolves.length > 0 ? (
                           <div className="text-sm">
                             <div className="font-medium truncate max-w-32">{entry.recentSolves[0].challenge}</div>
-                            <div className="text-muted-foreground">{entry.recentSolves[0].points} pts</div>
+                            <div className="text-muted-foreground">{entry.recentSolves[0].points}</div>
                           </div>
                         ) : (
                           <span className="text-muted-foreground text-sm">No recent activity</span>
@@ -460,9 +475,11 @@ export function LeaderboardTable() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={7} className="text-center py-12">
                       <div className="text-muted-foreground">
-                        <p>No players found</p>
+                        <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium mb-2">No players found</p>
+                        <p className="text-sm">Try adjusting your filters or search terms</p>
                       </div>
                     </TableCell>
                   </TableRow>

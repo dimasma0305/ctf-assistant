@@ -20,26 +20,44 @@ function useAPICall<T>(apiCall: () => Promise<T>, dependencies: any[] = []) {
   const [data, setData] = useState<T | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [retryCount, setRetryCount] = useState(0)
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+  const fetchData = useCallback(
+    async (isRetry = false) => {
+      if (!isRetry) {
+        setLoading(true)
+      }
+      setError(null)
 
-    try {
-      const result = await apiCall()
-      setData(result)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-    } finally {
-      setLoading(false)
-    }
-  }, dependencies)
+      try {
+        const result = await apiCall()
+        setData(result)
+        setRetryCount(0) // Reset retry count on success
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "An error occurred"
+        setError(errorMessage)
+
+        if (retryCount < 2 && (errorMessage.includes("fetch") || errorMessage.includes("network"))) {
+          setTimeout(
+            () => {
+              setRetryCount((prev) => prev + 1)
+              fetchData(true)
+            },
+            1000 * (retryCount + 1),
+          ) // Exponential backoff
+        }
+      } finally {
+        setLoading(false)
+      }
+    },
+    [...dependencies, retryCount],
+  )
 
   useEffect(() => {
     fetchData()
   }, [fetchData])
 
-  return { data, loading, error, refetch: fetchData }
+  return { data, loading, error, refetch: fetchData, retryCount }
 }
 
 // Scoreboard hook
@@ -191,9 +209,24 @@ export function usePolling<T>(
 
     fetchData() // Initial fetch
 
-    const intervalId = setInterval(fetchData, interval)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchData() // Refresh when tab becomes visible
+      }
+    }
 
-    return () => clearInterval(intervalId)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    const intervalId = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchData()
+      }
+    }, interval)
+
+    return () => {
+      clearInterval(intervalId)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
   }, [fetchData, interval, enabled])
 
   return { data, loading, error, refetch: fetchData }

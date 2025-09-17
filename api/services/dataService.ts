@@ -3,6 +3,7 @@ import FairScoringSystem from "../../src/Functions/scoringSystem";
 import { cache } from '../utils/cache';
 import { generateCacheKey } from '../utils/common';
 import { UserProfile, AvailableTimeRanges } from '../types';
+import { calculateExtendedMetricsForUsers } from '../utils/statistics';
 
 /**
  * Data Service Functions
@@ -13,57 +14,96 @@ import { UserProfile, AvailableTimeRanges } from '../types';
 /**
  * Cached version of FairScoringSystem.calculateUserScores with user profile enrichment
  */
-export async function getCachedUserScores(query: any = {}, ttl?: number): Promise<Map<string, UserProfile>> {
-    const cacheKey = generateCacheKey('userScores', query);
+export async function getCachedUserScores(
+    query: any = {}, 
+    ttl?: number, 
+    includeExtendedMetrics: boolean = true
+): Promise<Map<string, UserProfile>> {
+    const cacheKey = generateCacheKey('userScores', { ...query, extended: includeExtendedMetrics });
     
     // Try to get from cache first
     let userScores = cache.getCached<Map<string, UserProfile>>(cacheKey);
     
     if (!userScores) {
-        // Calculate fresh scoring data
-        const scoringData = await FairScoringSystem.calculateUserScores(query);
-        
-        // Get all unique Discord IDs from the scoring data
-        const discordIds = Array.from(scoringData.keys());
-        
-        // Fetch user profile data for all users in bulk
-        const userProfiles = await UserModel.find({ 
-            discord_id: { $in: discordIds } 
-        }).lean();
-        
-        // Create a lookup map for user profile data
-        const userLookup = new Map<string, any>();
-        userProfiles.forEach(user => {
-            userLookup.set(user.discord_id, {
-                username: user.username,
-                displayName: user.display_name,
-                avatar: user.avatar
-            });
-        });
-        
-        // Enrich scoring data with user profile information
-        userScores = new Map<string, UserProfile>();
-        
-        for (const [discordId, scoreData] of scoringData) {
-            const userInfo = userLookup.get(discordId);
-            const enrichedProfile: UserProfile = {
-                userId: discordId,
-                username: userInfo?.username || `User_${discordId}`,
-                displayName: userInfo?.displayName || userInfo?.username || `User_${discordId}`,
-                avatar: userInfo?.avatar,
-                totalScore: scoreData.totalScore,
-                solveCount: scoreData.solveCount,
-                ctfCount: scoreData.ctfCount,
-                categories: scoreData.categories,
-                recentSolves: scoreData.recentSolves,
-                ctfBreakdown: scoreData.ctfBreakdown
-            };
+        try {
+            // Calculate fresh scoring data
+            const scoringData = await FairScoringSystem.calculateUserScores(query);
             
-            userScores.set(discordId, enrichedProfile);
+            // Early return for empty results
+            if (scoringData.size === 0) {
+                userScores = new Map<string, UserProfile>();
+                cache.set(cacheKey, userScores, ttl);
+                return userScores;
+            }
+            
+            // Get all unique Discord IDs from the scoring data
+            const discordIds = Array.from(scoringData.keys());
+            
+            // Fetch user profile data for all users in bulk - only essential fields
+            const userProfiles = await UserModel.find({ 
+                discord_id: { $in: discordIds } 
+            }, {
+                discord_id: 1,
+                username: 1,
+                display_name: 1,
+                avatar: 1
+            }).lean();
+            
+            // Create a lookup map for user profile data
+            const userLookup = new Map<string, any>();
+            userProfiles.forEach(user => {
+                userLookup.set(user.discord_id, {
+                    username: user.username,
+                    displayName: user.display_name,
+                    avatar: user.avatar
+                });
+            });
+            
+            // Create base user profiles efficiently
+            const baseProfiles = new Map<string, UserProfile>();
+            
+            for (const [discordId, scoreData] of scoringData) {
+                const userInfo = userLookup.get(discordId);
+                const baseProfile: UserProfile = {
+                    userId: discordId,
+                    username: userInfo?.username || `User_${discordId}`,
+                    displayName: userInfo?.displayName || userInfo?.username || `User_${discordId}`,
+                    avatar: userInfo?.avatar,
+                    totalScore: scoreData.totalScore,
+                    solveCount: scoreData.solveCount,
+                    ctfCount: scoreData.ctfCount,
+                    categories: scoreData.categories,
+                    recentSolves: scoreData.recentSolves,
+                    ctfBreakdown: scoreData.ctfBreakdown
+                };
+                
+                baseProfiles.set(discordId, baseProfile);
+            }
+            
+            // Conditionally calculate extended metrics
+            const extendedMetricsMap = await calculateExtendedMetricsForUsers(baseProfiles, includeExtendedMetrics);
+            
+            // Enrich profiles with extended metrics
+            userScores = new Map<string, UserProfile>();
+            for (const [discordId, baseProfile] of baseProfiles) {
+                const extendedMetrics = extendedMetricsMap.get(discordId) || {};
+                const enrichedProfile: UserProfile = {
+                    ...baseProfile,
+                    ...extendedMetrics
+                };
+                
+                userScores.set(discordId, enrichedProfile);
+            }
+            
+            // Cache the enriched result with appropriate TTL
+            const cacheTTL = ttl || (includeExtendedMetrics ? 30 * 60 * 1000 : 10 * 60 * 1000); // 30min for extended, 10min for basic
+            cache.set(cacheKey, userScores, cacheTTL);
+            
+        } catch (error) {
+            console.error('Error in getCachedUserScores:', error);
+            // Return empty map on error to prevent cascading failures
+            return new Map<string, UserProfile>();
         }
-        
-        // Cache the enriched result
-        cache.set(cacheKey, userScores, ttl);
     }
     
     return userScores;

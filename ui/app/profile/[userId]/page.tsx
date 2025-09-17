@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Trophy, Star, Users, Clock } from "lucide-react"
 import { CertificateGenerator } from "@/components/certificate-generator"
-import { calculatePercentile, getAchievements } from "@/lib/utils"
+import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/utils"
 
 import Link from "next/link"
 import { useUserProfile } from "@/hooks/useAPI"
@@ -28,17 +28,6 @@ export default function UserProfilePage() {
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
   }
 
-  const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      web: "bg-blue-500",
-      crypto: "bg-purple-500",
-      pwn: "bg-red-500",
-      reverse: "bg-green-500",
-      forensics: "bg-yellow-500",
-      misc: "bg-gray-500",
-    }
-    return colors[category] || "bg-gray-500"
-  }
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString)

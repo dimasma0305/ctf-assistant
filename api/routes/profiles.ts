@@ -25,8 +25,8 @@ router.get("/:id", async (req, res) => {
             return;
         }
 
-        // Get global user scores (using cache)
-        const globalUserScores = await getCachedUserScores({});
+        // Get global user scores (using cache) - always include extended metrics for profiles
+        const globalUserScores = await getCachedUserScores({}, undefined, true);
         const userProfile = globalUserScores.get(userId);
         
         if (!userProfile) {
@@ -161,9 +161,9 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
             return;
         }
 
-        // Get CTF-specific user scores (using cache)
+        // Get CTF-specific user scores (using cache) - always include extended metrics for profiles
         const ctfQuery = { ctf_id: ctfId };
-        const ctfUserScores = await getCachedUserScores(ctfQuery);
+        const ctfUserScores = await getCachedUserScores(ctfQuery, undefined, true);
         const userProfile = ctfUserScores.get(userId);
         
         if (!userProfile) {

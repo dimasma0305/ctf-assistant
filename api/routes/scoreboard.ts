@@ -71,8 +71,9 @@ router.get("/", async (req, res) => {
             };
         }
 
-        // Get leaderboard data using cache
-        let allUserScores = await getCachedUserScores(query);
+        // Get leaderboard data using cache - extended metrics only needed for achievements
+        const includeExtendedMetrics = !searchTerm && (!limit || limit >= 50); // Only for larger result sets
+        let allUserScores = await getCachedUserScores(query, undefined, includeExtendedMetrics);
         
         // For monthly/yearly filtering, use separate rankings based on filtered data
         // For global leaderboard, use true rankings from complete dataset

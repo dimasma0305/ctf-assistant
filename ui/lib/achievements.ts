@@ -112,8 +112,50 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     icon: '⭐',
     category: 'ranking'
   },
+  TOP_50_GLOBAL: {
+    id: 'TOP_50_GLOBAL',
+    name: 'Top 50%',
+    description: 'Top 50% globally',
+    icon: '📈',
+    category: 'ranking'
+  },
+  TOP_50_CTF: {
+    id: 'TOP_50_CTF',
+    name: 'Top 50%',
+    description: 'Top 50% in CTF',
+    icon: '📈',
+    category: 'ranking'
+  },
+  RISING_STAR: {
+    id: 'RISING_STAR',
+    name: 'Rising Star',
+    description: 'Climbed 50+ ranks',
+    icon: '🌟',
+    category: 'ranking'
+  },
+  COMEBACK_KID: {
+    id: 'COMEBACK_KID',
+    name: 'Comeback Kid',
+    description: 'Climbed 100+ ranks',
+    icon: '🚀',
+    category: 'ranking'
+  },
 
   // Participation Achievements
+  LEGENDARY: {
+    id: 'LEGENDARY',
+    name: 'Legendary',
+    description: 'Solved 500+ challenges',
+    icon: '🏅',
+    category: 'participation'
+  },
+  UNSTOPPABLE: {
+    id: 'UNSTOPPABLE',
+    name: 'Unstoppable',
+    description: 'Solved 250+ challenges',
+    icon: '⚡',
+    category: 'participation'
+  },
   CENTURY_CLUB: {
     id: 'CENTURY_CLUB',
     name: 'Century Club',
@@ -126,6 +168,13 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     name: 'Veteran Solver',
     description: 'Solved 50+ challenges',
     icon: '🎯',
+    category: 'participation'
+  },
+  DEDICATED: {
+    id: 'DEDICATED',
+    name: 'Dedicated',
+    description: 'Solved 25+ challenges',
+    icon: '💪',
     category: 'participation'
   },
   ACTIVE_SOLVER: {
@@ -142,6 +191,27 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     icon: '🎯',
     category: 'participation'
   },
+  GETTING_STARTED: {
+    id: 'GETTING_STARTED',
+    name: 'Getting Started',
+    description: 'Solved 5+ challenges',
+    icon: '🚀',
+    category: 'participation'
+  },
+  FIRST_STEPS: {
+    id: 'FIRST_STEPS',
+    name: 'First Steps',
+    description: 'Solved your first challenge',
+    icon: '👶',
+    category: 'participation'
+  },
+  CTF_VETERAN: {
+    id: 'CTF_VETERAN',
+    name: 'CTF Veteran',
+    description: 'Participated in 25+ CTFs',
+    icon: '🎖️',
+    category: 'participation'
+  },
   CTF_EXPLORER: {
     id: 'CTF_EXPLORER',
     name: 'CTF Explorer',
@@ -154,6 +224,62 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     name: 'Multi-CTF Player',
     description: 'Participated in 5+ CTFs',
     icon: '🏆',
+    category: 'participation'
+  },
+  CTF_NEWCOMER: {
+    id: 'CTF_NEWCOMER',
+    name: 'CTF Newcomer',
+    description: 'Participated in 2+ CTFs',
+    icon: '🌱',
+    category: 'participation'
+  },
+  SPEED_DEMON: {
+    id: 'SPEED_DEMON',
+    name: 'Speed Demon',
+    description: 'Solved 10+ challenges in under 1 hour',
+    icon: '⚡',
+    category: 'participation'
+  },
+  LIGHTNING_FAST: {
+    id: 'LIGHTNING_FAST',
+    name: 'Lightning Fast',
+    description: 'Solved challenge in under 5 minutes',
+    icon: '🏃‍♂️',
+    category: 'participation'
+  },
+  CONSISTENT_SOLVER: {
+    id: 'CONSISTENT_SOLVER',
+    name: 'Consistent Solver',
+    description: 'Solved challenges 7 days in a row',
+    icon: '📅',
+    category: 'participation'
+  },
+  MARATHON_RUNNER: {
+    id: 'MARATHON_RUNNER',
+    name: 'Marathon Runner',
+    description: 'Solved challenges 30 days in a row',
+    icon: '🏃‍♂️',
+    category: 'participation'
+  },
+  WEEKEND_WARRIOR: {
+    id: 'WEEKEND_WARRIOR',
+    name: 'Weekend Warrior',
+    description: 'Most active on weekends',
+    icon: '⚔️',
+    category: 'participation'
+  },
+  NIGHT_OWL: {
+    id: 'NIGHT_OWL',
+    name: 'Night Owl',
+    description: 'Solved 50+ challenges after midnight',
+    icon: '🦉',
+    category: 'participation'
+  },
+  EARLY_BIRD: {
+    id: 'EARLY_BIRD',
+    name: 'Early Bird',
+    description: 'Solved 50+ challenges before 8 AM',
+    icon: '🐦',
     category: 'participation'
   },
 
@@ -179,6 +305,111 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     icon: '🔧',
     category: 'skill'
   },
+  WEB_EXPERT: {
+    id: 'WEB_EXPERT',
+    name: 'Web Expert',
+    description: 'Solved 20+ web challenges',
+    icon: '🌐',
+    category: 'skill'
+  },
+  CRYPTO_WIZARD: {
+    id: 'CRYPTO_WIZARD',
+    name: 'Crypto Wizard',
+    description: 'Solved 20+ crypto challenges',
+    icon: '🔐',
+    category: 'skill'
+  },
+  PWN_MASTER: {
+    id: 'PWN_MASTER',
+    name: 'Pwn Master',
+    description: 'Solved 20+ pwn challenges',
+    icon: '💥',
+    category: 'skill'
+  },
+  FORENSICS_DETECTIVE: {
+    id: 'FORENSICS_DETECTIVE',
+    name: 'Forensics Detective',
+    description: 'Solved 20+ forensics challenges',
+    icon: '🔍',
+    category: 'skill'
+  },
+  REVERSE_ENGINEER: {
+    id: 'REVERSE_ENGINEER',
+    name: 'Reverse Engineer',
+    description: 'Solved 20+ reverse engineering challenges',
+    icon: '🔄',
+    category: 'skill'
+  },
+  MISC_SPECIALIST: {
+    id: 'MISC_SPECIALIST',
+    name: 'Misc Specialist',
+    description: 'Solved 20+ misc challenges',
+    icon: '🎲',
+    category: 'skill'
+  },
+  STEGANOGRAPHER: {
+    id: 'STEGANOGRAPHER',
+    name: 'Steganographer',
+    description: 'Solved 20+ steganography challenges',
+    icon: '🖼️',
+    category: 'skill'
+  },
+  OSINT_INVESTIGATOR: {
+    id: 'OSINT_INVESTIGATOR',
+    name: 'OSINT Investigator',
+    description: 'Solved 20+ OSINT challenges',
+    icon: '🕵️',
+    category: 'skill'
+  },
+  FIRST_BLOOD: {
+    id: 'FIRST_BLOOD',
+    name: 'First Blood',
+    description: 'First to solve a challenge',
+    icon: '🩸',
+    category: 'skill'
+  },
+  SERIAL_SOLVER: {
+    id: 'SERIAL_SOLVER',
+    name: 'Serial Solver',
+    description: 'First blood on 5+ challenges',
+    icon: '🔪',
+    category: 'skill'
+  },
+  HARD_MODE: {
+    id: 'HARD_MODE',
+    name: 'Hard Mode',
+    description: 'Solved 10+ hard challenges',
+    icon: '😤',
+    category: 'skill'
+  },
+  EXPERT_LEVEL: {
+    id: 'EXPERT_LEVEL',
+    name: 'Expert Level',
+    description: 'Solved 5+ expert challenges',
+    icon: '🎯',
+    category: 'skill'
+  },
+  PUZZLE_SOLVER: {
+    id: 'PUZZLE_SOLVER',
+    name: 'Puzzle Solver',
+    description: 'Solved unique challenge types',
+    icon: '🧩',
+    category: 'skill'
+  },
+  PERFECTIONIST: {
+    id: 'PERFECTIONIST',
+    name: 'Perfectionist',
+    description: '100% solve rate in a CTF',
+    icon: '💎',
+    category: 'skill'
+  },
+  MULTI_TALENTED: {
+    id: 'MULTI_TALENTED',
+    name: 'Multi-Talented',
+    description: 'Solved challenges in 5+ categories in one CTF',
+    icon: '🌈',
+    category: 'skill'
+  },
 
   // Contribution Achievements
   MAJOR_CONTRIBUTOR: {
@@ -193,6 +424,83 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     name: 'Active Participant',
     description: 'Active CTF participation',
     icon: '🔥',
+    category: 'contribution'
+  },
+  TEAM_PLAYER: {
+    id: 'TEAM_PLAYER',
+    name: 'Team Player',
+    description: 'Participated in 10+ team CTFs',
+    icon: '👥',
+    category: 'contribution'
+  },
+  MENTOR: {
+    id: 'MENTOR',
+    name: 'Mentor',
+    description: 'Helped newcomers succeed',
+    icon: '🎓',
+    category: 'contribution'
+  },
+  COMMUNITY_BUILDER: {
+    id: 'COMMUNITY_BUILDER',
+    name: 'Community Builder',
+    description: 'Contributed to community growth',
+    icon: '🏗️',
+    category: 'contribution'
+  },
+  LONG_HAULER: {
+    id: 'LONG_HAULER',
+    name: 'Long Hauler',
+    description: 'Active for 1+ year',
+    icon: '📅',
+    category: 'contribution'
+  },
+  VETERAN_MEMBER: {
+    id: 'VETERAN_MEMBER',
+    name: 'Veteran Member',
+    description: 'Active for 2+ years',
+    icon: '🏆',
+    category: 'contribution'
+  },
+  FOUNDING_MEMBER: {
+    id: 'FOUNDING_MEMBER',
+    name: 'Founding Member',
+    description: 'Early platform adopter',
+    icon: '⭐',
+    category: 'contribution'
+  },
+  CHALLENGER: {
+    id: 'CHALLENGER',
+    name: 'Challenger',
+    description: 'Created challenges for community',
+    icon: '⚡',
+    category: 'contribution'
+  },
+  WRITEUP_AUTHOR: {
+    id: 'WRITEUP_AUTHOR',
+    name: 'Writeup Author',
+    description: 'Published detailed writeups',
+    icon: '📝',
+    category: 'contribution'
+  },
+  HELPFUL_SOUL: {
+    id: 'HELPFUL_SOUL',
+    name: 'Helpful Soul',
+    description: 'Provided hints and guidance',
+    icon: '🤝',
+    category: 'contribution'
+  },
+  SOCIAL_BUTTERFLY: {
+    id: 'SOCIAL_BUTTERFLY',
+    name: 'Social Butterfly',
+    description: 'Active in community discussions',
+    icon: '🦋',
+    category: 'contribution'
+  },
+  ORGANIZER: {
+    id: 'ORGANIZER',
+    name: 'Organizer',
+    description: 'Helped organize CTF events',
+    icon: '📋',
     category: 'contribution'
   }
 };
@@ -271,11 +579,53 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
     checkCTF: ({ userRank, totalUsers }) => userRank > Math.ceil(totalUsers * 0.1) && userRank <= Math.ceil(totalUsers * 0.25)
   },
 
+  // Top 50% Global
+  {
+    id: 'TOP_50_GLOBAL',
+    scope: 'global',
+    checkGlobal: ({ userRank, totalUsers }) => userRank > Math.ceil(totalUsers * 0.25) && userRank <= Math.ceil(totalUsers * 0.5)
+  },
+
+  // Top 50% CTF
+  {
+    id: 'TOP_50_CTF',
+    scope: 'ctf',
+    checkCTF: ({ userRank, totalUsers }) => userRank > Math.ceil(totalUsers * 0.25) && userRank <= Math.ceil(totalUsers * 0.5)
+  },
+
+  // Rising Star (Note: This would require rank history data, placeholder logic for now)
+  {
+    id: 'RISING_STAR',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.rankImprovement || 0) >= 50
+  },
+
+  // Comeback Kid (Note: This would require rank history data, placeholder logic for now)
+  {
+    id: 'COMEBACK_KID',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.rankImprovement || 0) >= 100
+  },
+
+  // Legendary (500+ solves)
+  {
+    id: 'LEGENDARY',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 500
+  },
+
+  // Unstoppable (250+ solves)
+  {
+    id: 'UNSTOPPABLE',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 250 && userProfile.solveCount < 500
+  },
+
   // Century Club (100+ solves)
   {
     id: 'CENTURY_CLUB',
     scope: 'global',
-    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 100
+    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 100 && userProfile.solveCount < 250
   },
 
   // Veteran Solver (50+ solves)
@@ -285,25 +635,54 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
     checkGlobal: ({ userProfile }) => userProfile.solveCount >= 50 && userProfile.solveCount < 100
   },
 
+  // Dedicated (25+ solves)
+  {
+    id: 'DEDICATED',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 25 && userProfile.solveCount < 50
+  },
+
   // Active Solver (20+ solves)
   {
     id: 'ACTIVE_SOLVER',
     scope: 'global',
-    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 20 && userProfile.solveCount < 50
+    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 20 && userProfile.solveCount < 25
   },
 
-  // CTF Solver (10+ solves in CTF)
+  // CTF Solver (10+ solves)
   {
     id: 'CTF_SOLVER',
-    scope: 'ctf',
+    scope: 'both',
+    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 10 && userProfile.solveCount < 20,
     checkCTF: ({ userProfile }) => userProfile.solveCount >= 10
+  },
+
+  // Getting Started (5+ solves)
+  {
+    id: 'GETTING_STARTED',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 5 && userProfile.solveCount < 10
+  },
+
+  // First Steps (1+ solve)
+  {
+    id: 'FIRST_STEPS',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => userProfile.solveCount >= 1 && userProfile.solveCount < 5
+  },
+
+  // CTF Veteran (25+ CTFs)
+  {
+    id: 'CTF_VETERAN',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => userProfile.ctfCount >= 25
   },
 
   // CTF Explorer (10+ CTFs)
   {
     id: 'CTF_EXPLORER',
     scope: 'global',
-    checkGlobal: ({ userProfile }) => userProfile.ctfCount >= 10
+    checkGlobal: ({ userProfile }) => userProfile.ctfCount >= 10 && userProfile.ctfCount < 25
   },
 
   // Multi-CTF Player (5+ CTFs)
@@ -311,6 +690,62 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
     id: 'MULTI_CTF_PLAYER',
     scope: 'global',
     checkGlobal: ({ userProfile }) => userProfile.ctfCount >= 5 && userProfile.ctfCount < 10
+  },
+
+  // CTF Newcomer (2+ CTFs)
+  {
+    id: 'CTF_NEWCOMER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => userProfile.ctfCount >= 2 && userProfile.ctfCount < 5
+  },
+
+  // Speed Demon (Note: Requires solve time data)
+  {
+    id: 'SPEED_DEMON',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.fastSolves || 0) >= 10
+  },
+
+  // Lightning Fast (Note: Requires solve time data)
+  {
+    id: 'LIGHTNING_FAST',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.ultraFastSolves || 0) >= 1
+  },
+
+  // Consistent Solver (Note: Requires streak data)
+  {
+    id: 'CONSISTENT_SOLVER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.longestStreak || 0) >= 7
+  },
+
+  // Marathon Runner (Note: Requires streak data)
+  {
+    id: 'MARATHON_RUNNER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.longestStreak || 0) >= 30
+  },
+
+  // Weekend Warrior (Note: Requires time-based solve data)
+  {
+    id: 'WEEKEND_WARRIOR',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.weekendSolveRatio || 0) >= 0.6
+  },
+
+  // Night Owl (Note: Requires time-based solve data)
+  {
+    id: 'NIGHT_OWL',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.nightSolves || 0) >= 50
+  },
+
+  // Early Bird (Note: Requires time-based solve data)
+  {
+    id: 'EARLY_BIRD',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.morningSolves || 0) >= 50
   },
 
   // Polymath (75%+ categories globally)
@@ -339,6 +774,101 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
       userProfile.categories.size >= Math.ceil(allCategories.size * 0.5) && userProfile.categories.size < Math.ceil(allCategories.size * 0.75)
   },
 
+  // Category-specific expertise achievements
+  {
+    id: 'WEB_EXPERT',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.categorySolves?.web || 0) >= 20
+  },
+
+  {
+    id: 'CRYPTO_WIZARD',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.categorySolves?.crypto || 0) >= 20
+  },
+
+  {
+    id: 'PWN_MASTER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.categorySolves?.pwn || 0) >= 20
+  },
+
+  {
+    id: 'FORENSICS_DETECTIVE',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.categorySolves?.forensics || 0) >= 20
+  },
+
+  {
+    id: 'REVERSE_ENGINEER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.categorySolves?.reverse || userProfile.categorySolves?.reversing || 0) >= 20
+  },
+
+  {
+    id: 'MISC_SPECIALIST',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.categorySolves?.misc || 0) >= 20
+  },
+
+  {
+    id: 'STEGANOGRAPHER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.categorySolves?.stego || userProfile.categorySolves?.steganography || 0) >= 20
+  },
+
+  {
+    id: 'OSINT_INVESTIGATOR',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.categorySolves?.osint || 0) >= 20
+  },
+
+  // Achievement-based accomplishments
+  {
+    id: 'FIRST_BLOOD',
+    scope: 'both',
+    checkGlobal: ({ userProfile }) => (userProfile.firstBloods || 0) >= 1,
+    checkCTF: ({ userProfile }) => (userProfile.firstBloods || 0) >= 1
+  },
+
+  {
+    id: 'SERIAL_SOLVER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.firstBloods || 0) >= 5
+  },
+
+  // Difficulty-based achievements
+  {
+    id: 'HARD_MODE',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.hardSolves || 0) >= 10
+  },
+
+  {
+    id: 'EXPERT_LEVEL',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.expertSolves || 0) >= 5
+  },
+
+  // Special accomplishments
+  {
+    id: 'PUZZLE_SOLVER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.uniqueChallengeTypes || 0) >= 10
+  },
+
+  {
+    id: 'PERFECTIONIST',
+    scope: 'ctf',
+    checkCTF: ({ userProfile, ctfStats }) => userProfile.solveCount === ctfStats.totalChallenges
+  },
+
+  {
+    id: 'MULTI_TALENTED',
+    scope: 'ctf',
+    checkCTF: ({ userProfile }) => userProfile.categories.size >= 5
+  },
+
   // Major Contributor (5%+ of total solves globally)
   {
     id: 'MAJOR_CONTRIBUTOR',
@@ -353,6 +883,89 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
     scope: 'ctf',
     checkCTF: ({ userProfile, ctfStats }) => 
       (userProfile.solveCount / ctfStats.totalSolves) * 100 >= 10
+  },
+
+  // Team Player (Note: Requires team participation data)
+  {
+    id: 'TEAM_PLAYER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.teamCTFs || 0) >= 10
+  },
+
+  // Mentor (Note: Requires mentoring/helping data)
+  {
+    id: 'MENTOR',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.helpedUsers || 0) >= 5
+  },
+
+  // Community Builder (Note: Requires community contribution metrics)
+  {
+    id: 'COMMUNITY_BUILDER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.communityScore || 0) >= 100
+  },
+
+  // Long Hauler (Note: Requires membership duration data)
+  {
+    id: 'LONG_HAULER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => {
+      const membershipDays = userProfile.membershipDays || 0;
+      return membershipDays >= 365; // 1+ year
+    }
+  },
+
+  // Veteran Member (Note: Requires membership duration data)
+  {
+    id: 'VETERAN_MEMBER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => {
+      const membershipDays = userProfile.membershipDays || 0;
+      return membershipDays >= 730; // 2+ years
+    }
+  },
+
+  // Founding Member (Note: Requires early adoption data)
+  {
+    id: 'FOUNDING_MEMBER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => userProfile.isEarlyAdopter === true
+  },
+
+  // Challenger (Note: Requires challenge creation data)
+  {
+    id: 'CHALLENGER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.challengesCreated || 0) >= 1
+  },
+
+  // Writeup Author (Note: Requires writeup publication data)
+  {
+    id: 'WRITEUP_AUTHOR',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.writeupCount || 0) >= 5
+  },
+
+  // Helpful Soul (Note: Requires help/hint data)
+  {
+    id: 'HELPFUL_SOUL',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.hintsGiven || 0) >= 20
+  },
+
+  // Social Butterfly (Note: Requires discussion/comment data)
+  {
+    id: 'SOCIAL_BUTTERFLY',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.discussionPosts || 0) >= 50
+  },
+
+  // Organizer (Note: Requires event organization data)
+  {
+    id: 'ORGANIZER',
+    scope: 'global',
+    checkGlobal: ({ userProfile }) => (userProfile.eventsOrganized || 0) >= 1
   }
 ];
 
