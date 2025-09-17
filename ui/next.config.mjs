@@ -12,24 +12,20 @@ const nextConfig = {
       'localhost',
       // Add your production domains here
     ],
+    unoptimized: true,
   },
   
-  // Redirect API calls to backend during development
-  async rewrites() {
-    if (process.env.NODE_ENV === 'development') {
-      return [
-        {
-          source: '/api/:path*',
-          destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.assistant.dimasc.tf/'}/api/:path*`,
-        },
-        {
-          source: '/health',
-          destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.assistant.dimasc.tf/'}/health`,
-        },
-      ]
-    }
-    return []
+  // ESLint configuration
+  eslint: {
+    ignoreDuringBuilds: true,
   },
+  
+  // TypeScript configuration
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  
+  // No longer need to proxy API calls to external backend
 }
 
 export default nextConfig

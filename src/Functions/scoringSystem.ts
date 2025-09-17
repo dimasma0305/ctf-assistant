@@ -62,6 +62,7 @@ interface UserScore {
         solves: number;
         points: number;
         score: number;
+        logo: string;
     }>;
 }
 
@@ -177,7 +178,8 @@ export class FairScoringSystem {
                         weight: ctfData.weight,
                         solves: 0,
                         points: 0,
-                        score: 0
+                        score: 0,
+                        logo: ctfData.logo || ''
                     });
                 }
                 

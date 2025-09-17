@@ -65,41 +65,47 @@ export default function UserProfilePage() {
     return name.slice(0, 2).toUpperCase()
   }
 
-  const mockCertificates = [
-    {
-      id: "cert-2024-12",
-      type: "monthly" as const,
-      period: "2024-12",
-      rank: 1,
-      totalParticipants: 156,
-      score: 2847.5,
-      solves: 23,
-      categories: ["web", "crypto", "pwn", "reverse"],
-      issuedDate: "2024-12-31T23:59:59Z",
-    },
-    {
-      id: "cert-2024-11",
-      type: "monthly" as const,
-      period: "2024-11",
-      rank: 2,
-      totalParticipants: 142,
-      score: 2156.3,
-      solves: 18,
-      categories: ["web", "crypto", "forensics"],
-      issuedDate: "2024-11-30T23:59:59Z",
-    },
-    {
-      id: "cert-2024",
-      type: "yearly" as const,
-      period: "2024",
-      rank: 3,
-      totalParticipants: 1247,
-      score: 15432.8,
-      solves: 187,
-      categories: ["web", "crypto", "pwn", "reverse", "forensics", "misc"],
-      issuedDate: "2024-12-31T23:59:59Z",
-    },
-  ]
+  const generateCertificatesFromProfile = (profileData: UserProfileResponse) => {
+    const certificates = []
+    const currentDate = new Date()
+    const currentYear = currentDate.getFullYear()
+    const currentMonth = currentDate.getMonth() + 1
+
+    // Check if user qualifies for certificates based on their global rank
+    // Only top 3 global ranks get certificates
+    if (profileData.globalRank <= 3) {
+      // Generate yearly certificate for current year
+      certificates.push({
+        id: `cert-${currentYear}`,
+        type: "yearly" as const,
+        period: currentYear.toString(),
+        rank: profileData.globalRank,
+        totalParticipants: profileData.totalUsers,
+        score: profileData.stats.totalScore,
+        solves: profileData.stats.solveCount,
+        categories: profileData.categoryBreakdown.map((cat) => cat.name),
+        issuedDate: `${currentYear}-12-31T23:59:59Z`,
+      })
+
+      // Generate monthly certificate for current month if we're past the first week
+      if (currentDate.getDate() > 7) {
+        const monthStr = currentMonth.toString().padStart(2, "0")
+        certificates.push({
+          id: `cert-${currentYear}-${monthStr}`,
+          type: "monthly" as const,
+          period: `${currentYear}-${monthStr}`,
+          rank: profileData.globalRank,
+          totalParticipants: profileData.totalUsers,
+          score: profileData.stats.totalScore,
+          solves: profileData.stats.solveCount,
+          categories: profileData.categoryBreakdown.map((cat) => cat.name),
+          issuedDate: `${currentYear}-${monthStr}-${new Date(currentYear, currentMonth, 0).getDate()}T23:59:59Z`,
+        })
+      }
+    }
+
+    return certificates
+  }
 
   if (loading) {
     return (
@@ -345,7 +351,7 @@ export default function UserProfilePage() {
           </TabsContent>
 
           <TabsContent value="certificates">
-            <CertificateGenerator user={profileData.user} certificates={mockCertificates} />
+            <CertificateGenerator user={profileData.user} certificates={generateCertificatesFromProfile(profileData)} />
           </TabsContent>
 
           <TabsContent value="activity">

@@ -1,7 +1,18 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { APIClient } from "@/lib/api"
+import {
+  getScoreboard,
+  getUserProfile,
+  getCTFProfile,
+  getCTFs,
+  getCTFDetails,
+  getCacheStatus,
+  getHealth,
+  clearCache as clearCacheAction,
+  warmCache as warmCacheAction,
+  getCTFRankings,
+} from "@/lib/actions"
 import type { ScoreboardParams, CTFsParams } from "@/lib/types"
 
 // Generic API hook
@@ -39,7 +50,7 @@ export function useScoreboard(initialParams: ScoreboardParams = {}) {
   const paramsKey = JSON.stringify(currentParams)
 
   const result = useAPICall(
-    () => APIClient.getLeaderboard(currentParams),
+    () => getScoreboard(currentParams),
     [paramsKey], // Use stringified params to avoid object reference issues
   )
 
@@ -64,7 +75,7 @@ export function useScoreboard(initialParams: ScoreboardParams = {}) {
 // User profile hook
 export function useUserProfile(userId: string | null) {
   return useAPICall(
-    () => (userId ? APIClient.getUserProfile(userId) : Promise.reject(new Error("No user ID provided"))),
+    () => (userId ? getUserProfile(userId) : Promise.reject(new Error("No user ID provided"))),
     [userId],
   )
 }
@@ -73,9 +84,7 @@ export function useUserProfile(userId: string | null) {
 export function useCTFProfile(ctfId: string | null, userId: string | null) {
   return useAPICall(
     () =>
-      ctfId && userId
-        ? APIClient.getCTFProfile(ctfId, userId)
-        : Promise.reject(new Error("CTF ID and User ID are required")),
+      ctfId && userId ? getCTFProfile(ctfId, userId) : Promise.reject(new Error("CTF ID and User ID are required")),
     [ctfId, userId],
   )
 }
@@ -84,7 +93,7 @@ export function useCTFProfile(ctfId: string | null, userId: string | null) {
 export function useCTFs(params: CTFsParams = {}) {
   const [currentParams, setCurrentParams] = useState(params)
 
-  const result = useAPICall(() => APIClient.getCTFs(currentParams), [currentParams])
+  const result = useAPICall(() => getCTFs(currentParams), [currentParams])
 
   const updateParams = useCallback((newParams: Partial<CTFsParams>) => {
     setCurrentParams((prev) => ({ ...prev, ...newParams }))
@@ -99,20 +108,17 @@ export function useCTFs(params: CTFsParams = {}) {
 
 // CTF details hook
 export function useCTFDetails(ctfId: string | null) {
-  return useAPICall(
-    () => (ctfId ? APIClient.getCTFDetails(ctfId) : Promise.reject(new Error("No CTF ID provided"))),
-    [ctfId],
-  )
+  return useAPICall(() => (ctfId ? getCTFDetails(ctfId) : Promise.reject(new Error("No CTF ID provided"))), [ctfId])
 }
 
 // Cache status hook
 export function useCacheStatus() {
-  return useAPICall(() => APIClient.getCacheStatus())
+  return useAPICall(() => getCacheStatus())
 }
 
 // Health check hook
 export function useHealth() {
-  return useAPICall(() => APIClient.getHealth())
+  return useAPICall(() => getHealth())
 }
 
 // Cache management hook
@@ -127,7 +133,7 @@ export function useCacheManagement() {
     setClearError(null)
 
     try {
-      await APIClient.clearCache()
+      await clearCacheAction()
     } catch (error) {
       setClearError(error instanceof Error ? error.message : "Failed to clear cache")
     } finally {
@@ -140,7 +146,7 @@ export function useCacheManagement() {
     setWarmError(null)
 
     try {
-      await APIClient.warmCache()
+      await warmCacheAction()
     } catch (error) {
       setWarmError(error instanceof Error ? error.message : "Failed to warm cache")
     } finally {
@@ -193,6 +199,22 @@ export function usePolling<T>(
   return { data, loading, error, refetch: fetchData }
 }
 
+export function useCTFRankings(params: any = {}) {
+  const [currentParams, setCurrentParams] = useState(params)
+
+  const result = useAPICall(() => getCTFRankings(currentParams), [currentParams])
+
+  const updateParams = useCallback((newParams: Partial<any>) => {
+    setCurrentParams((prev: any) => ({ ...prev, ...newParams }))
+  }, [])
+
+  return {
+    ...result,
+    updateParams,
+    currentParams,
+  }
+}
+
 export default {
   useScoreboard,
   useUserProfile,
@@ -203,4 +225,5 @@ export default {
   useHealth,
   useCacheManagement,
   usePolling,
+  useCTFRankings,
 }

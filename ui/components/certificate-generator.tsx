@@ -3,8 +3,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Trophy, Medal, Award, Download, Calendar, Star } from "lucide-react"
+import { Trophy, Medal, Award, Eye, Calendar, Star, X, Share2, ExternalLink } from "lucide-react"
 import type { UserInfo } from "@/lib/types"
+import { Certificate } from "@/components/certificate"
+import { useState } from "react"
+import Link from "next/link"
 
 interface CertificateData {
   id: string
@@ -24,6 +27,8 @@ interface CertificateGeneratorProps {
 }
 
 export function CertificateGenerator({ user, certificates }: CertificateGeneratorProps) {
+  const [showingCertificate, setShowingCertificate] = useState<CertificateData | null>(null)
+
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
@@ -75,45 +80,67 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
     return `${monthName} ${year}`
   }
 
-  const generateCertificate = async (certificate: CertificateData) => {
+  const showCertificate = (certificate: CertificateData) => {
+    setShowingCertificate(certificate)
+  }
+
+  const hideCertificate = () => {
+    setShowingCertificate(null)
+  }
+
+  const getCertificateShareUrl = (certificate: CertificateData) => {
+    const periodForUrl = certificate.type === "yearly" ? certificate.period : certificate.period.replace("-", "-")
+    return `/certificate/${user.userId}/${periodForUrl}`
+  }
+
+  const handleShareCertificate = async (certificate: CertificateData) => {
+    const shareUrl = `${window.location.origin}${getCertificateShareUrl(certificate)}`
+
     try {
-      const params = new URLSearchParams({
-        userId: user.userId,
-        username: user.username,
-        rank: certificate.rank.toString(),
-        period: certificate.type,
-        year: certificate.period.split("-")[0],
-        ...(certificate.type === "monthly" && {
-          month: new Date(
-            Number.parseInt(certificate.period.split("-")[0]),
-            Number.parseInt(certificate.period.split("-")[1]) - 1,
-          ).toLocaleString("default", { month: "long" }),
-        }),
-      })
-
-      const response = await fetch(`/api/certificate?${params}`)
-
-      if (!response.ok) {
-        throw new Error("Failed to generate certificate")
+      if (navigator.share) {
+        await navigator.share({
+          title: `${user.username}'s TCP1P Certificate`,
+          text: `Check out this TCP1P CTF achievement certificate!`,
+          url: shareUrl,
+        })
+      } else {
+        await navigator.clipboard.writeText(shareUrl)
+        // Could add toast notification here
       }
-
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `certificate-${user.username}-${certificate.type}-${certificate.rank}.png`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
     } catch (error) {
-      console.error("Certificate generation failed:", error)
-      alert("Failed to generate certificate. Please try again.")
+      console.error("Error sharing:", error)
     }
   }
 
   // Filter certificates to only show top 3 placements
   const eligibleCertificates = certificates.filter((cert) => cert.rank <= 3)
+
+  if (showingCertificate) {
+    return (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div className="relative max-w-4xl w-full max-h-[90vh] overflow-auto">
+          <Button
+            onClick={hideCertificate}
+            size="sm"
+            variant="outline"
+            className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur-sm"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+          <Certificate
+            username={user.username}
+            rank={showingCertificate.rank}
+            totalParticipants={showingCertificate.totalParticipants}
+            score={showingCertificate.score}
+            solves={showingCertificate.solves}
+            categories={showingCertificate.categories.length}
+            period={formatPeriod(showingCertificate.period, showingCertificate.type)}
+            issuedDate={showingCertificate.issuedDate}
+          />
+        </div>
+      </div>
+    )
+  }
 
   if (eligibleCertificates.length === 0) {
     return (
@@ -198,10 +225,27 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
                     <Calendar className="w-4 h-4" />
                     <span>Issued: {new Date(certificate.issuedDate).toLocaleDateString()}</span>
                   </div>
-                  <Button onClick={() => generateCertificate(certificate)} size="sm" className="gap-2">
-                    <Download className="w-4 h-4" />
-                    Download Certificate
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleShareCertificate(certificate)}
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Share
+                    </Button>
+                    <Link href={getCertificateShareUrl(certificate)} target="_blank">
+                      <Button size="sm" variant="outline" className="gap-2 bg-transparent">
+                        <ExternalLink className="w-4 h-4" />
+                        Public View
+                      </Button>
+                    </Link>
+                    <Button onClick={() => showCertificate(certificate)} size="sm" className="gap-2">
+                      <Eye className="w-4 h-4" />
+                      Show Certificate
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

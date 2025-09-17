@@ -35,6 +35,7 @@ interface UserProfile {
         solves: number;
         points: number;
         score: number;
+        logo: string;
     }>;
 }
 
@@ -1488,7 +1489,8 @@ app.get("/api/profile/:id", async (req, res) => {
                 weight: breakdown.weight,
                 solves: breakdown.solves,
                 points: breakdown.points,
-                score: Math.round(breakdown.score * 100) / 100
+                score: Math.round(breakdown.score * 100) / 100,
+                logo: breakdown.logo
             }))
             .sort((a, b) => b.score - a.score);
 

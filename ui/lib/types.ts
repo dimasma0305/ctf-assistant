@@ -24,6 +24,7 @@ export interface CTFBreakdown {
   solves: number
   points: number
   score: number
+  logo: string
   contribution?: number
 }
 
