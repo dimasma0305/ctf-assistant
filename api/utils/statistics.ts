@@ -183,7 +183,7 @@ export async function calculateCategoryStats(
 /**
  * Generate achievements based on user performance using shared achievement definitions
  */
-export function generateAchievementsIds(
+export function generateAchievementIds(
     userProfile: UserProfile,
     userRank: number,
     totalUsers: number,
@@ -192,7 +192,7 @@ export function generateAchievementsIds(
     scope: 'global' | 'ctf' = 'global',
     ctfTitle?: string
 ): string[] {
-    const achievementsIDs: string[] = [];
+    const achievementIds: string[] = [];
     
     // Check all achievement criteria
     for (const criteria of ACHIEVEMENT_CRITERIA) {
@@ -221,9 +221,9 @@ export function generateAchievementsIds(
             });
         }
         if (shouldAward) {
-            achievementsIDs.push(criteria.id);
+            achievementIds.push(criteria.id);
         }
     }
     
-    return achievementsIDs;
+    return achievementIds;
 }

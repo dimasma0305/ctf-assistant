@@ -564,7 +564,7 @@ export function LeaderboardTable() {
                 }),
                 ctfBreakdown: [],
                 recentSolves: selectedUser.recentSolves,
-                achievementsIds: [],
+                achievementIds: [],
                 performanceComparison: {
                   scoreVsAverage: { user: selectedUser.totalScore, average: 0, percentageDiff: 0 },
                   scoreVsMedian: { user: selectedUser.totalScore, median: 0, percentageDiff: 0 },

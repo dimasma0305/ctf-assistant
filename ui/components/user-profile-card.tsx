@@ -97,7 +97,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
 
   const categoryBreakdown: CategoryStat[] = calculateCategoryBreakdown()
 
-  const achievements: Achievement[] = getAchievements(profileData?.achievementsIds || [])
+  const achievements: Achievement[] = getAchievements(profileData?.achievementIds || [])
 
   const getUserInitials = (user: LeaderboardEntry["user"]) => {
     const name = user.displayName || user.username

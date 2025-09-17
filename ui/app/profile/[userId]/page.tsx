@@ -111,7 +111,7 @@ export default function UserProfilePage() {
     return certificates
   }
 
-  const achievements: Achievement[] = getAchievements(profileData?.achievementsIds || [])
+  const achievements: Achievement[] = getAchievements(profileData?.achievementIds || [])
 
   if (loading) {
     return (

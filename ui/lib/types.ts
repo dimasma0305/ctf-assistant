@@ -93,7 +93,7 @@ export interface UserProfileResponse {
   categoryBreakdown: CategoryStats[]
   ctfBreakdown: CTFBreakdown[]
   recentSolves: UserSolve[]
-  achievementsIds: string[]
+  achievementIds: string[]
   performanceComparison: {
     scoreVsAverage: {
       user: number
@@ -146,7 +146,7 @@ export interface CTFProfileResponse {
   }
   categoryBreakdown: CategoryStats[]
   allSolves: UserSolve[]
-  achievementsIds: string[]
+  achievementIds: string[]
   performanceComparison: {
     scoreVsAverage: {
       user: number
