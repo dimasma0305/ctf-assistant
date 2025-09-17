@@ -80,7 +80,7 @@ export async function getUserProfile(userId: string): Promise<UserProfileRespons
  * Fetch CTF-specific user profile
  */
 export async function getCTFProfile(ctfId: string, userId: string): Promise<CTFProfileResponse> {
-  return fetchAPI<CTFProfileResponse>(`/api/ctf/${ctfId}/profile/${userId}`)
+  return fetchAPI<CTFProfileResponse>(`/api/profile/${userId}/ctf/${ctfId}/`)
 }
 
 /**

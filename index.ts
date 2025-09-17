@@ -1,4 +1,4 @@
 import { config } from "dotenv";
 config();
-import "./src/webserver"
+import "./api/app"
 await import("./src/bot.ts")
