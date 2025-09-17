@@ -97,17 +97,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
 
   const categoryBreakdown: CategoryStat[] = calculateCategoryBreakdown()
 
-  // Use server-provided achievements when available, otherwise fallback to basic client-side ones
-  const achievements: Achievement[] = getAchievements(
-    // Prioritize CTF-specific achievements when available
-    (showCTFProfile && ctfProfileData?.achievements) || 
-    // Use global profile achievements when available 
-    profileData?.achievements || 
-    // Use scoreboard achievements if available (from LeaderboardEntry)
-    user.achievements ||
-    // Fallback to empty array
-    []
-  )
+  const achievements: Achievement[] = getAchievements(profileData?.achievementsIds || [])
 
   const getUserInitials = (user: LeaderboardEntry["user"]) => {
     const name = user.displayName || user.username

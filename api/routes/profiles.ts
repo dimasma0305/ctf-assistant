@@ -5,7 +5,7 @@ import {
     calculateGlobalStats, 
     calculateCategoryStats, 
     calculatePerformanceComparison, 
-    generateAchievements 
+    generateAchievementsIDs 
 } from '../utils/statistics';
 import { formatErrorResponse } from '../utils/common';
 
@@ -83,7 +83,7 @@ router.get("/:id", async (req, res) => {
             .sort((a, b) => b.score - a.score);
 
         // Global achievements using utility function
-        const achievements = generateAchievements(
+        const achievements = generateAchievementsIDs(
             userProfile, 
             userRank, 
             totalUsers, 
@@ -117,7 +117,7 @@ router.get("/:id", async (req, res) => {
             categoryBreakdown: categoryStats,
             ctfBreakdown: ctfBreakdown,
             recentSolves: recentSolves,
-            achievements: achievements,
+            achievementsIds: achievements,
             performanceComparison: performanceComparison,
             globalOverview: {
                 totalUsers: totalUsers,
@@ -222,7 +222,7 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
             }));
 
         // CTF-specific achievements using utility function
-        const ctfAchievements = generateAchievements(
+        const ctfAchievements = generateAchievementsIDs(
             userProfile,
             userRank,
             totalParticipants,
@@ -260,7 +260,7 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
             },
             categoryBreakdown: categoryStats,
             allSolves: allCtfSolves,
-            achievements: ctfAchievements,
+            achievementsIds: ctfAchievements,
             performanceComparison,
             ctfOverview: {
                 totalParticipants,

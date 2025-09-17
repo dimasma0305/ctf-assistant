@@ -183,7 +183,7 @@ export async function calculateCategoryStats(
 /**
  * Generate achievements based on user performance using shared achievement definitions
  */
-export function generateAchievements(
+export function generateAchievementsIDs(
     userProfile: UserProfile,
     userRank: number,
     totalUsers: number,

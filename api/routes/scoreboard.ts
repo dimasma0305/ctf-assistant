@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getCachedUserScores, getAvailableTimeRanges } from '../services/dataService';
-import { calculateGlobalStats, generateAchievements as generateAchievementsIDs } from '../utils/statistics';
+import { calculateGlobalStats, generateAchievementsIDs as generateAchievementsIDs } from '../utils/statistics';
 import { formatErrorResponse, validatePaginationParams, filterUsersBySearch } from '../utils/common';
 import { UserSolve } from '../types';
 

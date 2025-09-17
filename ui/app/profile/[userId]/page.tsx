@@ -8,11 +8,11 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Trophy, Star, Users, Clock } from "lucide-react"
 import { CertificateGenerator } from "@/components/certificate-generator"
-import { calculatePercentile } from "@/lib/utils"
+import { calculatePercentile, getAchievements } from "@/lib/utils"
 
 import Link from "next/link"
 import { useUserProfile } from "@/hooks/useAPI"
-import type { UserProfileResponse } from "@/lib/types"
+import type { Achievement, UserProfileResponse } from "@/lib/types"
 
 export default function UserProfilePage() {
   const params = useParams()
@@ -110,6 +110,8 @@ export default function UserProfilePage() {
 
     return certificates
   }
+
+  const achievements: Achievement[] = getAchievements(profileData?.achievementsIds || [])
 
   if (loading) {
     return (
@@ -412,7 +414,7 @@ export default function UserProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {profileData.achievements.map((achievement) => (
+                  {achievements.map((achievement) => (
                     <Card key={achievement.name} className="p-4 border-2 border-primary/20">
                       <div className="flex items-center gap-4">
                         <div className="text-3xl">{achievement.icon}</div>

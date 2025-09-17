@@ -413,7 +413,7 @@ export function CTFRankings() {
                   <div>
                     <h4 className="font-semibold mb-3">CTF Achievements</h4>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {getAchievements(selectedUser.achievements).map((achievement, index) => (
+                      {getAchievements(selectedUser.achievementsIds).map((achievement, index) => (
                         <Card key={`${achievement.id || achievement.name}-${index}`} className="p-4">
                           <div className="flex items-center gap-3">
                             <div className="text-2xl flex-shrink-0">{achievement.icon}</div>
