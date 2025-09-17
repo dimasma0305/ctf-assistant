@@ -60,14 +60,14 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
     id: 'GLOBAL_PODIUM',
     name: 'Global Podium',
     description: 'Top 3 worldwide',
-    icon: '🥈', // Will be dynamic based on rank
+    icon: '🥈', 
     category: 'ranking'
   },
   CTF_PODIUM: {
     id: 'CTF_PODIUM',
     name: 'CTF Podium',
     description: 'Top 3 in CTF',
-    icon: '🥈', // Will be dynamic based on rank
+    icon: '🥈', 
     category: 'ranking'
   },
   ELITE_GLOBAL: {
