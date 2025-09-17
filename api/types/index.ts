@@ -78,11 +78,7 @@ export interface CategoryStat {
     percentile: number;
 }
 
-export interface Achievement {
-    name: string;
-    description: string;
-    icon: string;
-}
+// Achievement interface is now defined in shared/achievements.ts
 
 // ===== VALIDATION TYPES =====
 

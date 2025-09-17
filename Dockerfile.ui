@@ -1,11 +1,14 @@
 FROM node:18-alpine as ui-builder
-WORKDIR /app/
-COPY ui/package.json /app/package.json
+WORKDIR /app/ui/
+COPY ui/package.json /app/ui/package.json
 RUN npm install
-COPY ui/ /app/
+
+WORKDIR /app/
+COPY . .
 ARG NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 RUN npm run build
+
 ENV PORT=3000
 ENV HOST=0.0.0.0
 EXPOSE 3000

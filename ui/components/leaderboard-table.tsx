@@ -558,7 +558,7 @@ export function LeaderboardTable() {
                   return {
                     name: category,
                     solves,
-                    totalPoints,
+                    totalScore: totalPoints,
                     avgPoints: solves > 0 ? Math.round(totalPoints / solves) : 0,
                   }
                 }),

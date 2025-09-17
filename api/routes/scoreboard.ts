@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getCachedUserScores, getAvailableTimeRanges } from '../services/dataService';
-import { calculateGlobalStats } from '../utils/statistics';
+import { calculateGlobalStats, generateAchievements } from '../utils/statistics';
 import { formatErrorResponse, validatePaginationParams, filterUsersBySearch } from '../utils/common';
 import { UserSolve } from '../types';
 
@@ -126,30 +126,53 @@ router.get("/", async (req, res) => {
         // Get available months and years for metadata
         const availableTimeRanges = await getAvailableTimeRanges();
 
-        // Format data for JSON response (convert Sets and Maps to arrays/objects)
-        const formattedLeaderboard = paginatedLeaderboard.map((entry) => ({
-            rank: userRankMap.get(entry.userId) || 1, // Use rank from appropriate dataset (monthly/yearly separate rankings, global for overall)
-            user: {
-                userId: entry.userId,
-                username: entry.username,
-                displayName: entry.displayName,
-                avatar: entry.avatar
-            },
-            totalScore: Math.round(entry.totalScore * 100) / 100, // round to 2 decimal places
-            solveCount: entry.solveCount,
-            ctfCount: entry.ctfCount,
-            categories: Array.from(entry.categories),
-            recentSolves: entry.recentSolves.map((solve: UserSolve) => ({
-                ctf_id: solve.ctf_id,
-                challenge: solve.challenge,
-                category: solve.category,
-                points: solve.points,
-                solved_at: solve.solved_at
-            }))
-        }));
-
-        // Calculate global stats for metadata
+        // Calculate global stats for metadata and achievement generation
         const globalStats = calculateGlobalStats(allUserScores);
+        
+        // Get all categories for achievement calculations
+        const allCategories = new Set<string>();
+        Array.from(allUserScores.values()).forEach(user => {
+            user.categories.forEach(cat => allCategories.add(cat));
+        });
+
+        // Format data for JSON response (convert Sets and Maps to arrays/objects)
+        const formattedLeaderboard = paginatedLeaderboard.map((entry) => {
+            const userRank = userRankMap.get(entry.userId) || 1;
+            const scope = isGlobal ? 'global' : 'ctf';
+            
+            // Generate achievements for this user
+            const userAchievements = generateAchievements(
+                entry,
+                userRank,
+                totalUsers,
+                globalStats,
+                allCategories,
+                scope as 'global' | 'ctf',
+                ctfId ? 'CTF' : undefined // CTF title fallback
+            );
+            
+            return {
+                rank: userRank, // Use rank from appropriate dataset (monthly/yearly separate rankings, global for overall)
+                user: {
+                    userId: entry.userId,
+                    username: entry.username,
+                    displayName: entry.displayName,
+                    avatar: entry.avatar
+                },
+                totalScore: Math.round(entry.totalScore * 100) / 100, // round to 2 decimal places
+                solveCount: entry.solveCount,
+                ctfCount: entry.ctfCount,
+                categories: Array.from(entry.categories),
+                achievements: userAchievements, // Add achievements to scoreboard response
+                recentSolves: entry.recentSolves.map((solve: UserSolve) => ({
+                    ctf_id: solve.ctf_id,
+                    challenge: solve.challenge,
+                    category: solve.category,
+                    points: solve.points,
+                    solved_at: solve.solved_at
+                }))
+            };
+        });
         
         // Response metadata
         const metadata = {

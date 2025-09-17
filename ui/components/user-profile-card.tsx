@@ -10,15 +10,10 @@ import { Trophy, TrendingUp, ExternalLink, Star, Target, AwardIcon } from "lucid
 import { useCTFProfile } from "@/hooks/useAPI"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { calculatePercentile } from "@/lib/utils"
+import { calculatePercentile, getAchievements } from "@/lib/utils"
 
-import type { LeaderboardEntry, UserProfileResponse } from "@/lib/types"
-
-interface Achievement {
-  name: string
-  description: string
-  icon: string
-}
+import type { LeaderboardEntry, UserProfileResponse, Achievement } from "@/lib/types"
+import { ACHIEVEMENTS, getAchievement, getRankAchievement, ACHIEVEMENT_CRITERIA } from "../../shared/achievements"
 
 interface CategoryStat {
   name: string
@@ -102,29 +97,17 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
 
   const categoryBreakdown: CategoryStat[] = calculateCategoryBreakdown()
 
-  const achievements: Achievement[] = [
-    ...(showCTFProfile && ctfProfileData?.achievements ? ctfProfileData.achievements : []),
-    ...(user.solveCount >= 100 ? [{ name: "Century Solver", description: "Solved 100+ challenges", icon: "🎯" }] : []),
-    ...(user.ctfCount >= 10 ? [{ name: "CTF Explorer", description: "Participated in 10+ CTFs", icon: "🗺️" }] : []),
-    ...(user.categories.length >= 5
-      ? [{ name: "Well Rounded", description: "Solved challenges in 5+ categories", icon: "🌟" }]
-      : []),
-    ...(user.rank <= 3
-      ? [
-          {
-            name: "Podium Finisher",
-            description: `${showCTFProfile && ctfProfileData ? "CTF" : "Global"} rank #${showCTFProfile && ctfProfileData ? ctfProfileData.ctfRank : user.rank}`,
-            icon:
-              (showCTFProfile && ctfProfileData ? ctfProfileData.ctfRank : user.rank) === 1
-                ? "🥇"
-                : (showCTFProfile && ctfProfileData ? ctfProfileData.ctfRank : user.rank) === 2
-                  ? "🥈"
-                  : "🥉",
-          },
-        ]
-      : []),
-    ...(user.rank <= 10 ? [{ name: "Elite Player", description: "Top 10 ranking", icon: "⭐" }] : []),
-  ]
+  // Use server-provided achievements when available, otherwise fallback to basic client-side ones
+  const achievements: Achievement[] = getAchievements(
+    // Prioritize CTF-specific achievements when available
+    (showCTFProfile && ctfProfileData?.achievements) || 
+    // Use global profile achievements when available 
+    profileData?.achievements || 
+    // Use scoreboard achievements if available (from LeaderboardEntry)
+    user.achievements ||
+    // Fallback to empty array
+    []
+  )
 
   const getUserInitials = (user: LeaderboardEntry["user"]) => {
     const name = user.displayName || user.username
@@ -151,8 +134,10 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
       reverse: "bg-green-500",
       forensics: "bg-yellow-500",
       misc: "bg-gray-500",
+      mobile: "bg-pink-500",
+      blockchain: "bg-orange-500",
     }
-    return colors[category] || "bg-gray-500"
+    return colors[category.toLowerCase()] || "bg-gray-500"
   }
 
   const formatTimeAgo = (dateString: string) => {

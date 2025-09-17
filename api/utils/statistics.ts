@@ -5,9 +5,15 @@ import {
     GlobalStats, 
     PerformanceComparison, 
     CategoryStat, 
-    Achievement,
     UserSolve 
 } from '../types';
+import { 
+    ACHIEVEMENTS, 
+    ACHIEVEMENT_CRITERIA, 
+    getAchievement, 
+    getRankAchievement,
+    type Achievement 
+} from '../../shared/achievements';
 
 /**
  * Statistics and Calculation Utilities
@@ -176,7 +182,7 @@ export async function calculateCategoryStats(
 }
 
 /**
- * Generate achievements based on user performance
+ * Generate achievements based on user performance using shared achievement definitions
  */
 export function generateAchievements(
     userProfile: UserProfile,
@@ -188,76 +194,67 @@ export function generateAchievements(
     ctfTitle?: string
 ): Achievement[] {
     const achievements: Achievement[] = [];
-    const solvePercentage = (userProfile.solveCount / globalStats.totalSolves) * 100;
     
-    // Ranking achievements
-    if (userRank === 1) {
-        achievements.push({ 
-            name: scope === 'global' ? "Global Champion" : "CTF Champion", 
-            description: scope === 'global' ? "#1 worldwide" : `#1 in ${ctfTitle}`, 
-            icon: "👑" 
-        });
-    } else if (userRank <= 3) {
-        const rankIcon = userRank === 2 ? "🥈" : "🥉";
-        achievements.push({ 
-            name: scope === 'global' ? "Global Podium" : "CTF Podium", 
-            description: scope === 'global' ? `#${userRank} worldwide` : `#${userRank} in ${ctfTitle}`, 
-            icon: rankIcon 
-        });
-    } else if (userRank <= Math.ceil(totalUsers * 0.05)) {
-        achievements.push({ 
-            name: "Elite", 
-            description: scope === 'global' ? "Top 5% globally" : `Top 5% in ${ctfTitle}`, 
-            icon: "⭐" 
-        });
-    } else if (userRank <= Math.ceil(totalUsers * 0.1)) {
-        achievements.push({ 
-            name: "Top 10%", 
-            description: scope === 'global' ? "Top 10% globally" : `Top 10% in ${ctfTitle}`, 
-            icon: "🌟" 
-        });
-    } else if (userRank <= Math.ceil(totalUsers * 0.25)) {
-        achievements.push({ 
-            name: "Top 25%", 
-            description: scope === 'global' ? "Top 25% globally" : `Top 25% in ${ctfTitle}`, 
-            icon: "⭐" 
-        });
-    }
-    
-    // Solve count achievements
-    if (scope === 'global') {
-        if (userProfile.solveCount >= 100) achievements.push({ name: "Century Club", description: "Solved 100+ challenges", icon: "💯" });
-        else if (userProfile.solveCount >= 50) achievements.push({ name: "Veteran Solver", description: "Solved 50+ challenges", icon: "🎯" });
-        else if (userProfile.solveCount >= 20) achievements.push({ name: "Active Solver", description: "Solved 20+ challenges", icon: "🔥" });
-    } else {
-        if (userProfile.solveCount >= 10) achievements.push({ name: "CTF Solver", description: "Solved 10+ challenges", icon: "🎯" });
-    }
-    
-    // CTF participation achievements (global only)
-    if (scope === 'global') {
-        if (userProfile.ctfCount >= 10) achievements.push({ name: "CTF Explorer", description: "Participated in 10+ CTFs", icon: "🗺️" });
-        else if (userProfile.ctfCount >= 5) achievements.push({ name: "Multi-CTF Player", description: "Participated in 5+ CTFs", icon: "🏆" });
-    }
-    
-    // Category diversity achievements
-    if (userProfile.categories.size >= Math.ceil(allCategories.size * 0.75)) {
-        achievements.push({ 
-            name: scope === 'global' ? "Polymath" : "Category Master", 
-            description: scope === 'global' ? "Master of multiple categories" : "Solved challenges in most categories", 
-            icon: "🧩" 
-        });
-    } else if (userProfile.categories.size >= Math.ceil(allCategories.size * 0.5)) {
-        achievements.push({ name: "Versatile", description: "Active in many categories", icon: "🔧" });
-    }
-    
-    // Contribution achievements
-    const contributionThreshold = scope === 'global' ? 5 : 10;
-    if (solvePercentage >= contributionThreshold) {
-        achievements.push({ 
-            name: scope === 'global' ? "Major Contributor" : "Active Participant", 
-            description: `${Math.round(solvePercentage)}% of total ${scope === 'global' ? 'community' : 'CTF'} solves`, 
-            icon: scope === 'global' ? "🌟" : "🔥" 
-        });
+    // Check all achievement criteria
+    for (const criteria of ACHIEVEMENT_CRITERIA) {
+        // Skip achievements that don't match the current scope
+        if (scope === 'global' && criteria.scope === 'ctf') continue;
+        if (scope === 'ctf' && criteria.scope === 'global') continue;
+        
+        let shouldAward = false;
+        
+        if (scope === 'global' && criteria.checkGlobal) {
+            shouldAward = criteria.checkGlobal({
+                userProfile,
+                userRank,
+                totalUsers,
+                globalStats,
+                allCategories
+            });
+        } else if (scope === 'ctf' && criteria.checkCTF) {
+            shouldAward = criteria.checkCTF({
+                userProfile,
+                userRank,
+                totalUsers,
+                ctfStats: globalStats, // In CTF context, this should be ctfStats
+                allCategories,
+                ctfTitle
+            });
+        }
+        
+        if (shouldAward) {
+            // Handle special cases for rank-based achievements with dynamic content
+            if (criteria.id === 'GLOBAL_CHAMPION' || criteria.id === 'CTF_CHAMPION') {
+                achievements.push(getRankAchievement(scope, userRank, ctfTitle));
+            } else if (criteria.id === 'GLOBAL_PODIUM' || criteria.id === 'CTF_PODIUM') {
+                achievements.push(getRankAchievement(scope, userRank, ctfTitle));
+            } else if (criteria.id === 'MAJOR_CONTRIBUTOR') {
+                // Dynamic contribution percentage
+                const solvePercentage = Math.round((userProfile.solveCount / globalStats.totalSolves) * 100);
+                achievements.push(getAchievement(criteria.id, {
+                    description: `${solvePercentage}% of total community solves`
+                }));
+            } else if (criteria.id === 'ACTIVE_PARTICIPANT') {
+                // Dynamic contribution percentage for CTF
+                const solvePercentage = Math.round((userProfile.solveCount / globalStats.totalSolves) * 100);
+                achievements.push(getAchievement(criteria.id, {
+                    description: `${solvePercentage}% of total CTF solves`
+                }));
+            } else {
+                // Standard achievement with possible scope-specific description
+                const achievement = getAchievement(criteria.id);
+                if ((criteria.id === 'ELITE_GLOBAL' || criteria.id === 'ELITE_CTF') && ctfTitle) {
+                    achievement.description = scope === 'global' ? "Top 5% globally" : `Top 5% in ${ctfTitle}`;
+                }
+                if ((criteria.id === 'TOP_10_GLOBAL' || criteria.id === 'TOP_10_CTF') && ctfTitle) {
+                    achievement.description = scope === 'global' ? "Top 10% globally" : `Top 10% in ${ctfTitle}`;
+                }
+                if ((criteria.id === 'TOP_25_GLOBAL' || criteria.id === 'TOP_25_CTF') && ctfTitle) {
+                    achievement.description = scope === 'global' ? "Top 25% globally" : `Top 25% in ${ctfTitle}`;
+                }
+                achievements.push(achievement);
+            }
+        }
     }
     
     return achievements;

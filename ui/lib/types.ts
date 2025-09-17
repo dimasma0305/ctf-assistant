@@ -36,6 +36,7 @@ export interface LeaderboardEntry {
   solveCount: number
   ctfCount: number
   categories: string[]
+  achievements: Achievement[]
   recentSolves: UserSolve[]
   ctfBreakdown: Record<string, Omit<CTFBreakdown, "ctfId">>
 }
@@ -61,12 +62,10 @@ export interface ScoreboardResponse {
   data: LeaderboardEntry[]
 }
 
-// Profile API Types
-export interface Achievement {
-  name: string
-  description: string
-  icon: string
-}
+// Profile API Types - Achievement interface imported from shared module
+import type { Achievement } from '../../shared/achievements'
+
+export type { Achievement }
 
 export interface CategoryStats {
   name: string
@@ -147,7 +146,7 @@ export interface CTFProfileResponse {
   }
   categoryBreakdown: CategoryStats[]
   allSolves: UserSolve[]
-  achievements: Achievement[]
+  achievements: string[]
   performanceComparison: {
     scoreVsAverage: {
       user: number

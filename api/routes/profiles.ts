@@ -148,11 +148,11 @@ router.get("/:id", async (req, res) => {
 });
 
 /**
- * GET /api/ctf/:ctfId/profile/:userId
+ * GET /api/profile/:userId/ctf/:ctfId
  * 
  * Returns CTF-specific user profile
  */
-router.get("/:userId/ctf/:ctfId/", async (req, res) => {
+router.get("/:userId/ctf/:ctfId", async (req, res) => {
     try {
         const { ctfId, userId } = req.params;
         
