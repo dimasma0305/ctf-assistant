@@ -252,8 +252,15 @@ async function calculateCategoryStats(
     allUsers: UserProfile[],
     solveFilter?: (solve: UserSolve) => boolean
 ): Promise<CategoryStat[]> {
+    // Get the User ObjectId from Discord ID first
+    const userDoc = await UserModel.findOne({ discord_id: userProfile.userId }).lean();
+    if (!userDoc) {
+        console.error('User document not found for Discord ID:', userProfile.userId);
+        return [];
+    }
+
     // Get all solves for this user from database to ensure we have complete data
-    const allSolvesQuery: any = { users: userProfile.userId };
+    const allSolvesQuery: any = { users: userDoc._id };
     if (solveFilter) {
         // If there's a CTF filter, apply it
         const sampleSolve = userProfile.recentSolves.find(s => solveFilter(s));
