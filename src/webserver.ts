@@ -271,7 +271,7 @@ function calculateCategoryStats(
             name: category,
             solves: filteredSolves.length,
             totalPoints: categoryPoints,
-            avgPoints: filteredSolves.length > 0 ? Math.round(categoryPoints / filteredSolves.length) : 0,
+            avgPoints: filteredSolves.length > 0 ? Math.round((categoryPoints / filteredSolves.length) * 100) / 100 : 0,
             rankInCategory: categoryRank,
             totalInCategory: categoryParticipants.length,
             percentile: Math.round((1 - (categoryRank - 1) / categoryParticipants.length) * 100)
@@ -890,7 +890,7 @@ app.get("/api/ctf/:ctfId/profile/:userId", async (req, res) => {
                 score: Math.round(userProfile.totalScore * 100) / 100,
                 solveCount: userProfile.solveCount,
                 categoriesCount: userProfile.categories.size,
-                averagePointsPerSolve: Math.round((ctfSolves.reduce((sum, solve) => sum + solve.points, 0) / ctfSolves.length) * 100) / 100,
+                averagePointsPerSolve: ctfSolves.length > 0 ? Math.round((ctfSolves.reduce((sum, solve) => sum + solve.points, 0) / ctfSolves.length) * 100) / 100 : 0,
                 contributionToTotal: Math.round((userProfile.solveCount / ctfStats.totalSolves) * 100 * 100) / 100
             },
             categoryBreakdown: categoryStats,
@@ -1523,7 +1523,7 @@ app.get("/api/profile/:id", async (req, res) => {
                 solveCount: userProfile.solveCount,
                 ctfCount: userProfile.ctfCount,
                 categoriesCount: userProfile.categories.size,
-                averagePointsPerSolve: userProfile.solveCount > 0 ? Math.round((userProfile.recentSolves.reduce((sum, solve) => sum + solve.points, 0) / userProfile.solveCount) * 100) / 100 : 0,
+                averagePointsPerSolve: userProfile.solveCount > 0 ? Math.round((userProfile.totalScore / userProfile.solveCount) * 100) / 100 : 0,
                 contributionToTotal: Math.round((userProfile.solveCount / globalStats.totalSolves) * 100 * 100) / 100
             },
             categoryBreakdown: categoryStats,

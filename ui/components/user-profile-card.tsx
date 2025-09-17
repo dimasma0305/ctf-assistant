@@ -44,7 +44,6 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
     showCTFProfile ? user.user.userId : null,
   )
 
-  const activeProfileData = showCTFProfile && ctfProfileData ? ctfProfileData : profileData
 
   const calculateCategoryBreakdown = (): CategoryStat[] => {
     if (showCTFProfile && ctfProfileData?.categoryBreakdown) {
@@ -70,8 +69,8 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
     })
 
     if (categoryStats.size === 0 && user.categories.length > 0) {
-      const avgSolvesPerCategory = Math.floor(user.solveCount / user.categories.length)
-      const avgPointsPerCategory = Math.floor(user.totalScore / user.categories.length)
+      const avgSolvesPerCategory = user.solveCount / user.categories.length
+      const avgPointsPerCategory = user.totalScore / user.categories.length
 
       return user.categories.map((category, index) => {
         const remainder = index < user.solveCount % user.categories.length ? 1 : 0
@@ -84,18 +83,19 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
         return {
           name: category,
           solves,
-          totalPoints,
-          avgPoints: solves > 0 ? Math.round(totalPoints / solves) : 0,
+          totalPoints: Number(totalPoints.toFixed(2)),
+          avgPoints: solves > 0 ? (totalPoints / solves) : 0,
         }
       })
     }
+
 
     return Array.from(categoryStats.entries())
       .map(([name, stats]) => ({
         name,
         solves: stats.solves,
-        totalPoints: stats.totalPoints,
-        avgPoints: stats.solves > 0 ? Math.round(stats.totalPoints / stats.solves) : 0,
+        totalPoints: Number(stats.totalPoints.toFixed(2)),
+        avgPoints: stats.solves > 0 ? (stats.totalPoints / stats.solves) : 0,
       }))
       .filter((stat) => stat.solves > 0)
   }
@@ -140,7 +140,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
   }
 
   const formatScore = (score: number) => {
-    return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+    return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 2 })
   }
 
   const getCategoryColor = (category: string) => {
@@ -168,8 +168,8 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
     }
   }
 
-  const averageScorePerSolve = user.totalScore / user.solveCount
-  const averageSolvesPerCTF = user.solveCount / user.ctfCount
+  const averageScorePerSolve = user.solveCount > 0 ? user.totalScore / user.solveCount : 0
+  const averageSolvesPerCTF = user.ctfCount > 0 ? user.solveCount / user.ctfCount : 0
 
   const displayRank = showCTFProfile && ctfProfileData ? ctfProfileData.ctfRank : user.rank
   const displayTotalUsers =
@@ -284,7 +284,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
                 <div className="bg-muted/30 rounded-lg p-3 sm:p-4 text-center">
                   <div className="text-lg sm:text-2xl font-bold text-foreground mb-1">
                     {showCTFProfile && ctfProfileData
-                      ? Math.round(ctfProfileData.stats.averagePointsPerSolve)
+                      ? Number(ctfProfileData.stats.averagePointsPerSolve.toFixed(2))
                       : user.categories.length}
                   </div>
                   <div className="text-xs text-muted-foreground">{showCTFProfile ? "Avg Pts" : "Categories"}</div>
@@ -298,7 +298,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
                       <div className="text-sm font-medium text-muted-foreground">Score vs Average</div>
                       <div className="text-2xl font-bold text-primary">
                         {ctfProfileData.performanceComparison.scoreVsAverage.percentageDiff > 0 ? "+" : ""}
-                        {ctfProfileData.performanceComparison.scoreVsAverage.percentageDiff}%
+                        {Number(ctfProfileData.performanceComparison.scoreVsAverage.percentageDiff.toFixed(2))}%
                       </div>
                       <div className="text-sm text-green-600">
                         {ctfProfileData.performanceComparison.scoreVsAverage.percentageDiff > 0
@@ -311,7 +311,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
                   <Card className="p-4">
                     <div className="space-y-2">
                       <div className="text-sm font-medium text-muted-foreground">CTF Percentile</div>
-                      <div className="text-2xl font-bold text-primary">{ctfProfileData.percentile}%</div>
+                      <div className="text-2xl font-bold text-primary">{Number(ctfProfileData.percentile.toFixed(2))}%</div>
                       <div className="text-sm text-green-600">Top {100 - ctfProfileData.percentile}%</div>
                     </div>
                   </Card>
@@ -333,7 +333,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
                   <Card className="p-4">
                     <div className="space-y-2">
                       <div className="text-sm font-medium text-muted-foreground">Avg Solves per CTF</div>
-                      <div className="text-2xl font-bold text-primary">{averageSolvesPerCTF.toFixed(1)}</div>
+                      <div className="text-2xl font-bold text-primary">{averageSolvesPerCTF.toFixed(0)}</div>
                       <div className="text-sm text-green-600">
                         {averageSolvesPerCTF > 5 ? "Consistent performer" : "Growing"}
                       </div>
@@ -367,7 +367,7 @@ export function UserProfileCard({ user, profileData, ctfId, showCTFProfile = fal
                         className="h-2"
                       />
                       <div className="text-sm text-muted-foreground">
-                        Average: {category.avgPoints} points per solve
+                        Average: {category.avgPoints.toFixed(2)} points per solve
                         {showCTFProfile && category.percentile && (
                           <span className="text-primary"> • Top {100 - category.percentile}%</span>
                         )}
