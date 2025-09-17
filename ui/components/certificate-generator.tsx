@@ -31,6 +31,7 @@ interface CertificateGeneratorProps {
 export function CertificateGenerator({ user, certificates }: CertificateGeneratorProps) {
   const [showingCertificate, setShowingCertificate] = useState<CertificateData | null>(null)
   const [showPendingOverlay, setShowPendingOverlay] = useState(true)
+  const displayName = user.displayName || user.username
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -108,7 +109,7 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
     try {
       if (navigator.share) {
         await navigator.share({
-          title: `${user.username}'s TCP1P Certificate`,
+          title: `${displayName}'s TCP1P Certificate`,
           text: `Check out this TCP1P Community achievement certificate!`,
           url: shareUrl,
         })
@@ -160,7 +161,7 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
             </div>
           )}
           <Certificate
-            username={user.username}
+            username={displayName}
             rank={showingCertificate.rank}
             totalParticipants={showingCertificate.totalParticipants}
             score={showingCertificate.score}
