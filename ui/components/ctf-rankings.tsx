@@ -175,11 +175,14 @@ export function CTFRankings() {
           </Card>
         ) : (
           filteredRankings.map((ctf) => (
-            <Card key={ctf.ctf_id}>
-              <CardHeader>
+            <Card
+              key={ctf.ctf_id}
+              className="shadow-lg border-2 border-primary/10 hover:border-primary/20 transition-all duration-200"
+            >
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b border-primary/20">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4 min-w-0 flex-1">
-                    <Avatar className="h-12 w-12 flex-shrink-0">
+                    <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-primary/30 shadow-md">
                       <CachedAvatarImage
                         src={ctf.logo || "/placeholder.svg"}
                         loadingPlaceholder={
@@ -191,7 +194,9 @@ export function CTFRankings() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <CardTitle className="font-[family-name:var(--font-playfair)] truncate">{ctf.title}</CardTitle>
+                      <CardTitle className="font-bold text-primary font-[family-name:var(--font-playfair)] truncate">
+                        {ctf.title}
+                      </CardTitle>
                       <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-2">
                         <span>by {ctf.organizer}</span>
                         <Badge className={`text-xs ${getStatusColor(ctf.schedule.status)} w-fit`}>
@@ -237,10 +242,10 @@ export function CTFRankings() {
                           </TableCell>
                           <TableCell>
                             <div
-                              className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-colors"
+                              className="flex items-center gap-3 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent rounded-md p-2 -m-2 transition-all duration-200 border border-transparent hover:border-primary/20"
                               onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
                             >
-                              <Avatar className="w-8 h-8 flex-shrink-0">
+                              <Avatar className="w-8 h-8 flex-shrink-0 ring-1 ring-primary/20">
                                 <CachedAvatarImage
                                   src={
                                     player.user.avatar ||
@@ -270,7 +275,10 @@ export function CTFRankings() {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Badge variant="secondary" className="font-mono text-foreground text-xs">
+                            <Badge
+                              variant="secondary"
+                              className="font-mono text-foreground text-xs bg-primary/10 border-primary/20"
+                            >
                               {player.solves}
                             </Badge>
                           </TableCell>
@@ -287,7 +295,7 @@ export function CTFRankings() {
 
       {/* CTF-Specific User Profile Modal */}
       <Dialog open={showUserProfile} onOpenChange={setShowUserProfile}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4 shadow-2xl border-2 border-primary/20">
           {profileLoading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
@@ -307,9 +315,9 @@ export function CTFRankings() {
           ) : (
             selectedUser && (
               <>
-                <DialogHeader>
+                <DialogHeader className="pb-4 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <Avatar className="h-16 w-16 flex-shrink-0">
+                    <Avatar className="h-16 w-16 flex-shrink-0 ring-4 ring-primary/30 shadow-lg">
                       <CachedAvatarImage
                         src={
                           selectedUser.user.avatar ||
@@ -324,7 +332,7 @@ export function CTFRankings() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <DialogTitle className="text-xl sm:text-2xl font-[family-name:var(--font-playfair)]">
+                      <DialogTitle className="text-xl sm:text-2xl font-bold text-primary font-[family-name:var(--font-playfair)]">
                         {selectedUser.user.displayName || selectedUser.user.username}
                       </DialogTitle>
                       <DialogDescription className="text-sm sm:text-base flex flex-col sm:flex-row sm:items-center gap-2">
@@ -344,9 +352,9 @@ export function CTFRankings() {
                 <div className="space-y-6">
                   {/* CTF Stats */}
                   <div>
-                    <h4 className="font-semibold mb-3">CTF Performance</h4>
+                    <h4 className="font-semibold mb-3 text-primary">CTF Performance</h4>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                      <Card>
+                      <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
                         <CardContent className="p-4 text-center">
                           <div className="text-xl sm:text-2xl font-bold text-primary">
                             {selectedUser.stats.score.toFixed(1)}
@@ -354,25 +362,25 @@ export function CTFRankings() {
                           <div className="text-xs text-muted-foreground">Total Score</div>
                         </CardContent>
                       </Card>
-                      <Card>
+                      <Card className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 border border-chart-3/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-chart-3">
                             {selectedUser.stats.solveCount}
                           </div>
                           <div className="text-xs text-muted-foreground">Solves</div>
                         </CardContent>
                       </Card>
-                      <Card>
+                      <Card className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 border border-chart-2/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-chart-2">
                             {selectedUser.stats.categoriesCount}
                           </div>
                           <div className="text-xs text-muted-foreground">Categories</div>
                         </CardContent>
                       </Card>
-                      <Card>
+                      <Card className="bg-gradient-to-br from-chart-4/10 to-chart-4/5 border border-chart-4/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-chart-4">
                             {selectedUser.stats.averagePointsPerSolve.toFixed(1)}
                           </div>
                           <div className="text-xs text-muted-foreground">Avg Points</div>
@@ -383,12 +391,12 @@ export function CTFRankings() {
 
                   {/* Category Breakdown */}
                   <div>
-                    <h4 className="font-semibold mb-3">Category Performance</h4>
+                    <h4 className="font-semibold mb-3 text-primary">Category Performance</h4>
                     <div className="space-y-3">
                       {selectedUser.categoryBreakdown.map((category) => (
                         <div
                           key={category.name}
-                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-muted/50 rounded-lg gap-2"
+                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg gap-2 border border-primary/10"
                         >
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 min-w-0 flex-1">
                             <Badge variant="outline" className="capitalize w-fit">
@@ -411,10 +419,13 @@ export function CTFRankings() {
 
                   {/* Achievements */}
                   <div>
-                    <h4 className="font-semibold mb-3">CTF Achievements</h4>
+                    <h4 className="font-semibold mb-3 text-primary">CTF Achievements</h4>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {getAchievements(selectedUser.achievementIds).map((achievement, index) => (
-                        <Card key={`${achievement.id || achievement.name}-${index}`} className="p-4">
+                        <Card
+                          key={`${achievement.id || achievement.name}-${index}`}
+                          className="p-4 border border-primary/10 hover:border-primary/20 transition-colors"
+                        >
                           <div className="flex items-center gap-3">
                             <div className="text-2xl flex-shrink-0">{achievement.icon}</div>
                             <div className="min-w-0 flex-1">

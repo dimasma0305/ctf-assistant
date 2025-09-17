@@ -144,13 +144,13 @@ export function CTFList() {
         {filteredCTFs.map((ctf) => (
           <Card
             key={ctf.ctf_id}
-            className="hover:bg-muted/50 transition-colors cursor-pointer"
+            className="hover:bg-muted/50 transition-all duration-200 cursor-pointer border-2 border-transparent hover:border-primary/20 shadow-lg hover:shadow-xl"
             onClick={() => handleCTFClick(ctf.ctf_id)}
           >
             <CardContent className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
-                  <Avatar className="h-12 w-12 flex-shrink-0">
+                  <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-primary/20 shadow-md">
                     <CachedAvatarImage
                       src={ctf.logo || "/placeholder.svg"}
                       loadingPlaceholder={
@@ -198,7 +198,7 @@ export function CTFList() {
                 </div>
 
                 <div className="text-left sm:text-right w-full sm:w-auto">
-                  <div className="text-sm font-medium text-foreground">
+                  <div className="text-sm font-medium text-primary">
                     {ctf.communityParticipation.uniqueParticipants} players
                   </div>
                   <div className="text-xs text-muted-foreground">{ctf.communityParticipation.totalSolves} solves</div>
@@ -211,7 +211,7 @@ export function CTFList() {
 
       {/* CTF Detail Modal */}
       <Dialog open={!!selectedCTFId} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4 shadow-2xl border-2 border-primary/20">
           {detailLoading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
@@ -227,9 +227,9 @@ export function CTFList() {
           ) : (
             selectedCTFDetails && (
               <>
-                <DialogHeader>
+                <DialogHeader className="pb-4 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <Avatar className="h-16 w-16 flex-shrink-0">
+                    <Avatar className="h-16 w-16 flex-shrink-0 ring-4 ring-primary/30 shadow-lg">
                       <CachedAvatarImage
                         src={selectedCTFDetails.logo || "/placeholder.svg"}
                         loadingPlaceholder={
@@ -241,7 +241,7 @@ export function CTFList() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <DialogTitle className="text-xl sm:text-2xl font-[family-name:var(--font-playfair)]">
+                      <DialogTitle className="text-xl sm:text-2xl font-bold text-primary font-[family-name:var(--font-playfair)]">
                         {selectedCTFDetails.title}
                       </DialogTitle>
                       <DialogDescription className="text-sm sm:text-base">
@@ -256,16 +256,16 @@ export function CTFList() {
                   {/* Description */}
                   {selectedCTFDetails.description && (
                     <div>
-                      <h4 className="font-semibold mb-2">Description</h4>
+                      <h4 className="font-semibold mb-2 text-primary">Description</h4>
                       <p className="text-muted-foreground text-sm">{selectedCTFDetails.description}</p>
                     </div>
                   )}
 
                   {/* Community Stats */}
                   <div>
-                    <h4 className="font-semibold mb-3">Community Participation</h4>
+                    <h4 className="font-semibold mb-3 text-primary">Community Participation</h4>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                      <Card>
+                      <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
                         <CardContent className="p-4 text-center">
                           <div className="text-xl sm:text-2xl font-bold text-primary">
                             {selectedCTFDetails.communityStats.uniqueParticipants}
@@ -273,25 +273,25 @@ export function CTFList() {
                           <div className="text-xs text-muted-foreground">Participants</div>
                         </CardContent>
                       </Card>
-                      <Card>
+                      <Card className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 border border-chart-3/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-chart-3">
                             {selectedCTFDetails.communityStats.totalSolves}
                           </div>
                           <div className="text-xs text-muted-foreground">Total Solves</div>
                         </CardContent>
                       </Card>
-                      <Card>
+                      <Card className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 border border-chart-2/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-chart-2">
                             {selectedCTFDetails.communityStats.challengesSolved}
                           </div>
                           <div className="text-xs text-muted-foreground">Challenges</div>
                         </CardContent>
                       </Card>
-                      <Card>
+                      <Card className="bg-gradient-to-br from-chart-4/10 to-chart-4/5 border border-chart-4/20">
                         <CardContent className="p-4 text-center">
-                          <div className="text-xl sm:text-2xl font-bold text-primary">
+                          <div className="text-xl sm:text-2xl font-bold text-chart-4">
                             {selectedCTFDetails.communityStats.categoriesCovered}
                           </div>
                           <div className="text-xs text-muted-foreground">Categories</div>
@@ -302,7 +302,7 @@ export function CTFList() {
 
                   {/* Categories */}
                   <div>
-                    <h4 className="font-semibold mb-3">Categories</h4>
+                    <h4 className="font-semibold mb-3 text-primary">Categories</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedCTFDetails.communityStats.categories.map((category) => (
                         <Badge key={category} variant="secondary">
@@ -314,21 +314,21 @@ export function CTFList() {
 
                   {/* Top Performers */}
                   <div>
-                    <h4 className="font-semibold mb-3">Top Performers</h4>
+                    <h4 className="font-semibold mb-3 text-primary">Top Performers</h4>
                     <div className="space-y-2">
                       {selectedCTFDetails.leaderboard.map((player) => (
                         <div
                           key={player.user.userId}
-                          className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                          className="flex items-center justify-between p-3 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg border border-primary/10 hover:border-primary/20 transition-colors"
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1">
                             <Badge
                               variant="outline"
-                              className="w-8 h-8 rounded-full flex items-center justify-center p-0 flex-shrink-0"
+                              className="w-8 h-8 rounded-full flex items-center justify-center p-0 flex-shrink-0 border-primary/30 text-primary font-bold"
                             >
                               {player.rank}
                             </Badge>
-                            <span className="font-medium truncate">
+                            <span className="font-medium truncate text-foreground">
                               {player.user.displayName || player.user.username}
                             </span>
                           </div>
@@ -343,7 +343,7 @@ export function CTFList() {
 
                   {/* External Link */}
                   <div className="flex justify-center sm:justify-end">
-                    <Button variant="outline" asChild>
+                    <Button variant="outline" asChild className="bg-transparent border-primary/30 hover:bg-primary/10">
                       <a
                         href={selectedCTFDetails.url}
                         target="_blank"

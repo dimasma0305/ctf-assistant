@@ -145,7 +145,7 @@ export default function Dashboard() {
             <TabsList className="grid w-full grid-cols-3 min-w-[300px] h-12 p-1 bg-muted/50">
               <TabsTrigger
                 value="leaderboard"
-                className="text-xs sm:text-sm h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Trophy className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Global Leaderboard</span>
@@ -153,14 +153,14 @@ export default function Dashboard() {
               </TabsTrigger>
               <TabsTrigger
                 value="ctfs"
-                className="text-xs sm:text-sm h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Target className="w-4 h-4 mr-2" />
                 CTFs
               </TabsTrigger>
               <TabsTrigger
                 value="ctf-rankings"
-                className="text-xs sm:text-sm h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Users className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">CTF Rankings</span>

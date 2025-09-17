@@ -15,15 +15,7 @@ interface CertificateProps {
   issuedDate: string
 }
 
-export function Certificate({
-  username,
-  rank,
-  score,
-  solves,
-  categories,
-  period,
-  issuedDate,
-}: CertificateProps) {
+export function Certificate({ username, rank, score, solves, categories, period, issuedDate }: CertificateProps) {
   const rankColors = {
     1: "bg-certificate-gold text-black border-certificate-gold/50",
     2: "bg-certificate-silver text-black border-certificate-silver/50",
@@ -137,7 +129,7 @@ export function Certificate({
     <div className="w-full max-w-4xl mx-auto bg-background font-sans">
       <div className="w-full relative overflow-hidden">
         <div
-          className="w-[800px] h-[566px] origin-top-left bg-slate-900 p-4 mx-auto"
+          className="w-[800px] h-[566px] origin-top-left bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 mx-auto shadow-2xl"
           style={
             {
               transform: "scale(var(--scale-factor, 1))",
@@ -145,38 +137,39 @@ export function Certificate({
             } as React.CSSProperties
           }
         >
-          {/* Decorative border frame */}
-          <div className="absolute inset-2 border-2 border-primary/30 rounded-lg" />
-          <div className="absolute inset-3 border border-primary/20 rounded-md" />
+          <div className="absolute inset-2 border-2 border-primary/40 rounded-lg shadow-inner" />
+          <div className="absolute inset-3 border border-primary/30 rounded-md" />
+          <div className="absolute inset-4 border border-primary/20 rounded-sm" />
 
-          {/* Subtle background pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="w-full h-full bg-[radial-gradient(circle_at_30%_20%,var(--primary)_0%,transparent_50%),radial-gradient(circle_at_70%_80%,var(--primary)_0%,transparent_50%)]" />
+          <div className="absolute inset-0 opacity-15">
+            <div className="w-full h-full bg-[radial-gradient(circle_at_30%_20%,var(--primary)_0%,transparent_50%),radial-gradient(circle_at_70%_80%,var(--chart-2)_0%,transparent_50%),radial-gradient(circle_at_50%_50%,var(--chart-3)_0%,transparent_70%)]" />
           </div>
 
-          <div className="bg-slate-800/90 border border-primary/40 rounded-lg p-6 h-full flex flex-col relative shadow-2xl backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-slate-800/95 via-slate-700/90 to-slate-800/95 border-2 border-primary/50 rounded-lg p-6 h-full flex flex-col relative shadow-2xl backdrop-blur-sm">
             {/* Header Section */}
             <div className="flex flex-col items-center mb-4">
-              {/* TCP1P Logo with coral glow */}
               <div className="mb-3 relative">
-                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
+                <div className="absolute inset-0 bg-primary/30 blur-xl rounded-full scale-150" />
+                <div className="absolute inset-0 bg-chart-2/20 blur-2xl rounded-full scale-125" />
                 <Image
                   src="/tcp1p-main-logo.png"
                   alt="TCP1P Logo"
                   width={80}
                   height={40}
-                  className="object-contain relative z-10"
+                  className="object-contain relative z-10 drop-shadow-2xl"
                 />
               </div>
 
-              <h1 className="text-2xl text-primary font-bold mb-1 tracking-wide text-center">CERTIFICATE</h1>
-              <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mb-1" />
+              <h1 className="text-2xl bg-gradient-to-r from-primary via-chart-2 to-primary bg-clip-text text-transparent font-bold mb-1 tracking-wide text-center">
+                CERTIFICATE
+              </h1>
+              <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mb-1" />
               <p className="text-sm text-slate-300 font-medium tracking-wider uppercase text-center">of Achievement</p>
             </div>
 
             <div className="flex items-center justify-center mb-4 gap-3">
-              <div className={`border rounded-md px-4 py-2 shadow-lg ${getRankColor(rank)}`}>
-                <span className="text-sm font-semibold tracking-wide text-center block">
+              <div className={`border-2 rounded-xl px-6 py-3 shadow-xl backdrop-blur-sm ${getRankColor(rank)}`}>
+                <span className="text-sm font-bold tracking-wide text-center block">
                   {getRankDisplay()} - {getCertificatePurpose()}
                 </span>
               </div>
@@ -189,8 +182,9 @@ export function Certificate({
               </p>
 
               <div className="relative mb-3">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 blur-sm rounded-md" />
-                <div className="relative bg-slate-700/80 border border-primary/40 rounded-md px-6 py-3 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/40 to-primary/30 blur-lg rounded-xl" />
+                <div className="absolute inset-0 bg-gradient-to-r from-chart-2/20 via-chart-2/30 to-chart-2/20 blur-sm rounded-xl" />
+                <div className="relative bg-gradient-to-r from-slate-700/90 via-slate-600/80 to-slate-700/90 border-2 border-primary/50 rounded-xl px-8 py-4 backdrop-blur-sm shadow-2xl">
                   <span className="text-xl font-bold text-white text-center tracking-wide drop-shadow-lg block">
                     {username}
                   </span>
@@ -198,27 +192,28 @@ export function Certificate({
               </div>
             </div>
 
-            {/* Statistics Section */}
-            <div className="flex flex-row justify-center items-center gap-4 mb-4">
+            <div className="flex flex-row justify-center items-center gap-6 mb-4">
               {/* Total Score */}
-              <div className="bg-slate-700/60 border border-primary/30 rounded-md px-3 py-2 flex flex-col items-center min-w-[80px] shadow-lg backdrop-blur-sm">
-                <span className={`text-lg font-bold mb-1 ${getStatColor(rank)}`}>{score.toLocaleString()}</span>
+              <div className="bg-gradient-to-br from-slate-700/80 via-slate-600/70 to-slate-700/80 border-2 border-primary/40 rounded-xl px-4 py-3 flex flex-col items-center min-w-[90px] shadow-xl backdrop-blur-sm">
+                <span className={`text-lg font-bold mb-1 drop-shadow-lg ${getStatColor(rank)}`}>
+                  {score.toLocaleString()}
+                </span>
                 <span className="text-xs text-slate-300 text-center uppercase tracking-wider font-medium">
                   Total Score
                 </span>
               </div>
 
               {/* Challenges Solved */}
-              <div className="bg-slate-700/60 border border-primary/30 rounded-md px-3 py-2 flex flex-col items-center min-w-[80px] shadow-lg backdrop-blur-sm">
-                <span className={`text-lg font-bold mb-1 ${getStatColor(rank)}`}>{solves}</span>
+              <div className="bg-gradient-to-br from-slate-700/80 via-slate-600/70 to-slate-700/80 border-2 border-primary/40 rounded-xl px-4 py-3 flex flex-col items-center min-w-[90px] shadow-xl backdrop-blur-sm">
+                <span className={`text-lg font-bold mb-1 drop-shadow-lg ${getStatColor(rank)}`}>{solves}</span>
                 <span className="text-xs text-slate-300 text-center uppercase tracking-wider font-medium">
                   Challenges
                 </span>
               </div>
 
               {/* Categories */}
-              <div className="bg-slate-700/60 border border-primary/30 rounded-md px-3 py-2 flex flex-col items-center min-w-[80px] shadow-lg backdrop-blur-sm">
-                <span className={`text-lg font-bold mb-1 ${getStatColor(rank)}`}>{categories}</span>
+              <div className="bg-gradient-to-br from-slate-700/80 via-slate-600/70 to-slate-700/80 border-2 border-primary/40 rounded-xl px-4 py-3 flex flex-col items-center min-w-[90px] shadow-xl backdrop-blur-sm">
+                <span className={`text-lg font-bold mb-1 drop-shadow-lg ${getStatColor(rank)}`}>{categories}</span>
                 <span className="text-xs text-slate-300 text-center uppercase tracking-wider font-medium">
                   Categories
                 </span>
@@ -233,8 +228,7 @@ export function Certificate({
               </p>
             </div>
 
-            {/* Footer */}
-            <div className="mt-auto pt-3 border-t border-primary/30 flex flex-row justify-between items-center">
+            <div className="mt-auto pt-4 border-t-2 border-primary/40 flex flex-row justify-between items-center">
               {/* Issue Date */}
               <div className="flex flex-col items-start">
                 <span className="text-xs text-slate-400 mb-1 uppercase tracking-wide font-medium">
@@ -243,20 +237,19 @@ export function Certificate({
                 <span className="text-sm text-white font-semibold">{getIssuedDate().toLocaleDateString()}</span>
               </div>
 
-              {/* TCP1P Branding */}
               <div className="flex flex-row items-center">
-                <div className="relative mr-2">
-                  <div className="absolute inset-0 bg-primary/20 blur-sm rounded-sm" />
+                <div className="relative mr-3">
+                  <div className="absolute inset-0 bg-primary/30 blur-md rounded-lg" />
                   <Image
                     src="/tcp1p-square-logo.jpeg"
                     alt="TCP1P Square Logo"
-                    width={24}
-                    height={24}
-                    className="rounded-sm border border-primary/30 relative z-10"
+                    width={28}
+                    height={28}
+                    className="rounded-lg border-2 border-primary/40 relative z-10 shadow-lg"
                   />
                 </div>
                 <div className="flex flex-col items-start">
-                  <span className="text-sm text-white font-semibold tracking-wide">TCP1P Community Platform</span>
+                  <span className="text-sm text-white font-bold tracking-wide">TCP1P Community Platform</span>
                   <span className="text-xs text-slate-300 font-medium">TCP1P Community Leaderboard</span>
                 </div>
               </div>
