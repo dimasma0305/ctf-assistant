@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { calculatePercentile, getAchievements } from "@/lib/utils"
 
 import type { LeaderboardEntry, UserProfileResponse, Achievement } from "@/lib/types"
-import { ACHIEVEMENTS, getAchievement, getRankAchievement, ACHIEVEMENT_CRITERIA } from "../../shared/achievements"
+import { ACHIEVEMENTS, getAchievement, getRankAchievement, ACHIEVEMENT_CRITERIA } from "../lib/achievements"
 
 interface CategoryStat {
   name: string

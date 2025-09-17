@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getCachedUserScores, getAvailableTimeRanges } from '../services/dataService';
-import { calculateGlobalStats, generateAchievements } from '../utils/statistics';
+import { calculateGlobalStats, generateAchievements as generateAchievementsIDs } from '../utils/statistics';
 import { formatErrorResponse, validatePaginationParams, filterUsersBySearch } from '../utils/common';
 import { UserSolve } from '../types';
 
@@ -141,7 +141,7 @@ router.get("/", async (req, res) => {
             const scope = isGlobal ? 'global' : 'ctf';
             
             // Generate achievements for this user
-            const userAchievements = generateAchievements(
+            const userAchievementsIDs = generateAchievementsIDs(
                 entry,
                 userRank,
                 totalUsers,
@@ -163,7 +163,7 @@ router.get("/", async (req, res) => {
                 solveCount: entry.solveCount,
                 ctfCount: entry.ctfCount,
                 categories: Array.from(entry.categories),
-                achievements: userAchievements, // Add achievements to scoreboard response
+                achievements: userAchievementsIDs,
                 recentSolves: entry.recentSolves.map((solve: UserSolve) => ({
                     ctf_id: solve.ctf_id,
                     challenge: solve.challenge,

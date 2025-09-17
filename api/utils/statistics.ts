@@ -12,8 +12,7 @@ import {
     ACHIEVEMENT_CRITERIA, 
     getAchievement, 
     getRankAchievement,
-    type Achievement 
-} from '../../shared/achievements';
+} from '../../ui/lib/achievements';
 
 /**
  * Statistics and Calculation Utilities
@@ -192,8 +191,8 @@ export function generateAchievements(
     allCategories: Set<string>,
     scope: 'global' | 'ctf' = 'global',
     ctfTitle?: string
-): Achievement[] {
-    const achievements: Achievement[] = [];
+): string[] {
+    const achievementsIDs: string[] = [];
     
     // Check all achievement criteria
     for (const criteria of ACHIEVEMENT_CRITERIA) {
@@ -221,41 +220,10 @@ export function generateAchievements(
                 ctfTitle
             });
         }
-        
         if (shouldAward) {
-            // Handle special cases for rank-based achievements with dynamic content
-            if (criteria.id === 'GLOBAL_CHAMPION' || criteria.id === 'CTF_CHAMPION') {
-                achievements.push(getRankAchievement(scope, userRank, ctfTitle));
-            } else if (criteria.id === 'GLOBAL_PODIUM' || criteria.id === 'CTF_PODIUM') {
-                achievements.push(getRankAchievement(scope, userRank, ctfTitle));
-            } else if (criteria.id === 'MAJOR_CONTRIBUTOR') {
-                // Dynamic contribution percentage
-                const solvePercentage = Math.round((userProfile.solveCount / globalStats.totalSolves) * 100);
-                achievements.push(getAchievement(criteria.id, {
-                    description: `${solvePercentage}% of total community solves`
-                }));
-            } else if (criteria.id === 'ACTIVE_PARTICIPANT') {
-                // Dynamic contribution percentage for CTF
-                const solvePercentage = Math.round((userProfile.solveCount / globalStats.totalSolves) * 100);
-                achievements.push(getAchievement(criteria.id, {
-                    description: `${solvePercentage}% of total CTF solves`
-                }));
-            } else {
-                // Standard achievement with possible scope-specific description
-                const achievement = getAchievement(criteria.id);
-                if ((criteria.id === 'ELITE_GLOBAL' || criteria.id === 'ELITE_CTF') && ctfTitle) {
-                    achievement.description = scope === 'global' ? "Top 5% globally" : `Top 5% in ${ctfTitle}`;
-                }
-                if ((criteria.id === 'TOP_10_GLOBAL' || criteria.id === 'TOP_10_CTF') && ctfTitle) {
-                    achievement.description = scope === 'global' ? "Top 10% globally" : `Top 10% in ${ctfTitle}`;
-                }
-                if ((criteria.id === 'TOP_25_GLOBAL' || criteria.id === 'TOP_25_CTF') && ctfTitle) {
-                    achievement.description = scope === 'global' ? "Top 25% globally" : `Top 25% in ${ctfTitle}`;
-                }
-                achievements.push(achievement);
-            }
+            achievementsIDs.push(criteria.id);
         }
     }
     
-    return achievements;
+    return achievementsIDs;
 }

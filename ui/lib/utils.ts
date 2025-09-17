@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Achievement, getAchievement } from "../../shared/achievements"
+import { Achievement, getAchievement } from "./achievements"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

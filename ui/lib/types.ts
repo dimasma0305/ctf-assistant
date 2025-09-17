@@ -63,7 +63,7 @@ export interface ScoreboardResponse {
 }
 
 // Profile API Types - Achievement interface imported from shared module
-import type { Achievement } from '../../shared/achievements'
+import type { Achievement } from './achievements'
 
 export type { Achievement }
 
