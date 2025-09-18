@@ -1,16 +1,22 @@
 /**
- * Shared Achievement Definitions
+ * Shared Achievement Definitions - Optimized for Performance
  * 
  * This file defines all possible achievements that can be earned by users.
  * It's shared between the API and UI to ensure consistency.
+ * 
+ * Performance optimizations:
+ * - Uses Map data structures for O(1) lookups
+ * - Pre-computed flattened hierarchies
+ * - Cached expensive computations
+ * - Frozen objects to prevent mutations
  */
 
 export interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: 'ranking' | 'participation' | 'skill' | 'contribution';
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly icon: string;
+  readonly category: 'ranking' | 'participation' | 'skill' | 'contribution';
 }
 
 export interface GlobalCheckParams {
@@ -899,20 +905,371 @@ export const ACHIEVEMENT_CRITERIA: AchievementCriteria[] = [
   }
 ];
 
+
 /**
- * Helper function to get achievement by ID with dynamic properties
+ * Achievement Hierarchies - Higher tier achievements unlock lower tier ones
+ * Simplified: Only direct parent-child relationships defined.
+ * Transitive relationships are automatically computed by the flattening algorithm.
+ */
+export const ACHIEVEMENT_HIERARCHIES: Record<string, string[]> = {
+  // Global ranking hierarchy (Champion → Podium → Elite → Top 10% → Top 25% → Top 50%)
+  GLOBAL_CHAMPION: ["GLOBAL_PODIUM"],
+  GLOBAL_PODIUM: ["ELITE_GLOBAL"],
+  ELITE_GLOBAL: ["TOP_10_GLOBAL"],
+  TOP_10_GLOBAL: ["TOP_25_GLOBAL"],
+  TOP_25_GLOBAL: ["TOP_50_GLOBAL"],
+
+  // CTF ranking hierarchy (Champion → Podium → Elite → Top 10% → Top 25% → Top 50%)
+  CTF_CHAMPION: ["CTF_PODIUM"],
+  CTF_PODIUM: ["ELITE_CTF"],
+  ELITE_CTF: ["TOP_10_CTF"],
+  TOP_10_CTF: ["TOP_25_CTF"],
+  TOP_25_CTF: ["TOP_50_CTF"],
+
+  // Participation hierarchy (solve count)
+  // 500+ → 250+ → 100+ → 50+ → 25+ → 20+ → 10+ → 5+ → 1+
+  LEGENDARY: ["UNSTOPPABLE"],
+  UNSTOPPABLE: ["CENTURY_CLUB"],
+  CENTURY_CLUB: ["VETERAN_SOLVER"],
+  VETERAN_SOLVER: ["DEDICATED"],
+  DEDICATED: ["ACTIVE_SOLVER"],
+  ACTIVE_SOLVER: ["CTF_SOLVER"],
+  CTF_SOLVER: ["GETTING_STARTED"],
+  GETTING_STARTED: ["FIRST_STEPS"],
+
+  // CTF participation hierarchy (25+ → 10+ → 5+ → 2+)
+  CTF_VETERAN: ["CTF_EXPLORER"],
+  CTF_EXPLORER: ["MULTI_CTF_PLAYER"],
+  MULTI_CTF_PLAYER: ["CTF_NEWCOMER"],
+
+  // Skill hierarchy
+  POLYMATH: ["CATEGORY_MASTER"],
+  CATEGORY_MASTER: ["VERSATILE"],
+  SERIAL_SOLVER: ["FIRST_BLOOD"],
+
+  // Contribution hierarchy
+  VETERAN_MEMBER: ["LONG_HAULER"],
+  COLLABORATIVE: ["TEAM_SOLVER"],
+  MENTOR: ["TEAM_SOLVER"],
+};
+
+// ================================
+// PERFORMANCE OPTIMIZATIONS
+// ================================
+
+/**
+ * Optimized Maps for O(1) lookups
+ */
+export const ACHIEVEMENTS_MAP = new Map<string, Readonly<Achievement>>(
+  Object.entries(ACHIEVEMENTS).map(([key, achievement]) => [key, Object.freeze(achievement)])
+);
+
+export const ACHIEVEMENT_CRITERIA_MAP = new Map<string, Readonly<AchievementCriteria>>(
+  ACHIEVEMENT_CRITERIA.map(criteria => [criteria.id, Object.freeze(criteria)])
+);
+
+/**
+ * Pre-computed flattened hierarchies for efficient lookup
+ * Maps each achievement to ALL achievements it unlocks (including nested ones)
+ */
+const FLATTENED_HIERARCHIES = new Map<string, Set<string>>();
+
+// Pre-compute flattened hierarchies
+const computeFlattenedHierarchies = () => {
+  const computeAllDescendants = (achievementId: string, visited = new Set<string>()): Set<string> => {
+    if (visited.has(achievementId)) return new Set(); // Prevent cycles
+    visited.add(achievementId);
+    
+    const allDescendants = new Set<string>();
+    const directDescendants = ACHIEVEMENT_HIERARCHIES[achievementId];
+    
+    if (directDescendants) {
+      for (const descendant of directDescendants) {
+        allDescendants.add(descendant);
+        const nestedDescendants = computeAllDescendants(descendant, new Set(visited));
+        nestedDescendants.forEach(nested => allDescendants.add(nested));
+      }
+    }
+    
+    return allDescendants;
+  };
+
+  for (const achievementId of Object.keys(ACHIEVEMENT_HIERARCHIES)) {
+    FLATTENED_HIERARCHIES.set(achievementId, computeAllDescendants(achievementId));
+  }
+};
+
+// Initialize flattened hierarchies
+computeFlattenedHierarchies();
+
+/**
+ * Achievement categories grouped by type for efficient filtering
+ */
+export const ACHIEVEMENTS_BY_CATEGORY = new Map<string, Set<string>>(
+  ['ranking', 'participation', 'skill', 'contribution'].map(category => [
+    category,
+    new Set(Object.entries(ACHIEVEMENTS)
+      .filter(([, achievement]) => achievement.category === category)
+      .map(([id]) => id))
+  ])
+);
+
+/**
+ * Cache for expensive computations
+ */
+const computationCache = new Map<string, any>();
+
+/**
+ * Optimized helper function to get achievement by ID with dynamic properties
+ * Uses cached Map lookups for better performance
  */
 export function getAchievement(id: string, overrides: Partial<Achievement> = {}): Achievement {
-  const baseAchievement = ACHIEVEMENTS[id];
+  const baseAchievement = ACHIEVEMENTS_MAP.get(id);
   if (!baseAchievement) {
     throw new Error(`Achievement with ID '${id}' not found`);
   }
   
-  return {
-    ...baseAchievement,
-    ...overrides
-  };
+  // If no overrides, return the frozen cached object directly
+  if (Object.keys(overrides).length === 0) {
+    return baseAchievement;
+  }
+  
+  // Create cache key for this specific override combination
+  const overrideKey = `${id}:${JSON.stringify(overrides)}`;
+  let cachedResult = computationCache.get(overrideKey);
+  
+  if (!cachedResult) {
+    cachedResult = Object.freeze({
+      ...baseAchievement,
+      ...overrides
+    });
+    computationCache.set(overrideKey, cachedResult);
+  }
+  
+  return cachedResult;
 }
+
+/**
+ * Bulk achievement getter - more efficient for multiple lookups
+ */
+export function getAchievements(ids: string[]): Achievement[] {
+  return ids.map(id => {
+    const achievement = ACHIEVEMENTS_MAP.get(id);
+    if (!achievement) {
+      throw new Error(`Achievement with ID '${id}' not found`);
+    }
+    return achievement;
+  });
+}
+
+/**
+ * Get achievements by category efficiently
+ */
+export function getAchievementsByCategory(category: Achievement['category']): Achievement[] {
+  const achievementIds = ACHIEVEMENTS_BY_CATEGORY.get(category);
+  if (!achievementIds) {
+    return [];
+  }
+  return Array.from(achievementIds).map(id => ACHIEVEMENTS_MAP.get(id)!);
+}
+
+
+/**
+ * Optimized function to get unlocked achievements with hierarchy
+ * Uses pre-computed flattened hierarchies for O(1) lookup per achievement
+ * Previously O(n*m) where n=achievements, m=avg hierarchy depth. Now O(n).
+ */
+export function getUnlockedAchievementsWithHierarchy(achievementIds: string[]): Set<string> {
+  // Create cache key for this specific combination
+  const cacheKey = `hierarchy:${achievementIds.sort().join(',')}`;
+  let cachedResult = computationCache.get(cacheKey);
+  
+  if (cachedResult) {
+    return new Set(cachedResult); // Return a new Set to prevent mutations
+  }
+
+  const unlockedSet = new Set(achievementIds);
+
+  // Use pre-computed flattened hierarchies for instant lookup
+  for (const achievementId of achievementIds) {
+    const allDescendants = FLATTENED_HIERARCHIES.get(achievementId);
+    if (allDescendants) {
+      allDescendants.forEach(descendant => unlockedSet.add(descendant));
+    }
+  }
+
+  // Cache the result (convert Set to Array for JSON serialization)
+  const resultArray = Array.from(unlockedSet);
+  computationCache.set(cacheKey, resultArray);
+
+  return unlockedSet;
+}
+
+/**
+ * Fast check if an achievement would be unlocked given a set of earned achievements
+ */
+export function isAchievementUnlocked(achievementId: string, earnedAchievements: Set<string>): boolean {
+  // Direct unlock
+  if (earnedAchievements.has(achievementId)) {
+    return true;
+  }
+
+  // Check if any earned achievement unlocks this one via hierarchy
+  for (const earnedId of earnedAchievements) {
+    const descendants = FLATTENED_HIERARCHIES.get(earnedId);
+    if (descendants && descendants.has(achievementId)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Get all achievements that would be unlocked by earning a specific achievement
+ */
+export function getAchievementsUnlockedBy(achievementId: string): Set<string> {
+  const result = new Set([achievementId]); // Include the achievement itself
+  const descendants = FLATTENED_HIERARCHIES.get(achievementId);
+  if (descendants) {
+    descendants.forEach(desc => result.add(desc));
+  }
+  return result;
+}
+
+// ================================
+// BULK OPERATIONS & UTILITIES
+// ================================
+
+/**
+ * Bulk check achievements against criteria - highly optimized
+ */
+export function checkBulkAchievements(
+  params: GlobalCheckParams | CTFCheckParams,
+  scope: 'global' | 'ctf' | 'both' = 'both'
+): string[] {
+  const unlockedAchievements: string[] = [];
+  
+  for (const [criteriaId, criteria] of ACHIEVEMENT_CRITERIA_MAP) {
+    if (scope !== 'both' && criteria.scope !== scope && criteria.scope !== 'both') {
+      continue;
+    }
+
+    let isUnlocked = false;
+    
+    if (criteria.checkGlobal && ('userProfile' in params)) {
+      isUnlocked = criteria.checkGlobal(params as GlobalCheckParams);
+    }
+    
+    if (!isUnlocked && criteria.checkCTF && ('ctfStats' in params)) {
+      isUnlocked = criteria.checkCTF(params as CTFCheckParams);
+    }
+
+    if (isUnlocked) {
+      unlockedAchievements.push(criteriaId);
+    }
+  }
+
+  return unlockedAchievements;
+}
+
+/**
+ * Get achievement statistics efficiently
+ */
+export function getAchievementStats(): {
+  total: number;
+  byCategory: Record<string, number>;
+  withHierarchies: number;
+} {
+  const cacheKey = 'achievement_stats';
+  let cachedStats = computationCache.get(cacheKey);
+  
+  if (!cachedStats) {
+    cachedStats = {
+      total: ACHIEVEMENTS_MAP.size,
+      byCategory: {
+        ranking: ACHIEVEMENTS_BY_CATEGORY.get('ranking')?.size || 0,
+        participation: ACHIEVEMENTS_BY_CATEGORY.get('participation')?.size || 0,
+        skill: ACHIEVEMENTS_BY_CATEGORY.get('skill')?.size || 0,
+        contribution: ACHIEVEMENTS_BY_CATEGORY.get('contribution')?.size || 0,
+      },
+      withHierarchies: FLATTENED_HIERARCHIES.size,
+    };
+    computationCache.set(cacheKey, cachedStats);
+  }
+  
+  return cachedStats;
+}
+
+/**
+ * Filter achievements by multiple criteria efficiently
+ */
+export function filterAchievements(filters: {
+  category?: Achievement['category'];
+  ids?: string[];
+  hasHierarchy?: boolean;
+}): Achievement[] {
+  let achievementIds: Set<string>;
+
+  // Start with the most restrictive filter
+  if (filters.ids) {
+    achievementIds = new Set(filters.ids);
+  } else if (filters.category) {
+    achievementIds = new Set(ACHIEVEMENTS_BY_CATEGORY.get(filters.category) || []);
+  } else {
+    achievementIds = new Set(ACHIEVEMENTS_MAP.keys());
+  }
+
+  // Apply additional filters
+  if (filters.category && !filters.ids) {
+    const categoryIds = ACHIEVEMENTS_BY_CATEGORY.get(filters.category) || new Set();
+    achievementIds = new Set([...achievementIds].filter(id => categoryIds.has(id)));
+  }
+
+  if (filters.hasHierarchy !== undefined) {
+    achievementIds = new Set([...achievementIds].filter(id => 
+      FLATTENED_HIERARCHIES.has(id) === filters.hasHierarchy
+    ));
+  }
+
+  // Convert to Achievement objects
+  return Array.from(achievementIds)
+    .map(id => ACHIEVEMENTS_MAP.get(id)!)
+    .filter(Boolean);
+}
+
+/**
+ * Cache management utilities
+ */
+export const cacheUtils = {
+  /**
+   * Clear all caches
+   */
+  clearAll(): void {
+    computationCache.clear();
+  },
+
+  /**
+   * Get cache stats
+   */
+  getStats(): { size: number; keys: string[] } {
+    return {
+      size: computationCache.size,
+      keys: Array.from(computationCache.keys())
+    };
+  },
+
+  /**
+   * Clear specific cache entries by pattern
+   */
+  clearByPattern(pattern: RegExp): void {
+    for (const [key] of computationCache) {
+      if (pattern.test(key)) {
+        computationCache.delete(key);
+      }
+    }
+  }
+};
 
 /**
  * Helper function to get dynamic rank-specific achievements

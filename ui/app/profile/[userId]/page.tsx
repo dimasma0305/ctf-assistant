@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Trophy, Star, Users, Clock, Award, Target, Zap, TrendingUp, Crown, Lock } from "lucide-react"
 import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/utils"
 import { CertificateGenerator } from "@/components/certificate-generator"
-import { ACHIEVEMENTS } from "@/lib/achievements"
+import { ACHIEVEMENTS, getUnlockedAchievementsWithHierarchy } from "@/lib/achievements"
 
 import Link from "next/link"
 import { useUserProfile } from "@/hooks/useAPI"
@@ -21,78 +21,6 @@ export default function UserProfilePage() {
 
   const { data: profileData, loading, error } = useUserProfile(userId)
 
-  const getUnlockedAchievementsWithHierarchy = (achievementIds: string[]) => {
-    const unlockedSet = new Set(achievementIds)
-
-    // Define achievement hierarchies (higher tier -> lower tiers)
-    const hierarchies = {
-      // Global ranking hierarchy
-      GLOBAL_CHAMPION: ["GLOBAL_PODIUM", "ELITE_GLOBAL", "TOP_10_GLOBAL", "TOP_25_GLOBAL", "TOP_50_GLOBAL"],
-      GLOBAL_PODIUM: ["ELITE_GLOBAL", "TOP_10_GLOBAL", "TOP_25_GLOBAL", "TOP_50_GLOBAL"],
-      ELITE_GLOBAL: ["TOP_10_GLOBAL", "TOP_25_GLOBAL", "TOP_50_GLOBAL"],
-      TOP_10_GLOBAL: ["TOP_25_GLOBAL", "TOP_50_GLOBAL"],
-      TOP_25_GLOBAL: ["TOP_50_GLOBAL"],
-
-      // CTF ranking hierarchy
-      CTF_CHAMPION: ["CTF_PODIUM", "ELITE_CTF", "TOP_10_CTF", "TOP_25_CTF", "TOP_50_CTF"],
-      CTF_PODIUM: ["ELITE_CTF", "TOP_10_CTF", "TOP_25_CTF", "TOP_50_CTF"],
-      ELITE_CTF: ["TOP_10_CTF", "TOP_25_CTF", "TOP_50_CTF"],
-      TOP_10_CTF: ["TOP_25_CTF", "TOP_50_CTF"],
-      TOP_25_CTF: ["TOP_50_CTF"],
-
-      // Participation hierarchy (solve count)
-      LEGENDARY: [
-        "UNSTOPPABLE",
-        "CENTURY_CLUB",
-        "VETERAN_SOLVER",
-        "DEDICATED",
-        "ACTIVE_SOLVER",
-        "CTF_SOLVER",
-        "GETTING_STARTED",
-        "FIRST_STEPS",
-      ],
-      UNSTOPPABLE: [
-        "CENTURY_CLUB",
-        "VETERAN_SOLVER",
-        "DEDICATED",
-        "ACTIVE_SOLVER",
-        "CTF_SOLVER",
-        "GETTING_STARTED",
-        "FIRST_STEPS",
-      ],
-      CENTURY_CLUB: ["VETERAN_SOLVER", "DEDICATED", "ACTIVE_SOLVER", "CTF_SOLVER", "GETTING_STARTED", "FIRST_STEPS"],
-      VETERAN_SOLVER: ["DEDICATED", "ACTIVE_SOLVER", "CTF_SOLVER", "GETTING_STARTED", "FIRST_STEPS"],
-      DEDICATED: ["ACTIVE_SOLVER", "CTF_SOLVER", "GETTING_STARTED", "FIRST_STEPS"],
-      ACTIVE_SOLVER: ["CTF_SOLVER", "GETTING_STARTED", "FIRST_STEPS"],
-      CTF_SOLVER: ["GETTING_STARTED", "FIRST_STEPS"],
-      GETTING_STARTED: ["FIRST_STEPS"],
-
-      // CTF participation hierarchy
-      CTF_VETERAN: ["CTF_EXPLORER", "MULTI_CTF_PLAYER", "CTF_NEWCOMER"],
-      CTF_EXPLORER: ["MULTI_CTF_PLAYER", "CTF_NEWCOMER"],
-      MULTI_CTF_PLAYER: ["CTF_NEWCOMER"],
-
-      // Skill hierarchy
-      POLYMATH: ["CATEGORY_MASTER", "VERSATILE"],
-      CATEGORY_MASTER: ["VERSATILE"],
-      SERIAL_SOLVER: ["FIRST_BLOOD"],
-
-      // Contribution hierarchy
-      VETERAN_MEMBER: ["LONG_HAULER"],
-      COLLABORATIVE: ["TEAM_SOLVER"],
-      MENTOR: ["TEAM_SOLVER"],
-    }
-
-    // Auto-unlock lower tier achievements
-    for (const achievementId of achievementIds) {
-      if (hierarchies[achievementId as keyof typeof hierarchies]) {
-        const lowerTiers = hierarchies[achievementId as keyof typeof hierarchies]
-        lowerTiers.forEach((lowerId) => unlockedSet.add(lowerId))
-      }
-    }
-
-    return unlockedSet
-  }
 
   const formatScore = (score: number) => {
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
