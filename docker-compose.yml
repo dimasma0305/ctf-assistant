@@ -37,7 +37,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ui.rule=Host(`assistant.dimasc.tf`)"
+      - "traefik.http.routers.ui.rule=Host(`scoring.1pc.tf`)"
       - "traefik.http.routers.ui.entrypoints=websecure"
       - "traefik.http.routers.ui.service=ui"
       - "traefik.http.services.ui.loadbalancer.server.port=3000"
