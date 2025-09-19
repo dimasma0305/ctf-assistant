@@ -7,14 +7,12 @@ services:
     networks:
       internal:
       traefik:
-    env_file:
-      - stack.env
     restart: always
     environment:
       - MONGO_URI=mongodb://root:example@mongo/
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ctf-assistant.rule=Host(`api.assistant.dimasc.tf`)"
+      - "traefik.http.routers.ctf-assistant.rule=Host(`api.assistant.1pc.tf`)"
       - "traefik.http.routers.ctf-assistant.entrypoints=websecure"
       - "traefik.http.routers.ctf-assistant.service=ctf-assistant"
       - "traefik.http.services.ctf-assistant.loadbalancer.server.port=3000"
@@ -30,7 +28,7 @@ services:
       context: .
       dockerfile: Dockerfile.ui
       args:
-        NEXT_PUBLIC_API_BASE_URL: https://api.assistant.dimasc.tf
+        NEXT_PUBLIC_API_BASE_URL: https://api.assistant.1pc.tf
     networks:
       internal:
       traefik:
