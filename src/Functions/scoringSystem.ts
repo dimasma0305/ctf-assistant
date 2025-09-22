@@ -1,4 +1,4 @@
-import { solveModel, CTFCacheModel, ChallengeModel } from '../Database/connect';
+import { solveModel, ChallengeModel } from '../Database/connect';
 import { infoEvent } from './ctftime-v2';
 
 /**
