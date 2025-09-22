@@ -1,69 +1,169 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Window, useWindow } from "@/components/ui/window"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Trophy, Medal, Award, Users, Target, Calendar, ExternalLink } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Trophy,
+  Medal,
+  Award,
+  Users,
+  Target,
+  Calendar,
+  ExternalLink,
+  Clock,
+  TrendingUp,
+  BarChart3,
+  CheckCircle2,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getCTFRankings, getCTFProfile } from "@/lib/actions"
 import { getAchievements } from "@/lib/utils"
-import type { CTFRanking, CTFProfileResponse } from "@/lib/types"
+import type { CTFRanking, CTFProfileResponse, CTFRankingsResponse } from "@/lib/types"
 
 export function CTFRankings() {
   const [ctfRankings, setCTFRankings] = useState<CTFRanking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedCTF, setSelectedCTF] = useState<string>("all")
-  const [selectedUser, setSelectedUser] = useState<CTFProfileResponse | null>(null)
-  const [showUserProfile, setShowUserProfile] = useState(false)
-  const [profileLoading, setProfileLoading] = useState(false)
+  const [openWindows, setOpenWindows] = useState<Map<string, CTFProfileResponse>>(new Map())
+  const [loadingProfiles, setLoadingProfiles] = useState<Set<string>>(new Set())
   const [profileError, setProfileError] = useState<string | null>(null)
 
-  // Fetch CTF rankings from API
-  const fetchCTFRankings = async () => {
+  const [totalCTFs, setTotalCTFs] = useState(0)
+  const [displayLimit, setDisplayLimit] = useState(50)
+  
+  // Access window management system
+  const { windows, restoreWindow } = useWindow()
+
+  const fetchCTFRankings = useCallback(async (limit = 50) => {
     try {
       setLoading(true)
       setError(null)
 
-      const response = await getCTFRankings({
-        limit: 10,
+      const response: CTFRankingsResponse = await getCTFRankings({
+        limit,
         hasParticipation: true,
       })
 
-      setCTFRankings(response.data || [])
+      if (response && response.data) {
+        setCTFRankings(response.data)
+        
+        if (response.metadata) {
+          setTotalCTFs(response.metadata.total)
+        }
+      } else {
+        throw new Error("Invalid response format")
+      }
     } catch (err) {
       console.error("Error fetching CTF rankings:", err)
-      setError(err instanceof Error ? err.message : "Failed to load CTF rankings")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load CTF rankings"
+      setError(errorMessage)
       setCTFRankings([])
+      setTotalCTFs(0)
     } finally {
       setLoading(false)
     }
-  }
-
-  useEffect(() => {
-    fetchCTFRankings()
   }, [])
 
-  const handleUserClick = async (ctfId: string, userId: string) => {
-    setProfileLoading(true)
-    setShowUserProfile(true)
-    setProfileError(null)
-    setSelectedUser(null)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchCTFRankings(displayLimit)
+    }, 100) // Small debounce to prevent rapid API calls
 
-    try {
-      const profileData = await getCTFProfile(ctfId, userId)
-      setSelectedUser(profileData)
-    } catch (err) {
-      console.error("Error fetching user profile:", err)
-      setProfileError(err instanceof Error ? err.message : "Failed to load user profile")
-    } finally {
-      setProfileLoading(false)
+    return () => clearTimeout(timeoutId)
+  }, [displayLimit, fetchCTFRankings])
+
+  const handleDisplayLimitChange = useCallback((newLimit: string) => {
+    const limit = Number.parseInt(newLimit)
+    setDisplayLimit(limit)
+  }, [])
+
+  const handleUserClick = useCallback(
+    async (ctfId: string, userId: string) => {
+      const windowId = `ctf-profile-${userId}-${ctfId}`
+
+      // Check if there's an existing minimized window with the same ID
+      const existingWindow = windows.find(w => w.id === windowId)
+      if (existingWindow && existingWindow.isMinimized) {
+        // Restore the existing minimized window
+        restoreWindow(windowId)
+        return
+      }
+
+      // Check if window is already open or currently loading
+      if (openWindows.has(windowId) || loadingProfiles.has(windowId)) {
+        return
+      }
+
+      // Mark this profile as loading
+      setLoadingProfiles(prev => new Set(prev).add(windowId))
+      setProfileError(null)
+
+      try {
+        const profileData = await getCTFProfile(ctfId, userId)
+        
+        setOpenWindows(prev => new Map(prev).set(windowId, profileData))
+      } catch (err) {
+        console.error("Error fetching user profile:", err)
+        setProfileError(err instanceof Error ? err.message : "Failed to load user profile")
+      } finally {
+        setLoadingProfiles(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(windowId)
+          return newSet
+        })
+      }
+    },
+    [openWindows, loadingProfiles, windows, restoreWindow],
+  )
+
+  const handleWindowOpenChange = useCallback((windowId: string, isOpen: boolean) => {
+    if (!isOpen) {
+      // Check if window is actually being closed (not just minimized)
+      const existingWindow = windows.find(w => w.id === windowId)
+      
+      // Only clean up if the window is actually being closed, not minimized
+      if (!existingWindow) {
+        setOpenWindows(prev => {
+          const newMap = new Map(prev)
+          newMap.delete(windowId)
+          return newMap
+        })
+        
+        // Also clean up any loading state for this window
+        setLoadingProfiles(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(windowId)
+          return newSet
+        })
+      }
     }
-  }
+  }, [windows])
+
+  const filteredRankings = useMemo(() => {
+    return selectedCTF === "all" ? ctfRankings : ctfRankings.filter((ctf) => ctf.ctf_id === selectedCTF)
+  }, [selectedCTF, ctfRankings])
+
+  const ctfOptions = useMemo(() => {
+    const uniqueCTFs = new Map<string, { id: string; title: string }>()
+    
+    ctfRankings.forEach((ctf) => {
+      if (!uniqueCTFs.has(ctf.ctf_id)) {
+        uniqueCTFs.set(ctf.ctf_id, {
+          id: ctf.ctf_id,
+          title: ctf.title,
+        })
+      }
+    })
+    
+    return Array.from(uniqueCTFs.values()).sort((a, b) => a.title.localeCompare(b.title))
+  }, [ctfRankings])
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -103,8 +203,6 @@ export function CTFRankings() {
     })
   }
 
-  const filteredRankings = selectedCTF === "all" ? ctfRankings : ctfRankings.filter((ctf) => ctf.ctf_id === selectedCTF)
-
   if (loading) {
     return (
       <div className="space-y-4">
@@ -131,7 +229,7 @@ export function CTFRankings() {
           <div className="text-red-500 text-lg font-semibold">Failed to load CTF rankings</div>
           <div className="text-muted-foreground">{error}</div>
           <button
-            onClick={fetchCTFRankings}
+            onClick={() => fetchCTFRankings(displayLimit)}
             className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
           >
             Try Again
@@ -143,25 +241,40 @@ export function CTFRankings() {
 
   return (
     <div className="space-y-6">
-      {/* CTF Filter */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* CTF Filter and Pagination Controls */}
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">CTF-Specific Rankings</h3>
-          <p className="text-sm text-muted-foreground">View leaderboards for individual competitions</p>
+          <p className="text-sm text-muted-foreground">
+            View leaderboards for individual competitions ({totalCTFs} total)
+          </p>
         </div>
-        <Select value={selectedCTF} onValueChange={setSelectedCTF} disabled={ctfRankings.length === 0}>
-          <SelectTrigger className="w-full sm:w-64">
-            <SelectValue placeholder="Select CTF" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All CTFs</SelectItem>
-            {ctfRankings.map((ctf) => (
-              <SelectItem key={ctf.ctf_id} value={ctf.ctf_id}>
-                {ctf.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <Select value={selectedCTF} onValueChange={setSelectedCTF} disabled={ctfOptions.length === 0}>
+            <SelectTrigger className="w-full sm:w-64">
+              <SelectValue placeholder="Select CTF" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All CTFs</SelectItem>
+              {ctfOptions.map((ctf) => (
+                <SelectItem key={ctf.id} value={ctf.id}>
+                  {ctf.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={displayLimit.toString()} onValueChange={handleDisplayLimitChange}>
+            <SelectTrigger className="w-full sm:w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="25">Show 25</SelectItem>
+              <SelectItem value="50">Show 50</SelectItem>
+              <SelectItem value="100">Show 100</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* CTF Rankings */}
@@ -243,23 +356,32 @@ export function CTFRankings() {
                           </TableCell>
                           <TableCell>
                             <div
-                              className="flex items-center gap-3 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent rounded-md p-2 -m-2 transition-all duration-200 border border-transparent hover:border-primary/20"
+                              className={`flex items-center gap-3 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent rounded-md p-2 -m-2 transition-all duration-200 border border-transparent hover:border-primary/20 ${
+                                loadingProfiles.has(`ctf-profile-${player.user.userId}-${ctf.ctf_id}`) ? "opacity-60" : ""
+                              }`}
                               onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
                             >
-                              <Avatar className="w-8 h-8 flex-shrink-0 ring-1 ring-primary/20">
-                                <CachedAvatarImage
-                                  src={
-                                    player.user.avatar ||
-                                    `/abstract-geometric-shapes.png?height=32&width=32&query=${player.user.userId}`
-                                  }
-                                  loadingPlaceholder={
-                                    <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                                  }
-                                />
-                                <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
-                                  {(player.user.displayName || player.user.username).substring(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
+                              <div className="relative">
+                                <Avatar className="w-8 h-8 flex-shrink-0 ring-1 ring-primary/20">
+                                  <CachedAvatarImage
+                                    src={
+                                      player.user.avatar ||
+                                      `/abstract-geometric-shapes.png?height=32&width=32&query=${player.user.userId}`
+                                    }
+                                    loadingPlaceholder={
+                                      <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                                    }
+                                  />
+                                  <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
+                                    {(player.user.displayName || player.user.username).substring(0, 2).toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                {loadingProfiles.has(`ctf-profile-${player.user.userId}-${ctf.ctf_id}`) && (
+                                  <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
+                                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                  </div>
+                                )}
+                              </div>
                               <div className="min-w-0 flex-1">
                                 <div className="font-medium hover:text-primary transition-colors truncate">
                                   {player.user.displayName || player.user.username}
@@ -294,181 +416,436 @@ export function CTFRankings() {
         )}
       </div>
 
-      {/* CTF-Specific User Profile Modal */}
-      <Dialog open={showUserProfile} onOpenChange={setShowUserProfile}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto mx-4 shadow-2xl border-2 border-primary/20">
-          {profileLoading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-2 text-muted-foreground">Loading CTF profile...</p>
-            </div>
-          ) : profileError ? (
-            <div className="p-8 text-center space-y-4">
-              <div className="text-red-500 text-lg font-semibold">Failed to load profile</div>
-              <div className="text-muted-foreground">{profileError}</div>
-              <button
-                onClick={() => setShowUserProfile(false)}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
+
+      {/* Profile Error Notification */}
+      {profileError && (
+        <Card className="border-destructive/50 bg-destructive/5">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 bg-destructive/20 rounded-full flex items-center justify-center">
+                  <span className="text-destructive text-xs">!</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-destructive">Profile Loading Failed</p>
+                  <p className="text-xs text-muted-foreground">{profileError}</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setProfileError(null)}
+                className="text-xs border-destructive/30"
               >
-                Close
-              </button>
+                Dismiss
+              </Button>
             </div>
-          ) : (
-            selectedUser && (
-              <>
-                <DialogHeader className="pb-6 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-                  <div className="flex items-start justify-between gap-6">
-                    {/* Left side - User info */}
-                    <div className="flex items-center gap-4 min-w-0 flex-1">
-                      <Avatar className="h-20 w-20 flex-shrink-0 ring-4 ring-primary/30 shadow-lg">
-                        <CachedAvatarImage
-                          src={
-                            selectedUser.user.avatar ||
-                            `/abstract-geometric-shapes.png?height=80&width=80&query=${selectedUser.user.userId}`
-                          }
-                          loadingPlaceholder={
-                            <div className="w-4 h-4 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                          }
-                        />
-                        <AvatarFallback className="bg-primary/20 text-foreground text-xl">
-                          {(selectedUser.user.displayName || selectedUser.user.username).substring(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <DialogTitle className="text-2xl font-bold text-primary font-[family-name:var(--font-playfair)] mb-2">
-                          {selectedUser.user.displayName || selectedUser.user.username}
-                        </DialogTitle>
-                        <div className="flex flex-wrap items-center gap-3 mb-3">
-                          <div className="flex items-center gap-2 text-sm">
-                            <Trophy className="w-4 h-4 text-yellow-500" />
-                            <span className="font-semibold">Rank #{selectedUser.ctfRank}</span>
-                            <span className="text-muted-foreground">of {selectedUser.totalParticipants}</span>
-                          </div>
-                          <Badge variant="secondary" className="text-foreground bg-primary/10 border-primary/20">
-                            Top {selectedUser.percentile}%
-                          </Badge>
-                        </div>
-                        <DialogDescription className="text-sm text-muted-foreground">
-                          Performance in {selectedUser.ctfInfo.title}
-                        </DialogDescription>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* CTF-Specific User Profile Modals - Multiple windows support */}
+      {Array.from(openWindows.entries()).map(([windowId, selectedUser]) => {
+        // Check if window exists in window management system and get its current state
+        const windowState = windows.find(w => w.id === windowId)
+        const isWindowOpen = windowState ? !windowState.isMinimized : true
+        
+        return (
+          <Window
+            key={windowId}
+            id={windowId}
+            title={`${selectedUser.user.displayName || selectedUser.user.username} - ${selectedUser.ctfInfo.title}`}
+            defaultSize={{ width: 1000, height: 700 }}
+            minSize={{ width: 320, height: 400 }}
+            isOpen={isWindowOpen}
+            onOpenChange={(isOpen) => handleWindowOpenChange(windowId, isOpen)}
+          >
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="p-4 sm:p-6 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                {/* Left side - User info */}
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Avatar className="h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 ring-4 ring-primary/30 shadow-lg">
+                    <CachedAvatarImage
+                      src={
+                        selectedUser.user.avatar ||
+                        `/abstract-geometric-shapes.png?height=80&width=80&query=${selectedUser.user.userId}`
+                      }
+                      loadingPlaceholder={
+                        <div className="w-4 h-4 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                      }
+                    />
+                    <AvatarFallback className="bg-primary/20 text-foreground text-lg sm:text-xl">
+                      {(selectedUser.user.displayName || selectedUser.user.username).substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-xl sm:text-2xl font-bold text-primary font-[family-name:var(--font-playfair)] mb-2 line-clamp-2">
+                      {selectedUser.user.displayName || selectedUser.user.username}
+                    </h2>
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Trophy className="w-4 h-4 text-yellow-500" />
+                        <span className="font-semibold">Rank #{selectedUser.ctfRank}</span>
+                        <span className="text-muted-foreground hidden sm:inline">
+                          of {selectedUser.totalParticipants}
+                        </span>
                       </div>
-                    </div>
-
-                    {/* Right side - Quick stats and action */}
-                    <div className="flex flex-col items-end gap-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2 hover:bg-primary/10 border-primary/20 bg-transparent"
-                        onClick={() => {
-                          window.open(`/profile/${selectedUser.user.userId}`, "_blank")
-                        }}
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        View Full Profile
-                      </Button>
-                      <div className="text-right text-sm">
-                        <div className="font-bold text-2xl text-primary">{selectedUser.stats.score.toFixed(1)}</div>
-                        <div className="text-xs text-muted-foreground">Total Score</div>
-                      </div>
-                    </div>
-                  </div>
-                </DialogHeader>
-
-                <div className="space-y-6 p-1">
-                  <div>
-                    <h4 className="font-semibold mb-4 text-primary flex items-center gap-2">
-                      <Trophy className="w-5 h-5" />
-                      Performance Overview
-                    </h4>
-                    <div className="grid grid-cols-3 gap-4">
-                      <Card className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 border border-chart-3/20">
-                        <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-chart-3 mb-1">{selectedUser.stats.solveCount}</div>
-                          <div className="text-xs text-muted-foreground">Challenges Solved</div>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 border border-chart-2/20">
-                        <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-chart-2 mb-1">
-                            {selectedUser.stats.categoriesCount}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Categories Mastered</div>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-gradient-to-br from-chart-4/10 to-chart-4/5 border border-chart-4/20">
-                        <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-chart-4 mb-1">
-                            {selectedUser.stats.averagePointsPerSolve.toFixed(0)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Avg Points/Solve</div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-4 text-primary flex items-center gap-2">
-                      <Target className="w-5 h-5" />
-                      Category Breakdown
-                    </h4>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                      {selectedUser.categoryBreakdown.map((category) => (
-                        <Card
-                          key={category.name}
-                          className="p-4 bg-gradient-to-r from-muted/30 to-muted/10 border border-primary/10 hover:border-primary/20 transition-all duration-200"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <Badge variant="outline" className="capitalize font-medium">
-                                {category.name}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                #{category.rankInCategory}/{category.totalInCategory}
-                              </span>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-bold text-primary">{category.solves}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {category.totalScore}pts • Top {category.percentile}%
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-4 text-primary flex items-center gap-2">
-                      <Award className="w-5 h-5" />
-                      Achievements ({getAchievements(selectedUser.achievementIds).length})
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {getAchievements(selectedUser.achievementIds).map((achievement, index) => (
-                        <Card
-                          key={`${achievement.id || achievement.name}-${index}`}
-                          className="p-3 border border-primary/10 hover:border-primary/20 transition-colors bg-gradient-to-br from-primary/5 to-transparent"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="text-xl flex-shrink-0">{achievement.icon}</div>
-                            <div className="min-w-0 flex-1">
-                              <div className="font-medium text-sm leading-tight">{achievement.name}</div>
-                              <div className="text-xs text-muted-foreground line-clamp-2">
-                                {achievement.description}
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      ))}
+                      <Badge variant="secondary" className="text-foreground bg-primary/10 border-primary/20 text-xs">
+                        Top {Math.round((selectedUser.ctfRank / selectedUser.totalParticipants) * 100)}%
+                      </Badge>
                     </div>
                   </div>
                 </div>
-              </>
-            )
-          )}
-        </DialogContent>
-      </Dialog>
+
+                {/* Right side - Quick stats and action */}
+                <div className="flex flex-row sm:flex-col items-center sm:items-end gap-3 w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 hover:bg-primary/10 border-primary/20 bg-transparent text-xs sm:text-sm"
+                    onClick={() => {
+                      window.open(`/profile/${selectedUser.user.userId}`, "_blank")
+                    }}
+                  >
+                    <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">View Full Profile</span>
+                    <span className="sm:hidden">Profile</span>
+                  </Button>
+                  <div className="text-right text-sm">
+                    <div className="font-bold text-xl sm:text-2xl text-primary">
+                      {selectedUser.stats.score.toFixed(1)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Total Score</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-hidden flex flex-col p-4 sm:p-6">
+              <Tabs defaultValue="overview" className="w-full flex flex-col h-full">
+                <div className="flex-shrink-0 overflow-x-auto">
+                  <TabsList className="grid w-full grid-cols-4 mb-4 min-w-[400px]">
+                    <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                      <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="hidden sm:inline">Overview</span>
+                      <span className="sm:hidden">Stats</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="solves" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                      <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Solves
+                    </TabsTrigger>
+                    <TabsTrigger value="categories" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                      <Target className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Categories</span>
+                      <span className="sm:hidden">Cats</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="comparison" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                      <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Comparison</span>
+                      <span className="sm:hidden">Comp</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+
+                <div className="flex-1 overflow-y-auto">
+                  <TabsContent value="overview" className="space-y-4 sm:space-y-6 mt-0">
+                    {/* Performance Overview */}
+                    <div>
+                      <h4 className="font-semibold mb-3 sm:mb-4 text-primary flex items-center gap-2 text-sm sm:text-base">
+                        <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Performance Overview
+                      </h4>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <Card className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 border border-chart-3/20">
+                          <CardContent className="p-3 sm:p-4 text-center">
+                            <div className="text-xl sm:text-2xl font-bold text-chart-3 mb-1">
+                              {selectedUser.stats.solveCount}
+                            </div>
+                            <div className="text-xs text-muted-foreground">Challenges</div>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 border border-chart-2/20">
+                          <CardContent className="p-3 sm:p-4 text-center">
+                            <div className="text-xl sm:text-2xl font-bold text-chart-2 mb-1">
+                              {selectedUser.stats.categoriesCount}
+                            </div>
+                            <div className="text-xs text-muted-foreground">Categories</div>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-br from-chart-4/10 to-chart-4/5 border border-chart-4/20">
+                          <CardContent className="p-3 sm:p-4 text-center">
+                            <div className="text-xl sm:text-2xl font-bold text-chart-4 mb-1">
+                              {selectedUser.stats.averagePointsPerSolve.toFixed(0)}
+                            </div>
+                            <div className="text-xs text-muted-foreground">Avg Points</div>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-br from-chart-1/10 to-chart-1/5 border border-chart-1/20">
+                          <CardContent className="p-3 sm:p-4 text-center">
+                            <div className="text-xl sm:text-2xl font-bold text-chart-1 mb-1">
+                              {selectedUser.stats.contributionToTotal.toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-muted-foreground">Contribution</div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+
+                    {/* Achievements */}
+                    <div>
+                      <h4 className="font-semibold mb-3 sm:mb-4 text-primary flex items-center gap-2 text-sm sm:text-base">
+                        <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Achievements ({getAchievements(selectedUser.achievementIds).length})
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {getAchievements(selectedUser.achievementIds).map((achievement, index) => (
+                          <Card
+                            key={`${achievement.id || achievement.name}-${index}`}
+                            className="p-3 border border-primary/10 hover:border-primary/20 transition-colors bg-gradient-to-br from-primary/5 to-transparent"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="text-lg sm:text-xl flex-shrink-0">{achievement.icon}</div>
+                              <div className="min-w-0 flex-1">
+                                <div className="font-medium text-sm leading-tight">{achievement.name}</div>
+                                <div className="text-xs text-muted-foreground line-clamp-2">
+                                  {achievement.description}
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="solves" className="space-y-4 mt-0">
+                    <div>
+                      <h4 className="font-semibold mb-3 sm:mb-4 text-primary flex items-center gap-2 text-sm sm:text-base">
+                        <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                        All Solves ({selectedUser.allSolves.length})
+                      </h4>
+                      <div className="space-y-3">
+                        {selectedUser.allSolves
+                          .sort((a, b) => new Date(b.solved_at).getTime() - new Date(a.solved_at).getTime())
+                          .map((solve, index) => (
+                            <Card key={index} className="p-3 sm:p-4 hover:bg-muted/50 transition-colors">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className="flex items-start gap-3 min-w-0 flex-1">
+                                  <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                                  <div className="min-w-0 flex-1">
+                                    <div className="font-medium text-sm sm:text-base line-clamp-2">
+                                      {solve.challenge}
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs sm:text-sm text-muted-foreground mt-1">
+                                      <Badge variant="outline" className="capitalize w-fit text-xs">
+                                        {solve.category}
+                                      </Badge>
+                                      <span className="flex items-center gap-1">
+                                        <Clock className="w-3 h-3" />
+                                        <span className="hidden sm:inline">
+                                          {new Date(solve.solved_at).toLocaleString()}
+                                        </span>
+                                        <span className="sm:hidden">
+                                          {new Date(solve.solved_at).toLocaleDateString()}
+                                        </span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-between sm:justify-end gap-3">
+                                  <div className="text-right">
+                                    <div className="text-lg sm:text-2xl font-bold text-primary">{solve.points}</div>
+                                    <div className="text-sm text-muted-foreground">points</div>
+                                  </div>
+                                  {solve.isTeamSolve && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      Team
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                              {solve.teammates && solve.teammates.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-muted">
+                                  <div className="text-xs sm:text-sm text-muted-foreground">
+                                    Solved with: {solve.teammates.join(", ")}
+                                  </div>
+                                </div>
+                              )}
+                            </Card>
+                          ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="categories" className="space-y-4 mt-0">
+                    <div>
+                      <h4 className="font-semibold mb-3 sm:mb-4 text-primary flex items-center gap-2 text-sm sm:text-base">
+                        <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Category Performance
+                      </h4>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {selectedUser.categoryBreakdown.map((category) => (
+                          <Card key={category.name} className="p-4">
+                            <div className="flex items-center justify-between mb-4">
+                              <Badge variant="outline" className="capitalize font-medium px-3 py-1 text-xs sm:text-sm">
+                                {category.name}
+                              </Badge>
+                              <div className="text-right">
+                                <div className="text-lg sm:text-2xl font-bold text-chart-3">{category.totalScore}</div>
+                                <div className="text-sm text-muted-foreground">points</div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Rank:</span>
+                                <span className="font-medium">
+                                  #{category.rankInCategory} of {category.totalInCategory}
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-muted">
+                                <div className="text-center">
+                                  <div className="text-lg sm:text-2xl font-bold text-chart-3">{category.solves}</div>
+                                  <div className="text-sm text-muted-foreground">Solves</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-lg sm:text-2xl font-bold text-chart-2">
+                                    {category.avgPoints.toFixed(1)}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">Avg Points</div>
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="comparison" className="space-y-4 mt-0">
+                    <div>
+                      <h4 className="font-semibold mb-3 sm:mb-4 text-primary flex items-center gap-2 text-sm sm:text-base">
+                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Performance Comparison
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Score vs Average */}
+                        <Card className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h5 className="font-medium text-sm sm:text-base">Score vs Average</h5>
+                            <Badge
+                              variant={
+                                selectedUser.performanceComparison.scoreVsAverage.percentageDiff > 0
+                                  ? "default"
+                                  : "secondary"
+                              }
+                              className={
+                                selectedUser.performanceComparison.scoreVsAverage.percentageDiff > 0
+                                  ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                  : ""
+                              }
+                            >
+                              {selectedUser.performanceComparison.scoreVsAverage.percentageDiff > 0 ? "+" : ""}
+                              {selectedUser.performanceComparison.scoreVsAverage.percentageDiff}%
+                            </Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span>Your Score:</span>
+                              <span className="font-bold text-primary">
+                                {selectedUser.performanceComparison.scoreVsAverage.user}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-sm text-muted-foreground">
+                              <span>Average:</span>
+                              <span>{selectedUser.performanceComparison.scoreVsAverage.average}</span>
+                            </div>
+                          </div>
+                        </Card>
+
+                        {/* Score vs Median */}
+                        <Card className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h5 className="font-medium text-sm sm:text-base">Score vs Median</h5>
+                            <Badge
+                              variant={
+                                selectedUser.performanceComparison.scoreVsMedian.percentageDiff > 0
+                                  ? "default"
+                                  : "secondary"
+                              }
+                              className={
+                                selectedUser.performanceComparison.scoreVsMedian.percentageDiff > 0
+                                  ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                  : ""
+                              }
+                            >
+                              {selectedUser.performanceComparison.scoreVsMedian.percentageDiff > 0 ? "+" : ""}
+                              {selectedUser.performanceComparison.scoreVsMedian.percentageDiff}%
+                            </Badge>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span>Your Score:</span>
+                              <span className="font-bold text-primary">
+                                {selectedUser.performanceComparison.scoreVsMedian.user}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-sm text-muted-foreground">
+                              <span>Median:</span>
+                              <span>{selectedUser.performanceComparison.scoreVsMedian.median}</span>
+                            </div>
+                          </div>
+                        </Card>
+
+                        {/* Solves vs Average */}
+                        <Card className="p-4 sm:col-span-2">
+                          <div className="flex items-center justify-between mb-3">
+                            <h5 className="font-medium text-sm sm:text-base">Solves vs Average</h5>
+                            <Badge
+                              variant={
+                                selectedUser.performanceComparison.solvesVsAverage.percentageDiff > 0
+                                  ? "default"
+                                  : "secondary"
+                              }
+                              className={
+                                selectedUser.performanceComparison.solvesVsAverage.percentageDiff > 0
+                                  ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                  : ""
+                              }
+                            >
+                              {selectedUser.performanceComparison.solvesVsAverage.percentageDiff > 0 ? "+" : ""}
+                              {selectedUser.performanceComparison.solvesVsAverage.percentageDiff}%
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="text-center">
+                              <div className="text-xl sm:text-2xl font-bold text-primary">
+                                {selectedUser.performanceComparison.solvesVsAverage.user}
+                              </div>
+                              <div className="text-sm text-muted-foreground">Your Solves</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-xl sm:text-2xl font-bold text-muted-foreground">
+                                {selectedUser.performanceComparison.solvesVsAverage.average}
+                              </div>
+                              <div className="text-sm text-muted-foreground">Average</div>
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </div>
+          </div>
+        </Window>
+        )
+      })}
     </div>
   )
 }

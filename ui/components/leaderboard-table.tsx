@@ -6,23 +6,378 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trophy, Medal, Award, ChevronLeft, ChevronRight, Filter, AlertCircle, Calendar, Users } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { UserProfileCard } from "@/components/user-profile-card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Trophy,
+  Medal,
+  Award,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  AlertCircle,
+  Calendar,
+  Users,
+  ExternalLink,
+  TrendingUp,
+  Star,
+  Target,
+  AwardIcon,
+} from "lucide-react"
+import { Window, useWindow } from "@/components/ui/window"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { SearchLeaderboard } from "@/components/search-leaderboard"
 import { useScoreboard } from "@/hooks/useAPI"
-import type { LeaderboardEntry } from "@/lib/types"
-import { calculatePercentile } from "@/lib/utils"
+import type { LeaderboardEntry, Achievement } from "@/lib/types"
+import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/utils"
+import Link from "next/link"
+
+interface CategoryStat {
+  name: string
+  solves: number
+  totalScore: number
+  avgPoints: number
+  rankInCategory?: number
+  percentile?: number
+}
+
+const formatScore = (score: number) => {
+  return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 2 })
+}
+
+const getUserInitials = (user: LeaderboardEntry["user"]) => {
+  const name = user.displayName || user.username
+  const parts = name.split(" ")
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase()
+  }
+  return name.slice(0, 2).toUpperCase()
+}
+
+const getUserDisplayName = (user: LeaderboardEntry["user"]) => {
+  return user.displayName || user.username
+}
+
+const formatTimeAgo = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+
+  if (diffInHours < 24) {
+    return `${diffInHours}h ago`
+  } else {
+    const diffInDays = Math.floor(diffInHours / 24)
+    return `${diffInDays}d ago`
+  }
+}
+
+const UserProfileContent = ({ user, leaderboardTotal }: { user: LeaderboardEntry; leaderboardTotal: number }) => {
+  const [selectedTab, setSelectedTab] = useState("overview")
+
+  const calculateCategoryBreakdown = (): CategoryStat[] => {
+    const categoryStats = new Map<string, { solves: number; totalScore: number; points: number[] }>()
+
+    user.recentSolves.forEach((solve) => {
+      const category = solve.category || "misc"
+      if (!categoryStats.has(category)) {
+        categoryStats.set(category, { solves: 0, totalScore: 0, points: [] })
+      }
+
+      const stats = categoryStats.get(category)!
+      stats.solves += 1
+      stats.totalScore += solve.points || 0
+      stats.points.push(solve.points || 0)
+    })
+
+    if (categoryStats.size === 0 && user.categories.length > 0) {
+      const avgSolvesPerCategory = user.solveCount / user.categories.length
+      const avgPointsPerCategory = user.totalScore / user.categories.length
+
+      return user.categories.map((category, index) => {
+        const remainder = index < user.solveCount % user.categories.length ? 1 : 0
+        const pointsRemainder =
+          index < user.totalScore % user.categories.length ? user.totalScore % user.categories.length : 0
+
+        const solves = avgSolvesPerCategory + remainder
+        const totalScore = avgPointsPerCategory + pointsRemainder
+
+        return {
+          name: category,
+          solves,
+          totalScore: Number(totalScore.toFixed(2)),
+          avgPoints: solves > 0 ? totalScore / solves : 0,
+        }
+      })
+    }
+
+    return Array.from(categoryStats.entries())
+      .map(([name, stats]) => ({
+        name,
+        solves: stats.solves,
+        totalScore: Number(stats.totalScore.toFixed(2)),
+        avgPoints: stats.solves > 0 ? stats.totalScore / stats.solves : 0,
+      }))
+      .filter((stat) => stat.solves > 0)
+  }
+
+  const categoryBreakdown: CategoryStat[] = calculateCategoryBreakdown()
+  const achievements: Achievement[] = getAchievements(user.achievementIds || [])
+  const averageScorePerSolve = user.solveCount > 0 ? user.totalScore / user.solveCount : 0
+  const averageSolvesPerCTF = user.ctfCount > 0 ? user.solveCount / user.ctfCount : 0
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="p-4 sm:p-6 border-b border-primary/20 bg-gradient-to-r from-primary/5 to-transparent flex-shrink-0">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          {/* Left side - User info */}
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="relative flex-shrink-0">
+              <Avatar className="w-16 h-16 sm:w-20 sm:h-20 ring-4 ring-primary/30 shadow-lg">
+                <CachedAvatarImage
+                  src={
+                    user.user.avatar ||
+                    `/abstract-geometric-shapes.png?key=profile&height=80&width=80&query=${user.user.userId}`
+                  }
+                  loadingPlaceholder={
+                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  }
+                />
+                <AvatarFallback className="text-lg font-bold bg-primary/20">
+                  {getUserInitials(user.user)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-lg border-2 border-background">
+                #{user.rank}
+              </div>
+            </div>
+
+            <div className="min-w-0 flex-1 space-y-3">
+              <h2 className="text-xl sm:text-2xl font-bold leading-tight text-primary">
+                {getUserDisplayName(user.user)}
+              </h2>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex items-center gap-2 px-3 py-2 bg-primary/15 text-sm">
+                  <Trophy className="w-4 h-4 text-primary" />
+                  <span className="font-medium">Rank #{user.rank}</span>
+                </div>
+                <Badge variant="secondary" className="w-fit bg-chart-2/20 text-chart-2">
+                  Top {calculatePercentile(user.rank, leaderboardTotal)}%
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - View Full Profile button */}
+          <div className="flex flex-row sm:flex-col items-center sm:items-end gap-3 w-full sm:w-auto">
+            <Link href={`/profile/${user.user.userId}`} className="block">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 hover:bg-primary/10 border-primary/20 bg-transparent text-xs sm:text-sm"
+              >
+                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">View Full Profile</span>
+                <span className="sm:hidden">Profile</span>
+              </Button>
+            </Link>
+            <div className="text-right text-sm">
+              <div className="font-bold text-xl sm:text-2xl text-primary">{formatScore(user.totalScore)}</div>
+              <div className="text-xs text-muted-foreground">Total Score</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-hidden flex flex-col p-4 sm:p-6">
+        <Tabs
+          value={selectedTab}
+          onValueChange={setSelectedTab}
+          className="w-full flex-1 overflow-hidden flex flex-col"
+        >
+          <TabsList className="grid w-full grid-cols-4 h-12 mb-6 p-1 flex-shrink-0 bg-muted/50">
+            <TabsTrigger
+              value="overview"
+              className="text-xs px-2 min-w-0 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <Target className="w-4 h-4 mr-1 flex-shrink-0" />
+              <span className="truncate">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="categories"
+              className="text-xs px-2 min-w-0 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <Star className="w-4 h-4 mr-1 flex-shrink-0" />
+              <span className="truncate">Skills</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="achievements"
+              className="text-xs px-2 min-w-0 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <AwardIcon className="w-4 h-4 mr-1 flex-shrink-0" />
+              <span className="truncate">Awards</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="activity"
+              className="text-xs px-2 min-w-0 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <TrendingUp className="w-4 h-4 mr-1 flex-shrink-0" />
+              <span className="truncate">Recent</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex-1 overflow-y-auto">
+            <TabsContent value="overview" className="space-y-6 mt-0">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-3 sm:p-4 text-center">
+                  <div className="text-lg sm:text-2xl font-bold text-primary mb-1 break-all">
+                    {formatScore(user.totalScore)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Total Score</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 p-3 sm:p-4 text-center">
+                  <div className="text-lg sm:text-2xl font-bold text-chart-3 mb-1">{user.solveCount}</div>
+                  <div className="text-xs text-muted-foreground">Challenges</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 p-3 sm:p-4 text-center">
+                  <div className="text-lg sm:text-2xl font-bold text-chart-2 mb-1">{user.ctfCount}</div>
+                  <div className="text-xs text-muted-foreground">CTFs</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-chart-4/10 to-chart-4/5 p-3 sm:p-4 text-center">
+                  <div className="text-lg sm:text-2xl font-bold text-chart-4 mb-1">{user.categories.length}</div>
+                  <div className="text-xs text-muted-foreground">Categories</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4">
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">Avg Score per Solve</div>
+                    <div className="text-2xl font-bold text-primary">{formatScore(averageScorePerSolve)}</div>
+                    <div className="text-sm text-green-600">
+                      {averageScorePerSolve > 15 ? "Above average" : "Improving"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">Avg Solves per CTF</div>
+                    <div className="text-2xl font-bold text-primary">{averageSolvesPerCTF.toFixed(0)}</div>
+                    <div className="text-sm text-green-600">
+                      {averageSolvesPerCTF > 5 ? "Consistent performer" : "Growing"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="categories" className="space-y-4 mt-0">
+              <div className="space-y-3">
+                {categoryBreakdown.map((category) => (
+                  <div key={category.name} className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className={`w-3 h-3 rounded-full ${getCategoryColor(category.name)}`} />
+                          <span className="font-medium capitalize">{category.name}</span>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {category.solves} solve{category.solves !== 1 ? "s" : ""}
+                        </div>
+                      </div>
+                      <Progress
+                        value={user.solveCount > 0 ? (category.solves / user.solveCount) * 100 : 0}
+                        className="h-2"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="achievements" className="space-y-4 mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {achievements.map((achievement) => (
+                  <div key={achievement.name} className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl flex-shrink-0">{achievement.icon}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-foreground mb-1">{achievement.name}</div>
+                        <div className="text-sm text-muted-foreground">{achievement.description}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="activity" className="space-y-3 mt-0">
+              <div className="space-y-2">
+                {user.recentSolves.length > 0 ? (
+                  user.recentSolves.map((activity, index) => (
+                    <div key={index} className="p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className={`w-2 h-2 rounded-full ${getCategoryColor(activity.category)}`} />
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-sm mb-1 truncate">{activity.challenge}</div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Badge variant="outline" className="text-xs">
+                                {activity.category}
+                              </Badge>
+                              <span className="text-xs text-primary font-medium">{activity.points}</span>
+                              {activity.isTeamSolve && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Team
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-muted-foreground whitespace-nowrap">
+                          {formatTimeAgo(activity.solved_at)}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="text-muted-foreground">No recent activity available</div>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+    </div>
+  )
+}
 
 export function LeaderboardTable() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [selectedCtf, setSelectedCtf] = useState<string>("global")
-  const [selectedUser, setSelectedUser] = useState<LeaderboardEntry | null>(null)
-  const [showUserProfile, setShowUserProfile] = useState(false)
+  const [selectedUsers, setSelectedUsers] = useState<Map<string, LeaderboardEntry>>(new Map())
   const [timePeriod, setTimePeriod] = useState<string>("all-time")
+
+  const { openWindow } = useWindow()
 
   const {
     data: leaderboardData,
@@ -34,23 +389,6 @@ export function LeaderboardTable() {
     offset: 0,
     global: true,
   })
-
-  const formatScore = (score: number) => {
-    return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-  }
-
-  const getUserInitials = (user: LeaderboardEntry["user"]) => {
-    const name = user.displayName || user.username
-    const parts = name.split(" ")
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase()
-    }
-    return name.slice(0, 2).toUpperCase()
-  }
-
-  const getUserDisplayName = (user: LeaderboardEntry["user"]) => {
-    return user.displayName || user.username
-  }
 
   const memoizedTimePeriodOptions = useMemo(() => {
     const options = [{ value: "all-time", label: "All Time" }]
@@ -84,10 +422,16 @@ export function LeaderboardTable() {
     return options
   }, [leaderboardData?.metadata])
 
-  const handleUserClick = useCallback((user: LeaderboardEntry) => {
-    setSelectedUser(user)
-    setShowUserProfile(true)
-  }, [])
+  const handleUserClick = useCallback(
+    (user: LeaderboardEntry) => {
+      const windowId = `leaderboard-profile-${user.user.userId}-${Date.now()}`
+      const windowTitle = `${getUserDisplayName(user.user)} - Profile`
+
+      setSelectedUsers((prev) => new Map(prev.set(windowId, user)))
+      openWindow(windowId, windowTitle)
+    },
+    [openWindow],
+  )
 
   const formattedLeaderboardData = useMemo(() => {
     if (!leaderboardData?.data) return []
@@ -375,120 +719,118 @@ export function LeaderboardTable() {
           </div>
         )}
 
-      <Card className="overflow-hidden">
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent border-b-2 border-primary/10">
-                  <TableHead className="w-16 font-semibold">Rank</TableHead>
-                  <TableHead className="min-w-[200px] font-semibold">Player</TableHead>
-                  <TableHead className="text-right min-w-[80px] font-semibold">Score</TableHead>
-                  <TableHead className="text-right min-w-[70px] font-semibold">Solves</TableHead>
-                  <TableHead className="text-right min-w-[60px] hidden sm:table-cell font-semibold">CTFs</TableHead>
-                  <TableHead className="min-w-[120px] hidden md:table-cell font-semibold">Categories</TableHead>
-                  <TableHead className="min-w-[140px] hidden lg:table-cell font-semibold">Recent Activity</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {formattedLeaderboardData.length > 0 ? (
-                  formattedLeaderboardData.map((entry) => (
-                    <TableRow
-                      key={entry.user.userId}
-                      className="hover:bg-muted/50 transition-colors border-b border-border/50"
-                    >
-                      <TableCell className="font-medium py-4">
-                        <div className="flex items-center justify-center">{getRankIcon(entry.rank)}</div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <div
-                          className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-all duration-200 hover:scale-[1.02]"
-                          onClick={() => handleUserClick(entry)}
-                        >
-                          <Avatar className="w-10 h-10 flex-shrink-0 ring-2 ring-primary/20">
-                            <CachedAvatarImage
-                              src={
-                                entry.user.avatar ||
-                                `/abstract-geometric-shapes.png?height=40&width=40&query=user-${entry.user.userId}`
-                              }
-                              loadingPlaceholder={
-                                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                              }
-                            />
-                            <AvatarFallback className="text-sm bg-primary/20 text-foreground font-medium">
-                              {entry.userInitials}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <div className="font-medium hover:text-primary transition-colors truncate text-base">
-                              {entry.displayName}
-                            </div>
-                            <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
-                              <span className="whitespace-nowrap">{entry.skillLevel}</span>
-                              <Badge variant="outline" className="text-xs border-primary/30">
-                                Top {entry.percentile}%
-                              </Badge>
-                            </div>
+      <div className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent border-b-2 border-primary/10">
+                <TableHead className="w-16 font-semibold">Rank</TableHead>
+                <TableHead className="min-w-[200px] font-semibold">Player</TableHead>
+                <TableHead className="text-right min-w-[80px] font-semibold">Score</TableHead>
+                <TableHead className="text-right min-w-[70px] font-semibold">Solves</TableHead>
+                <TableHead className="text-right min-w-[60px] hidden sm:table-cell font-semibold">CTFs</TableHead>
+                <TableHead className="min-w-[120px] hidden md:table-cell font-semibold">Categories</TableHead>
+                <TableHead className="min-w-[140px] hidden lg:table-cell font-semibold">Recent Activity</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {formattedLeaderboardData.length > 0 ? (
+                formattedLeaderboardData.map((entry) => (
+                  <TableRow
+                    key={entry.user.userId}
+                    className="hover:bg-muted/50 transition-colors border-b border-border/50"
+                  >
+                    <TableCell className="font-medium py-4">
+                      <div className="flex items-center justify-center">{getRankIcon(entry.rank)}</div>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <div
+                        className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-all duration-200 hover:scale-[1.02]"
+                        onClick={() => handleUserClick(entry)}
+                      >
+                        <Avatar className="w-10 h-10 flex-shrink-0 ring-2 ring-primary/20">
+                          <CachedAvatarImage
+                            src={
+                              entry.user.avatar ||
+                              `/abstract-geometric-shapes.png?height=40&width=40&query=user-${entry.user.userId}`
+                            }
+                            loadingPlaceholder={
+                              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                            }
+                          />
+                          <AvatarFallback className="text-sm bg-primary/20 text-foreground font-medium">
+                            {entry.userInitials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium hover:text-primary transition-colors truncate text-base">
+                            {entry.displayName}
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right py-4">
-                        <div className="font-mono font-bold text-primary text-base">{entry.formattedScore}</div>
-                      </TableCell>
-                      <TableCell className="text-right py-4">
-                        <Badge variant="secondary" className="font-mono text-foreground">
-                          {entry.solveCount}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right hidden sm:table-cell py-4">
-                        <Badge variant="outline" className="font-mono">
-                          {entry.ctfCount}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell py-4">
-                        <div className="flex flex-wrap gap-1">
-                          {entry.categories.slice(0, 2).map((category) => (
-                            <div key={category} className="flex items-center gap-1.5">
-                              <Badge variant="secondary" className="text-xs text-foreground">
-                                {category}
-                              </Badge>
-                            </div>
-                          ))}
-                          {entry.categories.length > 2 && (
-                            <Badge variant="secondary" className="text-xs text-foreground">
-                              +{entry.categories.length - 2}
+                          <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+                            <span className="whitespace-nowrap">{entry.skillLevel}</span>
+                            <Badge variant="outline" className="text-xs border-primary/30">
+                              Top {entry.percentile}%
                             </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell py-4">
-                        {entry.recentSolves.length > 0 ? (
-                          <div className="text-sm">
-                            <div className="font-medium truncate max-w-32">{entry.recentSolves[0].challenge}</div>
-                            <div className="text-muted-foreground">{entry.recentSolves[0].points}</div>
                           </div>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">No recent activity</span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12">
-                      <div className="text-muted-foreground">
-                        <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p className="text-lg font-medium mb-2">No players found</p>
-                        <p className="text-sm">Try adjusting your filters or search terms</p>
+                        </div>
                       </div>
                     </TableCell>
+                    <TableCell className="text-right py-4">
+                      <div className="font-mono font-bold text-primary text-base">{entry.formattedScore}</div>
+                    </TableCell>
+                    <TableCell className="text-right py-4">
+                      <Badge variant="secondary" className="font-mono text-foreground">
+                        {entry.solveCount}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right hidden sm:table-cell py-4">
+                      <Badge variant="outline" className="font-mono">
+                        {entry.ctfCount}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell py-4">
+                      <div className="flex flex-wrap gap-1">
+                        {entry.categories.slice(0, 2).map((category) => (
+                          <div key={category} className="flex items-center gap-1.5">
+                            <Badge variant="secondary" className="text-xs text-foreground">
+                              {category}
+                            </Badge>
+                          </div>
+                        ))}
+                        {entry.categories.length > 2 && (
+                          <Badge variant="secondary" className="text-xs text-foreground">
+                            +{entry.categories.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell py-4">
+                      {entry.recentSolves.length > 0 ? (
+                        <div className="text-sm">
+                          <div className="font-medium truncate max-w-32">{entry.recentSolves[0].challenge}</div>
+                          <div className="text-muted-foreground">{entry.recentSolves[0].points}</div>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">No recent activity</span>
+                      )}
+                    </TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-12">
+                    <div className="text-muted-foreground">
+                      <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg font-medium mb-2">No players found</p>
+                      <p className="text-sm">Try adjusting your filters or search terms</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-sm text-muted-foreground text-center sm:text-left">
@@ -536,75 +878,18 @@ export function LeaderboardTable() {
         </div>
       </div>
 
-      <Dialog open={showUserProfile} onOpenChange={setShowUserProfile}>
-        <DialogContent className="max-w-5xl max-h-[95vh] p-0 overflow-hidden bg-transparent border-0 shadow-none">
-          <DialogHeader className="sr-only">
-            <DialogTitle>
-              {selectedUser ? `${getUserDisplayName(selectedUser.user)} Profile` : "User Profile"}
-            </DialogTitle>
-          </DialogHeader>
-          {selectedUser && (
-            <UserProfileCard
-              user={selectedUser}
-              profileData={{
-                user: selectedUser.user,
-                globalRank: selectedUser.rank,
-                totalUsers: leaderboardData?.metadata.totalUsers || 1000,
-                percentile: calculatePercentile(selectedUser.rank, leaderboardData?.metadata.totalUsers || 1000),
-                stats: {
-                  totalScore: selectedUser.totalScore,
-                  solveCount: selectedUser.solveCount,
-                  ctfCount: selectedUser.ctfCount,
-                  categoriesCount: selectedUser.categories.length,
-                  averagePointsPerSolve: selectedUser.totalScore / selectedUser.solveCount,
-                  contributionToTotal: leaderboardData?.metadata.totalSolves
-                    ? Math.round((selectedUser.solveCount / leaderboardData.metadata.totalSolves) * 100 * 100) / 100
-                    : 0,
-                },
-                categoryBreakdown: selectedUser.categories.map((category, index) => {
-                  const totalCategories = selectedUser.categories.length
-                  const avgSolvesPerCategory = Math.floor(selectedUser.solveCount / totalCategories)
-                  const avgPointsPerCategory = Math.floor(selectedUser.totalScore / totalCategories)
-
-                  const solveRemainder = index < selectedUser.solveCount % totalCategories ? 1 : 0
-                  const pointsRemainder = index === 0 ? selectedUser.totalScore % totalCategories : 0
-
-                  const solves = avgSolvesPerCategory + solveRemainder
-                  const totalPoints = avgPointsPerCategory + pointsRemainder
-
-                  return {
-                    name: category,
-                    solves,
-                    totalScore: totalPoints,
-                    avgPoints: solves > 0 ? Math.round(totalPoints / solves) : 0,
-                  }
-                }),
-                ctfBreakdown: [],
-                recentSolves: selectedUser.recentSolves,
-                achievementIds: selectedUser.achievementIds,
-                performanceComparison: {
-                  scoreVsAverage: { user: selectedUser.totalScore, average: 0, percentageDiff: 0 },
-                  scoreVsMedian: { user: selectedUser.totalScore, median: 0, percentageDiff: 0 },
-                  solvesVsAverage: { user: selectedUser.solveCount, average: 0, percentageDiff: 0 },
-                },
-                globalOverview: {
-                  totalUsers: leaderboardData?.metadata.totalUsers || 1000,
-                  totalSolves: leaderboardData?.metadata.totalSolves || 0,
-                  averageScore: 0,
-                  medianScore: 0,
-                  totalCategories: selectedUser.categories.length,
-                  categories: selectedUser.categories,
-                },
-                metadata: {
-                  profileGenerated: new Date().toISOString(),
-                  dataSource: "Leaderboard Data",
-                  scope: "leaderboard",
-                },
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {Array.from(selectedUsers.entries()).map(([windowId, user]) => (
+        <Window
+          key={windowId}
+          id={windowId}
+          title={`${getUserDisplayName(user.user)} - Profile`}
+          isOpen={true}
+          defaultSize={{ width: 1000, height: 700 }}
+          minSize={{ width: 320, height: 400 }}
+        >
+          <UserProfileContent user={user} leaderboardTotal={leaderboardData?.metadata.total || 1000} />
+        </Window>
+      ))}
     </div>
   )
 }

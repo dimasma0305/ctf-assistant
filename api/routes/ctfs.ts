@@ -217,6 +217,7 @@ router.get("/rankings", async (req, res) => {
     try {
         // Parse query parameters
         const limit = parseInt(req.query.limit as string) || 10;
+        const offset = parseInt(req.query.offset as string) || 0;
         const status = req.query.status as string; // upcoming, active, completed
         const hasParticipation = req.query.hasParticipation !== 'false'; // default to true
         
@@ -224,6 +225,13 @@ router.get("/rankings", async (req, res) => {
         if (limit < 1 || limit > 50) {
             res.status(400).json({
                 error: "Limit must be between 1 and 50"
+            });
+            return;
+        }
+        
+        if (offset < 0) {
+            res.status(400).json({
+                error: "Offset must be non-negative"
             });
             return;
         }
@@ -289,11 +297,14 @@ router.get("/rankings", async (req, res) => {
         // Sort by start date (most recent first)
         ctfs.sort((a: any, b: any) => new Date(b.start).getTime() - new Date(a.start).getTime());
         
-        // Limit results
-        ctfs = ctfs.slice(0, limit);
+        // Calculate total before pagination
+        const totalCTFs = ctfs.length;
+        
+        // Apply pagination
+        const paginatedCTFs = ctfs.slice(offset, offset + limit);
 
         // Get leaderboard data for each CTF
-        const ctfRankings = await Promise.all(ctfs.map(async (ctf: any) => {
+        const ctfRankings = await Promise.all(paginatedCTFs.map(async (ctf: any) => {
             const participation = participationMap.get(ctf.ctf_id);
             if (!participation) {
                 return null; // Skip CTFs without participation
@@ -347,8 +358,14 @@ router.get("/rankings", async (req, res) => {
         res.json({
             data: validRankings,
             metadata: {
-                total: validRankings.length,
+                total: totalCTFs,
                 limit,
+                offset,
+                returned: validRankings.length,
+                hasNextPage: offset + limit < totalCTFs,
+                hasPreviousPage: offset > 0,
+                totalPages: Math.ceil(totalCTFs / limit),
+                currentPage: Math.floor(offset / limit) + 1,
                 filters: {
                     status: status || null,
                     hasParticipation

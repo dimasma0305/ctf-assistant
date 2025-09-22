@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -18,8 +18,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.slice(1) // Remove the #
-      console.log("[v0] Main page hash changed to:", hash)
+      const hash = window.location.hash.slice(1)
 
       if (hash === "leaderboard" || hash === "ctfs" || hash === "ctf-rankings") {
         setActiveTab(hash)
@@ -28,28 +27,36 @@ export default function Dashboard() {
         hash.startsWith("year-") ||
         ["all-time", "this-month", "last-month", "this-year", "last-year"].includes(hash)
       ) {
-        // These are leaderboard time period hashes, switch to leaderboard tab
-        console.log("[v0] Switching to leaderboard tab for time period:", hash)
         setActiveTab("leaderboard")
       }
     }
 
-    // Set initial tab from hash
     handleHashChange()
-
-    // Listen for hash changes
     window.addEventListener("hashchange", handleHashChange)
     return () => window.removeEventListener("hashchange", handleHashChange)
   }, [])
 
   const handleTabChange = (value: string) => {
     setActiveTab(value)
-    window.location.hash = value
+    // Use history.replaceState instead of direct hash manipulation to prevent page refresh
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `#${value}`)
+    }
   }
 
-  // Get data for stats overview
-  const { data: leaderboardData } = useScoreboard({ limit: 1 }) // Just need metadata
-  const { data: ctfsData } = useCTFs({ limit: 1 }) // Just need metadata
+  const { data: leaderboardData, isStale: leaderboardStale } = useScoreboard({ limit: 1 })
+  const { data: ctfsData, isStale: ctfsStale } = useCTFs({ limit: 1 })
+
+  const stats = useMemo(
+    () => ({
+      totalUsers: leaderboardData?.metadata.totalUsers || 0,
+      totalCTFs: ctfsData?.metadata.stats.totalCTFsInDatabase || 0,
+      activeCTFs: ctfsData?.metadata.stats.active || 0,
+      upcomingCTFs: ctfsData?.metadata.stats.upcoming || 0,
+      participationCTFs: ctfsData?.metadata.stats.ctfsWithParticipation || 0,
+    }),
+    [leaderboardData, ctfsData],
+  )
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,6 +88,12 @@ export default function Dashboard() {
                 <Activity className="w-3 h-3" />
                 <span className="hidden xs:inline">Live</span>
               </Badge>
+              {(leaderboardStale || ctfsStale) && (
+                <Badge variant="outline" className="gap-1 text-xs">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+                  <span className="hidden sm:inline">Updating</span>
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -99,7 +112,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-xl sm:text-2xl font-bold text-primary mb-1">
-                {leaderboardData?.metadata.totalUsers.toLocaleString() || "—"}
+                {stats.totalUsers.toLocaleString() || "—"}
               </div>
               <p className="text-xs text-muted-foreground">Active community members</p>
             </CardContent>
@@ -114,11 +127,9 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold text-chart-3 mb-1">
-                {ctfsData?.metadata.stats.totalCTFsInDatabase || "—"}
-              </div>
+              <div className="text-xl sm:text-2xl font-bold text-chart-3 mb-1">{stats.totalCTFs || "—"}</div>
               <p className="text-xs text-muted-foreground">
-                {ctfsData?.metadata.stats.active || 0} active, {ctfsData?.metadata.stats.upcoming || 0} upcoming
+                {stats.activeCTFs} active, {stats.upcomingCTFs} upcoming
               </p>
             </CardContent>
           </Card>
@@ -132,9 +143,7 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold text-chart-2 mb-1">
-                {ctfsData?.metadata.stats.ctfsWithParticipation || "—"}
-              </div>
+              <div className="text-xl sm:text-2xl font-bold text-chart-2 mb-1">{stats.participationCTFs || "—"}</div>
               <p className="text-xs text-muted-foreground">CTFs with community solves</p>
             </CardContent>
           </Card>
@@ -178,9 +187,7 @@ export default function Dashboard() {
                 </div>
                 <CardDescription>Top performers across all CTF competitions</CardDescription>
               </CardHeader>
-              <CardContent>
-                <LeaderboardTable />
-              </CardContent>
+              <CardContent>{activeTab === "leaderboard" && <LeaderboardTable />}</CardContent>
             </Card>
           </TabsContent>
 
@@ -193,9 +200,7 @@ export default function Dashboard() {
                 </div>
                 <CardDescription>Browse and explore CTF competitions with community participation</CardDescription>
               </CardHeader>
-              <CardContent>
-                <CTFList />
-              </CardContent>
+              <CardContent>{activeTab === "ctfs" && <CTFList />}</CardContent>
             </Card>
           </TabsContent>
 

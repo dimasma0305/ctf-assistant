@@ -1,9 +1,6 @@
 import express from "express";
 import cors from "cors";
-import session from "express-session";
 import bodyParser from 'body-parser';
-import crypto from 'crypto';
-import flash from "connect-flash";
 import client from "../src/client";
 import { MyClient } from "../src/Model/client";
 import { getCachedUserScores } from './services/dataService';
@@ -30,12 +27,6 @@ app.use(cors({
  */
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public', { index: 'index.html' }));
-app.use(session({
-    secret: process.env.SECRET || crypto.randomUUID(),
-    resave: false,
-    saveUninitialized: true
-}));
-app.use(flash());
 
 /**
  * Health Check Endpoint

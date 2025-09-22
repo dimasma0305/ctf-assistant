@@ -1,19 +1,10 @@
-import { Session } from "express-session";
 import { EventSchemaType } from "./Database/eventSchema";
-import express, { NextFunction, Response, Request } from "express";
+import express from "express";
 import { EventModel } from "./Database/connect";
 import { GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from "discord.js";
 import client from "./client";
 import { sleep } from "bun";
 
-interface AuthenticatedSession extends Session {
-    user?: string;
-    [key: string]: any;
-}
-
-export interface AuthenticatedRequest extends Request {
-    session: AuthenticatedSession
-}
 
 export async function getTCP1P() {
     let tcp1p = client.guilds.cache.find((g) => g.name == "TCP1P Server");
@@ -28,14 +19,6 @@ export async function getTCP1P() {
     }
     return tcp1p;
 }
-
-export const checkAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    if (req.session.user) {
-        return next();
-    }
-    req.flash('error', 'Please login to access the admin panel.');
-    return res.redirect('/login');
-};
 
 async function updateDiscordEvents(id: string) {
     try {

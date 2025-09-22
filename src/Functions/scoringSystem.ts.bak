@@ -2,30 +2,40 @@ import { solveModel, CTFCacheModel, ChallengeModel } from '../Database/connect';
 import { infoEvent } from './ctftime-v2';
 
 /**
- * NEW:
- * Get max challenge points for multiple CTFs at once (the "max_score" per CTF)
+ * Get total possible points for a CTF by summing all challenges in that CTF
  */
-export async function getBulkCTFMaxPoints(ctfIds: string[]): Promise<Map<string, number>> {
+export async function getCTFTotalPoints(ctfId: string): Promise<number> {
+    try {
+        const challenges = await ChallengeModel.find({ ctf_id: ctfId }).lean();
+        const totalPoints = challenges.reduce((sum, challenge) => sum + (challenge.points || 100), 0);
+        return totalPoints;
+    } catch (error) {
+        console.error(`Error calculating CTF total points for ${ctfId}:`, error);
+        return 0;
+    }
+}
+
+/**
+ * Get total possible points for multiple CTFs at once
+ */
+export async function getBulkCTFTotalPoints(ctfIds: string[]): Promise<Map<string, number>> {
     try {
         const challenges = await ChallengeModel.find({ ctf_id: { $in: ctfIds } }).lean();
-        const ctfMaxPoints = new Map<string, number>();
-
-        // Initialize with 0
-        ctfIds.forEach(ctfId => ctfMaxPoints.set(ctfId, 0));
-
-        // For each challenge, set the max for its CTF
+        const ctfTotalPoints = new Map<string, number>();
+        
+        // Initialize all CTFs with 0 points
+        ctfIds.forEach(ctfId => ctfTotalPoints.set(ctfId, 0));
+        
+        // Sum up points for each CTF
         challenges.forEach(challenge => {
             const ctfId = challenge.ctf_id;
             const points = challenge.points || 100;
-            const currentMax = ctfMaxPoints.get(ctfId) || 0;
-            if (points > currentMax) {
-                ctfMaxPoints.set(ctfId, points);
-            }
+            ctfTotalPoints.set(ctfId, (ctfTotalPoints.get(ctfId) || 0) + points);
         });
-
-        return ctfMaxPoints;
+        
+        return ctfTotalPoints;
     } catch (error) {
-        console.error('Error calculating bulk CTF max points:', error);
+        console.error('Error calculating bulk CTF total points:', error);
         return new Map();
     }
 }
@@ -58,25 +68,20 @@ interface UserScore {
 
 /**
  * Calculate normalized score based on:
- * - Challenge points normalized by max challenge points in that CTF (max_score)
+ * - Challenge points normalized by total CTF points (percentage of CTF completion)
  * - CTF weight as the only differentiating multiplier
- * - Makes all CTFs equal in base scoring regardless of their internal point systems,
- *   but now using (challenge_point / max_score) * ctf_weight as requested.
+ * - Makes all CTFs equal in base scoring regardless of their internal point systems
  */
 export class FairScoringSystem {
     
     /**
      * Calculate normalized score for a solve
-     *
-     * Formula: (challengePoints / maxScore) * ctfWeight
-     *
-     * Note: keep signature to avoid changing interfaces. The third parameter is treated
-     * as the "max score" for the CTF (maximum single-challenge points within the CTF).
      */
-    private static calculateBaseScore(challengePoints: number, ctfWeight: number, maxScore: number): number {
-        // Prevent divide-by-zero by falling back to challengePoints if maxScore is falsy
-        const effectiveMax = (typeof maxScore === 'number' && maxScore > 0) ? maxScore : challengePoints || 1;
-        const normalizedScore = challengePoints / effectiveMax;
+    private static calculateBaseScore(challengePoints: number, ctfWeight: number, ctfTotalPoints: number): number {
+        // Normalize challenge score by dividing by total CTF points (percentage of CTF)
+        // Then multiply by CTF weight as the only differentiating factor
+        // This makes all CTFs equal in base scoring, with only weight as multiplier
+        const normalizedScore = challengePoints / ctfTotalPoints;
         return (normalizedScore * ctfWeight);
     }
 
@@ -91,8 +96,8 @@ export class FairScoringSystem {
         // Get unique CTF IDs from solves
         const ctfIds = Array.from(new Set(solves.map(solve => solve.ctf_id || '').filter(id => id)));
         
-        // ALSO calculate the max single-challenge points per CTF (max_score)
-        const ctfMaxPoints = await getBulkCTFMaxPoints(ctfIds);
+        // Calculate total possible points for each CTF (not just solved challenges)
+        const ctfTotalPoints = await getBulkCTFTotalPoints(ctfIds);
 
         // Group solves by user
         for (const solve of solves) {
@@ -157,11 +162,9 @@ export class FairScoringSystem {
                     ctfData.weight = 10;
                 }
 
-                // Get the CTF max single-challenge points (max_score) and fallback if missing
-                const ctfMax = ctfMaxPoints.get(solve.ctf_id) || solve.points || 100;
-
-                // Calculate normalized score using (challengePoints / max_score) * ctfWeight
-                const totalSolveScore = this.calculateBaseScore(solve.points, ctfData.weight, ctfMax);
+                // Calculate normalized score using actual CTF total points
+                const ctfTotal = ctfTotalPoints.get(solve.ctf_id) || solve.points;
+                const totalSolveScore = this.calculateBaseScore(solve.points, ctfData.weight, ctfTotal);
                 
                 // Update user stats
                 userScore.totalScore += totalSolveScore;
@@ -188,7 +191,7 @@ export class FairScoringSystem {
 
             userScore.ctfCount = userScore.ctfBreakdown.size;
             
-            // Sort recent solves by points descending
+            // Sort recent solves by score descending
             userScore.recentSolves = userScore.recentSolves
                 .sort((a, b) => b.points - a.points)
                 .slice(0, 10); // Keep only top 10 for display

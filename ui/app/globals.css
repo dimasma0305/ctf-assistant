@@ -137,38 +137,65 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
+    scrollbar-width: auto;
+    scrollbar-color: rgba(0, 0, 0, 0.6) rgba(0, 0, 0, 0.1);
   }
   body {
     @apply bg-background text-foreground;
   }
 }
 
+/* Enhanced scrollbar styling to match the coral red theme while keeping it dark and visible */
 /* Webkit scrollbar styling for Chrome, Safari, Edge */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 14px;
+  height: 14px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: oklch(0.97 0.01 240 / 0.3); /* Light muted background */
+  border-radius: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 3px;
+  background: oklch(0.35 0.02 240 / 0.8); /* Dark blue-gray matching theme */
+  border-radius: 7px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  box-shadow: inset 0 0 0 1px oklch(0.6 0.2 15 / 0.2); /* Subtle coral accent */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.6);
+  background: oklch(0.45 0.2 15 / 0.9); /* Coral red on hover */
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: oklch(0.6 0.2 15 / 0.95); /* Brighter coral when active */
+  background-clip: content-box;
 }
 
 /* Dark mode scrollbar */
+.dark * {
+  scrollbar-color: oklch(0.25 0.02 240 / 0.8) oklch(0.15 0.01 240 / 0.3);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: oklch(0.15 0.01 240 / 0.3); /* Dark background matching theme */
+}
+
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: oklch(0.25 0.02 240 / 0.8); /* Dark secondary color */
+  background-clip: content-box;
+  box-shadow: inset 0 0 0 1px oklch(0.65 0.2 15 / 0.2); /* Coral accent glow */
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: oklch(0.65 0.2 15 / 0.7); /* Coral red on hover */
+  background-clip: content-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:active {
+  background: oklch(0.65 0.2 15 / 0.9); /* Brighter coral when active */
+  background-clip: content-box;
 }

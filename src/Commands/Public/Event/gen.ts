@@ -2,7 +2,7 @@ import { EventModel } from "../../../Database/connect";
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder } from "discord.js";
 
-const PUBLIC_URL = process.env.PUBLIC_URL || "https://assistant.dimasc.tf/"
+const PUBLIC_URL = process.env.PUBLIC_URL || "https://assistant.1pc.tf/"
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
