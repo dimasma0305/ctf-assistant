@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getCachedUserScores, getAvailableTimeRanges } from '../services/dataService';
 import { calculateGlobalStats, generateAchievementIds } from '../utils/statistics';
-import { formatErrorResponse, validatePaginationParams, filterUsersBySearch } from '../utils/common';
+import { formatErrorResponse, validatePaginationParams, filterUsersBySearch, categoryNormalize } from '../utils/common';
 import { UserSolve } from '../types';
 
 const router = Router();
@@ -168,7 +168,7 @@ router.get("/", async (req, res) => {
                 recentSolves: entry.recentSolves.map((solve: UserSolve) => ({
                     ctf_id: solve.ctf_id,
                     challenge: solve.challenge,
-                    category: solve.category,
+                    category: categoryNormalize(solve.category),
                     points: solve.points,
                     solved_at: solve.solved_at
                 }))

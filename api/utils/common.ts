@@ -10,7 +10,7 @@ export function categoryNormalize(category: string) {
         "web": ["web", "web exploitation"],
         "crypto": ["crypto", "cryptography"],
         "pwn": ["pwn", "pwnable", "binary exploitation"],
-        "reverse": ["reverse", "reverse engineering", "reversing"],
+        "reverse": ["reverse", "reverse engineering", "reversing", "rev"],
         "forensics": ["forensics", "forensic", "digital forensics"],
         "misc": ["misc", "miscellaneous"],
         "steganography": ["steganography", "stegano"],  
