@@ -151,6 +151,8 @@ router.get("/", async (req, res) => {
                 scope as 'global' | 'ctf',
                 ctfId ? 'CTF' : undefined // CTF title fallback
             );
+
+            const categories = Array.from(entry.categories).map(category => categoryNormalize(category));
             
             return {
                 rank: userRank, // Use rank from appropriate dataset (monthly/yearly separate rankings, global for overall)
@@ -163,7 +165,7 @@ router.get("/", async (req, res) => {
                 totalScore: Math.round(entry.totalScore * 100) / 100, // round to 2 decimal places
                 solveCount: entry.solveCount,
                 ctfCount: entry.ctfCount,
-                categories: Array.from(entry.categories),
+                categories: categories,
                 achievementIds: achievementIds,
                 recentSolves: entry.recentSolves.map((solve: UserSolve) => ({
                     ctf_id: solve.ctf_id,

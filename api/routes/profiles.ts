@@ -7,7 +7,7 @@ import {
     calculatePerformanceComparison, 
     generateAchievementIds     
 } from '../utils/statistics';
-import { formatErrorResponse } from '../utils/common';
+import { formatErrorResponse, categoryNormalize } from '../utils/common';
 
 const router = Router();
 
@@ -62,7 +62,7 @@ router.get("/:id", async (req, res) => {
             .map(solve => ({
                 ctf_id: solve.ctf_id,
                 challenge: solve.challenge,
-                category: solve.category,
+                category: categoryNormalize(solve.category),
                 points: solve.points,
                 solved_at: solve.solved_at,
                 isTeamSolve: solve.users.length > 1,
@@ -214,7 +214,7 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
             .sort((a, b) => new Date(b.solved_at).getTime() - new Date(a.solved_at).getTime())
             .map(solve => ({
                 challenge: solve.challenge,
-                category: solve.category,
+                category: categoryNormalize(solve.category),
                 points: solve.points,
                 solved_at: solve.solved_at,
                 isTeamSolve: solve.users.length > 1,

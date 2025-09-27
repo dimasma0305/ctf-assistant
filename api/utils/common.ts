@@ -5,27 +5,42 @@ import { UserProfile, ValidationResult } from '../types';
  * Common Utility Functions
  */
 
-export function categoryNormalize(category: string) {
+const CATEGORY_LOOKUP: Record<string, string> = (() => {
     const categoryNames: Record<string, string[]> = {
-        "web": ["web", "web exploitation"],
-        "crypto": ["crypto", "cryptography"],
-        "pwn": ["pwn", "pwnable", "binary exploitation"],
-        "reverse": ["reverse", "reverse engineering", "reversing", "rev"],
-        "forensics": ["forensics", "forensic", "digital forensics"],
-        "misc": ["misc", "miscellaneous"],
-        "steganography": ["steganography", "stegano"],  
-        "osint": ["osint", "open source intelligence", "open-source intelligence"],
-        "blockchain": ["blockchain", "blockchain exploitation", "web3", "smart contract"],
-        "mobile": ["mobile", "mobile exploitation", "mobile security"],
+      web: ["web", "web exploitation"],
+      crypto: ["crypto", "cryptography"],
+      pwn: ["pwn", "pwnable", "binary exploitation"],
+      reverse: ["reverse", "reverse engineering", "reversing", "rev"],
+      forensics: ["forensics", "forensic", "digital forensics"],
+      misc: ["misc", "miscellaneous"],
+      steganography: ["steganography", "stegano"],
+      osint: ["osint", "open source intelligence", "open-source intelligence"],
+      blockchain: ["blockchain", "blockchain exploitation", "web3", "smart contract"],
+      mobile: ["mobile", "mobile exploitation", "mobile security"],
+    };
+  
+    const map = Object.create(null) as Record<string, string>;
+    for (const [canonical, aliases] of Object.entries(categoryNames)) {
+      for (const a of aliases) {
+        // simpan versi ter-normalisasi dari alias sebagai key
+        map[a.toLowerCase().trim()] = canonical;
+      }
     }
-    category = category.toLowerCase().trim();
-    for (const name in categoryNames) {
-        if (categoryNames[name].includes(category)) {
-            return name;
-        }
-    }
-    return category;
-}
+    return map;
+  })();
+  
+  export function categoryNormalize(category: string): string {
+    if (!category) return category;
+    // normalisasi kecil: lowercase + trim + samakan dash/underscore/spasi ganda
+    const key = category
+      .toLowerCase()
+      .trim()
+      .replace(/[-_]+/g, " ")
+      .replace(/\s+/g, " ");
+  
+    return CATEGORY_LOOKUP[key] ?? key;
+  }
+  
 
 /**
  * Format error response consistently
