@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const messageSchema = {
+export const schema = {
     ctfEventId: String,
     messageId: String,
     channelId: String,
@@ -12,5 +13,5 @@ export const messageSchema = {
     }
 };
 
-export type MessageSchemaType = typeof messageSchema;
-export default new Schema(messageSchema); 
+export const messageSchema = new Schema(schema);
+export type MessageSchemaType = InferSchemaType<typeof messageSchema>;

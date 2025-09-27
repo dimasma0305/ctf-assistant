@@ -1,4 +1,4 @@
-import { EventSchemaType } from "./Database/eventSchema";
+import { EventSchemaType } from "./Database/connect";
 import express from "express";
 import { EventModel } from "./Database/connect";
 import { GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from "discord.js";

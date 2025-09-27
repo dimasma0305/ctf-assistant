@@ -5,6 +5,28 @@ import { UserProfile, ValidationResult } from '../types';
  * Common Utility Functions
  */
 
+export function categoryNormalize(category: string) {
+    const categoryNames: Record<string, string[]> = {
+        "web": ["web", "web exploitation"],
+        "crypto": ["crypto", "cryptography"],
+        "pwn": ["pwn", "pwnable", "binary exploitation"],
+        "reverse": ["reverse", "reverse engineering", "reversing"],
+        "forensics": ["forensics", "forensic", "digital forensics"],
+        "misc": ["misc", "miscellaneous"],
+        "steganography": ["steganography", "stegano"],  
+        "osint": ["osint", "open source intelligence", "open-source intelligence"],
+        "blockchain": ["blockchain", "blockchain exploitation", "web3", "smart contract"],
+        "mobile": ["mobile", "mobile exploitation", "mobile security"],
+    }
+    category = category.toLowerCase().trim();
+    for (const name in categoryNames) {
+        if (categoryNames[name].includes(category)) {
+            return name;
+        }
+    }
+    return category;
+}
+
 /**
  * Format error response consistently
  */

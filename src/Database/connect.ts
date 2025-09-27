@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
-import eventSchema from './eventSchema';
-import challengeSchema from './challengeSchema';
-import solveSchema from './solveSchema';
-import messageSchema from './messageSchema';
-import sessionStateSchema from './sessionStateSchema';
-import fetchCommandSchema from './fetchCommandSchema';
-import ctfCacheSchema from './ctfCacheSchema';
-import weightRetrySchema from './weightRetrySchema';
-import leaderboardTrackingSchema from './leaderboardTrackingSchema';
-import userSchema from './userSchema';
+import {challengeSchema, type ChallengeSchemaType} from './challengeSchema';
+import {eventSchema, type EventSchemaType} from './eventSchema';
+import {solveSchema, type SolveSchemaType} from './solveSchema';
+import {messageSchema, type MessageSchemaType} from './messageSchema';
+import {sessionStateSchema, type SessionStateSchemaType} from './sessionStateSchema';
+import {fetchCommandSchema, type FetchCommandSchemaType} from './fetchCommandSchema';
+import {ctfCacheSchema, type CTFCacheSchemaType} from './ctfCacheSchema';
+import {weightRetrySchema, type WeightRetrySchemaType} from './weightRetrySchema';
+import {leaderboardTrackingSchema, type LeaderboardTrackingSchemaType} from './leaderboardTrackingSchema';
+import {userSchema, type UserSchemaType} from './userSchema';
+import {messageCacheSchema, type MessageCacheSchemaType} from './messageCacheSchema';
 
 const MONGO_URI = process.env.MONGO_URI || ""
 
@@ -26,5 +27,20 @@ export const CTFCacheModel = mongoose.model("CTFCache", ctfCacheSchema)
 export const WeightRetryModel = mongoose.model("WeightRetry", weightRetrySchema)
 export const LeaderboardTrackingModel = mongoose.model("LeaderboardTracking", leaderboardTrackingSchema)
 export const UserModel = mongoose.model("User", userSchema)
+export const MessageCacheModel = mongoose.model("MessageCache", messageCacheSchema)
 
-export default { connect, EventModel, ChallengeModel, solveModel, MessageModel, SessionStateModel, FetchCommandModel, CTFCacheModel, WeightRetryModel, LeaderboardTrackingModel, UserModel }
+export {
+    EventSchemaType,
+    ChallengeSchemaType,
+    SolveSchemaType,
+    MessageSchemaType,
+    SessionStateSchemaType,
+    FetchCommandSchemaType,
+    CTFCacheSchemaType,
+    WeightRetrySchemaType,
+    LeaderboardTrackingSchemaType,
+    UserSchemaType,
+    MessageCacheSchemaType,
+}
+
+export default {connect};

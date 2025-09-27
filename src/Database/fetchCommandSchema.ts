@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const fetchCommandSchema = {
+export const schema = {
     ctf: {
         type: Schema.Types.ObjectId,
         ref: 'CTFCache',
@@ -42,5 +43,5 @@ export const fetchCommandSchema = {
     },
 }
 
-export type FetchCommandSchemaType = typeof fetchCommandSchema;
-export default new Schema(fetchCommandSchema);
+export const fetchCommandSchema = new Schema(schema);
+export type FetchCommandSchemaType = InferSchemaType<typeof fetchCommandSchema>;

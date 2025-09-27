@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const leaderboardTrackingSchema = {
+export const schema = {
     messageId: { type: String, required: true, unique: true },
     channelId: { type: String, required: true },
     guildId: { type: String, required: true },
@@ -15,5 +16,5 @@ export const leaderboardTrackingSchema = {
     updatedAt: { type: Date, default: Date.now }
 };
 
-export type LeaderboardTrackingSchemaType = typeof leaderboardTrackingSchema;
-export default new Schema(leaderboardTrackingSchema);
+export const leaderboardTrackingSchema = new Schema(schema);
+export type LeaderboardTrackingSchemaType = InferSchemaType<typeof leaderboardTrackingSchema>;

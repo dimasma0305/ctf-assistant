@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const ctfCacheSchema = {
+export const schema = {
     ctf_id: {
         type: String,
         required: true,
@@ -54,5 +55,5 @@ export const ctfCacheSchema = {
     }
 }
 
-export type CTFCacheSchemaType = typeof ctfCacheSchema;
-export default new Schema(ctfCacheSchema);
+export const ctfCacheSchema = new Schema(schema);
+export type CTFCacheSchemaType = InferSchemaType<typeof ctfCacheSchema>;

@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const weightRetrySchema = {
+export const schema = {
     ctf_id: {
         type: String,
         required: true,
@@ -41,5 +42,5 @@ export const weightRetrySchema = {
     }
 }
 
-export type WeightRetrySchemaType = typeof weightRetrySchema;
-export default new Schema(weightRetrySchema);
+export const weightRetrySchema = new Schema(schema);
+export type WeightRetrySchemaType = InferSchemaType<typeof weightRetrySchema>;

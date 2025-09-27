@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const eventSchema = {
+export const schema = {
     organizer: String,
     description: String,
     title: String,
@@ -31,5 +32,5 @@ export const eventSchema = {
     }],
 }
 
-export type EventSchemaType = typeof eventSchema;
-export default new Schema(eventSchema);
+export const eventSchema = new Schema(schema);
+export type EventSchemaType = InferSchemaType<typeof eventSchema>;

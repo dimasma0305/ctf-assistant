@@ -1,6 +1,6 @@
 import { SlashCommandSubcommandBuilder, EmbedBuilder } from "discord.js";
 import { SubCommand } from "../../../Model/command";
-import { solveModel } from "../../../Database/connect";
+import { solveModel, ChallengeSchemaType, ChallengeModel } from "../../../Database/connect";
 import { 
     getChallengeInfo, 
     getChannelAndCTFData, 
@@ -45,8 +45,25 @@ export const command: SubCommand = {
             return;
         }
         
-        await solveModel.deleteOne({ctf_id: ctfData.id, challenge: challengeName, category: category});
-        
+        const challenge = await ChallengeModel.findOne({ 
+            name: challengeName, 
+            category 
+          });
+          
+        if (!challenge) {
+            throw new Error("Challenge not found");
+        }
+          
+        const deletedSolve = await solveModel.deleteOne({
+            ctf_id: ctfData.id,
+            challenge_ref: challenge._id
+        });
+
+        if (deletedSolve.deletedCount === 0) {
+            interaction.reply("This challenge solve does not exist.");
+            return;
+        }
+
         // Update thread name to show unsolved status
         await markThreadAsUnsolved(interaction.channel!);
         

@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const messageCacheSchema = new Schema({
+export const schema = {
     channelId: {
         type: String,
         required: true,
@@ -16,6 +17,7 @@ export const messageCacheSchema = new Schema({
         expires: '1h',
         default: Date.now
     }
-});
+}
 
-export default mongoose.model('MessageCache', messageCacheSchema);
+export const messageCacheSchema = new Schema(schema);
+export type MessageCacheSchemaType = InferSchemaType<typeof messageCacheSchema>;

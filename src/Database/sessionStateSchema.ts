@@ -1,6 +1,6 @@
-import { Schema } from 'mongoose';
+import { Schema, InferSchemaType } from 'mongoose';
 
-const sessionStateSchema = new Schema({
+const schema = {
   // Using singleton pattern - only one document will exist
   _id: { type: String, default: 'session_state' },
   
@@ -14,11 +14,12 @@ const sessionStateSchema = new Schema({
   
   savedAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
-});
+}
+
+export const sessionStateSchema = new Schema(schema);
+export type SessionStateSchemaType = InferSchemaType<typeof sessionStateSchema>;
 
 // Update the updatedAt field on save
 sessionStateSchema.pre('save', function() {
   this.updatedAt = new Date();
 });
-
-export default sessionStateSchema;

@@ -1,12 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose, { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const challengeSchema = {
-    // Challenge identification
-    challenge_id: {
-        type: String,
-        required: true,
-    },
+export const schema = {
     name: {
         type: String,
         required: true,
@@ -66,13 +61,5 @@ export const challengeSchema = {
     }
 }
 
-export type ChallengeSchemaType = typeof challengeSchema;
-
-const schema = new Schema(challengeSchema);
-
-// Create compound indexes for efficient queries
-schema.index({ ctf_id: 1, challenge_id: 1 }, { unique: true }); // Unique per CTF
-schema.index({ ctf_id: 1, name: 1 }); // Query by name within CTF
-schema.index({ ctf_id: 1, category: 1 }); // Query by category within CTF
-
-export default schema;
+export const challengeSchema = new Schema(schema);
+export type ChallengeSchemaType = InferSchemaType<typeof challengeSchema>;

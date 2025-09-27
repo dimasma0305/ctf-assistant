@@ -1,5 +1,5 @@
 import { Message as DiscordMessage } from "discord.js";
-import MessageCache from "../../Database/messageCacheSchema";
+import {MessageCacheModel} from "../../Database/connect";
 
 export const MAX_CACHE_SIZE = 20; // Max number of messages to keep per channel cache
 
@@ -45,7 +45,7 @@ export async function updateChannelCache(message: DiscordMessage) {
         embeds: message.embeds.length > 0
     };
     
-    await MessageCache.findOneAndUpdate(
+    await MessageCacheModel.findOneAndUpdate(
         { channelId },
         {
             $push: {
@@ -60,6 +60,6 @@ export async function updateChannelCache(message: DiscordMessage) {
 }
 
 export async function getChannelCache(channelId: string): Promise<SimplifiedMessage[]> {
-    const cache = await MessageCache.findOne({ channelId });
+    const cache = await MessageCacheModel.findOne({ channelId });
     return cache ? cache.messages : [];
 }

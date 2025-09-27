@@ -1,4 +1,4 @@
-import { UserModel, solveModel } from "../../src/Database/connect";
+import { UserModel, solveModel, ChallengeSchemaType } from "../../src/Database/connect";
 import { 
     UserProfile, 
     UserRankingResult, 
@@ -105,18 +105,13 @@ export async function calculateCategoryStats(
             }
 
             // Fetch only essential fields
-            const allSolves = await solveModel.find(allSolvesQuery, {
-                users: 1,
-                category: 1,
-                ctf_id: 1,
-                solved_at: 1
-            }).lean();
+            const allSolves = await solveModel.find(allSolvesQuery).populate<{challenge_ref: ChallengeSchemaType}>("challenge_ref", "name category").lean();
             
             // Convert to UserSolve format
             relevantSolves = allSolves.map(solve => ({
                 ctf_id: solve.ctf_id,
-                challenge: 'Challenge', // Placeholder
-                category: solve.category || 'misc',
+                challenge: solve.challenge_ref.name || 'Challenge',
+                category: solve.challenge_ref.category || 'misc',
                 points: 100, // Default points since we don't have challenge_ref populated
                 solved_at: solve.solved_at,
                 users: solve.users.map((id: any) => id.toString())

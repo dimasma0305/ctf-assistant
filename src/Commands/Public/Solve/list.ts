@@ -1,6 +1,6 @@
 import { SubCommand } from "../../../Model/command";
 import { EmbedBuilder, SlashCommandSubcommandBuilder, TextChannel } from "discord.js";
-import { solveModel } from "../../../Database/connect";
+import { ChallengeSchemaType, UserSchemaType, solveModel, SolveSchemaType } from "../../../Database/connect";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -21,14 +21,14 @@ export const command: SubCommand = {
       interaction.reply("This channel does not have a valid CTF event associated with it.");
       return
     }
-    const solves = await solveModel.find({ctf_id: data.id}).populate('users')
+    const solves = await solveModel.find({ctf_id: data.id}).populate<{users: UserSchemaType[]}>('users').populate<{challenge_ref: ChallengeSchemaType}>('challenge_ref')
     var description;
     if (solves.length == 0){
         description = "No solved challenges found."
     }else{
         // Group solves by category
-        const solvesByCategory = solves.reduce((acc: any, solve: any) => {
-            const category = solve.category || "Legacy"; // Use "Legacy" for old solves without category
+        const solvesByCategory = solves.reduce((acc: any, solve) => {
+            const category = solve.challenge_ref.category || "Legacy"; // Use "Legacy" for old solves without category
             if (!acc[category]) {
                 acc[category] = [];
             }
@@ -44,7 +44,7 @@ export const command: SubCommand = {
                 const challengesList = solvesByCategory[category]
                     .map((solve: any) => {
                         // Extract discord_ids from populated users
-                        const userMentions = solve.users.map((user: any) => {
+                        const userMentions = solve.users.map((user: UserSchemaType) => {
                             if (typeof user === 'object' && user !== null && 'discord_id' in user) {
                                 return `<@${user.discord_id}>`;
                             } else if (typeof user === 'string') {
@@ -53,7 +53,7 @@ export const command: SubCommand = {
                             }
                             return '<@unknown>';
                         }).join(', ');
-                        return `• **${solve.challenge}** solved by ${userMentions}`;
+                        return `• **${solve.challenge_ref.name}** solved by ${userMentions}`;
                     })
                     .join('\n');
                 return `${categoryHeader}\n${challengesList}`;

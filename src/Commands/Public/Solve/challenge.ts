@@ -1,7 +1,7 @@
 
 import { SubCommand } from "../../../Model/command";
 import { EmbedBuilder, SlashCommandSubcommandBuilder } from "discord.js";
-import { solveModel, ChallengeModel } from "../../../Database/connect";
+import { solveModel, ChallengeModel, UserModel } from "../../../Database/connect";
 import { 
     getChallengeInfo, 
     getChannelAndCTFData, 
@@ -9,6 +9,7 @@ import {
     extractAndProcessUserIds, 
     markThreadAsSolved 
 } from "./utils";
+import { UserSchemaType } from "../../../Database/userSchema";
 
 // Helper function to create or update challenge data
 async function createOrUpdateChallenge(challengeName: string, category: string, ctfId: string, points: number = 100) {
@@ -27,7 +28,6 @@ async function createOrUpdateChallenge(challengeName: string, category: string, 
     } else {
         // Create new challenge
         challenge = new ChallengeModel({
-            challenge_id: `${ctfId}-${challengeName.replace(/[^a-zA-Z0-9]/g, '-')}`,
             name: challengeName,
             category: category,
             points: points,
@@ -85,17 +85,14 @@ export const command: SubCommand = {
         // Create or update challenge in database
         const challengeData = await createOrUpdateChallenge(challengeName, category, ctfData.id.toString(), 100);
         
-        const existingSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: ctfData.id.toString() });
+        const existingSolve = await solveModel.findOne({ challenge_ref: challengeData._id, ctf_id: ctfData.id.toString() });
         if (existingSolve) {
             existingSolve.users = userObjectIds;
-            existingSolve.category = category; // Update category in case it changed
             existingSolve.challenge_ref = challengeData._id; // Update challenge reference
             await existingSolve.save();
         } else {
             const newSolve = new solveModel({
-                challenge: challengeName,
                 ctf_id: ctfData.id.toString(),
-                category: category,
                 users: userObjectIds,
                 challenge_ref: challengeData._id,
             });
@@ -107,8 +104,8 @@ export const command: SubCommand = {
         await challengeData.save();
         
         // Get Discord IDs for mentions by populating the users
-        const populatedSolve = await solveModel.findOne({ challenge: challengeName, ctf_id: ctfData.id.toString() }).populate('users');
-        const discordIds = populatedSolve?.users?.map((user: any) => user.discord_id) || [];
+        const populatedSolve = await solveModel.findOne({ challenge_ref: challengeData._id, ctf_id: ctfData.id.toString() }).populate<{users: UserSchemaType[]}>('users');
+        const discordIds = populatedSolve?.users?.map((user) => user.discord_id) || [];
         
         const winnerEmbed = new EmbedBuilder()
             .setColor('#0099ff')

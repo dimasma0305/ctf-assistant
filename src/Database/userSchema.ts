@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { InferSchemaType } from 'mongoose';
 const { Schema } = mongoose;
 
-export const userSchema = {
+export const schema = {
     // Discord user ID as the primary identifier
     discord_id: {
         type: String,
@@ -30,5 +31,5 @@ export const userSchema = {
     }
 }
 
-export type UserSchemaType = typeof userSchema;
-export default new Schema(userSchema);
+export const userSchema = new Schema(schema);
+export type UserSchemaType = InferSchemaType<typeof userSchema>;

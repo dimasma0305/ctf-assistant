@@ -166,7 +166,6 @@ async function saveChallengesFromFetch(challenges: any[], ctfId: string) {
             } else {
                 // Create new challenge
                 challenge = new ChallengeModel({
-                    challenge_id: `${ctfId}-${challengeData.name.replace(/[^a-zA-Z0-9]/g, '-')}`,
                     name: challengeData.name,
                     category: challengeData.category,
                     points: challengeData.points,

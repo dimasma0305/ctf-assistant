@@ -1,5 +1,7 @@
 import { solveModel, ChallengeModel } from '../Database/connect';
 import { infoEvent } from './ctftime-v2';
+import { ChallengeSchemaType } from '../Database/challengeSchema';
+import { UserSchemaType } from '../Database/userSchema';
 
 /**
  * NEW:
@@ -85,7 +87,7 @@ export class FairScoringSystem {
      */
     static async calculateUserScores(globalQuery: any = {}): Promise<Map<string, UserScore>> {
         // Get solves with populated challenge data and user data
-        const solves = await solveModel.find(globalQuery).populate('challenge_ref').populate('users').lean();
+        const solves = await solveModel.find(globalQuery).populate<{challenge_ref: ChallengeSchemaType}>('challenge_ref').populate<{users: UserSchemaType[]}>('users').lean();
         const userScores = new Map<string, UserScore>();
 
         // Get unique CTF IDs from solves
@@ -97,12 +99,12 @@ export class FairScoringSystem {
         // Group solves by user
         for (const solve of solves) {
             // Get challenge data from populated reference
-            let challengeName = solve.challenge || 'Unknown';
-            let challengeCategory = solve.category || 'Unknown';
+            let challengeName = solve.challenge_ref.name || 'Unknown';
+            let challengeCategory = solve.challenge_ref.category || 'Unknown';
             let challengePoints = 100;
 
             if (solve.challenge_ref && typeof solve.challenge_ref === 'object' && solve.challenge_ref !== null && 'points' in solve.challenge_ref) {
-                const challengeRef = solve.challenge_ref as any;
+                const challengeRef = solve.challenge_ref;
                 challengeName = challengeRef.name || challengeName;
                 challengeCategory = challengeRef.category || challengeCategory;
                 challengePoints = challengeRef.points || 100;
@@ -114,7 +116,7 @@ export class FairScoringSystem {
                 for (const user of solve.users) {
                     if (typeof user === 'object' && user !== null && 'discord_id' in user) {
                         // User is populated
-                        const populatedUser = user as any;
+                        const populatedUser = user;
                         userDiscordIds.push(populatedUser.discord_id);
                     } else if (typeof user === 'string') {
                         // Fallback: if not populated, assume it's a discord_id (shouldn't happen with new system)
