@@ -152,8 +152,8 @@ router.get("/", async (req, res) => {
                 ctfId ? 'CTF' : undefined // CTF title fallback
             );
 
-            const categories = Array.from(entry.categories).map(category => categoryNormalize(category));
-            
+            const categories = new Set(Array.from(entry.categories).map(category => categoryNormalize(category)));
+
             return {
                 rank: userRank, // Use rank from appropriate dataset (monthly/yearly separate rankings, global for overall)
                 user: {
