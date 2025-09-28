@@ -1,41 +1,139 @@
 import { SubCommand } from "../../../Model/command";
-import { SlashCommandSubcommandBuilder, TextChannel, ThreadAutoArchiveDuration } from "discord.js";
+import { SlashCommandSubcommandBuilder, TextChannel, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, AttachmentBuilder, ChatInputCommandInteraction, ModalSubmitInteraction } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
-import { solveModel } from "../../../Database/connect";
-import { parseChallenges, ParsedChallenge, parseFetchCommand, ParsedFetchCommand, saveFetchCommand } from "./utils";
-
-// Moved to challengeUtils.ts
+import { parseChallenges, ParsedChallenge, parseFetchCommand, ParsedFetchCommand, saveFetchCommand, updateThreadsStatus } from "./utils";
 
 export const command: SubCommand = {
     data: new SlashCommandSubcommandBuilder()
         .setName('init')
         .setDescription('Initialize challenges from CTF platform JSON (creates threads with ❌ prefix)')
         .addStringOption(option => option
-            .setName("json")
-            .setDescription("JSON data from CTF platform API endpoint (optional if fetch_command is provided)")
-            .setRequired(false)
-        )
-        .addStringOption(option => option
             .setName("fetch_command")
             .setDescription("JavaScript fetch command to run every 5 minutes for auto-updates (optional)")
             .setRequired(false)
+        )
+        .addAttachmentOption(option => option
+            .setName("json_file")
+            .setDescription("Upload a JSON file containing challenge data (alternative to modal input)")
+            .setRequired(false)
         ),
     async execute(interaction, _client) {
-        await interaction.deferReply({ flags: ["Ephemeral"] });
+        let finalJsonData: string | null = null;
+        let currentInteraction: ChatInputCommandInteraction | ModalSubmitInteraction = interaction;
         
         const channel = interaction.channel;
         if (!channel || !(channel instanceof TextChannel)) {
-            await interaction.editReply("This command can only be used in a text channel.");
+            await interaction.reply({ content: "This command can only be used in a text channel.", ephemeral: true });
             return;
         }
 
-        const jsonData = interaction.options.getString("json");
         const fetchCommand = interaction.options.getString("fetch_command");
+        const jsonFile = interaction.options.getAttachment("json_file");
 
-        // Validate that either JSON data or fetch command is provided
-        if (!jsonData && !fetchCommand) {
-            await interaction.editReply("❌ You must provide either `json` data or a `fetch_command`.");
-            return;
+        // Priority: File upload > Fetch command > Modal input
+        if (jsonFile) {
+            await interaction.deferReply({ ephemeral: true });
+            
+            // Validate file type
+            if (!jsonFile.name.endsWith('.json') && !jsonFile.name.endsWith('.txt')) {
+                await interaction.editReply("❌ Please upload a .json or .txt file containing the JSON data.");
+                return;
+            }
+
+            // Validate file size (Discord limit is 25MB for nitro, 8MB for regular users)
+            if (jsonFile.size > 25 * 1024 * 1024) {
+                await interaction.editReply("❌ File is too large. Maximum file size is 25MB.");
+                return;
+            }
+
+            try {
+                const response = await fetch(jsonFile.url);
+                if (!response.ok) {
+                    await interaction.editReply(`❌ Failed to download file: ${response.status} ${response.statusText}`);
+                    return;
+                }
+                
+                finalJsonData = await response.text();
+                
+                if (!finalJsonData.trim()) {
+                    await interaction.editReply("❌ The uploaded file is empty.");
+                    return;
+                }
+            } catch (error) {
+                await interaction.editReply(`❌ Failed to read file: ${error}`);
+                return;
+            }
+        } else if (fetchCommand) {
+            await interaction.deferReply({ ephemeral: true });
+            // Handle fetch command (existing code)
+        } else {
+            // Show modal with multiple inputs for large JSON
+            const modal = new ModalBuilder()
+                .setCustomId('json_data_modal')
+                .setTitle('CTF Platform JSON Data');
+
+            // Create multiple text inputs for larger data
+            const jsonInput1 = new TextInputBuilder()
+                .setCustomId('json_data_input_1')
+                .setLabel('JSON Data (Part 1/3)')
+                .setStyle(TextInputStyle.Paragraph)
+                .setPlaceholder('Paste the first part of your JSON data here...')
+                .setRequired(true)
+                .setMaxLength(4000);
+
+            const jsonInput2 = new TextInputBuilder()
+                .setCustomId('json_data_input_2')
+                .setLabel('JSON Data (Part 2/3) - Optional')
+                .setStyle(TextInputStyle.Paragraph)
+                .setPlaceholder('Continue your JSON data here if it was too long...')
+                .setRequired(false)
+                .setMaxLength(4000);
+
+            const jsonInput3 = new TextInputBuilder()
+                .setCustomId('json_data_input_3')
+                .setLabel('JSON Data (Part 3/3) - Optional')
+                .setStyle(TextInputStyle.Paragraph)
+                .setPlaceholder('Final part of your JSON data...')
+                .setRequired(false)
+                .setMaxLength(4000);
+
+            const actionRow1 = new ActionRowBuilder<TextInputBuilder>().addComponents(jsonInput1);
+            const actionRow2 = new ActionRowBuilder<TextInputBuilder>().addComponents(jsonInput2);
+            const actionRow3 = new ActionRowBuilder<TextInputBuilder>().addComponents(jsonInput3);
+            
+            modal.addComponents(actionRow1, actionRow2, actionRow3);
+
+            await interaction.showModal(modal);
+
+            try {
+                const modalSubmitInteraction = await interaction.awaitModalSubmit({
+                    time: 300000, // 5 minutes timeout
+                    filter: (i) => i.user.id === interaction.user.id && i.customId === 'json_data_modal'
+                });
+
+                const jsonPart1 = modalSubmitInteraction.fields.getTextInputValue('json_data_input_1');
+                const jsonPart2 = modalSubmitInteraction.fields.getTextInputValue('json_data_input_2') || '';
+                const jsonPart3 = modalSubmitInteraction.fields.getTextInputValue('json_data_input_3') || '';
+                
+                // Combine all parts
+                const combinedJson = (jsonPart1 + jsonPart2 + jsonPart3).trim();
+                
+                if (!combinedJson) {
+                    await modalSubmitInteraction.reply({ 
+                        content: "❌ No JSON data provided. Command cancelled.", 
+                        ephemeral: true 
+                    });
+                    return;
+                }
+                
+                finalJsonData = combinedJson;
+                
+                await modalSubmitInteraction.deferReply({ ephemeral: true });
+                currentInteraction = modalSubmitInteraction;
+                
+            } catch (error) {
+                return;
+            }
         }
 
         // Parse channel topic to get CTF event data
@@ -44,62 +142,56 @@ export const command: SubCommand = {
             const id = JSON.parse(channel.topic || "{}").id;
 
             if (!id) {
-                await interaction.editReply("This channel does not have a valid CTF event associated with it.");
+                await currentInteraction.editReply("This channel does not have a valid CTF event associated with it.");
                 return;
             }
 
             ctfData = await infoEvent(id, false);
             if (!ctfData.id) {
-                await interaction.editReply("This channel does not have a valid CTF event associated with it.");
+                await currentInteraction.editReply("This channel does not have a valid CTF event associated with it.");
                 return;
             }
         } catch (error) {
-            await interaction.editReply("Failed to parse channel topic. Make sure this is a CTF event channel.");
+            await currentInteraction.editReply("Failed to parse channel topic. Make sure this is a CTF event channel.");
             return;
         }
 
-        // Get JSON data either from user input or fetch command
-        let finalJsonData: string;
+        // Handle fetch command if provided
         let parsedFetch: ParsedFetchCommand | null = null;
         
-        if (fetchCommand) {
+        if (fetchCommand && !finalJsonData) {
             try {
-                // Parse and execute the fetch command to get JSON data
                 parsedFetch = parseFetchCommand(fetchCommand);
                 
-                // Execute the fetch command
                 const response = await fetch(parsedFetch.url, {
                     method: parsedFetch.method,
-                    headers: parsedFetch.headers as any,
-                    body: parsedFetch.body || undefined
+                    headers: parsedFetch.headers,
+                    body: parsedFetch.body
                 });
 
+                await saveFetchCommand(parsedFetch, ctfData, channel.id);
+
                 if (!response.ok) {
-                    await interaction.editReply(`❌ Fetch command failed: ${response.status} ${response.statusText}`);
+                    await currentInteraction.editReply(`❌ Fetch command failed: ${response.status} ${response.statusText}`);
                     return;
                 }
 
                 finalJsonData = await response.text();
                 
-                // Use provided JSON data as fallback if fetch fails to return data
-                if (!finalJsonData.trim() && jsonData) {
-                    finalJsonData = jsonData;
-                }
-            } catch (error) {
-                if (jsonData) {
-                    // Fallback to provided JSON data if fetch fails
-                    finalJsonData = jsonData;
-                    await interaction.followUp({ 
-                        content: `⚠️ Fetch command failed (${error}), using provided JSON data as fallback.`, 
-                        ephemeral: true 
-                    });
-                } else {
-                    await interaction.editReply(`❌ Fetch command failed and no JSON fallback provided: ${error}`);
+                if (!finalJsonData.trim()) {
+                    await currentInteraction.editReply("❌ Fetch command returned empty data.");
                     return;
                 }
+            } catch (error) {
+                await currentInteraction.editReply(`❌ Fetch command failed: ${error}`);
+                return;
             }
-        } else {
-            finalJsonData = jsonData!; // We know it exists due to validation above
+        }
+
+        // Validate that we have JSON data before proceeding
+        if (!finalJsonData || !finalJsonData.trim()) {
+            await currentInteraction.editReply("❌ No valid JSON data obtained. Please provide JSON data via file upload, fetch command, or modal input.");
+            return;
         }
 
         // Parse challenges based on platform
@@ -107,102 +199,25 @@ export const command: SubCommand = {
         try {
             challenges = await parseChallenges(finalJsonData);
         } catch (error) {
-            await interaction.editReply(`❌ Failed to parse JSON data: ${error}`);
+            await currentInteraction.editReply(`❌ Failed to parse JSON data: ${error}`);
             return;
         }
 
         if (challenges.length === 0) {
-            await interaction.editReply("No challenges found in the provided JSON data.");
+            await currentInteraction.editReply("No challenges found in the provided JSON data.");
             return;
         }
 
-        // Get existing solves from database
-        const existingSolves = await solveModel.find({ ctf_id: ctfData.id });
-        const solvedChallenges = new Set(existingSolves.filter(solve => solve.challenge).map(solve => solve.challenge!.toLowerCase()));
-
-        // Group challenges by category
-        const challengesByCategory = challenges.reduce((acc, challenge) => {
-            const category = challenge.category || 'misc';
-            if (!acc[category]) {
-                acc[category] = [];
-            }
-            acc[category].push(challenge);
-            return acc;
-        }, {} as Record<string, ParsedChallenge[]>);
-
-        let createdThreads = 0;
-        let skippedThreads = 0;
-        const errors: string[] = [];
-
-        // Create threads for each challenge
-        for (const [category, categoryChallenges] of Object.entries(challengesByCategory)) {
-            // Sort challenges by points (ascending)
-            const sortedChallenges = (categoryChallenges as ParsedChallenge[]).sort((a, b) => a.points - b.points);
-            
-            for (const challenge of sortedChallenges) {
-                try {
-                    // Determine prefix based on solve status
-                    const isSolved = solvedChallenges.has(challenge.name.toLowerCase());
-                    const prefix = isSolved ? '✅' : '❌';
-                    
-                    // Format thread name: "❌ [Category] Challenge Name"
-                    const threadName = `${prefix} [${category.toUpperCase()}] ${challenge.name}`;
-                    
-                    // Check if thread already exists
-                    const existingThread = channel.threads.cache.find(thread => 
-                        thread.name === threadName || 
-                        thread.name === `✅ [${category.toUpperCase()}] ${challenge.name}` ||
-                        thread.name === `❌ [${category.toUpperCase()}] ${challenge.name}`
-                    );
-                    
-                    if (existingThread) {
-                        skippedThreads++;
-                        continue;
-                    }
-
-                    // Create thread
-                    const thread = await channel.threads.create({
-                        name: threadName,
-                        autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
-                        reason: `CTF Challenge: ${challenge.name} (${category})`
-                    });
-
-                    // Send initial message with challenge info
-                    const challengeInfo = [
-                        `# ${challenge.name}`,
-                        `**Category:** ${category}`,
-                        `**Points:** ${challenge.points}`,
-                        `**Solves:** ${challenge.solves}`,
-                        challenge.tags && challenge.tags.length > 0 ? `**Tags:** ${challenge.tags.join(', ')}` : '',
-                        '',
-                        '💡 **Use this thread to discuss and solve this challenge!**',
-                        '📝 When solved, use `/solve challenge` to mark it as complete.',
-                        '',
-                        '---',
-                        `*Challenge ID: ${challenge.id}*`
-                    ].filter(line => line !== '').join('\n');
-
-                    await thread.send(challengeInfo);
-                    createdThreads++;
-                    
-                } catch (error) {
-                    errors.push(`${challenge.name}: ${error}`);
-                    console.error(`Failed to create thread for ${challenge.name}:`, error);
-                }
-            }
-        }
+        const { updatedMessages, errors, skippedThreads } = await updateThreadsStatus(challenges, channel, ctfData.id);
 
         // Summary message
         const summary = [
             `✅ **Challenge Initialization Complete!**`,
             '',
             `📊 **Summary:**`,
-            `• Created: ${createdThreads} threads`,
+            `• Created: ${updatedMessages} threads`,
             `• Skipped (already exist): ${skippedThreads} threads`,
             `• Total challenges: ${challenges.length}`,
-            '',
-            `📂 **Categories processed:**`,
-            Object.keys(challengesByCategory).map(cat => `• ${cat}: ${challengesByCategory[cat].length} challenges`).join('\n')
         ];
 
         if (errors.length > 0) {
@@ -213,18 +228,18 @@ export const command: SubCommand = {
             }
         }
 
-        await interaction.editReply(summary.join('\n'));
+        await currentInteraction.editReply(summary.join('\n'));
         
         // Handle fetch command if provided - save it for periodic updates
         if (fetchCommand && parsedFetch) {
             try {
                 await saveFetchCommand(parsedFetch, ctfData, channel.id);
-                await interaction.followUp({ 
+                await currentInteraction.followUp({ 
                     content: "✅ Auto-update fetch command saved! The bot will now fetch updates every 5 minutes until the CTF ends.", 
                     ephemeral: true 
                 });
             } catch (error) {
-                await interaction.followUp({ 
+                await currentInteraction.followUp({ 
                     content: `⚠️ Failed to save fetch command for auto-updates: ${error}`, 
                     ephemeral: true 
                 });
@@ -232,4 +247,3 @@ export const command: SubCommand = {
         }
     },
 };
-

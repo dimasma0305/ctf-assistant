@@ -3,7 +3,7 @@ import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 import cron from "node-cron";
 import { FetchCommandModel, WeightRetryModel, ChallengeModel } from "../../Database/connect";
-import { parseChallenges, updateThreadStatus } from "../../Commands/Public/Solve/utils";
+import { parseChallenges, updateThreadsStatus } from "../../Commands/Public/Solve/utils";
 import { infoEvent } from "../../Functions/ctftime-v2";
 
 export const event: Event = {
@@ -124,7 +124,7 @@ async function updateChallengesFromFetch(jsonData: string, fetchCmd: any, channe
         await saveChallengesFromFetch(challenges, fetchCmd.ctf.ctf_id);
 
         // Update thread status for each challenge
-        await updateThreadStatus(challenges, channel, fetchCmd.ctf.ctf_id);
+        await updateThreadsStatus(challenges, channel, fetchCmd.ctf.ctf_id);
         
         console.log(`Updated ${challenges.length} challenges for CTF ${fetchCmd.ctf.ctf_id}`);
         
