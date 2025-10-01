@@ -48,50 +48,6 @@ export default function UserProfilePage() {
     return name.slice(0, 2).toUpperCase()
   }
 
-  const generateCertificatesFromProfile = (profileData: UserProfileResponse) => {
-    const certificates = []
-    const currentDate = new Date()
-    const currentYear = currentDate.getFullYear()
-    const currentMonth = currentDate.getMonth() + 1
-
-    if (profileData.globalRank <= 3) {
-      certificates.push({
-        id: `cert-${currentYear}`,
-        type: "yearly" as const,
-        period: currentYear.toString(),
-        rank: profileData.globalRank,
-        totalParticipants: profileData.totalUsers,
-        score: profileData.stats.totalScore,
-        solves: profileData.stats.solveCount,
-        categories: profileData.categoryBreakdown.map((cat) => cat.name),
-        issuedDate: `${currentYear}-12-31T23:59:59Z`,
-        isPending: true,
-        issuedAt: null,
-      })
-
-      if (currentDate.getDate() > 7) {
-        const monthStr = currentMonth.toString().padStart(2, "0")
-        const isCurrentMonth = true
-        certificates.push({
-          id: `cert-${currentYear}-${monthStr}`,
-          type: "monthly" as const,
-          period: `${currentYear}-${monthStr}`,
-          rank: profileData.globalRank,
-          totalParticipants: profileData.totalUsers,
-          score: profileData.stats.totalScore,
-          solves: profileData.stats.solveCount,
-          categories: profileData.categoryBreakdown.map((cat) => cat.name),
-          issuedDate: `${currentYear}-${monthStr}-${new Date(currentYear, currentMonth, 0).getDate()}T23:59:59Z`,
-          isPending: isCurrentMonth,
-          issuedAt: isCurrentMonth
-            ? null
-            : `${currentYear}-${monthStr}-${new Date(currentYear, currentMonth, 0).getDate()}T23:59:59Z`,
-        })
-      }
-    }
-
-    return certificates
-  }
 
   const achievements: Achievement[] = getAchievements(profileData?.achievementIds || [])
   const allAchievements = Object.values(ACHIEVEMENTS)
@@ -547,12 +503,7 @@ export default function UserProfilePage() {
                   <CardDescription>Official certificates for outstanding performance</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
-                  {profileData && (
-                    <CertificateGenerator
-                      user={profileData.user}
-                      certificates={generateCertificatesFromProfile(profileData)}
-                    />
-                  )}
+                  <CertificateGenerator userId={userId} />
                 </CardContent>
               </Card>
             </TabsContent>

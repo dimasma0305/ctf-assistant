@@ -8,6 +8,8 @@ import type {
   CTFDetailsResponse,
   CacheStatusResponse,
   CTFRankingsResponse,
+  CertificateResponse,
+  SingleCertificateResponse,
   ScoreboardParams,
   CTFsParams,
   CTFRankingsParams,
@@ -139,4 +141,18 @@ export async function getHealth(): Promise<{
   timestamp: string
 }> {
   return fetchAPI("/health")
+}
+
+/**
+ * Fetch user certificates
+ */
+export async function getCertificates(userId: string): Promise<CertificateResponse> {
+  return fetchAPI<CertificateResponse>(`/api/certificates/${userId}`)
+}
+
+/**
+ * Fetch a specific certificate
+ */
+export async function getCertificate(userId: string, period: string): Promise<SingleCertificateResponse> {
+  return fetchAPI<SingleCertificateResponse>(`/api/certificates/${userId}/${period}`)
 }

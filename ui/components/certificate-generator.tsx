@@ -4,34 +4,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Trophy, Medal, Award, Eye, Calendar, Star, X, Share2, ExternalLink, Clock } from "lucide-react"
-import type { UserInfo } from "@/lib/types"
-import { Certificate } from "@/components/certificate"
+import type { Certificate } from "@/lib/types"
+import { Certificate as CertificateComponent } from "@/components/certificate"
 import { useState } from "react"
 import Link from "next/link"
-
-interface CertificateData {
-  id: string
-  type: "monthly" | "yearly"
-  period: string
-  rank: number
-  totalParticipants: number
-  score: number
-  solves: number
-  categories: string[]
-  issuedDate: string
-  isPending?: boolean
-  issuedAt?: string | null
-}
+import { useCertificates } from "@/hooks/useAPI"
 
 interface CertificateGeneratorProps {
-  user: UserInfo
-  certificates: CertificateData[]
+  userId: string
 }
 
-export function CertificateGenerator({ user, certificates }: CertificateGeneratorProps) {
-  const [showingCertificate, setShowingCertificate] = useState<CertificateData | null>(null)
+export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
+  const { data: certificateData, loading, error } = useCertificates(userId)
+  const [showingCertificate, setShowingCertificate] = useState<Certificate | null>(null)
   const [showPendingOverlay, setShowPendingOverlay] = useState(true)
-  const displayName = user.displayName || user.username
+  
+  const displayName = certificateData?.userInfo?.displayName || certificateData?.userInfo?.username || "User"
+
+  // Debug logging
+  console.log('CertificateGenerator Debug:', {
+    userId,
+    loading,
+    error,
+    certificateData,
+    certificatesCount: certificateData?.certificates?.length || 0,
+    debug: (certificateData?.metadata as any)?.debug
+  })
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -41,6 +39,14 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
         return <Medal className="w-6 h-6 text-gray-400" />
       case 3:
         return <Award className="w-6 h-6 text-amber-600" />
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+        return <Star className="w-6 h-6 text-blue-500" />
       default:
         return null
     }
@@ -54,6 +60,14 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
         return "Second Place"
       case 3:
         return "Third Place"
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+        return `Top 10 - #${rank}`
       default:
         return `${rank}th Place`
     }
@@ -67,8 +81,16 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
         return "from-gray-300 to-gray-500"
       case 3:
         return "from-amber-400 to-amber-600"
-      default:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
         return "from-blue-400 to-blue-600"
+      default:
+        return "from-purple-400 to-purple-600"
     }
   }
 
@@ -84,7 +106,7 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
     return `${monthName} ${year}`
   }
 
-  const showCertificate = (certificate: CertificateData) => {
+  const showCertificate = (certificate: Certificate) => {
     setShowingCertificate(certificate)
     setShowPendingOverlay(true)
   }
@@ -94,12 +116,12 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
     setShowPendingOverlay(true)
   }
 
-  const getCertificateShareUrl = (certificate: CertificateData) => {
-    const periodForUrl = certificate.type === "yearly" ? certificate.period : certificate.period.replace("-", "-")
-    return `/certificate/${user.userId}/${periodForUrl}`
+  const getCertificateShareUrl = (certificate: Certificate) => {
+    const periodForUrl = certificate.type === "yearly" ? certificate.period : certificate.periodValue
+    return `/certificate/${userId}/${periodForUrl}`
   }
 
-  const handleShareCertificate = async (certificate: CertificateData) => {
+  const handleShareCertificate = async (certificate: Certificate) => {
     if (certificate.isPending || !certificate.issuedAt) {
       return
     }
@@ -122,12 +144,50 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
     }
   }
 
-  const processedCertificates = certificates
-    .filter((cert) => cert.rank <= 3)
-    .map((cert) => ({
-      ...cert,
-      isPending: !cert.issuedAt || cert.issuedAt === null,
-    }))
+  if (loading) {
+    return (
+      <div className="p-6 space-y-4">
+        <div className="h-6 w-48 bg-muted animate-pulse rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="h-32 bg-muted animate-pulse rounded-xl" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center space-y-4">
+        <div className="w-12 h-12 mx-auto bg-destructive/20 rounded-full flex items-center justify-center">
+          <Award className="w-6 h-6 text-destructive" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Error Loading Certificates</h3>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!certificateData || certificateData.certificates.length === 0) {
+    return (
+      <div className="p-6 text-center space-y-4">
+        <div className="w-12 h-12 mx-auto bg-muted rounded-full flex items-center justify-center">
+          <Award className="w-6 h-6 text-muted-foreground" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">No Certificates Available</h3>
+          <p className="text-sm text-muted-foreground">
+            Certificates are only available for top 10 players in the leaderboard.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const certificates = certificateData.certificates
 
   if (showingCertificate) {
     return (
@@ -160,14 +220,14 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
               </div>
             </div>
           )}
-          <Certificate
+          <CertificateComponent
             username={displayName}
             rank={showingCertificate.rank}
             totalParticipants={showingCertificate.totalParticipants}
             score={showingCertificate.score}
-            solves={showingCertificate.solves}
-            categories={showingCertificate.categories.length}
-            period={formatPeriod(showingCertificate.period, showingCertificate.type)}
+            solves={showingCertificate.stats.challenges}
+            categories={showingCertificate.stats.categories}
+            period={showingCertificate.period}
             issuedDate={showingCertificate.issuedDate}
           />
         </div>
@@ -175,7 +235,7 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
     )
   }
 
-  if (processedCertificates.length === 0) {
+  if (certificates.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -203,13 +263,13 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Trophy className="w-5 h-5" />
-          Certificates ({processedCertificates.length})
+          Certificates ({certificates.length})
         </CardTitle>
         <CardDescription>Achievement certificates for top 3 placements in monthly and yearly rankings</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {processedCertificates.map((certificate) => (
+          {certificates.map((certificate) => (
             <Card
               key={certificate.id}
               className={`relative overflow-hidden ${certificate.isPending ? "opacity-60" : ""}`}
@@ -260,11 +320,11 @@ export function CertificateGenerator({ user, certificates }: CertificateGenerato
                     <div className="text-xs text-muted-foreground">Total Score</div>
                   </div>
                   <div className="text-center p-2 sm:p-3 bg-muted/50 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-primary">{certificate.solves}</div>
+                    <div className="text-lg sm:text-xl font-bold text-primary">{certificate.stats.challenges}</div>
                     <div className="text-xs text-muted-foreground">Challenges</div>
                   </div>
                   <div className="text-center p-2 sm:p-3 bg-muted/50 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-primary">{certificate.categories.length}</div>
+                    <div className="text-lg sm:text-xl font-bold text-primary">{certificate.stats.categories}</div>
                     <div className="text-xs text-muted-foreground">Categories</div>
                   </div>
                 </div>

@@ -9,6 +9,7 @@ import { getCachedUserScores } from './services/dataService';
 import scoreboardRoutes from './routes/scoreboard';
 import profileRoutes from './routes/profiles';
 import ctfRoutes from './routes/ctfs';
+import certificateRoutes from './routes/certificates';
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.get("/health", (req, res) => {
 app.use("/api/scoreboard", scoreboardRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/ctfs", ctfRoutes);
+app.use("/api/certificates", certificateRoutes);
 
 // Ensure client guilds are fetched
 client.guilds.fetch();

@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Certificate } from "@/components/certificate"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Share2, Clock } from "lucide-react"
-import { useUserProfile } from "@/hooks/useAPI"
+import { useCertificate } from "@/hooks/useAPI"
 import { useState, useEffect } from "react"
 
 export default function PublicCertificatePage() {
@@ -15,7 +15,7 @@ export default function PublicCertificatePage() {
   const [shareSuccess, setShareSuccess] = useState(false)
   const [canGoBack, setCanGoBack] = useState(false)
 
-  const { data: profileData, loading, error } = useUserProfile(userId)
+  const { data: certificateData, loading, error } = useCertificate(userId, period)
 
   useEffect(() => {
     // Check if there's a previous page in history
@@ -43,18 +43,8 @@ export default function PublicCertificatePage() {
   }
 
   const isCertificatePending = () => {
-    // In a real implementation, you would check the certificate status from the API
-    // For now, we'll assume certificates issued in the current month are pending
-    const currentDate = new Date()
-    const currentYear = currentDate.getFullYear()
-    const currentMonth = currentDate.getMonth() + 1
-
-    if (period.includes("-")) {
-      const [year, month] = period.split("-")
-      return Number.parseInt(year) === currentYear && Number.parseInt(month) === currentMonth
-    } else {
-      return Number.parseInt(period) === currentYear
-    }
+    // Check certificate status from API data
+    return certificateData?.certificate?.isPending || false
   }
 
   const handleShare = async () => {
@@ -62,7 +52,7 @@ export default function PublicCertificatePage() {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: `${profileData?.user.displayName || profileData?.user.username}'s TCP1P Certificate`,
+          title: `${certificateData?.userInfo?.displayName || certificateData?.userInfo?.username}'s TCP1P Certificate`,
           text: `Check out this TCP1P Community achievement certificate!`,
           url: shareUrl,
         })
@@ -87,7 +77,7 @@ export default function PublicCertificatePage() {
     )
   }
 
-  if (error || !profileData) {
+  if (error || !certificateData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
@@ -99,20 +89,8 @@ export default function PublicCertificatePage() {
     )
   }
 
-  // Check if user is eligible for certificate (top 3)
-  if (profileData.globalRank > 3) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center">
-          <h1 className="text-xl sm:text-2xl font-bold mb-2">Certificate Not Available</h1>
-          <p className="text-muted-foreground mb-4">Certificates are only available for top 3 ranked players.</p>
-          <Button onClick={handleNavigation}>{canGoBack ? "Return to Previous Page" : "Return to Dashboard"}</Button>
-        </div>
-      </div>
-    )
-  }
 
-  if (isCertificatePending()) {
+  if (certificateData && isCertificatePending()) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md mx-auto">
@@ -163,22 +141,22 @@ export default function PublicCertificatePage() {
         {/* Certificate Display */}
         <div className="flex justify-center mb-6 sm:mb-8">
           <Certificate
-            username={profileData.user.displayName || profileData.user.username}
-            rank={profileData.globalRank}
-            totalParticipants={profileData.totalUsers}
-            score={profileData.stats.totalScore}
-            solves={profileData.stats.solveCount}
-            categories={profileData.categoryBreakdown.length}
-            period={formatPeriod(period)}
-            issuedDate={new Date().toISOString()}
+            username={certificateData.userInfo.displayName || certificateData.userInfo.username}
+            rank={certificateData.certificate.rank}
+            totalParticipants={certificateData.certificate.totalParticipants}
+            score={certificateData.certificate.score}
+            solves={certificateData.certificate.stats.challenges}
+            categories={certificateData.certificate.stats.categories}
+            period={certificateData.certificate.period}
+            issuedDate={certificateData.certificate.issuedDate}
           />
         </div>
 
         {/* Certificate Info */}
         <div className="text-center px-4">
           <p className="text-sm sm:text-base text-muted-foreground">
-            This certificate recognizes {profileData.user.displayName || profileData.user.username}'s achievement as #
-            {profileData.globalRank} in the TCP1P Community {formatPeriod(period)} leaderboard.
+            This certificate recognizes {certificateData.userInfo.displayName || certificateData.userInfo.username}'s achievement as #
+            {certificateData.certificate.rank} in the TCP1P Community {certificateData.certificate.period} leaderboard.
           </p>
         </div>
       </div>

@@ -362,20 +362,52 @@ export interface CTFRankingsParams {
 // Certificate Types
 export interface Certificate {
   id: string
-  userId: string
-  period: string // "monthly" | "yearly"
+  type: "monthly" | "yearly"
+  period: string // "January 2024" for monthly, "2024" for yearly
   periodValue: string // "2024-01" for monthly, "2024" for yearly
   rank: number // 1, 2, or 3
   title: string
   description: string
   score: number
   totalParticipants: number
-  issuedAt: string | null // null if pending
+  issuedDate: string
   isPending: boolean
+  issuedAt: string | null // null if pending
   stats: {
     totalScore: number
     challenges: number
     categories: number
+  }
+}
+
+export interface CertificateResponse {
+  userId: string
+  certificates: Certificate[]
+  userInfo: {
+    userId: string
+    username: string
+    displayName: string
+    avatar: string
+  }
+  metadata: {
+    generatedAt: string
+    globalRank: number
+    totalUsers: number
+  }
+}
+
+export interface SingleCertificateResponse {
+  certificate: Certificate
+  userInfo: {
+    userId: string
+    username: string
+    displayName: string
+    avatar: string
+  }
+  metadata: {
+    generatedAt: string
+    globalRank: number
+    totalUsers: number
   }
 }
 

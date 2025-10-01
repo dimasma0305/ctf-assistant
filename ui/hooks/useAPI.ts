@@ -12,8 +12,10 @@ import {
   clearCache as clearCacheAction,
   warmCache as warmCacheAction,
   getCTFRankings,
+  getCertificates,
+  getCertificate,
 } from "@/lib/actions"
-import type { ScoreboardParams, CTFsParams } from "@/lib/types"
+import type { ScoreboardParams, CTFsParams, CertificateResponse, SingleCertificateResponse } from "@/lib/types"
 
 // Generic API hook
 function useAPICall<T>(
@@ -394,6 +396,42 @@ export function useCTFRankings(params: any = {}) {
     updateParams,
     currentParams,
   }
+}
+
+// Certificates hook
+export function useCertificates(userId: string | null) {
+  const cacheKey = userId ? `certificates:${userId}` : undefined
+
+  return useAPICall(
+    () => {
+      if (!userId) throw new Error("User ID is required")
+      return getCertificates(userId)
+    },
+    [userId],
+    {
+      cacheKey,
+      ttl: 10 * 60 * 1000, // 10 minutes for certificates
+      enabled: !!userId,
+    }
+  )
+}
+
+// Single certificate hook
+export function useCertificate(userId: string | null, period: string | null) {
+  const cacheKey = userId && period ? `certificate:${userId}:${period}` : undefined
+
+  return useAPICall(
+    () => {
+      if (!userId || !period) throw new Error("User ID and period are required")
+      return getCertificate(userId, period)
+    },
+    [userId, period],
+    {
+      cacheKey,
+      ttl: 10 * 60 * 1000, // 10 minutes for certificates
+      enabled: !!userId && !!period,
+    }
+  )
 }
 
 // Comprehensive caching system with TTL and request deduplication
