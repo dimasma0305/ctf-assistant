@@ -6,6 +6,7 @@ export interface ParsedChallenge {
     points: number;
     solves: number;
     solved: boolean;
+    description?: string;
     tags?: string[];
 }
 
@@ -18,6 +19,7 @@ export function validateAndSanitizeChallenge(challenge: any, index: number): Par
     const points = Math.max(0, parseInt(String(challenge.points || 0)) || 0);
     const solves = Math.max(0, parseInt(String(challenge.solves || 0)) || 0);
     const solved = Boolean(challenge.solved);
+    const description = challenge.description ? String(challenge.description).trim() : undefined;
     const tags = Array.isArray(challenge.tags) ? challenge.tags.filter((tag: any) => tag && String(tag).trim()) : [];
     
     // Validate that name is not empty
@@ -32,6 +34,7 @@ export function validateAndSanitizeChallenge(challenge: any, index: number): Par
         points,
         solves,
         solved,
+        description,
         tags
     };
 }

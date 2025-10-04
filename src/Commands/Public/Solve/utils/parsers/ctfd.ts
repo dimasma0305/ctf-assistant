@@ -12,6 +12,12 @@ interface CTFdChallenge {
     tags: Array<{ value: string }>;
     template: string;
     script: string;
+    description?: string;
+    files?: Array<{
+        id: number;
+        type: string;
+        location: string;
+    }>;
 }
 
 // Interface for CTFd API response
@@ -74,13 +80,31 @@ export function parse(data: any): ParsedChallenge[] {
     // TypeScript assertion after validation
     const ctfdData = data as CTFdResponse;
     
-    return ctfdData.data.map((challenge, index) => validateAndSanitizeChallenge({
-        id: challenge.id,
-        name: challenge.name,
-        category: challenge.category,
-        points: challenge.value,
-        solves: challenge.solves,
-        solved: challenge.solved_by_me,
-        tags: challenge.tags?.map(tag => tag.value) || []
-    }, index));
+    return ctfdData.data.map((challenge, index) => {
+        // Combine description with file information if files exist
+        let combinedDescription = challenge.description || '';
+        
+        if (challenge.files && challenge.files.length > 0) {
+            const filesInfo = challenge.files.map(file => {
+                return `📎 **File ${file.id}**: ${file.location}`;
+            }).join('\n');
+            
+            if (combinedDescription) {
+                combinedDescription += '\n\n---\n\n**Files:**\n' + filesInfo;
+            } else {
+                combinedDescription = '**Files:**\n' + filesInfo;
+            }
+        }
+        
+        return validateAndSanitizeChallenge({
+            id: challenge.id,
+            name: challenge.name,
+            category: challenge.category,
+            points: challenge.value,
+            solves: challenge.solves,
+            solved: challenge.solved_by_me,
+            description: combinedDescription,
+            tags: challenge.tags?.map(tag => tag.value) || []
+        }, index);
+    });
 }

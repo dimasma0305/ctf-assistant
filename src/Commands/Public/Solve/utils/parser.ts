@@ -1,10 +1,78 @@
 import { TextChannel } from "discord.js";
-import { ChallengeSchemaType, solveModel } from "../../../../Database/connect";
+import { ChallengeSchemaType, solveModel, ChallengeModel } from "../../../../Database/connect";
 import { ParsedChallenge } from './parsers/types';
 import fg from 'fast-glob';
 import path from 'path';
 
 export * from './parsers/types';
+
+/**
+ * Check if a challenge is solved by querying the solve schema
+ * @param challengeName - The name of the challenge to check
+ * @param ctfId - The CTF event ID
+ * @returns Promise<boolean> - True if the challenge is solved, false otherwise
+ */
+export async function isChallengeSolved(challengeName: string, ctfId: string): Promise<boolean> {
+    try {
+        // First, find the challenge by name and ctf_id
+        const challenge = await ChallengeModel.findOne({
+            name: challengeName,
+            ctf_id: ctfId
+        });
+
+        if (!challenge) {
+            return false; // Challenge doesn't exist
+        }
+
+        // Check if there's a solve record for this challenge
+        const solve = await solveModel.findOne({
+            challenge_ref: challenge._id,
+            ctf_id: ctfId
+        });
+
+        return solve !== null;
+    } catch (error) {
+        console.error(`Error checking solve status for challenge ${challengeName}:`, error);
+        return false;
+    }
+}
+
+/**
+ * Check if a challenge is solved by challenge ID
+ * @param challengeId - The ObjectId of the challenge
+ * @param ctfId - The CTF event ID
+ * @returns Promise<boolean> - True if the challenge is solved, false otherwise
+ */
+export async function isChallengeSolvedById(challengeId: string, ctfId: string): Promise<boolean> {
+    try {
+        const solve = await solveModel.findOne({
+            challenge_ref: challengeId,
+            ctf_id: ctfId
+        });
+
+        return solve !== null;
+    } catch (error) {
+        console.error(`Error checking solve status for challenge ID ${challengeId}:`, error);
+        return false;
+    }
+}
+
+/**
+ * Get all solved challenges for a CTF event
+ * @param ctfId - The CTF event ID
+ * @returns Promise<string[]> - Array of solved challenge names
+ */
+export async function getSolvedChallenges(ctfId: string): Promise<string[]> {
+    try {
+        const solves = await solveModel.find({ ctf_id: ctfId }).populate<{challenge_ref: ChallengeSchemaType}>('challenge_ref');
+        return solves
+            .filter(solve => solve.challenge_ref)
+            .map(solve => solve.challenge_ref.name);
+    } catch (error) {
+        console.error(`Error getting solved challenges for CTF ${ctfId}:`, error);
+        return [];
+    }
+}
 
 const currentScriptPath = import.meta.path;
 const currentScriptDir = path.dirname(currentScriptPath);
@@ -33,11 +101,10 @@ export async function parseChallenges(jsonData: string): Promise<ParsedChallenge
 
     for (const parser of parserFunctions) {
         try {
-            if (parser) {   
+            if (parser) {
                 return parser(data);
             }
         } catch (error) {
-            console.error(error);
             continue;
         }
     }
@@ -47,9 +114,10 @@ export async function parseChallenges(jsonData: string): Promise<ParsedChallenge
 // Update thread status based on solved challenges
 export async function updateThreadsStatus(challenges: ParsedChallenge[], channel: TextChannel, ctfId: number) {
     try {
-        // Get existing solves from database
-        const existingSolves = await solveModel.find({ ctf_id: ctfId.toString() }).populate<{challenge_ref: ChallengeSchemaType}>('challenge_ref');
-        const solvedChallenges = new Set(existingSolves.filter(solve => solve.challenge_ref.is_solved).map(solve => solve.challenge_ref.name.toLowerCase()));
+        // Get all solved challenges for this CTF using the solve schema (more reliable than challenge.is_solved)
+        // This directly queries the solve schema to determine which challenges have been solved
+        const solvedChallengeNames = await getSolvedChallenges(ctfId.toString());
+        const solvedChallenges = new Set(solvedChallengeNames.map(name => name.toLowerCase()));
 
         let updatedMessages = 0;
         let createdThreads = 0;
@@ -58,6 +126,7 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
 
         for (const challenge of challenges) {
             try {
+                // Check if challenge is solved using the solve schema (more reliable than challenge.is_solved)
                 const isSolved = solvedChallenges.has(challenge.name.toLowerCase());
                 const category = challenge.category.toUpperCase();
                 const expectedName = `[${category}] ${challenge.name}`;
@@ -101,6 +170,14 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
 
                 // Create updated challenge info
                 const solveStatus = isSolved ? '🎉 **SOLVED!** 🎉' : '🔍 **Unsolved**';
+                
+                // Sanitize description for Discord display
+                const sanitizedDescription = challenge.description 
+                    ? challenge.description
+                        .replace(/```/g, '`\u200B``') // Escape code blocks
+                        .trim()
+                    : '';
+                
                 const challengeInfo = [
                     `# ${challenge.name}`,
                     `**Status:** ${solveStatus}`,
@@ -108,6 +185,7 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                     `**Points:** ${challenge.points}`,
                     `**Solves:** ${challenge.solves}`,
                     challenge.tags && challenge.tags.length > 0 ? `**Tags:** ${challenge.tags.join(', ')}` : '',
+                    challenge.description ? `\n**Description:**\n\`\`\`\n${sanitizedDescription}\n\`\`\`` : '',
                     '',
                     '💡 **Use this thread to discuss and solve this challenge!**',
                     isSolved ? '✅ This challenge has been marked as solved!' : '📝 When solved, use `/solve challenge` to mark it as complete.',

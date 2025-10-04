@@ -76,6 +76,23 @@ export function parse(data: any): ParsedChallenge[] {
             tags.push(challenge.difficulty.toLowerCase());
         }
         
+        // Combine description with file information if files exist
+        let combinedDescription = challenge.description || '';
+        
+        if (challenge.files && challenge.files.length > 0) {
+            const filesInfo = challenge.files.map((file: any, fileIndex: number) => {
+                const fileName = file.name || file.filename || `File ${fileIndex + 1}`;
+                const fileUrl = file.url || file.link || 'No URL available';
+                return `📎 **${fileName}**: ${fileUrl}`;
+            }).join('\n');
+            
+            if (combinedDescription) {
+                combinedDescription += '\n\n---\n\n**Files:**\n' + filesInfo;
+            } else {
+                combinedDescription = '**Files:**\n' + filesInfo;
+            }
+        }
+        
         return validateAndSanitizeChallenge({
             id,
             name,
@@ -83,6 +100,7 @@ export function parse(data: any): ParsedChallenge[] {
             points,
             solves,
             solved,
+            description: combinedDescription,
             tags
         }, index);
     });

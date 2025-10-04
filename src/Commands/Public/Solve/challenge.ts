@@ -12,7 +12,7 @@ import {
 import { UserSchemaType } from "../../../Database/userSchema";
 
 // Helper function to create or update challenge data
-async function createOrUpdateChallenge(challengeName: string, category: string, ctfId: string, points: number = 100) {
+async function createOrUpdateChallenge(challengeName: string, category: string, ctfId: string, points: number = 100, description: string = "") {
     // Try to find existing challenge
     let challenge = await ChallengeModel.findOne({
         ctf_id: ctfId,
@@ -22,6 +22,9 @@ async function createOrUpdateChallenge(challengeName: string, category: string, 
     if (challenge) {
         // Update existing challenge
         challenge.category = category;
+        if (description) {
+            challenge.description = description;
+        }
         challenge.updated_at = new Date();
         await challenge.save();
         return challenge;
@@ -31,6 +34,7 @@ async function createOrUpdateChallenge(challengeName: string, category: string, 
             name: challengeName,
             category: category,
             points: points,
+            description: description,
             ctf_id: ctfId,
             is_solved: false,
             solves: 0,
