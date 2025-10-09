@@ -1,0 +1,96 @@
+site_name: CTF Assistant Bot Documentation
+site_description: Complete documentation for the CTF Assistant Discord bot
+site_author: TCP1P Team
+site_url: https://dimasma0305.github.io/ctf-assistant
+
+repo_name: dimasma0305/ctf-assistant
+repo_url: https://github.com/dimasma0305/ctf-assistant
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+  favicon: https://tcp1p.team/favicon.ico
+  logo: https://tcp1p.team/favicon.ico
+
+nav:
+  - Home: README.md
+  - Quick Start: quick-start.md
+  - Commands:
+      - CTFTime Commands: commands/ctftime.md
+      - Notify Commands: commands/notify.md
+      - Solve Commands: commands/solve.md
+      - Event Commands: commands/event.md
+      - Clean Commands: commands/clean.md
+      - CTFEvent Commands: commands/ctfevent.md
+      - Utility Commands: commands/utilities.md
+  - Setup & Configuration:
+      - Setup Guide: README.md#setup-guide
+  - Troubleshooting: README.md#troubleshooting
+  - Contributing: CONTRIBUTING.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+plugins:
+  - search:
+      lang: en
+  - minify:
+      minify_html: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/TCP1P
+      name: TCP1P on GitHub
+    - icon: fontawesome/solid/globe
+      link: https://tcp1p.team
+      name: TCP1P Website
+  generator: false
+
+copyright: Copyright &copy; 2024 TCP1P Team. Made with ❤️ for the CTF community.
+

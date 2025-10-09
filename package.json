@@ -8,7 +8,10 @@
     "start": "bun run index.ts",
     "dev": "bun --watch index.ts",
     "populate-db": "bun run scripts/populate-db.ts",
-    "populate-db:clean": "bun run scripts/populate-db.ts --clear"
+    "populate-db:clean": "bun run scripts/populate-db.ts --clear",
+    "docs:build": "mkdocs build --strict",
+    "docs:serve": "mkdocs serve",
+    "docs:deploy": "mkdocs gh-deploy --force"
   },
   "keywords": [],
   "author": "",

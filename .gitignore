@@ -7,3 +7,11 @@ package-lock.json
 bun.lockb
 /Writeup/
 /volumes/
+
+# Documentation build output
+/site/
+
+# Python virtual environment (for docs)
+venv/
+__pycache__/
+*.pyc
