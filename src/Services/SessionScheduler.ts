@@ -18,9 +18,17 @@ interface SessionSchedulerStatus {
 
 export class SessionScheduler {
   private client: MyClient;
-  private currentTask: cron.ScheduledTask | null = null;
+  private currentTask: ReturnType<typeof cron.schedule> | null = null;
   private sessionInfo: SessionLimitInfo | null = null;
   private isWaitingForReset: boolean = false;
+  
+  // Session budget tracking
+  private identifyCallsToday: number = 0;
+  private resumeCallsToday: number = 0;
+  private sessionResetTime: Date | null = null;
+  private readonly sessionBudget: number = 1000; // Discord's default limit
+  private readonly warningThreshold: number = 0.8; // Warn at 80%
+  private readonly criticalThreshold: number = 0.95; // Critical at 95%
 
   constructor(client: MyClient) {
     this.client = client;
@@ -310,5 +318,86 @@ export class SessionScheduler {
       hasScheduledTask: !!this.currentTask,
       nextResetTime: this.sessionInfo?.resetTime?.toISOString()
     };
+  }
+
+  /**
+   * Record an IDENTIFY call (uses a session)
+   */
+  recordIdentify(): void {
+    this.identifyCallsToday++;
+    this.checkSessionBudget();
+    this.saveSessionMetrics();
+  }
+
+  /**
+   * Record a RESUME call (doesn't use a session)
+   */
+  recordResume(): void {
+    this.resumeCallsToday++;
+    console.log('✅ Session RESUMED (no IDENTIFY used)');
+    this.saveSessionMetrics();
+  }
+
+  /**
+   * Check session budget and warn if approaching limit
+   */
+  private checkSessionBudget(): void {
+    const usage = this.identifyCallsToday / this.sessionBudget;
+    
+    if (usage >= this.criticalThreshold) {
+      console.error(`🚨 CRITICAL: Session budget at ${(usage * 100).toFixed(1)}% (${this.identifyCallsToday}/${this.sessionBudget})`);
+    } else if (usage >= this.warningThreshold) {
+      console.warn(`⚠️  WARNING: Session budget at ${(usage * 100).toFixed(1)}% (${this.identifyCallsToday}/${this.sessionBudget})`);
+    }
+  }
+
+  /**
+   * Get current session usage stats
+   */
+  getSessionUsage(): {
+    identifyCalls: number;
+    resumeCalls: number;
+    budget: number;
+    remaining: number;
+    usagePercent: number;
+  } {
+    return {
+      identifyCalls: this.identifyCallsToday,
+      resumeCalls: this.resumeCallsToday,
+      budget: this.sessionBudget,
+      remaining: this.sessionBudget - this.identifyCallsToday,
+      usagePercent: (this.identifyCallsToday / this.sessionBudget) * 100
+    };
+  }
+
+  /**
+   * Save session metrics to database
+   */
+  private async saveSessionMetrics(): Promise<void> {
+    try {
+      await SessionStateModel.findOneAndUpdate(
+        { _id: 'session_state' },
+        {
+          $set: {
+            'metrics.totalIdentifyCalls': this.identifyCallsToday,
+            'metrics.totalResumeCalls': this.resumeCallsToday,
+            'metrics.lastIdentifyTime': new Date()
+          }
+        },
+        { upsert: true }
+      );
+    } catch (error) {
+      console.error('Failed to save session metrics:', error);
+    }
+  }
+
+  /**
+   * Reset daily session counters (called when 24h window resets)
+   */
+  resetSessionCounters(): void {
+    console.log(`📊 Resetting session counters. Previous: ${this.identifyCallsToday} IDENTIFY, ${this.resumeCallsToday} RESUME`);
+    this.identifyCallsToday = 0;
+    this.resumeCallsToday = 0;
+    this.sessionResetTime = new Date();
   }
 }

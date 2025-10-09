@@ -2,6 +2,13 @@ import { config } from "dotenv";
 import db from "./Database/connect";
 config();
 
+// Validate environment before proceeding
+import { runStartupValidation } from "./utils/validation";
+if (!runStartupValidation()) {
+  console.error('❌ Startup validation failed. Exiting...');
+  process.exit(1);
+}
+
 const { TOKEN } = process.env;
 if (!process.env.NODB){
   db.connect()
@@ -18,6 +25,10 @@ import {
 
 import { MyClient } from "./Model/client";
 import { SessionScheduler } from "./Services/SessionScheduler";
+import { ConnectionStateManager, ConnectionState } from "./Services/ConnectionStateManager";
+import { HealthMonitor } from "./Services/HealthMonitor";
+import { RateLimitManager } from "./Services/RateLimitManager";
+import { MetricsCollector } from "./Services/MetricsCollector";
 import { handleAIChat, updateChannelCache } from "./Services/AI";
 import { handleSpamDetection, handlePhishingDetection } from "./Services/Moderation";
 import "./Services/AI/memory";
@@ -43,47 +54,119 @@ client.events = new Collection();
 client.commands = new Collection();
 client.subCommands = new Collection();
 
-// Initialize session scheduler
+// Initialize all services
+const connectionStateManager = new ConnectionStateManager();
+client.connectionStateManager = connectionStateManager;
+
 const sessionScheduler = new SessionScheduler(client);
 client.sessionScheduler = sessionScheduler;
 
+const rateLimitManager = new RateLimitManager();
+client.rateLimitManager = rateLimitManager;
 
-// Reduced debug logging to prevent unnecessary session usage
-client.on(Events.Debug, (message) => {
-    // Only log important debug messages to reduce noise
-    if (message.includes('READY') || message.includes('RESUMED') || message.includes('error')) {
-        console.log(message);
-    }
+const healthMonitor = new HealthMonitor(client);
+client.healthMonitor = healthMonitor;
+
+const metricsCollector = new MetricsCollector(client);
+client.metricsCollector = metricsCollector;
+
+
+// ===== Enhanced Event Monitoring =====
+
+// Ready event - fired when bot first connects
+client.on(Events.ClientReady, () => {
+  console.log(`✅ Bot is ready! Logged in as ${client.user?.tag}`);
+  connectionStateManager.setState(ConnectionState.CONNECTED, 'Bot ready');
+  sessionScheduler.recordIdentify(); // Ready means we used an IDENTIFY
+  healthMonitor.start(); // Start health monitoring
 });
 
-// Enhanced error handling with session limit detection
-client.on('error', (error) => {
-  console.error('Discord client error:', error);
-  
-  // Don't exit immediately on errors - let reconnection logic handle it
-  if (error.message?.includes('session_start_limit') || error.message?.includes('sessions remaining')) {
-    console.error('Session limit reached. Bot will wait for limit reset.');
-    return;
+// Resumed event - fired when session is resumed (no IDENTIFY used!)
+client.on('resumed' as any, () => {
+  console.log('✅ Session RESUMED (no IDENTIFY call made)');
+  connectionStateManager.setState(ConnectionState.CONNECTED, 'Session resumed');
+  sessionScheduler.recordResume(); // Track RESUME separately
+});
+
+// Debug events - monitor gateway messages
+client.on(Events.Debug, (message) => {
+  // Only log important debug messages to reduce noise
+  if (message.includes('READY')) {
+    console.log('🔍 Gateway: READY received');
+  } else if (message.includes('RESUMED')) {
+    console.log('🔍 Gateway: RESUMED received');
+  } else if (message.includes('Session Limit Information')) {
+    console.log('🔍 Gateway:', message);
+  } else if (message.includes('Heartbeat acknowledged')) {
+    // Heartbeat is working - connection is healthy
   }
 });
 
-client.on('disconnect', () => {
-  console.log('Bot disconnected');
+// Error event - handle all errors gracefully
+client.on('error', async (error) => {
+  console.error('💥 Discord client error:', error);
+  connectionStateManager.setState(ConnectionState.ERROR, error.message);
+  
+  // Check if error is session-related
+  if (error.message?.includes('session_start_limit') || error.message?.includes('sessions remaining')) {
+    console.log('🚫 Session limit error detected');
+    await sessionScheduler.handleSessionLimitError(error);
+    connectionStateManager.setState(ConnectionState.WAITING_FOR_RESET, 'Session limit reached');
+  }
 });
 
-client.on('clientReady', () => {
-  console.log(`Bot is ready! Logged in as ${client.user?.tag}`);
+// Disconnect event
+client.on('disconnect' as any, () => {
+  console.log('🔌 Bot disconnected');
+  connectionStateManager.setState(ConnectionState.DISCONNECTED, 'Client disconnected');
+  healthMonitor.stop();
 });
 
-// Enhanced login with session scheduler integration
+// Reconnecting event
+client.on('reconnecting' as any, () => {
+  console.log('🔄 Bot is reconnecting...');
+  connectionStateManager.setState(ConnectionState.RECONNECTING, 'Client reconnecting');
+});
+
+// Shard errors
+client.on(Events.ShardError, (error) => {
+  console.error('💥 Shard error:', error);
+  connectionStateManager.setState(ConnectionState.ERROR, `Shard error: ${error.message}`);
+});
+
+// Enhanced login with rate limit checking and smart reconnection
 async function loginWithScheduler(maxRetries = 3) {
   let retryCount = 0;
   
   while (retryCount < maxRetries) {
+    // Check rate limits before attempting connection
+    const rateLimitCheck = rateLimitManager.canAttemptConnection();
+    if (!rateLimitCheck.allowed) {
+      console.warn(`⏳ Rate limit: ${rateLimitCheck.reason}`);
+      if (rateLimitCheck.waitTimeMs) {
+        const waitSec = Math.ceil(rateLimitCheck.waitTimeMs / 1000);
+        console.log(`⏳ Waiting ${waitSec}s before retry...`);
+        await new Promise(resolve => setTimeout(resolve, rateLimitCheck.waitTimeMs));
+      }
+      continue;
+    }
+
     try {
       console.log(`🔐 Attempting to login to Discord (attempt ${retryCount + 1}/${maxRetries})...`);
+      connectionStateManager.setState(ConnectionState.CONNECTING, `Login attempt ${retryCount + 1}`);
+      
+      // Add jitter to prevent thundering herd
+      const jitter = RateLimitManager.generateJitter();
+      if (retryCount > 0) {
+        console.log(`⏱️  Adding ${Math.floor(jitter / 1000)}s jitter...`);
+        await new Promise(resolve => setTimeout(resolve, jitter));
+      }
+      
       await client.login(TOKEN);
       console.log('✅ Successfully logged in to Discord!');
+      
+      // Record successful login
+      rateLimitManager.recordIdentify(true);
       
       // Cancel any existing scheduled reconnection since we're now connected
       await sessionScheduler.cancelScheduledReconnection();
@@ -91,10 +174,13 @@ async function loginWithScheduler(maxRetries = 3) {
       
     } catch (error: any) {
       console.error(`❌ Login attempt ${retryCount + 1} failed:`, error.message);
+      rateLimitManager.recordIdentify(false);
+      connectionStateManager.setState(ConnectionState.ERROR, `Login failed: ${error.message}`);
       
       // Handle session limit specifically with scheduler
       if (error.message?.includes('sessions remaining') || error.message?.includes('session_start_limit')) {
         console.log('🚫 Session limit detected, delegating to session scheduler...');
+        connectionStateManager.setState(ConnectionState.WAITING_FOR_RESET, 'Session limit reached');
         
         const handled = await sessionScheduler.handleSessionLimitError(error);
         if (handled) {
@@ -119,25 +205,51 @@ async function loginWithScheduler(maxRetries = 3) {
   }
   
   console.error('💥 Max retry attempts reached. The bot will remain inactive until manual intervention.');
-  console.log('ℹ️  Check session scheduler status:', sessionScheduler.getStatus());
+  console.log('ℹ️  Connection state:', connectionStateManager.getSummary());
+  console.log('ℹ️  Session scheduler status:', sessionScheduler.getStatus());
+  console.log('ℹ️  Rate limit status:', rateLimitManager.getStatus());
 }
 
-// Handle graceful shutdown
+// Handle graceful shutdown with comprehensive cleanup
 process.on('SIGINT', async () => {
   console.log('📴 Received SIGINT. Gracefully shutting down...');
-  await sessionScheduler.cancelScheduledReconnection();
-  client.destroy();
-  process.exit(0);
+  await performGracefulShutdown();
 });
 
 process.on('SIGTERM', async () => {
   console.log('📴 Received SIGTERM. Gracefully shutting down...');
-  await sessionScheduler.cancelScheduledReconnection();
-  client.destroy();
-  process.exit(0);
+  await performGracefulShutdown();
 });
 
-// Add monitoring for session scheduler status
+async function performGracefulShutdown() {
+  try {
+    // Log final metrics
+    console.log('📊 Final metrics before shutdown:');
+    metricsCollector.logMetrics();
+    console.log('📊 Connection health:', connectionStateManager.getSummary());
+    console.log('📊 Session usage:', sessionScheduler.getSessionUsage());
+    
+    // Stop health monitoring
+    healthMonitor.stop();
+    
+    // Cancel scheduled tasks
+    await sessionScheduler.cancelScheduledReconnection();
+    
+    // Destroy client connection
+    connectionStateManager.setState(ConnectionState.DISCONNECTED, 'Graceful shutdown');
+    client.destroy();
+    
+    console.log('✅ Shutdown complete');
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Error during shutdown:', error);
+    process.exit(1);
+  }
+}
+
+// ===== Periodic Monitoring and Health Checks =====
+
+// Monitor session scheduler status
 setInterval(() => {
   const status = sessionScheduler.getStatus();
   if (status.isWaitingForReset) {
@@ -149,26 +261,35 @@ setInterval(() => {
   }
 }, 10 * 60 * 1000); // Log every 10 minutes when waiting
 
-// Handle disconnection with session scheduler awareness
-client.on('disconnect', () => {
-  console.log('🔌 Bot disconnected');
-  if (!sessionScheduler.isWaitingForSessionReset()) {
-    console.log('⚡ Attempting automatic reconnection...');
-    setTimeout(() => loginWithScheduler(), 5000);
-  } else {
-    console.log('⏳ Session scheduler is active, not attempting immediate reconnection');
-  }
+// Periodic health and metrics logging
+setInterval(() => {
+  console.log('📊 === Periodic Health Report ===');
+  console.log('   ' + connectionStateManager.getSummary());
+  console.log('   ' + metricsCollector.getSummary());
+  console.log('   ' + healthMonitor.getHealthSummary());
+  
+  const sessionUsage = sessionScheduler.getSessionUsage();
+  console.log(`   Session: ${sessionUsage.identifyCalls} IDENTIFY, ${sessionUsage.resumeCalls} RESUME (${sessionUsage.usagePercent.toFixed(1)}% used)`);
+  
+  const rateLimitStatus = rateLimitManager.getStatus();
+  console.log(`   Rate limit: ${rateLimitStatus.remaining}/${rateLimitStatus.limit} remaining`);
+}, 30 * 60 * 1000); // Log every 30 minutes
+
+// Check for zombie connections and trigger recovery
+healthMonitor.on('zombieConnection', async ({ timeSinceLastEvent }) => {
+  console.error(`🧟 Zombie connection detected! No events for ${Math.floor(timeSinceLastEvent / 60000)} minutes`);
+  console.log('🔄 Triggering reconnection to recover...');
+  
+  // Destroy and reconnect
+  client.destroy();
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  loginWithScheduler();
 });
 
-// Enhanced error handling with session scheduler
-client.on('error', async (error) => {
-  console.error('💥 Discord client error:', error);
-  
-  // Check if error is session-related
-  if (error.message?.includes('session_start_limit') || error.message?.includes('sessions remaining')) {
-    console.log('🚫 Session limit error detected in client error handler');
-    await sessionScheduler.handleSessionLimitError(error);
-  }
+// Monitor for unhealthy state
+healthMonitor.on('unhealthy', ({ issues }) => {
+  console.error('🚨 Health monitor detected unhealthy state:', issues);
+  console.log('ℹ️  Current metrics:', metricsCollector.getSummary());
 });
 
 // Start login process with scheduler

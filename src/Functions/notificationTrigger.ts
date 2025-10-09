@@ -153,3 +153,4 @@ export async function sendEventCreated(
     return await triggerNotification(client, "event_created", message, embedsToSend);
 }
 
+

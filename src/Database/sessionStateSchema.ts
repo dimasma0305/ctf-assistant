@@ -12,6 +12,23 @@ const schema = {
   
   isWaitingForReset: { type: Boolean, default: false },
   
+  // Connection history and metrics
+  connectionHistory: [{
+    state: { type: String, required: true },
+    timestamp: { type: Date, required: true },
+    reason: { type: String, required: false },
+    metadata: { type: Schema.Types.Mixed, required: false }
+  }],
+  
+  metrics: {
+    totalIdentifyCalls: { type: Number, default: 0 },
+    totalResumeCalls: { type: Number, default: 0 },
+    totalReconnections: { type: Number, default: 0 },
+    totalDisconnections: { type: Number, default: 0 },
+    lastIdentifyTime: { type: Date, required: false },
+    lastResumeTime: { type: Date, required: false }
+  },
+  
   savedAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }
