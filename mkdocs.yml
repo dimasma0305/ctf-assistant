@@ -7,6 +7,11 @@ repo_name: dimasma0305/ctf-assistant
 repo_url: https://github.com/dimasma0305/ctf-assistant
 edit_uri: edit/main/docs/
 
+# Exclude non-documentation files
+exclude_docs: |
+  requirements.txt
+  .gitignore
+
 theme:
   name: material
   palette:
@@ -50,9 +55,6 @@ nav:
       - Clean Commands: commands/clean.md
       - CTFEvent Commands: commands/ctfevent.md
       - Utility Commands: commands/utilities.md
-  - Setup & Configuration:
-      - Setup Guide: README.md#setup-guide
-  - Troubleshooting: README.md#troubleshooting
   - Contributing: CONTRIBUTING.md
 
 markdown_extensions:

@@ -283,7 +283,6 @@ pm2 restart ctf-assistant
 - 📖 Read the [full documentation](README.md)
 - 🔧 Check out [CTFTime commands](commands/ctftime.md)
 - 🤝 Learn about [contributing](CONTRIBUTING.md)
-- 🚀 Set up [GitHub Pages](setup-github-pages.md) for your docs
 
 ## Getting Help
 
