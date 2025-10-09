@@ -6,6 +6,7 @@ import { getUpcommingOnlineEvent } from "../../Functions/ctftime-v2";
 import { scheduleEmbedTemplate } from "../../Commands/Public/Ctftime/utils/event";
 import { createCTFTimeHelpEmbed } from "../../Commands/Public/Ctftime/utils/helpEmbed";
 import { openai } from "../../utils/openai";
+import { GuildChannelModel } from "../../Database/connect";
 
 // Template messages as fallback when OpenAI is unavailable
 const mabarMessageTemplates = [
@@ -85,40 +86,93 @@ export const event: Event = {
     name: "LoadCrontEvent",
     once: true,
     async execute(client: MyClient) {
-        client.guilds.cache.forEach((guild) => {
-            const channel = guild.channels.cache.find((channel) => {
-                return channel.name == "mabar-ctf"
-            })
-            if (!channel) return
-            if (channel instanceof BaseGuildTextChannel) {
-                cron.schedule("0 8 * * 5", async() => {
-                    const dynamicMessage = await generateMabarMessage();
-                    const event = await getUpcommingOnlineEvent(5);
-                    const embedsSend: Array<APIEmbed> = [];
+        // Schedule the cron job to run every Friday at 8 AM Singapore time
+        cron.schedule("0 8 * * 5", async() => {
+            console.log("🕐 Running scheduled CTF notification job...");
+            
+            try {
+                // Get all active registered channels from the database
+                const registeredChannels = await GuildChannelModel.find({ is_active: true });
+                
+                if (registeredChannels.length === 0) {
+                    console.log("📭 No active channels registered for notifications");
+                    return;
+                }
 
-                    for (let i = 0; i < event.length; i++) {
-                      const data = event[i];
-                      embedsSend.push(scheduleEmbedTemplate({
+                console.log(`📢 Found ${registeredChannels.length} registered channel(s)`);
+
+                // Generate dynamic message and fetch upcoming events
+                const dynamicMessage = await generateMabarMessage();
+                const events = await getUpcommingOnlineEvent(5);
+                const embedsSend: Array<APIEmbed> = [];
+
+                for (let i = 0; i < events.length; i++) {
+                    const data = events[i];
+                    embedsSend.push(scheduleEmbedTemplate({
                         ctfEvent: data,
-                      }));
+                    }));
+                }
+
+                // Send messages to all registered channels that have weekly_reminder enabled
+                for (const registration of registeredChannels) {
+                    try {
+                        // Check if this channel is subscribed to weekly_reminder events
+                        const eventTypes = registration.event_types || ["weekly_reminder"];
+                        if (!eventTypes.includes("weekly_reminder")) {
+                            console.log(`⏭️ Skipping ${registration.guild_name} / ${registration.channel_name} - not subscribed to weekly_reminder`);
+                            continue;
+                        }
+
+                        // Fetch the guild and channel
+                        const guild = await client.guilds.fetch(registration.guild_id).catch(() => null);
+                        if (!guild) {
+                            console.log(`⚠️ Guild not found: ${registration.guild_name} (${registration.guild_id})`);
+                            continue;
+                        }
+
+                        const channel = await guild.channels.fetch(registration.channel_id).catch(() => null);
+                        if (!channel || !(channel instanceof BaseGuildTextChannel)) {
+                            console.log(`⚠️ Channel not found or not a text channel: ${registration.channel_name} in ${registration.guild_name}`);
+                            continue;
+                        }
+
+                        // Send the messages
+                        await channel.send(dynamicMessage);
+                        
+                        if (embedsSend.length > 0) {
+                            await channel.send("Ini ya mas daftar CTF minggu ini:");
+                            await channel.send({ embeds: embedsSend });
+                        } else {
+                            await channel.send("Waduh ternyata nda ada CTF minggu ini :(");
+                        }
+
+                        // Send help message to guide participants
+                        const helpEmbed = createCTFTimeHelpEmbed();
+                        await channel.send("📖 **Panduan Penggunaan Bot CTF:**");
+                        await channel.send({ embeds: [helpEmbed] });
+
+                        // Update tracking information in the database
+                        registration.last_notification_sent = new Date();
+                        registration.last_event_type_triggered = "weekly_reminder";
+                        registration.notification_count = (registration.notification_count || 0) + 1;
+                        registration.updated_at = new Date();
+                        await registration.save();
+
+                        console.log(`✅ Sent notifications to: ${guild.name} / ${channel.name} (weekly_reminder #${registration.notification_count})`);
+                    } catch (error) {
+                        console.error(`❌ Error sending to ${registration.guild_name} / ${registration.channel_name}:`, error);
                     }
-                    await channel.send(dynamicMessage)
-                    if (embedsSend.length > 0){
-                        await channel.send("Ini ya mas daftar CTF minggu ini:")
-                        await channel.send({embeds: embedsSend})
-                    }else {
-                        await channel.send("Waduh ternyata nda ada CTF minggu ini :(")
-                    }
-                    
-                    // Send help message to guide participants
-                    const helpEmbed = createCTFTimeHelpEmbed();
-                    await channel.send("📖 **Panduan Penggunaan Bot CTF:**");
-                    await channel.send({embeds: [helpEmbed]});
-                }, {
-                    scheduled: true,
-                    timezone: "Asia/Singapore"
-                })
+                }
+
+                console.log("✅ Scheduled CTF notification job completed");
+            } catch (error) {
+                console.error("❌ Error in scheduled CTF notification job:", error);
             }
-        })
+        }, {
+            scheduled: true,
+            timezone: "Asia/Singapore"
+        });
+
+        console.log("✅ CTF notification cron job loaded successfully");
     },
 }

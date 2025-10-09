@@ -10,6 +10,7 @@ import {weightRetrySchema, type WeightRetrySchemaType} from './weightRetrySchema
 import {leaderboardTrackingSchema, type LeaderboardTrackingSchemaType} from './leaderboardTrackingSchema';
 import {userSchema, type UserSchemaType} from './userSchema';
 import {messageCacheSchema, type MessageCacheSchemaType} from './messageCacheSchema';
+import {guildChannelSchema, type GuildChannelSchemaType} from './guildChannelSchema';
 
 const MONGO_URI = process.env.MONGO_URI || ""
 
@@ -28,6 +29,7 @@ export const WeightRetryModel = mongoose.model("WeightRetry", weightRetrySchema)
 export const LeaderboardTrackingModel = mongoose.model("LeaderboardTracking", leaderboardTrackingSchema)
 export const UserModel = mongoose.model("User", userSchema)
 export const MessageCacheModel = mongoose.model("MessageCache", messageCacheSchema)
+export const GuildChannelModel = mongoose.model("GuildChannel", guildChannelSchema)
 
 export {
     EventSchemaType,
@@ -41,6 +43,7 @@ export {
     LeaderboardTrackingSchemaType,
     UserSchemaType,
     MessageCacheSchemaType,
+    GuildChannelSchemaType,
 }
 
 export default {connect};
