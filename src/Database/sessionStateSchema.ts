@@ -29,6 +29,16 @@ const schema = {
     lastResumeTime: { type: Date, required: false }
   },
   
+  // Persisted session data for RESUME across restarts
+  persistedSession: {
+    sessionId: { type: String, required: false },
+    sequence: { type: Number, required: false },
+    resumeURL: { type: String, required: false },
+    shardId: { type: Number, required: false, default: 0 },
+    savedAt: { type: Date, required: false },
+    expiresAt: { type: Date, required: false }
+  },
+  
   savedAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }

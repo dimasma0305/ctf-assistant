@@ -29,6 +29,7 @@ import { ConnectionStateManager, ConnectionState } from "./Services/ConnectionSt
 import { HealthMonitor } from "./Services/HealthMonitor";
 import { RateLimitManager } from "./Services/RateLimitManager";
 import { MetricsCollector } from "./Services/MetricsCollector";
+import { SessionPersistence } from "./Services/SessionPersistence";
 import { handleAIChat, updateChannelCache } from "./Services/AI";
 import { handleSpamDetection, handlePhishingDetection } from "./Services/Moderation";
 import "./Services/AI/memory";
@@ -70,6 +71,9 @@ client.healthMonitor = healthMonitor;
 const metricsCollector = new MetricsCollector(client);
 client.metricsCollector = metricsCollector;
 
+const sessionPersistence = new SessionPersistence(client);
+client.sessionPersistence = sessionPersistence;
+
 
 // ===== Enhanced Event Monitoring =====
 
@@ -77,7 +81,20 @@ client.metricsCollector = metricsCollector;
 client.on(Events.ClientReady, () => {
   console.log(`✅ Bot is ready! Logged in as ${client.user?.tag}`);
   connectionStateManager.setState(ConnectionState.CONNECTED, 'Bot ready');
-  sessionScheduler.recordIdentify(); // Ready means we used an IDENTIFY
+  
+  // Check if this was a RESUME or fresh IDENTIFY
+  // If we had a saved session, this might have been a RESUME
+  if (sessionPersistence.hasValidSession()) {
+    console.log('✅ Connection established via RESUME (no IDENTIFY used!)');
+    sessionScheduler.recordResume();
+  } else {
+    console.log('✅ Connection established via IDENTIFY');
+    sessionScheduler.recordIdentify();
+  }
+  
+  // Start capturing session data for next restart
+  sessionPersistence.startCapture();
+  
   healthMonitor.start(); // Start health monitoring
 });
 
@@ -134,9 +151,14 @@ client.on(Events.ShardError, (error) => {
   connectionStateManager.setState(ConnectionState.ERROR, `Shard error: ${error.message}`);
 });
 
-// Enhanced login with rate limit checking and smart reconnection
+// Enhanced login with rate limit checking, session persistence, and smart reconnection
 async function loginWithScheduler(maxRetries = 3) {
   let retryCount = 0;
+  
+  // Load saved session data (do this once at startup)
+  if (retryCount === 0) {
+    await sessionPersistence.initialize();
+  }
   
   while (retryCount < maxRetries) {
     // Check rate limits before attempting connection
@@ -155,6 +177,19 @@ async function loginWithScheduler(maxRetries = 3) {
       console.log(`🔐 Attempting to login to Discord (attempt ${retryCount + 1}/${maxRetries})...`);
       connectionStateManager.setState(ConnectionState.CONNECTING, `Login attempt ${retryCount + 1}`);
       
+      // Check if we have a saved session to resume
+      const hasValidSession = sessionPersistence.hasValidSession();
+      if (hasValidSession) {
+        console.log('🔄 Found valid saved session, will attempt RESUME instead of IDENTIFY');
+        const sessionStatus = sessionPersistence.getStatus();
+        console.log(`   Session expires in ${Math.floor((sessionStatus.timeUntilExpiry || 0) / 1000)}s`);
+        
+        // Attempt to inject session data for RESUME
+        await sessionPersistence.attemptSessionResume();
+      } else {
+        console.log('🆕 No saved session, will use fresh IDENTIFY');
+      }
+      
       // Add jitter to prevent thundering herd
       const jitter = RateLimitManager.generateJitter();
       if (retryCount > 0) {
@@ -165,8 +200,12 @@ async function loginWithScheduler(maxRetries = 3) {
       await client.login(TOKEN);
       console.log('✅ Successfully logged in to Discord!');
       
-      // Record successful login
-      rateLimitManager.recordIdentify(true);
+      // Record successful login (only if it wasn't a RESUME)
+      if (!hasValidSession) {
+        rateLimitManager.recordIdentify(true);
+      } else {
+        console.log('✅ RESUME successful - no session consumed!');
+      }
       
       // Cancel any existing scheduled reconnection since we're now connected
       await sessionScheduler.cancelScheduledReconnection();
@@ -174,6 +213,16 @@ async function loginWithScheduler(maxRetries = 3) {
       
     } catch (error: any) {
       console.error(`❌ Login attempt ${retryCount + 1} failed:`, error.message);
+      
+      // Check if RESUME failed - clear saved session and retry with IDENTIFY
+      if (sessionPersistence.hasValidSession() && error.message?.includes('Invalid session')) {
+        console.warn('⚠️  RESUME failed with invalid session, clearing saved session data...');
+        await sessionPersistence.clearSessionData();
+        console.log('🔄 Will retry with fresh IDENTIFY');
+        // Don't count this as a retry - just clear the session and try again
+        continue;
+      }
+      
       rateLimitManager.recordIdentify(false);
       connectionStateManager.setState(ConnectionState.ERROR, `Login failed: ${error.message}`);
       
@@ -208,6 +257,7 @@ async function loginWithScheduler(maxRetries = 3) {
   console.log('ℹ️  Connection state:', connectionStateManager.getSummary());
   console.log('ℹ️  Session scheduler status:', sessionScheduler.getStatus());
   console.log('ℹ️  Rate limit status:', rateLimitManager.getStatus());
+  console.log('ℹ️  Session persistence status:', sessionPersistence.getStatus());
 }
 
 // Handle graceful shutdown with comprehensive cleanup
@@ -228,6 +278,10 @@ async function performGracefulShutdown() {
     metricsCollector.logMetrics();
     console.log('📊 Connection health:', connectionStateManager.getSummary());
     console.log('📊 Session usage:', sessionScheduler.getSessionUsage());
+    console.log('📊 Session persistence:', sessionPersistence.getStatus());
+    
+    // Save session data for next restart (CRITICAL for RESUME)
+    await sessionPersistence.saveBeforeShutdown();
     
     // Stop health monitoring
     healthMonitor.stop();
@@ -273,6 +327,14 @@ setInterval(() => {
   
   const rateLimitStatus = rateLimitManager.getStatus();
   console.log(`   Rate limit: ${rateLimitStatus.remaining}/${rateLimitStatus.limit} remaining`);
+  
+  const sessionPersistenceStatus = sessionPersistence.getStatus();
+  if (sessionPersistenceStatus.hasSession) {
+    const timeRemaining = Math.floor((sessionPersistenceStatus.timeUntilExpiry || 0) / 1000);
+    console.log(`   Saved session: ${sessionPersistenceStatus.isExpired ? 'EXPIRED' : `Valid (expires in ${timeRemaining}s)`}`);
+  } else {
+    console.log('   Saved session: None');
+  }
 }, 30 * 60 * 1000); // Log every 30 minutes
 
 // Check for zombie connections and trigger recovery
