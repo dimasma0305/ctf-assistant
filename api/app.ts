@@ -54,8 +54,8 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/ctfs", ctfRoutes);
 app.use("/api/certificates", certificateRoutes);
 
-// Ensure client guilds are fetched
-client.guilds.fetch();
+// Ensure client guilds are fetched (only after client is ready)
+// This will be called from the client ready event handler
 
 /**
  * Start Server

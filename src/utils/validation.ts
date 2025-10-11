@@ -113,6 +113,24 @@ export function runStartupValidation(): boolean {
     envValidation.warnings.forEach(warning => console.warn(`   - ${warning}`));
   }
   
+  // Check if TOKEN is missing (critical error)
+  if (!process.env.TOKEN) {
+    console.error('');
+    console.error('🚨 CRITICAL: Discord bot token is missing!');
+    console.error('');
+    console.error('Please create a .env file with your Discord bot token:');
+    console.error('');
+    console.error('TOKEN=your_discord_bot_token_here');
+    console.error('');
+    console.error('To get a token:');
+    console.error('1. Go to https://discord.com/developers/applications');
+    console.error('2. Create a new application or select existing');
+    console.error('3. Go to "Bot" section');
+    console.error('4. Copy the token');
+    console.error('');
+    return false;
+  }
+  
   if (envValidation.valid) {
     console.log('✅ Startup validation passed');
   } else {

@@ -6,7 +6,6 @@ import { ConnectionStateManager } from "../Services/ConnectionStateManager";
 import { HealthMonitor } from "../Services/HealthMonitor";
 import { RateLimitManager } from "../Services/RateLimitManager";
 import { MetricsCollector } from "../Services/MetricsCollector";
-import { SessionPersistence } from "../Services/SessionPersistence";
 
 class MyClient extends Client {
     events!: Collection<string, EventExecute>;
@@ -17,7 +16,6 @@ class MyClient extends Client {
     healthMonitor?: HealthMonitor;
     rateLimitManager?: RateLimitManager;
     metricsCollector?: MetricsCollector;
-    sessionPersistence?: SessionPersistence;
 }
 
 export { MyClient }

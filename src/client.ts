@@ -29,7 +29,6 @@ import { ConnectionStateManager, ConnectionState } from "./Services/ConnectionSt
 import { HealthMonitor } from "./Services/HealthMonitor";
 import { RateLimitManager } from "./Services/RateLimitManager";
 import { MetricsCollector } from "./Services/MetricsCollector";
-import { SessionPersistence } from "./Services/SessionPersistence";
 import { handleAIChat, updateChannelCache } from "./Services/AI";
 import { handleSpamDetection, handlePhishingDetection } from "./Services/Moderation";
 import "./Services/AI/memory";
@@ -46,9 +45,109 @@ const {
 
 const { User, Message, GuildMember, Channel } = Partials;
 
+// Load session from database
+import { SessionStateModel } from "./Database/connect";
+
+/**
+ * Custom sharding strategy with database-backed session persistence
+ * This enables RESUME across bot restarts by storing session data in MongoDB
+ * Based on Discord.js PR #10420 and @discordjs/ws session management
+ */
+class DatabaseSessionStrategy {
+  private manager: any;
+  private strategy: any;
+  
+  constructor(manager: any) {
+    this.manager = manager;
+    
+    // Import and create the base strategy
+    const { SimpleShardingStrategy } = require('@discordjs/ws');
+    this.strategy = new SimpleShardingStrategy(manager);
+    
+    // Override the manager's session callbacks BEFORE any connections
+    this.overrideSessionCallbacks();
+  }
+  
+  private overrideSessionCallbacks() {
+    // Store original callbacks
+    const originalRetrieve = this.manager.options.retrieveSessionInfo;
+    const originalUpdate = this.manager.options.updateSessionInfo;
+    
+    // Override retrieveSessionInfo
+    this.manager.options.retrieveSessionInfo = async (shardId: number) => {
+      try {
+        const state = await SessionStateModel.findById('session_state');
+        if (state?.persistedSession) {
+          const session = state.persistedSession;
+          const expiresAt = new Date(session.expiresAt);
+          const now = new Date();
+          
+          if (now < expiresAt && session.sessionId && session.resumeURL) {
+            console.log(`🔄 RESUME: Using saved session (seq: ${session.sequence}, expires in ${Math.floor((expiresAt.getTime() - now.getTime()) / 60000)}m)`);
+            return {
+              sessionId: session.sessionId,
+              sequence: session.sequence || 0,
+              resumeURL: session.resumeURL,
+              shardId,
+              shardCount: 1
+            };
+          }
+        }
+      } catch (error) {
+        console.error('❌ Session retrieve error:', error);
+      }
+      
+      return null;
+    };
+    
+    // Override updateSessionInfo
+    this.manager.options.updateSessionInfo = async (shardId: number, sessionInfo: any) => {
+      // Call original first to maintain in-memory state
+      if (originalUpdate) {
+        await originalUpdate(shardId, sessionInfo);
+      }
+      
+      if (sessionInfo?.sessionId) {
+        try {
+          const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+          await SessionStateModel.findOneAndUpdate(
+            { _id: 'session_state' },
+            {
+              $set: {
+                persistedSession: {
+                  sessionId: sessionInfo.sessionId,
+                  sequence: sessionInfo.sequence || 0,
+                  resumeURL: sessionInfo.resumeURL,
+                  shardId,
+                  savedAt: new Date(),
+                  expiresAt
+                }
+              }
+            },
+            { upsert: true }
+          );
+          console.log(`💾 Session saved to DB (seq: ${sessionInfo.sequence}, expires in 30m)`);
+        } catch (error) {
+          console.error('❌ Session save error:', error);
+        }
+      }
+    };
+  }
+  
+  // Delegate all IShardingStrategy methods to the base strategy
+  spawn(shardIds: number[]) { return this.strategy.spawn(shardIds); }
+  connect() { return this.strategy.connect(); }
+  destroy(options?: any) { return this.strategy.destroy(options); }
+  send(shardId: number, payload: any) { return this.strategy.send(shardId, payload); }
+  fetchStatus() { return this.strategy.fetchStatus(); }
+}
+
 const client = new Client({
   intents: [Guilds, GuildMembers, GuildMessages, GuildMessageReactions, MessageContent, DirectMessages],
   partials: [User, Message, GuildMember, Channel],
+  ws: {
+    buildStrategy: (manager: any) => new DatabaseSessionStrategy(manager)
+  }
 }) as MyClient;
 
 client.events = new Collection();
@@ -71,10 +170,6 @@ client.healthMonitor = healthMonitor;
 const metricsCollector = new MetricsCollector(client);
 client.metricsCollector = metricsCollector;
 
-const sessionPersistence = new SessionPersistence(client);
-client.sessionPersistence = sessionPersistence;
-
-
 // ===== Enhanced Event Monitoring =====
 
 // Ready event - fired when bot first connects
@@ -82,20 +177,12 @@ client.on(Events.ClientReady, () => {
   console.log(`✅ Bot is ready! Logged in as ${client.user?.tag}`);
   connectionStateManager.setState(ConnectionState.CONNECTED, 'Bot ready');
   
-  // Check if this was a RESUME or fresh IDENTIFY
-  // If we had a saved session, this might have been a RESUME
-  if (sessionPersistence.hasValidSession()) {
-    console.log('✅ Connection established via RESUME (no IDENTIFY used!)');
-    sessionScheduler.recordResume();
-  } else {
-    console.log('✅ Connection established via IDENTIFY');
-    sessionScheduler.recordIdentify();
-  }
+  healthMonitor.start();
   
-  // Start capturing session data for next restart
-  sessionPersistence.startCapture();
-  
-  healthMonitor.start(); // Start health monitoring
+  // Fetch guilds for API
+  client.guilds.fetch().catch(err => {
+    console.warn('⚠️  Failed to fetch guilds:', err.message);
+  });
 });
 
 // Resumed event - fired when session is resumed (no IDENTIFY used!)
@@ -151,14 +238,9 @@ client.on(Events.ShardError, (error) => {
   connectionStateManager.setState(ConnectionState.ERROR, `Shard error: ${error.message}`);
 });
 
-// Enhanced login with rate limit checking, session persistence, and smart reconnection
+// Enhanced login with rate limit checking and smart reconnection
 async function loginWithScheduler(maxRetries = 3) {
   let retryCount = 0;
-  
-  // Load saved session data (do this once at startup)
-  if (retryCount === 0) {
-    await sessionPersistence.initialize();
-  }
   
   while (retryCount < maxRetries) {
     // Check rate limits before attempting connection
@@ -177,19 +259,6 @@ async function loginWithScheduler(maxRetries = 3) {
       console.log(`🔐 Attempting to login to Discord (attempt ${retryCount + 1}/${maxRetries})...`);
       connectionStateManager.setState(ConnectionState.CONNECTING, `Login attempt ${retryCount + 1}`);
       
-      // Check if we have a saved session to resume
-      const hasValidSession = sessionPersistence.hasValidSession();
-      if (hasValidSession) {
-        console.log('🔄 Found valid saved session, will attempt RESUME instead of IDENTIFY');
-        const sessionStatus = sessionPersistence.getStatus();
-        console.log(`   Session expires in ${Math.floor((sessionStatus.timeUntilExpiry || 0) / 1000)}s`);
-        
-        // Attempt to inject session data for RESUME
-        await sessionPersistence.attemptSessionResume();
-      } else {
-        console.log('🆕 No saved session, will use fresh IDENTIFY');
-      }
-      
       // Add jitter to prevent thundering herd
       const jitter = RateLimitManager.generateJitter();
       if (retryCount > 0) {
@@ -200,12 +269,8 @@ async function loginWithScheduler(maxRetries = 3) {
       await client.login(TOKEN);
       console.log('✅ Successfully logged in to Discord!');
       
-      // Record successful login (only if it wasn't a RESUME)
-      if (!hasValidSession) {
-        rateLimitManager.recordIdentify(true);
-      } else {
-        console.log('✅ RESUME successful - no session consumed!');
-      }
+      // Record successful login
+      rateLimitManager.recordIdentify(true);
       
       // Cancel any existing scheduled reconnection since we're now connected
       await sessionScheduler.cancelScheduledReconnection();
@@ -213,15 +278,6 @@ async function loginWithScheduler(maxRetries = 3) {
       
     } catch (error: any) {
       console.error(`❌ Login attempt ${retryCount + 1} failed:`, error.message);
-      
-      // Check if RESUME failed - clear saved session and retry with IDENTIFY
-      if (sessionPersistence.hasValidSession() && error.message?.includes('Invalid session')) {
-        console.warn('⚠️  RESUME failed with invalid session, clearing saved session data...');
-        await sessionPersistence.clearSessionData();
-        console.log('🔄 Will retry with fresh IDENTIFY');
-        // Don't count this as a retry - just clear the session and try again
-        continue;
-      }
       
       rateLimitManager.recordIdentify(false);
       connectionStateManager.setState(ConnectionState.ERROR, `Login failed: ${error.message}`);
@@ -234,17 +290,15 @@ async function loginWithScheduler(maxRetries = 3) {
         const handled = await sessionScheduler.handleSessionLimitError(error);
         if (handled) {
           console.log('📅 Session scheduler has taken over. Bot will automatically reconnect when limit resets.');
-          // Don't exit - let the scheduler handle reconnection
           return;
         } else {
           console.error('⚠️  Failed to parse session limit, falling back to manual retry...');
-          // Fallback: wait 5 minutes and retry
           console.log('⏳ Waiting 5 minutes before manual retry...');
           await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
         }
       } else {
-        // For other errors, use exponential backoff (but shorter retries)
-        const waitTime = Math.min(1000 * Math.pow(2, retryCount), 15000); // Max 15 seconds
+        // For other errors, use exponential backoff
+        const waitTime = Math.min(1000 * Math.pow(2, retryCount), 15000);
         console.error(`⏳ Network/API error, waiting ${waitTime/1000}s before retry...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
       }
@@ -257,7 +311,6 @@ async function loginWithScheduler(maxRetries = 3) {
   console.log('ℹ️  Connection state:', connectionStateManager.getSummary());
   console.log('ℹ️  Session scheduler status:', sessionScheduler.getStatus());
   console.log('ℹ️  Rate limit status:', rateLimitManager.getStatus());
-  console.log('ℹ️  Session persistence status:', sessionPersistence.getStatus());
 }
 
 // Handle graceful shutdown with comprehensive cleanup
@@ -278,10 +331,6 @@ async function performGracefulShutdown() {
     metricsCollector.logMetrics();
     console.log('📊 Connection health:', connectionStateManager.getSummary());
     console.log('📊 Session usage:', sessionScheduler.getSessionUsage());
-    console.log('📊 Session persistence:', sessionPersistence.getStatus());
-    
-    // Save session data for next restart (CRITICAL for RESUME)
-    await sessionPersistence.saveBeforeShutdown();
     
     // Stop health monitoring
     healthMonitor.stop();
@@ -327,14 +376,6 @@ setInterval(() => {
   
   const rateLimitStatus = rateLimitManager.getStatus();
   console.log(`   Rate limit: ${rateLimitStatus.remaining}/${rateLimitStatus.limit} remaining`);
-  
-  const sessionPersistenceStatus = sessionPersistence.getStatus();
-  if (sessionPersistenceStatus.hasSession) {
-    const timeRemaining = Math.floor((sessionPersistenceStatus.timeUntilExpiry || 0) / 1000);
-    console.log(`   Saved session: ${sessionPersistenceStatus.isExpired ? 'EXPIRED' : `Valid (expires in ${timeRemaining}s)`}`);
-  } else {
-    console.log('   Saved session: None');
-  }
 }, 30 * 60 * 1000); // Log every 30 minutes
 
 // Check for zombie connections and trigger recovery
