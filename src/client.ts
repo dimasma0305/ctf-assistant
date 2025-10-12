@@ -68,6 +68,15 @@ class DatabaseSessionStrategy {
     this.overrideSessionCallbacks();
   }
   
+  private async clearSavedSession() {
+    try {
+      await SessionStateModel.findByIdAndDelete('session_state');
+      console.log('🗑️  Cleared invalid session from database');
+    } catch (error) {
+      console.error('❌ Failed to clear session:', error);
+    }
+  }
+  
   private overrideSessionCallbacks() {
     // Store original callbacks
     const originalRetrieve = this.manager.options.retrieveSessionInfo;
@@ -83,7 +92,13 @@ class DatabaseSessionStrategy {
           const now = new Date();
           
           if (now < expiresAt && session.sessionId && session.resumeURL) {
-            console.log(`🔄 RESUME: Using saved session (seq: ${session.sequence}, expires in ${Math.floor((expiresAt.getTime() - now.getTime()) / 60000)}m)`);
+            // Only log once per actual resume attempt (not on every check)
+            if (!(global as any).attemptedResume) {
+              console.log(`🔄 RESUME: Using saved session (seq: ${session.sequence}, expires in ${Math.floor((expiresAt.getTime() - now.getTime()) / 60000)}m)`);
+              // Set global flag to track that we're attempting a resume
+              (global as any).attemptedResume = true;
+            }
+            
             return {
               sessionId: session.sessionId,
               sequence: session.sequence || 0,
@@ -91,6 +106,9 @@ class DatabaseSessionStrategy {
               shardId,
               shardCount: 1
             };
+          } else {
+            console.log('⚠️  Saved session expired or invalid, clearing...');
+            await this.clearSavedSession();
           }
         }
       } catch (error) {
@@ -142,6 +160,9 @@ class DatabaseSessionStrategy {
   fetchStatus() { return this.strategy.fetchStatus(); }
 }
 
+// Initialize global flag for tracking resume attempts
+(global as any).attemptedResume = false;
+
 const client = new Client({
   intents: [Guilds, GuildMembers, GuildMessages, GuildMessageReactions, MessageContent, DirectMessages],
   partials: [User, Message, GuildMember, Channel],
@@ -172,28 +193,51 @@ client.metricsCollector = metricsCollector;
 
 // ===== Enhanced Event Monitoring =====
 
-// Ready event - fired when bot first connects
+// Common initialization for both ready and resumed events
+function initializeBot() {
+  connectionStateManager.setState(ConnectionState.CONNECTED, 'Bot connected');
+  
+  // Start health monitor (safe to call multiple times, has internal check)
+  healthMonitor.start();
+}
+
+// Ready event - fired when bot first connects (IDENTIFY)
 client.on(Events.ClientReady, () => {
   console.log(`✅ Bot is ready! Logged in as ${client.user?.tag}`);
-  connectionStateManager.setState(ConnectionState.CONNECTED, 'Bot ready');
-  
-  healthMonitor.start();
-  
-  // Fetch guilds for API
-  client.guilds.fetch().catch(err => {
-    console.warn('⚠️  Failed to fetch guilds:', err.message);
-  });
+  initializeBot();
+  (global as any).attemptedResume = false; // Reset flag on successful IDENTIFY
 });
 
-// Resumed event - fired when session is resumed (no IDENTIFY used!)
+// Resumed event - fired when session is resumed (RESUME, no IDENTIFY used!)
 client.on('resumed' as any, () => {
   console.log('✅ Session RESUMED (no IDENTIFY call made)');
-  connectionStateManager.setState(ConnectionState.CONNECTED, 'Session resumed');
   sessionScheduler.recordResume(); // Track RESUME separately
+  (global as any).attemptedResume = false; // Reset flag on successful RESUME
+  
+  // IMPORTANT: Must initialize bot on resume too, since ClientReady doesn't fire on RESUME!
+  initializeBot();
+});
+
+// ShardReady - fired when shard becomes ready (could be after IDENTIFY or failed RESUME)
+client.on(Events.ShardReady, async (shardId: number) => {
+  console.log(`🎯 Shard ${shardId} ready`);
+  
+  // If we attempted to resume but ended up here (not in resumed event), it means RESUME failed
+  if ((global as any).attemptedResume) {
+    console.log('⚠️  Session RESUME failed, Discord forced new IDENTIFY');
+    console.log('🗑️  Clearing saved session from database...');
+    try {
+      await SessionStateModel.findByIdAndDelete('session_state');
+      console.log('✅ Cleared invalid session after failed resume');
+    } catch (error) {
+      console.error('❌ Failed to clear invalid session:', error);
+    }
+    (global as any).attemptedResume = false;
+  }
 });
 
 // Debug events - monitor gateway messages
-client.on(Events.Debug, (message) => {
+client.on(Events.Debug, async (message) => {
   // Only log important debug messages to reduce noise
   if (message.includes('READY')) {
     console.log('🔍 Gateway: READY received');
@@ -202,8 +246,21 @@ client.on(Events.Debug, (message) => {
   } else if (message.includes('Session Limit Information')) {
     console.log('🔍 Gateway:', message);
   } else if (message.includes('Heartbeat acknowledged')) {
-    // Heartbeat is working - connection is healthy
+    // Heartbeat is working - connection is healthy (don't log to reduce noise)
+  } else if (message.includes('Session is invalid') || message.includes('Invalid session')) {
+    console.log('⚠️  Gateway: Invalid session detected in debug message');
+    if ((global as any).attemptedResume) {
+      console.log('🗑️  Clearing saved session after invalid session message...');
+      try {
+        await SessionStateModel.findByIdAndDelete('session_state');
+        console.log('✅ Cleared invalid session from database');
+      } catch (error) {
+        console.error('❌ Failed to clear invalid session:', error);
+      }
+      (global as any).attemptedResume = false;
+    }
   }
+  console.log('🔍 Gateway:', message);
 });
 
 // Error event - handle all errors gracefully

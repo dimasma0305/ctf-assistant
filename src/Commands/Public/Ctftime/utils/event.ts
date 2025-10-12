@@ -390,14 +390,20 @@ ${weight}
 
     async addMessageRoleEventListener(msg: Message){
         this.__initializeChannelAndRole()
+        // Calculate timeout duration, cap at max safe 32-bit signed integer (2147483647 ms = ~24.8 days)
+        const timeUntilFinish = this.options.ctfEvent.finish.getTime() - new Date().getTime();
+        const MAX_TIMEOUT = 2147483647; // Maximum safe timeout in milliseconds
+        const collectorTimeout = Math.min(timeUntilFinish, MAX_TIMEOUT);
+        
         const collector = msg.createMessageComponentCollector({
             filter: async (i) => {
                 await i.deferUpdate()
                 return i.user.id ? true : false
             },
-            time: this.options.ctfEvent.finish.getTime() - new Date().getTime(),
+            time: collectorTimeout,
             componentType: ComponentType.Button,
         })
+        
         collector.on("collect", async (interaction)=>{
             if (interaction.customId == "join"){
                 if (await this.addRoleToUser(interaction.user)){
@@ -409,6 +415,14 @@ ${weight}
                     const dm = await interaction.user.createDM()
                     await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
                 }
+            }
+        })
+        
+        // If the event duration exceeds max timeout, renew the collector when it expires
+        collector.on("end", async (collected, reason) => {
+            if (reason === "time" && new Date().getTime() < this.options.ctfEvent.finish.getTime()) {
+                console.log(`Collector timed out, renewing listener for message ${msg.id}`);
+                await this.addMessageRoleEventListener(msg);
             }
         })
     }

@@ -7,6 +7,8 @@
   "scripts": {
     "start": "bun run index.ts",
     "dev": "bun --watch index.ts",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
     "populate-db": "bun run scripts/populate-db.ts",
     "populate-db:clean": "bun run scripts/populate-db.ts --clear",
     "docs:build": "mkdocs build --strict",

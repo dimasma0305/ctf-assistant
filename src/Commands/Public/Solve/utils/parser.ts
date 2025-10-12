@@ -76,7 +76,10 @@ export async function getSolvedChallenges(ctfId: string): Promise<string[]> {
 
 const currentScriptPath = import.meta.path;
 const currentScriptDir = path.dirname(currentScriptPath);
-const parsers = fg.sync(`${currentScriptDir}/parsers/*.ts`);
+// Load all parser files, excluding test files and types file
+const parsers = fg.sync(`${currentScriptDir}/parsers/*.ts`, {
+    ignore: ['**/*.test.ts', '**/*.spec.ts', '**/types.ts']
+});
 const parserFunctions: ((data: any) => ParsedChallenge[])[] | null[] = parsers.map(parser => {
     const p = require(parser);
     if (p.parse) {
@@ -91,14 +94,9 @@ export async function parseChallenges(jsonData: string): Promise<ParsedChallenge
     try {
         data = JSON.parse(jsonData);
     } catch (error) {
-        throw new Error(`Invalid JSON data: ${error instanceof Error ? error.message : 'Unable to parse JSON'}`);
+        data = jsonData;
     }
     
-    // Validate that data is not null or undefined
-    if (data === null || data === undefined) {
-        throw new Error('JSON data is null or undefined');
-    }
-
     for (const parser of parserFunctions) {
         try {
             if (parser) {
@@ -172,26 +170,47 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                 const solveStatus = isSolved ? '🎉 **SOLVED!** 🎉' : '🔍 **Unsolved**';
                 
                 // Sanitize description for Discord display
-                const sanitizedDescription = challenge.description 
+                let sanitizedDescription = challenge.description 
                     ? challenge.description
                         .replace(/```/g, '`\u200B``') // Escape code blocks
                         .trim()
                     : '';
                 
-                const challengeInfo = [
+                // Calculate base message size (without description)
+                const baseMessageParts = [
                     `# ${challenge.name}`,
                     `**Status:** ${solveStatus}`,
                     `**Category:** ${challenge.category}`,
                     `**Points:** ${challenge.points}`,
                     `**Solves:** ${challenge.solves}`,
                     challenge.tags && challenge.tags.length > 0 ? `**Tags:** ${challenge.tags.join(', ')}` : '',
-                    challenge.description ? `\n**Description:**\n\`\`\`\n${sanitizedDescription}\n\`\`\`` : '',
                     '',
                     '💡 **Use this thread to discuss and solve this challenge!**',
                     isSolved ? '✅ This challenge has been marked as solved!' : '📝 When solved, use `/solve challenge` to mark it as complete.',
                     '',
                     '---',
                     `*Challenge ID: ${challenge.id}*`
+                ];
+                const baseMessageSize = baseMessageParts.filter(l => l !== '').join('\n').length;
+                
+                // Discord message limit is 4000, leave room for description header and code blocks
+                const MAX_MESSAGE_LENGTH = 2000;
+                const DESCRIPTION_OVERHEAD = 30; // "\n**Description:**\n```\n```\n"
+                const maxDescriptionLength = MAX_MESSAGE_LENGTH - baseMessageSize - DESCRIPTION_OVERHEAD - 100; // Extra buffer
+                
+                // Truncate description if needed
+                let descriptionText = '';
+                if (sanitizedDescription) {
+                    if (sanitizedDescription.length > maxDescriptionLength) {
+                        sanitizedDescription = sanitizedDescription.substring(0, maxDescriptionLength - 50) + '\n\n... (truncated, too long for Discord)';
+                    }
+                    descriptionText = `\n**Description:**\n\`\`\`\n${sanitizedDescription}\n\`\`\``;
+                }
+                
+                const challengeInfo = [
+                    ...baseMessageParts.slice(0, 6), // Everything up to tags
+                    descriptionText,
+                    ...baseMessageParts.slice(6) // Everything after tags
                 ].filter(line => line !== '').join('\n');
 
                 if (firstMessage && firstMessage.author.bot) {
