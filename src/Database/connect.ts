@@ -11,6 +11,7 @@ import {leaderboardTrackingSchema, type LeaderboardTrackingSchemaType} from './l
 import {userSchema, type UserSchemaType} from './userSchema';
 import {messageCacheSchema, type MessageCacheSchemaType} from './messageCacheSchema';
 import {guildChannelSchema, type GuildChannelSchemaType} from './guildChannelSchema';
+import {trakteerSchema, type TrakteerSchemaType} from './trakteerSchema';
 
 const MONGO_URI = process.env.MONGO_URI || ""
 
@@ -30,6 +31,7 @@ export const LeaderboardTrackingModel = mongoose.model("LeaderboardTracking", le
 export const UserModel = mongoose.model("User", userSchema)
 export const MessageCacheModel = mongoose.model("MessageCache", messageCacheSchema)
 export const GuildChannelModel = mongoose.model("GuildChannel", guildChannelSchema)
+export const TrakteerModel = mongoose.model("Trakteer", trakteerSchema)
 
 export {
     EventSchemaType,
@@ -44,6 +46,7 @@ export {
     UserSchemaType,
     MessageCacheSchemaType,
     GuildChannelSchemaType,
+    TrakteerSchemaType,
 }
 
 export default {connect};

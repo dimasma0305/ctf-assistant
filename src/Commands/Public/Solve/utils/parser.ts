@@ -131,11 +131,40 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                 const threadPrefix = isSolved ? '✅' : '❌';
                 const threadName = `${threadPrefix} ${expectedName}`;
 
-                // Find existing thread with any prefix
-                let existingThread = channel.threads.cache.find(thread => {
+                // Fetch active threads from API (not cache) to find existing threads
+                const activeThreads = await channel.threads.fetch();
+                
+                // Find all matching threads (with any prefix)
+                const matchingThreads = activeThreads.threads.filter(thread => {
                     const threadNameWithoutPrefix = thread.name.replace(/^[✅❌]\s*/, '');
                     return threadNameWithoutPrefix === expectedName;
                 });
+
+                let existingThread = null;
+
+                // Handle duplicates: keep oldest, delete the rest
+                if (matchingThreads.size > 1) {
+                    console.log(`Found ${matchingThreads.size} duplicate threads for ${expectedName}, cleaning up...`);
+                    
+                    // Sort by creation date (oldest first)
+                    const sortedThreads = Array.from(matchingThreads.values())
+                        .sort((a, b) => a.createdTimestamp! - b.createdTimestamp!);
+                    
+                    // Keep the first (oldest) thread
+                    existingThread = sortedThreads[0];
+                    
+                    // Delete all duplicate threads
+                    for (let i = 1; i < sortedThreads.length; i++) {
+                        try {
+                            await sortedThreads[i].delete('Duplicate thread cleanup');
+                            console.log(`Deleted duplicate thread: ${sortedThreads[i].name} (ID: ${sortedThreads[i].id})`);
+                        } catch (deleteError) {
+                            console.error(`Failed to delete duplicate thread ${sortedThreads[i].id}:`, deleteError);
+                        }
+                    }
+                } else if (matchingThreads.size === 1) {
+                    existingThread = matchingThreads.first()!;
+                }
 
                 // If thread doesn't exist, create it
                 if (!existingThread) {

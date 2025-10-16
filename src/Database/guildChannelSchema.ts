@@ -31,7 +31,7 @@ export const schema = {
     // Event types this channel is subscribed to
     event_types: {
         type: [String],
-        enum: ['weekly_reminder', 'ctf_announcement', 'solve_update', 'event_created', 'custom'],
+        enum: ['weekly_reminder'],
         default: ['weekly_reminder']
     },
     // Who registered this channel
