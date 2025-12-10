@@ -2,7 +2,7 @@ import { TextChannel } from "discord.js";
 import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 import cron from "node-cron";
-import { TrakteerModel } from "../../Database/connect";
+import { TrakteerModel, TrakteerSchemaType } from "../../Database/connect";
 import { EmbedBuilder } from "discord.js";
 
 interface TrakteerSupport {
@@ -114,7 +114,7 @@ export const event: Event = {
 
             // Send notification for each new support
             for (const support of newSupports) {
-              await sendTrakteerNotification(channel, support);
+              await sendTrakteerNotification(channel, support, config);
             }
 
             // Update last checked time to now
@@ -158,7 +158,8 @@ export const event: Event = {
 // Function to send Trakteer notification to channel
 async function sendTrakteerNotification(
   channel: TextChannel,
-  support: TrakteerSupport
+  support: TrakteerSupport,
+  config: TrakteerSchemaType
 ) {
   try {
     const embed = new EmbedBuilder()
@@ -197,6 +198,9 @@ async function sendTrakteerNotification(
 
     // Set color to Trakteer orange
     embed.setColor(0xff6b35);
+    if (config.page_url) {
+      embed.setURL(config.page_url);
+    }
 
     await channel.send({ embeds: [embed] });
   } catch (error) {

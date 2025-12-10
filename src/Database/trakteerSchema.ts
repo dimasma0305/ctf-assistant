@@ -15,6 +15,11 @@ export const schema = {
         type: String,
         required: true,
     },
+    page_url: {
+        type: String,
+        required: false,
+        default: "",
+    },
     is_active: {
         type: Boolean,
         default: true,

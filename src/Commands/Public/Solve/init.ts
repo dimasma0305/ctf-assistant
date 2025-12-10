@@ -208,14 +208,15 @@ export const command: SubCommand = {
             return;
         }
 
-        const { updatedMessages, errors, skippedThreads } = await updateThreadsStatus(challenges, channel, ctfData.id);
+        const { updatedMessages, createdThreads, errors, skippedThreads } = await updateThreadsStatus(challenges, channel, ctfData.id);
 
         // Summary message
         const summary = [
             `✅ **Challenge Initialization Complete!**`,
             '',
             `📊 **Summary:**`,
-            `• Created: ${updatedMessages} threads`,
+            `• Created: ${createdThreads} new threads`,
+            `• Updated: ${updatedMessages} messages`,
             `• Skipped (already exist): ${skippedThreads} threads`,
             `• Total challenges: ${challenges.length}`,
         ];

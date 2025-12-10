@@ -24,6 +24,12 @@ export const command: SubCommand = {
         .setName("api_key")
         .setDescription("Your Trakteer API key")
         .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("page_url")
+        .setDescription("Your Trakteer page link (e.g. https://trakteer.id/username)")
+        .setRequired(false)
     ),
   async execute(interaction) {
     if (!interaction.guild) {
@@ -44,6 +50,7 @@ export const command: SubCommand = {
 
     const channel = interaction.options.getChannel("channel", true) as TextChannel;
     const apiKey = interaction.options.getString("api_key", true);
+    const pageUrl = interaction.options.getString("page_url") || "";
 
     await interaction.deferReply({ ephemeral: true });
 
@@ -83,6 +90,7 @@ export const command: SubCommand = {
         // Update existing configuration
         existingConfig.channel_id = channel.id;
         existingConfig.api_key = apiKey;
+        existingConfig.page_url = pageUrl || existingConfig.page_url || "";
         existingConfig.is_active = true;
         existingConfig.updated_at = new Date();
         await existingConfig.save();
@@ -100,6 +108,11 @@ export const command: SubCommand = {
               inline: true,
             }
           )
+          .addFields(
+            pageUrl
+              ? { name: "Trakteer Link", value: pageUrl, inline: false }
+              : { name: "Trakteer Link", value: existingConfig.page_url || "Not set", inline: false }
+          )
           .setColor(0x00ff00)
           .setTimestamp();
 
@@ -110,6 +123,7 @@ export const command: SubCommand = {
           guild_id: interaction.guild.id,
           channel_id: channel.id,
           api_key: apiKey,
+          page_url: pageUrl,
           is_active: true,
           created_at: new Date(),
           updated_at: new Date(),
@@ -134,6 +148,11 @@ export const command: SubCommand = {
               value: "✅ Active - Will check for new supports every 5 minutes",
               inline: false,
             }
+          )
+          .addFields(
+            pageUrl
+              ? { name: "Trakteer Link", value: pageUrl, inline: false }
+              : { name: "Trakteer Link", value: "Not set", inline: false }
           )
           .setColor(0x00ff00)
           .setTimestamp();

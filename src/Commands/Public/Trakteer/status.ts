@@ -78,6 +78,11 @@ export const command: SubCommand = {
               ? `<t:${Math.floor(config.last_checked.getTime() / 1000)}:R>`
               : "Never",
             inline: true,
+          },
+          {
+            name: "Trakteer Link",
+            value: config.page_url || "Not set",
+            inline: false,
           }
         )
         .setColor(config.is_active ? 0x00ff00 : 0xff0000)

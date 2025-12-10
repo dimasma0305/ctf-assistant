@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { TextChannel, Message } from "discord.js";
 import { ChallengeSchemaType, solveModel, ChallengeModel } from "../../../../Database/connect";
 import { ParsedChallenge } from './parsers/types';
 import fg from 'fast-glob';
@@ -91,9 +91,11 @@ const parserFunctions: ((data: any) => ParsedChallenge[])[] | null[] = parsers.m
 // Parse challenges based on platform type
 export async function parseChallenges(jsonData: string): Promise<ParsedChallenge[]> {
     let data: any;
+    const errors: string[] = [];
     try {
         data = JSON.parse(jsonData);
     } catch (error) {
+        errors.push('Error parsing JSON data:', (error as Error).message, jsonData);
         data = jsonData;
     }
     
@@ -103,10 +105,16 @@ export async function parseChallenges(jsonData: string): Promise<ParsedChallenge
                 return parser(data);
             }
         } catch (error) {
+            errors.push('Error parsing challenges:', (error as Error).message);
             continue;
         }
     }
-    throw new Error('No parser found for the given data');
+
+    if (errors.length > 0) {
+        throw new Error(errors.join('\n'));
+    }else {
+        throw new Error('No parser found for the given data');
+    }
 }
 
 // Update thread status based on solved challenges
@@ -122,6 +130,20 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
         const errors: string[] = [];
         let skippedThreads = 0;
 
+        // Fetch all active threads ONCE at the beginning to avoid race conditions
+        const activeThreads = await channel.threads.fetch();
+        
+        // Create a map to track threads by their expected name (without prefix)
+        // This prevents race conditions when creating multiple threads
+        const threadMap = new Map<string, any>();
+        for (const [_, thread] of activeThreads.threads) {
+            const threadNameWithoutPrefix = thread.name.replace(/^[✅❌]\s*/, '');
+            if (!threadMap.has(threadNameWithoutPrefix)) {
+                threadMap.set(threadNameWithoutPrefix, []);
+            }
+            threadMap.get(threadNameWithoutPrefix)!.push(thread);
+        }
+
         for (const challenge of challenges) {
             try {
                 // Check if challenge is solved using the solve schema (more reliable than challenge.is_solved)
@@ -131,24 +153,17 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                 const threadPrefix = isSolved ? '✅' : '❌';
                 const threadName = `${threadPrefix} ${expectedName}`;
 
-                // Fetch active threads from API (not cache) to find existing threads
-                const activeThreads = await channel.threads.fetch();
-                
-                // Find all matching threads (with any prefix)
-                const matchingThreads = activeThreads.threads.filter(thread => {
-                    const threadNameWithoutPrefix = thread.name.replace(/^[✅❌]\s*/, '');
-                    return threadNameWithoutPrefix === expectedName;
-                });
+                // Check our local map for existing threads
+                const matchingThreads = threadMap.get(expectedName) || [];
 
                 let existingThread = null;
 
                 // Handle duplicates: keep oldest, delete the rest
-                if (matchingThreads.size > 1) {
-                    console.log(`Found ${matchingThreads.size} duplicate threads for ${expectedName}, cleaning up...`);
+                if (matchingThreads.length > 1) {
+                    console.log(`Found ${matchingThreads.length} duplicate threads for ${expectedName}, cleaning up...`);
                     
                     // Sort by creation date (oldest first)
-                    const sortedThreads = Array.from(matchingThreads.values())
-                        .sort((a, b) => a.createdTimestamp! - b.createdTimestamp!);
+                    const sortedThreads = matchingThreads.sort((a: any, b: any) => a.createdTimestamp! - b.createdTimestamp!);
                     
                     // Keep the first (oldest) thread
                     existingThread = sortedThreads[0];
@@ -162,8 +177,11 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                             console.error(`Failed to delete duplicate thread ${sortedThreads[i].id}:`, deleteError);
                         }
                     }
-                } else if (matchingThreads.size === 1) {
-                    existingThread = matchingThreads.first()!;
+                    
+                    // Update the map to only keep the oldest thread
+                    threadMap.set(expectedName, [existingThread]);
+                } else if (matchingThreads.length === 1) {
+                    existingThread = matchingThreads[0];
                 }
 
                 // If thread doesn't exist, create it
@@ -175,6 +193,9 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                     });
                     createdThreads++;
                     console.log(`Created new thread: ${threadName}`);
+                    
+                    // Add to our local map to prevent duplicate creation in this session
+                    threadMap.set(expectedName, [existingThread]);
                 } else {
                     skippedThreads++;
                 }
@@ -186,14 +207,24 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                 }
 
                 // Handle the challenge info message
-                const starter = await existingThread.fetchStarterMessage();
+                let starterId = existingThread.id;
+                try {
+                    const starter = await existingThread.fetchStarterMessage();
+                    if (starter) {
+                        starterId = starter.id;
+                    }
+                } catch (e) {
+                    // Ignore errors fetching starter message (e.g. if it was deleted)
+                }
 
                 // Fetch oldest messages (after the starter ID)
                 const messages = await existingThread.messages.fetch({
-                    limit: 1,
-                    after: starter?.id,
+                    limit: 5,
+                    after: starterId,
                 });
-                const firstMessage = messages.first();
+                
+                // Find the first message sent by us
+                const botMessage = messages.find((m: Message) => m.author.id === channel.client.user.id);
 
                 // Create updated challenge info
                 const solveStatus = isSolved ? '🎉 **SOLVED!** 🎉' : '🔍 **Unsolved**';
@@ -242,12 +273,37 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                     ...baseMessageParts.slice(6) // Everything after tags
                 ].filter(line => line !== '').join('\n');
 
-                if (firstMessage && firstMessage.author.bot) {
+                if (botMessage) {
                     // Check if the message content needs updating
-                    if (firstMessage.content !== challengeInfo) {
-                        await firstMessage.edit(challengeInfo);
-                        updatedMessages++;
-                        console.log(`Updated first message in thread: ${existingThread.name}`);
+                    if (botMessage.content !== challengeInfo) {
+                        try {
+                            if (botMessage.editable) {
+                                // Check if the message is a system message (e.g. thread starter message if it was a system message)
+                                // System messages (type !== 0) cannot be edited
+                                if (botMessage.type === 0 || botMessage.type === 19) { // 0: Default, 19: Reply
+                                    await botMessage.edit(challengeInfo);
+                                    updatedMessages++;
+                                    console.log(`Updated bot message in thread: ${existingThread.name}`);
+                                } else {
+                                    console.warn(`Found bot message in ${existingThread.name} but it is a system message (type ${botMessage.type}). Creating new message.`);
+                                    await existingThread.send(challengeInfo);
+                                    updatedMessages++;
+                                }
+                            } else {
+                                // If we found our message but can't edit it, that's weird. 
+                                // Maybe we lost permissions? Log it.
+                                console.warn(`Found bot message in ${existingThread.name} but it is not editable.`);
+                            }
+                        } catch (editError) {
+                            console.error(`Failed to edit message in ${existingThread.name}:`, editError);
+                            // If edit fails (e.g. Unknown Message), maybe we should create a new one?
+                            // But checking error code is safer.
+                            if ((editError as any).code === 10008 || (editError as any).code === 50021) { // 10008: Unknown Message, 50021: Cannot execute action on a system message
+                                await existingThread.send(challengeInfo);
+                                updatedMessages++;
+                                console.log(`Re-created message in thread after edit failure: ${existingThread.name}`);
+                            }
+                        }
                     }
                 } else {
                     // No bot message exists, create one

@@ -133,8 +133,10 @@ export const command: SubCommand = {
       author: interaction.user
     })
 
-    await event.addEvent()
-    await event.createMessageForRole()
+    await Promise.all([
+      event.addEvent(),
+      event.createMessageForRole()
+    ])
 
     await interaction.editReply({
       content: "Success",

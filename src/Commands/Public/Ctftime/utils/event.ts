@@ -1,6 +1,5 @@
-import { ActionRowBuilder, APIActionRowComponent, APIMessageActionRowComponent, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, ComponentType, DMChannel, Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, GuildScheduledEventUser, Interaction, JSONEncodable, Message, Role, TextBasedChannel, TextChannel, User } from "discord.js";
+import { ActionRowBuilder, APIActionRowComponent, APIMessageActionRowComponent, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, ComponentType, DMChannel, Guild, GuildMember, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, JSONEncodable, Message, RESTJSONErrorCodes, Role, TextChannel, User } from "discord.js";
 
-import { sleep } from "bun";
 import { CTFEvent, infoEvent } from "../../../../Functions/ctftime-v2";
 import cron from 'node-cron';
 import { dateToCron } from "../../../../Functions/discord-utils";
@@ -10,6 +9,29 @@ const ENV = process.env.ENV || 'production';
 
 import { ChannelType, ColorResolvable } from "discord.js";
 import { translate } from "../../../../Functions/discord-utils";
+
+const LOG_PREFIX = '[ReactionRoleEvent]';
+
+function logInfo(message: string, meta?: Record<string, unknown>) {
+    if (meta) {
+        console.log(`${LOG_PREFIX} ${message}`, meta);
+        return;
+    }
+    console.log(`${LOG_PREFIX} ${message}`);
+}
+
+function logWarn(message: string, meta?: Record<string, unknown>) {
+    if (meta) {
+        console.warn(`${LOG_PREFIX} ${message}`, meta);
+        return;
+    }
+    console.warn(`${LOG_PREFIX} ${message}`);
+}
+
+function logError(message: string, error: unknown, meta?: Record<string, unknown>) {
+    const payload = meta ? { ...meta, error } : { error };
+    console.error(`${LOG_PREFIX} ${message}`, payload);
+}
 
 interface CreateChannelProps {
     channelName: string;
@@ -77,6 +99,68 @@ export function scheduleEmbedTemplate(props: ScheduleEmbedTemplateProps): APIEmb
 }
 
 
+type DMMessagePayload = Parameters<DMChannel['send']>[0];
+
+function buildMabarNotification(ctfEvent: CTFEvent): DMMessagePayload {
+    return {
+        embeds: [{
+            title: "🎮 Notifikasi Mabar TCP1P",
+            description: `Hai teman-teman yang luar biasa!
+
+Aku punya kabar seru nih! 🥳🎉 Kita akan mabar ${ctfEvent.title}! 💃🕹️ Jangan lupa cek info lengkapnya di <#1008578079016370246> ya!
+
+Ayo semangat belajar bareng-bareng dan tingkatkan skill cyber security kita di CTF kali ini! 🚀💻 Jangan sampe kelewat, ya! ❤️`
+        }]
+    };
+}
+
+async function sendSequentialDMs(dmChannel: DMChannel, messages: DMMessagePayload[]): Promise<void> {
+    for (const message of messages) {
+        await dmChannel.send(message);
+    }
+}
+
+async function runWithConcurrency<T>(items: T[], limit: number, task: (item: T) => Promise<void>): Promise<void> {
+    const queue = [...items];
+    const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
+        while (queue.length) {
+            const item = queue.shift();
+            if (!item) break;
+            await task(item);
+        }
+    });
+    await Promise.all(workers);
+}
+
+function isDiscordApiError(error: unknown): error is { code: number } {
+    return typeof error === 'object' && error !== null && 'code' in error;
+}
+
+async function openDMChannel(user: User): Promise<DMChannel | null> {
+    if (user.dmChannel) {
+        return user.dmChannel;
+    }
+
+    try {
+        return await user.createDM();
+    } catch (error) {
+        if (isDiscordApiError(error) && error.code === RESTJSONErrorCodes.CannotSendMessagesToThisUser) {
+            logWarn('User has DMs disabled or blocked the bot', {
+                userId: user.id,
+                username: `${user.username}#${user.discriminator}`,
+            });
+            return null;
+        }
+
+        logError('Unexpected error while creating DM channel', error, {
+            userId: user.id,
+            username: `${user.username}#${user.discriminator}`,
+        });
+        return null;
+    }
+}
+
+
 
 interface createRoleProps {
     guild: Guild;
@@ -140,11 +224,11 @@ async function generateCtfEndMessage(ctfTitle: string, roleId: string): Promise<
         }
     } catch (error) {
         console.error('❌ Error generating CTF end message with OpenAI:', error);
-        
+
         // Check if it's a token limit or rate limit error
         if (error instanceof Error && (
-            error.message.includes('quota') || 
-            error.message.includes('limit') || 
+            error.message.includes('quota') ||
+            error.message.includes('limit') ||
             error.message.includes('token') ||
             error.message.includes('rate')
         )) {
@@ -152,7 +236,7 @@ async function generateCtfEndMessage(ctfTitle: string, roleId: string): Promise<
         } else {
             console.log('🔄 OpenAI unavailable, using template fallback');
         }
-        
+
         // Fallback to random template message
         const randomTemplate = ctfEndMessageTemplates[Math.floor(Math.random() * ctfEndMessageTemplates.length)];
         console.log('📝 Using template message as fallback');
@@ -173,17 +257,19 @@ export class ReactionRoleEvent {
     options: EventListenerOptions;
     discussChannel?: TextChannel;
     role?: Role;
+    private initializationTask?: Promise<void>;
     constructor(guild: Guild, initialChannel: TextChannel, options: EventListenerOptions) {
         this.options = options
         this.guild = guild
         this.initialChannel = initialChannel
     }
-    async __initializeChannelAndRole() {
+    private async performInitialization() {
         const ctfName = this.options.ctfEvent.title
         const role = await this.createEventRoleIfNotExist(ctfName)
         this.role = role
         this.discussChannel = await this.createDefaultChannelIfNotExist(ctfName, role, async (channel) => {
-            const credsMessage = await channel.send({ content: `
+            const credsMessage = await channel.send({
+                content: `
 # 🎉 Selamat Datang di Ruang Diskusi ${ctfName}!
 
 <@&${role.id}> **Mari kolaborasi dan belajar bersama!** 💻✨
@@ -220,13 +306,25 @@ export class ReactionRoleEvent {
 - **Contoh:** \`https://ctf.example.com/api/v1/challenges\`
 
 > 💡 Copy JSON dari endpoint tersebut, lalu gunakan \`/solve init\`
-            `.trim() })
+            `.trim()
+            })
             credsMessage.pin('Panduan Resmi CTF');
-            setTimeout(async() => {
-                if (ENV != 'development') await this.sendNotification()
-            }, 100);
+            try {
+                await this.sendNotification()
+            } catch (error) {
+                logError('Failed to send notification to members', error, {
+                    roleId: role.id,
+                    eventId: this.options.ctfEvent.id,
+                })
+            }
         })
 
+    }
+    async __initializeChannelAndRole() {
+        if (!this.initializationTask) {
+            this.initializationTask = this.performInitialization();
+        }
+        return this.initializationTask;
     }
 
     async createEventRoleIfNotExist(ctfName: string) {
@@ -241,21 +339,21 @@ export class ReactionRoleEvent {
             channelName: name,
             guild: this.guild,
             role: role,
-            data: {id: this.options.ctfEvent.id},
+            data: { id: this.options.ctfEvent.id },
             callback: callback
         })
     }
-    async getDiscussChannel(){
+    async getDiscussChannel() {
         const channels = await this.guild.channels.fetch()
         const name = translate(this.options.ctfEvent.title)
         var channel = channels.find((channel) => channel?.name === name) as TextChannel
         if (!(channel instanceof TextChannel)) return
         return channel
     }
-    async createEventIfNotExist(){
-        var event = this.guild.scheduledEvents.cache.find((event)=>event.name===this.options.ctfEvent.title && !event.isCanceled() && !event.isCompleted())
+    async createEventIfNotExist() {
+        var event = this.guild.scheduledEvents.cache.find((event) => event.name === this.options.ctfEvent.title && !event.isCanceled() && !event.isCompleted())
 
-        if (!event){
+        if (!event) {
             const description = this.options.ctfEvent.description.substr(0, 800)
             const ctftimeUrl = this.options.ctfEvent.ctftime_url
             const url = this.options.ctfEvent.url
@@ -263,7 +361,7 @@ export class ReactionRoleEvent {
             const format = this.options.ctfEvent.format
             const weight = this.options.ctfEvent.weight
             var startTime = this.options.ctfEvent.start
-            if (startTime.getTime() < new Date().getTime()){
+            if (startTime.getTime() < new Date().getTime()) {
                 startTime = new Date(new Date().getTime() + 60000)
             }
 
@@ -276,7 +374,7 @@ export class ReactionRoleEvent {
                 description: `${description}
 
 :busts_in_silhouette: **Organizers**
-${organizers.map((organizer)=>organizer.name).join("\n")}
+${organizers.map((organizer) => organizer.name).join("\n")}
 
 :gear: **Format**
 ${format}
@@ -292,28 +390,44 @@ ${weight}
                     location: `${ctftimeUrl} - ${url}`
                 }
             })
-            const mabarChannel = this.guild.channels.cache.find((channel)=>channel.name.includes("mabar-ctf")) as TextChannel
-            if (mabarChannel){
+            const mabarChannel = this.guild.channels.cache.find((channel) => channel.name.includes("mabar-ctf")) as TextChannel
+            if (mabarChannel) {
                 await mabarChannel.send(`${event.url}`)
                 await mabarChannel.send(`Halo teman-teman <@&${this.options.notificationRole?.id}> silahkan yang mau ikut mabar ${this.options.ctfEvent.title} bisa klik interest diatas ya XP`)
             }
         }
         return event
     }
-    async addRoleToUser(iuser: User){
+    async addRoleToUser(iuser: User) {
         const role = await this.getRole()
-        const user = this.guild.members.cache.find((user)=> user.id==iuser.id)
-        if (!user) return
-        if (user.roles.cache.get(role.name)) return false
-        await user.roles.add(role)
+        let member: GuildMember | null = null
+        try {
+            member = await this.guild.members.fetch(iuser.id)
+        } catch (error) {
+            logError('Failed to fetch guild member during role assignment', error, {
+                userId: iuser.id,
+                eventId: this.options.ctfEvent.id,
+            })
+            return false
+        }
+        if (member.roles.cache.has(role.id)) return false
+        await member.roles.add(role)
         return true
     }
-    async removeRoleFromUser(iuser: User){
+    async removeRoleFromUser(iuser: User) {
         const role = await this.getRole()
-        const user = this.guild.members.cache.find((user)=> user.id==iuser.id)
-        if (!user) return
-        if (user.roles.cache.get(role.name)) {
-            await user.roles.remove(role)
+        let member: GuildMember | null = null
+        try {
+            member = await this.guild.members.fetch(iuser.id)
+        } catch (error) {
+            logError('Failed to fetch guild member during role removal', error, {
+                userId: iuser.id,
+                eventId: this.options.ctfEvent.id,
+            })
+            return false
+        }
+        if (member.roles.cache.has(role.id)) {
+            await member.roles.remove(role)
             return true
         }
         return false
@@ -322,35 +436,65 @@ ${weight}
         await this.__initializeChannelAndRole()
         const role = await this.getRole()
         const event = await this.createEventIfNotExist()
+        if (!event) {
+            logWarn('Unable to create or fetch scheduled event', {
+                eventTitle: this.options.ctfEvent.title,
+            })
+            return
+        }
 
-        var subsBefore = await event.fetchSubscribers()
-        const members = await this.guild.members.fetch()
-        subsBefore.forEach(async (gUser)=>{
-            const user = members.find((user)=> user.id==gUser.user.id)
-            if (!user) return
-            if (user.roles.cache.has(role.id)) return
-            await this.addRoleToUser(gUser.user)
-            const dm = await gUser.user.createDM()
-            this.sendSuccessMessage(dm)
+        let subsBefore = await event.fetchSubscribers({ withMember: true })
+
+        await runWithConcurrency(Array.from(subsBefore.values()), 5, async (gUser) => {
+            const member = gUser.member ?? await this.guild.members.fetch(gUser.user.id).catch((error) => {
+                logError('Failed to fetch member while syncing subscribers (initial)', error, {
+                    userId: gUser.user.id,
+                    eventId: this.options.ctfEvent.id,
+                })
+                return null
+            })
+            if (!member || member.roles.cache.has(role.id)) return
+            const wasAdded = await this.addRoleToUser(gUser.user)
+            if (wasAdded) {
+                const dm = await openDMChannel(gUser.user)
+                if (dm) {
+                    await this.sendSuccessMessage(dm)
+                }
+            }
         })
 
         const updateSubscribers = async () => {
-            const subs = await event.fetchSubscribers();
-            const members = await this.guild.members.fetch();
-            subs.forEach(async (gUser) => {
-                const user = members.find((user) => user.id == gUser.user.id);
-                if (!user) return;
-                if (user.roles.cache.has(role.id)) return;
-                const dm = await gUser.user.createDM();
-                await this.addRoleToUser(gUser.user);
-                this.sendSuccessMessage(dm);
+            const subs = await event.fetchSubscribers({ withMember: true });
+
+            await runWithConcurrency(Array.from(subs.values()), 5, async (gUser) => {
+                const member = gUser.member ?? await this.guild.members.fetch(gUser.user.id).catch((error) => {
+                    logError('Failed to fetch member while syncing subscribers (add)', error, {
+                        userId: gUser.user.id,
+                        eventId: this.options.ctfEvent.id,
+                    })
+                    return null
+                });
+                if (!member || member.roles.cache.has(role.id)) return;
+                const wasAdded = await this.addRoleToUser(gUser.user);
+                if (wasAdded) {
+                    const dm = await openDMChannel(gUser.user);
+                    if (dm) {
+                        await this.sendSuccessMessage(dm);
+                    }
+                }
             });
-            subsBefore.forEach(async (gUser) => {
+
+            await runWithConcurrency(Array.from(subsBefore.values()), 5, async (gUser) => {
                 if (subs.get(gUser.user.id)) return;
-                const dm = await gUser.user.createDM();
-                await this.removeRoleFromUser(gUser.user);
-                await dm.send(`Successfully removed the role for "${this.options.ctfEvent.title}"`);
+                const wasRemoved = await this.removeRoleFromUser(gUser.user);
+                if (wasRemoved) {
+                    const dm = await openDMChannel(gUser.user);
+                    if (dm) {
+                        await dm.send(`Successfully removed the role for "${this.options.ctfEvent.title}"`);
+                    }
+                }
             });
+
             subsBefore = subs;
         };
 
@@ -363,38 +507,42 @@ ${weight}
 
         const updateTask = cron.schedule('*/5 * * * * *', updateSubscribers);
         const endTask = cron.schedule(dateToCron(new Date(this.options.ctfEvent.finish)), scheduleEndMessage);
-        
+
         const stopTasks = () => {
             updateTask.stop();
             endTask.stop();
         };
     }
 
-    async archive(){
+    async archive() {
         var archivesCategory = this.guild.channels.cache.find(channel => channel.name === "archives" && channel.type === ChannelType.GuildCategory);
         if (!archivesCategory) {
-            archivesCategory = await this.guild.channels.create({name: "archives", type: ChannelType.GuildCategory});
+            archivesCategory = await this.guild.channels.create({ name: "archives", type: ChannelType.GuildCategory });
         }
         if (!archivesCategory) return;
-        const discussChannel =  await this.getDiscussChannel()
+        const discussChannel = await this.getDiscussChannel()
         await discussChannel?.setParent(archivesCategory.id);
-        
+
         // Clean up the message entries in database
         try {
             await MessageModel.deleteMany({ ctfEventId: this.options.ctfEvent.id });
-            console.log(`Cleaned up message records for CTF event: ${this.options.ctfEvent.title}`);
+            logInfo('Cleaned up message records for CTF event', {
+                eventTitle: this.options.ctfEvent.title,
+            });
         } catch (error) {
-            console.error(`Error cleaning up message records: ${error}`);
+            logError('Error cleaning up message records', error, {
+                eventTitle: this.options.ctfEvent.title,
+            });
         }
     }
 
-    async addMessageRoleEventListener(msg: Message){
-        this.__initializeChannelAndRole()
+    async addMessageRoleEventListener(msg: Message) {
+        await this.__initializeChannelAndRole()
         // Calculate timeout duration, cap at max safe 32-bit signed integer (2147483647 ms = ~24.8 days)
         const timeUntilFinish = this.options.ctfEvent.finish.getTime() - new Date().getTime();
         const MAX_TIMEOUT = 2147483647; // Maximum safe timeout in milliseconds
         const collectorTimeout = Math.min(timeUntilFinish, MAX_TIMEOUT);
-        
+
         const collector = msg.createMessageComponentCollector({
             filter: async (i) => {
                 await i.deferUpdate()
@@ -403,31 +551,38 @@ ${weight}
             time: collectorTimeout,
             componentType: ComponentType.Button,
         })
-        
-        collector.on("collect", async (interaction)=>{
-            if (interaction.customId == "join"){
-                if (await this.addRoleToUser(interaction.user)){
-                    const dm = await interaction.user.createDM()
-                    this.sendSuccessMessage(dm)
+
+        collector.on("collect", async (interaction) => {
+            if (interaction.customId == "join") {
+                if (await this.addRoleToUser(interaction.user)) {
+                    const dm = await openDMChannel(interaction.user)
+                    if (dm) {
+                        await this.sendSuccessMessage(dm)
+                    }
                 }
-            }else if (interaction.customId == "leave"){
-                if (await this.removeRoleFromUser(interaction.user)){
-                    const dm = await interaction.user.createDM()
-                    await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
+            } else if (interaction.customId == "leave") {
+                if (await this.removeRoleFromUser(interaction.user)) {
+                    const dm = await openDMChannel(interaction.user)
+                    if (dm) {
+                        await dm.send(`Successfully remove the role for "${this.options.ctfEvent.title}"`)
+                    }
                 }
             }
         })
-        
+
         // If the event duration exceeds max timeout, renew the collector when it expires
         collector.on("end", async (collected, reason) => {
             if (reason === "time" && new Date().getTime() < this.options.ctfEvent.finish.getTime()) {
-                console.log(`Collector timed out, renewing listener for message ${msg.id}`);
+                logInfo('Collector timed out, renewing listener', {
+                    messageId: msg.id,
+                    eventId: this.options.ctfEvent.id,
+                });
                 await this.addMessageRoleEventListener(msg);
             }
         })
     }
 
-    async createMessageForRole(){
+    async createMessageForRole() {
         const join = new ButtonBuilder()
             .setCustomId('join')
             .setLabel('Join!')
@@ -443,7 +598,7 @@ ${weight}
 
         const message = await this.initialChannel.send({ "embeds": [scheduleEmbedTemplate({ ctfEvent: this.options.ctfEvent })], components: [row as JSONEncodable<APIActionRowComponent<APIMessageActionRowComponent>>] });
         await this.addMessageRoleEventListener(message);
-        
+
         // Save message to database
         await MessageModel.create({
             ctfEventId: this.options.ctfEvent.id,
@@ -455,53 +610,74 @@ ${weight}
     }
 
     async getRole(): Promise<Role> {
-        const role = this.role
-        if (!role) {
-            await sleep(1000)
-            return this.getRole()
+        if (!this.role) {
+            await this.__initializeChannelAndRole()
         }
-        return role
+        if (!this.role) {
+            throw new Error(`Failed to initialize role for event ${this.options.ctfEvent.title}`)
+        }
+        return this.role
     }
 
     async sendNotification() {
         const notificationRole = this.options.notificationRole
-        if (notificationRole) {
-            notificationRole.members.forEach(async (member) => {
-                const dmChannel = await member.createDM(true)
-                const mabarNotification = {
-                    embeds: [{
-                        title: "🎮 Notifikasi Mabar TCP1P",
-                        description: `Hai teman-teman yang luar biasa!
-
-Aku punya kabar seru nih! 🥳🎉 Kita akan mabar ${this.options.ctfEvent.title}! 💃🕹️ Jangan lupa cek info lengkapnya di <#1008578079016370246> ya!
-
-Ayo semangat belajar bareng-bareng dan tingkatkan skill cyber security kita di CTF kali ini! 🚀💻 Jangan sampe kelewat, ya! ❤️`
-                    }]
-                };
-                dmChannel.send(mabarNotification);
-            })
+        if (!notificationRole) {
+            return
         }
+
+        const members = Array.from(notificationRole.members.values())
+        if (members.length === 0) {
+            logWarn('No members found for notification role, skipping dispatch', {
+                roleId: notificationRole.id,
+                eventId: this.options.ctfEvent.id,
+            })
+            return
+        }
+
+        const mabarNotification = buildMabarNotification(this.options.ctfEvent)
+
+        const concurrencyLimit = Math.min(5, members.length)
+
+        await runWithConcurrency(members, Math.max(concurrencyLimit, 1), async (member) => {
+            const dmChannel = await openDMChannel(member.user)
+            if (!dmChannel) return
+
+            try {
+                await dmChannel.send(mabarNotification)
+            } catch (error) {
+                logError('Failed to send notification DM', error, {
+                    roleId: notificationRole.id,
+                    memberTag: `${member.user.username}#${member.user.discriminator}`,
+                    eventId: this.options.ctfEvent.id,
+                })
+            }
+        })
     }
 
     sendFailureMessage(dmChannel: DMChannel) {
-        dmChannel.send({
+        return sendSequentialDMs(dmChannel, [{
             content: `Authentication failed. Please provide the correct password to proceed.`,
-        });
+        }]);
     }
     sendSuccessMessage(dmChannel: DMChannel) {
-        dmChannel.send({
-            content: `Successfully added the role for "${this.options.ctfEvent.title}"!`,
-        });
-        dmChannel.send({
-            content: `Here's the channel for the CTF event. Good luck!`,
-        });
-        dmChannel.send({
+        const discussChannelMessage = this.discussChannel ? {
             embeds: [{
                 fields: [
-                    { name: "**Discuss Channel**", value: `<#${this.discussChannel?.id}>` },
+                    { name: "**Discuss Channel**", value: `<#${this.discussChannel.id}>` },
                 ]
             }]
-        });
+        } : undefined
+
+        const messages: DMMessagePayload[] = [
+            { content: `Successfully added the role for "${this.options.ctfEvent.title}"!` },
+            { content: `Here's the channel for the CTF event. Good luck!` },
+        ]
+
+        if (discussChannelMessage) {
+            messages.push(discussChannelMessage)
+        }
+
+        return sendSequentialDMs(dmChannel, messages)
     }
 }
 
@@ -525,75 +701,97 @@ export async function getEmbedCTFEvent(interaction: ChatInputCommandInteraction<
 
 // Add a function to restore message listeners on bot restart
 export async function restoreEventMessageListeners(client: MyClient) {
-    console.log("Restoring event message listeners...")
+    logInfo("Restoring event message listeners...")
     try {
         const storedMessages = await MessageModel.find({});
-        
+
         for (const storedMessage of storedMessages) {
             try {
                 // Check for valid data
                 if (!storedMessage.guildId || !storedMessage.channelId || !storedMessage.messageId || !storedMessage.ctfEventId) {
-                    console.error('Invalid stored message data:', storedMessage);
+                    logWarn('Invalid stored message record encountered', {
+                        storedMessageId: storedMessage._id?.toString?.(),
+                    });
                     continue;
                 }
-                
+
                 // Fetch guild
                 const guild = await client.guilds.fetch(storedMessage.guildId);
                 if (!guild) {
-                    console.log(`Guild not found: ${storedMessage.guildId}`);
+                    logWarn('Guild not found while restoring listener', {
+                        guildId: storedMessage.guildId,
+                        messageId: storedMessage.messageId,
+                    });
                     continue;
                 }
-                
+
                 // Fetch channel
                 const channel = await guild.channels.fetch(storedMessage.channelId);
                 if (!channel || !(channel instanceof TextChannel)) {
-                    console.log(`Channel not found or not a text channel: ${storedMessage.channelId}`);
+                    logWarn('Channel not found or not a text channel while restoring listener', {
+                        channelId: storedMessage.channelId,
+                        guildId: storedMessage.guildId,
+                        messageId: storedMessage.messageId,
+                    });
                     continue;
                 }
-                
+
                 // Fetch message
                 try {
                     const message = await channel.messages.fetch(storedMessage.messageId);
-                    
+
                     // Fetch CTF event
                     const ctfEvent = await infoEvent(String(storedMessage.ctfEventId));
                     if (!ctfEvent) {
-                        console.log(`CTF event not found: ${storedMessage.ctfEventId}`);
+                        logWarn('CTF event not found while restoring listener', {
+                            ctfEventId: storedMessage.ctfEventId,
+                            messageId: storedMessage.messageId,
+                        });
                         continue;
                     }
-                    
+
                     // Create notification role
                     const notificationRole = await createRoleIfNotExist({
                         name: "CTF Waiting Role",
                         guild: guild,
                         color: "#87CEEB"
                     });
-                    
+
                     // Create reaction role event
                     const reactionRoleEvent = new ReactionRoleEvent(guild, channel, {
                         ctfEvent: ctfEvent,
                         notificationRole: notificationRole
                     });
-                    
+
                     // Initialize channels and roles, then add message listener
                     await reactionRoleEvent.__initializeChannelAndRole();
                     await reactionRoleEvent.addMessageRoleEventListener(message);
-                    
-                    console.log(`Restored event listener for message: ${message.id} (CTF Event: ${ctfEvent.title})`);
+
+                    logInfo('Restored event listener', {
+                        messageId: message.id,
+                        ctfEventTitle: ctfEvent.title,
+                    });
                 } catch (error: any) {
-                    console.error(`Error fetching message: ${error}`);
-                    
+                    logError('Error fetching stored message while restoring listener', error, {
+                        messageId: storedMessage.messageId,
+                        guildId: storedMessage.guildId,
+                    });
+
                     // If message not found, delete the record
                     if (error.code === 10008) { // Discord error code for unknown message
                         await MessageModel.deleteOne({ messageId: storedMessage.messageId });
-                        console.log(`Deleted record for missing message: ${storedMessage.messageId}`);
+                        logInfo('Deleted record for missing message', {
+                            messageId: storedMessage.messageId,
+                        });
                     }
                 }
             } catch (error) {
-                console.error(`Error processing stored message: ${error}`);
+                logError('Error processing stored message during listener restore', error, {
+                    storedMessageId: storedMessage._id?.toString?.(),
+                });
             }
         }
     } catch (error) {
-        console.error(`Error fetching stored messages: ${error}`);
+        logError('Error fetching stored messages', error);
     }
 }
