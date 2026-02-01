@@ -3,6 +3,7 @@
 import type React from "react"
 
 import Image from "next/image"
+import { ScoreDisplay } from "@/components/score-display"
 
 interface CertificateProps {
   username: string
@@ -202,7 +203,7 @@ export function Certificate({
             <div className="flex flex-row justify-center items-center gap-4 mb-4">
               {/* Total Score */}
               <div className="bg-slate-700/60 border border-primary/30 rounded-md px-3 py-2 flex flex-col items-center min-w-[80px] shadow-lg backdrop-blur-sm">
-                <span className={`text-lg font-bold mb-1 ${getStatColor(rank)}`}>{score.toLocaleString()}</span>
+                <ScoreDisplay score={score} className={`text-lg mb-1 block ${getStatColor(rank)}`} />
                 <span className="text-xs text-slate-300 text-center uppercase tracking-wider font-medium">
                   Total Score
                 </span>

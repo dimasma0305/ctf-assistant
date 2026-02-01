@@ -15,6 +15,7 @@ import { WindowProvider } from "@/components/ui/window"
 import Link from "next/link"
 import { useUserProfile } from "@/hooks/useAPI"
 import type { Achievement, UserProfileResponse } from "@/lib/types"
+import { ScoreDisplay } from "@/components/score-display"
 
 export default function UserProfilePage() {
   const params = useParams()
@@ -22,9 +23,7 @@ export default function UserProfilePage() {
 
   const { data: profileData, loading, error } = useUserProfile(userId)
 
-  const formatScore = (score: number) => {
-    return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-  }
+
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString)
@@ -199,7 +198,7 @@ export default function UserProfilePage() {
                       <Target className="w-4 h-4 text-primary" />
                       <span className="text-sm font-medium text-primary">Total Score</span>
                     </div>
-                    <div className="text-xl font-bold text-primary">{formatScore(profileData.stats.totalScore)}</div>
+                    <ScoreDisplay score={profileData.stats.totalScore} className="text-xl text-primary block" />
                   </div>
 
                   <div className="text-center p-4 bg-chart-3/10 rounded-lg border border-chart-3/20">
@@ -352,7 +351,7 @@ export default function UserProfilePage() {
                             </div>
                             <div className="text-right lg:hidden flex-shrink-0">
                               <div className="text-xs text-muted-foreground">Score</div>
-                              <div className="font-bold text-xl text-foreground">{formatScore(ctf.score)}</div>
+                              <ScoreDisplay score={ctf.score} className="text-xl text-foreground block" />
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
@@ -380,7 +379,7 @@ export default function UserProfilePage() {
                               </div>
                               <div className="hidden lg:block ml-auto text-right">
                                 <div className="text-sm text-muted-foreground">Score</div>
-                                <div className="font-bold text-2xl text-foreground">{formatScore(ctf.score)}</div>
+                                <ScoreDisplay score={ctf.score} className="text-2xl text-foreground block" />
                               </div>
                             </div>
                             <div className="w-full bg-muted rounded-full h-2">
@@ -441,11 +440,10 @@ export default function UserProfilePage() {
                             return (
                               <Card
                                 key={achievement.id}
-                                className={`p-4 border transition-all duration-300 ${
-                                  isUnlocked
-                                    ? "border-primary/20 bg-gradient-to-br from-primary/10 to-chart-3/5 hover:shadow-md"
-                                    : "border-muted/20 bg-muted/10 opacity-60"
-                                }`}
+                                className={`p-4 border transition-all duration-300 ${isUnlocked
+                                  ? "border-primary/20 bg-gradient-to-br from-primary/10 to-chart-3/5 hover:shadow-md"
+                                  : "border-muted/20 bg-muted/10 opacity-60"
+                                  }`}
                               >
                                 <div className="flex items-center gap-4">
                                   <div
@@ -456,9 +454,8 @@ export default function UserProfilePage() {
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
                                       <h3
-                                        className={`font-bold ${
-                                          isUnlocked ? "text-foreground" : "text-muted-foreground"
-                                        }`}
+                                        className={`font-bold ${isUnlocked ? "text-foreground" : "text-muted-foreground"
+                                          }`}
                                       >
                                         {achievement.name}
                                       </h3>
@@ -472,9 +469,8 @@ export default function UserProfilePage() {
                                       )}
                                     </div>
                                     <p
-                                      className={`text-sm ${
-                                        isUnlocked ? "text-muted-foreground" : "text-muted-foreground/70"
-                                      }`}
+                                      className={`text-sm ${isUnlocked ? "text-muted-foreground" : "text-muted-foreground/70"
+                                        }`}
                                     >
                                       {achievement.description}
                                     </p>

@@ -30,6 +30,7 @@ import { SearchLeaderboard } from "@/components/search-leaderboard"
 import { useScoreboard } from "@/hooks/useAPI"
 import type { LeaderboardEntry, Achievement } from "@/lib/types"
 import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/utils"
+import { ScoreDisplay, formatScore } from "@/components/score-display"
 import Link from "next/link"
 
 interface CategoryStat {
@@ -41,9 +42,7 @@ interface CategoryStat {
   percentile?: number
 }
 
-const formatScore = (score: number) => {
-  return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 2 })
-}
+
 
 const getUserInitials = (user: LeaderboardEntry["user"]) => {
   const name = user.displayName || user.username
@@ -182,7 +181,7 @@ const UserProfileContent = ({ user, leaderboardTotal }: { user: LeaderboardEntry
               </Button>
             </Link>
             <div className="text-right text-sm">
-              <div className="font-bold text-xl sm:text-2xl text-primary">{formatScore(user.totalScore)}</div>
+              <ScoreDisplay score={user.totalScore} className="text-xl sm:text-2xl text-primary block" />
               <div className="text-xs text-muted-foreground">Total Score</div>
             </div>
           </div>
@@ -242,9 +241,7 @@ const UserProfileContent = ({ user, leaderboardTotal }: { user: LeaderboardEntry
             <TabsContent value="overview" className="space-y-6 mt-0">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-3 sm:p-4 text-center">
-                  <div className="text-lg sm:text-2xl font-bold text-primary mb-1 break-all">
-                    {formatScore(user.totalScore)}
-                  </div>
+                  <ScoreDisplay score={user.totalScore} className="text-lg sm:text-2xl text-primary mb-1 block break-all" />
                   <div className="text-xs text-muted-foreground">Total Score</div>
                 </div>
 
@@ -268,7 +265,7 @@ const UserProfileContent = ({ user, leaderboardTotal }: { user: LeaderboardEntry
                 <div className="p-4">
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-muted-foreground">Avg Score per Solve</div>
-                    <div className="text-2xl font-bold text-primary">{formatScore(averageScorePerSolve)}</div>
+                    <ScoreDisplay score={averageScorePerSolve} className="text-2xl text-primary block" />
                     <div className="text-sm text-green-600">
                       {averageScorePerSolve > 15 ? "Above average" : "Improving"}
                     </div>
@@ -438,7 +435,6 @@ export function LeaderboardTable() {
 
     return leaderboardData.data.map((entry) => ({
       ...entry,
-      formattedScore: formatScore(entry.totalScore),
       userInitials: getUserInitials(entry.user),
       displayName: getUserDisplayName(entry.user),
       skillLevel: entry.rank <= 10 ? "Elite" : entry.rank <= 50 ? "Advanced" : "Intermediate",
@@ -776,7 +772,7 @@ export function LeaderboardTable() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right py-4">
-                      <div className="font-mono font-bold text-primary text-base">{entry.formattedScore}</div>
+                      <ScoreDisplay score={entry.totalScore} className="text-primary text-base block" />
                     </TableCell>
                     <TableCell className="text-right py-4">
                       <Badge variant="secondary" className="font-mono text-foreground">
