@@ -79,141 +79,189 @@ Cybersecurity, ethical hacking, CTF challenges (Web, Forensics, Crypto, RE, Pwni
 
     // Configuration for OpenClaw using DeepSeek via OpenAI compatible provider
     const config = {
-        meta: {
-            lastTouchedVersion: "2026.1.30"
+        "meta": {
+            "lastTouchedVersion": "2026.1.30",
+            "lastTouchedAt": "2026-02-02T14:39:06.698Z"
         },
-        logging: {
-            level: "debug",
-            consoleLevel: "debug",
-            consoleStyle: "pretty"
+        "wizard": {
+            "lastRunAt": "2026-02-02T14:39:06.690Z",
+            "lastRunVersion": "2026.1.30",
+            "lastRunCommand": "onboard",
+            "lastRunMode": "local"
         },
-        models: {
-            mode: "merge",
-            providers: {
-                deepseek: {
-                    baseUrl: "https://api.deepseek.com",
-                    apiKey: OPENAI_API_KEY,
-                    api: "openai-completions",
-                    models: [
+        "logging": {
+            "level": "debug",
+            "consoleLevel": "debug",
+            "consoleStyle": "pretty",
+            "redactSensitive": "tools"
+        },
+        "models": {
+            "mode": "merge",
+            "providers": {
+                "deepseek": {
+                    "baseUrl": "https://api.deepseek.com",
+                    "apiKey": OPENAI_API_KEY,
+                    "api": "openai-completions",
+                    "models": [
                         {
-                            id: "deepseek-reasoner",
-                            name: "DeepSeek Reasoner",
-                            reasoning: true,
-                            input: ["text"],
-                            contextWindow: 64000,
-                            maxTokens: 4096
+                            "id": "deepseek-reasoner",
+                            "name": "DeepSeek Reasoner",
+                            "reasoning": true,
+                            "input": [
+                                "text"
+                            ],
+                            "cost": {
+                                "input": 0,
+                                "output": 0,
+                                "cacheRead": 0,
+                                "cacheWrite": 0
+                            },
+                            "contextWindow": 64000,
+                            "maxTokens": 4096
                         },
                         {
-                            id: "deepseek-chat",
-                            name: "DeepSeek Chat",
-                            reasoning: false,
-                            input: ["text"],
-                            contextWindow: 64000,
-                            maxTokens: 4096
+                            "id": "deepseek-chat",
+                            "name": "DeepSeek Chat",
+                            "reasoning": false,
+                            "input": [
+                                "text"
+                            ],
+                            "cost": {
+                                "input": 0,
+                                "output": 0,
+                                "cacheRead": 0,
+                                "cacheWrite": 0
+                            },
+                            "contextWindow": 64000,
+                            "maxTokens": 4096
                         }
                     ]
                 }
             }
         },
-        agents: {
-            defaults: {
-                model: {
-                    primary: "deepseek/deepseek-chat"
+        "agents": {
+            "defaults": {
+                "model": {
+                    "primary": "deepseek/deepseek-chat"
                 },
-                workspace: "./data/workspace",
-                repoRoot: "./data/workspace"
+                "workspace": "/app/data/workspace",
+                "repoRoot": "./data/workspace",
+                "maxConcurrent": 4,
+                "subagents": {
+                    "maxConcurrent": 8
+                },
+                "models": {
+                    "deepseek/deepseek-chat": {}
+                }
             },
-            list: [
+            "list": [
                 {
-                    id: "hackerika",
-                    name: "Hackerika",
-                    default: true,
-                    model: "deepseek/deepseek-chat",
-                    agentDir: "./data/agents/hackerika/agent",
-                    workspace: "./data/workspace",
-                    identity: {
-                        name: "Hackerika",
-                        emoji: "🎀"
+                    "id": "hackerika",
+                    "default": true,
+                    "name": "Hackerika",
+                    "workspace": "./data/workspace",
+                    "agentDir": "./data/agents/hackerika/agent",
+                    "model": "deepseek/deepseek-chat",
+                    "identity": {
+                        "name": "Hackerika",
+                        "emoji": "🎀"
                     },
-                    groupChat: {
-                        // Include the Discord bot ID for @mention detection
-                        // Discord @mentions appear as <@1077393568647352320> in raw content
-                        mentionPatterns: ["1077393568647352320", "hackerika", "hacker", "rika"]
+                    "groupChat": {
+                        "mentionPatterns": [
+                            "1077393568647352320",
+                            "hackerika",
+                            "hacker",
+                            "rika"
+                        ]
                     }
                 }
             ]
         },
-        channels: {
-            discord: {
-                enabled: true,
-                token: TOKEN,
-                configWrites: false,
-                groupPolicy: "open",
-                historyLimit: 10,
-                dmHistoryLimit: 10,
-                dm: {
-                    enabled: true,
-                    policy: "open",
-                    allowFrom: ["*"]
+        "tools": {
+            "profile": "messaging",
+            "allow": [
+                "group:web",
+                "group:memory",
+                "browser",
+                "image"
+            ],
+            "deny": [
+                "group:runtime",
+                "group:fs",
+                "nodes"
+            ],
+            "web": {
+                "search": {
+                    "enabled": true,
+                    "provider": "brave",
+                    "maxResults": 5,
+                    "timeoutSeconds": 30,
+                    "cacheTtlMinutes": 15
                 },
-                guilds: {
+                "fetch": {
+                    "enabled": true
+                }
+            }
+        },
+        "messages": {
+            "ackReactionScope": "all"
+        },
+        "commands": {
+            "native": "auto",
+            "nativeSkills": "auto"
+        },
+        "session": {
+            "store": "./data/sessions.json"
+        },
+        "channels": {
+            "discord": {
+                "enabled": true,
+                "configWrites": false,
+                "token": TOKEN,
+                "retry": {
+                    "attempts": 3,
+                    "minDelayMs": 500,
+                    "maxDelayMs": 30000,
+                    "jitter": 0.1
+                },
+                "groupPolicy": "open",
+                "dm": {
+                    "enabled": true,
+                    "policy": "open",
+                    "allowFrom": [
+                        "*"
+                    ]
+                },
+                "guilds": {
                     "*": {
-                        requireMention: true
+                        "requireMention": false
                     }
-                },
-                retry: {
-                    attempts: 3,
-                    minDelayMs: 500,
-                    maxDelayMs: 30000,
-                    jitter: 0.1,
-                },
-            }
-        },
-        session: {
-            store: "./data/sessions"
-        },
-        gateway: {
-            mode: "local",
-            auth: {
-                mode: "token",
-                token: TOKEN
-            }
-        },
-        tools: {
-            // Use messaging profile as base (safe for Discord bot)
-            profile: "messaging",
-            // Allow additional tools on top of messaging profile
-            allow: [
-                "group:web",      // web_search, web_fetch
-                "group:memory",   // memory_search, memory_get
-                "browser",        // for web browsing
-                "image"           // for image analysis
-            ],
-            // Explicitly deny dangerous tools
-            deny: [
-                "group:runtime",  // exec, bash, process
-                "group:fs",       // read, write, edit, apply_patch
-                "nodes"           // no node control
-            ],
-            web: {
-                search: {
-                    enabled: true,
-                    provider: "brave",
-                    maxResults: 5,
-                    timeoutSeconds: 30,
-                    cacheTtlMinutes: 15
-                },
-                fetch: {
-                    enabled: true
                 }
             }
         },
-        // Explicitly enable Discord plugin
-        plugins: {
-            entries: {
-                discord: {
-                    enabled: true
+        "gateway": {
+            "mode": "local",
+            "auth": {
+                "mode": "token",
+                "token": TOKEN
+            },
+            "port": 18789,
+            "bind": "loopback",
+            "tailscale": {
+                "mode": "off",
+                "resetOnExit": false
+            }
+        },
+        "plugins": {
+            "entries": {
+                "discord": {
+                    "enabled": true
                 }
+            }
+        },
+        "skills": {
+            "install": {
+                "nodeManager": "bun"
             }
         }
     };
