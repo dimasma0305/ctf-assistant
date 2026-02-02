@@ -41,25 +41,29 @@ export async function handleSpamDetection(message: OmitPartialGroupDMChannel<Dis
         console.log(`Could not delete message ${spamMessage.messageId}: ${error}`);
       }
     }
-    
+
     // Don't kick if it's only stickers
     if (!isOnlySticker) {
-      // Ban the user from the guild
+      // Kick the user from the guild (if bot has permission)
       if (message.member && message.guild) {
-        await message.member.kick("Spamming the same message multiple times");
+        try {
+          await message.member.kick("Spamming the same message multiple times");
+        } catch (error) {
+          console.log(`Could not kick user ${message.author.tag}: Missing permissions`);
+        }
       }
       try {
-        await message.author.send("You have been banned for spamming the same message multiple times.");
+        await message.author.send("You have been kicked for spamming the same message multiple times.");
       } catch (error) {
         console.log("Could not send DM to user");
       }
     }
-    
+
     // Clear user's message history to prevent further checks
     delete recentMessages[userId];
     return true; // Message was spam and handled
   }
-  
+
   return false; // Not spam
 }
 
@@ -70,19 +74,27 @@ export async function handlePhishingDetection(message: OmitPartialGroupDMChannel
   ];
 
   if (phishingMessage.some(regex => regex.test(message.content))) {
-    await message.delete();
-    // Ban the user from the guild
+    try {
+      await message.delete();
+    } catch (error) {
+      console.log(`Could not delete phishing message: ${error}`);
+    }
+    // Kick the user from the guild (if bot has permission)
     if (message.member && message.guild) {
-      await message.member.kick("Sending phishing messages");
+      try {
+        await message.member.kick("Sending phishing messages");
+      } catch (error) {
+        console.log(`Could not kick user ${message.author.tag}: Missing permissions`);
+      }
     }
     try {
-      await message.author.send("You have been banned for sending phishing messages.");
+      await message.author.send("You have been kicked for sending phishing messages.");
     } catch (error) {
       console.log("Could not send DM to user");
     }
     return true; // Message was phishing and handled
   }
-  
+
   return false; // Not phishing
 }
 
@@ -93,7 +105,7 @@ export function sanitizeMentions(content: string | object | any[], guild?: Guild
     let sanitized = content
       .replace(/@everyone/gi, '@\u200beveryone') // Insert zero-width space
       .replace(/@here/gi, '@\u200bhere'); // Insert zero-width space
-    
+
     // Handle role mentions: <@&roleId> -> @<rolet>
     if (guild) {
       sanitized = sanitized.replace(/<@&(\d+)>/g, (match, roleId) => {
@@ -111,15 +123,15 @@ export function sanitizeMentions(content: string | object | any[], guild?: Guild
       // If no guild provided, just replace with generic placeholder
       sanitized = sanitized.replace(/<@&\d+>/g, '@<rolet>');
     }
-    
+
     return sanitized;
   }
-  
+
   // Handle arrays
   if (Array.isArray(content)) {
     return content.map(item => sanitizeMentions(item, guild));
   }
-  
+
   // Handle objects (including null)
   if (content && typeof content === 'object') {
     const sanitized: any = {};
@@ -128,7 +140,7 @@ export function sanitizeMentions(content: string | object | any[], guild?: Guild
     }
     return sanitized;
   }
-  
+
   // Return primitive values unchanged
   return content;
 }

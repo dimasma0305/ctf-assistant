@@ -1,16 +1,17 @@
 import { UserModel, solveModel, ChallengeSchemaType } from "../../src/Database/connect";
-import { 
-    UserProfile, 
-    UserRankingResult, 
-    GlobalStats, 
-    PerformanceComparison, 
-    CategoryStat, 
+import {
+    UserProfile,
+    UserRankingResult,
+    GlobalStats,
+    PerformanceComparison,
+    CategoryStat,
     UserSolve,
-    MonthlyRank 
+    MonthlyRank
 } from '../types';
-import { 
-    ACHIEVEMENT_CRITERIA, 
+import {
+    ACHIEVEMENT_CRITERIA,
 } from '../../ui/lib/achievements';
+import { categoryNormalize } from './common';
 
 /**
  * Statistics and Calculation Utilities
@@ -25,7 +26,7 @@ export function calculateUserRank(userId: string, userScores: Map<string, UserPr
     const userRank = allUsers.findIndex(user => user.userId === userId) + 1;
     const totalUsers = allUsers.length;
     const percentile = Math.round((userRank / totalUsers) * 100);
-    
+
     return { rank: userRank, totalUsers, percentile };
 }
 
@@ -39,7 +40,7 @@ export function calculateGlobalStats(userScores: Map<string, UserProfile>): Glob
     const avgScore = totalScore / allUsers.length;
     const sortedUsers = allUsers.sort((a, b) => b.totalScore - a.totalScore);
     const medianScore = sortedUsers[Math.floor(allUsers.length / 2)]?.totalScore || 0;
-    
+
     return { totalSolves, totalScore, avgScore, medianScore };
 }
 
@@ -47,8 +48,8 @@ export function calculateGlobalStats(userScores: Map<string, UserProfile>): Glob
  * Calculate performance comparison against averages
  */
 export function calculatePerformanceComparison(
-    userProfile: UserProfile, 
-    globalStats: GlobalStats, 
+    userProfile: UserProfile,
+    globalStats: GlobalStats,
     totalUsers: number
 ): PerformanceComparison {
     return {
@@ -81,12 +82,12 @@ export async function calculateCategoryStats(
     try {
         // Use existing solve data from profile when possible
         let relevantSolves = userProfile.recentSolves;
-        
+
         // Apply filter if provided
         if (solveFilter) {
             relevantSolves = relevantSolves.filter(solveFilter);
         }
-        
+
         // If we have very few solves in profile, fetch more from database
         if (relevantSolves.length < 10 && userProfile.solveCount > 10) {
             const userDoc = await UserModel.findOne({ discord_id: userProfile.userId }, { _id: 1 }).lean();
@@ -105,8 +106,8 @@ export async function calculateCategoryStats(
             }
 
             // Fetch only essential fields
-            const allSolves = await solveModel.find(allSolvesQuery).populate<{challenge_ref: ChallengeSchemaType}>("challenge_ref", "name category").lean();
-            
+            const allSolves = await solveModel.find(allSolvesQuery).populate<{ challenge_ref: ChallengeSchemaType }>("challenge_ref", "name category").lean();
+
             // Convert to UserSolve format
             relevantSolves = allSolves.map(solve => ({
                 ctf_id: solve.ctf_id,
@@ -117,13 +118,13 @@ export async function calculateCategoryStats(
                 users: solve.users.map((id: any) => id.toString())
             }));
         }
-        
+
         // Process solves efficiently to calculate scores per category
         const categoryStats = new Map<string, { solves: number; totalScore: number }>();
-        
+
         for (const solve of relevantSolves) {
-            const challengeCategory = solve.category || 'misc';
-            
+            const challengeCategory = categoryNormalize(solve.category || 'misc');
+
             // Get CTF data for scoring calculation
             const ctfBreakdown = userProfile.ctfBreakdown.get(solve.ctf_id);
             if (!ctfBreakdown) continue;
@@ -131,7 +132,7 @@ export async function calculateCategoryStats(
             // Calculate the score for this individual solve
             const ctfSolveCount = relevantSolves.filter(s => s.ctf_id === solve.ctf_id).length;
             if (ctfSolveCount === 0) continue;
-            
+
             const scorePerSolve = ctfBreakdown.score / ctfSolveCount;
 
             // Initialize or update category stats
@@ -148,10 +149,10 @@ export async function calculateCategoryStats(
             .map(([category, stats]) => {
                 // Simplified ranking calculation using existing data
                 const categoryParticipants = allUsers.filter(p => p.categories.has(category));
-                
+
                 // Estimate ranking based on solve count and total score
                 const categoryRank = Math.max(1, Math.floor(categoryParticipants.length * 0.3)); // Rough estimate
-                
+
                 return {
                     name: category,
                     solves: stats.solves,
@@ -159,11 +160,11 @@ export async function calculateCategoryStats(
                     avgPoints: stats.solves > 0 ? Math.round((stats.totalScore / stats.solves) * 100) / 100 : 0,
                     rankInCategory: categoryRank,
                     totalInCategory: categoryParticipants.length,
-                    percentile: Math.round((categoryRank / categoryParticipants.length) * 100)  
+                    percentile: Math.round((categoryRank / categoryParticipants.length) * 100)
                 };
             })
             .sort((a, b) => b.totalScore - a.totalScore);
-            
+
     } catch (error) {
         console.error('Error calculating category stats:', error);
         return [];
@@ -174,11 +175,11 @@ export async function calculateCategoryStats(
  * Calculate extended achievement metrics for multiple user profiles efficiently
  */
 export async function calculateExtendedMetricsForUsers(
-    userProfiles: Map<string, UserProfile>, 
+    userProfiles: Map<string, UserProfile>,
     includeExtendedMetrics: boolean = true
 ): Promise<Map<string, Partial<UserProfile>>> {
     const results = new Map<string, Partial<UserProfile>>();
-    
+
     // Skip extended metrics calculation if not needed
     if (!includeExtendedMetrics) {
         for (const discordId of userProfiles.keys()) {
@@ -186,30 +187,30 @@ export async function calculateExtendedMetricsForUsers(
         }
         return results;
     }
-    
+
     // Early return for empty dataset
     if (userProfiles.size === 0) {
         return results;
     }
-    
+
     try {
         // Get all Discord IDs
         const discordIds = Array.from(userProfiles.keys());
-        
+
         // Get all user documents in one optimized query
-        const userDocs = await UserModel.find({ 
-            discord_id: { $in: discordIds } 
+        const userDocs = await UserModel.find({
+            discord_id: { $in: discordIds }
         }, { discord_id: 1, _id: 1 }).lean(); // Only fetch needed fields
-        
+
         // Create efficient lookup maps
         const userDocLookup = new Map<string, any>();
         const objectIdToDiscordId = new Map<string, string>();
-        
+
         userDocs.forEach(doc => {
             userDocLookup.set(doc.discord_id, doc);
             objectIdToDiscordId.set(doc._id.toString(), doc.discord_id);
         });
-        
+
         // Early return if no user docs found
         if (userDocs.length === 0) {
             for (const discordId of userProfiles.keys()) {
@@ -217,27 +218,27 @@ export async function calculateExtendedMetricsForUsers(
             }
             return results;
         }
-        
+
         // Get all solves for all users in one optimized query
         const userObjectIds = userDocs.map(doc => doc._id);
-        const allSolves = await solveModel.find({ 
-            users: { $in: userObjectIds } 
+        const allSolves = await solveModel.find({
+            users: { $in: userObjectIds }
         }, {
             // Only fetch essential fields to reduce memory usage
-            users: 1, 
-            solved_at: 1, 
-            ctf_id: 1, 
+            users: 1,
+            solved_at: 1,
+            ctf_id: 1,
             category: 1
         }).lean();
-        
+
         // Efficiently group solves by user using the lookup map
         const solvesByUser = new Map<string, any[]>();
-        
+
         // Initialize empty arrays for all users
         for (const discordId of discordIds) {
             solvesByUser.set(discordId, []);
         }
-        
+
         // Group solves efficiently
         for (const solve of allSolves) {
             for (const userId of solve.users) {
@@ -247,11 +248,11 @@ export async function calculateExtendedMetricsForUsers(
                 }
             }
         }
-        
+
         // Calculate metrics for each user in parallel batches
         const batchSize = 50; // Process in smaller batches to avoid memory issues
         const discordIdArray = Array.from(userProfiles.keys());
-        
+
         for (let i = 0; i < discordIdArray.length; i += batchSize) {
             const batch = discordIdArray.slice(i, i + batchSize);
             const batchPromises = batch.map(async (discordId) => {
@@ -260,13 +261,13 @@ export async function calculateExtendedMetricsForUsers(
                 const metrics = await calculateExtendedMetricsSync(userProfile, userSolves);
                 return { discordId, metrics };
             });
-            
+
             const batchResults = await Promise.all(batchPromises);
             batchResults.forEach(({ discordId, metrics }) => {
                 results.set(discordId, metrics);
             });
         }
-        
+
     } catch (error) {
         console.error('Error calculating extended metrics:', error);
         // Return empty metrics for all users on error
@@ -274,7 +275,7 @@ export async function calculateExtendedMetricsForUsers(
             results.set(discordId, {});
         }
     }
-    
+
     return results;
 }
 
@@ -303,16 +304,16 @@ async function calculateExtendedMetricsForSingleUser(userProfile: UserProfile, a
         if (!userDoc) {
             return {};
         }
-        
+
         // Only fetch essential fields for single user
         allSolves = await solveModel.find({ users: userDoc._id }, {
-            users: 1, 
-            solved_at: 1, 
-            ctf_id: 1, 
+            users: 1,
+            solved_at: 1,
+            ctf_id: 1,
             category: 1
         }).lean();
     }
-    
+
     return calculateExtendedMetricsCore(userProfile, allSolves);
 }
 
@@ -340,7 +341,7 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
             rankImprovement: 0
         };
     }
-    
+
     // Initialize counters
     const categorySolves: Record<string, number> = {};
     let fastSolves = 0;
@@ -352,7 +353,7 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
     let expertSolves = 0;
     let firstBloods = 0;
     let helpedUsers = 0; // Count of challenges solved together with others
-    
+
     const solveDates: number[] = []; // Use timestamps for better performance
     const challengeTypes = new Set<string>();
     // get user by discord id
@@ -361,7 +362,7 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
         return {};
     }
     const membershipDays = Math.floor((new Date().getTime() - user.created_at.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     // Calculate rank improvement from monthly rank history
     // Note: This is now calculated in the bulk processing function above for efficiency
     // Individual calculations will use placeholder logic to avoid expensive calls
@@ -372,25 +373,25 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
         const avgScore = userProfile.totalScore / Math.max(userProfile.solveCount, 1);
         rankImprovement = Math.floor((recentActivity * avgScore) / 100); // Rough estimate
     }
-    
+
     // Single pass through all solves for efficiency
     for (const solve of allSolves) {
         const solveTime = new Date(solve.solved_at).getTime();
         solveDates.push(solveTime);
-        
+
         // Get challenge data with defaults
         const challengeCategory = solve.category || 'misc';
         const challengePoints = 100; // Default points since we don't have challenge_ref populated
-        
+
         // Count category solves
         categorySolves[challengeCategory] = (categorySolves[challengeCategory] || 0) + 1;
         challengeTypes.add(challengeCategory);
-        
+
         // Calculate timing-based metrics
         const solveDate = new Date(solveTime);
         const hour = solveDate.getHours();
         const dayOfWeek = solveDate.getDay();
-        
+
         // Fast solves based on points (heuristic)
         if (challengePoints <= 100) {
             fastSolves++;
@@ -398,19 +399,19 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
                 ultraFastSolves++;
             }
         }
-        
+
         // Time-based metrics
         if (hour >= 22 || hour < 6) nightSolves++;
         if (hour >= 5 && hour < 8) morningSolves++;
         if (dayOfWeek === 0 || dayOfWeek === 6) weekendSolves++;
-        
+
         // Difficulty-based metrics (heuristic based on points)
         if (challengePoints >= 400) hardSolves++;
         if (challengePoints >= 500) {
             expertSolves++;
             firstBloods++; // High-point challenges might be first bloods
         }
-        
+
         // Team solve detection - count challenges solved together with others
         if (solve.users && solve.users.length > 1) {
             helpedUsers++; // Each challenge solved with others counts as helping/being helped
@@ -421,10 +422,10 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
     let longestStreak = 0;
     if (solveDates.length > 0) {
         solveDates.sort((a, b) => a - b); // Sort timestamps
-        
+
         let currentStreak = 1;
         let lastDay = Math.floor(solveDates[0] / (1000 * 60 * 60 * 24));
-        
+
         for (let i = 1; i < solveDates.length; i++) {
             const currentDay = Math.floor(solveDates[i] / (1000 * 60 * 60 * 24));
             if (currentDay === lastDay + 1 || currentDay === lastDay) {
@@ -439,9 +440,9 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
         }
         longestStreak = Math.max(longestStreak, currentStreak);
     }
-    
+
     const totalSolves = allSolves.length;
-    
+
     // Return optimized metrics object
     return {
         categorySolves,
@@ -457,7 +458,7 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
         uniqueChallengeTypes: challengeTypes.size,
         teamCTFs: Math.max(1, Math.floor(helpedUsers / 3)), // Estimate team CTFs from collaborative solves
         membershipDays,
-        
+
         // Community-based metrics
         helpedUsers,
         rankImprovement
@@ -472,17 +473,17 @@ export function calculateRankImprovement(monthlyRanks: MonthlyRank[]): number {
     if (!monthlyRanks || monthlyRanks.length < 2) {
         return 0;
     }
-    
+
     // Sort by month to ensure chronological order
     const sortedRanks = monthlyRanks.sort((a, b) => a.month.localeCompare(b.month));
-    
+
     // Calculate improvement from first to last recorded rank
     const firstRank = sortedRanks[0].rank;
     const lastRank = sortedRanks[sortedRanks.length - 1].rank;
-    
+
     // Rank improvement is positive when rank number goes down (better position)
     const improvement = firstRank - lastRank;
-    
+
     return Math.max(0, improvement); // Return 0 if rank got worse
 }
 
@@ -499,15 +500,15 @@ export function generateAchievementIds(
     ctfTitle?: string
 ): string[] {
     const achievementIds: string[] = [];
-    
+
     // Check all achievement criteria
     for (const criteria of ACHIEVEMENT_CRITERIA) {
         // Skip achievements that don't match the current scope
         if (scope === 'global' && criteria.scope === 'ctf') continue;
         if (scope === 'ctf' && criteria.scope === 'global') continue;
-        
+
         let shouldAward = false;
-        
+
         if (scope === 'global' && criteria.checkGlobal) {
             shouldAward = criteria.checkGlobal({
                 userProfile,
@@ -530,6 +531,6 @@ export function generateAchievementIds(
             achievementIds.push(criteria.id);
         }
     }
-    
+
     return achievementIds;
 }

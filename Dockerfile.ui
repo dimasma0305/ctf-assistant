@@ -1,4 +1,4 @@
-FROM node:18-alpine as ui-builder
+FROM node:18-alpine AS ui-builder
 WORKDIR /app/
 COPY ui/package.json /app/package.json
 RUN npm install

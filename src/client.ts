@@ -10,9 +10,11 @@ if (!runStartupValidation()) {
 }
 
 const { TOKEN } = process.env;
-if (!process.env.NODB){
+if (!process.env.NODB) {
   db.connect()
 }
+
+import { startClawbot } from './Services/AI/clawbot';
 
 import {
   Client,
@@ -26,9 +28,9 @@ import {
 import { MyClient } from "./Model/client";
 import { SessionScheduler } from "./Services/SessionScheduler";
 import { ConnectionStateManager, ConnectionState } from "./Services/ConnectionStateManager";
-import { handleAIChat, updateChannelCache } from "./Services/AI";
+import { updateChannelCache } from "./Services/AI";
 import { handleSpamDetection, handlePhishingDetection } from "./Services/Moderation";
-import "./Services/AI/memory";
+
 
 
 const {
@@ -108,7 +110,7 @@ client.on(Events.Debug, async (message) => {
 client.on('error', async (error) => {
   console.error('💥 Discord client error:', error);
   connectionStateManager.setState(ConnectionState.ERROR, error.message);
-  
+
   // Check if error is session-related
   if (error.message?.includes('session_start_limit') || error.message?.includes('sessions remaining')) {
     console.log('🚫 Session limit error detected');
@@ -138,36 +140,36 @@ client.on(Events.ShardError, (error) => {
 // Enhanced login with smart reconnection
 async function loginWithScheduler(maxRetries = 3) {
   let retryCount = 0;
-  
+
   while (retryCount < maxRetries) {
     try {
       console.log(`🔐 Attempting to login to Discord (attempt ${retryCount + 1}/${maxRetries})...`);
       connectionStateManager.setState(ConnectionState.CONNECTING, `Login attempt ${retryCount + 1}`);
-      
+
       // Add jitter to prevent thundering herd
       if (retryCount > 0) {
         const jitter = Math.floor(Math.random() * 5000);
         console.log(`⏱️  Adding ${Math.floor(jitter / 1000)}s jitter...`);
         await new Promise(resolve => setTimeout(resolve, jitter));
       }
-      
+
       await client.login(TOKEN);
       console.log('✅ Successfully logged in to Discord!');
-      
+
       // Cancel any existing scheduled reconnection since we're now connected
       await sessionScheduler.cancelScheduledReconnection();
       return;
-      
+
     } catch (error: any) {
       console.error(`❌ Login attempt ${retryCount + 1} failed:`, error.message);
-      
+
       connectionStateManager.setState(ConnectionState.ERROR, `Login failed: ${error.message}`);
-      
+
       // Handle session limit specifically with scheduler
       if (error.message?.includes('sessions remaining') || error.message?.includes('session_start_limit')) {
         console.log('🚫 Session limit detected, delegating to session scheduler...');
         connectionStateManager.setState(ConnectionState.WAITING_FOR_RESET, 'Session limit reached');
-        
+
         const handled = await sessionScheduler.handleSessionLimitError(error);
         if (handled) {
           console.log('📅 Session scheduler has taken over. Bot will automatically reconnect when limit resets.');
@@ -180,14 +182,14 @@ async function loginWithScheduler(maxRetries = 3) {
       } else {
         // For other errors, use exponential backoff
         const waitTime = Math.min(1000 * Math.pow(2, retryCount), 15000);
-        console.error(`⏳ Network/API error, waiting ${waitTime/1000}s before retry...`);
+        console.error(`⏳ Network/API error, waiting ${waitTime / 1000}s before retry...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
       }
-      
+
       retryCount++;
     }
   }
-  
+
   console.error('💥 Max retry attempts reached. The bot will remain inactive until manual intervention.');
   console.log('ℹ️  Connection state:', connectionStateManager.getSummary());
   console.log('ℹ️  Session scheduler status:', sessionScheduler.getStatus());
@@ -210,14 +212,14 @@ async function performGracefulShutdown() {
     console.log('📊 Final metrics before shutdown:');
     console.log('📊 Connection health:', connectionStateManager.getSummary());
     console.log('📊 Session usage:', sessionScheduler.getSessionUsage());
-    
+
     // Cancel scheduled tasks
     await sessionScheduler.cancelScheduledReconnection();
-    
+
     // Destroy client connection
     connectionStateManager.setState(ConnectionState.DISCONNECTED, 'Graceful shutdown');
     client.destroy();
-    
+
     console.log('✅ Shutdown complete');
     process.exit(0);
   } catch (error) {
@@ -244,14 +246,16 @@ setInterval(() => {
 setInterval(() => {
   console.log('📊 === Periodic Health Report ===');
   console.log('   ' + connectionStateManager.getSummary());
-  
+
   const sessionUsage = sessionScheduler.getSessionUsage();
   console.log(`   Session: ${sessionUsage.identifyCalls} IDENTIFY, ${sessionUsage.resumeCalls} RESUME (${sessionUsage.usagePercent.toFixed(1)}% used)`);
 }, 30 * 60 * 1000); // Log every 30 minutes
 
 // Start login process with scheduler
 console.log('🚀 Starting CTF Assistant Bot...');
-loginWithScheduler();
+
+startClawbot().catch((err: unknown) => console.error("Failed to start Clawbot:", err));
+loginWithScheduler().catch((err: unknown) => console.error("Failed to start original client:", err));
 
 
 client.on(Events.MessageCreate, async (message) => {
@@ -269,8 +273,7 @@ client.on(Events.MessageCreate, async (message) => {
   const isPhishing = await handlePhishingDetection(message);
   if (isPhishing) return;
 
-  // Handle AI chat functionality
-  await handleAIChat(message, client);
+  // AI chat now handled by Clawbot (started separately)
 });
 
 export default client
