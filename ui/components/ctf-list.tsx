@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Window, useWindow } from "@/components/ui/window"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Calendar, Users, Trophy, ExternalLink, Search, MapPin, AlertCircle } from "lucide-react"
+import { Calendar, Users, Trophy, ExternalLink, Search, MapPin, AlertCircle, Target } from "lucide-react"
 import { useCTFs, useCTFDetails } from "@/hooks/useAPI"
 
 function CTFDetailsWindow({
@@ -215,9 +215,13 @@ function CTFDetailsWindow({
 
 export function CTFList() {
   const [selectedCTFs, setSelectedCTFs] = useState<Map<string, { ctfId: string; ctf: any }>>(new Map())
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchInput, setSearchInput] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [formatFilter, setFormatFilter] = useState<string>("all")
+  const [offset, setOffset] = useState(0)
+  const limit = 20
+
+  const debounceTimeoutRef = useRef<NodeJS.Timeout>()
 
   const { openWindow } = useWindow()
 
@@ -227,20 +231,40 @@ export function CTFList() {
     error,
     updateParams,
   } = useCTFs({
-    limit: 50,
+    limit,
+    offset: 0,
     hasParticipation: true,
     sortBy: "start_desc",
   })
 
-  const filteredCTFs = (ctfsData?.data || []).filter((ctf) => {
-    const matchesSearch =
-      ctf.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ctf.organizer.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || ctf.schedule.status === statusFilter
-    const matchesFormat = formatFilter === "all" || ctf.format.toLowerCase() === formatFilter.toLowerCase()
+  useEffect(() => {
+    if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current)
 
-    return matchesSearch && matchesStatus && matchesFormat
-  })
+    debounceTimeoutRef.current = setTimeout(() => {
+      // Reset pagination when filters/search change.
+      setOffset(0)
+      updateParams({
+        limit,
+        offset: 0,
+        q: searchInput.trim() ? searchInput.trim() : undefined,
+        status: statusFilter === "all" ? undefined : (statusFilter as any),
+        format: formatFilter === "all" ? undefined : formatFilter,
+      })
+    }, 400)
+
+    return () => {
+      if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current)
+    }
+  }, [searchInput, statusFilter, formatFilter, limit, updateParams])
+
+  const pagination = useMemo(() => {
+    const total = ctfsData?.metadata?.total ?? 0
+    const returned = ctfsData?.metadata?.returned ?? 0
+    const hasNext =
+      ctfsData?.metadata?.hasNextPage ?? (offset + returned < total && returned > 0)
+    const hasPrev = ctfsData?.metadata?.hasPreviousPage ?? offset > 0
+    return { total, returned, hasNext, hasPrev }
+  }, [ctfsData?.metadata, offset])
 
   const handleCTFClick = (ctfId: string) => {
     const ctf = (ctfsData?.data || []).find((c) => c.ctf_id === ctfId)
@@ -313,8 +337,8 @@ export function CTFList() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Search CTFs..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -342,10 +366,48 @@ export function CTFList() {
             </SelectContent>
           </Select>
         </div>
+        {ctfsData?.metadata && (
+          <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+            <div>
+              Showing <span className="font-medium text-foreground">{ctfsData.metadata.returned}</span> of{" "}
+              <span className="font-medium text-foreground">{ctfsData.metadata.total}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={!pagination.hasPrev || loading}
+                onClick={() => {
+                  const nextOffset = Math.max(0, offset - limit)
+                  setOffset(nextOffset)
+                  updateParams({ offset: nextOffset, limit })
+                }}
+                className="h-7 px-2 text-xs"
+              >
+                Prev
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={!pagination.hasNext || loading}
+                onClick={() => {
+                  const nextOffset = offset + limit
+                  setOffset(nextOffset)
+                  updateParams({ offset: nextOffset, limit })
+                }}
+                className="h-7 px-2 text-xs"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
-        {filteredCTFs.map((ctf) => (
+        {(ctfsData?.data || []).map((ctf) => (
           <Card
             key={ctf.ctf_id}
             className="hover:bg-muted/50 transition-all duration-200 cursor-pointer border-2 border-transparent hover:border-primary/20 shadow-lg hover:shadow-xl"
@@ -412,6 +474,16 @@ export function CTFList() {
           </Card>
         ))}
       </div>
+
+      {!loading && (ctfsData?.data?.length || 0) === 0 && (
+        <Card className="p-6">
+          <div className="text-center text-muted-foreground">
+            <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium mb-2">No results</p>
+            <p>Try a different search or filter.</p>
+          </div>
+        </Card>
+      )}
 
       {Array.from(selectedCTFs.entries()).map(([windowId, { ctfId, ctf }]) => (
         <CTFDetailsWindow

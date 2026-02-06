@@ -226,10 +226,15 @@ export interface CTFsResponse {
     limit: number
     offset: number
     returned: number
+    hasNextPage?: boolean
+    hasPreviousPage?: boolean
+    totalPages?: number
+    currentPage?: number
     filters: {
       status: string | null
       format: string | null
       organizer: string | null
+      q?: string | null
       hasParticipation: boolean
       sortBy: string
     }
@@ -311,6 +316,7 @@ export interface CTFsParams {
   status?: "upcoming" | "active" | "completed"
   format?: string
   organizer?: string
+  q?: string
   hasParticipation?: boolean
   sortBy?: "start_desc" | "start_asc" | "title" | "participants"
 }
@@ -345,8 +351,15 @@ export interface CTFRankingsResponse {
   metadata: {
     total: number
     limit: number
+    offset?: number
+    returned?: number
+    hasNextPage?: boolean
+    hasPreviousPage?: boolean
+    totalPages?: number
+    currentPage?: number
     filters: {
       status: string | null
+      q?: string | null
       hasParticipation: boolean
     }
     timestamp: string
@@ -355,7 +368,9 @@ export interface CTFRankingsResponse {
 
 export interface CTFRankingsParams {
   limit?: number
+  offset?: number
   status?: "upcoming" | "active" | "completed"
+  q?: string
   hasParticipation?: boolean
 }
 

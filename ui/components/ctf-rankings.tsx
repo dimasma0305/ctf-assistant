@@ -1,13 +1,15 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Window, useWindow } from "@/components/ui/window"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
   Trophy,
   Medal,
@@ -20,69 +22,67 @@ import {
   TrendingUp,
   BarChart3,
   CheckCircle2,
+  Search,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getCTFRankings, getCTFProfile } from "@/lib/actions"
+import { getCTFProfile } from "@/lib/actions"
 import { getAchievements } from "@/lib/utils"
-import type { CTFRanking, CTFProfileResponse, CTFRankingsResponse } from "@/lib/types"
+import type { CTFRanking, CTFProfileResponse } from "@/lib/types"
+import { useCTFRankings } from "@/hooks/useAPI"
 
 export function CTFRankings() {
-  const [ctfRankings, setCTFRankings] = useState<CTFRanking[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [selectedCTF, setSelectedCTF] = useState<string>("all")
   const [openWindows, setOpenWindows] = useState<Map<string, CTFProfileResponse>>(new Map())
   const [loadingProfiles, setLoadingProfiles] = useState<Set<string>>(new Set())
   const [profileError, setProfileError] = useState<string | null>(null)
 
-  const [totalCTFs, setTotalCTFs] = useState(0)
-  const [displayLimit, setDisplayLimit] = useState(50)
+  const [displayLimit, setDisplayLimit] = useState(25)
+  const [offset, setOffset] = useState(0)
+  const [searchInput, setSearchInput] = useState("")
+  const debounceTimeoutRef = useRef<NodeJS.Timeout>()
   
   // Access window management system
   const { windows, restoreWindow } = useWindow()
 
-  const fetchCTFRankings = useCallback(async (limit = 50) => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const response: CTFRankingsResponse = await getCTFRankings({
-        limit,
-        hasParticipation: true,
-      })
-
-      if (response && response.data) {
-        setCTFRankings(response.data)
-        
-        if (response.metadata) {
-          setTotalCTFs(response.metadata.total)
-        }
-      } else {
-        throw new Error("Invalid response format")
-      }
-    } catch (err) {
-      console.error("Error fetching CTF rankings:", err)
-      const errorMessage = err instanceof Error ? err.message : "Failed to load CTF rankings"
-      setError(errorMessage)
-      setCTFRankings([])
-      setTotalCTFs(0)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const { data: rankingsData, loading, error, updateParams } = useCTFRankings({
+    limit: 25,
+    offset: 0,
+    hasParticipation: true,
+  })
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchCTFRankings(displayLimit)
-    }, 100) // Small debounce to prevent rapid API calls
-
-    return () => clearTimeout(timeoutId)
-  }, [displayLimit, fetchCTFRankings])
+    updateParams({
+      limit: displayLimit,
+      offset,
+      hasParticipation: true,
+    })
+  }, [displayLimit, offset, updateParams])
 
   const handleDisplayLimitChange = useCallback((newLimit: string) => {
     const limit = Number.parseInt(newLimit)
     setDisplayLimit(limit)
+    setOffset(0)
   }, [])
+
+  useEffect(() => {
+    if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current)
+    debounceTimeoutRef.current = setTimeout(() => {
+      setOffset(0)
+      updateParams({
+        q: searchInput.trim() ? searchInput.trim() : undefined,
+        offset: 0,
+        limit: displayLimit,
+        hasParticipation: true,
+      })
+    }, 400)
+
+    return () => {
+      if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current)
+    }
+  }, [searchInput, displayLimit, updateParams])
+
+  const ctfRankings: CTFRanking[] = rankingsData?.data || []
+  const totalCTFs = rankingsData?.metadata?.total || 0
 
   const handleUserClick = useCallback(
     async (ctfId: string, userId: string) => {
@@ -165,6 +165,19 @@ export function CTFRankings() {
     return Array.from(uniqueCTFs.values()).sort((a, b) => a.title.localeCompare(b.title))
   }, [ctfRankings])
 
+  useEffect(() => {
+    if (selectedCTF !== "all" && !ctfRankings.some((c) => c.ctf_id === selectedCTF)) {
+      setSelectedCTF("all")
+    }
+  }, [selectedCTF, ctfRankings])
+
+  const pagination = useMemo(() => {
+    const returned = rankingsData?.metadata?.returned ?? ctfRankings.length
+    const hasNext = rankingsData?.metadata?.hasNextPage ?? (offset + returned < totalCTFs && returned > 0)
+    const hasPrev = rankingsData?.metadata?.hasPreviousPage ?? offset > 0
+    return { returned, hasNext, hasPrev }
+  }, [rankingsData?.metadata, ctfRankings.length, offset, totalCTFs])
+
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
@@ -227,13 +240,8 @@ export function CTFRankings() {
       <Card className="p-6">
         <div className="text-center space-y-4">
           <div className="text-red-500 text-lg font-semibold">Failed to load CTF rankings</div>
-          <div className="text-muted-foreground">{error}</div>
-          <button
-            onClick={() => fetchCTFRankings(displayLimit)}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
-          >
-            Try Again
-          </button>
+          <div className="text-muted-foreground">{String(error)}</div>
+          <Button onClick={() => updateParams({ offset, limit: displayLimit })}>Try Again</Button>
         </div>
       </Card>
     )
@@ -250,6 +258,15 @@ export function CTFRankings() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search CTF rankings..."
+              className="pl-10"
+            />
+          </div>
           <Select value={selectedCTF} onValueChange={setSelectedCTF} disabled={ctfOptions.length === 0}>
             <SelectTrigger className="w-full sm:w-64">
               <SelectValue placeholder="Select CTF" />
@@ -269,11 +286,34 @@ export function CTFRankings() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="10">Show 10</SelectItem>
               <SelectItem value="25">Show 25</SelectItem>
               <SelectItem value="50">Show 50</SelectItem>
-              <SelectItem value="100">Show 100</SelectItem>
             </SelectContent>
           </Select>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={!pagination.hasPrev || loading}
+              onClick={() => setOffset((prev) => Math.max(0, prev - displayLimit))}
+              className="w-full sm:w-auto"
+            >
+              Prev
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={!pagination.hasNext || loading}
+              onClick={() => setOffset((prev) => prev + displayLimit)}
+              className="w-full sm:w-auto"
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -288,131 +328,138 @@ export function CTFRankings() {
             </div>
           </Card>
         ) : (
-          filteredRankings.map((ctf) => (
-            <Card
-              key={ctf.ctf_id}
-              className="shadow-lg border-2 border-primary/10 hover:border-primary/20 transition-all duration-200"
-            >
-              <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b border-primary/20">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 min-w-0 flex-1">
-                    <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-primary/30 shadow-md">
-                      <CachedAvatarImage
-                        src={ctf.logo || "/placeholder.svg"}
-                        loadingPlaceholder={
-                          <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                        }
-                      />
-                      <AvatarFallback className="bg-primary/20 text-foreground">
-                        {ctf.title.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <CardTitle className="font-bold text-primary font-[family-name:var(--font-playfair)] truncate">
-                        {ctf.title}
-                      </CardTitle>
-                      <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <span>by {ctf.organizer}</span>
-                        <Badge className={`text-xs ${getStatusColor(ctf.schedule.status)} w-fit`}>
-                          {ctf.schedule.status}
-                        </Badge>
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <div className="w-full sm:w-auto">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        <span className="whitespace-nowrap">{ctf.communityStats.uniqueParticipants} players</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Target className="h-4 w-4" />
-                        <span className="whitespace-nowrap">{ctf.communityStats.totalSolves} solves</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        <span className="whitespace-nowrap">{formatDate(ctf.schedule.start)}</span>
+          <Accordion type="single" collapsible className="space-y-4">
+            {filteredRankings.map((ctf) => (
+              <AccordionItem
+                key={ctf.ctf_id}
+                value={ctf.ctf_id}
+                className="shadow-lg border-2 border-primary/10 hover:border-primary/20 transition-all duration-200 rounded-lg overflow-hidden"
+              >
+                <AccordionTrigger className="px-4 sm:px-6 bg-gradient-to-r from-primary/5 to-transparent">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-primary/30 shadow-md">
+                        <CachedAvatarImage
+                          src={ctf.logo || "/placeholder.svg"}
+                          loadingPlaceholder={
+                            <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                          }
+                        />
+                        <AvatarFallback className="bg-primary/20 text-foreground">
+                          {ctf.title.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-bold text-primary font-[family-name:var(--font-playfair)] truncate">
+                          {ctf.title}
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-muted-foreground">
+                          <span className="truncate">by {ctf.organizer}</span>
+                          <Badge className={`text-xs ${getStatusColor(ctf.schedule.status)} w-fit`}>
+                            {ctf.schedule.status}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
+                    <div className="w-full sm:w-auto">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          <span className="whitespace-nowrap">{ctf.communityStats.uniqueParticipants} players</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Target className="h-4 w-4" />
+                          <span className="whitespace-nowrap">{ctf.communityStats.totalSolves} solves</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          <span className="whitespace-nowrap">{formatDate(ctf.schedule.start)}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-16">Rank</TableHead>
-                        <TableHead className="min-w-[150px]">Player</TableHead>
-                        <TableHead className="text-right min-w-[80px]">Score</TableHead>
-                        <TableHead className="text-right min-w-[70px]">Solves</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {ctf.leaderboard.map((player) => (
-                        <TableRow key={player.user.userId} className="hover:bg-muted/50">
-                          <TableCell className="font-medium">
-                            <div className="flex items-center justify-center">{getRankIcon(player.rank)}</div>
-                          </TableCell>
-                          <TableCell>
-                            <div
-                              className={`flex items-center gap-3 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent rounded-md p-2 -m-2 transition-all duration-200 border border-transparent hover:border-primary/20 ${
-                                loadingProfiles.has(`ctf-profile-${player.user.userId}-${ctf.ctf_id}`) ? "opacity-60" : ""
-                              }`}
-                              onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
-                            >
-                              <div className="relative">
-                                <Avatar className="w-8 h-8 flex-shrink-0 ring-1 ring-primary/20">
-                                  <CachedAvatarImage
-                                    src={
-                                      player.user.avatar ||
-                                      `/abstract-geometric-shapes.png?height=32&width=32&query=${player.user.userId}`
-                                    }
-                                    loadingPlaceholder={
-                                      <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                                    }
-                                  />
-                                  <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
-                                    {(player.user.displayName || player.user.username).substring(0, 2).toUpperCase()}
-                                  </AvatarFallback>
-                                </Avatar>
-                                {loadingProfiles.has(`ctf-profile-${player.user.userId}-${ctf.ctf_id}`) && (
-                                  <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
-                                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="font-medium hover:text-primary transition-colors truncate">
-                                  {player.user.displayName || player.user.username}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {player.rank <= 3 ? "Elite" : player.rank <= 10 ? "Advanced" : "Intermediate"}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="font-mono font-bold text-primary text-sm sm:text-base">
-                              {player.score.toFixed(1)}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Badge
-                              variant="secondary"
-                              className="font-mono text-foreground text-xs bg-primary/10 border-primary/20"
-                            >
-                              {player.solves}
-                            </Badge>
-                          </TableCell>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 sm:px-6">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="hover:bg-transparent">
+                          <TableHead className="w-16">Rank</TableHead>
+                          <TableHead className="min-w-[150px]">Player</TableHead>
+                          <TableHead className="text-right min-w-[80px]">Score</TableHead>
+                          <TableHead className="text-right min-w-[70px]">Solves</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+                      </TableHeader>
+                      <TableBody>
+                        {ctf.leaderboard.map((player) => (
+                          <TableRow key={player.user.userId} className="hover:bg-muted/50">
+                            <TableCell className="font-medium">
+                              <div className="flex items-center justify-center">{getRankIcon(player.rank)}</div>
+                            </TableCell>
+                            <TableCell>
+                              <div
+                                className={`flex items-center gap-3 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent rounded-md p-2 -m-2 transition-all duration-200 border border-transparent hover:border-primary/20 ${
+                                  loadingProfiles.has(`ctf-profile-${player.user.userId}-${ctf.ctf_id}`)
+                                    ? "opacity-60"
+                                    : ""
+                                }`}
+                                onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
+                              >
+                                <div className="relative">
+                                  <Avatar className="w-8 h-8 flex-shrink-0 ring-1 ring-primary/20">
+                                    <CachedAvatarImage
+                                      src={
+                                        player.user.avatar ||
+                                        `/abstract-geometric-shapes.png?height=32&width=32&query=${player.user.userId}`
+                                      }
+                                      loadingPlaceholder={
+                                        <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                                      }
+                                    />
+                                    <AvatarFallback className="text-xs bg-primary/20 text-foreground font-medium">
+                                      {(player.user.displayName || player.user.username)
+                                        .substring(0, 2)
+                                        .toUpperCase()}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  {loadingProfiles.has(`ctf-profile-${player.user.userId}-${ctf.ctf_id}`) && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
+                                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="font-medium hover:text-primary transition-colors truncate">
+                                    {player.user.displayName || player.user.username}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {player.rank <= 3 ? "Elite" : player.rank <= 10 ? "Advanced" : "Intermediate"}
+                                  </div>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="font-mono font-bold text-primary text-sm sm:text-base">
+                                {player.score.toFixed(1)}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Badge
+                                variant="secondary"
+                                className="font-mono text-foreground text-xs bg-primary/10 border-primary/20"
+                              >
+                                {player.solves}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         )}
       </div>
 

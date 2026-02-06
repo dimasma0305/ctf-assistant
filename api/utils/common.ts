@@ -94,6 +94,13 @@ export function generateCacheKey(prefix: string, query: any = {}): string {
 }
 
 /**
+ * Escape user input for use in a RegExp constructor.
+ */
+export function escapeRegex(input: string): string {
+    return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Filter users by search term
  */
 export function filterUsersBySearch(userScores: Map<string, UserProfile>, searchTerm: string): Map<string, UserProfile> {

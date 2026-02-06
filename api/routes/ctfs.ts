@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { CTFCacheModel, solveModel } from "../../src/Database/connect";
 import { getCachedUserScores } from '../services/dataService';
+import { getCTFParticipationMap } from '../services/ctfParticipation';
+import { escapeRegex } from '../utils/common';
 
 const router = Router();
 
@@ -17,6 +19,7 @@ router.get("/", async (req, res) => {
         const status = req.query.status as string; // upcoming, active, completed
         const format = req.query.format as string; // jeopardy, attack-defense, etc.
         const organizer = req.query.organizer as string;
+        const q = req.query.q as string; // full-text-ish search (title/organizer/description)
         const hasParticipation = req.query.hasParticipation === 'true'; // only CTFs with solves
         const sortBy = (req.query.sortBy as string) || 'start_desc'; // start_desc, start_asc, title, participants
         
@@ -35,96 +38,63 @@ router.get("/", async (req, res) => {
             return;
         }
 
-        // Get CTFs with participation data
-        const participationData = await solveModel.aggregate([
-            {
-                $unwind: "$users"
-            },
-            {
-                $group: {
-                    _id: "$ctf_id",
-                    totalSolves: { $sum: 1 },
-                    uniqueParticipants: { $addToSet: "$users" },
-                    firstSolve: { $min: "$solved_at" },
-                    lastSolve: { $max: "$solved_at" }
-                }
-            },
-            {
-                $project: {
-                    ctf_id: "$_id",
-                    totalSolves: 1,
-                    participantCount: { $size: "$uniqueParticipants" },
-                    firstSolve: 1,
-                    lastSolve: 1
-                }
-            }
-        ]);
+        const participationMap = await getCTFParticipationMap();
 
-        const participationMap = new Map();
-        participationData.forEach((data: any) => {
-            if (data.ctf_id) {
-                participationMap.set(data.ctf_id, {
-                    totalSolves: data.totalSolves,
-                    participantCount: data.participantCount,
-                    firstSolve: data.firstSolve,
-                    lastSolve: data.lastSolve
-                });
-            }
-        });
-
-        // Build query for CTFCache
-        let ctfQuery: any = {};
+        const andClauses: any[] = [];
         if (organizer) {
-            ctfQuery['organizers.name'] = { $regex: organizer, $options: 'i' };
+            andClauses.push({ 'organizers.name': { $regex: escapeRegex(organizer), $options: 'i' } });
         }
         if (format) {
-            ctfQuery.format = { $regex: format, $options: 'i' };
+            andClauses.push({ format: { $regex: escapeRegex(format), $options: 'i' } });
+        }
+        if (q && q.trim()) {
+            const re = new RegExp(escapeRegex(q.trim()), 'i');
+            andClauses.push({
+                $or: [
+                    { title: re },
+                    { 'organizers.name': re },
+                    { description: re }
+                ]
+            });
         }
 
-        // Filter by status if specified
         const now = new Date();
-        if (status === 'upcoming') {
-            ctfQuery.start = { $gt: now };
-        } else if (status === 'active') {
-            ctfQuery.start = { $lte: now };
-            ctfQuery.finish = { $gte: now };
-        } else if (status === 'completed') {
-            ctfQuery.finish = { $lt: now };
-        }
+        const statusClause = (() => {
+            if (status === 'upcoming') return { start: { $gt: now } };
+            if (status === 'active') return { start: { $lte: now }, finish: { $gte: now } };
+            if (status === 'completed') return { finish: { $lt: now } };
+            return null;
+        })();
+        if (statusClause) andClauses.push(statusClause);
 
-        // Get CTFs from cache
-        let ctfs = await CTFCacheModel.find(ctfQuery).lean();
-
-        // If hasParticipation filter is enabled, only include CTFs with solves
         if (hasParticipation) {
-            ctfs = ctfs.filter(ctf => participationMap.has(ctf.ctf_id));
+            const ids = Array.from(participationMap.keys());
+            andClauses.push({ ctf_id: { $in: ids } });
         }
 
-        // Sort CTFs
-        ctfs.sort((a: any, b: any) => {
+        const ctfQuery: any = andClauses.length > 0 ? { $and: andClauses } : {};
+
+        const sort: any = (() => {
             switch (sortBy) {
                 case 'start_asc':
-                    return new Date(a.start).getTime() - new Date(b.start).getTime();
+                    return { start: 1 };
+                case 'title':
+                    return { title: 1 };
+                case 'participants':
+                    // Fall back to cached participant count field. (Previously used solve-derived uniqueParticipants.)
+                    return { participants: -1 };
                 case 'start_desc':
                 default:
-                    return new Date(b.start).getTime() - new Date(a.start).getTime();
-                case 'title':
-                    return a.title.localeCompare(b.title);
-                case 'participants':
-                    const aParticipation = participationMap.get(a.ctf_id);
-                    const bParticipation = participationMap.get(b.ctf_id);
-                    return (bParticipation?.participantCount || 0) - (aParticipation?.participantCount || 0);
+                    return { start: -1 };
             }
-        });
+        })();
 
-        // Apply pagination
-        const totalCTFs = ctfs.length;
-        const paginatedCTFs = ctfs.slice(offset, offset + limit);
+        const totalCTFs = await CTFCacheModel.countDocuments(ctfQuery);
+        const paginatedCTFs = await CTFCacheModel.find(ctfQuery).sort(sort).skip(offset).limit(limit).lean();
 
         // Format response data
         const formattedCTFs = paginatedCTFs.map((ctf: any) => {
             const participation = participationMap.get(ctf.ctf_id);
-            const now = new Date();
             const start = new Date(ctf.start);
             const finish = new Date(ctf.finish);
             
@@ -171,25 +141,58 @@ router.get("/", async (req, res) => {
             };
         });
 
+        const hasNextPage = offset + formattedCTFs.length < totalCTFs;
+        const hasPreviousPage = offset > 0;
+        const totalPages = Math.max(1, Math.ceil(totalCTFs / limit));
+        const currentPage = Math.floor(offset / limit) + 1;
+
         // Response metadata
+        // Note: stats are best-effort and may reflect the filtered view depending on provided filters.
+        const baseClauses: any[] = [];
+        if (organizer) baseClauses.push({ 'organizers.name': { $regex: escapeRegex(organizer), $options: 'i' } });
+        if (format) baseClauses.push({ format: { $regex: escapeRegex(format), $options: 'i' } });
+        if (q && q.trim()) {
+            const re = new RegExp(escapeRegex(q.trim()), 'i');
+            baseClauses.push({ $or: [{ title: re }, { 'organizers.name': re }, { description: re }] });
+        }
+        if (hasParticipation) {
+            const ids = Array.from(participationMap.keys());
+            baseClauses.push({ ctf_id: { $in: ids } });
+        }
+        const totalInDb = await CTFCacheModel.countDocuments({});
+        const upcomingCount = await CTFCacheModel.countDocuments({
+            $and: [...baseClauses, { start: { $gt: now } }],
+        });
+        const activeCount = await CTFCacheModel.countDocuments({
+            $and: [...baseClauses, { start: { $lte: now }, finish: { $gte: now } }],
+        });
+        const completedCount = await CTFCacheModel.countDocuments({
+            $and: [...baseClauses, { finish: { $lt: now } }],
+        });
+
         const metadata = {
             total: totalCTFs,
             limit,
             offset,
             returned: formattedCTFs.length,
+            hasNextPage,
+            hasPreviousPage,
+            totalPages,
+            currentPage,
             filters: {
                 status: status || null,
                 format: format || null,
                 organizer: organizer || null,
+                q: q || null,
                 hasParticipation: hasParticipation || false,
                 sortBy
             },
             stats: {
-                totalCTFsInDatabase: totalCTFs,
-                ctfsWithParticipation: participationData.length,
-                upcoming: ctfs.filter((ctf: any) => new Date(ctf.start) > now).length,
-                active: ctfs.filter((ctf: any) => new Date(ctf.start) <= now && new Date(ctf.finish) >= now).length,
-                completed: ctfs.filter((ctf: any) => new Date(ctf.finish) < now).length
+                totalCTFsInDatabase: totalInDb,
+                ctfsWithParticipation: participationMap.size,
+                upcoming: upcomingCount,
+                active: activeCount,
+                completed: completedCount
             },
             timestamp: new Date().toISOString()
         };
@@ -219,6 +222,7 @@ router.get("/rankings", async (req, res) => {
         const limit = parseInt(req.query.limit as string) || 10;
         const offset = parseInt(req.query.offset as string) || 0;
         const status = req.query.status as string; // upcoming, active, completed
+        const q = req.query.q as string; // search title/organizer/description
         const hasParticipation = req.query.hasParticipation !== 'false'; // default to true
         
         // Validate parameters
@@ -236,72 +240,41 @@ router.get("/rankings", async (req, res) => {
             return;
         }
 
-        // Get participation data for CTFs
-        const participationData = await solveModel.aggregate([
-            {
-                $unwind: "$users"
-            },
-            {
-                $group: {
-                    _id: "$ctf_id",
-                    totalSolves: { $sum: 1 },
-                    uniqueParticipants: { $addToSet: "$users" },
-                    firstSolve: { $min: "$solved_at" },
-                    lastSolve: { $max: "$solved_at" }
-                }
-            },
-            {
-                $project: {
-                    ctf_id: "$_id",
-                    totalSolves: 1,
-                    participantCount: { $size: "$uniqueParticipants" },
-                    firstSolve: 1,
-                    lastSolve: 1
-                }
-            }
-        ]);
-
-        const participationMap = new Map();
-        participationData.forEach((data: any) => {
-            if (data.ctf_id) {
-                participationMap.set(data.ctf_id, {
-                    totalSolves: data.totalSolves,
-                    uniqueParticipants: data.participantCount,
-                    firstSolve: data.firstSolve,
-                    lastSolve: data.lastSolve
-                });
-            }
-        });
+        const participationMap = await getCTFParticipationMap();
 
         // Build query for CTFs
-        let ctfQuery: any = {};
+        const andClauses: any[] = [];
         const now = new Date();
         
-        if (status === 'upcoming') {
-            ctfQuery.start = { $gt: now };
-        } else if (status === 'active') {
-            ctfQuery.start = { $lte: now };
-            ctfQuery.finish = { $gte: now };
-        } else if (status === 'completed') {
-            ctfQuery.finish = { $lt: now };
+        if (q && q.trim()) {
+            const re = new RegExp(escapeRegex(q.trim()), 'i');
+            andClauses.push({
+                $or: [
+                    { title: re },
+                    { 'organizers.name': re },
+                    { description: re }
+                ]
+            });
         }
 
-        // Get CTFs from cache
-        let ctfs = await CTFCacheModel.find(ctfQuery).lean();
+        if (status === 'upcoming') {
+            andClauses.push({ start: { $gt: now } });
+        } else if (status === 'active') {
+            andClauses.push({ start: { $lte: now }, finish: { $gte: now } });
+        } else if (status === 'completed') {
+            andClauses.push({ finish: { $lt: now } });
+        }
 
         // Filter to only CTFs with participation if requested
         if (hasParticipation) {
-            ctfs = ctfs.filter(ctf => participationMap.has(ctf.ctf_id));
+            const ids = Array.from(participationMap.keys());
+            andClauses.push({ ctf_id: { $in: ids } });
         }
 
-        // Sort by start date (most recent first)
-        ctfs.sort((a: any, b: any) => new Date(b.start).getTime() - new Date(a.start).getTime());
-        
-        // Calculate total before pagination
-        const totalCTFs = ctfs.length;
-        
-        // Apply pagination
-        const paginatedCTFs = ctfs.slice(offset, offset + limit);
+        const ctfQuery: any = andClauses.length ? { $and: andClauses } : {};
+
+        const totalCTFs = await CTFCacheModel.countDocuments(ctfQuery);
+        const paginatedCTFs = await CTFCacheModel.find(ctfQuery).sort({ start: -1 }).skip(offset).limit(limit).lean();
 
         // Get leaderboard data for each CTF
         const ctfRankings = await Promise.all(paginatedCTFs.map(async (ctf: any) => {
@@ -311,7 +284,7 @@ router.get("/rankings", async (req, res) => {
             }
 
             // Get top performers for this CTF (cached)
-            const topPerformers = await getCachedUserScores({ ctf_id: ctf.ctf_id }, 5 * 60 * 1000); // 5 minute cache
+            const topPerformers = await getCachedUserScores({ ctf_id: ctf.ctf_id }, 5 * 60 * 1000, false); // 5 minute cache, no extended metrics
             const leaderboard = Array.from(topPerformers.values())
                 .sort((a, b) => b.totalScore - a.totalScore)
                 .slice(0, 5) // Top 5 for rankings view
@@ -345,7 +318,7 @@ router.get("/rankings", async (req, res) => {
                     status: ctfStatus
                 },
                 communityStats: {
-                    uniqueParticipants: participation.uniqueParticipants,
+                    uniqueParticipants: participation.participantCount,
                     totalSolves: participation.totalSolves
                 },
                 leaderboard
@@ -368,6 +341,7 @@ router.get("/rankings", async (req, res) => {
                 currentPage: Math.floor(offset / limit) + 1,
                 filters: {
                     status: status || null,
+                    q: q || null,
                     hasParticipation
                 },
                 timestamp: new Date().toISOString()

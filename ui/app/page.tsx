@@ -214,7 +214,7 @@ export default function Dashboard() {
                 <CardDescription>Performance breakdown by individual competitions</CardDescription>
               </CardHeader>
               <CardContent>
-                <CTFRankings />
+                {activeTab === "ctf-rankings" && <CTFRankings />}
               </CardContent>
             </Card>
           </TabsContent>
