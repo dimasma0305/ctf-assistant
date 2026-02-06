@@ -781,28 +781,24 @@ export function LeaderboardTable() {
                 Showing rankings for: <strong className="text-primary">{getTimePeriodText(timePeriod)}</strong>
               </span>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={copyShareLink}
-                className="h-7 px-2 text-xs border-primary/30 text-primary"
-                title={`Copy ${shareUrl || shareHash}`}
-              >
-                <Copy className="w-3.5 h-3.5 mr-1" />
-                Copy link
-              </Button>
-              <a
-                href={shareUrl || shareHash}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-primary underline underline-offset-2 hover:opacity-80 cursor-pointer break-all"
-                title={shareUrl || shareHash}
-              >
-                {shareUrl || shareHash}
-              </a>
-            </div>
+            <a
+              href={shareUrl || shareHash}
+              className="inline-flex items-center gap-1 text-xs text-primary underline underline-offset-2 hover:opacity-80 cursor-pointer"
+              title={`Copy ${shareUrl || shareHash}`}
+              onClick={(e) => {
+                e.preventDefault()
+                copyShareLink()
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault()
+                  copyShareLink()
+                }
+              }}
+            >
+              <Copy className="w-3.5 h-3.5" />
+              Copy shareable link
+            </a>
           </div>
         )}
       </div>
