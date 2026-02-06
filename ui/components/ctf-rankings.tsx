@@ -42,7 +42,7 @@ export function CTFRankings() {
   const debounceTimeoutRef = useRef<NodeJS.Timeout>()
   
   // Access window management system
-  const { windows, restoreWindow } = useWindow()
+  const { windows, openWindow, restoreWindow, bringToFront } = useWindow()
 
   const { data: rankingsData, loading, error, updateParams } = useCTFRankings({
     limit: 25,
@@ -89,15 +89,22 @@ export function CTFRankings() {
       const windowId = `ctf-profile-${userId}-${ctfId}`
 
       // Check if there's an existing minimized window with the same ID
-      const existingWindow = windows.find(w => w.id === windowId)
-      if (existingWindow && existingWindow.isMinimized) {
-        // Restore the existing minimized window
-        restoreWindow(windowId)
+      const existingWindow = windows.find((w) => w.id === windowId)
+      if (existingWindow) {
+        if (existingWindow.isMinimized) restoreWindow(windowId)
+        else bringToFront(windowId)
         return
       }
 
       // Check if window is already open or currently loading
       if (openWindows.has(windowId) || loadingProfiles.has(windowId)) {
+        const existingProfile = openWindows.get(windowId)
+        if (existingProfile) {
+          openWindow(
+            windowId,
+            `${existingProfile.user.displayName || existingProfile.user.username} - ${existingProfile.ctfInfo.title}`,
+          )
+        }
         return
       }
 
@@ -109,6 +116,10 @@ export function CTFRankings() {
         const profileData = await getCTFProfile(ctfId, userId)
         
         setOpenWindows(prev => new Map(prev).set(windowId, profileData))
+        openWindow(
+          windowId,
+          `${profileData.user.displayName || profileData.user.username} - ${profileData.ctfInfo.title}`,
+        )
       } catch (err) {
         console.error("Error fetching user profile:", err)
         setProfileError(err instanceof Error ? err.message : "Failed to load user profile")
@@ -120,7 +131,7 @@ export function CTFRankings() {
         })
       }
     },
-    [openWindows, loadingProfiles, windows, restoreWindow],
+    [openWindows, loadingProfiles, windows, restoreWindow, bringToFront, openWindow],
   )
 
   const handleWindowOpenChange = useCallback((windowId: string, isOpen: boolean) => {
@@ -493,10 +504,6 @@ export function CTFRankings() {
 
       {/* CTF-Specific User Profile Modals - Multiple windows support */}
       {Array.from(openWindows.entries()).map(([windowId, selectedUser]) => {
-        // Check if window exists in window management system and get its current state
-        const windowState = windows.find(w => w.id === windowId)
-        const isWindowOpen = windowState ? !windowState.isMinimized : true
-        
         return (
           <Window
             key={windowId}
@@ -504,7 +511,6 @@ export function CTFRankings() {
             title={`${selectedUser.user.displayName || selectedUser.user.username} - ${selectedUser.ctfInfo.title}`}
             defaultSize={{ width: 1000, height: 700 }}
             minSize={{ width: 320, height: 400 }}
-            isOpen={isWindowOpen}
             onOpenChange={(isOpen) => handleWindowOpenChange(windowId, isOpen)}
           >
           <div className="flex flex-col h-full">

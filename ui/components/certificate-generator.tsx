@@ -9,6 +9,7 @@ import { Certificate as CertificateComponent } from "@/components/certificate"
 import { useState } from "react"
 import Link from "next/link"
 import { useCertificates } from "@/hooks/useAPI"
+import { toast } from "sonner"
 
 interface CertificateGeneratorProps {
   userId: string
@@ -20,17 +21,6 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
   const [showPendingOverlay, setShowPendingOverlay] = useState(true)
   
   const displayName = certificateData?.userInfo?.displayName || certificateData?.userInfo?.username || "User"
-  const debugMetadata = certificateData?.metadata as { debug?: unknown } | undefined
-
-  // Debug logging
-  console.log('CertificateGenerator Debug:', {
-    userId,
-    loading,
-    error,
-    certificateData,
-    certificatesCount: certificateData?.certificates?.length || 0,
-    debug: debugMetadata?.debug
-  })
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -124,6 +114,7 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
 
   const handleShareCertificate = async (certificate: Certificate) => {
     if (certificate.isPending || !certificate.issuedAt) {
+      toast.info("Certificate pending", { description: "This certificate hasn't been issued yet." })
       return
     }
 
@@ -136,12 +127,28 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
           text: `Check out this TCP1P Community achievement certificate!`,
           url: shareUrl,
         })
+        toast.success("Shared")
       } else {
-        await navigator.clipboard.writeText(shareUrl)
-        // Could add toast notification here
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(shareUrl)
+        } else {
+          const el = document.createElement("textarea")
+          el.value = shareUrl
+          el.setAttribute("readonly", "true")
+          el.style.position = "fixed"
+          el.style.left = "-9999px"
+          document.body.appendChild(el)
+          el.select()
+          document.execCommand("copy")
+          document.body.removeChild(el)
+        }
+        toast.success("Copied", { description: shareUrl })
       }
     } catch (error) {
       console.error("Error sharing:", error)
+      // User canceling the native share sheet should not be treated as an error.
+      if (error instanceof DOMException && error.name === "AbortError") return
+      toast.error("Share failed", { description: "Your browser blocked sharing/copy." })
     }
   }
 

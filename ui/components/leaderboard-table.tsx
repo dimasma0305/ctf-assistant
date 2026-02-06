@@ -402,7 +402,7 @@ export function LeaderboardTable() {
     return `month-${month}`
   })
 
-  const { openWindow } = useWindow()
+  const { openWindow, windows } = useWindow()
 
   const {
     data: leaderboardData,
@@ -978,9 +978,19 @@ export function LeaderboardTable() {
           key={windowId}
           id={windowId}
           title={`${getUserDisplayName(user.user)} - Profile`}
-          isOpen={true}
           defaultSize={{ width: 1000, height: 700 }}
           minSize={{ width: 320, height: 400 }}
+          onOpenChange={(open) => {
+            if (!open) {
+              // If the window still exists in the provider, it's minimized, not closed.
+              if (windows.some((w) => w.id === windowId)) return
+              setSelectedUsers((prev) => {
+                const next = new Map(prev)
+                next.delete(windowId)
+                return next
+              })
+            }
+          }}
         >
           <UserProfileContent user={user} leaderboardTotal={leaderboardData?.metadata.total || 1000} />
         </Window>

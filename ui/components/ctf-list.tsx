@@ -25,16 +25,20 @@ function CTFDetailsWindow({
   onClose: () => void
 }) {
   const { data: ctfDetails, loading: detailLoading, error: detailError } = useCTFDetails(ctfId)
+  const { windows } = useWindow()
 
   return (
     <Window
       id={windowId}
       title={ctf ? `${ctf.title} - Details` : "CTF Details"}
-      isOpen={true}
       defaultSize={{ width: 1000, height: 700 }}
       minSize={{ width: 320, height: 400 }}
       onOpenChange={(open) => {
-        if (!open) onClose()
+        if (!open) {
+          // If the window still exists in the provider, it's minimized, not closed.
+          if (windows.some((w) => w.id === windowId)) return
+          onClose()
+        }
       }}
     >
       <div className="flex flex-col h-full">

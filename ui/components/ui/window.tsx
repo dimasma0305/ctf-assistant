@@ -301,7 +301,8 @@ interface WindowProps {
   defaultSize?: { width: number; height: number }
   minSize?: { width: number; height: number }
   maxSize?: { width: number; height: number }
-  isOpen: boolean
+  // Optional external control. If omitted, the Window is controlled by WindowProvider state.
+  isOpen?: boolean
   onOpenChange?: (open: boolean) => void
 }
 
@@ -581,7 +582,12 @@ export function Window({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => minimizeWindow(id)}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation()
+                minimizeWindow(id)
+              }}
               className="h-6 w-6 p-0 hover:bg-yellow-500/20"
             >
               <Minus className="h-3 w-3" />
@@ -589,7 +595,12 @@ export function Window({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => closeWindow(id)}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation()
+                closeWindow(id)
+              }}
               className="h-6 w-6 p-0 hover:bg-red-500/20"
             >
               <X className="h-3 w-3" />
@@ -622,10 +633,30 @@ export function Window({
         <div className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur flex-shrink-0">
           <h2 className="font-semibold truncate flex-1">{title}</h2>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => minimizeWindow(id)} className="h-8 w-8 p-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation()
+                minimizeWindow(id)
+              }}
+              className="h-8 w-8 p-0"
+            >
               <Minus className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => closeWindow(id)} className="h-8 w-8 p-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation()
+                closeWindow(id)
+              }}
+              className="h-8 w-8 p-0"
+            >
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -696,7 +727,12 @@ export function Window({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => maximizeWindow(id)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation()
+              maximizeWindow(id)
+            }}
             className="h-6 w-6 p-0 hover:bg-blue-500/20 transition-colors duration-150"
             title={window?.isMaximized ? "Restore" : "Maximize"}
           >
@@ -705,7 +741,12 @@ export function Window({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => minimizeWindow(id)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation()
+              minimizeWindow(id)
+            }}
             className="h-6 w-6 p-0 hover:bg-yellow-500/20 transition-colors duration-150"
           >
             <Minus className="h-3 w-3" />
@@ -713,7 +754,12 @@ export function Window({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => closeWindow(id)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation()
+              closeWindow(id)
+            }}
             className="h-6 w-6 p-0 hover:bg-red-500/20 transition-colors duration-150"
           >
             <X className="h-3 w-3" />
