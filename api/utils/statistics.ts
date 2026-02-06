@@ -8,6 +8,7 @@ import {
     UserSolve,
     MonthlyRank 
 } from '../types';
+import { categoryNormalize } from './common';
 import { 
     ACHIEVEMENT_CRITERIA, 
 } from '../../ui/lib/achievements';
@@ -76,65 +77,85 @@ export function calculatePerformanceComparison(
 export async function calculateCategoryStats(
     userProfile: UserProfile,
     allUsers: UserProfile[],
-    solveFilter?: (solve: UserSolve) => boolean
+    options?: { ctfId?: string }
 ): Promise<CategoryStat[]> {
     try {
-        // Use existing solve data from profile when possible
-        let relevantSolves = userProfile.recentSolves;
-        
-        // Apply filter if provided
-        if (solveFilter) {
-            relevantSolves = relevantSolves.filter(solveFilter);
-        }
-        
-        // If we have very few solves in profile, fetch more from database
-        if (relevantSolves.length < 10 && userProfile.solveCount > 10) {
+        // IMPORTANT: userProfile.recentSolves is intentionally capped (currently top 10),
+        // so using it for category breakdown massively undercounts categories for users
+        // with >10 solves (often showing ~1% per category in the UI). For accurate
+        // category stats, fetch solves from the DB unless the user has <= recentSolves.
+
+        const buildCtfIdMatcher = (ctfId: string) => {
+            const asNumber = Number(ctfId);
+            if (Number.isFinite(asNumber)) {
+                return { $in: [ctfId, asNumber] };
+            }
+            return ctfId;
+        };
+
+        const needsDb = userProfile.solveCount > userProfile.recentSolves.length || !!options?.ctfId;
+
+        let relevantSolves: UserSolve[] = userProfile.recentSolves;
+
+        if (needsDb) {
             const userDoc = await UserModel.findOne({ discord_id: userProfile.userId }, { _id: 1 }).lean();
             if (!userDoc) {
                 console.error('User document not found for Discord ID:', userProfile.userId);
                 return [];
             }
 
-            // Build optimized query
             const allSolvesQuery: any = { users: userDoc._id };
-            if (solveFilter) {
-                const sampleSolve = userProfile.recentSolves.find(s => solveFilter(s));
-                if (sampleSolve) {
-                    allSolvesQuery.ctf_id = sampleSolve.ctf_id;
-                }
+            if (options?.ctfId) {
+                allSolvesQuery.ctf_id = buildCtfIdMatcher(options.ctfId);
             }
 
-            // Fetch only essential fields
-            const allSolves = await solveModel.find(allSolvesQuery).populate<{challenge_ref: ChallengeSchemaType}>("challenge_ref", "name category").lean();
-            
-            // Convert to UserSolve format
-            relevantSolves = allSolves.map(solve => ({
-                ctf_id: solve.ctf_id,
-                challenge: solve.challenge_ref.name || 'Challenge',
-                category: solve.challenge_ref.category || 'misc',
-                points: 100, // Default points since we don't have challenge_ref populated
-                solved_at: solve.solved_at,
-                users: solve.users.map((id: any) => id.toString())
+            // Fetch only the data we need for category grouping.
+            const allSolves = await solveModel
+                .find(allSolvesQuery, { ctf_id: 1, challenge_ref: 1, solved_at: 1, users: 1 })
+                .populate<{ challenge_ref: ChallengeSchemaType }>('challenge_ref', 'name category')
+                .lean();
+
+            relevantSolves = allSolves
+                .filter((solve) => solve.challenge_ref)
+                .map((solve) => ({
+                    ctf_id: solve.ctf_id,
+                    challenge: solve.challenge_ref.name || 'Challenge',
+                    category: categoryNormalize(solve.challenge_ref.category || 'misc'),
+                    // points are not required for category % bars; keep a safe default
+                    points: 100,
+                    solved_at: solve.solved_at,
+                    users: Array.isArray(solve.users) ? solve.users.map((id: any) => id.toString()) : []
+                }));
+        } else {
+            // Normalize categories even when using the cached sample.
+            relevantSolves = relevantSolves.map((s) => ({
+                ...s,
+                category: categoryNormalize(s.category || 'misc')
             }));
         }
-        
+
         // Process solves efficiently to calculate scores per category
         const categoryStats = new Map<string, { solves: number; totalScore: number }>();
-        
+
+        // Precompute solve count per CTF for score attribution without O(n^2) filtering.
+        const ctfSolveCounts = new Map<string, number>();
         for (const solve of relevantSolves) {
-            const challengeCategory = solve.category || 'misc';
-            
-            // Get CTF data for scoring calculation
+            const ctfId = solve.ctf_id;
+            if (!ctfId) continue;
+            ctfSolveCounts.set(ctfId, (ctfSolveCounts.get(ctfId) || 0) + 1);
+        }
+
+        for (const solve of relevantSolves) {
+            const challengeCategory = categoryNormalize(solve.category || 'misc');
+
             const ctfBreakdown = userProfile.ctfBreakdown.get(solve.ctf_id);
             if (!ctfBreakdown) continue;
 
-            // Calculate the score for this individual solve
-            const ctfSolveCount = relevantSolves.filter(s => s.ctf_id === solve.ctf_id).length;
+            const ctfSolveCount = ctfSolveCounts.get(solve.ctf_id) || 0;
             if (ctfSolveCount === 0) continue;
-            
+
             const scorePerSolve = ctfBreakdown.score / ctfSolveCount;
 
-            // Initialize or update category stats
             const existing = categoryStats.get(challengeCategory) || { solves: 0, totalScore: 0 };
             categoryStats.set(challengeCategory, {
                 solves: existing.solves + 1,
@@ -147,10 +168,15 @@ export async function calculateCategoryStats(
             .filter(([_category, stats]) => stats.solves > 0)
             .map(([category, stats]) => {
                 // Simplified ranking calculation using existing data
-                const categoryParticipants = allUsers.filter(p => p.categories.has(category));
+                const categoryParticipants = allUsers.filter((p) =>
+                    Array.from(p.categories).some((c) => categoryNormalize(c) === category)
+                );
                 
                 // Estimate ranking based on solve count and total score
-                const categoryRank = Math.max(1, Math.floor(categoryParticipants.length * 0.3)); // Rough estimate
+                const totalInCategory = categoryParticipants.length;
+                const categoryRank = totalInCategory > 0
+                    ? Math.max(1, Math.floor(totalInCategory * 0.3)) // Rough estimate
+                    : 1;
                 
                 return {
                     name: category,
@@ -158,8 +184,8 @@ export async function calculateCategoryStats(
                     totalScore: Math.round(stats.totalScore * 100) / 100,
                     avgPoints: stats.solves > 0 ? Math.round((stats.totalScore / stats.solves) * 100) / 100 : 0,
                     rankInCategory: categoryRank,
-                    totalInCategory: categoryParticipants.length,
-                    percentile: Math.round((categoryRank / categoryParticipants.length) * 100)  
+                    totalInCategory: totalInCategory,
+                    percentile: totalInCategory > 0 ? Math.round((categoryRank / totalInCategory) * 100) : 100
                 };
             })
             .sort((a, b) => b.totalScore - a.totalScore);

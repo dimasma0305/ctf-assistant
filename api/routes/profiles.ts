@@ -259,11 +259,7 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
         });
 
         // User's category performance within this CTF using utility function with filter
-        const categoryStats = await calculateCategoryStats(
-            userProfile, 
-            ctfParticipants,
-            (solve) => solve.ctf_id === ctfId
-        );
+        const categoryStats = await calculateCategoryStats(userProfile, ctfParticipants, { ctfId });
 
         // Fetch accurate solves for this user in this CTF from the database.
         // (The cached scoring data keeps only a small "recentSolves" window for UI previews.)
