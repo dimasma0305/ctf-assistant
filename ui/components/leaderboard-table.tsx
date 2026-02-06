@@ -394,7 +394,11 @@ export function LeaderboardTable() {
   const [pageSize, setPageSize] = useState(10)
   const [selectedCtf, setSelectedCtf] = useState<string>("global")
   const [selectedUsers, setSelectedUsers] = useState<Map<string, LeaderboardEntry>>(new Map())
-  const [timePeriod, setTimePeriod] = useState<string>("all-time")
+  const [timePeriod, setTimePeriod] = useState<string>(() => {
+    const now = new Date()
+    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+    return `month-${month}`
+  })
 
   const { openWindow } = useWindow()
 
