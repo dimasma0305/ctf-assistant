@@ -191,6 +191,17 @@ export async function getAvailableTimeRanges(): Promise<AvailableTimeRanges> {
             years: Array.from(availableYears).sort((a, b) => b - a) // Most recent first
         };
 
+        // Keep frontend and backend in sync by including the current month/year even
+        // if there are no solves yet for that period (avoid filling large gaps).
+        const now = new Date();
+        const nowMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        if (!result.months.includes(nowMonth)) {
+            result.months.unshift(nowMonth);
+        }
+        if (!result.years.includes(now.getFullYear())) {
+            result.years.unshift(now.getFullYear());
+        }
+
         // Cache for 1 hour (data doesn't change frequently)
         cache.set(cacheKey, result, 60 * 60 * 1000);
         
@@ -298,4 +309,3 @@ export async function getMonthlyRankHistory(userId: string): Promise<MonthlyRank
         return [];
     }
 }
-

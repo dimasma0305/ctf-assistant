@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
         }
 
         if (year && (year < 2020 || year > 2100)) {
-            res.status(400).json(formatErrorResponse(400, "Year must be between 2020 and 2030", undefined, req));
+            res.status(400).json(formatErrorResponse(400, "Year must be between 2020 and 2100", undefined, req));
             return;
         }
 

@@ -42,6 +42,28 @@ interface CategoryStat {
   percentile?: number
 }
 
+const canonicalizeTimePeriod = (period: string) => {
+  const now = new Date()
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const lastMonth = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`
+
+  switch (period) {
+    case "leaderboard":
+      return "all-time"
+    case "this-month":
+      return `month-${thisMonth}`
+    case "last-month":
+      return `month-${lastMonth}`
+    case "this-year":
+      return `year-${now.getFullYear()}`
+    case "last-year":
+      return `year-${now.getFullYear() - 1}`
+    default:
+      return period
+  }
+}
+
 
 
 const getUserInitials = (user: LeaderboardEntry["user"]) => {
@@ -392,9 +414,21 @@ export function LeaderboardTable() {
 
     if (leaderboardData?.metadata) {
       const { availableYears, availableMonths } = leaderboardData.metadata
+      const now = new Date()
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+      const currentYear = now.getFullYear()
 
-      if (availableYears && availableYears.length > 0) {
-        availableYears.forEach((year) => {
+      // Always include the current year/month in the UI even if the backend
+      // hasn't observed solves yet for that period.
+      const years = Array.from(new Set([...(availableYears || []), currentYear])).sort((a, b) => b - a)
+      const months = (() => {
+        const list = availableMonths ? [...availableMonths] : []
+        if (!list.includes(currentMonth)) list.unshift(currentMonth)
+        return list
+      })()
+
+      if (years.length > 0) {
+        years.forEach((year) => {
           options.push({
             value: `year-${year}`,
             label: `${year}`,
@@ -402,8 +436,8 @@ export function LeaderboardTable() {
         })
       }
 
-      if (availableMonths && availableMonths.length > 0) {
-        availableMonths.slice(0, 12).forEach((month) => {
+      if (months.length > 0) {
+        months.slice(0, 12).forEach((month) => {
           const [year, monthNum] = month.split("-")
           const monthName = new Date(Number.parseInt(year), Number.parseInt(monthNum) - 1).toLocaleString("default", {
             month: "long",
@@ -484,9 +518,15 @@ export function LeaderboardTable() {
       const isDynamicYear = hash.startsWith("year-") && hash.match(/^year-\d{4}$/)
 
       if (validPeriods.includes(hash) || isDynamicMonth || isDynamicYear) {
-        console.log("[v0] Setting initial time period to:", hash)
-        setTimePeriod(hash)
+        const canonical = canonicalizeTimePeriod(hash)
+        console.log("[v0] Setting initial time period to:", canonical)
+        setTimePeriod(canonical)
         setCurrentPage(1)
+
+        // Normalize share URLs so the select always has a matching option.
+        if (canonical !== hash) {
+          window.history.replaceState(null, "", `#${canonical}`)
+        }
       }
     }
 
@@ -503,10 +543,11 @@ export function LeaderboardTable() {
       const isDynamicYear = hash.startsWith("year-") && hash.match(/^year-\d{4}$/)
 
       if (validPeriods.includes(hash) || isDynamicMonth || isDynamicYear) {
-        console.log("[v0] Setting time period to:", hash)
-        setTimePeriod(hash)
+        const canonical = canonicalizeTimePeriod(hash)
+        console.log("[v0] Setting time period to:", canonical)
+        setTimePeriod(canonical)
         setCurrentPage(1)
-        const timeParams = getTimeParams(hash)
+        const timeParams = getTimeParams(canonical)
         updateParams({
           offset: 0,
           limit: pageSize,
@@ -514,6 +555,10 @@ export function LeaderboardTable() {
           ctf_id: selectedCtf !== "global" ? selectedCtf : undefined,
           ...timeParams,
         })
+
+        if (canonical !== hash) {
+          window.history.replaceState(null, "", `#${canonical}`)
+        }
       }
     }
 
