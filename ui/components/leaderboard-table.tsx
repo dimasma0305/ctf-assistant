@@ -483,7 +483,7 @@ export function LeaderboardTable() {
   }, [leaderboardData])
 
   const shareHash = useMemo(() => {
-    return timePeriod === "all-time" ? "#leaderboard" : `#${timePeriod}`
+    return timePeriod === "all-time" ? "#all-time" : `#${timePeriod}`
   }, [timePeriod])
 
   const copyShareLink = async () => {
@@ -540,10 +540,9 @@ export function LeaderboardTable() {
 
       if (!hash) return
 
-      if (hash === "leaderboard") {
-        setTimePeriod("all-time")
-        return
-      }
+      // "#leaderboard" is used by the dashboard as a tab identifier, not a time filter.
+      // Leaving timePeriod untouched keeps the current-month default (or last selection).
+      if (hash === "leaderboard") return
 
       const validPeriods = ["all-time", "this-month", "last-month", "this-year", "last-year"]
       const isDynamicMonth = hash.startsWith("month-") && hash.match(/^month-\d{4}-\d{2}$/)
@@ -569,6 +568,8 @@ export function LeaderboardTable() {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1)
       console.log("[v0] Hash changed to:", hash)
+
+      if (hash === "leaderboard") return
 
       const validPeriods = ["all-time", "this-month", "last-month", "this-year", "last-year"]
       const isDynamicMonth = hash.startsWith("month-") && hash.match(/^month-\d{4}-\d{2}$/)
@@ -615,36 +616,34 @@ export function LeaderboardTable() {
   const handleTimePeriodChange = (period: string) => {
     setTimePeriod(period)
     setCurrentPage(1)
-
-    if (period === "all-time") {
-      window.location.hash = "leaderboard"
-    } else {
-      window.location.hash = period
-    }
+    window.location.hash = period
   }
 
   const getTimeParams = (period: string) => {
     if (period.startsWith("month-")) {
       const monthValue = period.replace("month-", "")
-      return { month: monthValue }
+      return { month: monthValue, year: undefined }
     } else if (period.startsWith("year-")) {
       const yearValue = Number.parseInt(period.replace("year-", ""))
-      return { year: yearValue }
+      return { year: yearValue, month: undefined }
     }
 
     const now = new Date()
     switch (period) {
       case "this-month":
-        return { month: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}` }
+        return { month: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`, year: undefined }
       case "last-month":
         const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-        return { month: `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}` }
+        return {
+          month: `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}`,
+          year: undefined,
+        }
       case "this-year":
-        return { year: now.getFullYear() }
+        return { year: now.getFullYear(), month: undefined }
       case "last-year":
-        return { year: now.getFullYear() - 1 }
+        return { year: now.getFullYear() - 1, month: undefined }
       default:
-        return {}
+        return { month: undefined, year: undefined }
     }
   }
 
