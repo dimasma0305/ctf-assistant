@@ -1,7 +1,7 @@
 import { UserModel, solveModel } from "../../src/Database/connect";
 import FairScoringSystem from "../../src/Functions/scoringSystem";
 import { cache } from '../utils/cache';
-import { generateCacheKey } from '../utils/common';
+import { categoryNormalize, generateCacheKey } from '../utils/common';
 import { UserProfile, AvailableTimeRanges, MonthlyRank } from '../types';
 import { calculateExtendedMetricsForUsers, calculateRankImprovement } from '../utils/statistics';
 
@@ -19,7 +19,9 @@ export async function getCachedUserScores(
     ttl?: number, 
     includeExtendedMetrics: boolean = true
 ): Promise<Map<string, UserProfile>> {
-    const cacheKey = generateCacheKey('userScores', { ...query, extended: includeExtendedMetrics });
+    // Bump this when score/metric semantics change to avoid serving stale cached shapes.
+    const USER_SCORES_CACHE_VERSION = 3;
+    const cacheKey = generateCacheKey('userScores', { ...query, extended: includeExtendedMetrics, v: USER_SCORES_CACHE_VERSION });
     
     // Try to get from cache first
     let userScores = cache.getCached<Map<string, UserProfile>>(cacheKey);
@@ -64,6 +66,7 @@ export async function getCachedUserScores(
             
             for (const [discordId, scoreData] of scoringData) {
                 const userInfo = userLookup.get(discordId);
+                const normalizedCategories = new Set(Array.from(scoreData.categories).map(categoryNormalize));
                 const baseProfile: UserProfile = {
                     userId: discordId,
                     username: userInfo?.username || `User_${discordId}`,
@@ -72,7 +75,7 @@ export async function getCachedUserScores(
                     totalScore: scoreData.totalScore,
                     solveCount: scoreData.solveCount,
                     ctfCount: scoreData.ctfCount,
-                    categories: scoreData.categories,
+                    categories: normalizedCategories,
                     recentSolves: scoreData.recentSolves,
                     ctfBreakdown: scoreData.ctfBreakdown
                 };

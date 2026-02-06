@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getCachedUserScores, getAvailableTimeRanges } from '../services/dataService';
-import { calculateGlobalStats, generateAchievementIds } from '../utils/statistics';
+import { calculateExtendedMetricsForUsers, calculateGlobalStats, generateAchievementIds } from '../utils/statistics';
 import { formatErrorResponse, validatePaginationParams, filterUsersBySearch, categoryNormalize } from '../utils/common';
 import { UserSolve } from '../types';
 
@@ -79,8 +79,10 @@ router.get("/", async (req, res) => {
             };
         }
 
-        // Get leaderboard data using cache - extended metrics only needed for achievements
-        const includeExtendedMetrics = !searchTerm && (!limit || limit >= 50); // Only for larger result sets
+        // Fetch base leaderboard data. Extended metrics are computed only for the
+        // paginated page below to keep this endpoint responsive and deterministic
+        // (achievement lighting should not depend on limit/search).
+        const includeExtendedMetrics = false;
         let allUserScores = await getCachedUserScores(query, undefined, includeExtendedMetrics);
         
         // For monthly/yearly filtering, use separate rankings based on filtered data
@@ -97,7 +99,7 @@ router.get("/", async (req, res) => {
             });
         } else {
             // Global leaderboard: get rankings from complete unfiltered dataset
-            const globalUserScores = await getCachedUserScores({}); // No query filters for true global rankings
+            const globalUserScores = await getCachedUserScores({}, undefined, false); // No query filters for true global rankings
             const allSortedUsers = Array.from(globalUserScores.values())
                 .sort((a, b) => b.totalScore - a.totalScore);
             
@@ -125,12 +127,20 @@ router.get("/", async (req, res) => {
             totalUsers = allUserScores.size; // Users with activity in the specified time period
         } else {
             // Get total from global dataset
-            const globalUserScores = await getCachedUserScores({});
+            const globalUserScores = await getCachedUserScores({}, undefined, false);
             totalUsers = globalUserScores.size;
         }
         
         // Apply pagination after filtering
         const paginatedLeaderboard = sortedLeaderboard.slice(offset, offset + limit);
+
+        // Compute extended metrics only for the returned users so category-based
+        // achievements (e.g. 20+ web) reliably light up.
+        const pageProfiles = new Map<string, any>();
+        for (const entry of paginatedLeaderboard) {
+            pageProfiles.set(entry.userId, entry as any);
+        }
+        const pageExtendedMetrics = await calculateExtendedMetricsForUsers(pageProfiles as any, true);
         
         // Get available months and years for metadata
         const availableTimeRanges = await getAvailableTimeRanges();
@@ -148,10 +158,13 @@ router.get("/", async (req, res) => {
         const formattedLeaderboard = paginatedLeaderboard.map((entry) => {
             const userRank = userRankMap.get(entry.userId) || 1;
             const scope = isGlobal ? 'global' : 'ctf';
+
+            const extendedMetrics = pageExtendedMetrics.get(entry.userId) || {};
+            const entryForAchievements = { ...(entry as any), ...(extendedMetrics as any) };
             
             // Generate achievements for this user
             const achievementIds = generateAchievementIds(
-                entry,
+                entryForAchievements,
                 userRank,
                 totalUsers,
                 globalStats,

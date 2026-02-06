@@ -13,6 +13,16 @@ import {
     ACHIEVEMENT_CRITERIA, 
 } from '../../ui/lib/achievements';
 
+type SolveWithChallenge = {
+    users?: any[];
+    solved_at: Date;
+    ctf_id: string;
+    // When populated, contains at least category/points/name.
+    challenge_ref?: Partial<ChallengeSchemaType> | null;
+    // Back-compat: some callers may still provide a raw category field.
+    category?: string;
+};
+
 /**
  * Statistics and Calculation Utilities
  */
@@ -253,8 +263,12 @@ export async function calculateExtendedMetricsForUsers(
             users: 1, 
             solved_at: 1, 
             ctf_id: 1, 
-            category: 1
+            challenge_ref: 1
         }).lean();
+
+        // Solve docs do not store category/points; populate challenge_ref so achievements can
+        // reliably compute categorySolves (e.g. 20+ web) and difficulty heuristics.
+        await solveModel.populate(allSolves, { path: "challenge_ref", select: "name category points" });
         
         // Efficiently group solves by user using the lookup map
         const solvesByUser = new Map<string, any[]>();
@@ -335,8 +349,10 @@ async function calculateExtendedMetricsForSingleUser(userProfile: UserProfile, a
             users: 1, 
             solved_at: 1, 
             ctf_id: 1, 
-            category: 1
+            challenge_ref: 1
         }).lean();
+
+        await solveModel.populate(allSolves, { path: "challenge_ref", select: "name category points" });
     }
     
     return calculateExtendedMetricsCore(userProfile, allSolves);
@@ -400,13 +416,14 @@ async function calculateExtendedMetricsCore(userProfile: UserProfile, allSolves:
     }
     
     // Single pass through all solves for efficiency
-    for (const solve of allSolves) {
+    for (const solve of allSolves as SolveWithChallenge[]) {
         const solveTime = new Date(solve.solved_at).getTime();
         solveDates.push(solveTime);
         
-        // Get challenge data with defaults
-        const challengeCategory = solve.category || 'misc';
-        const challengePoints = 100; // Default points since we don't have challenge_ref populated
+        // Get challenge data with defaults (Solve does not store category/points directly).
+        const rawCategory = solve.challenge_ref?.category || solve.category || 'misc';
+        const challengeCategory = categoryNormalize(rawCategory);
+        const challengePoints = typeof solve.challenge_ref?.points === 'number' ? solve.challenge_ref.points : 100;
         
         // Count category solves
         categorySolves[challengeCategory] = (categorySolves[challengeCategory] || 0) + 1;
