@@ -14,6 +14,7 @@ import {
   Award,
   ChevronLeft,
   ChevronRight,
+  Copy,
   Filter,
   AlertCircle,
   Calendar,
@@ -32,6 +33,7 @@ import type { LeaderboardEntry, Achievement } from "@/lib/types"
 import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/utils"
 import { ScoreDisplay, formatScore } from "@/components/score-display"
 import Link from "next/link"
+import { toast } from "sonner"
 
 interface CategoryStat {
   name: string
@@ -480,6 +482,32 @@ export function LeaderboardTable() {
     }))
   }, [leaderboardData])
 
+  const shareHash = useMemo(() => {
+    return timePeriod === "all-time" ? "#leaderboard" : `#${timePeriod}`
+  }, [timePeriod])
+
+  const copyShareLink = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareHash)
+      } else {
+        // Fallback for older/blocked clipboard environments
+        const el = document.createElement("textarea")
+        el.value = shareHash
+        el.setAttribute("readonly", "true")
+        el.style.position = "fixed"
+        el.style.left = "-9999px"
+        document.body.appendChild(el)
+        el.select()
+        document.execCommand("copy")
+        document.body.removeChild(el)
+      }
+      toast.success("Copied", { description: shareHash })
+    } catch {
+      toast.error("Copy failed", { description: "Your browser blocked clipboard access." })
+    }
+  }
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
     const timeParams = getTimeParams(timePeriod)
@@ -746,9 +774,17 @@ export function LeaderboardTable() {
                 Showing rankings for: <strong className="text-primary">{getTimePeriodText(timePeriod)}</strong>
               </span>
             </div>
-            <Badge variant="outline" className="text-xs border-primary/30 text-primary">
-              Shareable Link: #{timePeriod}
-            </Badge>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={copyShareLink}
+              className="h-7 px-2 text-xs border-primary/30 text-primary"
+              title={`Copy ${shareHash}`}
+            >
+              <Copy className="w-3.5 h-3.5 mr-1" />
+              Shareable Link: {shareHash}
+            </Button>
           </div>
         )}
       </div>

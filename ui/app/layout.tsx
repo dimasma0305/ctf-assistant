@@ -6,6 +6,7 @@ import { Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { WindowProvider } from "@/components/ui/window"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 const playfair = Playfair_Display({
@@ -36,6 +37,7 @@ export default function RootLayout({
         <WindowProvider>
           <Suspense fallback={null}>{children}</Suspense>
         </WindowProvider>
+        <Toaster position="top-right" />
         <Analytics />
       </body>
     </html>
