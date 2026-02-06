@@ -211,6 +211,13 @@ export const command: SubCommand = {
         const { updatedMessages, createdThreads, errors, skippedThreads } = await updateThreadsStatus(challenges, channel, ctfData.id);
 
         // Summary message
+        const finish = new Date(ctfData.finish);
+        const finishText = finish.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, ' UTC');
+        const now = new Date();
+        const finalScoreNote = now < finish
+            ? `⚠️ **Final Score Note:** After the CTF ends (${finishText}), run \`/solve init\` again to refresh points/solves for the final scoreboard.`
+            : `⚠️ **Final Score Note:** This CTF ended (${finishText}). If you need final scoreboard accuracy, run \`/solve init\` again to refresh points/solves.`;
+
         const summary = [
             `✅ **Challenge Initialization Complete!**`,
             '',
@@ -219,6 +226,8 @@ export const command: SubCommand = {
             `• Updated: ${updatedMessages} messages`,
             `• Skipped (already exist): ${skippedThreads} threads`,
             `• Total challenges: ${challenges.length}`,
+            '',
+            finalScoreNote,
         ];
 
         if (errors.length > 0) {

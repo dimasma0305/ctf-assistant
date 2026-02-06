@@ -70,6 +70,7 @@ import { APIEmbed } from "discord.js";
 import moment from "moment"
 import { MyClient } from "../../../../Model/client";
 import { openai, isOpenAIConfigured } from "../../../../utils/openai";
+import { CTFCacheModel, FetchCommandModel } from "../../../../Database/connect";
 
 interface ScheduleEmbedTemplateProps {
     ctfEvent: CTFEvent;
@@ -500,7 +501,30 @@ ${weight}
 
         const scheduleEndMessage = async () => {
             const endMessage = await generateCtfEndMessage(this.options.ctfEvent.title, role.id);
-            await this.discussChannel?.send(endMessage);
+            let finalMessage = endMessage;
+
+            // If this event was initialized without a fetch command (manual JSON upload / modal),
+            // remind people to re-run /solve init after the CTF ends to refresh final points/solves.
+            try {
+                const ctfCache = await CTFCacheModel.findOne({ ctf_id: this.options.ctfEvent.id.toString() }, { _id: 1 }).lean();
+                if (ctfCache && this.discussChannel) {
+                    const fetchCmd = await FetchCommandModel.findOne({
+                        ctf: ctfCache._id,
+                        channel_id: this.discussChannel.id,
+                    }, { _id: 1 }).lean();
+
+                    if (!fetchCmd) {
+                        finalMessage += `\n\n⚠️ **Final Score Reminder:** Jalankan \`/solve init\` lagi di channel ini setelah CTF selesai untuk refresh data (points/solves) supaya scoreboard final akurat.`;
+                    }
+                }
+            } catch (error) {
+                logWarn('Failed to check fetch command status for end reminder', {
+                    eventId: this.options.ctfEvent.id,
+                    error,
+                });
+            }
+
+            await this.discussChannel?.send(finalMessage);
             stopTasks();
             await this.archive()
         };
