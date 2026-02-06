@@ -2,6 +2,7 @@ import { solveModel, ChallengeModel } from '../Database/connect';
 import { infoEvent } from './ctftime-v2';
 import { ChallengeSchemaType } from '../Database/challengeSchema';
 import { UserSchemaType } from '../Database/userSchema';
+import { getEffectiveWeight } from './weightUtils';
 
 /**
  * Get max challenge points for multiple CTFs at once (the "max_score" per CTF)
@@ -197,14 +198,21 @@ export class FairScoringSystem {
             console.error('Error in bulk CTF data fetch:', err);
         }
 
-        // Compute global average weight for defaults
-        let globalAvgWeight = instance.defaultCtfWeight;
-        if (ctfDataMap.size > 0) {
-            const weights = Array.from(ctfDataMap.values()).map(data => data.weight || 0).filter(w => w > 0);
-            if (weights.length > 0) {
-                globalAvgWeight = weights.reduce((sum, w) => sum + w, 0) / weights.length;
+        // Precompute effective weights once per CTF.
+        // Important: CTFtime uses weight=0 for unrated/unvoted events. Using a global average here
+        // makes unrated events score like high-weight events, which inflates results.
+        const effectiveWeightMap = new Map<string, number>();
+        await Promise.all(ctfIds.map(async (id) => {
+            const ctfData = ctfDataMap.get(id);
+            if (!ctfData) return;
+            try {
+                const effectiveWeight = await getEffectiveWeight(id, ctfData.weight || 0);
+                effectiveWeightMap.set(id, effectiveWeight);
+            } catch (err) {
+                console.error(`Error computing effective weight for CTF ${id}:`, err);
+                effectiveWeightMap.set(id, ctfData.weight || 0);
             }
-        }
+        }));
 
         // Group solves by user
         for (const solve of solves) {
@@ -271,10 +279,7 @@ export class FairScoringSystem {
                     if (!ctfData) {
                         continue;
                     }
-                    let ctfWeight = ctfData.weight;
-                    if (ctfWeight === 0) {
-                        ctfWeight = globalAvgWeight;
-                    }
+                    const ctfWeight = effectiveWeightMap.get(solve.ctf_id) ?? (ctfData.weight || 0);
 
                     const ctfMax = ctfMaxPoints.get(solve.ctf_id) || solve.points || instance.defaultChallengePoints;
                     const ctfMaxSolve = ctfMaxSolves.get(solve.ctf_id) || 1;

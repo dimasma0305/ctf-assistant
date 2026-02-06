@@ -32,36 +32,72 @@ function CTFSolveList({ userId, ctfId, enabled }: { userId: string; ctfId: strin
   }
 
   const solves = data?.allSolves ?? []
+  const totalParticipants = data?.totalParticipants ?? 0
   if (solves.length === 0) {
     return <div className="text-sm text-muted-foreground py-2">No solves found for this CTF.</div>
   }
 
   return (
-    <div className="space-y-2 pt-2">
-      {solves.map((solve: UserSolve, idx: number) => (
-        <div key={`${solve.ctf_id}:${solve.challenge}:${solve.solved_at}:${idx}`} className="flex items-start justify-between gap-3 p-3 bg-background/60 border border-primary/10">
-          <div className="min-w-0 flex-1">
-            <div className="font-medium text-sm text-foreground truncate">{solve.challenge}</div>
-            <div className="flex items-center gap-2 flex-wrap mt-1">
-              <Badge variant="outline" className="text-xs capitalize">
-                {solve.category}
-              </Badge>
-              {solve.isTeamSolve && (
-                <Badge variant="secondary" className="text-xs">
-                  Team
-                </Badge>
-              )}
-              {solve.teammates && solve.teammates.length > 0 && (
-                <span className="text-xs text-muted-foreground truncate">With: {solve.teammates.join(", ")}</span>
-              )}
+    <div className="pt-3 space-y-2">
+      <div className="text-xs text-muted-foreground flex items-center gap-2">
+        <Users className="w-3.5 h-3.5" />
+        <span>
+          Showing solves with community context: <span className="font-medium">{totalParticipants || "?"}</span> participants
+        </span>
+      </div>
+      {solves.map((solve: UserSolve, idx: number) => {
+        const solvers = solve.solves ?? 0
+        const denom = totalParticipants > 0 ? totalParticipants : 0
+        const rate = denom > 0 ? Math.min((solvers / denom) * 100, 100) : 0
+
+        return (
+          <div
+            key={`${solve.ctf_id}:${solve.challenge}:${solve.solved_at}:${idx}`}
+            className="p-3 bg-background/60 border border-primary/10 hover:border-primary/20 transition-colors"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="font-medium text-sm text-foreground truncate">{solve.challenge}</div>
+                <div className="flex items-center gap-2 flex-wrap mt-1">
+                  <Badge variant="outline" className="text-xs capitalize">
+                    {solve.category}
+                  </Badge>
+                  {solve.isTeamSolve && (
+                    <Badge variant="secondary" className="text-xs">
+                      Team
+                    </Badge>
+                  )}
+                  {typeof solve.solves === "number" && (
+                    <Badge variant="secondary" className="text-xs bg-muted/60 text-foreground">
+                      {solvers}/{denom || "?"} solvers
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              <div className="text-right flex-shrink-0">
+                <div className="text-sm font-bold text-primary">{solve.points} pts</div>
+                <div className="text-xs text-muted-foreground whitespace-nowrap">
+                  {new Date(solve.solved_at).toLocaleString()}
+                </div>
+              </div>
             </div>
+
+            {typeof solve.solves === "number" && denom > 0 && (
+              <div className="mt-2">
+                <Progress value={rate} className="h-2" />
+                <div className="mt-1 text-[11px] text-muted-foreground">
+                  Solve rate: {rate.toFixed(1)}%
+                </div>
+              </div>
+            )}
+
+            {solve.teammates && solve.teammates.length > 0 && (
+              <div className="mt-2 text-xs text-muted-foreground truncate">With: {solve.teammates.join(", ")}</div>
+            )}
           </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-sm font-bold text-primary">{solve.points} pts</div>
-            <div className="text-xs text-muted-foreground whitespace-nowrap">{new Date(solve.solved_at).toLocaleString()}</div>
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

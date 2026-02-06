@@ -12,6 +12,7 @@ export interface UserSolve {
   challenge: string
   category: string
   points: number
+  solves?: number
   solved_at: string
   isTeamSolve?: boolean
   teammates?: string[]

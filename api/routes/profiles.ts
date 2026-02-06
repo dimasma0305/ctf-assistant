@@ -57,6 +57,7 @@ async function getUserCtfSolves(userId: string, ctfId: string) {
                 challenge: challenge.name || 'Unknown',
                 category: categoryNormalize(challenge.category || 'misc'),
                 points: challenge.points || 0,
+                solves: challenge.solves || 0,
                 solved_at: solve.solved_at,
                 isTeamSolve: teammates.length > 0,
                 teammates,
