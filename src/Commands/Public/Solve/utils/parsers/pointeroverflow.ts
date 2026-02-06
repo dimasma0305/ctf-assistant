@@ -41,9 +41,29 @@ interface PointerOverflowResponse {
 }
 
 // Pointer Overflow CTF format validation
-function validate(data: any): void {
+function validateResponseShape(data: any): asserts data is PointerOverflowResponse {
     if (typeof data !== 'object' || data === null) {
-        throw new Error('Pointer Overflow CTF format error: Expected object, got ' + typeof data);
+        throw new Error('Pointer Overflow CTF format error: Expected object');
+    }
+    if (!('challenges' in data)) {
+        throw new Error('Pointer Overflow CTF format error: Missing required "challenges" field');
+    }
+    if (!Array.isArray((data as any).challenges)) {
+        throw new Error('Pointer Overflow CTF format error: "challenges" field must be an array');
+    }
+}
+
+function validateChallengeShape(challenge: any): void {
+    if (typeof challenge !== 'object' || challenge === null) {
+        throw new Error('Pointer Overflow CTF format error: Challenge must be an object');
+    }
+
+    // Validate required fields (tests expect specific messages for these).
+    if (!('name' in challenge) || typeof challenge.name !== 'string') {
+        throw new Error('Pointer Overflow CTF format error: Challenge missing required field "name"');
+    }
+    if (!('cid' in challenge) || typeof challenge.cid !== 'number') {
+        throw new Error('Pointer Overflow CTF format error: Challenge "cid" must be a number');
     }
 }
 
@@ -76,12 +96,14 @@ export function parse(data: any): ParsedChallenge[] {
     }
     
     // Validate format before processing
-    validate(parsedData);
+    validateResponseShape(parsedData);
     
     // TypeScript assertion after validation
     const poData = parsedData as PointerOverflowResponse;
     
     return poData.challenges.map((challenge, index) => {
+        validateChallengeShape(challenge);
+
         // Extract category from challenge name
         const category = extractCategory(challenge.name);
         
@@ -89,8 +111,8 @@ export function parse(data: any): ParsedChallenge[] {
         let combinedDescription = challenge.description || '';
         
         // Add attachments information to description if attachments exist
-        if (challenge.attachments && challenge.attachments.length > 0) {
-            const attachmentsInfo = challenge.attachments.map(file => {
+        if (Array.isArray(challenge.attachments) && challenge.attachments.length > 0) {
+            const attachmentsInfo = challenge.attachments.map((file: any) => {
                 return `📎 **${file.name || `Attachment ${file.aid}`}**: ${file.url}`;
             }).join('\n');
             
@@ -102,13 +124,13 @@ export function parse(data: any): ParsedChallenge[] {
         }
         
         // Extract tags
-        const tags = challenge.tags?.map(tag => tag.name || tag.tagslug) || [];
+        const tags = Array.isArray(challenge.tags) ? challenge.tags.map((tag: any) => tag.name || tag.tagslug) : [];
         
         // Add additional metadata as tags
-        if (!challenge.unlocked) {
+        if (challenge.unlocked === false) {
             tags.push('locked');
         }
-        if (challenge.teaser) {
+        if (challenge.teaser === true) {
             tags.push('teaser');
         }
         
@@ -116,12 +138,11 @@ export function parse(data: any): ParsedChallenge[] {
             id: challenge.cid,
             name: challenge.name,
             category: category,
-            points: challenge.current_points || challenge.points,
+            points: typeof challenge.current_points === 'number' ? challenge.current_points : challenge.points,
             solves: challenge.solves,
-            solved: challenge.answered,
+            solved: challenge.answered === true,
             description: combinedDescription,
             tags
         }, index);
     });
 }
-
