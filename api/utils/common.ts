@@ -9,11 +9,28 @@ const CATEGORY_LOOKUP: Record<string, string> = (() => {
     const categoryNames: Record<string, string[]> = {
       web: ["web", "web exploitation"],
       crypto: ["crypto", "cryptography"],
-      pwn: ["pwn", "pwnable", "binary exploitation"],
-      reverse: ["reverse", "reverse engineering", "reversing", "rev"],
+      pwn: [
+        "pwn",
+        "pwnable",
+        "binary exploitation",
+        // Common CTF shorthand / variants
+        "binex",
+        "binexp",
+        "binary",
+        "exploit",
+        "exploitation",
+      ],
+      reverse: [
+        "reverse",
+        "reverse engineering",
+        "reversing",
+        "rev",
+        // Common shorthand
+        "re",
+      ],
       forensics: ["forensics", "forensic", "digital forensics"],
-      misc: ["misc", "miscellaneous"],
-      steganography: ["steganography", "stegano"],
+      misc: ["misc", "miscellaneous", "unknown", "other"],
+      steganography: ["steganography", "stegano", "stego", "steg"],
       osint: ["osint", "open source intelligence", "open-source intelligence"],
       blockchain: ["blockchain", "blockchain exploitation", "web3", "smart contract"],
       mobile: ["mobile", "mobile exploitation", "mobile security"],

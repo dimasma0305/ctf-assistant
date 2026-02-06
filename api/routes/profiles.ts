@@ -103,7 +103,7 @@ router.get("/:id", async (req, res) => {
         const allUsers = Array.from(globalUserScores.values());
         const allCategories = new Set<string>();
         allUsers.forEach(user => {
-            user.categories.forEach(cat => allCategories.add(cat));
+            user.categories.forEach(cat => allCategories.add(categoryNormalize(cat)));
         });
 
         // User's category performance across all CTFs using utility function
@@ -164,7 +164,7 @@ router.get("/:id", async (req, res) => {
                 totalScore: Math.round(userProfile.totalScore * 100) / 100,
                 solveCount: userProfile.solveCount,
                 ctfCount: userProfile.ctfCount,
-                categoriesCount: userProfile.categories.size,
+                categoriesCount: new Set(Array.from(userProfile.categories).map(categoryNormalize)).size,
                 averagePointsPerSolve: userProfile.solveCount > 0 ? Math.round((userProfile.totalScore / userProfile.solveCount) * 100) / 100 : 0,
                 contributionToTotal: Math.round((userProfile.solveCount / globalStats.totalSolves) * 100 * 100) / 100
             },
@@ -255,7 +255,7 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
         const ctfParticipants = Array.from(ctfUserScores.values());
         const allCategories = new Set<string>();
         ctfParticipants.forEach(participant => {
-            participant.categories.forEach(cat => allCategories.add(cat));
+            participant.categories.forEach(cat => allCategories.add(categoryNormalize(cat)));
         });
 
         // User's category performance within this CTF using utility function with filter
@@ -299,7 +299,7 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
             stats: {
                 score: Math.round(userProfile.totalScore * 100) / 100,
                 solveCount: userProfile.solveCount,
-                categoriesCount: userProfile.categories.size,
+                categoriesCount: new Set(Array.from(userProfile.categories).map(categoryNormalize)).size,
                 averagePointsPerSolve: allCtfSolves.length > 0
                     ? Math.round((allCtfSolves.reduce((sum, solve) => sum + (solve.points || 0), 0) / allCtfSolves.length) * 100) / 100
                     : 0,

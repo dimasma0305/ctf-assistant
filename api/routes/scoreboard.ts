@@ -141,7 +141,7 @@ router.get("/", async (req, res) => {
         // Get all categories for achievement calculations
         const allCategories = new Set<string>();
         Array.from(allUserScores.values()).forEach(user => {
-            user.categories.forEach(cat => allCategories.add(cat));
+            user.categories.forEach(cat => allCategories.add(categoryNormalize(cat)));
         });
 
         // Format data for JSON response (convert Sets and Maps to arrays/objects)
