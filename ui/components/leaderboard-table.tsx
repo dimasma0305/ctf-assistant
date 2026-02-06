@@ -486,14 +486,22 @@ export function LeaderboardTable() {
     return timePeriod === "all-time" ? "#all-time" : `#${timePeriod}`
   }, [timePeriod])
 
+  const [shareUrl, setShareUrl] = useState<string>("")
+  useEffect(() => {
+    // Build an absolute URL so users can share/copy a real link, not only the hash fragment.
+    if (typeof window === "undefined") return
+    setShareUrl(`${window.location.origin}${window.location.pathname}${window.location.search}${shareHash}`)
+  }, [shareHash])
+
   const copyShareLink = async () => {
+    const textToCopy = shareUrl || shareHash
     try {
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(shareHash)
+        await navigator.clipboard.writeText(textToCopy)
       } else {
         // Fallback for older/blocked clipboard environments
         const el = document.createElement("textarea")
-        el.value = shareHash
+        el.value = textToCopy
         el.setAttribute("readonly", "true")
         el.style.position = "fixed"
         el.style.left = "-9999px"
@@ -502,7 +510,7 @@ export function LeaderboardTable() {
         document.execCommand("copy")
         document.body.removeChild(el)
       }
-      toast.success("Copied", { description: shareHash })
+      toast.success("Copied", { description: textToCopy })
     } catch {
       toast.error("Copy failed", { description: "Your browser blocked clipboard access." })
     }
@@ -773,17 +781,28 @@ export function LeaderboardTable() {
                 Showing rankings for: <strong className="text-primary">{getTimePeriodText(timePeriod)}</strong>
               </span>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={copyShareLink}
-              className="h-7 px-2 text-xs border-primary/30 text-primary"
-              title={`Copy ${shareHash}`}
-            >
-              <Copy className="w-3.5 h-3.5 mr-1" />
-              Shareable Link: {shareHash}
-            </Button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={copyShareLink}
+                className="h-7 px-2 text-xs border-primary/30 text-primary"
+                title={`Copy ${shareUrl || shareHash}`}
+              >
+                <Copy className="w-3.5 h-3.5 mr-1" />
+                Copy link
+              </Button>
+              <a
+                href={shareUrl || shareHash}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-primary underline underline-offset-2 hover:opacity-80 cursor-pointer break-all"
+                title={shareUrl || shareHash}
+              >
+                {shareUrl || shareHash}
+              </a>
+            </div>
           </div>
         )}
       </div>

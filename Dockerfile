@@ -1,4 +1,4 @@
-FROM oven/bun:latest as app
+FROM oven/bun:latest AS app
 WORKDIR /app
 COPY package.json package.json
 RUN bun install
