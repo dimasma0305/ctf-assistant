@@ -1,6 +1,6 @@
 "use client"
 import { useParams } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -109,7 +109,51 @@ export default function UserProfilePage() {
 
   const { data: profileData, loading, error } = useUserProfile(userId)
   const [expandedCtfId, setExpandedCtfId] = useState<string | null>(null)
+  const [selectedTab, setSelectedTab] = useState<"categories" | "ctfs" | "achievements" | "certificates" | "activity">(
+    "categories",
+  )
 
+  const setTabHash = (tab: string) => {
+    if (typeof window === "undefined") return
+    const url = new URL(window.location.href)
+    url.hash = tab
+    window.history.replaceState({}, "", url)
+  }
+
+  const tabFromHash = (hash: string) => {
+    const key = (hash || "").replace(/^#/, "").toLowerCase()
+    switch (key) {
+      case "categories":
+      case "ctfs":
+      case "achievements":
+      case "certificates":
+      case "activity":
+        return key
+      default:
+        return null
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const applyFromHash = () => {
+      const tab = tabFromHash(window.location.hash)
+      if (tab) {
+        setSelectedTab(tab)
+        return
+      }
+      // If no valid hash, write the default so the URL is shareable.
+      setTabHash("categories")
+    }
+
+    // Initial read
+    applyFromHash()
+
+    // Keep in sync when user navigates back/forward or edits the hash.
+    window.addEventListener("hashchange", applyFromHash)
+    return () => window.removeEventListener("hashchange", applyFromHash)
+  }, [])
 
 
   const formatTimeAgo = (dateString: string) => {
@@ -316,7 +360,20 @@ export default function UserProfilePage() {
             </CardHeader>
           </Card>
 
-          <Tabs defaultValue="categories" className="space-y-4 sm:space-y-6">
+          <div id="profile-tabs" />
+          <Tabs
+            value={selectedTab}
+            onValueChange={(v) => {
+              const tab = tabFromHash(`#${v}`)
+              if (!tab) return
+              setSelectedTab(tab)
+              setTabHash(tab)
+              // Close expanded CTF when leaving/entering via hash navigation.
+              if (tab !== "ctfs") setExpandedCtfId(null)
+              document.getElementById("profile-tabs")?.scrollIntoView({ block: "start" })
+            }}
+            className="space-y-4 sm:space-y-6"
+          >
             <div className="w-full">
               <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto p-1 bg-muted/50 gap-1">
                 <TabsTrigger
