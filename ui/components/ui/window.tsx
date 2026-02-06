@@ -395,7 +395,7 @@ export function Window({
     }
   }, [window, id, defaultSize, updateWindow])
 
-  const actualMaxSize = useMemo(() => {
+  const actualMaxSize = React.useMemo(() => {
     if (maxSize) return maxSize
     return {
       width: isClient ? globalThis.window.innerWidth : 1200,
