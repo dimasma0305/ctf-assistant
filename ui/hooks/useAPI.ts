@@ -210,12 +210,8 @@ export function useCTFProfileDetailed(userId: string | null, ctfId: string | nul
         return Promise.reject(new Error("User ID and CTF ID are required"))
       }
 
-      return fetch(`/api/profile/${userId}/ctf/${ctfId}`).then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
+      // Use the same API base URL logic as the rest of the app (NEXT_PUBLIC_API_BASE_URL).
+      return getCTFProfile(ctfId, userId)
     },
     [userId, ctfId, enabled],
     {

@@ -1,5 +1,6 @@
 "use client"
 import { useParams } from "next/navigation"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,15 +14,64 @@ import { ACHIEVEMENTS, getUnlockedAchievementsWithHierarchy } from "@/lib/achiev
 import { WindowProvider } from "@/components/ui/window"
 
 import Link from "next/link"
-import { useUserProfile } from "@/hooks/useAPI"
-import type { Achievement, UserProfileResponse } from "@/lib/types"
+import { useCTFProfileDetailed, useUserProfile } from "@/hooks/useAPI"
+import type { Achievement, UserProfileResponse, UserSolve } from "@/lib/types"
 import { ScoreDisplay } from "@/components/score-display"
+
+function CTFSolveList({ userId, ctfId, enabled }: { userId: string; ctfId: string; enabled: boolean }) {
+  const { data, loading, error } = useCTFProfileDetailed(userId, ctfId, enabled)
+
+  if (!enabled) return null
+
+  if (loading) {
+    return <div className="text-sm text-muted-foreground py-2">Loading solves...</div>
+  }
+
+  if (error) {
+    return <div className="text-sm text-destructive py-2">Failed to load solves: {error}</div>
+  }
+
+  const solves = data?.allSolves ?? []
+  if (solves.length === 0) {
+    return <div className="text-sm text-muted-foreground py-2">No solves found for this CTF.</div>
+  }
+
+  return (
+    <div className="space-y-2 pt-2">
+      {solves.map((solve: UserSolve, idx: number) => (
+        <div key={`${solve.ctf_id}:${solve.challenge}:${solve.solved_at}:${idx}`} className="flex items-start justify-between gap-3 p-3 bg-background/60 border border-primary/10">
+          <div className="min-w-0 flex-1">
+            <div className="font-medium text-sm text-foreground truncate">{solve.challenge}</div>
+            <div className="flex items-center gap-2 flex-wrap mt-1">
+              <Badge variant="outline" className="text-xs capitalize">
+                {solve.category}
+              </Badge>
+              {solve.isTeamSolve && (
+                <Badge variant="secondary" className="text-xs">
+                  Team
+                </Badge>
+              )}
+              {solve.teammates && solve.teammates.length > 0 && (
+                <span className="text-xs text-muted-foreground truncate">With: {solve.teammates.join(", ")}</span>
+              )}
+            </div>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <div className="text-sm font-bold text-primary">{solve.points} pts</div>
+            <div className="text-xs text-muted-foreground whitespace-nowrap">{new Date(solve.solved_at).toLocaleString()}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function UserProfilePage() {
   const params = useParams()
   const userId = params.userId as string
 
   const { data: profileData, loading, error } = useUserProfile(userId)
+  const [expandedCtfId, setExpandedCtfId] = useState<string | null>(null)
 
 
 
@@ -389,6 +439,20 @@ export default function UserProfilePage() {
                                   width: `${Math.min((ctf.score / Math.max(...profileData.ctfBreakdown.map((c) => c.score))) * 100, 100)}%`,
                                 }}
                               />
+                            </div>
+
+                            <div className="mt-4 pt-3 border-t border-primary/10">
+                              <Button
+                                type="button"
+                                variant="link"
+                                className="p-0 h-auto text-sm text-primary underline underline-offset-2 hover:opacity-80"
+                                onClick={() => setExpandedCtfId((prev) => (prev === ctf.ctf_id ? null : ctf.ctf_id))}
+                              >
+                                {expandedCtfId === ctf.ctf_id
+                                  ? "Hide solved challenges"
+                                  : `Show solved challenges (${ctf.solves})`}
+                              </Button>
+                              <CTFSolveList userId={userId} ctfId={ctf.ctf_id} enabled={expandedCtfId === ctf.ctf_id} />
                             </div>
                           </div>
                         </div>

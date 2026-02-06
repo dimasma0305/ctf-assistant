@@ -39,10 +39,18 @@ router.get("/", async (req, res) => {
             return;
         }
 
+        const buildCtfIdMatcher = (value: string) => {
+            const asNumber = Number(value);
+            if (Number.isFinite(asNumber)) {
+                return { $in: [value, asNumber] };
+            }
+            return value;
+        };
+
         // Build query for leaderboard data
         let query: any = {};
         if (!isGlobal && ctfId) {
-            query.ctf_id = ctfId;
+            query.ctf_id = buildCtfIdMatcher(ctfId);
         }
 
         // Add date filtering to query

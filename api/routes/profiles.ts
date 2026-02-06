@@ -8,8 +8,61 @@ import {
     generateAchievementIds     
 } from '../utils/statistics';
 import { formatErrorResponse, categoryNormalize } from '../utils/common';
+import { UserModel, solveModel } from '../../src/Database/connect';
+import type { UserSchemaType, ChallengeSchemaType } from '../../src/Database/connect';
 
 const router = Router();
+
+function buildCtfIdMatcher(ctfId: string) {
+    const asNumber = Number(ctfId);
+    if (Number.isFinite(asNumber)) {
+        return { $in: [ctfId, asNumber] };
+    }
+    return ctfId;
+}
+
+async function getUserCtfSolves(userId: string, ctfId: string) {
+    // Resolve discord_id -> User _id, then fetch solves with populated challenge metadata.
+    const userDoc = await UserModel.findOne({ discord_id: userId }, { _id: 1 }).lean();
+    // Solve.users is an ObjectId[]; never include the raw Discord ID in the query
+    // or Mongoose will throw a CastError.
+    if (!userDoc) {
+        return [];
+    }
+    const ctfIdMatcher = buildCtfIdMatcher(ctfId);
+
+    const solves = await solveModel
+        .find({ ctf_id: ctfIdMatcher, users: userDoc._id })
+        .populate<{ challenge_ref: ChallengeSchemaType }>('challenge_ref')
+        .populate<{ users: UserSchemaType[] }>('users')
+        .sort({ solved_at: -1 })
+        .lean();
+
+    return solves
+        .filter((solve) => solve.challenge_ref)
+        .map((solve) => {
+            const challenge = solve.challenge_ref as unknown as ChallengeSchemaType;
+            const teammates = Array.isArray(solve.users)
+                ? solve.users
+                    .map((u) => {
+                        if (u && typeof u === 'object' && 'discord_id' in u) return (u as unknown as UserSchemaType).discord_id;
+                        if (typeof u === 'string') return u;
+                        return undefined;
+                    })
+                    .filter((id): id is string => typeof id === 'string' && id !== userId)
+                : [];
+
+            return {
+                ctf_id: solve.ctf_id,
+                challenge: challenge.name || 'Unknown',
+                category: categoryNormalize(challenge.category || 'misc'),
+                points: challenge.points || 0,
+                solved_at: solve.solved_at,
+                isTeamSolve: teammates.length > 0,
+                teammates,
+            };
+        });
+}
 
 /**
  * GET /api/profile/:id
@@ -162,7 +215,7 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
         }
 
         // Get CTF-specific user scores (using cache) - always include extended metrics for profiles
-        const ctfQuery = { ctf_id: ctfId };
+        const ctfQuery = { ctf_id: buildCtfIdMatcher(ctfId) };
         const ctfUserScores = await getCachedUserScores(ctfQuery, undefined, true);
         const userProfile = ctfUserScores.get(userId);
         
@@ -208,18 +261,9 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
             (solve) => solve.ctf_id === ctfId
         );
 
-        // All solves in this CTF (not just recent ones)
-        const ctfSolves = userProfile.recentSolves.filter(solve => solve.ctf_id === ctfId);
-        const allCtfSolves = ctfSolves
-            .sort((a, b) => new Date(b.solved_at).getTime() - new Date(a.solved_at).getTime())
-            .map(solve => ({
-                challenge: solve.challenge,
-                category: categoryNormalize(solve.category),
-                points: solve.points,
-                solved_at: solve.solved_at,
-                isTeamSolve: solve.users.length > 1,
-                teammates: solve.users.filter(id => id !== userId)
-            }));
+        // Fetch accurate solves for this user in this CTF from the database.
+        // (The cached scoring data keeps only a small "recentSolves" window for UI previews.)
+        const allCtfSolves = await getUserCtfSolves(userId, ctfId);
 
         // CTF-specific achievements using utility function
         const achievementIds = generateAchievementIds(
@@ -255,7 +299,9 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
                 score: Math.round(userProfile.totalScore * 100) / 100,
                 solveCount: userProfile.solveCount,
                 categoriesCount: userProfile.categories.size,
-                averagePointsPerSolve: ctfSolves.length > 0 ? Math.round((ctfSolves.reduce((sum, solve) => sum + solve.points, 0) / ctfSolves.length) * 100) / 100 : 0,
+                averagePointsPerSolve: allCtfSolves.length > 0
+                    ? Math.round((allCtfSolves.reduce((sum, solve) => sum + (solve.points || 0), 0) / allCtfSolves.length) * 100) / 100
+                    : 0,
                 contributionToTotal: Math.round((userProfile.solveCount / ctfStats.totalSolves) * 100 * 100) / 100
             },
             categoryBreakdown: categoryStats,
