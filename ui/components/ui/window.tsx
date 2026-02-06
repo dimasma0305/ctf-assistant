@@ -342,7 +342,6 @@ export function Window({
   const isMountedRef = useRef(true)
   const [dragPreview, setDragPreview] = useState({ x: 0, y: 0 })
   const [resizePreview, setResizePreview] = useState({ width: 0, height: 0 })
-  const [resizeOffset, setResizeOffset] = useState({ width: 0, height: 0 }) // Declare resizeOffset variable
 
   const window = windows.find((w) => w.id === id)
   const isOpen = !!window && !window.isMinimized
@@ -370,13 +369,13 @@ export function Window({
         isHandlingExternalChange.current = false
       }, 0)
     }
-  }, [externalIsOpen, id, title])
+  }, [externalIsOpen, isOpen, openWindow, closeWindow, id, title])
 
   useEffect(() => {
     if (onOpenChange && !isHandlingExternalChange.current) {
       onOpenChange(isOpen)
     }
-  }, [isOpen])
+  }, [isOpen, onOpenChange])
 
   useEffect(() => {
     if (!isClient) return
@@ -394,12 +393,15 @@ export function Window({
     if (window && !window.size.width && !window.size.height && defaultSize) {
       updateWindow(id, { size: defaultSize })
     }
-  }, [window, id, defaultSize])
+  }, [window, id, defaultSize, updateWindow])
 
-  const actualMaxSize = maxSize || {
-    width: isClient ? globalThis.window.innerWidth : 1200,
-    height: isClient ? globalThis.window.innerHeight : 800,
-  }
+  const actualMaxSize = useMemo(() => {
+    if (maxSize) return maxSize
+    return {
+      width: isClient ? globalThis.window.innerWidth : 1200,
+      height: isClient ? globalThis.window.innerHeight : 800,
+    }
+  }, [maxSize, isClient])
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
@@ -488,10 +490,6 @@ export function Window({
           if (!isNaN(newWidth) && !isNaN(newHeight)) {
             resizeDimensionsRef.current = { width: newWidth, height: newHeight }
             setResizePreview({ width: newWidth, height: newHeight })
-            setResizeOffset({
-              width: newWidth - (resizeStart.width || defaultSize.width),
-              height: newHeight - (resizeStart.height || defaultSize.height),
-            }) // Update resizeOffset
           }
         }
       })

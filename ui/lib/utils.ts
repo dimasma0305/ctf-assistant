@@ -41,7 +41,7 @@ export function getAchievements(achievements: (Achievement | string)[]): Achieve
       // It's an achievement ID, fetch the full achievement
       try {
         processedAchievements.push(getAchievement(achievement));
-      } catch (error) {
+      } catch {
         console.warn(`Unknown achievement ID: ${achievement}`);
       }
     } else {
@@ -100,7 +100,9 @@ export function getCategoryColor(category: string): string {
  * @returns Tailwind CSS text color class
  */
 export function getCategoryTextColor(category: string): string {
-  // Most category colors are dark enough to use white text
+  const normalizedCategory = category.toLowerCase().trim();
+  // Yellow backgrounds need dark text for contrast.
+  if (normalizedCategory === "forensics") return "text-black";
   return "text-white";
 }
 

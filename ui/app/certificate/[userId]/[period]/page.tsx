@@ -30,18 +30,6 @@ export default function PublicCertificatePage() {
     }
   }
 
-  const formatPeriod = (period: string) => {
-    // Handle both "2024" and "2024-01" formats
-    if (period.includes("-")) {
-      const [year, month] = period.split("-")
-      const monthName = new Date(Number.parseInt(year), Number.parseInt(month) - 1).toLocaleString("default", {
-        month: "long",
-      })
-      return `${monthName} ${year}`
-    }
-    return period
-  }
-
   const isCertificatePending = () => {
     // Check certificate status from API data
     return certificateData?.certificate?.isPending || false
@@ -155,7 +143,8 @@ export default function PublicCertificatePage() {
         {/* Certificate Info */}
         <div className="text-center px-4">
           <p className="text-sm sm:text-base text-muted-foreground">
-            This certificate recognizes {certificateData.userInfo.displayName || certificateData.userInfo.username}'s achievement as #
+            This certificate recognizes {certificateData.userInfo.displayName || certificateData.userInfo.username}
+            &apos;s achievement as #
             {certificateData.certificate.rank} in the TCP1P Community {certificateData.certificate.period} leaderboard.
           </p>
         </div>

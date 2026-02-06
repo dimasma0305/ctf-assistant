@@ -39,13 +39,6 @@ export function Certificate({
     default: "text-primary",
   }
 
-  const rankBadgeStyles = {
-    1: "bg-certificate-gold text-black font-bold border border-certificate-gold/50 shadow-lg",
-    2: "bg-certificate-silver text-black font-bold border border-certificate-silver/50 shadow-lg",
-    3: "bg-certificate-bronze text-white font-bold border border-certificate-bronze/50 shadow-lg",
-    default: "bg-primary text-primary-foreground font-semibold border border-primary/50 shadow-lg",
-  }
-
   const getRankDisplay = () => {
     if (rank === 1) return "1st"
     if (rank === 2) return "2nd"
@@ -66,13 +59,6 @@ export function Certificate({
     if (rank === 2) return statColors[2]
     if (rank === 3) return statColors[3]
     return statColors.default
-  }
-
-  const getRankBadgeStyle = (rank: number) => {
-    if (rank === 1) return rankBadgeStyles[1]
-    if (rank === 2) return rankBadgeStyles[2]
-    if (rank === 3) return rankBadgeStyles[3]
-    return rankBadgeStyles.default
   }
 
   const getCertificatePurpose = () => {

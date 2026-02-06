@@ -50,7 +50,7 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
 }
 
 // Build query string from params
-function buildQueryString(params: Record<string, any>): string {
+function buildQueryString(params: Record<string, unknown>): string {
   const searchParams = new URLSearchParams()
 
   Object.entries(params).forEach(([key, value]) => {
@@ -125,7 +125,7 @@ export async function clearCache(): Promise<{ message: string; clearedEntries: n
 /**
  * Warm cache
  */
-export async function warmCache(): Promise<{ message: string; statistics: any; timestamp: string }> {
+export async function warmCache(): Promise<{ message: string; statistics: unknown; timestamp: string }> {
   return fetchAPI("/api/cache/warm", { method: "POST" })
 }
 

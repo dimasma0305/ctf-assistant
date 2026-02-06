@@ -31,7 +31,7 @@ import { SearchLeaderboard } from "@/components/search-leaderboard"
 import { useScoreboard } from "@/hooks/useAPI"
 import type { LeaderboardEntry, Achievement } from "@/lib/types"
 import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/utils"
-import { ScoreDisplay, formatScore } from "@/components/score-display"
+import { ScoreDisplay } from "@/components/score-display"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -393,7 +393,7 @@ const UserProfileContent = ({ user, leaderboardTotal }: { user: LeaderboardEntry
 
 export function LeaderboardTable() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const pageSize = 10
   const [selectedCtf, setSelectedCtf] = useState<string>("global")
   const [selectedUsers, setSelectedUsers] = useState<Map<string, LeaderboardEntry>>(new Map())
   const [timePeriod, setTimePeriod] = useState<string>(() => {

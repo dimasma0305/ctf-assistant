@@ -20,6 +20,7 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
   const [showPendingOverlay, setShowPendingOverlay] = useState(true)
   
   const displayName = certificateData?.userInfo?.displayName || certificateData?.userInfo?.username || "User"
+  const debugMetadata = certificateData?.metadata as { debug?: unknown } | undefined
 
   // Debug logging
   console.log('CertificateGenerator Debug:', {
@@ -28,7 +29,7 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
     error,
     certificateData,
     certificatesCount: certificateData?.certificates?.length || 0,
-    debug: (certificateData?.metadata as any)?.debug
+    debug: debugMetadata?.debug
   })
 
   const getRankIcon = (rank: number) => {

@@ -20,18 +20,18 @@ export interface Achievement {
 }
 
 export interface GlobalCheckParams {
-  userProfile: any;
+  userProfile: unknown;
   userRank: number;
   totalUsers: number;
-  globalStats: any;
+  globalStats: unknown;
   allCategories: Set<string>;
 }
 
 export interface CTFCheckParams {
-  userProfile: any;
+  userProfile: unknown;
   userRank: number;
   totalUsers: number;
-  ctfStats: any;
+  ctfStats: unknown;
   allCategories: Set<string>;
   ctfTitle?: string;
 }
@@ -1017,7 +1017,7 @@ export const ACHIEVEMENTS_BY_CATEGORY = new Map<string, Set<string>>(
 /**
  * Cache for expensive computations
  */
-const computationCache = new Map<string, any>();
+const computationCache = new Map<string, unknown>();
 
 /**
  * Optimized helper function to get achievement by ID with dynamic properties
@@ -1036,7 +1036,7 @@ export function getAchievement(id: string, overrides: Partial<Achievement> = {})
   
   // Create cache key for this specific override combination
   const overrideKey = `${id}:${JSON.stringify(overrides)}`;
-  let cachedResult = computationCache.get(overrideKey);
+  let cachedResult = computationCache.get(overrideKey) as Achievement | undefined;
   
   if (!cachedResult) {
     cachedResult = Object.freeze({
@@ -1082,7 +1082,7 @@ export function getAchievementsByCategory(category: Achievement['category']): Ac
 export function getUnlockedAchievementsWithHierarchy(achievementIds: string[]): Set<string> {
   // Create cache key for this specific combination
   const cacheKey = `hierarchy:${achievementIds.sort().join(',')}`;
-  let cachedResult = computationCache.get(cacheKey);
+  const cachedResult = computationCache.get(cacheKey) as string[] | undefined;
   
   if (cachedResult) {
     return new Set(cachedResult); // Return a new Set to prevent mutations

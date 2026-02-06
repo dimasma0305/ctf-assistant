@@ -336,7 +336,9 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
                 ) : (
                   <div className="p-6 text-center text-muted-foreground">
                     <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p className="text-lg font-medium">No players found matching "{searchInput}"</p>
+                    <p className="text-lg font-medium">
+                      No players found matching &quot;{searchInput}&quot;
+                    </p>
                     <p className="text-sm mt-1">Try a different search term</p>
                   </div>
                 )}

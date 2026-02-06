@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avata
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Calendar, Users, Trophy, ExternalLink, Search, MapPin, AlertCircle, Target } from "lucide-react"
 import { useCTFs, useCTFDetails } from "@/hooks/useAPI"
+import type { CTFResponse, CTFsParams } from "@/lib/types"
 
 function CTFDetailsWindow({
   windowId,
@@ -20,7 +21,7 @@ function CTFDetailsWindow({
 }: {
   windowId: string
   ctfId: string
-  ctf: any
+  ctf: CTFResponse
   onClose: () => void
 }) {
   const { data: ctfDetails, loading: detailLoading, error: detailError } = useCTFDetails(ctfId)
@@ -32,6 +33,9 @@ function CTFDetailsWindow({
       isOpen={true}
       defaultSize={{ width: 1000, height: 700 }}
       minSize={{ width: 320, height: 400 }}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
     >
       <div className="flex flex-col h-full">
         {detailLoading ? (
@@ -214,9 +218,9 @@ function CTFDetailsWindow({
 }
 
 export function CTFList() {
-  const [selectedCTFs, setSelectedCTFs] = useState<Map<string, { ctfId: string; ctf: any }>>(new Map())
+  const [selectedCTFs, setSelectedCTFs] = useState<Map<string, { ctfId: string; ctf: CTFResponse }>>(new Map())
   const [searchInput, setSearchInput] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<"all" | NonNullable<CTFsParams["status"]>>("all")
   const [formatFilter, setFormatFilter] = useState<string>("all")
   const [offset, setOffset] = useState(0)
   const limit = 20
@@ -247,7 +251,7 @@ export function CTFList() {
         limit,
         offset: 0,
         q: searchInput.trim() ? searchInput.trim() : undefined,
-        status: statusFilter === "all" ? undefined : (statusFilter as any),
+        status: statusFilter === "all" ? undefined : statusFilter,
         format: formatFilter === "all" ? undefined : formatFilter,
       })
     }, 400)
@@ -275,10 +279,6 @@ export function CTFList() {
 
     setSelectedCTFs((prev) => new Map(prev.set(windowId, { ctfId, ctf })))
     openWindow(windowId, windowTitle)
-  }
-
-  const handleCloseModal = () => {
-    setSelectedCTFs(new Map())
   }
 
   const getStatusColor = (status: string) => {

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -14,7 +13,6 @@ import Image from "next/image"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("leaderboard")
-  const router = useRouter()
 
   useEffect(() => {
     const handleHashChange = () => {
