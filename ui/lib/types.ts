@@ -137,6 +137,7 @@ export interface CTFProfileResponse {
   }
   ctfRank: number
   totalParticipants: number
+  ctftimeParticipants: number
   percentile: number
   stats: {
     score: number

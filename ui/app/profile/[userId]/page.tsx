@@ -32,7 +32,7 @@ function CTFSolveList({ userId, ctfId, enabled }: { userId: string; ctfId: strin
   }
 
   const solves = data?.allSolves ?? []
-  const totalParticipants = data?.totalParticipants ?? 0
+  const ctftimeParticipants = data?.ctftimeParticipants ?? 0
   if (solves.length === 0) {
     return <div className="text-sm text-muted-foreground py-2">No solves found for this CTF.</div>
   }
@@ -42,12 +42,13 @@ function CTFSolveList({ userId, ctfId, enabled }: { userId: string; ctfId: strin
       <div className="text-xs text-muted-foreground flex items-center gap-2">
         <Users className="w-3.5 h-3.5" />
         <span>
-          Showing solves with community context: <span className="font-medium">{totalParticipants || "?"}</span> participants
+          Showing solve rate vs CTFtime participants:{" "}
+          <span className="font-medium">{ctftimeParticipants || "?"}</span>
         </span>
       </div>
       {solves.map((solve: UserSolve, idx: number) => {
         const solvers = solve.solves ?? 0
-        const denom = totalParticipants > 0 ? totalParticipants : 0
+        const denom = ctftimeParticipants > 0 ? ctftimeParticipants : 0
         const rate = denom > 0 ? Math.min((solvers / denom) * 100, 100) : 0
 
         return (

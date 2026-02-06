@@ -8,7 +8,7 @@ import {
     generateAchievementIds     
 } from '../utils/statistics';
 import { formatErrorResponse, categoryNormalize } from '../utils/common';
-import { UserModel, solveModel } from '../../src/Database/connect';
+import { CTFCacheModel, UserModel, solveModel } from '../../src/Database/connect';
 import type { UserSchemaType, ChallengeSchemaType } from '../../src/Database/connect';
 
 const router = Router();
@@ -245,6 +245,9 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
         // Calculate user's rank within this CTF using utility function
         const { rank: userRank, totalUsers: totalParticipants, percentile } = calculateUserRank(userId, ctfUserScores);
 
+        const ctfCache = await CTFCacheModel.findOne({ ctf_id: buildCtfIdMatcher(ctfId) }, { participants: 1 }).lean();
+        const ctftimeParticipants = ctfCache?.participants ?? 0;
+
         // Calculate CTF statistics using utility function
         const ctfStats = calculateGlobalStats(ctfUserScores);
 
@@ -295,6 +298,7 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
             },
             ctfRank: userRank,
             totalParticipants,
+            ctftimeParticipants,
             percentile: percentile,
             stats: {
                 score: Math.round(userProfile.totalScore * 100) / 100,
