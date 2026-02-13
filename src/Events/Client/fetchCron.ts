@@ -6,10 +6,18 @@ import { FetchCommandModel, WeightRetryModel, ChallengeModel } from "../../Datab
 import { parseChallenges, updateThreadsStatus } from "../../Commands/Public/Solve/utils";
 import { infoEvent } from "../../Functions/ctftime-v2";
 
+let fetchCronInitialized = false;
+
 export const event: Event = {
     name: "clientReady",
     once: true,
     async execute(client: MyClient) {
+        if (fetchCronInitialized) {
+            console.log("Fetch cron already initialized, skipping duplicate registration.");
+            return;
+        }
+        fetchCronInitialized = true;
+
         console.log("Loading fetch cron jobs...");
         
         // Function to execute fetch commands and update challenges

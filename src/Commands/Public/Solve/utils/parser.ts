@@ -6,6 +6,113 @@ import path from 'path';
 
 export * from './parsers/types';
 
+type UpdateThreadsResult = {
+    updatedMessages: number;
+    createdThreads: number;
+    errors: string[];
+    skippedThreads: number;
+};
+
+// Serialize update runs per channel+ctf to avoid duplicate thread/message creation
+const threadUpdateQueues = new Map<string, Promise<UpdateThreadsResult>>();
+const threadInfoMessageCache = new Map<string, string>();
+
+function isChallengeInfoMessage(message: Message, challengeId: string | number): boolean {
+    return message.content.includes(`*Challenge ID: ${challengeId}*`);
+}
+
+async function findBotChallengeInfoMessage(
+    thread: any,
+    botUserId: string,
+    challengeId: string | number
+): Promise<Message | null> {
+    const cachedId = threadInfoMessageCache.get(thread.id);
+    if (cachedId) {
+        try {
+            const cachedMessage = await thread.messages.fetch(cachedId);
+            if (cachedMessage.author.id === botUserId && isChallengeInfoMessage(cachedMessage, challengeId)) {
+                return cachedMessage;
+            }
+        } catch (_error) {
+            // Cache might be stale (message deleted), fall through to re-scan.
+        }
+        threadInfoMessageCache.delete(thread.id);
+    }
+
+    // Scan from oldest to newest so we can keep the earliest challenge info message.
+    let afterId = thread.id;
+    let scannedCount = 0;
+    const MAX_SCAN = 500;
+    let oldestMatch: Message | null = null;
+
+    while (scannedCount < MAX_SCAN) {
+        const batch = await thread.messages.fetch({
+            limit: 100,
+            after: afterId
+        });
+
+        if (batch.size === 0) {
+            break;
+        }
+
+        const ordered = Array.from(batch.values()).sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+        for (const message of ordered) {
+            if (message.author.id === botUserId && isChallengeInfoMessage(message, challengeId)) {
+                oldestMatch = message;
+                break;
+            }
+        }
+
+        if (oldestMatch) {
+            break;
+        }
+
+        scannedCount += ordered.length;
+        afterId = ordered[ordered.length - 1].id;
+    }
+
+    if (oldestMatch) {
+        threadInfoMessageCache.set(thread.id, oldestMatch.id);
+        return oldestMatch;
+    }
+
+    return null;
+}
+
+async function findAllBotChallengeInfoMessages(
+    thread: any,
+    botUserId: string,
+    challengeId: string | number
+): Promise<Message[]> {
+    let afterId = thread.id;
+    let scannedCount = 0;
+    const MAX_SCAN = 500;
+    const matches: Message[] = [];
+
+    while (scannedCount < MAX_SCAN) {
+        const batch = await thread.messages.fetch({
+            limit: 100,
+            after: afterId
+        });
+
+        if (batch.size === 0) {
+            break;
+        }
+
+        const ordered = Array.from(batch.values()).sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+        for (const message of ordered) {
+            if (message.author.id === botUserId && isChallengeInfoMessage(message, challengeId)) {
+                matches.push(message);
+            }
+        }
+
+        scannedCount += ordered.length;
+        afterId = ordered[ordered.length - 1].id;
+    }
+
+    return matches.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+}
+
 /**
  * Check if a challenge is solved by querying the solve schema
  * @param challengeName - The name of the challenge to check
@@ -118,7 +225,34 @@ export async function parseChallenges(jsonData: string): Promise<ParsedChallenge
 }
 
 // Update thread status based on solved challenges
-export async function updateThreadsStatus(challenges: ParsedChallenge[], channel: TextChannel, ctfId: number) {
+export async function updateThreadsStatus(challenges: ParsedChallenge[], channel: TextChannel, ctfId: number): Promise<UpdateThreadsResult> {
+    const queueKey = `${channel.id}:${ctfId}`;
+    const previousRun = threadUpdateQueues.get(queueKey) || Promise.resolve({
+        updatedMessages: 0,
+        createdThreads: 0,
+        errors: [],
+        skippedThreads: 0
+    });
+
+    const nextRun = previousRun
+        .catch(() => ({
+            updatedMessages: 0,
+            createdThreads: 0,
+            errors: [],
+            skippedThreads: 0
+        }))
+        .then(() => runThreadStatusUpdate(challenges, channel, ctfId))
+        .finally(() => {
+            if (threadUpdateQueues.get(queueKey) === nextRun) {
+                threadUpdateQueues.delete(queueKey);
+            }
+        });
+
+    threadUpdateQueues.set(queueKey, nextRun);
+    return nextRun;
+}
+
+async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: TextChannel, ctfId: number): Promise<UpdateThreadsResult> {
     try {
         // Get all solved challenges for this CTF using the solve schema (more reliable than challenge.is_solved)
         // This directly queries the solve schema to determine which challenges have been solved
@@ -186,6 +320,18 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
 
                 // If thread doesn't exist, create it
                 if (!existingThread) {
+                    // Re-check channel state right before create to reduce cross-run race duplication.
+                    const latestThreads = await channel.threads.fetch();
+                    const latestMatches = Array.from(latestThreads.threads.values()).filter(
+                        (t: any) => t.name.replace(/^[✅❌]\s*/, '') === expectedName
+                    );
+                    if (latestMatches.length > 0) {
+                        existingThread = latestMatches.sort((a: any, b: any) => a.createdTimestamp! - b.createdTimestamp!)[0];
+                        skippedThreads++;
+                    }
+                }
+
+                if (!existingThread) {
                     existingThread = await channel.threads.create({
                         name: threadName,
                         autoArchiveDuration: 10080, // 7 days
@@ -205,26 +351,6 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                     await existingThread.setName(threadName);
                     console.log(`Updated thread name from ${existingThread.name} to ${threadName}`);
                 }
-
-                // Handle the challenge info message
-                let starterId = existingThread.id;
-                try {
-                    const starter = await existingThread.fetchStarterMessage();
-                    if (starter) {
-                        starterId = starter.id;
-                    }
-                } catch (e) {
-                    // Ignore errors fetching starter message (e.g. if it was deleted)
-                }
-
-                // Fetch oldest messages (after the starter ID)
-                const messages = await existingThread.messages.fetch({
-                    limit: 5,
-                    after: starterId,
-                });
-                
-                // Find the first message sent by us
-                const botMessage = messages.find((m: Message) => m.author.id === channel.client.user.id);
 
                 // Create updated challenge info
                 const solveStatus = isSolved ? '🎉 **SOLVED!** 🎉' : '🔍 **Unsolved**';
@@ -273,19 +399,40 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                     ...baseMessageParts.slice(6) // Everything after tags
                 ].filter(line => line !== '').join('\n');
 
-                if (botMessage) {
-                    // Check if the message content needs updating
-                    if (botMessage.content !== challengeInfo) {
+                const botMessage = await findBotChallengeInfoMessage(existingThread, channel.client.user.id, challenge.id);
+                const allBotMessages = await findAllBotChallengeInfoMessages(existingThread, channel.client.user.id, challenge.id);
+                let primaryBotMessage = botMessage;
+
+                if (allBotMessages.length > 1) {
+                    const [primaryMessage, ...duplicateMessages] = allBotMessages;
+                    primaryBotMessage = primaryMessage;
+                    threadInfoMessageCache.set(existingThread.id, primaryMessage.id);
+                    for (const duplicateMessage of duplicateMessages) {
                         try {
-                            if (botMessage.editable) {
+                            await duplicateMessage.delete();
+                            console.log(`Deleted duplicate challenge info message ${duplicateMessage.id} in thread: ${existingThread.name}`);
+                        } catch (deleteError) {
+                            console.warn(`Failed to delete duplicate challenge info message ${duplicateMessage.id}:`, deleteError);
+                        }
+                    }
+                } else if (!primaryBotMessage && allBotMessages.length === 1) {
+                    primaryBotMessage = allBotMessages[0];
+                    threadInfoMessageCache.set(existingThread.id, allBotMessages[0].id);
+                }
+
+                if (primaryBotMessage) {
+                    // Check if the message content needs updating
+                    if (primaryBotMessage.content !== challengeInfo) {
+                        try {
+                            if (primaryBotMessage.editable) {
                                 // Check if the message is a system message (e.g. thread starter message if it was a system message)
                                 // System messages (type !== 0) cannot be edited
-                                if (botMessage.type === 0 || botMessage.type === 19) { // 0: Default, 19: Reply
-                                    await botMessage.edit(challengeInfo);
+                                if (primaryBotMessage.type === 0 || primaryBotMessage.type === 19) { // 0: Default, 19: Reply
+                                    await primaryBotMessage.edit(challengeInfo);
                                     updatedMessages++;
                                     console.log(`Updated bot message in thread: ${existingThread.name}`);
                                 } else {
-                                    console.warn(`Found bot message in ${existingThread.name} but it is a system message (type ${botMessage.type}). Creating new message.`);
+                                    console.warn(`Found bot message in ${existingThread.name} but it is a system message (type ${primaryBotMessage.type}). Creating new message.`);
                                     await existingThread.send(challengeInfo);
                                     updatedMessages++;
                                 }
@@ -307,7 +454,8 @@ export async function updateThreadsStatus(challenges: ParsedChallenge[], channel
                     }
                 } else {
                     // No bot message exists, create one
-                    await existingThread.send(challengeInfo);
+                    const createdMessage = await existingThread.send(challengeInfo);
+                    threadInfoMessageCache.set(existingThread.id, createdMessage.id);
                     updatedMessages++;
                     console.log(`Created first message in thread: ${existingThread.name}`);
                 }
