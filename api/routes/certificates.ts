@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { getCachedUserScores, calculateMonthlyRanks } from '../services/dataService';
 import { calculateUserRank, calculateGlobalStats } from '../utils/statistics';
 import { formatErrorResponse } from '../utils/common';
+import { UserModel, solveModel } from '../../src/Database/connect';
 
 const router = Router();
 
@@ -73,18 +74,34 @@ router.get("/:userId", async (req, res) => {
 
         certificates.push(yearlyCertificate);
 
-        // Generate monthly certificates using the proper scoring system
-        // We need to check the user's recent solves to determine which months have activity
-        const userSolves = userProfile.recentSolves || [];
-        const monthsWithActivity = new Set();
-        
-        // Extract months from user's solves
-        userSolves.forEach(solve => {
-            const solveDate = new Date(solve.solved_at);
-            const year = solveDate.getFullYear();
-            const month = solveDate.getMonth() + 1; // getMonth() returns 0-11, we want 1-12
-            monthsWithActivity.add(`${year}-${month.toString().padStart(2, "0")}`);
-        });
+        // Generate monthly certificates using the proper scoring system.
+        // IMPORTANT: userProfile.recentSolves is a small capped window; it is not reliable
+        // for discovering all months with activity. Query solves for this user instead.
+        const monthsWithActivity = new Set<string>();
+        let userSolvesCount = 0;
+        const userDoc = await UserModel.findOne({ discord_id: userId }, { _id: 1 }).lean();
+        if (userDoc) {
+            const monthAgg = await solveModel.aggregate([
+                { $match: { users: userDoc._id } },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$solved_at" },
+                            month: { $month: "$solved_at" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                }
+            ]);
+
+            for (const row of monthAgg as any[]) {
+                const year = Number(row?._id?.year);
+                const month = Number(row?._id?.month);
+                if (!Number.isFinite(year) || !Number.isFinite(month)) continue;
+                monthsWithActivity.add(`${year}-${String(month).padStart(2, "0")}`);
+                userSolvesCount += Number(row.count || 0);
+            }
+        }
         
         // Only generate certificates for months with actual activity
         for (const monthKey of monthsWithActivity) {
@@ -168,7 +185,7 @@ router.get("/:userId", async (req, res) => {
                     currentMonth,
                     certificatesGenerated: certificates.length,
                     monthlyCertificates: certificates.filter(c => c.type === "monthly").length,
-                    userSolvesCount: userSolves.length,
+                    userSolvesCount,
                     monthsWithActivity: Array.from(monthsWithActivity),
                     totalUserScore: Math.round(userProfile.totalScore * 100) / 100,
                     globalRank: userRank,

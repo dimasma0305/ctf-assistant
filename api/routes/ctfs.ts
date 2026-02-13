@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { CTFCacheModel, solveModel } from "../../src/Database/connect";
 import { getCachedUserScores } from '../services/dataService';
 import { getCTFParticipationMap } from '../services/ctfParticipation';
-import { escapeRegex } from '../utils/common';
+import { categoryNormalize, escapeRegex } from '../utils/common';
 
 const router = Router();
 
@@ -373,8 +373,17 @@ router.get("/:ctfId", async (req, res) => {
             return;
         }
 
+        const buildCtfIdMatcher = (value: string) => {
+            const asNumber = Number(value);
+            if (Number.isFinite(asNumber)) {
+                return { $in: [value, asNumber] };
+            }
+            return value;
+        };
+        const ctfIdMatcher = buildCtfIdMatcher(ctfId);
+
         // Get CTF from cache
-        const ctf = await CTFCacheModel.findOne({ ctf_id: ctfId }).lean();
+        const ctf = await CTFCacheModel.findOne({ ctf_id: ctfIdMatcher }).lean();
         
         if (!ctf) {
             res.status(404).json({
@@ -384,49 +393,51 @@ router.get("/:ctfId", async (req, res) => {
             return;
         }
 
-        // Get detailed participation data for this CTF
-        const participationData = await solveModel.aggregate([
-            { $match: { ctf_id: ctfId } },
-            {
-                $unwind: "$users"
-            },
-            {
-                $group: {
-                    _id: "$ctf_id",
-                    totalSolves: { $sum: 1 },
-                    uniqueUsers: { $addToSet: "$users" },
-                    categories: { $addToSet: "$category" },
-                    challenges: { $addToSet: "$challenge" },
-                    firstSolve: { $min: "$solved_at" },
-                    lastSolve: { $max: "$solved_at" },
-                    solves: { $push: "$$ROOT" }
-                }
-            },
-            {
-                $project: {
-                    totalSolves: 1,
-                    participantCount: { $size: "$uniqueUsers" },
-                    categoryCount: { $size: "$categories" },
-                    challengeCount: { $size: "$challenges" },
-                    categories: 1,
-                    challenges: 1,
-                    firstSolve: 1,
-                    lastSolve: 1,
-                    solves: 1
-                }
-            }
-        ]);
+        // Get detailed participation stats for this CTF.
+        // Note: Solve docs store challenge metadata via challenge_ref, not inline fields,
+        // so use populate + JS aggregation for correctness.
+        const solves = await solveModel
+            .find({ ctf_id: ctfIdMatcher })
+            .populate('challenge_ref', 'name category')
+            .lean();
 
-        const participation = participationData[0] || {
-            totalSolves: 0,
-            participantCount: 0,
-            categoryCount: 0,
-            challengeCount: 0,
-            categories: [],
-            challenges: [],
-            firstSolve: null,
-            lastSolve: null,
-            solves: []
+        const uniqueParticipants = new Set<string>();
+        const categories = new Set<string>();
+        const challenges = new Set<string>();
+        let totalSolves = 0; // count "user-solves" (solve entry * number of users)
+        let firstSolve: Date | null = null;
+        let lastSolve: Date | null = null;
+
+        for (const solve of solves as any[]) {
+            const users = Array.isArray(solve.users) ? solve.users : [];
+            totalSolves += users.length;
+
+            for (const u of users) {
+                uniqueParticipants.add(u.toString());
+            }
+
+            const solvedAt = solve.solved_at ? new Date(solve.solved_at) : null;
+            if (solvedAt) {
+                if (!firstSolve || solvedAt < firstSolve) firstSolve = solvedAt;
+                if (!lastSolve || solvedAt > lastSolve) lastSolve = solvedAt;
+            }
+
+            const ch = solve.challenge_ref;
+            if (ch) {
+                if (ch.name) challenges.add(String(ch.name));
+                if (ch.category) categories.add(categoryNormalize(String(ch.category)));
+            }
+        }
+
+        const participation = {
+            totalSolves,
+            participantCount: uniqueParticipants.size,
+            categoryCount: categories.size,
+            challengeCount: challenges.size,
+            categories: Array.from(categories),
+            challenges: Array.from(challenges),
+            firstSolve,
+            lastSolve,
         };
 
         // Calculate CTF status
@@ -439,7 +450,7 @@ router.get("/:ctfId", async (req, res) => {
         else if (finish >= now) ctfStatus = 'active';
 
         // Get top performers for this CTF
-        const topPerformers = await getCachedUserScores({ ctf_id: ctfId });
+        const topPerformers = await getCachedUserScores({ ctf_id: ctfIdMatcher }, undefined, false);
         const leaderboard = Array.from(topPerformers.values())
             .sort((a, b) => b.totalScore - a.totalScore)
             .slice(0, 10)
