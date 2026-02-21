@@ -17,6 +17,19 @@ type UpdateThreadsResult = {
 const threadUpdateQueues = new Map<string, Promise<UpdateThreadsResult>>();
 const threadInfoMessageCache = new Map<string, string>();
 
+export function normalizeThreadLookupKey(value: string): string {
+    return value
+        .normalize('NFKC')
+        // Remove invisible/formatting chars that frequently create "same-looking" duplicates:
+        // - C0/C1 control and format characters (includes zero-width chars)
+        // - variation selectors (basic + supplementary plane)
+        // - Unicode tag characters U+E0000-U+E007F
+        .replace(/[\p{Cc}\p{Cf}\uFE00-\uFE0F\u{E0100}-\u{E01EF}\u{E0000}-\u{E007F}]/gu, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLocaleLowerCase('en-US');
+}
+
 function isChallengeInfoMessage(message: Message, challengeId: string | number): boolean {
     return message.content.includes(`*Challenge ID: ${challengeId}*`);
 }
@@ -257,7 +270,7 @@ async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: Tex
         // Get all solved challenges for this CTF using the solve schema (more reliable than challenge.is_solved)
         // This directly queries the solve schema to determine which challenges have been solved
         const solvedChallengeNames = await getSolvedChallenges(ctfId.toString());
-        const solvedChallenges = new Set(solvedChallengeNames.map(name => name.toLowerCase()));
+        const solvedChallenges = new Set(solvedChallengeNames.map(name => normalizeThreadLookupKey(name)));
 
         let updatedMessages = 0;
         let createdThreads = 0;
@@ -272,23 +285,25 @@ async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: Tex
         const threadMap = new Map<string, any>();
         for (const [_, thread] of activeThreads.threads) {
             const threadNameWithoutPrefix = thread.name.replace(/^[✅❌]\s*/, '');
-            if (!threadMap.has(threadNameWithoutPrefix)) {
-                threadMap.set(threadNameWithoutPrefix, []);
+            const lookupKey = normalizeThreadLookupKey(threadNameWithoutPrefix);
+            if (!threadMap.has(lookupKey)) {
+                threadMap.set(lookupKey, []);
             }
-            threadMap.get(threadNameWithoutPrefix)!.push(thread);
+            threadMap.get(lookupKey)!.push(thread);
         }
 
         for (const challenge of challenges) {
             try {
                 // Check if challenge is solved using the solve schema (more reliable than challenge.is_solved)
-                const isSolved = solvedChallenges.has(challenge.name.toLowerCase());
+                const isSolved = solvedChallenges.has(normalizeThreadLookupKey(challenge.name));
                 const category = challenge.category.toUpperCase();
                 const expectedName = `[${category}] ${challenge.name}`;
+                const expectedNameLookupKey = normalizeThreadLookupKey(expectedName);
                 const threadPrefix = isSolved ? '✅' : '❌';
                 const threadName = `${threadPrefix} ${expectedName}`;
 
                 // Check our local map for existing threads
-                const matchingThreads = threadMap.get(expectedName) || [];
+                const matchingThreads = threadMap.get(expectedNameLookupKey) || [];
 
                 let existingThread = null;
 
@@ -313,7 +328,7 @@ async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: Tex
                     }
                     
                     // Update the map to only keep the oldest thread
-                    threadMap.set(expectedName, [existingThread]);
+                    threadMap.set(expectedNameLookupKey, [existingThread]);
                 } else if (matchingThreads.length === 1) {
                     existingThread = matchingThreads[0];
                 }
@@ -323,7 +338,7 @@ async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: Tex
                     // Re-check channel state right before create to reduce cross-run race duplication.
                     const latestThreads = await channel.threads.fetch();
                     const latestMatches = Array.from(latestThreads.threads.values()).filter(
-                        (t: any) => t.name.replace(/^[✅❌]\s*/, '') === expectedName
+                        (t: any) => normalizeThreadLookupKey(t.name.replace(/^[✅❌]\s*/, '')) === expectedNameLookupKey
                     );
                     if (latestMatches.length > 0) {
                         existingThread = latestMatches.sort((a: any, b: any) => a.createdTimestamp! - b.createdTimestamp!)[0];
@@ -341,7 +356,7 @@ async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: Tex
                     console.log(`Created new thread: ${threadName}`);
                     
                     // Add to our local map to prevent duplicate creation in this session
-                    threadMap.set(expectedName, [existingThread]);
+                    threadMap.set(expectedNameLookupKey, [existingThread]);
                 } else {
                     skippedThreads++;
                 }
