@@ -44,27 +44,7 @@ interface CategoryStat {
   percentile?: number
 }
 
-const canonicalizeTimePeriod = (period: string) => {
-  const now = new Date()
-  const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
-  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-  const lastMonth = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`
-
-  switch (period) {
-    case "leaderboard":
-      return "all-time"
-    case "this-month":
-      return `month-${thisMonth}`
-    case "last-month":
-      return `month-${lastMonth}`
-    case "this-year":
-      return `year-${now.getFullYear()}`
-    case "last-year":
-      return `year-${now.getFullYear() - 1}`
-    default:
-      return period
-  }
-}
+// Helpers originally here have been refactored inside the component scope
 
 
 
@@ -94,33 +74,7 @@ const formatTimeAgo = (dateString: string) => {
   }
 }
 
-const getTimeParams = (period: string) => {
-  if (period.startsWith("month-")) {
-    const monthValue = period.replace("month-", "")
-    return { month: monthValue, year: undefined }
-  } else if (period.startsWith("year-")) {
-    const yearValue = Number.parseInt(period.replace("year-", ""))
-    return { year: yearValue, month: undefined }
-  }
-
-  const now = new Date()
-  switch (period) {
-    case "this-month":
-      return { month: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`, year: undefined }
-    case "last-month":
-      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-      return {
-        month: `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}`,
-        year: undefined,
-      }
-    case "this-year":
-      return { year: now.getFullYear(), month: undefined }
-    case "last-year":
-      return { year: now.getFullYear() - 1, month: undefined }
-    default:
-      return { month: undefined, year: undefined }
-  }
-}
+// Helpers originally here have been refactored inside the component scope
 
 const UserProfileContent = ({ user, leaderboardTotal }: { user: LeaderboardEntry; leaderboardTotal: number }) => {
   const [selectedTab, setSelectedTab] = useState("overview")
@@ -424,11 +378,65 @@ export function LeaderboardTable() {
   const pageSize = 10
   const [selectedCtf, setSelectedCtf] = useState<string>("global")
   const [selectedUsers, setSelectedUsers] = useState<Map<string, LeaderboardEntry>>(new Map())
-  const [timePeriod, setTimePeriod] = useState<string>(() => {
+
+  // Memoize the "now" values so they are stable across renders
+  const today = useMemo(() => {
     const now = new Date()
-    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
-    return `month-${month}`
-  })
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+    const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const lastMonth = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`
+    const thisYear = now.getFullYear()
+    const lastYear = now.getFullYear() - 1
+    return { now, thisMonth, lastMonth, thisYear, lastYear }
+  }, [])
+
+  const canonicalizeTimePeriod = useCallback(
+    (period: string) => {
+      switch (period) {
+        case "leaderboard":
+          return "all-time"
+        case "this-month":
+          return `month-${today.thisMonth}`
+        case "last-month":
+          return `month-${today.lastMonth}`
+        case "this-year":
+          return `year-${today.thisYear}`
+        case "last-year":
+          return `year-${today.lastYear}`
+        default:
+          return period
+      }
+    },
+    [today],
+  )
+
+  const getTimeParams = useCallback(
+    (period: string) => {
+      if (period.startsWith("month-")) {
+        const monthValue = period.replace("month-", "")
+        return { month: monthValue, year: undefined }
+      } else if (period.startsWith("year-")) {
+        const yearValue = Number.parseInt(period.replace("year-", ""))
+        return { year: yearValue, month: undefined }
+      }
+
+      switch (period) {
+        case "this-month":
+          return { month: today.thisMonth, year: undefined }
+        case "last-month":
+          return { month: today.lastMonth, year: undefined }
+        case "this-year":
+          return { year: today.thisYear, month: undefined }
+        case "last-year":
+          return { year: today.lastYear, month: undefined }
+        default:
+          return { month: undefined, year: undefined }
+      }
+    },
+    [today],
+  )
+
+  const [timePeriod, setTimePeriod] = useState<string>(() => `month-${today.thisMonth}`)
 
   const { openWindow, windows } = useWindow()
 

@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Explicitly tell Tailwind v4 where to scan for utility classes */
+@source "../app";
+@source "../components";
+@source "../lib";
+@source "../hooks";
+
 @custom-variant dark (&:is(.dark *));
 
 /* 
@@ -227,7 +233,7 @@
   }
 
   .bento-card:hover {
-    @apply border-white/10 shadow-[0_10px_40px_-10px_rgba(0, 0, 0, 0.5)];
+    @apply border-white/10 shadow-xl shadow-black/50;
     transform: translateY(-2px);
   }
 

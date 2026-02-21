@@ -108,34 +108,50 @@ export default function Dashboard() {
         {/* Main Content */}
         <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-10 flex-grow">
           <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-5 sm:gap-6 mb-8 sm:mb-12 auto-rows-[160px]">
-            <Card className="bento-card col-span-1 md:col-span-2 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-primary/40">
-              <div className="frosted-noise" />
-              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -translate-y-10 translate-x-10 group-hover:bg-primary/30 transition-colors duration-700" />
+            <Card
+              className="bento-card col-span-1 md:col-span-2 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-primary/40"
+              role="region"
+              aria-label="Total Players Statistics"
+            >
+              <div className="frosted-noise" aria-hidden="true" />
+              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -translate-y-10 translate-x-10 group-hover:bg-primary/30 transition-colors duration-700 pointer-events-none" aria-hidden="true" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">Total Players</CardTitle>
+                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]" id="total-players-title">Total Players</CardTitle>
                 <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 group-hover:neon-glow-primary transition-all duration-300">
                   <Users className="h-5 w-5 text-primary" />
                 </div>
               </CardHeader>
               <CardContent className="relative z-10 flex flex-col justify-end h-[calc(100%-70px)]">
-                <div className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-1 drop-shadow-lg">
+                <div
+                  className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-1 drop-shadow-lg"
+                  aria-labelledby="total-players-title"
+                  aria-live="polite"
+                >
                   {stats.totalUsers.toLocaleString() || "—"}
                 </div>
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground opacity-80">Active community members</p>
               </CardContent>
             </Card>
 
-            <Card className="bento-card col-span-1 md:col-span-2 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-chart-3/40">
-              <div className="frosted-noise" />
-              <div className="absolute bottom-0 right-0 w-48 h-48 bg-chart-3/10 rounded-full blur-3xl translate-y-10 translate-x-10 group-hover:bg-chart-3/30 transition-colors duration-700" />
+            <Card
+              className="bento-card col-span-1 md:col-span-2 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-chart-3/40"
+              role="region"
+              aria-label="CTF Events Statistics"
+            >
+              <div className="frosted-noise" aria-hidden="true" />
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-chart-3/10 rounded-full blur-3xl translate-y-10 translate-x-10 group-hover:bg-chart-3/30 transition-colors duration-700 pointer-events-none" aria-hidden="true" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">CTF Events</CardTitle>
+                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]" id="ctf-events-title">CTF Events</CardTitle>
                 <div className="p-3 bg-chart-3/10 rounded-2xl border border-chart-3/20 group-hover:shadow-[0_0_20px_-5px_var(--chart-3)] transition-all duration-300">
                   <Target className="h-5 w-5 text-chart-3" />
                 </div>
               </CardHeader>
               <CardContent className="relative z-10 flex flex-col justify-end h-[calc(100%-70px)]">
-                <div className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-chart-3 to-chart-4 mb-1 drop-shadow-lg">
+                <div
+                  className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-chart-3 to-chart-4 mb-1 drop-shadow-lg"
+                  aria-labelledby="ctf-events-title"
+                  aria-live="polite"
+                >
                   {stats.totalCTFs || "—"}
                 </div>
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground opacity-80">
@@ -144,17 +160,25 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bento-card col-span-1 md:col-span-4 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-chart-2/40">
-              <div className="frosted-noise" />
-              <div className="absolute top-1/2 left-1/2 w-full h-full bg-chart-2/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 group-hover:bg-chart-2/20 transition-colors duration-700" />
+            <Card
+              className="bento-card col-span-1 md:col-span-4 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-chart-2/40"
+              role="region"
+              aria-label="Platform Participation Statistics"
+            >
+              <div className="frosted-noise" aria-hidden="true" />
+              <div className="absolute top-1/2 left-1/2 w-full h-full bg-chart-2/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 group-hover:bg-chart-2/20 transition-colors duration-700 pointer-events-none" aria-hidden="true" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">Participation</CardTitle>
+                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]" id="participation-title">Participation</CardTitle>
                 <div className="p-3 bg-chart-2/10 rounded-2xl border border-chart-2/20 group-hover:shadow-[0_0_20px_-5px_var(--chart-2)] transition-all duration-300">
                   <Hexagon className="h-5 w-5 text-chart-2" />
                 </div>
               </CardHeader>
               <CardContent className="relative z-10 flex flex-col justify-end h-[calc(100%-70px)]">
-                <div className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-chart-2 to-primary mb-1 drop-shadow-lg">
+                <div
+                  className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-chart-2 to-primary mb-1 drop-shadow-lg"
+                  aria-labelledby="participation-title"
+                  aria-live="polite"
+                >
                   {stats.participationCTFs || "—"}
                 </div>
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground opacity-80">CTFs with community solves</p>

@@ -17,6 +17,9 @@ import {
 } from "@/lib/actions"
 import type { ScoreboardParams, CTFsParams, CertificateResponse, SingleCertificateResponse } from "@/lib/types"
 
+// Global map to deduplicate concurrent requests for the same cacheKey
+const inFlightRequests = new Map<string, Promise<any>>()
+
 // Generic API hook
 function useAPICall<T>(
   apiCall: () => Promise<T>,
@@ -77,9 +80,30 @@ function useAPICall<T>(
             }
           }
 
-          result = await dataCache.getOrFetch(cacheKey, apiCall, ttl)
+          // Check for existing in-flight request
+          if (inFlightRequests.has(cacheKey)) {
+            result = await inFlightRequests.get(cacheKey)!
+          } else {
+            const fetchPromise = dataCache.getOrFetch(cacheKey, apiCall, ttl)
+            inFlightRequests.set(cacheKey, fetchPromise)
+            try {
+              result = await fetchPromise
+            } finally {
+              inFlightRequests.delete(cacheKey)
+            }
+          }
         } else {
-          result = await apiCall()
+          if (cacheKey) {
+            const fetchPromise = apiCall()
+            inFlightRequests.set(cacheKey, fetchPromise)
+            try {
+              result = await fetchPromise
+            } finally {
+              inFlightRequests.delete(cacheKey)
+            }
+          } else {
+            result = await apiCall()
+          }
         }
 
         if (!controller.signal.aborted) {

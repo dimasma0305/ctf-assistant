@@ -60,6 +60,33 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
     }
   }, [windows, isMouseOverWindow])
 
+  // Global Escape key handler to close the topmost window
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        const openWindows = windows.filter((w) => !w.isMinimized)
+        if (openWindows.length > 0) {
+          // Find window with highest Z-index
+          const topmostWindow = openWindows.reduce((prev, current) =>
+            (prev.zIndex > current.zIndex) ? prev : current
+          )
+          setWindows((prev) => prev.filter((w) => w.id !== topmostWindow.id))
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [windows])
+
+  // Z-Index Normalization Pass
+  useEffect(() => {
+    if (windows.length === 0 && nextZIndex > 2000) {
+      // Periodic reset when all windows are closed to prevent integer scalar bloat
+      setNextZIndex(1000)
+    }
+  }, [windows, nextZIndex])
+
   const handleWindowMouseEnter = useCallback(() => {
     mouseOverWindowRef.current = true
     setIsMouseOverWindow(true)

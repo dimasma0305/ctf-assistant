@@ -277,9 +277,13 @@ export default function UserProfilePage() {
           </header>
 
           <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-7xl flex-1">
-            <Card className="bento-card mb-8 border-l-4 border-l-primary shadow-2xl hover:border-primary/40 relative overflow-visible">
-              <div className="frosted-noise" />
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+            <Card
+              className="bento-card mb-8 border-l-4 border-l-primary shadow-2xl hover:border-primary/40 relative overflow-visible"
+              role="region"
+              aria-label="User Profile Main Card"
+            >
+              <div className="frosted-noise" aria-hidden="true" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" aria-hidden="true" />
               <CardHeader className="pb-6 bg-transparent relative z-10">
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -332,36 +336,59 @@ export default function UserProfilePage() {
                       <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors" />
                       <div className="relative z-10 flex items-center gap-2">
                         <Target className="w-4 h-4 text-primary opacity-80" />
-                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">Total Score</span>
+                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase" id="profile-total-score">Total Score</span>
                       </div>
-                      <ScoreDisplay score={profileData.stats.totalScore} className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-primary block" />
+                      <ScoreDisplay
+                        score={profileData.stats.totalScore}
+                        className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-primary block"
+                        aria-labelledby="profile-total-score"
+                        aria-live="polite"
+                      />
                     </div>
 
                     <div className="relative overflow-hidden flex flex-col justify-between p-5 bg-background/40 rounded-3xl border border-white/5 hover:border-chart-3/40 transition-colors group">
                       <div className="absolute inset-0 bg-chart-3/5 group-hover:bg-chart-3/10 transition-colors" />
                       <div className="relative z-10 flex items-center gap-2">
                         <Zap className="w-4 h-4 text-chart-3 opacity-80" />
-                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">Challenges</span>
+                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase" id="profile-challenges">Challenges</span>
                       </div>
-                      <div className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-3">{profileData.stats.solveCount}</div>
+                      <div
+                        className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-3"
+                        aria-labelledby="profile-challenges"
+                        aria-live="polite"
+                      >
+                        {profileData.stats.solveCount}
+                      </div>
                     </div>
 
                     <div className="relative overflow-hidden flex flex-col justify-between p-5 bg-background/40 rounded-3xl border border-white/5 hover:border-chart-2/40 transition-colors group">
                       <div className="absolute inset-0 bg-chart-2/5 group-hover:bg-chart-2/10 transition-colors" />
                       <div className="relative z-10 flex items-center gap-2">
                         <Trophy className="w-4 h-4 text-chart-2 opacity-80" />
-                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">CTFs</span>
+                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase" id="profile-ctfs">CTFs</span>
                       </div>
-                      <div className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-2">{profileData.stats.ctfCount}</div>
+                      <div
+                        className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-2"
+                        aria-labelledby="profile-ctfs"
+                        aria-live="polite"
+                      >
+                        {profileData.stats.ctfCount}
+                      </div>
                     </div>
 
                     <div className="relative overflow-hidden flex flex-col justify-between p-5 bg-background/40 rounded-3xl border border-white/5 hover:border-chart-4/40 transition-colors group">
                       <div className="absolute inset-0 bg-chart-4/5 group-hover:bg-chart-4/10 transition-colors" />
                       <div className="relative z-10 flex items-center gap-2">
                         <Award className="w-4 h-4 text-chart-4 opacity-80" />
-                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">Categories</span>
+                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase" id="profile-categories">Categories</span>
                       </div>
-                      <div className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-4">{profileData.stats.categoriesCount}</div>
+                      <div
+                        className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-4"
+                        aria-labelledby="profile-categories"
+                        aria-live="polite"
+                      >
+                        {profileData.stats.categoriesCount}
+                      </div>
                     </div>
                   </div>
                 </div>

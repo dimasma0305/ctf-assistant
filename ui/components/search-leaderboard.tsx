@@ -115,7 +115,7 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
               '[role="dialog"] button[aria-label="Close"], [role="dialog"] button:has(svg), .user-profile-card button:has(svg)',
             )
             if (closeButton) {
-              ;(closeButton as HTMLElement).click()
+              ; (closeButton as HTMLElement).click()
               return
             }
 
@@ -221,11 +221,10 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
       )}
 
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          isExpanded
+        className={`transition-all duration-300 ease-in-out ${isExpanded
             ? "fixed z-50 w-full max-w-2xl px-4 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
             : "relative"
-        }`}
+          }`}
         ref={searchContainerRef}
       >
         {/* Search Input */}
@@ -237,9 +236,8 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
             value={searchInput}
             onChange={(e) => handleSearchInputChange(e.target.value)}
             onFocus={!isExpanded ? handleSearchFocus : undefined}
-            className={`transition-all duration-300 ease-in-out ${
-              isExpanded ? "w-full h-12 text-lg px-4 bg-card border-2 border-primary/50 shadow-2xl" : "w-64 h-9"
-            }`}
+            className={`transition-all duration-300 ease-in-out ${isExpanded ? "w-full h-12 text-lg px-4 bg-card border-2 border-primary/50 shadow-2xl" : "w-64 h-9"
+              }`}
           />
           {isExpanded && (
             <Button
@@ -267,11 +265,10 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
         {/* Search Results */}
         {showResults && isExpanded && (
           <div
-            className={`mt-4 transition-all duration-300 ease-in-out ${
-              isExpanded ? "opacity-100 transform translate-y-0" : "opacity-0 transform -translate-y-2"
-            }`}
+            className={`absolute z-50 w-full left-0 top-full mt-2 transition-all duration-300 ease-in-out ${isExpanded ? "opacity-100 transform translate-y-0" : "opacity-0 transform -translate-y-2 pointer-events-none"
+              }`}
           >
-            <Card className="shadow-2xl border-2 border-primary/20">
+            <Card className="shadow-2xl border border-primary/20 bg-background/95 backdrop-blur-md">
               <CardContent className="p-0 max-h-96 overflow-y-auto">
                 {searchError ? (
                   <Alert variant="destructive" className="m-4">
