@@ -2,17 +2,17 @@ import type React from "react"
 import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
-import { Playfair_Display } from "next/font/google"
+import { Outfit } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { WindowProvider } from "@/components/ui/window"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
-const playfair = Playfair_Display({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-playfair",
-  weight: ["400", "700"],
+  variable: "--font-outfit",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 })
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${playfair.variable}`}>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${outfit.variable}`}>
         <WindowProvider>
           <Suspense fallback={null}>{children}</Suspense>
         </WindowProvider>

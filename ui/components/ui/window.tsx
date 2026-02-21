@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { useState, useRef, useEffect, useCallback } from "react"
 import { X, Minus, Maximize2, Minimize2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -95,10 +96,10 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
         // Center the window with a small offset for multiple windows
         const windowIndex = prev.length
         const offsetMultiplier = windowIndex * 30 // 30px offset for each additional window
-        
+
         const centerX = (screenWidth - windowWidth) / 2
         const centerY = (screenHeight - windowHeight) / 2
-        
+
         const positionX = Math.max(0, Math.min(screenWidth - windowWidth, centerX + offsetMultiplier))
         const positionY = Math.max(0, Math.min(screenHeight - windowHeight, centerY + offsetMultiplier))
 
@@ -408,6 +409,8 @@ export function Window({
     (e: React.MouseEvent | React.TouchEvent) => {
       if (isMobile || window?.isMaximized) return
 
+      e.stopPropagation()
+
       const clientX = "touches" in e && e.touches[0] ? e.touches[0].clientX : "clientX" in e ? e.clientX : 0
       const clientY = "touches" in e && e.touches[0] ? e.touches[0].clientY : "clientY" in e ? e.clientY : 0
 
@@ -558,7 +561,7 @@ export function Window({
   }
 
   if (!isMountedRef.current && window && !window.isMinimized) {
-    return (
+    const errorWindow = (
       <div
         className={cn("fixed bg-background border rounded-lg shadow-2xl flex flex-col", className)}
         style={{
@@ -616,6 +619,8 @@ export function Window({
         </div>
       </div>
     )
+    if (typeof document === "undefined") return null
+    return createPortal(errorWindow, document.body)
   }
 
   if (!isOpen) {
@@ -623,7 +628,7 @@ export function Window({
   }
 
   if (isMobile) {
-    return (
+    const mobileWindow = (
       <div
         className="fixed inset-0 z-[9998] bg-background flex flex-col"
         style={{ zIndex: window.zIndex }}
@@ -673,9 +678,11 @@ export function Window({
         </div>
       </div>
     )
+    if (typeof document === "undefined") return null
+    return createPortal(mobileWindow, document.body)
   }
 
-  return (
+  const windowContent = (
     <div
       ref={windowRef}
       className={cn(
@@ -721,6 +728,7 @@ export function Window({
         )}
         onMouseDown={handleMouseDown}
         onTouchStart={handleMouseDown}
+        onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-semibold truncate flex-1">{title}</h2>
         <div className="flex items-center gap-1">
@@ -767,7 +775,7 @@ export function Window({
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto">{children}</div>
+      <div className="flex-1 overflow-auto" onClick={(e) => e.stopPropagation()}>{children}</div>
 
       {!window?.isMaximized && (
         <div
@@ -788,4 +796,7 @@ export function Window({
       )}
     </div>
   )
+
+  if (typeof document === "undefined") return null
+  return createPortal(windowContent, document.body)
 }

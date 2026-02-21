@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Trophy, Users, Target, Activity } from "lucide-react"
+import { Trophy, Users, Target, Activity, Sparkles, Hexagon } from "lucide-react"
 import { LeaderboardTable } from "@/components/leaderboard-table"
 import { CTFList } from "@/components/ctf-list"
 import { CTFRankings } from "@/components/ctf-rankings"
@@ -36,7 +36,6 @@ export default function Dashboard() {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value)
-    // Use history.replaceState instead of direct hash manipulation to prevent page refresh
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `#${value}`)
     }
@@ -57,167 +56,205 @@ export default function Dashboard() {
   )
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg p-1">
-                <Image
-                  src="/tcp1p-logo.png"
-                  alt="TCP1P Logo"
-                  width={32}
-                  height={32}
-                  className="w-8 h-8 object-contain"
-                />
+    <div className="min-h-screen bg-background relative overflow-hidden font-sans selection:bg-primary/30 selection:text-primary">
+      {/* Ambient Background Orbs - Optimized */}
+      <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden h-screen w-screen contain-strict">
+        <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full animate-blob pointer-events-none" style={{ background: 'radial-gradient(circle, oklch(var(--primary) / 0.15) 0%, transparent 70%)' }} />
+        <div className="absolute top-[20%] right-[-10%] w-[30vw] h-[30vw] rounded-full animate-blob animation-delay-2000 pointer-events-none" style={{ background: 'radial-gradient(circle, oklch(var(--accent) / 0.15) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full animate-blob animation-delay-4000 pointer-events-none" style={{ background: 'radial-gradient(circle, oklch(var(--chart-2) / 0.15) 0%, transparent 70%)' }} />
+      </div>
+
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Header */}
+        <header className="glass-panel sticky top-0 z-50">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/80 to-accent/80 p-[1px] shadow-lg neon-glow-primary group overflow-hidden">
+                  <div className="absolute inset-0 bg-background/50 backdrop-blur-sm group-hover:bg-background/30 transition-colors z-0" />
+                  <Image
+                    src="/tcp1p-logo.png"
+                    alt="TCP1P Logo"
+                    width={36}
+                    height={36}
+                    className="w-8 h-8 object-contain relative z-10 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] group-hover:scale-110 transition-transform duration-500"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/70">
+                    TCP1P Community Scoring
+                  </h1>
+                  <p className="text-xs sm:text-sm font-medium text-primary tracking-wide flex items-center gap-1.5 hidden xs:flex">
+                    <Sparkles className="w-3 h-3 animate-pulse" /> Competitive Cybersecurity Platform
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-lg sm:text-xl font-bold font-[family-name:var(--font-playfair)] text-foreground">
-                  TCP1P Community Scoring
-                </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground hidden xs:block">
-                  Competitive Cybersecurity Platform
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="gap-1">
-                <Activity className="w-3 h-3" />
-                <span className="hidden xs:inline">Live</span>
-              </Badge>
-              {(leaderboardStale || ctfsStale) && (
-                <Badge variant="outline" className="gap-1 text-xs">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-                  <span className="hidden sm:inline">Updating</span>
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="gap-1.5 border-primary/30 bg-primary/10 text-primary backdrop-blur-md shadow-[0_0_10px_-2px_var(--primary)] px-3 py-1 text-xs">
+                  <Activity className="w-3.5 h-3.5 animate-pulse" />
+                  <span className="hidden xs:inline font-semibold">Live System</span>
                 </Badge>
-              )}
+                {(leaderboardStale || ctfsStale) && (
+                  <Badge variant="outline" className="gap-1.5 border-chart-3/30 bg-chart-3/10 text-chart-3 backdrop-blur-md px-3 py-1 text-xs">
+                    <div className="w-2 h-2 bg-chart-3 rounded-full animate-pulse shadow-[0_0_5px_currentColor]" />
+                    <span className="hidden sm:inline font-semibold">Syncing</span>
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <Card className="relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -translate-y-10 translate-x-10" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Players</CardTitle>
-              <div className="p-2 bg-primary/20 rounded-lg">
-                <Users className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl sm:text-2xl font-bold text-primary mb-1">
-                {stats.totalUsers.toLocaleString() || "—"}
-              </div>
-              <p className="text-xs text-muted-foreground">Active community members</p>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-chart-3/10 rounded-full -translate-y-10 translate-x-10" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">CTF Events</CardTitle>
-              <div className="p-2 bg-chart-3/20 rounded-lg">
-                <Target className="h-4 w-4 text-chart-3" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl sm:text-2xl font-bold text-chart-3 mb-1">{stats.totalCTFs || "—"}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.activeCTFs} active, {stats.upcomingCTFs} upcoming
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="sm:col-span-2 lg:col-span-1 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-chart-2/10 rounded-full -translate-y-10 translate-x-10" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Participation</CardTitle>
-              <div className="p-2 bg-chart-2/20 rounded-lg">
-                <Trophy className="h-4 w-4 text-chart-2" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl sm:text-2xl font-bold text-chart-2 mb-1">{stats.participationCTFs || "—"}</div>
-              <p className="text-xs text-muted-foreground">CTFs with community solves</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 sm:space-y-6">
-          <div className="w-full overflow-x-auto">
-            <TabsList className="grid w-full grid-cols-3 min-w-[300px] h-12 p-1 bg-muted/50">
-              <TabsTrigger
-                value="leaderboard"
-                className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Trophy className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Global Leaderboard</span>
-                <span className="sm:hidden">Leaderboard</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="ctfs"
-                className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Target className="w-4 h-4 mr-2" />
-                CTFs
-              </TabsTrigger>
-              <TabsTrigger
-                value="ctf-rankings"
-                className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Users className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">CTF Rankings</span>
-                <span className="sm:hidden">Rankings</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="leaderboard" className="space-y-6">
-            <Card className="border-l-4 border-l-primary">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-primary" />
-                  <CardTitle className="font-[family-name:var(--font-playfair)]">Global Leaderboard</CardTitle>
+        {/* Main Content */}
+        <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-10 flex-grow">
+          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-5 sm:gap-6 mb-8 sm:mb-12 auto-rows-[160px]">
+            <Card className="bento-card col-span-1 md:col-span-2 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-primary/40">
+              <div className="frosted-noise" />
+              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -translate-y-10 translate-x-10 group-hover:bg-primary/30 transition-colors duration-700" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">Total Players</CardTitle>
+                <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 group-hover:neon-glow-primary transition-all duration-300">
+                  <Users className="h-5 w-5 text-primary" />
                 </div>
-                <CardDescription>Top performers across all CTF competitions</CardDescription>
               </CardHeader>
-              <CardContent>{activeTab === "leaderboard" && <LeaderboardTable />}</CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="ctfs" className="space-y-6">
-            <Card className="border-l-4 border-l-chart-3">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-chart-3" />
-                  <CardTitle className="font-[family-name:var(--font-playfair)]">CTF Competitions</CardTitle>
+              <CardContent className="relative z-10 flex flex-col justify-end h-[calc(100%-70px)]">
+                <div className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-1 drop-shadow-lg">
+                  {stats.totalUsers.toLocaleString() || "—"}
                 </div>
-                <CardDescription>Browse and explore CTF competitions with community participation</CardDescription>
-              </CardHeader>
-              <CardContent>{activeTab === "ctfs" && <CTFList />}</CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="ctf-rankings" className="space-y-6">
-            <Card className="border-l-4 border-l-chart-2">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-chart-2" />
-                  <CardTitle className="font-[family-name:var(--font-playfair)]">CTF-Specific Rankings</CardTitle>
-                </div>
-                <CardDescription>Performance breakdown by individual competitions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {activeTab === "ctf-rankings" && <CTFRankings />}
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground opacity-80">Active community members</p>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
+
+            <Card className="bento-card col-span-1 md:col-span-2 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-chart-3/40">
+              <div className="frosted-noise" />
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-chart-3/10 rounded-full blur-3xl translate-y-10 translate-x-10 group-hover:bg-chart-3/30 transition-colors duration-700" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">CTF Events</CardTitle>
+                <div className="p-3 bg-chart-3/10 rounded-2xl border border-chart-3/20 group-hover:shadow-[0_0_20px_-5px_var(--chart-3)] transition-all duration-300">
+                  <Target className="h-5 w-5 text-chart-3" />
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10 flex flex-col justify-end h-[calc(100%-70px)]">
+                <div className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-chart-3 to-chart-4 mb-1 drop-shadow-lg">
+                  {stats.totalCTFs || "—"}
+                </div>
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground opacity-80">
+                  {stats.activeCTFs} live · {stats.upcomingCTFs} upcoming
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bento-card col-span-1 md:col-span-4 lg:col-span-2 group border-t-white/5 border-l-white/5 hover:border-chart-2/40">
+              <div className="frosted-noise" />
+              <div className="absolute top-1/2 left-1/2 w-full h-full bg-chart-2/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 group-hover:bg-chart-2/20 transition-colors duration-700" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                <CardTitle className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">Participation</CardTitle>
+                <div className="p-3 bg-chart-2/10 rounded-2xl border border-chart-2/20 group-hover:shadow-[0_0_20px_-5px_var(--chart-2)] transition-all duration-300">
+                  <Hexagon className="h-5 w-5 text-chart-2" />
+                </div>
+              </CardHeader>
+              <CardContent className="relative z-10 flex flex-col justify-end h-[calc(100%-70px)]">
+                <div className="text-5xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-chart-2 to-primary mb-1 drop-shadow-lg">
+                  {stats.participationCTFs || "—"}
+                </div>
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground opacity-80">CTFs with community solves</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 sm:space-y-8">
+            <div className="w-full flex justify-center">
+              <TabsList className="grid grid-cols-3 w-full max-w-2xl h-14 p-1.5 glass-card rounded-2xl">
+                <TabsTrigger
+                  value="leaderboard"
+                  className="rounded-xl text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:neon-glow-primary data-[state=active]:shadow-none hover:bg-white/5"
+                >
+                  <Trophy className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Global Leaderboard</span>
+                  <span className="sm:hidden">Leaderboard</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="ctfs"
+                  className="rounded-xl text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-accent/20 data-[state=active]:text-accent data-[state=active]:neon-glow-accent data-[state=active]:shadow-none hover:bg-white/5"
+                >
+                  <Target className="w-4 h-4 mr-2" />
+                  CTF List
+                </TabsTrigger>
+                <TabsTrigger
+                  value="ctf-rankings"
+                  className="rounded-xl text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-chart-2/20 data-[state=active]:text-chart-2 data-[state=active]:shadow-[0_0_20px_-5px_var(--chart-2)] data-[state=active]:shadow-none hover:bg-white/5"
+                >
+                  <Users className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">CTF Rankings</span>
+                  <span className="sm:hidden">Rankings</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <div className="relative min-h-[500px]">
+              <TabsContent value="leaderboard" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
+                <Card className="glass-card border-none overflow-hidden relative shadow-2xl">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-primary via-accent to-primary" />
+                  <CardHeader className="bg-background/20 backdrop-blur-md border-b border-white/5 pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Trophy className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl font-bold tracking-tight">Global Leaderboard</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm font-medium opacity-80 mt-1">Top performers across all CTF competitions</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0 sm:p-6 bg-black/10">
+                    {activeTab === "leaderboard" && <LeaderboardTable />}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="ctfs" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
+                <Card className="glass-card border-none overflow-hidden relative shadow-2xl">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-accent via-chart-3 to-accent" />
+                  <CardHeader className="bg-background/20 backdrop-blur-md border-b border-white/5 pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-accent/10 rounded-lg">
+                        <Target className="w-5 h-5 text-accent" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl font-bold tracking-tight">CTF Competitions</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm font-medium opacity-80 mt-1">Browse and explore CTF competitions with community participation</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0 sm:p-6 bg-black/10">
+                    {activeTab === "ctfs" && <CTFList />}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="ctf-rankings" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
+                <Card className="glass-card border-none overflow-hidden relative shadow-2xl">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-chart-2 via-primary to-chart-2" />
+                  <CardHeader className="bg-background/20 backdrop-blur-md border-b border-white/5 pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-chart-2/10 rounded-lg">
+                        <Users className="w-5 h-5 text-chart-2" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl font-bold tracking-tight">CTF-Specific Rankings</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm font-medium opacity-80 mt-1">Performance breakdown by individual competitions</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0 sm:p-6 bg-black/10">
+                    {activeTab === "ctf-rankings" && <CTFRankings />}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </main>
+      </div>
     </div>
   )
 }

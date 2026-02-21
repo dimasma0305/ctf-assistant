@@ -94,6 +94,34 @@ const formatTimeAgo = (dateString: string) => {
   }
 }
 
+const getTimeParams = (period: string) => {
+  if (period.startsWith("month-")) {
+    const monthValue = period.replace("month-", "")
+    return { month: monthValue, year: undefined }
+  } else if (period.startsWith("year-")) {
+    const yearValue = Number.parseInt(period.replace("year-", ""))
+    return { year: yearValue, month: undefined }
+  }
+
+  const now = new Date()
+  switch (period) {
+    case "this-month":
+      return { month: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`, year: undefined }
+    case "last-month":
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+      return {
+        month: `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}`,
+        year: undefined,
+      }
+    case "this-year":
+      return { year: now.getFullYear(), month: undefined }
+    case "last-year":
+      return { year: now.getFullYear() - 1, month: undefined }
+    default:
+      return { month: undefined, year: undefined }
+  }
+}
+
 const UserProfileContent = ({ user, leaderboardTotal }: { user: LeaderboardEntry; leaderboardTotal: number }) => {
   const [selectedTab, setSelectedTab] = useState("overview")
 
@@ -413,6 +441,7 @@ export function LeaderboardTable() {
     limit: pageSize,
     offset: 0,
     global: true,
+    ...getTimeParams(timePeriod),
   })
 
   const memoizedTimePeriodOptions = useMemo(() => {
@@ -627,34 +656,6 @@ export function LeaderboardTable() {
     window.location.hash = period
   }
 
-  const getTimeParams = (period: string) => {
-    if (period.startsWith("month-")) {
-      const monthValue = period.replace("month-", "")
-      return { month: monthValue, year: undefined }
-    } else if (period.startsWith("year-")) {
-      const yearValue = Number.parseInt(period.replace("year-", ""))
-      return { year: yearValue, month: undefined }
-    }
-
-    const now = new Date()
-    switch (period) {
-      case "this-month":
-        return { month: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`, year: undefined }
-      case "last-month":
-        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-        return {
-          month: `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}`,
-          year: undefined,
-        }
-      case "this-year":
-        return { year: now.getFullYear(), month: undefined }
-      case "last-year":
-        return { year: now.getFullYear() - 1, month: undefined }
-      default:
-        return { month: undefined, year: undefined }
-    }
-  }
-
   const getTimePeriodText = (period: string) => {
     if (period.startsWith("month-")) {
       const monthValue = period.replace("month-", "")
@@ -739,14 +740,14 @@ export function LeaderboardTable() {
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto">
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <div className="p-2 bg-primary/10 rounded-lg">
+              <div className="p-2 bg-primary/10 rounded-lg border border-primary/20">
                 <Calendar className="w-4 h-4 text-primary" />
               </div>
               <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
-                <SelectTrigger className="w-full sm:w-48 h-10">
+                <SelectTrigger className="w-full sm:w-48 h-10 glass-panel border-white/5">
                   <SelectValue placeholder="Time Period" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="glass-card">
                   {getTimePeriodOptions().map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -756,14 +757,14 @@ export function LeaderboardTable() {
               </Select>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <div className="p-2 bg-chart-3/10 rounded-lg">
+              <div className="p-2 bg-chart-3/10 rounded-lg border border-chart-3/20">
                 <Filter className="w-4 h-4 text-chart-3" />
               </div>
               <Select value={selectedCtf} onValueChange={handleCtfChange}>
-                <SelectTrigger className="w-full sm:w-48 h-10">
+                <SelectTrigger className="w-full sm:w-48 h-10 glass-panel border-white/5">
                   <SelectValue placeholder="Select CTF" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="glass-card">
                   <SelectItem value="global">Global Rankings</SelectItem>
                 </SelectContent>
               </Select>
@@ -772,18 +773,18 @@ export function LeaderboardTable() {
         </div>
 
         {timePeriod !== "all-time" && (
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded-xl backdrop-blur-md shadow-sm">
             <div className="flex items-center gap-2">
-              <div className="p-1 bg-primary/20 rounded">
+              <div className="p-1.5 bg-primary/20 rounded-md">
                 <Calendar className="w-4 h-4 text-primary" />
               </div>
-              <span className="text-sm font-medium">
-                Showing rankings for: <strong className="text-primary">{getTimePeriodText(timePeriod)}</strong>
+              <span className="text-sm font-medium text-foreground/90">
+                Showing rankings for: <strong className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent drop-shadow-sm">{getTimePeriodText(timePeriod)}</strong>
               </span>
             </div>
             <a
               href={shareUrl || shareHash}
-              className="inline-flex items-center gap-1 text-xs text-primary underline underline-offset-2 hover:opacity-80 cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs text-primary underline underline-offset-4 hover:opacity-80 cursor-pointer font-medium ml-1"
               title={`Copy ${shareUrl || shareHash}`}
               onClick={(e) => {
                 e.preventDefault()
@@ -797,7 +798,7 @@ export function LeaderboardTable() {
               }}
             >
               <Copy className="w-3.5 h-3.5" />
-              Copy shareable link
+              Copy share link
             </a>
           </div>
         )}
@@ -806,26 +807,27 @@ export function LeaderboardTable() {
       {leaderboardData?.metadata &&
         ((leaderboardData.metadata.availableMonths?.length ?? 0) > 0 ||
           (leaderboardData.metadata.availableYears?.length ?? 0) > 0) && (
-          <div className="text-xs text-muted-foreground">
-            Data available from{" "}
-            {leaderboardData.metadata.availableMonths?.[leaderboardData.metadata.availableMonths.length - 1]}
-            to {leaderboardData.metadata.availableMonths?.[0]}({leaderboardData.metadata.availableYears?.length || 0}{" "}
-            years, {leaderboardData.metadata.availableMonths?.length || 0} months)
+          <div className="text-xs text-muted-foreground/70 font-medium tracking-wide">
+            DATA AVAILABLE FROM{" "}
+            {leaderboardData.metadata.availableMonths?.[leaderboardData.metadata.availableMonths.length - 1]?.toUpperCase()}{" "}
+            TO {leaderboardData.metadata.availableMonths?.[0]?.toUpperCase()} ({leaderboardData.metadata.availableYears?.length || 0}{" "}
+            YEARS, {leaderboardData.metadata.availableMonths?.length || 0} MONTHS)
           </div>
         )}
 
-      <div className="overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="glass-card border-none rounded-2xl overflow-hidden shadow-2xl relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+        <div className="overflow-x-auto relative z-10">
           <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent border-b-2 border-primary/10">
-                <TableHead className="w-16 font-semibold">Rank</TableHead>
-                <TableHead className="min-w-[200px] font-semibold">Player</TableHead>
-                <TableHead className="text-right min-w-[80px] font-semibold">Score</TableHead>
-                <TableHead className="text-right min-w-[70px] font-semibold">Solves</TableHead>
-                <TableHead className="text-right min-w-[60px] hidden sm:table-cell font-semibold">CTFs</TableHead>
-                <TableHead className="min-w-[120px] hidden md:table-cell font-semibold">Categories</TableHead>
-                <TableHead className="min-w-[140px] hidden lg:table-cell font-semibold">Recent Activity</TableHead>
+            <TableHeader className="bg-black/20">
+              <TableRow className="hover:bg-transparent border-b border-white/10">
+                <TableHead className="w-16 font-semibold text-muted-foreground">Rank</TableHead>
+                <TableHead className="min-w-[200px] font-semibold text-muted-foreground">Player</TableHead>
+                <TableHead className="text-right min-w-[80px] font-semibold text-muted-foreground">Score</TableHead>
+                <TableHead className="text-right min-w-[70px] font-semibold text-muted-foreground">Solves</TableHead>
+                <TableHead className="text-right min-w-[60px] hidden sm:table-cell font-semibold text-muted-foreground">CTFs</TableHead>
+                <TableHead className="min-w-[120px] hidden md:table-cell font-semibold text-muted-foreground">Categories</TableHead>
+                <TableHead className="min-w-[140px] hidden lg:table-cell font-semibold text-muted-foreground">Recent Activity</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -833,37 +835,37 @@ export function LeaderboardTable() {
                 formattedLeaderboardData.map((entry) => (
                   <TableRow
                     key={entry.user.userId}
-                    className="hover:bg-muted/50 transition-colors border-b border-border/50"
+                    className="hover:bg-primary/5 transition-colors border-b border-white/5 group"
                   >
                     <TableCell className="font-medium py-4">
-                      <div className="flex items-center justify-center">{getRankIcon(entry.rank)}</div>
+                      <div className="flex items-center justify-center filter drop-shadow-md">{getRankIcon(entry.rank)}</div>
                     </TableCell>
                     <TableCell className="py-4">
                       <div
-                        className="flex items-center gap-3 cursor-pointer hover:bg-muted/30 rounded-md p-2 -m-2 transition-all duration-200 hover:scale-[1.02]"
+                        className="flex items-center gap-3 cursor-pointer hover:bg-white/5 rounded-2xl p-2 -m-2 transition-all duration-300 hover:scale-[1.02] border border-transparent hover:border-primary/20 hover:shadow-[0_4px_20px_-5px_var(--primary)]"
                         onClick={() => handleUserClick(entry)}
                       >
-                        <Avatar className="w-10 h-10 flex-shrink-0 ring-2 ring-primary/20">
+                        <Avatar className="w-12 h-12 flex-shrink-0 ring-2 ring-primary/20 group-hover:ring-primary/50 transition-all shadow-[0_0_10px_-2px_var(--primary)]">
                           <CachedAvatarImage
                             src={
                               entry.user.avatar ||
-                              `/abstract-geometric-shapes.png?height=40&width=40&query=user-${entry.user.userId}`
+                              `/abstract-geometric-shapes.png?height=48&width=48&query=user-${entry.user.userId}`
                             }
                             loadingPlaceholder={
                               <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                             }
                           />
-                          <AvatarFallback className="text-sm bg-primary/20 text-foreground font-medium">
+                          <AvatarFallback className="text-sm bg-primary/20 text-primary font-bold">
                             {entry.userInitials}
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
-                          <div className="font-medium hover:text-primary transition-colors truncate text-base">
+                          <div className="font-bold hover:text-primary transition-colors truncate text-lg tracking-tight">
                             {entry.displayName}
                           </div>
-                          <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+                          <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap uppercase font-semibold tracking-wider">
                             <span className="whitespace-nowrap">{entry.skillLevel}</span>
-                            <Badge variant="outline" className="text-xs border-primary/30">
+                            <Badge variant="outline" className="text-[10px] border-primary/30 py-0 h-4">
                               Top {entry.percentile}%
                             </Badge>
                           </div>
@@ -871,15 +873,15 @@ export function LeaderboardTable() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right py-4">
-                      <ScoreDisplay score={entry.totalScore} className="text-primary text-base block" />
+                      <ScoreDisplay score={entry.totalScore} className="text-primary text-xl font-mono tracking-tighter font-black block" />
                     </TableCell>
                     <TableCell className="text-right py-4">
-                      <Badge variant="secondary" className="font-mono text-foreground">
+                      <Badge variant="secondary" className="font-mono text-foreground font-black tracking-tight text-sm">
                         {entry.solveCount}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right hidden sm:table-cell py-4">
-                      <Badge variant="outline" className="font-mono">
+                      <Badge variant="outline" className="font-mono font-bold tracking-tight">
                         {entry.ctfCount}
                       </Badge>
                     </TableCell>
@@ -887,13 +889,13 @@ export function LeaderboardTable() {
                       <div className="flex flex-wrap gap-1">
                         {entry.categories.slice(0, 2).map((category) => (
                           <div key={category} className="flex items-center gap-1.5">
-                            <Badge variant="secondary" className="text-xs text-foreground">
+                            <Badge variant="secondary" className="text-xs text-foreground uppercase tracking-widest px-2 py-0 border border-white/5">
                               {category}
                             </Badge>
                           </div>
                         ))}
                         {entry.categories.length > 2 && (
-                          <Badge variant="secondary" className="text-xs text-foreground">
+                          <Badge variant="secondary" className="text-xs text-foreground bg-white/5">
                             +{entry.categories.length - 2}
                           </Badge>
                         )}

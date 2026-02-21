@@ -74,7 +74,7 @@ function CTFDetailsWindow({
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <h2 className="text-xl sm:text-2xl font-bold text-primary font-[family-name:var(--font-playfair)] mb-2 line-clamp-2">
+                      <h2 className="text-xl sm:text-2xl font-bold text-primary font-[family-name:var(--font-outfit)] mb-2 line-clamp-2">
                         {ctfDetails.title}
                       </h2>
                       <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -347,7 +347,7 @@ export function CTFList() {
           />
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val as any)}>
             <SelectTrigger className="w-full sm:w-[140px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -414,20 +414,21 @@ export function CTFList() {
         {(ctfsData?.data || []).map((ctf) => (
           <Card
             key={ctf.ctf_id}
-            className="hover:bg-muted/50 transition-all duration-200 cursor-pointer border-2 border-transparent hover:border-primary/20 shadow-lg hover:shadow-xl"
+            className="glass-card group hover:scale-[1.01] transition-all duration-300 cursor-pointer border-t-white/5 border-l-white/5 hover:border-primary/40 relative overflow-hidden shadow-lg hover:shadow-xl hover:neon-glow-primary"
             onClick={() => handleCTFClick(ctf.ctf_id)}
           >
-            <CardContent className="p-4 sm:p-6">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -translate-y-10 translate-x-10 group-hover:bg-primary/20 transition-colors duration-500 pointer-events-none" />
+            <CardContent className="p-4 sm:p-6 relative z-10">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
-                  <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-primary/20 shadow-md">
+                  <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-primary/20 shadow-[0_0_15px_-3px_var(--primary)]">
                     <CachedAvatarImage
                       src={ctf.logo || "/placeholder.svg"}
                       loadingPlaceholder={
                         <div className="w-3 h-3 border border-muted-foreground border-t-transparent rounded-full animate-spin" />
                       }
                     />
-                    <AvatarFallback className="bg-primary/20 text-foreground">
+                    <AvatarFallback className="bg-primary/20 text-foreground font-bold">
                       {ctf.title.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>

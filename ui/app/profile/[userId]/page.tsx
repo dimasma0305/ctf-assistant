@@ -248,473 +248,482 @@ export default function UserProfilePage() {
 
   return (
     <WindowProvider>
-      <div className="min-h-screen bg-background">
-        <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link href="/">
-                <Button variant="ghost" size="lg" className="gap-2 hover:bg-primary/10">
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="gap-1">
-                  <Users className="w-3 h-3" />
-                  Profile View
-                </Badge>
+      <div className="min-h-screen bg-background relative overflow-hidden font-sans selection:bg-primary/30 selection:text-primary">
+        {/* Ambient Background Orbs - Optimized */}
+        <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden h-screen w-screen contain-strict">
+          <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full animate-blob pointer-events-none" style={{ background: 'radial-gradient(circle, oklch(var(--primary) / 0.15) 0%, transparent 70%)' }} />
+          <div className="absolute top-[20%] right-[-10%] w-[30vw] h-[30vw] rounded-full animate-blob animation-delay-2000 pointer-events-none" style={{ background: 'radial-gradient(circle, oklch(var(--accent) / 0.15) 0%, transparent 70%)' }} />
+          <div className="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full animate-blob animation-delay-4000 pointer-events-none" style={{ background: 'radial-gradient(circle, oklch(var(--chart-2) / 0.15) 0%, transparent 70%)' }} />
+        </div>
+
+        <div className="relative z-10 flex flex-col min-h-screen">
+          <header className="glass-panel sticky top-0 z-50">
+            <div className="container mx-auto px-4 py-4">
+              <div className="flex items-center justify-between">
+                <Link href="/">
+                  <Button variant="ghost" size="lg" className="gap-2 hover:bg-primary/10">
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Dashboard
+                  </Button>
+                </Link>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="gap-1">
+                    <Users className="w-3 h-3" />
+                    Profile View
+                  </Badge>
+                </div>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-7xl">
-          <Card className="mb-8 border-l-4 border-l-primary shadow-lg">
-            <CardHeader className="pb-6 bg-gradient-to-r from-primary/5 to-transparent">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col sm:flex-row items-center gap-6">
-                  <div className="relative flex-shrink-0">
-                    <Avatar className="w-24 h-24 ring-4 ring-primary/30 shadow-lg">
-                      <CachedAvatarImage
-                        src={
-                          profileData.user.avatar ||
-                          `/abstract-geometric-shapes.png?key=profile&height=128&width=128&query=${profileData.user.userId}`
-                        }
-                        loadingPlaceholder={
-                          <div className="w-6 h-6 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                        }
-                      />
-                      <AvatarFallback className="text-2xl bg-primary/20 text-primary font-bold">
-                        {getUserInitials(profileData.user)}
-                      </AvatarFallback>
-                    </Avatar>
-                    {profileData.globalRank <= 3 && (
-                      <div className="absolute -top-2 -right-2">
-                        <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 p-2 rounded-full shadow-lg border-2 border-yellow-300">
-                          <Crown className="w-4 h-4 text-yellow-900" />
+          <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-7xl flex-1">
+            <Card className="bento-card mb-8 border-l-4 border-l-primary shadow-2xl hover:border-primary/40 relative overflow-visible">
+              <div className="frosted-noise" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+              <CardHeader className="pb-6 bg-transparent relative z-10">
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    <div className="relative flex-shrink-0">
+                      <Avatar className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-primary/30 shadow-[0_0_30px_-5px_var(--primary)]">
+                        <CachedAvatarImage
+                          src={
+                            profileData.user.avatar ||
+                            `/abstract-geometric-shapes.png?key=profile&height=128&width=128&query=${profileData.user.userId}`
+                          }
+                          loadingPlaceholder={
+                            <div className="w-6 h-6 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                          }
+                        />
+                        <AvatarFallback className="text-3xl bg-primary/20 text-primary font-bold">
+                          {getUserInitials(profileData.user)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {profileData.globalRank <= 3 && (
+                        <div className="absolute -top-3 -right-3">
+                          <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 p-2.5 rounded-full shadow-lg border-2 border-yellow-300 transform rotate-12">
+                            <Crown className="w-5 h-5 text-yellow-900" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 text-center sm:text-left flex flex-col justify-center">
+                      <CardTitle className="text-4xl sm:text-5xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-[family-name:var(--font-outfit)] tracking-tight">
+                        {profileData.user.displayName || profileData.user.username}
+                      </CardTitle>
+
+                      <div className="flex flex-wrap justify-center sm:justify-start gap-3">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-xl border border-primary/30 shadow-[0_4px_12px_-4px_var(--primary)] backdrop-blur-md transition-all hover:scale-105">
+                          <Trophy className="w-4 h-4 text-primary" />
+                          <span className="font-bold text-primary text-sm tracking-wide">Rank #{profileData.globalRank}</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-chart-2/10 rounded-xl border border-chart-2/30 shadow-[0_4px_12px_-4px_var(--chart-2)] backdrop-blur-md transition-all hover:scale-105">
+                          <Users className="w-4 h-4 text-chart-2" />
+                          <span className="text-chart-2 font-bold text-sm tracking-wide">
+                            Top {calculatePercentile(profileData.globalRank, profileData.totalUsers)}%
+                          </span>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
 
-                  <div className="flex-1 text-center sm:text-left">
-                    <CardTitle className="text-2xl sm:text-3xl font-bold mb-3 text-primary font-[family-name:var(--font-playfair)]">
-                      {profileData.user.displayName || profileData.user.username}
-                    </CardTitle>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[120px] mt-4">
+                    <div className="relative overflow-hidden flex flex-col justify-between p-5 bg-background/40 rounded-3xl border border-white/5 hover:border-primary/40 transition-colors group">
+                      <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors" />
+                      <div className="relative z-10 flex items-center gap-2">
+                        <Target className="w-4 h-4 text-primary opacity-80" />
+                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">Total Score</span>
+                      </div>
+                      <ScoreDisplay score={profileData.stats.totalScore} className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-primary block" />
+                    </div>
 
-                    <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/15 rounded-full border border-primary/30">
-                        <Trophy className="w-4 h-4 text-primary" />
-                        <span className="font-medium text-primary text-sm">Global Rank #{profileData.globalRank}</span>
+                    <div className="relative overflow-hidden flex flex-col justify-between p-5 bg-background/40 rounded-3xl border border-white/5 hover:border-chart-3/40 transition-colors group">
+                      <div className="absolute inset-0 bg-chart-3/5 group-hover:bg-chart-3/10 transition-colors" />
+                      <div className="relative z-10 flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-chart-3 opacity-80" />
+                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">Challenges</span>
                       </div>
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-chart-2/15 rounded-full border border-chart-2/30">
-                        <Users className="w-4 h-4 text-chart-2" />
-                        <span className="text-chart-2 font-medium text-sm">
-                          Top {calculatePercentile(profileData.globalRank, profileData.totalUsers)}%
-                        </span>
+                      <div className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-3">{profileData.stats.solveCount}</div>
+                    </div>
+
+                    <div className="relative overflow-hidden flex flex-col justify-between p-5 bg-background/40 rounded-3xl border border-white/5 hover:border-chart-2/40 transition-colors group">
+                      <div className="absolute inset-0 bg-chart-2/5 group-hover:bg-chart-2/10 transition-colors" />
+                      <div className="relative z-10 flex items-center gap-2">
+                        <Trophy className="w-4 h-4 text-chart-2 opacity-80" />
+                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">CTFs</span>
                       </div>
-                      <Badge
-                        variant="secondary"
-                        className="gap-1 px-3 py-1.5 bg-chart-3/15 text-chart-3 border-chart-3/30 text-sm"
-                      >
-                        Elite Player
-                      </Badge>
+                      <div className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-2">{profileData.stats.ctfCount}</div>
+                    </div>
+
+                    <div className="relative overflow-hidden flex flex-col justify-between p-5 bg-background/40 rounded-3xl border border-white/5 hover:border-chart-4/40 transition-colors group">
+                      <div className="absolute inset-0 bg-chart-4/5 group-hover:bg-chart-4/10 transition-colors" />
+                      <div className="relative z-10 flex items-center gap-2">
+                        <Award className="w-4 h-4 text-chart-4 opacity-80" />
+                        <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">Categories</span>
+                      </div>
+                      <div className="relative z-10 text-3xl sm:text-4xl font-black font-mono tracking-tighter text-chart-4">{profileData.stats.categoriesCount}</div>
                     </div>
                   </div>
                 </div>
+              </CardHeader>
+            </Card>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-primary/10 rounded-lg border border-primary/20">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Target className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium text-primary">Total Score</span>
-                    </div>
-                    <ScoreDisplay score={profileData.stats.totalScore} className="text-xl text-primary block" />
-                  </div>
-
-                  <div className="text-center p-4 bg-chart-3/10 rounded-lg border border-chart-3/20">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Zap className="w-4 h-4 text-chart-3" />
-                      <span className="text-sm font-medium text-chart-3">Challenges</span>
-                    </div>
-                    <div className="text-xl font-bold text-chart-3">{profileData.stats.solveCount}</div>
-                  </div>
-
-                  <div className="text-center p-4 bg-chart-2/10 rounded-lg border border-chart-2/20">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Trophy className="w-4 h-4 text-chart-2" />
-                      <span className="text-sm font-medium text-chart-2">CTFs</span>
-                    </div>
-                    <div className="text-xl font-bold text-chart-2">{profileData.stats.ctfCount}</div>
-                  </div>
-
-                  <div className="text-center p-4 bg-chart-4/10 rounded-lg border border-chart-4/20">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Award className="w-4 h-4 text-chart-4" />
-                      <span className="text-sm font-medium text-chart-4">Categories</span>
-                    </div>
-                    <div className="text-xl font-bold text-chart-4">{profileData.stats.categoriesCount}</div>
-                  </div>
-                </div>
+            <div id="profile-tabs" />
+            <Tabs
+              value={selectedTab}
+              onValueChange={(v) => {
+                const tab = tabFromHash(`#${v}`)
+                if (!tab) return
+                setSelectedTab(tab)
+                setTabHash(tab)
+                // Close expanded CTF when leaving/entering via hash navigation.
+                if (tab !== "ctfs") setExpandedCtfId(null)
+                document.getElementById("profile-tabs")?.scrollIntoView({ block: "start" })
+              }}
+              className="space-y-4 sm:space-y-6"
+            >
+              <div className="w-full">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto p-1 bg-muted/50 gap-1">
+                  <TabsTrigger
+                    value="categories"
+                    className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    <Star className="w-4 h-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Categories</span>
+                    <span className="xs:hidden">Cat</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="ctfs"
+                    className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    <Trophy className="w-4 h-4 mr-1 sm:mr-2" />
+                    <span>CTFs</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="achievements"
+                    className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    <Award className="w-4 h-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Awards</span>
+                    <span className="xs:hidden">Awd</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="certificates"
+                    className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    <Award className="w-4 h-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Certificates</span>
+                    <span className="xs:hidden">Cert</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="activity"
+                    className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground col-span-2 sm:col-span-1"
+                  >
+                    <TrendingUp className="w-4 h-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Activity</span>
+                    <span className="xs:hidden">Act</span>
+                  </TabsTrigger>
+                </TabsList>
               </div>
-            </CardHeader>
-          </Card>
 
-          <div id="profile-tabs" />
-          <Tabs
-            value={selectedTab}
-            onValueChange={(v) => {
-              const tab = tabFromHash(`#${v}`)
-              if (!tab) return
-              setSelectedTab(tab)
-              setTabHash(tab)
-              // Close expanded CTF when leaving/entering via hash navigation.
-              if (tab !== "ctfs") setExpandedCtfId(null)
-              document.getElementById("profile-tabs")?.scrollIntoView({ block: "start" })
-            }}
-            className="space-y-4 sm:space-y-6"
-          >
-            <div className="w-full">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto p-1 bg-muted/50 gap-1">
-                <TabsTrigger
-                  value="categories"
-                  className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  <Star className="w-4 h-4 mr-1 sm:mr-2" />
-                  <span className="hidden xs:inline">Categories</span>
-                  <span className="xs:hidden">Cat</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="ctfs"
-                  className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  <Trophy className="w-4 h-4 mr-1 sm:mr-2" />
-                  <span>CTFs</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="achievements"
-                  className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  <Award className="w-4 h-4 mr-1 sm:mr-2" />
-                  <span className="hidden xs:inline">Awards</span>
-                  <span className="xs:hidden">Awd</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="certificates"
-                  className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  <Award className="w-4 h-4 mr-1 sm:mr-2" />
-                  <span className="hidden xs:inline">Certificates</span>
-                  <span className="xs:hidden">Cert</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="activity"
-                  className="text-xs sm:text-sm h-10 !text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground col-span-2 sm:col-span-1"
-                >
-                  <TrendingUp className="w-4 h-4 mr-1 sm:mr-2" />
-                  <span className="hidden xs:inline">Activity</span>
-                  <span className="xs:hidden">Act</span>
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="categories">
-              <Card className="border-l-4 border-l-primary shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-primary" />
-                    <CardTitle className="font-[family-name:var(--font-playfair)]">Category Performance</CardTitle>
-                  </div>
-                  <CardDescription>Breakdown of performance across different challenge categories</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 p-6">
-                  {profileData.categoryBreakdown.map((category) => (
-                    <div
-                      key={category.name}
-                      className="space-y-3 p-4 rounded-lg bg-muted/30 border border-primary/10 hover:shadow-md transition-all duration-300"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-4 h-4 rounded-full ${getCategoryColor(category.name)}`} />
-                          <span className="font-medium capitalize text-foreground">{category.name}</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-foreground">{category.solves} solves</div>
-                          <div className="text-sm text-muted-foreground">{category.totalScore} total score</div>
-                        </div>
-                      </div>
-                      <Progress value={(category.solves / profileData.stats.solveCount) * 100} className="h-3" />
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          {Math.round((category.solves / profileData.stats.solveCount) * 100)}% of total solves
-                        </span>
-                        <span className="text-muted-foreground">Avg: {category.avgPoints} pts/solve</span>
-                      </div>
+              <TabsContent value="categories">
+                <Card className="glass-card border-l-4 border-l-primary shadow-lg hover:neon-glow-primary transition-shadow duration-300">
+                  <CardHeader className="bg-transparent">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-5 h-5 text-primary" />
+                      <CardTitle className="font-[family-name:var(--font-outfit)] text-xl">Category Performance</CardTitle>
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="ctfs">
-              <Card className="border-l-4 border-l-chart-3 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-chart-3/5 to-transparent">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-chart-3" />
-                    <CardTitle className="font-[family-name:var(--font-playfair)]">CTF Participation History</CardTitle>
-                  </div>
-                  <CardDescription>Performance in individual CTF competitions</CardDescription>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    {profileData.ctfBreakdown.map((ctf) => (
-                      <Card
-                        key={ctf.ctf_id}
-                        className="p-4 hover:shadow-md transition-all duration-300 border border-primary/10 bg-muted/20"
-                      >
-                        <div className="flex flex-col lg:flex-row lg:items-start gap-4">
-                          <div className="flex items-center gap-3 lg:flex-col lg:items-center">
-                            <Avatar className="w-12 h-12 lg:w-16 lg:h-16 border border-primary/20 flex-shrink-0">
-                              <CachedAvatarImage
-                                src={ctf.logo || `/placeholder.svg?height=64&width=64&query=CTF+logo+${ctf.ctfTitle}`}
-                                loadingPlaceholder={
-                                  <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
-                                }
-                              />
-                              <AvatarFallback className="text-sm font-bold bg-primary/20 text-primary">
-                                {ctf.ctfTitle
-                                  .split(" ")
-                                  .map((word) => word[0])
-                                  .join("")
-                                  .slice(0, 2)
-                                  .toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 lg:hidden">
-                              <h3 className="font-bold text-lg text-foreground">{ctf.ctfTitle}</h3>
-                            </div>
-                            <div className="text-right lg:hidden flex-shrink-0">
-                              <div className="text-xs text-muted-foreground">Score</div>
-                              <ScoreDisplay score={ctf.score} className="text-xl text-foreground block" />
-                            </div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="hidden lg:block mb-3">
-                              <h3 className="font-bold text-xl text-foreground mb-1">{ctf.ctfTitle}</h3>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-2 mb-3">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm text-muted-foreground">Weight:</span>
-                                <Badge
-                                  variant="secondary"
-                                  className="px-2 py-1 bg-primary/15 text-primary border-primary/20"
-                                >
-                                  {ctf.weight}x
-                                </Badge>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm text-muted-foreground">Solves:</span>
-                                <Badge
-                                  variant="outline"
-                                  className="px-2 py-1 border-chart-3/20 text-chart-3 bg-chart-3/10"
-                                >
-                                  {ctf.solves}
-                                </Badge>
-                              </div>
-                              <div className="hidden lg:block ml-auto text-right">
-                                <div className="text-sm text-muted-foreground">Score</div>
-                                <ScoreDisplay score={ctf.score} className="text-2xl text-foreground block" />
-                              </div>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-2">
-                              <div
-                                className="bg-gradient-to-r from-primary to-chart-2 rounded-full h-2 transition-all duration-300"
-                                style={{
-                                  width: `${Math.min((ctf.score / Math.max(...profileData.ctfBreakdown.map((c) => c.score))) * 100, 100)}%`,
-                                }}
-                              />
-                            </div>
-
-                            <div className="mt-4 pt-3 border-t border-primary/10">
-                              <Button
-                                type="button"
-                                variant="link"
-                                className="p-0 h-auto text-sm text-primary underline underline-offset-2 hover:opacity-80"
-                                onClick={() => setExpandedCtfId((prev) => (prev === ctf.ctf_id ? null : ctf.ctf_id))}
-                              >
-                                {expandedCtfId === ctf.ctf_id
-                                  ? "Hide solved challenges"
-                                  : `Show solved challenges (${ctf.solves})`}
-                              </Button>
-                              <CTFSolveList userId={userId} ctfId={ctf.ctf_id} enabled={expandedCtfId === ctf.ctf_id} />
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="achievements">
-              <Card className="border-l-4 border-l-chart-2 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-chart-2/5 to-transparent">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-chart-2" />
-                    <CardTitle className="font-[family-name:var(--font-playfair)]">Achievements & Milestones</CardTitle>
-                  </div>
-                  <CardDescription>Recognition for exceptional performance and participation</CardDescription>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="mb-6 p-4 bg-muted/30 rounded-lg border border-primary/10">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-foreground">Achievement Progress</span>
-                      <span className="text-sm text-muted-foreground">
-                        {achievements.length} / {allAchievements.length}
-                      </span>
-                    </div>
-                    <Progress value={(achievements.length / allAchievements.length) * 100} className="h-2" />
-                  </div>
-
-                  {["ranking", "participation", "skill", "contribution"].map((category) => {
-                    const categoryAchievements = allAchievements.filter(
-                      (achievement) => achievement.category === category,
-                    )
-                    const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
-
-                    return (
-                      <div key={category} className="mb-8">
-                        <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                          {category === "ranking" && <Trophy className="w-4 h-4" />}
-                          {category === "participation" && <Target className="w-4 h-4" />}
-                          {category === "skill" && <Zap className="w-4 h-4" />}
-                          {category === "contribution" && <Users className="w-4 h-4" />}
-                          {categoryName}
-                        </h3>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                          {categoryAchievements.map((achievement) => {
-                            const isUnlocked = unlockedAchievementIds.has(achievement.id)
-                            return (
-                              <Card
-                                key={achievement.id}
-                                className={`p-4 border transition-all duration-300 ${isUnlocked
-                                  ? "border-primary/20 bg-gradient-to-br from-primary/10 to-chart-3/5 hover:shadow-md"
-                                  : "border-muted/20 bg-muted/10 opacity-60"
-                                  }`}
-                              >
-                                <div className="flex items-center gap-4">
-                                  <div
-                                    className={`text-3xl p-3 rounded-lg ${isUnlocked ? "bg-white/20" : "bg-muted/20"}`}
-                                  >
-                                    {isUnlocked ? achievement.icon : <Lock className="w-6 h-6 text-muted-foreground" />}
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <h3
-                                        className={`font-bold ${isUnlocked ? "text-foreground" : "text-muted-foreground"
-                                          }`}
-                                      >
-                                        {achievement.name}
-                                      </h3>
-                                      {isUnlocked && (
-                                        <Badge
-                                          variant="secondary"
-                                          className="px-2 py-1 bg-primary/15 text-primary border-primary/20 text-xs"
-                                        >
-                                          Unlocked
-                                        </Badge>
-                                      )}
-                                    </div>
-                                    <p
-                                      className={`text-sm ${isUnlocked ? "text-muted-foreground" : "text-muted-foreground/70"
-                                        }`}
-                                    >
-                                      {achievement.description}
-                                    </p>
-                                  </div>
-                                </div>
-                              </Card>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="certificates">
-              <Card className="border-l-4 border-l-orange-500 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-orange-500/5 to-transparent">
-                  <div className="flex items-center gap-2">
-                    <Award className="w-5 h-5 text-orange-500" />
-                    <CardTitle className="font-[family-name:var(--font-playfair)]">
-                      Certificates & Recognition
-                    </CardTitle>
-                  </div>
-                  <CardDescription>Official certificates for outstanding performance</CardDescription>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <CertificateGenerator userId={userId} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="activity">
-              <Card className="border-l-4 border-l-chart-4 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-chart-4/5 to-transparent">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-chart-4" />
-                    <CardTitle className="font-[family-name:var(--font-playfair)]">Recent Activity</CardTitle>
-                  </div>
-                  <CardDescription>Latest challenge solves and participation</CardDescription>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    {profileData.recentSolves.map((activity, index) => (
-                      <Card
-                        key={index}
-                        className="p-4 border border-primary/10 bg-muted/20 hover:shadow-md transition-all duration-300"
+                    <CardDescription>Breakdown of performance across different challenge categories</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4 p-6">
+                    {profileData.categoryBreakdown.map((category) => (
+                      <div
+                        key={category.name}
+                        className="space-y-3 p-4 rounded-xl bg-background/50 backdrop-blur-sm border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 group"
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className={`w-3 h-3 rounded-full ${getCategoryColor(activity.category)}`} />
-                            <div>
-                              <h3 className="font-semibold text-foreground mb-1">{activity.challenge}</h3>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Badge
-                                  variant="outline"
-                                  className="px-2 py-1 border-primary/20 text-primary bg-primary/10"
-                                >
-                                  {activity.category}
-                                </Badge>
-                                <span className="font-bold text-primary">{activity.points} points</span>
-                                {activity.isTeamSolve && (
+                          <div className="flex items-center gap-3">
+                            <div className={`w-4 h-4 rounded-full ${getCategoryColor(category.name)}`} />
+                            <span className="font-medium capitalize text-foreground">{category.name}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold text-foreground">{category.solves} solves</div>
+                            <div className="text-sm text-muted-foreground">{category.totalScore} total score</div>
+                          </div>
+                        </div>
+                        <Progress value={(category.solves / profileData.stats.solveCount) * 100} className="h-3" />
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            {Math.round((category.solves / profileData.stats.solveCount) * 100)}% of total solves
+                          </span>
+                          <span className="text-muted-foreground">Avg: {category.avgPoints} pts/solve</span>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="ctfs">
+                <Card className="glass-card border-l-4 border-l-chart-3 shadow-lg hover:neon-glow-accent transition-shadow duration-300">
+                  <CardHeader className="bg-transparent">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-chart-3" />
+                      <CardTitle className="font-[family-name:var(--font-outfit)] text-xl">CTF Participation History</CardTitle>
+                    </div>
+                    <CardDescription>Performance in individual CTF competitions</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      {profileData.ctfBreakdown.map((ctf) => (
+                        <Card
+                          key={ctf.ctf_id}
+                          className="p-4 sm:p-6 bg-background/50 backdrop-blur-md hover:scale-[1.01] transition-transform duration-300 border border-white/5 hover:border-chart-3/30 hover:bg-chart-3/5 group"
+                        >
+                          <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                            <div className="flex items-center gap-3 lg:flex-col lg:items-center">
+                              <Avatar className="w-12 h-12 lg:w-16 lg:h-16 border border-primary/20 flex-shrink-0">
+                                <CachedAvatarImage
+                                  src={ctf.logo || `/placeholder.svg?height=64&width=64&query=CTF+logo+${ctf.ctfTitle}`}
+                                  loadingPlaceholder={
+                                    <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                                  }
+                                />
+                                <AvatarFallback className="text-sm font-bold bg-primary/20 text-primary">
+                                  {ctf.ctfTitle
+                                    .split(" ")
+                                    .map((word) => word[0])
+                                    .join("")
+                                    .slice(0, 2)
+                                    .toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 lg:hidden">
+                                <h3 className="font-bold text-lg text-foreground">{ctf.ctfTitle}</h3>
+                              </div>
+                              <div className="text-right lg:hidden flex-shrink-0">
+                                <div className="text-xs text-muted-foreground">Score</div>
+                                <ScoreDisplay score={ctf.score} className="text-xl text-foreground block" />
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="hidden lg:block mb-3">
+                                <h3 className="font-bold text-xl text-foreground mb-1">{ctf.ctfTitle}</h3>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2 mb-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-muted-foreground">Weight:</span>
                                   <Badge
                                     variant="secondary"
-                                    className="px-2 py-1 bg-chart-3/15 text-chart-3 border-chart-3/20"
+                                    className="px-2 py-1 bg-primary/15 text-primary border-primary/20"
                                   >
-                                    Team solve with {activity.teammates?.length || 0} others
+                                    {ctf.weight}x
                                   </Badge>
-                                )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-muted-foreground">Solves:</span>
+                                  <Badge
+                                    variant="outline"
+                                    className="px-2 py-1 border-chart-3/20 text-chart-3 bg-chart-3/10"
+                                  >
+                                    {ctf.solves}
+                                  </Badge>
+                                </div>
+                                <div className="hidden lg:block ml-auto text-right">
+                                  <div className="text-sm text-muted-foreground">Score</div>
+                                  <ScoreDisplay score={ctf.score} className="text-2xl text-foreground block" />
+                                </div>
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-2">
+                                <div
+                                  className="bg-gradient-to-r from-primary to-chart-2 rounded-full h-2 transition-all duration-300"
+                                  style={{
+                                    width: `${Math.min((ctf.score / Math.max(...profileData.ctfBreakdown.map((c) => c.score))) * 100, 100)}%`,
+                                  }}
+                                />
+                              </div>
+
+                              <div className="mt-4 pt-3 border-t border-primary/10">
+                                <Button
+                                  type="button"
+                                  variant="link"
+                                  className="p-0 h-auto text-sm text-primary underline underline-offset-2 hover:opacity-80"
+                                  onClick={() => setExpandedCtfId((prev) => (prev === ctf.ctf_id ? null : ctf.ctf_id))}
+                                >
+                                  {expandedCtfId === ctf.ctf_id
+                                    ? "Hide solved challenges"
+                                    : `Show solved challenges (${ctf.solves})`}
+                                </Button>
+                                <CTFSolveList userId={userId} ctfId={ctf.ctf_id} enabled={expandedCtfId === ctf.ctf_id} />
                               </div>
                             </div>
                           </div>
-                          <div className="text-sm text-muted-foreground flex items-center gap-2">
-                            <Clock className="w-4 h-4" />
-                            {formatTimeAgo(activity.solved_at)}
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="achievements">
+                <Card className="glass-card border-l-4 border-l-chart-2 shadow-lg hover:shadow-[0_0_20px_-5px_var(--chart-2)] transition-shadow duration-300">
+                  <CardHeader className="bg-transparent">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-5 h-5 text-chart-2" />
+                      <CardTitle className="font-[family-name:var(--font-outfit)] text-xl">Achievements & Milestones</CardTitle>
+                    </div>
+                    <CardDescription>Recognition for exceptional performance and participation</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="mb-6 p-4 bg-background/60 backdrop-blur-sm rounded-xl border border-white/5">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-foreground">Achievement Progress</span>
+                        <span className="text-sm text-muted-foreground">
+                          {achievements.length} / {allAchievements.length}
+                        </span>
+                      </div>
+                      <Progress value={(achievements.length / allAchievements.length) * 100} className="h-2" />
+                    </div>
+
+                    {["ranking", "participation", "skill", "contribution"].map((category) => {
+                      const categoryAchievements = allAchievements.filter(
+                        (achievement) => achievement.category === category,
+                      )
+                      const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
+
+                      return (
+                        <div key={category} className="mb-8">
+                          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                            {category === "ranking" && <Trophy className="w-4 h-4" />}
+                            {category === "participation" && <Target className="w-4 h-4" />}
+                            {category === "skill" && <Zap className="w-4 h-4" />}
+                            {category === "contribution" && <Users className="w-4 h-4" />}
+                            {categoryName}
+                          </h3>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {categoryAchievements.map((achievement) => {
+                              const isUnlocked = unlockedAchievementIds.has(achievement.id)
+                              return (
+                                <Card
+                                  key={achievement.id}
+                                  className={`p-4 border transition-all duration-300 ${isUnlocked
+                                    ? "border-primary/30 bg-primary/5 hover:bg-primary/10 hover:shadow-[0_0_15px_-3px_var(--primary)] hover:-translate-y-1"
+                                    : "border-white/5 bg-background/40 opacity-70 grayscale-[0.5]"
+                                    }`}
+                                >
+                                  <div className="flex items-center gap-4">
+                                    <div
+                                      className={`text-3xl p-3 rounded-lg ${isUnlocked ? "bg-white/20" : "bg-muted/20"}`}
+                                    >
+                                      {isUnlocked ? achievement.icon : <Lock className="w-6 h-6 text-muted-foreground" />}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <h3
+                                          className={`font-bold ${isUnlocked ? "text-foreground" : "text-muted-foreground"
+                                            }`}
+                                        >
+                                          {achievement.name}
+                                        </h3>
+                                        {isUnlocked && (
+                                          <Badge
+                                            variant="secondary"
+                                            className="px-2 py-1 bg-primary/15 text-primary border-primary/20 text-xs"
+                                          >
+                                            Unlocked
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <p
+                                        className={`text-sm ${isUnlocked ? "text-muted-foreground" : "text-muted-foreground/70"
+                                          }`}
+                                      >
+                                        {achievement.description}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </Card>
+                              )
+                            })}
                           </div>
                         </div>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </main>
+                      )
+                    })}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="certificates">
+                <Card className="glass-card border-l-4 border-l-orange-500 shadow-lg hover:shadow-[0_0_20px_-5px_rgb(249_115_22)] transition-shadow duration-300">
+                  <CardHeader className="bg-transparent">
+                    <div className="flex items-center gap-2">
+                      <Award className="w-5 h-5 text-orange-500" />
+                      <CardTitle className="font-[family-name:var(--font-outfit)] text-xl">
+                        Certificates & Recognition
+                      </CardTitle>
+                    </div>
+                    <CardDescription>Official certificates for outstanding performance</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <CertificateGenerator userId={userId} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="activity">
+                <Card className="glass-card border-l-4 border-l-chart-4 shadow-lg hover:shadow-[0_0_20px_-5px_var(--chart-4)] transition-shadow duration-300">
+                  <CardHeader className="bg-transparent">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-chart-4" />
+                      <CardTitle className="font-[family-name:var(--font-outfit)] text-xl">Recent Activity</CardTitle>
+                    </div>
+                    <CardDescription>Latest challenge solves and participation</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      {profileData.recentSolves.map((activity, index) => (
+                        <Card
+                          key={index}
+                          className="p-4 sm:p-5 bg-background/50 backdrop-blur-md border border-white/5 hover:border-chart-4/40 hover:bg-chart-4/5 transition-all duration-300 hover:translate-x-1 group"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-3 h-3 rounded-full ${getCategoryColor(activity.category)}`} />
+                              <div>
+                                <h3 className="font-semibold text-foreground mb-1">{activity.challenge}</h3>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Badge
+                                    variant="outline"
+                                    className="px-2 py-1 border-primary/20 text-primary bg-primary/10"
+                                  >
+                                    {activity.category}
+                                  </Badge>
+                                  <span className="font-bold text-primary">{activity.points} points</span>
+                                  {activity.isTeamSolve && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="px-2 py-1 bg-chart-3/15 text-chart-3 border-chart-3/20"
+                                    >
+                                      Team solve with {activity.teammates?.length || 0} others
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-2">
+                              <Clock className="w-4 h-4" />
+                              {formatTimeAgo(activity.solved_at)}
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </main>
+        </div>
       </div>
     </WindowProvider>
   )
