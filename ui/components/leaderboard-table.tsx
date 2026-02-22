@@ -173,6 +173,18 @@ export function LeaderboardTable() {
     [openWindow],
   )
 
+  const handleWindowOpenChange = useCallback((windowId: string, open: boolean) => {
+    if (!open) {
+      // If the window still exists in the provider, it's minimized, not closed.
+      if (windows.some((w) => w.id === windowId)) return
+      setSelectedUsers((prev) => {
+        const next = new Map(prev)
+        next.delete(windowId)
+        return next
+      })
+    }
+  }, [windows])
+
   const formattedLeaderboardData = useMemo(() => {
     if (!leaderboardData?.data) return []
 
@@ -196,7 +208,7 @@ export function LeaderboardTable() {
     setShareUrl(`${window.location.origin}${window.location.pathname}${window.location.search}${shareHash}`)
   }, [shareHash])
 
-  const copyShareLink = async () => {
+  const copyShareLink = useCallback(async () => {
     const textToCopy = shareUrl || shareHash
     try {
       if (navigator.clipboard?.writeText) {
@@ -217,9 +229,9 @@ export function LeaderboardTable() {
     } catch {
       toast.error("Copy failed", { description: "Your browser blocked clipboard access." })
     }
-  }
+  }, [shareUrl, shareHash])
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page)
     const timeParams = getTimeParams(timePeriod)
     updateParams({
@@ -229,9 +241,9 @@ export function LeaderboardTable() {
       ctf_id: selectedCtf !== "global" ? selectedCtf : undefined,
       ...timeParams,
     })
-  }
+  }, [selectedCtf, pageSize, timePeriod, getTimeParams, updateParams])
 
-  const handleCtfChange = (ctfId: string) => {
+  const handleCtfChange = useCallback((ctfId: string) => {
     setSelectedCtf(ctfId)
     setCurrentPage(1)
     const timeParams = getTimeParams(timePeriod)
@@ -242,7 +254,7 @@ export function LeaderboardTable() {
       ctf_id: ctfId !== "global" ? ctfId : undefined,
       ...timeParams,
     })
-  }
+  }, [pageSize, timePeriod, getTimeParams, updateParams])
 
   useEffect(() => {
     const initializeFromHash = () => {
@@ -324,11 +336,11 @@ export function LeaderboardTable() {
     }
   }, [timePeriod, currentPage, pageSize, selectedCtf, updateParams])
 
-  const handleTimePeriodChange = (period: string) => {
+  const handleTimePeriodChange = useCallback((period: string) => {
     setTimePeriod(period)
     setCurrentPage(1)
     window.location.hash = period
-  }
+  }, [])
 
   const getTimePeriodText = (period: string) => {
     if (period.startsWith("month-")) {
@@ -362,8 +374,6 @@ export function LeaderboardTable() {
 
 
   const totalPages = leaderboardData ? Math.ceil(leaderboardData.metadata.total / pageSize) : 0
-
-  const getTimePeriodOptions = () => memoizedTimePeriodOptions
 
   if (loading) {
     return (
@@ -407,7 +417,7 @@ export function LeaderboardTable() {
                   <SelectValue placeholder="Time Period" />
                 </SelectTrigger>
                 <SelectContent className="glass-card">
-                  {getTimePeriodOptions().map((option) => (
+                  {memoizedTimePeriodOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -567,17 +577,7 @@ export function LeaderboardTable() {
           title={`${getUserDisplayName(user.user)} - Profile`}
           defaultSize={{ width: 1000, height: 700 }}
           minSize={{ width: 320, height: 400 }}
-          onOpenChange={(open) => {
-            if (!open) {
-              // If the window still exists in the provider, it's minimized, not closed.
-              if (windows.some((w) => w.id === windowId)) return
-              setSelectedUsers((prev) => {
-                const next = new Map(prev)
-                next.delete(windowId)
-                return next
-              })
-            }
-          }}
+          onOpenChange={(open: boolean) => handleWindowOpenChange(windowId, open)}
         >
           <UserProfileContent user={user} leaderboardTotal={leaderboardData?.metadata.total || 1000} />
         </Window>

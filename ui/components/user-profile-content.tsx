@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,7 @@ interface CategoryStat {
 const UserProfileComponent = ({ user, leaderboardTotal }: { user: LeaderboardEntry; leaderboardTotal: number }) => {
     const [selectedTab, setSelectedTab] = useState("overview")
 
-    const calculateCategoryBreakdown = (): CategoryStat[] => {
+    const categoryBreakdown = useMemo<CategoryStat[]>(() => {
         const categoryStats = new Map<string, { solves: number; totalScore: number; points: number[] }>()
 
         user.recentSolves.forEach((solve) => {
@@ -74,12 +74,11 @@ const UserProfileComponent = ({ user, leaderboardTotal }: { user: LeaderboardEnt
                 avgPoints: stats.solves > 0 ? stats.totalScore / stats.solves : 0,
             }))
             .filter((stat) => stat.solves > 0)
-    }
+    }, [user.recentSolves, user.categories, user.solveCount, user.totalScore])
 
-    const categoryBreakdown: CategoryStat[] = calculateCategoryBreakdown()
-    const achievements: Achievement[] = getAchievements(user.achievementIds || [])
-    const averageScorePerSolve = user.solveCount > 0 ? user.totalScore / user.solveCount : 0
-    const averageSolvesPerCTF = user.ctfCount > 0 ? user.solveCount / user.ctfCount : 0
+    const achievements = useMemo<Achievement[]>(() => getAchievements(user.achievementIds || []), [user.achievementIds])
+    const averageScorePerSolve = useMemo(() => user.solveCount > 0 ? user.totalScore / user.solveCount : 0, [user.totalScore, user.solveCount])
+    const averageSolvesPerCTF = useMemo(() => user.ctfCount > 0 ? user.solveCount / user.ctfCount : 0, [user.solveCount, user.ctfCount])
 
     return (
         <div className="flex flex-col h-full">
@@ -243,7 +242,7 @@ const UserProfileComponent = ({ user, leaderboardTotal }: { user: LeaderboardEnt
 
                         <TabsContent value="categories" className="space-y-4 mt-0">
                             <div className="space-y-3">
-                                {categoryBreakdown.map((category) => (
+                                {categoryBreakdown.map((category: CategoryStat) => (
                                     <div key={category.name} className="p-4">
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between gap-2">
@@ -267,7 +266,7 @@ const UserProfileComponent = ({ user, leaderboardTotal }: { user: LeaderboardEnt
 
                         <TabsContent value="achievements" className="space-y-4 mt-0">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {achievements.map((achievement) => (
+                                {achievements.map((achievement: Achievement) => (
                                     <div key={achievement.name} className="p-4">
                                         <div className="flex items-center gap-3">
                                             <div className="text-2xl flex-shrink-0">{achievement.icon}</div>
