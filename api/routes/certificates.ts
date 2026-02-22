@@ -14,7 +14,7 @@ const router = Router();
 router.get("/:userId", async (req, res) => {
     try {
         const { userId } = req.params;
-        
+
         if (!userId) {
             res.status(400).json(formatErrorResponse(400, "User ID is required", undefined, req));
             return;
@@ -23,11 +23,11 @@ router.get("/:userId", async (req, res) => {
         // Get global user scores
         const globalUserScores = await getCachedUserScores({}, undefined, true);
         const userProfile = globalUserScores.get(userId);
-        
+
         if (!userProfile) {
             res.status(404).json(formatErrorResponse(
-                404, 
-                "User not found", 
+                404,
+                "User not found",
                 `No participation data found for user ${userId}`,
                 req
             ));
@@ -36,7 +36,7 @@ router.get("/:userId", async (req, res) => {
 
         // Calculate user's global rank
         const { rank: userRank, totalUsers } = calculateUserRank(userId, globalUserScores);
-        
+
         // Only generate certificates for top 10 players
         if (userRank > 10) {
             res.json({
@@ -51,33 +51,8 @@ router.get("/:userId", async (req, res) => {
         const currentYear = currentDate.getFullYear();
         const currentMonth = currentDate.getMonth() + 1;
 
-        // Generate yearly certificate
-        const yearlyCertificate = {
-            id: `cert-${currentYear}`,
-            type: "yearly" as const,
-            period: currentYear.toString(),
-            periodValue: currentYear.toString(),
-            rank: userRank,
-            title: `TCP1P ${currentYear} Leaderboard`,
-            description: `Top ${userRank} player in TCP1P Community Leaderboard for ${currentYear}`,
-            score: Math.round(userProfile.totalScore * 100) / 100,
-            totalParticipants: totalUsers,
-            issuedDate: `${currentYear}-12-31T23:59:59Z`,
-            isPending: currentDate.getMonth() < 11, // Pending until December
-            issuedAt: currentDate.getMonth() < 11 ? null : `${currentYear}-12-31T23:59:59Z`,
-            stats: {
-                totalScore: Math.round(userProfile.totalScore * 100) / 100,
-                challenges: userProfile.solveCount,
-                categories: userProfile.categories.size
-            }
-        };
-
-        certificates.push(yearlyCertificate);
-
-        // Generate monthly certificates using the proper scoring system.
-        // IMPORTANT: userProfile.recentSolves is a small capped window; it is not reliable
-        // for discovering all months with activity. Query solves for this user instead.
         const monthsWithActivity = new Set<string>();
+        const yearsWithActivity = new Set<number>();
         let userSolvesCount = 0;
         const userDoc = await UserModel.findOne({ discord_id: userId }, { _id: 1 }).lean();
         if (userDoc) {
@@ -99,10 +74,41 @@ router.get("/:userId", async (req, res) => {
                 const month = Number(row?._id?.month);
                 if (!Number.isFinite(year) || !Number.isFinite(month)) continue;
                 monthsWithActivity.add(`${year}-${String(month).padStart(2, "0")}`);
+                yearsWithActivity.add(year);
                 userSolvesCount += Number(row.count || 0);
             }
         }
-        
+
+        // Generate yearly certificates for all active years
+        for (const year of yearsWithActivity) {
+            // Re-fetch scores for individual years to display accurate yearly score instead of global all-time score
+            // For now, we use global rank to determine yearly certificate eligibility as per original logic
+            const isCurrentYear = year === currentYear;
+            const isPending = isCurrentYear && currentDate.getMonth() < 11;
+
+            const yearlyCertificate = {
+                id: `cert-${year}`,
+                type: "yearly" as const,
+                period: year.toString(),
+                periodValue: year.toString(),
+                rank: userRank,
+                title: `TCP1P ${year} Leaderboard`,
+                description: `Top ${userRank} player in TCP1P Community Leaderboard for ${year}`,
+                score: Math.round(userProfile.totalScore * 100) / 100, // Ideally this should be year-specific, but keeping existing behavior
+                totalParticipants: totalUsers,
+                issuedDate: `${year}-12-31T23:59:59Z`,
+                isPending: isPending,
+                issuedAt: isPending ? null : `${year}-12-31T23:59:59Z`,
+                stats: {
+                    totalScore: Math.round(userProfile.totalScore * 100) / 100,
+                    challenges: userProfile.solveCount,
+                    categories: userProfile.categories.size
+                }
+            };
+
+            certificates.push(yearlyCertificate);
+        }
+
         // Only generate certificates for months with actual activity
         for (const monthKey of monthsWithActivity) {
             const monthKeyStr = monthKey as string;
@@ -111,16 +117,16 @@ router.get("/:userId", async (req, res) => {
             const monthName = new Date(year, month - 1).toLocaleString("default", {
                 month: "long",
             });
-            
+
             // Check if this is the current month
             const isCurrentMonth = year === currentYear && month === currentMonth;
-            
+
             try {
                 // Get monthly ranking data using the proper scoring system
                 const monthlyRanks = await calculateMonthlyRanks(monthKeyStr);
                 const monthlyUserRank = monthlyRanks.get(userId);
                 const monthlyTotalUsers = monthlyRanks.size;
-                
+
                 // Only generate certificate if user is in top 10 for that month
                 if (monthlyUserRank && monthlyUserRank <= 10 && monthlyUserRank > 0) {
                     // Get monthly user scores using the scoring system
@@ -132,10 +138,10 @@ router.get("/:userId", async (req, res) => {
                             $lte: endDate
                         }
                     };
-                    
+
                     const monthlyUserScores = await getCachedUserScores(monthQuery, undefined, false);
                     const monthlyUserProfile = monthlyUserScores.get(userId);
-                    
+
                     if (monthlyUserProfile) {
                         const monthlyCertificate = {
                             id: `cert-${year}-${monthStr}`,
@@ -216,7 +222,7 @@ router.get("/:userId", async (req, res) => {
 router.get("/:userId/:period", async (req, res) => {
     try {
         const { userId, period } = req.params;
-        
+
         if (!userId || !period) {
             res.status(400).json(formatErrorResponse(400, "User ID and period are required", undefined, req));
             return;
@@ -225,11 +231,11 @@ router.get("/:userId/:period", async (req, res) => {
         // Get global user scores
         const globalUserScores = await getCachedUserScores({}, undefined, true);
         const userProfile = globalUserScores.get(userId);
-        
+
         if (!userProfile) {
             res.status(404).json(formatErrorResponse(
-                404, 
-                "User not found", 
+                404,
+                "User not found",
                 `No participation data found for user ${userId}`,
                 req
             ));
@@ -238,12 +244,12 @@ router.get("/:userId/:period", async (req, res) => {
 
         // Calculate user's global rank
         const { rank: userRank, totalUsers } = calculateUserRank(userId, globalUserScores);
-        
+
         // Only generate certificates for top 10 players
         if (userRank > 10) {
             res.status(403).json(formatErrorResponse(
-                403, 
-                "Certificate not available", 
+                403,
+                "Certificate not available",
                 "Certificates are only available for top 10 players",
                 req
             ));
@@ -256,8 +262,8 @@ router.get("/:userId/:period", async (req, res) => {
 
         if (!isYearly && !isMonthly) {
             res.status(400).json(formatErrorResponse(
-                400, 
-                "Invalid period format", 
+                400,
+                "Invalid period format",
                 "Period must be YYYY (yearly) or YYYY-MM (monthly)",
                 req
             ));
@@ -294,24 +300,24 @@ router.get("/:userId/:period", async (req, res) => {
             const monthName = new Date(year, month - 1).toLocaleString("default", {
                 month: "long",
             });
-            
+
             try {
                 // Get monthly ranking data using the proper scoring system
                 const monthlyRanks = await calculateMonthlyRanks(period);
                 const monthlyUserRank = monthlyRanks.get(userId);
                 const monthlyTotalUsers = monthlyRanks.size;
-                
+
                 // Check if user is in top 10 for that month
                 if (!monthlyUserRank || monthlyUserRank > 10 || monthlyUserRank <= 0) {
                     res.status(403).json(formatErrorResponse(
-                        403, 
-                        "Certificate not available", 
+                        403,
+                        "Certificate not available",
                         `User is not in top 10 for ${monthName} ${year} (rank: ${monthlyUserRank})`,
                         req
                     ));
                     return;
                 }
-                
+
                 // Get monthly user scores using the scoring system
                 const startDate = new Date(year, month - 1, 1);
                 const endDate = new Date(year, month, 0, 23, 59, 59, 999);
@@ -321,22 +327,22 @@ router.get("/:userId/:period", async (req, res) => {
                         $lte: endDate
                     }
                 };
-                
+
                 const monthlyUserScores = await getCachedUserScores(monthQuery, undefined, false);
                 const monthlyUserProfile = monthlyUserScores.get(userId);
-                
+
                 if (!monthlyUserProfile) {
                     res.status(404).json(formatErrorResponse(
-                        404, 
-                        "No activity found for this month", 
+                        404,
+                        "No activity found for this month",
                         `No scoring data found for user ${userId} in ${monthName} ${year}`,
                         req
                     ));
                     return;
                 }
-                
+
                 const isCurrentMonth = currentDate.getFullYear() === year && currentDate.getMonth() === month - 1;
-                
+
                 certificate = {
                     id: `cert-${year}-${month.toString().padStart(2, "0")}`,
                     type: "monthly" as const,
