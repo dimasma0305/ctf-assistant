@@ -90,7 +90,12 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
     if (type === "yearly") {
       return period
     }
-    // Format YYYY-MM to "Month Year"
+    // If it doesn't contain a hyphen, it's already formatted by the backend (e.g. "January 2026")
+    if (!period.includes("-")) {
+      return period
+    }
+
+    // Format YYYY-MM to "Month Year" if required
     const [year, month] = period.split("-")
     const monthName = new Date(Number.parseInt(year), Number.parseInt(month) - 1).toLocaleString("default", {
       month: "long",

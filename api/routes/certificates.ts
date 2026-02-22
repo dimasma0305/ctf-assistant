@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCachedUserScores, calculateMonthlyRanks } from '../services/dataService';
+import { getCachedUserScores, calculateMonthlyRanks, calculateYearlyRanks } from '../services/dataService';
 import { calculateUserRank, calculateGlobalStats } from '../utils/statistics';
 import { formatErrorResponse } from '../utils/common';
 import { UserModel, solveModel } from '../../src/Database/connect';
@@ -81,32 +81,57 @@ router.get("/:userId", async (req, res) => {
 
         // Generate yearly certificates for all active years
         for (const year of yearsWithActivity) {
-            // Re-fetch scores for individual years to display accurate yearly score instead of global all-time score
-            // For now, we use global rank to determine yearly certificate eligibility as per original logic
             const isCurrentYear = year === currentYear;
             const isPending = isCurrentYear && currentDate.getMonth() < 11;
 
-            const yearlyCertificate = {
-                id: `cert-${year}`,
-                type: "yearly" as const,
-                period: year.toString(),
-                periodValue: year.toString(),
-                rank: userRank,
-                title: `TCP1P ${year} Leaderboard`,
-                description: `Top ${userRank} player in TCP1P Community Leaderboard for ${year}`,
-                score: Math.round(userProfile.totalScore * 100) / 100, // Ideally this should be year-specific, but keeping existing behavior
-                totalParticipants: totalUsers,
-                issuedDate: `${year}-12-31T23:59:59Z`,
-                isPending: isPending,
-                issuedAt: isPending ? null : `${year}-12-31T23:59:59Z`,
-                stats: {
-                    totalScore: Math.round(userProfile.totalScore * 100) / 100,
-                    challenges: userProfile.solveCount,
-                    categories: userProfile.categories.size
-                }
-            };
+            try {
+                // Get yearly ranking data using the scoring system
+                const yearlyRanks = await calculateYearlyRanks(year);
+                const yearlyUserRank = yearlyRanks.get(userId);
+                const yearlyTotalUsers = yearlyRanks.size;
 
-            certificates.push(yearlyCertificate);
+                // Only generate if user is in top 10 for that year
+                if (yearlyUserRank && yearlyUserRank <= 10 && yearlyUserRank > 0) {
+                    // Get yearly user scores based on time range
+                    const startDate = new Date(year, 0, 1);
+                    const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
+                    const yearQuery = {
+                        solved_at: {
+                            $gte: startDate,
+                            $lte: endDate
+                        }
+                    };
+
+                    const yearlyUserScores = await getCachedUserScores(yearQuery, undefined, false);
+                    const yearlyUserProfile = yearlyUserScores.get(userId);
+
+                    if (yearlyUserProfile) {
+                        const yearlyCertificate = {
+                            id: `cert-${year}`,
+                            type: "yearly" as const,
+                            period: year.toString(),
+                            periodValue: year.toString(),
+                            rank: yearlyUserRank,
+                            title: `TCP1P ${year} Leaderboard`,
+                            description: `Top ${yearlyUserRank} player in TCP1P Community Leaderboard for ${year}`,
+                            score: Math.round(yearlyUserProfile.totalScore * 100) / 100,
+                            totalParticipants: yearlyTotalUsers,
+                            issuedDate: `${year}-12-31T23:59:59Z`,
+                            isPending: isPending,
+                            issuedAt: isPending ? null : `${year}-12-31T23:59:59Z`,
+                            stats: {
+                                totalScore: Math.round(yearlyUserProfile.totalScore * 100) / 100,
+                                challenges: yearlyUserProfile.solveCount,
+                                categories: yearlyUserProfile.categories.size
+                            }
+                        };
+
+                        certificates.push(yearlyCertificate);
+                    }
+                }
+            } catch (error) {
+                console.error(`Error processing yearly certificate for ${year}:`, error);
+            }
         }
 
         // Only generate certificates for months with actual activity
@@ -275,25 +300,77 @@ router.get("/:userId/:period", async (req, res) => {
 
         if (isYearly) {
             const year = parseInt(period);
-            certificate = {
-                id: `cert-${year}`,
-                type: "yearly" as const,
-                period: year.toString(),
-                periodValue: year.toString(),
-                rank: userRank,
-                title: `TCP1P ${year} Leaderboard`,
-                description: `Top ${userRank} player in TCP1P Community Leaderboard for ${year}`,
-                score: Math.round(userProfile.totalScore * 100) / 100,
-                totalParticipants: totalUsers,
-                issuedDate: `${year}-12-31T23:59:59Z`,
-                isPending: currentDate.getFullYear() === year && currentDate.getMonth() < 11,
-                issuedAt: (currentDate.getFullYear() === year && currentDate.getMonth() < 11) ? null : `${year}-12-31T23:59:59Z`,
-                stats: {
-                    totalScore: Math.round(userProfile.totalScore * 100) / 100,
-                    challenges: userProfile.solveCount,
-                    categories: userProfile.categories.size
+            try {
+                // Get yearly ranking data using the scoring system
+                const yearlyRanks = await calculateYearlyRanks(year);
+                const yearlyUserRank = yearlyRanks.get(userId);
+                const yearlyTotalUsers = yearlyRanks.size;
+
+                // Check if user is in top 10 for that year
+                if (!yearlyUserRank || yearlyUserRank > 10 || yearlyUserRank <= 0) {
+                    res.status(403).json(formatErrorResponse(
+                        403,
+                        "Certificate not available",
+                        `User is not in top 10 for ${year} (rank: ${yearlyUserRank})`,
+                        req
+                    ));
+                    return;
                 }
-            };
+
+                // Get yearly user scores
+                const startDate = new Date(year, 0, 1);
+                const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
+                const yearQuery = {
+                    solved_at: {
+                        $gte: startDate,
+                        $lte: endDate
+                    }
+                };
+
+                const yearlyUserScores = await getCachedUserScores(yearQuery, undefined, false);
+                const yearlyUserProfile = yearlyUserScores.get(userId);
+
+                if (!yearlyUserProfile) {
+                    res.status(404).json(formatErrorResponse(
+                        404,
+                        "No activity found for this year",
+                        `No scoring data found for user ${userId} in ${year}`,
+                        req
+                    ));
+                    return;
+                }
+
+                const isCurrentYear = currentDate.getFullYear() === year;
+
+                certificate = {
+                    id: `cert-${year}`,
+                    type: "yearly" as const,
+                    period: year.toString(),
+                    periodValue: year.toString(),
+                    rank: yearlyUserRank,
+                    title: `TCP1P ${year} Leaderboard`,
+                    description: `Top ${yearlyUserRank} player in TCP1P Community Leaderboard for ${year}`,
+                    score: Math.round(yearlyUserProfile.totalScore * 100) / 100,
+                    totalParticipants: yearlyTotalUsers,
+                    issuedDate: `${year}-12-31T23:59:59Z`,
+                    isPending: isCurrentYear && currentDate.getMonth() < 11,
+                    issuedAt: (isCurrentYear && currentDate.getMonth() < 11) ? null : `${year}-12-31T23:59:59Z`,
+                    stats: {
+                        totalScore: Math.round(yearlyUserProfile.totalScore * 100) / 100,
+                        challenges: yearlyUserProfile.solveCount,
+                        categories: yearlyUserProfile.categories.size
+                    }
+                };
+            } catch (error) {
+                console.error(`Error processing yearly certificate for ${period}:`, error);
+                res.status(500).json(formatErrorResponse(
+                    500,
+                    "Internal server error",
+                    `Error processing certificate for ${period}`,
+                    req
+                ));
+                return;
+            }
         } else {
             // Monthly certificate - check if user has activity in this month using proper scoring system
             const [year, month] = period.split('-').map(Number);
