@@ -215,6 +215,7 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
                   size="sm"
                   variant="ghost"
                   className="absolute top-2 right-2 h-6 w-6 p-0"
+                  aria-label="Close"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -357,6 +358,7 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
                         ? "opacity-50 cursor-not-allowed"
                         : "hover:bg-primary/10 border border-primary/20 hover:border-primary/40"
                         }`}
+                      aria-label="Share certificate"
                     >
                       {certificate.isPending ? <X className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
                       <span className="hidden sm:inline">{certificate.isPending ? "Cannot Share" : "Share"}</span>
@@ -387,6 +389,7 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
                       onClick={() => showCertificate(certificate)}
                       size="sm"
                       className="gap-2 flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200"
+                      aria-label="Preview certificate"
                     >
                       <Eye className="w-4 h-4" />
                       <span className="hidden sm:inline">{certificate.isPending ? "Preview" : "Show"}</span>
