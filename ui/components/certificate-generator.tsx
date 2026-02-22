@@ -10,6 +10,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useCertificates } from "@/hooks/useAPI"
 import { toast } from "sonner"
+import { createPortal } from "react-dom"
 
 interface CertificateGeneratorProps {
   userId: string
@@ -19,7 +20,7 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
   const { data: certificateData, loading, error } = useCertificates(userId)
   const [showingCertificate, setShowingCertificate] = useState<Certificate | null>(null)
   const [showPendingOverlay, setShowPendingOverlay] = useState(true)
-  
+
   const displayName = certificateData?.userInfo?.displayName || certificateData?.userInfo?.username || "User"
 
   const getRankIcon = (rank: number) => {
@@ -198,17 +199,9 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
   const certificates = certificateData.certificates
 
   if (showingCertificate) {
-    return (
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-        <div className="relative max-w-4xl w-full max-h-[95vh] overflow-auto">
-          <Button
-            onClick={hideCertificate}
-            size="sm"
-            variant="outline"
-            className="absolute top-2 right-2 z-10 bg-background/80 backdrop-blur-sm"
-          >
-            <X className="w-4 h-4" />
-          </Button>
+    const modalContent = (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[99999]">
+        <div className="relative w-full max-h-[95vh] overflow-auto flex justify-center">
           {showingCertificate.isPending && showPendingOverlay && (
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-5 flex items-center justify-center">
               <div className="bg-background/90 border border-border rounded-lg p-6 text-center max-w-sm mx-4 relative">
@@ -237,10 +230,13 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
             categories={showingCertificate.stats.categories}
             period={showingCertificate.period}
             issuedDate={showingCertificate.issuedDate}
+            onClose={hideCertificate}
           />
         </div>
       </div>
     )
+
+    return typeof document !== "undefined" ? createPortal(modalContent, document.body) : null
   }
 
   if (certificates.length === 0) {
@@ -352,11 +348,10 @@ export function CertificateGenerator({ userId }: CertificateGeneratorProps) {
                       size="sm"
                       variant="ghost"
                       disabled={certificate.isPending}
-                      className={`gap-2 flex-1 sm:flex-none transition-all duration-200 ${
-                        certificate.isPending
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:bg-primary/10 border border-primary/20 hover:border-primary/40"
-                      }`}
+                      className={`gap-2 flex-1 sm:flex-none transition-all duration-200 ${certificate.isPending
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-primary/10 border border-primary/20 hover:border-primary/40"
+                        }`}
                     >
                       {certificate.isPending ? <X className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
                       <span className="hidden sm:inline">{certificate.isPending ? "Cannot Share" : "Share"}</span>

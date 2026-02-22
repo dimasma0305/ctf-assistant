@@ -4,6 +4,7 @@ import type React from "react"
 
 import Image from "next/image"
 import { ScoreDisplay } from "@/components/score-display"
+import { X } from "lucide-react"
 
 interface CertificateProps {
   username: string
@@ -14,6 +15,7 @@ interface CertificateProps {
   categories: number
   period: string
   issuedDate: string
+  onClose?: () => void
 }
 
 export function Certificate({
@@ -24,6 +26,7 @@ export function Certificate({
   categories,
   period,
   issuedDate,
+  onClose,
 }: CertificateProps) {
   const rankColors = {
     1: "bg-certificate-gold text-black border-certificate-gold/50",
@@ -121,7 +124,7 @@ export function Certificate({
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-background font-sans">
+    <div className="w-full max-w-4xl mx-auto bg-transparent font-sans">
       <div className="w-full relative overflow-hidden">
         <div
           className="w-[800px] h-[566px] origin-top-left bg-slate-900 p-4 mx-auto"
@@ -142,6 +145,15 @@ export function Certificate({
           </div>
 
           <div className="bg-slate-800/90 border border-primary/40 rounded-lg p-6 h-full flex flex-col relative shadow-2xl backdrop-blur-sm">
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-md p-1.5 transition-colors z-50 border border-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+
             {/* Header Section */}
             <div className="flex flex-col items-center mb-4">
               {/* TCP1P Logo with coral glow */}

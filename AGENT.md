@@ -24,7 +24,8 @@ This is a Next.js (App Router) project providing the main web dashboard for the 
 1. **No Any Types**: Maintain strict TypeScript typing. Do not use `any`. Use defined interfaces in `lib/types.ts`.
 2. **No Orphan Logs**: Remove debug `console.log` statements before finalizing changes. Use the UI `Toaster` component for user-facing errors.
 3. **DRY Principle**: When building new views, check if UI elements or format helpers already exist in the shared libraries. 
+4. **MANDATORY DOCKER UPDATE**: After making *ANY* changes to the frontend (`ui/`) or backend (`api/`, `src/`), you **MUST** rebuild and restart the Docker containers to apply the updates. The changes will not take effect otherwise. run `docker compose build <service> && docker compose up -d <service>`.
 
 ## Key Commands
-- Start frontend: `cd ui && bun run dev`
-- Rebuild local docker setup: `docker compose up ui --build -d`
+- Start frontend locally (dev mode): `cd ui && bun run dev`
+- Apply changes/Rebuild (MANDATORY AFTER EDITS): `docker compose build ui ctf-assistant && docker compose up -d`
