@@ -15,7 +15,7 @@ import {
   getCertificates,
   getCertificate,
 } from "@/lib/actions"
-import type { ScoreboardParams, CTFsParams, CertificateResponse, SingleCertificateResponse } from "@/lib/types"
+import type { ScoreboardParams, CTFsParams, CTFRankingsParams, CertificateResponse, SingleCertificateResponse } from "@/lib/types"
 
 // Global map to deduplicate concurrent requests for the same cacheKey
 const inFlightRequests = new Map<string, Promise<any>>()
@@ -396,7 +396,7 @@ export function usePolling<T>(
 }
 
 // CTF rankings hook
-export function useCTFRankings(params: any = {}) {
+export function useCTFRankings(params: CTFRankingsParams = {}) {
   const [currentParams, setCurrentParams] = useState(params)
   const paramsKey = JSON.stringify(currentParams)
   const cacheKey = `ctf-rankings:${paramsKey}`
@@ -407,8 +407,8 @@ export function useCTFRankings(params: any = {}) {
     staleWhileRevalidate: true,
   })
 
-  const updateParams = useCallback((newParams: Partial<any>) => {
-    setCurrentParams((prev: any) => ({ ...prev, ...newParams }))
+  const updateParams = useCallback((newParams: Partial<CTFRankingsParams>) => {
+    setCurrentParams((prev) => ({ ...prev, ...newParams }))
   }, [])
 
   return {

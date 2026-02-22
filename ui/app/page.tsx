@@ -1,15 +1,18 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useTheme } from "next-themes"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Trophy, Users, Target, Activity, Sparkles, Hexagon } from "lucide-react"
+import { Trophy, Users, Target, Activity, Sparkles, Hexagon, Sun, Moon } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { LeaderboardTable } from "@/components/leaderboard-table"
 import { CTFList } from "@/components/ctf-list"
 import { CTFRankings } from "@/components/ctf-rankings"
 import { useScoreboard, useCTFs } from "@/hooks/useAPI"
 import Image from "next/image"
+import { Footer } from "@/components/footer"
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("leaderboard")
@@ -43,6 +46,9 @@ export default function Dashboard() {
 
   const { data: leaderboardData, isStale: leaderboardStale } = useScoreboard({ limit: 1 })
   const { data: ctfsData, isStale: ctfsStale } = useCTFs({ limit: 1 })
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const stats = useMemo(
     () => ({
@@ -99,6 +105,21 @@ export default function Dashboard() {
                     <div className="w-2 h-2 bg-chart-3 rounded-full animate-pulse shadow-[0_0_5px_currentColor]" />
                     <span className="hidden sm:inline font-semibold">Syncing</span>
                   </Badge>
+                )}
+                {mounted && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="h-9 w-9 rounded-lg border border-border/50 bg-background/50 backdrop-blur-md hover:bg-primary/10"
+                    aria-label="Toggle theme"
+                  >
+                    {theme === "dark" ? (
+                      <Sun className="h-4 w-4 text-primary" />
+                    ) : (
+                      <Moon className="h-4 w-4 text-primary" />
+                    )}
+                  </Button>
                 )}
               </div>
             </div>
@@ -278,6 +299,8 @@ export default function Dashboard() {
             </div>
           </Tabs>
         </main>
+
+        <Footer />
       </div>
     </div>
   )

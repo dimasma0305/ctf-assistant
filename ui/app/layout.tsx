@@ -6,6 +6,7 @@ import { Outfit } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { WindowProvider } from "@/components/ui/window"
+import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
@@ -17,8 +18,16 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: "TCP1P Community Scoring Dashboard",
-  description: "Competitive cybersecurity scoring platform",
-  generator: "v0.app",
+  description:
+    "Competitive cybersecurity scoring platform — track CTF leaderboards, rankings, and team performance across competitions.",
+  keywords: ["CTF", "cybersecurity", "leaderboard", "TCP1P", "capture the flag", "scoring"],
+  authors: [{ name: "TCP1P", url: "https://tcp1p.team" }],
+  openGraph: {
+    title: "TCP1P Community Scoring Dashboard",
+    description: "Track CTF leaderboards, rankings, and team performance.",
+    type: "website",
+    siteName: "TCP1P Scoring",
+  },
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
@@ -32,14 +41,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${outfit.variable}`}>
-        <WindowProvider>
-          <Suspense fallback={null}>{children}</Suspense>
-        </WindowProvider>
-        <Toaster position="top-right" />
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <WindowProvider>
+            <Suspense fallback={null}>{children}</Suspense>
+          </WindowProvider>
+          <Toaster position="top-right" />
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
   )
 }
+

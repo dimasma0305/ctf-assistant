@@ -34,6 +34,7 @@ import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/ut
 import { ScoreDisplay } from "@/components/score-display"
 import Link from "next/link"
 import { toast } from "sonner"
+import { getUserInitials, getUserDisplayName, formatTimeAgo, getRankIcon } from "@/lib/format-helpers"
 
 interface CategoryStat {
   name: string
@@ -44,37 +45,7 @@ interface CategoryStat {
   percentile?: number
 }
 
-// Helpers originally here have been refactored inside the component scope
 
-
-
-const getUserInitials = (user: LeaderboardEntry["user"]) => {
-  const name = user.displayName || user.username
-  const parts = name.split(" ")
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase()
-  }
-  return name.slice(0, 2).toUpperCase()
-}
-
-const getUserDisplayName = (user: LeaderboardEntry["user"]) => {
-  return user.displayName || user.username
-}
-
-const formatTimeAgo = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-
-  if (diffInHours < 24) {
-    return `${diffInHours}h ago`
-  } else {
-    const diffInDays = Math.floor(diffInHours / 24)
-    return `${diffInDays}d ago`
-  }
-}
-
-// Helpers originally here have been refactored inside the component scope
 
 const UserProfileContent = ({ user, leaderboardTotal }: { user: LeaderboardEntry; leaderboardTotal: number }) => {
   const [selectedTab, setSelectedTab] = useState("overview")
@@ -581,7 +552,7 @@ export function LeaderboardTable() {
   useEffect(() => {
     const initializeFromHash = () => {
       const hash = window.location.hash.slice(1)
-      console.log("[v0] Initializing from hash:", hash)
+
 
       if (!hash) return
 
@@ -595,7 +566,7 @@ export function LeaderboardTable() {
 
       if (validPeriods.includes(hash) || isDynamicMonth || isDynamicYear) {
         const canonical = canonicalizeTimePeriod(hash)
-        console.log("[v0] Setting initial time period to:", canonical)
+
         setTimePeriod(canonical)
         setCurrentPage(1)
 
@@ -612,7 +583,7 @@ export function LeaderboardTable() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1)
-      console.log("[v0] Hash changed to:", hash)
+
 
       if (hash === "leaderboard") return
 
@@ -622,7 +593,7 @@ export function LeaderboardTable() {
 
       if (validPeriods.includes(hash) || isDynamicMonth || isDynamicYear) {
         const canonical = canonicalizeTimePeriod(hash)
-        console.log("[v0] Setting time period to:", canonical)
+
         setTimePeriod(canonical)
         setCurrentPage(1)
         const timeParams = getTimeParams(canonical)
@@ -646,7 +617,7 @@ export function LeaderboardTable() {
 
   useEffect(() => {
     if (timePeriod) {
-      console.log("[v0] Time period changed, updating API params:", timePeriod)
+
       const timeParams = getTimeParams(timePeriod)
       updateParams({
         offset: (currentPage - 1) * pageSize,
@@ -693,22 +664,7 @@ export function LeaderboardTable() {
     }
   }
 
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return <Trophy className="w-5 h-5 text-yellow-500" />
-      case 2:
-        return <Medal className="w-5 h-5 text-gray-400" />
-      case 3:
-        return <Award className="w-5 h-5 text-amber-600" />
-      default:
-        return (
-          <span className="w-5 h-5 flex items-center justify-center text-sm font-bold text-muted-foreground">
-            #{rank}
-          </span>
-        )
-    }
-  }
+
 
   const totalPages = leaderboardData ? Math.ceil(leaderboardData.metadata.total / pageSize) : 0
 

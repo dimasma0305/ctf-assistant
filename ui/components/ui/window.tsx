@@ -155,13 +155,11 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const minimizeWindow = useCallback((id: string) => {
-    console.log("[v0] Minimizing window:", id)
     setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, isMinimized: true } : w)))
   }, [])
 
   const restoreWindow = useCallback(
     (id: string) => {
-      console.log("[v0] Restoring window:", id)
       const newZIndex = nextZIndex + 1
       setNextZIndex(newZIndex + 1)
       setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, isMinimized: false, zIndex: newZIndex } : w)))
@@ -223,7 +221,6 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const minimizeAllWindows = useCallback(() => {
-    console.log("[v0] Minimizing all windows")
     setWindows((prev) => prev.map((w) => ({ ...w, isMinimized: true })))
   }, [])
 
@@ -297,7 +294,6 @@ function WindowTaskbar() {
           size="sm"
           className="flex items-center gap-2 max-w-48 truncate animate-in slide-in-from-bottom-2 duration-300"
           onClick={() => {
-            console.log("[v0] Taskbar button clicked for window:", window.id)
             restoreWindow(window.id)
           }}
         >
@@ -308,7 +304,6 @@ function WindowTaskbar() {
             className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
             onClick={(e) => {
               e.stopPropagation()
-              console.log("[v0] Taskbar close button clicked for window:", window.id)
               closeWindow(window.id)
             }}
           >

@@ -24,6 +24,7 @@ import {
   CheckCircle2,
   Search,
 } from "lucide-react"
+import { getStatusColor, formatDate, getRankIcon } from "@/lib/format-helpers"
 import { Button } from "@/components/ui/button"
 import { getCTFProfile } from "@/lib/actions"
 import { getAchievements } from "@/lib/utils"
@@ -189,43 +190,7 @@ export function CTFRankings() {
     return { returned, hasNext, hasPrev }
   }, [rankingsData?.metadata, ctfRankings.length, offset, totalCTFs])
 
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return <Trophy className="w-5 h-5 text-yellow-500" />
-      case 2:
-        return <Medal className="w-5 h-5 text-gray-400" />
-      case 3:
-        return <Award className="w-5 h-5 text-amber-600" />
-      default:
-        return (
-          <span className="w-5 h-5 flex items-center justify-center text-sm font-bold text-muted-foreground">
-            #{rank}
-          </span>
-        )
-    }
-  }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
-      case "upcoming":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30"
-      case "completed":
-        return "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/30"
-      default:
-        return "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/30"
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
 
   if (loading) {
     return (
@@ -411,8 +376,8 @@ export function CTFRankings() {
                             <TableCell>
                               <div
                                 className={`flex items-center gap-3 cursor-pointer hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent rounded-md p-2 -m-2 transition-all duration-200 border border-transparent hover:border-primary/20 ${loadingProfiles.has(`ctf-profile-${player.user.userId}-${ctf.ctf_id}`)
-                                    ? "opacity-60"
-                                    : ""
+                                  ? "opacity-60"
+                                  : ""
                                   }`}
                                 onClick={() => handleUserClick(ctf.ctf_id, player.user.userId)}
                               >

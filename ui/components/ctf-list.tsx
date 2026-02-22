@@ -10,6 +10,7 @@ import { Window, useWindow } from "@/components/ui/window"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Calendar, Users, Trophy, ExternalLink, Search, MapPin, AlertCircle, Target, X } from "lucide-react"
+import { getStatusColor, formatDate } from "@/lib/format-helpers"
 import { useCTFs, useCTFDetails } from "@/hooks/useAPI"
 import type { CTFResponse, CTFsParams } from "@/lib/types"
 
@@ -284,26 +285,7 @@ export function CTFList() {
     openWindow(windowId, windowTitle)
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
-      case "upcoming":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30"
-      case "completed":
-        return "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/30"
-      default:
-        return "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/30"
-    }
-  }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
 
   if (error) {
     return (

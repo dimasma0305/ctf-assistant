@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Trophy, Medal, Award, Search, AlertCircle, X } from "lucide-react"
+import { getRankIcon, getUserInitials, getUserDisplayName } from "@/lib/format-helpers"
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -67,12 +68,10 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
   }
 
   const handleSearchFocus = () => {
-    console.log("[v0] Search expanding, current scroll position:", window.scrollY)
     setIsExpanded(true)
     // Focus the input after animation completes
     setTimeout(() => {
       searchInputRef.current?.focus()
-      console.log("[v0] Search input focused, container position:", searchContainerRef.current?.getBoundingClientRect())
     }, 300)
   }
 
@@ -180,35 +179,7 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
     }
   }, [])
 
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return <Trophy className="w-4 h-4 text-yellow-500" />
-      case 2:
-        return <Medal className="w-4 h-4 text-gray-400" />
-      case 3:
-        return <Award className="w-4 h-4 text-amber-600" />
-      default:
-        return (
-          <span className="w-4 h-4 flex items-center justify-center text-xs font-bold text-muted-foreground">
-            #{rank}
-          </span>
-        )
-    }
-  }
 
-  const getUserInitials = (user: LeaderboardEntry["user"]) => {
-    const name = user.displayName || user.username
-    const parts = name.split(" ")
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase()
-    }
-    return name.slice(0, 2).toUpperCase()
-  }
-
-  const getUserDisplayName = (user: LeaderboardEntry["user"]) => {
-    return user.displayName || user.username
-  }
 
   const formatScore = (score: number) => {
     return score.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
