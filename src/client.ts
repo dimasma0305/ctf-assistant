@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import db from "./Database/connect";
+import { isNoDbMode } from "./utils/env";
 config();
 
 // Validate environment before proceeding
@@ -10,8 +11,10 @@ if (!runStartupValidation()) {
 }
 
 const { TOKEN } = process.env;
-if (!process.env.NODB){
-  db.connect()
+if (!isNoDbMode()) {
+  await db.connect();
+} else {
+  console.warn('⚠️  NODB mode enabled, skipping MongoDB connection');
 }
 
 import {

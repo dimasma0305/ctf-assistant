@@ -2,6 +2,8 @@
  * Validation utilities for Discord bot startup
  */
 
+import { getMongoUri, isNoDbMode } from "./env";
+
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
@@ -63,9 +65,9 @@ export function validateEnvironment(): ValidationResult {
   }
 
   // Check database connection if not NODB mode
-  if (!process.env.NODB) {
-    if (!process.env.MONGODB_URI && !process.env.DATABASE_URL) {
-      warnings.push('No MongoDB connection string found (MONGODB_URI or DATABASE_URL)');
+  if (!isNoDbMode()) {
+    if (!getMongoUri()) {
+      warnings.push('No MongoDB connection string found (MONGO_URI, MONGODB_URI, or DATABASE_URL)');
     }
   }
 
@@ -202,4 +204,3 @@ export function validateBotConfig(config: {
 
   return { valid: errors.length === 0, errors, warnings };
 }
-
