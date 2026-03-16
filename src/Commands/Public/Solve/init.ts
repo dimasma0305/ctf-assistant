@@ -1,5 +1,5 @@
 import { SubCommand } from "../../../Model/command";
-import { SlashCommandSubcommandBuilder, TextChannel, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, AttachmentBuilder, ChatInputCommandInteraction, ModalSubmitInteraction } from "discord.js";
+import { SlashCommandSubcommandBuilder, TextChannel, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, AttachmentBuilder, ChatInputCommandInteraction, ModalSubmitInteraction, MessageFlags } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { parseChallenges, ParsedChallenge, parseFetchCommand, ParsedFetchCommand, saveFetchCommand, updateThreadsStatus } from "./utils";
 
@@ -23,7 +23,7 @@ export const command: SubCommand = {
         
         const channel = interaction.channel;
         if (!channel || !(channel instanceof TextChannel)) {
-            await interaction.reply({ content: "This command can only be used in a text channel.", ephemeral: true });
+            await interaction.reply({ content: "This command can only be used in a text channel.", flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -32,7 +32,7 @@ export const command: SubCommand = {
 
         // Priority: File upload > Fetch command > Modal input
         if (jsonFile) {
-            await interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
             
             // Validate file type
             if (!jsonFile.name.endsWith('.json') && !jsonFile.name.endsWith('.txt')) {
@@ -64,7 +64,7 @@ export const command: SubCommand = {
                 return;
             }
         } else if (fetchCommand) {
-            await interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
             // Handle fetch command (existing code)
         } else {
             // Show modal with multiple inputs for large JSON
@@ -121,14 +121,14 @@ export const command: SubCommand = {
                 if (!combinedJson) {
                     await modalSubmitInteraction.reply({ 
                         content: "❌ No JSON data provided. Command cancelled.", 
-                        ephemeral: true 
+                        flags: MessageFlags.Ephemeral 
                     });
                     return;
                 }
                 
                 finalJsonData = combinedJson;
                 
-                await modalSubmitInteraction.deferReply({ ephemeral: true });
+                await modalSubmitInteraction.deferReply({ flags: MessageFlags.Ephemeral });
                 currentInteraction = modalSubmitInteraction;
                 
             } catch (error) {
@@ -246,12 +246,12 @@ export const command: SubCommand = {
                 await saveFetchCommand(parsedFetch, ctfData, channel.id);
                 await currentInteraction.followUp({ 
                     content: "✅ Auto-update fetch command saved! The bot will now fetch updates every 5 minutes until the CTF ends.", 
-                    ephemeral: true 
+                    flags: MessageFlags.Ephemeral 
                 });
             } catch (error) {
                 await currentInteraction.followUp({ 
                     content: `⚠️ Failed to save fetch command for auto-updates: ${error}`, 
-                    ephemeral: true 
+                    flags: MessageFlags.Ephemeral 
                 });
             }
         }

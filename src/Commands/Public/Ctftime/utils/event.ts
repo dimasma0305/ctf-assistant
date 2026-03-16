@@ -565,6 +565,15 @@ ${weight}
         // Calculate timeout duration, cap at max safe 32-bit signed integer (2147483647 ms = ~24.8 days)
         const timeUntilFinish = this.options.ctfEvent.finish.getTime() - new Date().getTime();
         const MAX_TIMEOUT = 2147483647; // Maximum safe timeout in milliseconds
+        if (timeUntilFinish <= 0) {
+            logInfo('Skipping message listener for finished CTF event', {
+                messageId: msg.id,
+                eventId: this.options.ctfEvent.id,
+                eventTitle: this.options.ctfEvent.title,
+            });
+            return;
+        }
+
         const collectorTimeout = Math.min(timeUntilFinish, MAX_TIMEOUT);
 
         const collector = msg.createMessageComponentCollector({
@@ -728,6 +737,7 @@ export async function restoreEventMessageListeners(client: MyClient) {
     logInfo("Restoring event message listeners...")
     try {
         const storedMessages = await MessageModel.find({});
+        const now = Date.now();
 
         for (const storedMessage of storedMessages) {
             try {
@@ -735,6 +745,16 @@ export async function restoreEventMessageListeners(client: MyClient) {
                 if (!storedMessage.guildId || !storedMessage.channelId || !storedMessage.messageId || !storedMessage.ctfEventId) {
                     logWarn('Invalid stored message record encountered', {
                         storedMessageId: storedMessage._id?.toString?.(),
+                    });
+                    continue;
+                }
+
+                const storedExpiry = storedMessage.expireAt ? new Date(storedMessage.expireAt).getTime() : null;
+                if (storedExpiry !== null && storedExpiry <= now) {
+                    await MessageModel.deleteOne({ _id: storedMessage._id });
+                    logInfo('Deleted expired listener record before restore', {
+                        messageId: storedMessage.messageId,
+                        ctfEventId: storedMessage.ctfEventId,
                     });
                     continue;
                 }
@@ -770,6 +790,15 @@ export async function restoreEventMessageListeners(client: MyClient) {
                         logWarn('CTF event not found while restoring listener', {
                             ctfEventId: storedMessage.ctfEventId,
                             messageId: storedMessage.messageId,
+                        });
+                        continue;
+                    }
+
+                    if (ctfEvent.finish.getTime() <= now) {
+                        await MessageModel.deleteOne({ _id: storedMessage._id });
+                        logInfo('Deleted stale listener record for finished CTF event', {
+                            messageId: storedMessage.messageId,
+                            ctfEventTitle: ctfEvent.title,
                         });
                         continue;
                     }
