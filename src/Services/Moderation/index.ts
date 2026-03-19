@@ -1,4 +1,4 @@
-import { OmitPartialGroupDMChannel, Message as DiscordMessage, Guild } from "discord.js";
+import { Collection, Guild, Message as DiscordMessage, OmitPartialGroupDMChannel } from "discord.js";
 
 // Spam detection: track recent messages by user
 interface RecentMessage {
@@ -8,6 +8,111 @@ interface RecentMessage {
 }
 
 const recentMessages: Record<string, RecentMessage[]> = {};
+const SPAM_WINDOW_MS = 60_000;
+const SPAM_KICK_CLEANUP_WINDOW_MS = 5 * 60_000;
+const MESSAGE_FETCH_BATCH_SIZE = 100;
+
+interface MessageFetchChannel {
+  id: string;
+  isTextBased(): boolean;
+  messages: {
+    fetch(options: {
+      limit: number;
+      before?: string;
+    }): Promise<Collection<string, DiscordMessage<boolean>>>;
+  };
+}
+
+function isMessageFetchChannel(channel: unknown): channel is MessageFetchChannel {
+  if (!channel || typeof channel !== "object") {
+    return false;
+  }
+
+  if (!("isTextBased" in channel) || typeof channel.isTextBased !== "function") {
+    return false;
+  }
+
+  return channel.isTextBased() && "messages" in channel;
+}
+
+async function deleteMessagesById(
+  message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
+  messageIds: string[],
+): Promise<void> {
+  for (const messageId of messageIds) {
+    try {
+      const messageToDelete = await message.channel.messages.fetch(messageId);
+      await messageToDelete.delete();
+    } catch (error) {
+      console.log(`Could not delete message ${messageId}: ${error}`);
+    }
+  }
+}
+
+async function deleteRecentMessagesFromUser(
+  message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
+  userId: string,
+  cutoffTimestamp: number,
+): Promise<number> {
+  if (!message.guild) {
+    return 0;
+  }
+
+  const channels = await message.guild.channels.fetch();
+  let deletedCount = 0;
+
+  for (const [, channel] of channels) {
+    if (!isMessageFetchChannel(channel)) {
+      continue;
+    }
+
+    let before: string | undefined;
+
+    while (true) {
+      let messages: Collection<string, DiscordMessage<boolean>>;
+
+      try {
+        messages = await channel.messages.fetch({
+          limit: MESSAGE_FETCH_BATCH_SIZE,
+          before,
+        });
+      } catch (error) {
+        console.log(`Could not fetch messages from channel ${channel.id}: ${error}`);
+        break;
+      }
+
+      if (messages.size === 0) {
+        break;
+      }
+
+      for (const [, fetchedMessage] of messages) {
+        if (fetchedMessage.createdTimestamp < cutoffTimestamp) {
+          continue;
+        }
+
+        if (fetchedMessage.author.id !== userId) {
+          continue;
+        }
+
+        try {
+          await fetchedMessage.delete();
+          deletedCount++;
+        } catch (error) {
+          console.log(`Could not delete recent message ${fetchedMessage.id}: ${error}`);
+        }
+      }
+
+      const oldestMessage = messages.last();
+      if (!oldestMessage || oldestMessage.createdTimestamp < cutoffTimestamp || messages.size < MESSAGE_FETCH_BATCH_SIZE) {
+        break;
+      }
+
+      before = oldestMessage.id;
+    }
+  }
+
+  return deletedCount;
+}
 
 // Spam detection function
 export async function handleSpamDetection(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>): Promise<boolean> {
@@ -24,7 +129,7 @@ export async function handleSpamDetection(message: OmitPartialGroupDMChannel<Dis
   }
 
   // Clean old messages (older than 1 minute)
-  recentMessages[userId] = recentMessages[userId].filter(msg => now - msg.timestamp < 60000);
+  recentMessages[userId] = recentMessages[userId].filter(msg => now - msg.timestamp < SPAM_WINDOW_MS);
 
   // Add current message
   recentMessages[userId].push({ content, timestamp: now, messageId: message.id });
@@ -32,24 +137,29 @@ export async function handleSpamDetection(message: OmitPartialGroupDMChannel<Dis
   // Check for spam: same message 3 times within 1 minute
   const sameMessages = recentMessages[userId].filter(msg => msg.content === content);
   if (sameMessages.length >= 3) {
-    // Delete all spam messages (including previous ones)
-    for (const spamMessage of sameMessages) {
-      try {
-        const messageToDelete = await message.channel.messages.fetch(spamMessage.messageId);
-        await messageToDelete.delete();
-      } catch (error) {
-        console.log(`Could not delete message ${spamMessage.messageId}: ${error}`);
-      }
-    }
+    await deleteMessagesById(message, sameMessages.map((spamMessage) => spamMessage.messageId));
     
     // Don't kick if it's only stickers
     if (!isOnlySticker) {
-      // Ban the user from the guild
       if (message.member && message.guild) {
-        await message.member.kick("Spamming the same message multiple times");
+        try {
+          await message.member.kick("Spamming the same message multiple times");
+
+          const deletedRecentMessageCount = await deleteRecentMessagesFromUser(
+            message,
+            userId,
+            now - SPAM_KICK_CLEANUP_WINDOW_MS,
+          );
+
+          console.log(
+            `Deleted ${deletedRecentMessageCount} recent message(s) from spammer ${userId} after kick.`,
+          );
+        } catch (error) {
+          console.log(`Could not kick spammer ${userId}: ${error}`);
+        }
       }
       try {
-        await message.author.send("You have been banned for spamming the same message multiple times.");
+        await message.author.send("You have been kicked for spamming the same message multiple times.");
       } catch (error) {
         console.log("Could not send DM to user");
       }
