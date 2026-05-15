@@ -69,9 +69,10 @@ function initializeBot() {
 }
 
 // Ready event - fired when bot first connects
-client.on(Events.ClientReady, () => {
+client.on(Events.ClientReady, (readyClient) => {
   console.log(`✅ Bot is ready! Logged in as ${client.user?.tag}`);
   initializeBot();
+  client.emit("clientReady", readyClient);
 });
 
 // Resumed event - fired when session is resumed

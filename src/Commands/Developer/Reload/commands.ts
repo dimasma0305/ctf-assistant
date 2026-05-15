@@ -6,10 +6,9 @@ const { loadCommands } = require("../../../Handlers/commandHandler");
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
     .setName("events").setDescription("Reload your events"),
-  execute(interaction, client) {
-    loadCommands(client);
-    interaction.editReply({
-      content: "Reloaded Commands",
-    });
+  async execute(interaction, client) {
+    await interaction.deferReply({ flags: ["Ephemeral"] });
+    await loadCommands(client);
+    await interaction.editReply({ content: "Reloaded Commands" });
   },
 };

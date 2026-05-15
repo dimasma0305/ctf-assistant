@@ -15,3 +15,17 @@ bun.lockb
 venv/
 __pycache__/
 *.pyc
+
+# AI assistant local files (keep local, do not push)
+AGENT.md
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+COPILOT.md
+
+# AI assistant local directories
+.claude/
+.cursor/
+.aider*
+.roo/
+.windsurf/

@@ -13,6 +13,26 @@ type UpdateThreadsResult = {
     skippedThreads: number;
 };
 
+const DISCORD_MESSAGE_MAX_LENGTH = 2000;
+const TRUNCATION_SUFFIX = '\n... (truncated)';
+
+function truncateForDiscord(content: string, maxLength: number = DISCORD_MESSAGE_MAX_LENGTH): string {
+    if (content.length <= maxLength) {
+        return content;
+    }
+    const truncated = content.slice(0, Math.max(0, maxLength - TRUNCATION_SUFFIX.length));
+    return `${truncated}${TRUNCATION_SUFFIX}`;
+}
+
+function toCompactErrorMessage(error: unknown, maxLength: number = 280): string {
+    const raw = error instanceof Error ? (error.stack || error.message) : String(error);
+    const compact = raw.replace(/\s+/g, ' ').trim();
+    if (compact.length <= maxLength) {
+        return compact;
+    }
+    return `${compact.slice(0, Math.max(0, maxLength - 1))}…`;
+}
+
 // Serialize update runs per channel+ctf to avoid duplicate thread/message creation
 const threadUpdateQueues = new Map<string, Promise<UpdateThreadsResult>>();
 const threadInfoMessageCache = new Map<string, string>();
@@ -394,25 +414,40 @@ async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: Tex
                 ];
                 const baseMessageSize = baseMessageParts.filter(l => l !== '').join('\n').length;
                 
-                // Discord message limit is 4000, leave room for description header and code blocks
-                const MAX_MESSAGE_LENGTH = 2000;
+                // Discord message content limit is 2000.
+                const MAX_MESSAGE_LENGTH = DISCORD_MESSAGE_MAX_LENGTH;
                 const DESCRIPTION_OVERHEAD = 30; // "\n**Description:**\n```\n```\n"
-                const maxDescriptionLength = MAX_MESSAGE_LENGTH - baseMessageSize - DESCRIPTION_OVERHEAD - 100; // Extra buffer
+                const maxDescriptionLength = Math.max(0, MAX_MESSAGE_LENGTH - baseMessageSize - DESCRIPTION_OVERHEAD - 100); // Extra buffer
                 
                 // Truncate description if needed
                 let descriptionText = '';
                 if (sanitizedDescription) {
                     if (sanitizedDescription.length > maxDescriptionLength) {
-                        sanitizedDescription = sanitizedDescription.substring(0, maxDescriptionLength - 50) + '\n\n... (truncated, too long for Discord)';
+                        const safeDescriptionLimit = Math.max(0, maxDescriptionLength - 50);
+                        sanitizedDescription = sanitizedDescription.slice(0, safeDescriptionLimit) + '\n\n... (truncated, too long for Discord)';
                     }
                     descriptionText = `\n**Description:**\n\`\`\`\n${sanitizedDescription}\n\`\`\``;
                 }
                 
-                const challengeInfo = [
+                let challengeInfo = [
                     ...baseMessageParts.slice(0, 6), // Everything up to tags
                     descriptionText,
                     ...baseMessageParts.slice(6) // Everything after tags
                 ].filter(line => line !== '').join('\n');
+
+                // Final guard: make sure we never exceed Discord's message limit.
+                if (challengeInfo.length > DISCORD_MESSAGE_MAX_LENGTH) {
+                    const fallbackWithoutDescription = [
+                        ...baseMessageParts.slice(0, 6),
+                        ...baseMessageParts.slice(6)
+                    ].filter(line => line !== '').join('\n');
+
+                    if (fallbackWithoutDescription.length > DISCORD_MESSAGE_MAX_LENGTH) {
+                        challengeInfo = truncateForDiscord(fallbackWithoutDescription, DISCORD_MESSAGE_MAX_LENGTH);
+                    } else {
+                        challengeInfo = fallbackWithoutDescription;
+                    }
+                }
 
                 const botMessage = await findBotChallengeInfoMessage(existingThread, channel.client.user.id, challenge.id);
                 const allBotMessages = await findAllBotChallengeInfoMessages(existingThread, channel.client.user.id, challenge.id);
@@ -475,7 +510,7 @@ async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: Tex
                     console.log(`Created first message in thread: ${existingThread.name}`);
                 }
             } catch (error) {
-                errors.push(`${challenge.name}: ${error}`);
+                errors.push(`${challenge.name}: ${toCompactErrorMessage(error)}`);
                 console.error(`Failed to process thread for ${challenge.name}:`, error);
             }
         }

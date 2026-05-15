@@ -5,6 +5,14 @@ import { MyClient } from "../../Model/client";
 export const event: Event = {
   name: "interactionCreate",
   async execute(interaction: ChatInputCommandInteraction, client: MyClient) {
+    const truncateForDiscord = (content: string, maxLength: number = 2000): string => {
+      if (content.length <= maxLength) {
+        return content;
+      }
+      const suffix = '\n... (truncated)';
+      return `${content.slice(0, Math.max(0, maxLength - suffix.length))}${suffix}`;
+    };
+
     if (!interaction.isChatInputCommand()) return;
     const command = client.commands.get(interaction.commandName);
     if (!command) {
@@ -81,14 +89,15 @@ export const event: Event = {
         
         // Handle error response based on interaction state
         const errorMessage = error?.toString() || "An error occurred while executing the command.";
+        const safeErrorMessage = truncateForDiscord(`❌ ${errorMessage}`);
         
         try {
           if (interaction.deferred) {
-            await interaction.editReply({ content: `❌ ${errorMessage}` });
+            await interaction.editReply({ content: safeErrorMessage });
           } else if (interaction.replied) {
-            await interaction.followUp({ content: `❌ ${errorMessage}`, flags: ["Ephemeral"] });
+            await interaction.followUp({ content: safeErrorMessage, flags: ["Ephemeral"] });
           } else {
-            await interaction.reply({ content: `❌ ${errorMessage}`, flags: ["Ephemeral"] });
+            await interaction.reply({ content: safeErrorMessage, flags: ["Ephemeral"] });
           }
         } catch (replyError) {
           console.error('Failed to send error response:', replyError);

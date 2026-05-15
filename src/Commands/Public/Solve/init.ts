@@ -18,6 +18,14 @@ export const command: SubCommand = {
             .setRequired(false)
         ),
     async execute(interaction, _client) {
+        const truncateForDiscord = (content: string, maxLength: number = 2000): string => {
+            if (content.length <= maxLength) {
+                return content;
+            }
+            const suffix = '\n... (truncated)';
+            return `${content.slice(0, Math.max(0, maxLength - suffix.length))}${suffix}`;
+        };
+
         let finalJsonData: string | null = null;
         let currentInteraction: ChatInputCommandInteraction | ModalSubmitInteraction = interaction;
         
@@ -65,7 +73,6 @@ export const command: SubCommand = {
             }
         } else if (fetchCommand) {
             await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-            // Handle fetch command (existing code)
         } else {
             // Show modal with multiple inputs for large JSON
             const modal = new ModalBuilder()
@@ -169,8 +176,6 @@ export const command: SubCommand = {
                     body: parsedFetch.body
                 });
 
-                await saveFetchCommand(parsedFetch, ctfData, channel.id);
-
                 if (!response.ok) {
                     await currentInteraction.editReply(`❌ Fetch command failed: ${response.status} ${response.statusText}`);
                     return;
@@ -238,7 +243,7 @@ export const command: SubCommand = {
             }
         }
 
-        await currentInteraction.editReply(summary.join('\n'));
+        await currentInteraction.editReply(truncateForDiscord(summary.join('\n')));
         
         // Handle fetch command if provided - save it for periodic updates
         if (fetchCommand && parsedFetch) {
@@ -250,7 +255,7 @@ export const command: SubCommand = {
                 });
             } catch (error) {
                 await currentInteraction.followUp({ 
-                    content: `⚠️ Failed to save fetch command for auto-updates: ${error}`, 
+                    content: truncateForDiscord(`⚠️ Failed to save fetch command for auto-updates: ${error}`), 
                     flags: MessageFlags.Ephemeral 
                 });
             }
