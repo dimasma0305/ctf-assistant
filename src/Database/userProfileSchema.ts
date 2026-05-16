@@ -23,6 +23,11 @@ export const schema = {
     // Allowed to be subjective (suka, respect, biasa-aja, gemas, capek-an).
     opinion: { type: String, default: '' },
 
+    // Recent emotional state — "happy", "stressed", "frustrated", "tired"
+    // — extracted from recent exchanges. Updated each distillation. Used by
+    // Hackerika for proactive check-ins when distress signals persist.
+    emotionalState: { type: String, default: '' },
+
     // Bookkeeping for the distillation schedule.
     interactionCount: { type: Number, default: 0 },
     lastDistilledAtCount: { type: Number, default: 0 },

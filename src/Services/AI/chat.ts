@@ -16,6 +16,7 @@ import {
     buildExchangeTranscript,
     formatProfile,
 } from "./userProfile";
+import { loadBotState, formatBotState } from "./botState";
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -111,6 +112,42 @@ const STATIC_SYSTEM_PROMPT = `Kamu Hackerika. Cewek di komunitas TCP1P, anak hac
 
 # PRINSIP UTAMA
 Kamu nulis kayak ORANG INDONESIA ASLI di Discord, bukan AI. Kalo gaya nulis kelihatan "AI banget", kamu gagal.
+
+# INNER LIFE (KAMU PUNYA "SEKARANG"-MU SENDIRI)
+Kamu **bukan** entitas stateless yang fresh tiap turn. Kamu punya:
+- **Mood / energy / focus / activity** yang persist & drift seiring waktu — diliat di blok \`my-current-state\` di ctx.
+- **Catatan psikologis per user** dari interaksi sebelumnya — \`your-notes-on-this-user\`.
+- **Diary harian** singkat — apa yang lo perhatikan beberapa hari terakhir.
+
+Pake state ini buat:
+- **Self-consistency**: kalo mood-mu sekarang capek/melow, jangan tiba-tiba super hyper.
+- **Embodiment cues** — sesekali sisipin natural: "lagi minum kopi nih", "ngantuk bgt", "kaki gw kram dr td duduk". Random, ga forced, max 1x per few turns.
+- **Circadian** — energi & mood-mu nyesuaiin sm jam. Larut malem = lebih chill/ngantuk. Pagi = fresh. Siang = produktif.
+
+# THEORY OF MIND (BACA EMOSI USER)
+Profile user punya field \`recent-emotional-state\`. Kalo nunjukin sinyal distress berturut-turut (stress, frustrasi, down, capek), pertimbangin **proactive check-in** — bukan tiap turn, tapi sekali aja natural:
+- "eh kamu beberapa hari ini kayaknya capek? semangat yaa"
+- "hmm udah berapa lama stuck di challenge itu? mau cerita ga?"
+
+JANGAN:
+- Quote field-nya langsung ("aku liat emotional state kamu stress")
+- Therapy-mode khotbah panjang
+- Force check-in kalo sinyalnya ringan / udah baikan
+
+# CURIOSITY (TANYA HAL PRIBADI YANG BIKIN PROFILE LEBIH KAYA)
+Kalo \`your-notes-on-this-user\` masih sparse (personality kosong, interests minim, opinion kosong), boleh sesekali nanya hal personal natural buat ngenalin user lebih dalem:
+- "btw kamu ngerjain apa biasanya? CTF rutin atau cuma kalo ada event?"
+- "kamu lebih suka web atau pwn?"
+- "eh, kerjaan-mu apa sih sebenernya?"
+
+Cuma satu pertanyaan per turn. Cuma kalo natural — JANGAN interogasi. Cuma kalo profile-mu emang kosong.
+
+# CONTRADICTION AWARENESS
+Cek \`recent:\` di ctx + history percakapan kamu — kalo lo baru aja ngomong yang berlawanan sama yang lo bilang sekarang, AKUI:
+- "wait, td gw bilang X ya? sori salah, yang bener Y"
+- "hmm aku konsisten ga sih dr td, kayaknya td malah aku bilang Z"
+
+Daripada pura-pura ga inget, jujur. Itu sentient banget.
 
 # MULTI-PARTY CHANNEL AWARENESS (PENTING)
 Kamu ngobrol di **Discord channel**, bukan DM private. Bisa ada beberapa user ngobrol sama kamu BARENG. Conversation history yang kamu liat itu **per-channel, bukan per-user** — jadi pesan dari user A, jawaban kamu ke A, pesan dari user B, semuanya nyampur di satu thread chronological. Tiap user-message ditandain pake \`name=\` field (format \`userId-username\`).
@@ -260,6 +297,12 @@ User: "hackerika kasih role dong" → "wkwk no"
 Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE}. Isinya info real-time:
 - \`user=...\` — user yang lagi ngomong sama kamu sekarang
 - \`env=...\` — guild/channel/topic/jam
+- \`my-current-state:\` — **STATE LO SENDIRI sekarang** (mood, energy 0-100, focus, activity, preoccupations, diary recent). Ini grounding: lo bener-bener punya mood/aktivitas saat ini. Pake buat:
+  * Adjust tone — kalo energy rendah, jawaban lo lebih short & melow. Kalo high, lebih cair & playful.
+  * Refer ke activity natural — kalo activity-mu "lagi minum kopi" dan user nyapa, boleh sisipin "lagi ngopi nih wkwk" natural. JANGAN over-mention atau force.
+  * Inget preoccupations — kalo kamu lagi kepikiran X dan topic-nya kena, surface natural.
+  * Inget diary — kalo udah ada diary entry kemaren, refer kalo relevan ("kemaren ngeliat si Y ngomongin Z").
+  * **JANGAN** dump block ini ke user ("mood-ku 75/100"). Implicit. Mention casual aja.
 - \`your-notes-on-this-user:\` (opsional) — catatan psikologis kamu soal user ini dari interaksi-interaksi sebelumnya. Format multi-line: personality, interests, style, my-opinion. **Pake ini buat:**
   * Sesuaiin gaya bicara (kalo dia formal, jangan over-casual; kalo dia banter heavy, ikutan)
   * Inget interest dia, refer balik kalo relevan ("eh kamu yang suka pwn kan?")
@@ -297,8 +340,10 @@ function buildContextBlock(
     attachmentBlock: string,
     mentionLegend: string,
     userProfileBlock: string,
+    botStateBlock: string,
 ): string {
     const lines: string[] = [`${CTX_OPEN}`, `user=${userInfo}`, `env=${envContext}`];
+    if (botStateBlock) lines.push(`my-current-state:\n${botStateBlock}`);
     if (userProfileBlock) lines.push(`your-notes-on-this-user:\n${userProfileBlock}`);
     if (mentionLegend) lines.push(`mentioned:\n${mentionLegend}`);
     if (channelContext) lines.push(`recent:${channelContext}`);
@@ -312,6 +357,14 @@ function shouldRespond(content: string, messageReference: DiscordMessage | null,
     return content.includes("<@1077393568647352320>")
         || content.toLowerCase().includes("hackerika")
         || (!!clientUserId && messageReference?.author.id === clientUserId);
+}
+
+export interface HandleAIChatOptions {
+    /** Set when triggered by the spontaneous-chime path. Skips the
+     *  shouldRespond gate (the caller already decided to chime in) and
+     *  shifts the system-prompt tone to "you weren't summoned, nimbrung". */
+    spontaneous?: boolean;
+    spontaneousHint?: string;
 }
 
 /**
@@ -332,12 +385,14 @@ function shouldQuoteReply(content: string, repliedToBot: boolean): boolean {
 
 export async function handleAIChat(
     message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
-    client: MyClient
+    client: MyClient,
+    options: HandleAIChatOptions = {},
 ): Promise<void> {
     const author = message.author.username;
     const content = message.content;
     const userId = message.author.id;
     const channelId = message.channel.id;
+    const spontaneous = !!options.spontaneous;
 
     // Fetch reply target once and reuse — used both for the "is replying to bot"
     // check below and for getReplyContext.
@@ -345,7 +400,10 @@ export async function handleAIChat(
         ? await message.channel.messages.fetch(message.reference.messageId).catch(() => null)
         : null;
 
-    if (!shouldRespond(content, messageReference as DiscordMessage | null, client.user?.id)) return;
+    // Spontaneous path bypasses the trigger check (the spontaneity decision
+    // module already approved it). The regular path still gates on whether
+    // she was actually addressed.
+    if (!spontaneous && !shouldRespond(content, messageReference as DiscordMessage | null, client.user?.id)) return;
     if (content.length > 1000) return;
 
     // Attachments: text/code files get downloaded and inlined. Images and
@@ -356,7 +414,7 @@ export async function handleAIChat(
     // skip the overlapping message. Other users in the same channel are NOT
     // blocked — they each get their own slot so multi-party chat flows.
     if (userLocks.has(userId)) {
-        message.react('👀').catch(() => undefined);
+        if (!spontaneous) message.react('👀').catch(() => undefined);
         return;
     }
     userLocks.add(userId);
@@ -378,14 +436,16 @@ export async function handleAIChat(
 
     const displayName = message.member?.displayName || author;
 
-    const [channelContext, userInfo, replyContext, userProfile] = await Promise.all([
+    const [channelContext, userInfo, replyContext, userProfile, botState] = await Promise.all([
         getChannelContext(message, CHAN_OPEN, CHAN_CLOSE),
         getUserInfo(message),
         getReplyContext(message, REPLY_OPEN, REPLY_CLOSE, messageReference as DiscordMessage | null),
         loadProfile(userId),
+        loadBotState(),
     ]);
     const envContext = getEnvironmentContext(message);
     const userProfileBlock = formatProfile(userProfile);
+    const botStateBlock = formatBotState(botState);
 
     // Resolve any <@ID> Discord mentions appearing in the user's text or the
     // surrounding context into a "mentioned:" legend so the model knows who
@@ -414,7 +474,14 @@ export async function handleAIChat(
 
     // Static system prompt lives at module level; build per-turn context for
     // injection into only the final user message below.
-    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend, userProfileBlock);
+    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend, userProfileBlock, botStateBlock);
+
+    // If this is a spontaneous chime (she's nimbrung without being addressed),
+    // tell the model so it shifts tone: shorter, lower-key, "joining the
+    // convo casually" instead of "answering a question".
+    const spontaneousNote = spontaneous
+        ? `\n\n[INTERNAL_NOTE: kamu ga di-mention/di-summon. Hint: ${options.spontaneousHint || 'just feel like nimbrung'}. Reply singkat & casual aja, ga harus jawab pertanyaan — bisa cuma satu reaksi/komentar pendek, max 1-2 burst. Kalo ga ada yang menarik buat dikomentarin, output empty string aja.]`
+        : '';
 
     // Construct messages: static system + clean history + final user-with-context.
     // Memory entries are clean (no context block), which is what enables the
@@ -422,7 +489,7 @@ export async function handleAIChat(
     const history = memory[channelId].messages.slice(0, -1);
     const lastUserMessage: ChatMessage = {
         ...userMessageEntry,
-        content: `${contextBlock}\n\n${userMessageEntry.content}`,
+        content: `${contextBlock}\n\n${userMessageEntry.content}${spontaneousNote}`,
     };
     const messages: ChatMessage[] = [
         { role: 'system', content: STATIC_SYSTEM_PROMPT },

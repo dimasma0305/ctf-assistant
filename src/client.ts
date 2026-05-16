@@ -31,6 +31,8 @@ import { SessionScheduler } from "./Services/SessionScheduler";
 import { ConnectionStateManager, ConnectionState } from "./Services/ConnectionStateManager";
 import { handleAIChat, updateChannelCache } from "./Services/AI";
 import { handleSpamDetection, handlePhishingDetection } from "./Services/Moderation";
+import { maybeReactToMessage } from "./Services/AI/reactions";
+import { shouldChimeIn } from "./Services/AI/spontaneous";
 import "./Services/AI/memory";
 
 
@@ -286,8 +288,30 @@ client.on(Events.MessageCreate, async (message) => {
   const isPhishing = await handlePhishingDetection(message);
   if (isPhishing) return;
 
-  // Handle AI chat functionality
+  // Ambient reaction (fire-and-forget) — emoji reactions on triggers like
+  // wins, frustration, late-night vibes. Cheap, makes her feel "present"
+  // even when not actively replying.
+  void maybeReactToMessage(message as DiscordMessage, client.user?.id);
+
+  // Handle AI chat functionality (gated on @mention / "hackerika" / reply-to-her).
   await handleAIChat(message, client);
+
+  // Spontaneous chime-in path — for messages where she WAS NOT addressed.
+  // The decision module gates this aggressively (cooldowns, quiet hours,
+  // probability + profile-based scoring). Fire-and-forget.
+  void (async () => {
+    try {
+      const decision = await shouldChimeIn(message as DiscordMessage, client.user?.id);
+      if (!decision.shouldChime) return;
+      console.log(`💭 [Spontaneous] ${decision.reason} → chiming in on msg ${message.id}`);
+      await handleAIChat(message as DiscordMessage, client, {
+        spontaneous: true,
+        spontaneousHint: decision.promptHint,
+      });
+    } catch (error) {
+      console.error('[Spontaneous] decision/chime failed:', error);
+    }
+  })();
 });
 
 export default client
