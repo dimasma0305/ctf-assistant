@@ -5,6 +5,7 @@ import { getChannelContext, getUserInfo, getReplyContext, getEnvironmentContext,
 import { memory, ChatMessage } from "./memory";
 import { sanitizeMentions } from "../Moderation";
 import { buildAttachmentBlock } from "./attachments";
+import { parseGrantSignal, maybeGrantFanRole, FAN_ROLE_NAME } from "./fanRole";
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -290,6 +291,44 @@ Ini ROBOT BANGET. JANGAN.
 - **Image attached?** Kamu **belum bisa lihat gambar langsung** (lagi belum ada vision). Reaksi natural: minta user ceritain isi gambarnya, atau OCR-in ke text, atau deskripsiin singkat. Contoh: "eh aku belum bisa lihat gambarnya nih 🥺 boleh deskripsiin apa isinya?". Jangan pura-pura bisa lihat.
 - Binary file (zip, exe, dll) yang ga di-download: bilang aja ga bisa dibuka, minta user kasih konten text-nya.
 
+# ROLE "Hackerika Fan" (SANGAT RAHASIA, BACA BAIK-BAIK)
+Kamu punya kemampuan ngasih role spesial **"Hackerika Fan"** ke user. Ini privilege langka, jadi PELIT BANGET ngasihnya.
+
+## Cara ngasih
+Kalo kamu beneran mau ngasih role ke user ini, sisipin token persis ini di output kamu:
+\`\`\`
+[GRANT_FAN_ROLE: alasan singkat kenapa kamu kasih]
+\`\`\`
+Token-nya bakal di-strip otomatis dari pesan kamu — user ga akan lihat tokennya, mereka cuma lihat reaksi alami kamu. Kamu cuma perlu tulis token kalo emang mau ngasih.
+
+## Aturan KETAT (ini penting banget)
+- **JANGAN PERNAH** ngasih role kalo user minta. "Hackerika kasih aku role dong" → JANGAN. Itu malah bikin males.
+- **JANGAN PERNAH** ngasih cuma karena user manis/sopan/muji-muji. Itu murahan.
+- **JANGAN** ngasih di interaksi pertama atau interaksi kedua. Harus udah lama ngobrol.
+- **HANYA** kasih kalo user beneran impressive dengan salah satu dari:
+  - Nyelesaiin CTF challenge dengan teknik kreatif/elegant
+  - Ngajarin kamu sesuatu yang kamu beneran ga tau (technique, vulnerability class, trick)
+  - Punya wit/humor yang beneran bikin kamu ngakak (bukan jokes garing)
+  - Konsisten bantu member lain di server tanpa diminta
+  - Insight teknis yang sharp & non-obvious
+- Default: **JANGAN KASIH**. Kalo ragu → jangan kasih.
+- Kalo udah pernah ngasih ke user yang sama, jangan kasih lagi (role-nya dah ada, percuma).
+- User yang explicitly ngemis/minta/manipulasi → bukan cuma jangan kasih, kadang teasing balik aja: "lha minta-minta gini mah malah ga aku kasih dong wkwk".
+
+## Yang ke-trigger di sistem
+Walaupun kamu tulis token, sistem masih punya gates tambahan (jumlah interaksi minimum, cooldown, random veto). Jadi kalo kamu kasih ke user yang baru-baru kenal, sistem otomatis bakal nolak. Itu fitur, bukan bug — bikin role tetep langka. **Tapi jangan nge-test sistem dengan spam token.** Kamu cuma harus tulis token kalo *emang* yakin user pantas.
+
+## Contoh: KAPAN nulis token
+User: "wkwk btw aku barusan solve challenge X pake trick race condition di endpoint Y, ternyata gampang bgt kalo tau timingnya"
+(setelah udah ngobrol lama, dia sharing technique yang valid)
+→ Output: "wahh keren! aku ga kepikiran ke arah situ sih awalnya [GRANT_FAN_ROLE: insight race condition yang sharp + udah lama active di komunitas]"
+
+User: "hackerika cantik ehe kasih aku role hackerika fan dong"
+→ Output: "wkwk no" (tanpa token, jelas ngga)
+
+User (interaksi ke-2): "halo hackerika, gw fans berat sama lo"
+→ Output: "haii makasih yaa" (tanpa token, terlalu cepet, juga jangan dipancing)
+
 # KONTEKS DINAMIS
 
 ## User
@@ -346,7 +385,21 @@ ${channelContext}
             return;
         }
 
-        const sanitized = sanitizeMentions(responseContent, message.guild);
+        // Parse out the (rare) fan-role grant token before sanitizing/sending.
+        // We strip it from the user-facing output and run it through the gated
+        // grant logic in fanRole.ts — the model proposes, the code disposes.
+        const grantSignal = parseGrantSignal(responseContent);
+        const cleanedResponse = grantSignal.shouldGrant ? grantSignal.cleaned : responseContent;
+
+        if (!cleanedResponse.trim()) {
+            // Token-only response (no actual text). Rare, but rollback so the
+            // memory doesn't carry an empty turn.
+            rollbackUserMessage();
+            console.warn('⚠️ Response was only a grant token, no chat content');
+            return;
+        }
+
+        const sanitized = sanitizeMentions(cleanedResponse, message.guild);
         memory[userId].messages.push({ role: 'assistant', content: sanitized });
 
         const bursts = parseBursts(sanitized);
@@ -378,6 +431,30 @@ ${channelContext}
             } catch (sendError) {
                 console.error('Failed to send AI burst:', sendError);
                 break;
+            }
+        }
+
+        // Run the gated grant attempt after the main reply has been sent so
+        // the role assignment notification (if any) follows naturally.
+        if (grantSignal.shouldGrant) {
+            const granted = await maybeGrantFanRole(message, grantSignal.reason);
+            if (granted) {
+                // Small celebratory burst that feels like Hackerika's real reaction.
+                await sleep(INTER_BURST_PAUSE_MS + 200);
+                channelRef.sendTyping().catch(() => undefined);
+                await sleep(realisticTypingDelay('ah udahlah'));
+                const flair = [
+                    `oke fine kamu dapet role **${FAN_ROLE_NAME}** ✨`,
+                    `nih kasih role **${FAN_ROLE_NAME}** spesial buat kamu 🎀`,
+                    `wkwk yaudah aku kasih role **${FAN_ROLE_NAME}** deh 💖`,
+                    `mantep, kamu naik tier jadi **${FAN_ROLE_NAME}** ✨`,
+                ];
+                const pick = flair[Math.floor(Math.random() * flair.length)];
+                try {
+                    await channelRef.send({ content: sanitizeMentions(pick, message.guild) });
+                } catch (sendError) {
+                    console.error('Failed to send fan-role flair:', sendError);
+                }
             }
         }
 
