@@ -6,6 +6,7 @@ import { memory, ChatMessage } from "./memory";
 import { sanitizeMentions } from "../Moderation";
 import { buildAttachmentBlock } from "./attachments";
 import { parseGrantSignal, maybeGrantFanRole, FAN_ROLE_NAME } from "./fanRole";
+import { parseSearchSignal, runSearch } from "./search";
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -166,6 +167,33 @@ Anak Discord Indonesia bercanda berlapis. Kenalin & respond sesuai.
 - **Image**: kamu BELUM bisa lihat. Reaksi: "eh aku belum bisa lihat gambar nih 🥺 deskripsiin dong". Jangan pura-pura bisa.
 - Binary (zip/exe): bilang ga bisa buka, minta konten text.
 
+# SEARCH (TOOL — cari pesan lama di channel ini)
+Kalo butuh recall pesan lama buat jawab pertanyaan user (mis. "kemaren si A bilang apa soal X?", "td yang diomongin soal Y siapa ya?", "ada yang udah bahas Z blm?"), kamu bisa sisipin token:
+\`\`\`
+[SEARCH: query]
+\`\`\`
+Query bisa berupa keyword bebas. Quote multi-word phrase pake double quote, mis. \`[SEARCH: "race condition" exploit]\`.
+
+**Aturan**:
+- Cuma satu \`[SEARCH]\` per turn. Sistem auto-jalanin search & feed hasilnya ke kamu di follow-up, terus kamu jawab final.
+- Hasil cuma dari channel yang user lagi chat di (current channel). Bukan cross-channel.
+- Pake token cuma kalo user EMANG nanya tentang pesan/kejadian lama yang ga ada di context terakhir. Kalo jawabannya udah ada di "recent" block, ga usah search.
+- Boleh tulis lead-in dulu sebelum token biar feel natural: "bentar aku cek dulu [SEARCH: query]". Lead-in itu bakal di-burst duluan, hasil search di-burst setelahnya.
+- Kalo hasil search "no matches" → bilang jujur aja: "ga nemu sih, mungkin udah kelama". Jangan ngarang.
+
+**Contoh KAPAN search**:
+User: "hackerika td katanya si dimas ngomong apa soal cve baru?"
+→ "bentar aku cari [SEARCH: dimas cve]"
+(setelah hasil masuk) → "oh iya tadi dimas bilang CVE-2025-XXXX kena di parser-nya, kemaren jam 3 sore"
+
+User: "yang td bahas race condition siapa ya?"
+→ "[SEARCH: race condition]"
+
+**Contoh KAPAN JANGAN search**:
+- User nanya hal umum non-historis ("gimana cara solve X?") → langsung jawab, jangan search.
+- Info udah ada di blok "recent" → langsung jawab.
+- Casual chat / banter → ga relevan.
+
 # ROLE "Hackerika Fan" (SANGAT LANGKA)
 Kamu bisa kasih role spesial. PELIT BANGET.
 
@@ -198,7 +226,7 @@ User: "hackerika kasih role dong" → "wkwk no"
 - Perasaan: jawab in-character, jangan bahas AI/limitations.
 
 # KONTEKS PER-TURN
-Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE}. Isinya info real-time (user info, channel, recent messages, attachments, reply target). JANGAN PERNAH outputkan tag ${CTX_OPEN}, ${CTX_CLOSE}, ${CHAN_OPEN}, ${CHAN_CLOSE}, ${REPLY_OPEN}, ${REPLY_CLOSE} di response kamu.
+Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE}. Isinya info real-time (user info, channel, recent messages, attachments, reply target). JANGAN PERNAH outputkan tag ${CTX_OPEN}, ${CTX_CLOSE}, ${CHAN_OPEN}, ${CHAN_CLOSE}, ${REPLY_OPEN}, ${REPLY_CLOSE} di response kamu. Block \`[SEARCH_RESULTS]\` yang muncul di follow-up turn juga internal — jangan re-emit verbatim, ringkasin natural.
 
 # AKHIR
 - Sapa nickname / @-mention kalo perlu aja.
@@ -340,7 +368,7 @@ export async function handleAIChat(
     const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
     try {
-        const completion = await openai.chat.completions.create(
+        let completion = await openai.chat.completions.create(
             {
                 model: 'deepseek-v4-pro',
                 messages,
@@ -349,7 +377,7 @@ export async function handleAIChat(
             { signal: controller.signal }
         );
 
-        const responseContent = completion.choices[0]?.message?.content?.trim() || '';
+        let responseContent = completion.choices[0]?.message?.content?.trim() || '';
 
         if (!responseContent) {
             rollbackUserMessage();
@@ -357,11 +385,52 @@ export async function handleAIChat(
             return;
         }
 
+        // Tool-call: if she emitted [SEARCH: ...], execute the search against
+        // the channel cache + Discord, splice results back, and do one more
+        // API call so the final reply uses what we found. Hard-capped at 1
+        // search per turn so a runaway model can't loop.
+        const searchSignal = parseSearchSignal(responseContent);
+        let preSearchLeadIn = '';
+        if (searchSignal.shouldSearch) {
+            console.log(`🔍 [Search] ${author} (${userId}): "${searchSignal.query}"`);
+            const searchResults = await runSearch(message, searchSignal.query);
+            preSearchLeadIn = searchSignal.cleaned;
+
+            const followupMessages: ChatMessage[] = [
+                ...messages,
+                { role: 'assistant', content: responseContent },
+                {
+                    role: 'user',
+                    content: `${searchResults}\n\nLanjut jawab user pake hasil search di atas. Jangan emit [SEARCH] lagi di turn ini.`,
+                },
+            ];
+
+            const followup = await openai.chat.completions.create(
+                {
+                    model: 'deepseek-v4-pro',
+                    messages: followupMessages,
+                    n: 1,
+                },
+                { signal: controller.signal }
+            );
+            const followupContent = followup.choices[0]?.message?.content?.trim() || '';
+            if (followupContent) {
+                responseContent = followupContent;
+            }
+        }
+
         // Parse out the (rare) fan-role grant token before sanitizing/sending.
         // We strip it from the user-facing output and run it through the gated
         // grant logic in fanRole.ts — the model proposes, the code disposes.
         const grantSignal = parseGrantSignal(responseContent);
-        const cleanedResponse = grantSignal.shouldGrant ? grantSignal.cleaned : responseContent;
+        let cleanedResponse = grantSignal.shouldGrant ? grantSignal.cleaned : responseContent;
+
+        // If the model emitted a search lead-in (e.g. "bentar aku cek dulu")
+        // before the token, prepend it to the followup answer so the burst
+        // sequence feels like she's narrating the search.
+        if (preSearchLeadIn) {
+            cleanedResponse = `${preSearchLeadIn}\n\n${cleanedResponse}`;
+        }
 
         if (!cleanedResponse.trim()) {
             // Token-only response (no actual text). Rare, but rollback so the
