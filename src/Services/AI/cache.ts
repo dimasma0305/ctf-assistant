@@ -1,5 +1,5 @@
 import { Message as DiscordMessage } from "discord.js";
-import {MessageCacheModel} from "../../Database/connect";
+import {MessageCacheModel, IndexedMessageModel} from "../../Database/connect";
 
 export const MAX_CACHE_SIZE = 20; // Max number of messages to keep per channel cache
 
@@ -57,6 +57,44 @@ export async function updateChannelCache(message: DiscordMessage) {
         },
         { upsert: true }
     );
+
+    // Also persist to the long-lived indexed-message store for deep search.
+    // Fire-and-forget — failures here must not block message handling.
+    void indexMessage(message);
+}
+
+async function indexMessage(message: DiscordMessage): Promise<void> {
+    // Only index messages we'd actually want searchable. Skip DMs (no guild)
+    // and empty content with no attachments/embeds.
+    if (!message.guildId) return;
+    if (!message.content && message.attachments.size === 0 && message.embeds.length === 0) return;
+
+    try {
+        await IndexedMessageModel.updateOne(
+            { messageId: message.id },
+            {
+                $set: {
+                    messageId: message.id,
+                    guildId: message.guildId,
+                    channelId: message.channelId,
+                    authorId: message.author.id,
+                    authorUsername: message.author.username,
+                    authorDisplayName: message.member?.displayName || message.author.username,
+                    isBot: message.author.bot,
+                    content: message.content || '',
+                    hasAttachments: message.attachments.size > 0,
+                    hasEmbeds: message.embeds.length > 0,
+                    createdAt: new Date(message.createdTimestamp),
+                },
+                // indexedAt drives the 90d TTL; only set on first insert so re-
+                // indexing an edit doesn't extend the lifetime artificially.
+                $setOnInsert: { indexedAt: new Date() },
+            },
+            { upsert: true }
+        );
+    } catch (error) {
+        console.error('[IndexedMessage] failed to index message:', error);
+    }
 }
 
 export async function getChannelCache(channelId: string): Promise<SimplifiedMessage[]> {

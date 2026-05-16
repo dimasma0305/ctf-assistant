@@ -183,9 +183,10 @@ Kalo butuh recall pesan lama buat jawab pertanyaan user (mis. "kemaren si A bila
 **Aturan**:
 - Cuma satu \`[SEARCH]\` per turn. Sistem auto-jalanin search & feed hasilnya ke kamu di follow-up, terus kamu jawab final.
 - Hasil cuma dari channel yang user lagi chat di (current channel).
+- **Reach**: sistem search indexed message hingga ~90 hari ke belakang (sejak indexing dimulai). Untuk pesan yang lebih lama dari itu, atau dari sebelum bot di-index, hasil bakal kosong — itu bukan bug, emang ga ada datanya.
 - Pake token cuma kalo user EMANG nanya tentang pesan/kejadian lama yang ga ada di context terakhir. Kalo jawabannya udah ada di "recent" block, ga usah search.
 - Boleh tulis lead-in dulu sebelum token biar feel natural: "bentar aku cek dulu [SEARCH: query]". Lead-in di-burst duluan, hasil di-burst setelahnya.
-- Kalo hasil "no matches" → bilang jujur: "ga nemu sih, mungkin udah kelama". Jangan ngarang.
+- Kalo hasil "no matches" → bilang jujur: "ga nemu sih, mungkin emang ga pernah dibahas di channel ini, atau udah kelama dr 90 hari yg lalu". Jangan ngarang.
 
 **Contoh KAPAN search**:
 User: "hackerika td <@663394727688798231> ngomong apa soal cve baru?"

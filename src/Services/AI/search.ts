@@ -1,10 +1,11 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage, TextChannel, NewsChannel, ThreadChannel } from "discord.js";
-import { MessageCacheModel } from "../../Database/connect";
+import { MessageCacheModel, IndexedMessageModel } from "../../Database/connect";
 
 const MAX_SEARCH_RESULTS = 8;             // hard cap on result rows fed back to the model
 const MAX_RESULT_CONTENT_CHARS = 220;     // per-message truncation in the results block
-const DISCORD_FALLBACK_LIMIT = 100;       // how many recent messages to pull when cache is sparse
-const MIN_CACHE_HITS = 3;                 // if cache returns fewer matches than this, fall back to API fetch
+const INDEX_QUERY_LIMIT = 50;             // how many indexed matches to evaluate before truncating
+const DISCORD_FALLBACK_LIMIT = 100;       // how many recent messages to pull when index is sparse
+const MIN_INDEX_HITS = 3;                 // if index returns fewer matches than this, also fetch from Discord API
 
 /**
  * Match `[SEARCH: query]` anywhere in the model output. Like the fan-role
@@ -35,7 +36,7 @@ interface RawHit {
     authorName: string;
     content: string;
     createdTimestamp: number;
-    source: 'cache' | 'discord';
+    source: 'cache' | 'discord' | 'index';
 }
 
 interface ParsedQuery {
@@ -101,6 +102,57 @@ function matchesAuthor(authorId: string, authorIds: string[]): boolean {
     return authorIds.includes(authorId);
 }
 
+/**
+ * Search the persistent MongoDB index. This is the deepest tier — covers the
+ * full 90-day TTL window for this channel, not just the last 100 messages.
+ *
+ * Strategy:
+ *   - Build a filter: channelId always, authorId if set, content $text if any tokens
+ *   - Sort by createdAt desc (newest first)
+ *   - Cap to INDEX_QUERY_LIMIT documents
+ *   - Application-level token re-check (in case $text matched on stemming
+ *     but our substring contract is stricter)
+ */
+async function searchIndex(
+    guildId: string | null,
+    channelId: string,
+    parsed: ParsedQuery,
+): Promise<RawHit[]> {
+    if (!guildId) return [];
+    const filter: any = { guildId, channelId };
+    if (parsed.authorIds.length > 0) {
+        filter.authorId = parsed.authorIds.length === 1 ? parsed.authorIds[0] : { $in: parsed.authorIds };
+    }
+    if (parsed.tokens.length > 0) {
+        // Mongo $text takes a space-separated string and uses an OR-like match;
+        // we still enforce strict AND substring at application level below.
+        filter.$text = { $search: parsed.tokens.join(' ') };
+    }
+
+    try {
+        const docs = await IndexedMessageModel.find(filter)
+            .sort({ createdAt: -1 })
+            .limit(INDEX_QUERY_LIMIT)
+            .lean();
+        const hits: RawHit[] = [];
+        for (const d of docs as any[]) {
+            const content = d.content || '';
+            if (!matchesContent(content, parsed.tokens)) continue;
+            hits.push({
+                authorId: d.authorId,
+                authorName: d.authorDisplayName || d.authorUsername || 'unknown',
+                content,
+                createdTimestamp: new Date(d.createdAt).getTime(),
+                source: 'index',
+            });
+        }
+        return hits;
+    } catch (error) {
+        console.error('[Search] index query failed:', error);
+        return [];
+    }
+}
+
 async function searchCache(channelId: string, parsed: ParsedQuery): Promise<RawHit[]> {
     const cache = await MessageCacheModel.findOne({ channelId }).lean();
     if (!cache || !cache.messages) return [];
@@ -160,32 +212,47 @@ export async function runSearch(
     query: string,
 ): Promise<string> {
     const parsed = parseQuery(query);
-    // Need at least one filter to be meaningful — otherwise we'd return the
-    // entire channel cache.
+    // Need at least one filter to be meaningful — otherwise we'd return
+    // every message in the index.
     if (parsed.authorIds.length === 0 && parsed.tokens.length === 0) return '';
 
+    const guildId = message.guildId;
     const channelId = message.channel.id;
 
-    let hits = await searchCache(channelId, parsed);
+    // Tier 1: persistent MongoDB index (covers the full 90-day window for
+    // every channel the bot has been receiving messages in).
+    const indexHits = await searchIndex(guildId, channelId, parsed);
+    const hits: RawHit[] = [...indexHits];
 
-    // Always also fetch from Discord when an author filter is set — the cache
-    // is only 20 messages deep, so author-scoped searches benefit most from
-    // the wider 100-message window.
-    const needFallback = hits.length < MIN_CACHE_HITS || parsed.authorIds.length > 0;
-    if (needFallback) {
-        const apiHits = await searchDiscord(message, parsed);
-        const seen = new Set(hits.map((h) => `${h.authorId}|${h.createdTimestamp}|${h.content.slice(0, 32)}`));
-        for (const h of apiHits) {
+    // Tier 2: short-lived per-channel cache. Covers very recent messages
+    // that may not yet have been flushed to the index.
+    const cacheHits = await searchCache(channelId, parsed);
+
+    // Tier 3: live Discord fetch — only when index hits are sparse. Catches
+    // messages predating the index or any gaps in indexing (e.g. bot was
+    // offline). Author-scoped searches always pay for this because the
+    // index might miss messages from before the bot joined / restarted.
+    const needDiscord = indexHits.length < MIN_INDEX_HITS || parsed.authorIds.length > 0;
+    const discordHits = needDiscord ? await searchDiscord(message, parsed) : [];
+
+    // Merge with dedup by (authorId + timestamp + content-prefix).
+    const seen = new Set<string>();
+    const merge = (src: RawHit[]) => {
+        for (const h of src) {
             const key = `${h.authorId}|${h.createdTimestamp}|${h.content.slice(0, 32)}`;
-            if (!seen.has(key)) {
-                hits.push(h);
-                seen.add(key);
-            }
+            if (seen.has(key)) continue;
+            seen.add(key);
+            hits.push(h);
         }
+    };
+    // index already in hits — record their keys, then merge the others.
+    for (const h of indexHits) {
+        seen.add(`${h.authorId}|${h.createdTimestamp}|${h.content.slice(0, 32)}`);
     }
+    merge(cacheHits);
+    merge(discordHits);
 
-    // Human-readable description of which filters were active — helps the
-    // model speak naturally in the followup ("ga nemu pesan dari X soal Y").
+    // Human-readable description of which filters were active.
     const filterDesc = [
         parsed.authorIds.length > 0 ? `from=${parsed.authorIds.map((id) => `<@${id}>`).join(',')}` : null,
         parsed.tokens.length > 0 ? `terms="${parsed.tokens.join(' ')}"` : null,
