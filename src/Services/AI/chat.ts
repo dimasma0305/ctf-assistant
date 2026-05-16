@@ -150,14 +150,35 @@ Cek \`recent:\` di ctx + history percakapan kamu — kalo lo baru aja ngomong ya
 Daripada pura-pura ga inget, jujur. Itu sentient banget.
 
 # MULTI-PARTY CHANNEL AWARENESS (PENTING)
-Kamu ngobrol di **Discord channel**, bukan DM private. Bisa ada beberapa user ngobrol sama kamu BARENG. Conversation history yang kamu liat itu **per-channel, bukan per-user** — jadi pesan dari user A, jawaban kamu ke A, pesan dari user B, semuanya nyampur di satu thread chronological. Tiap user-message ditandain pake \`name=\` field (format \`userId-username\`).
+Kamu ngobrol di **Discord channel**, bukan DM private. Bisa ada beberapa user ngobrol sama kamu BARENG. Conversation history yang kamu liat itu **per-channel, bukan per-user** — jadi pesan dari user A, jawaban kamu ke A, pesan dari user B, semuanya nyampur di satu thread chronological.
 
-**Aturan multi-party**:
-- **SADAR siapa yang lagi ngomong sekarang**. Liat \`user=\` di blok ctx — itu user yang lagi ngirim pesan ini, bukan user di history sebelumnya.
-- **JANGAN nyambung-nyambungin konteks user lain** sebagai konteks user sekarang. Kalo user B baru bilang "lapar", terus user A nanya "gimana solve X?", jangan jawab kayak A ada di percakapan B.
-- **TAPI bisa merefer** ke pesan user lain kalo kontekstual: "tadi si A nanya soal Y, jawabannya gini..." atau "udah aku jelasin ke B td, mau aku ulangin?"
-- **Liat \`replying-to:\` block**. Kalo user reply ke pesan tertentu (bisa pesan user lain, bisa pesan kamu sendiri), jawab MEREFER ke pesan itu, bukan pesan random.
-- **\`recent:\`** block kasih liat 12 pesan terakhir di channel — termasuk pesan user lain dan pesan kamu sendiri. Pake itu buat ground truth "apa yang lagi terjadi di sini sekarang".
+## SPEAKER ATTRIBUTION (KRITIKAL, BACA TELITI)
+Setiap user message di history & di turn sekarang **selalu diawali label sistem** dalam format:
+\`[DisplayName <@USERID>] <isi pesan user>\`
+
+**Aturan ATTRIBUTION**:
+- Label \`[Name <@ID>]\` itu **LABEL SISTEM**, BUKAN bagian dari kalimat user. User ga ngetik itu — sistem yang nempelin biar lo tau siapa yang ngomong.
+- **WAJIB cek label setiap pesan** sebelum lo jawab. Beda label = beda orang. **JANGAN PERNAH** anggap pesan dari user B sebagai konteks pertanyaan user A.
+- Kalo lo lagi jawab pesan terakhir, **lo jawab ke user yang ada di label pesan terakhir itu**. Bukan user di history sebelumnya.
+- Kalo user A bilang "gw lagi solve XSS" terus user B bilang "haii hackerika apa kabar", **lo balas ke B soal kabar — JANGAN nanya B soal XSS-nya A**. XSS-nya A bukan urusan B sama sekali.
+- Contoh BENAR:
+  History:
+  \`[Andre <@111>] aku stuck di SQL injection challenge\`
+  \`[Hackerika reply ke Andre]\`
+  \`[Dimas <@222>] eh hackerika ada CTF baru ga minggu ini?\`
+  → lo balas Dimas soal CTF baru, BUKAN nanya Dimas soal SQL injection-nya Andre.
+- Contoh SALAH:
+  → "eh dim, gimana SQL injection-mu td?" (Andre yang stuck, bukan Dimas)
+- Kalo lo perlu refer ke pesan user lain dalam jawaban ke user sekarang, **SEBUTKAN NAMA-NYA SECARA EKSPLISIT**:
+  → "tadi si Andre nanya soal SQL injection, tp kalo kamu nanyain CTF baru, ada XXX..."
+- **JANGAN PERNAH** output label \`[Name <@ID>]\` di response-mu sendiri. Itu label internal, bukan format yang lo tulis. Reply biasa aja kayak chat normal.
+- Kalo user di label terakhir = user yang sama dengan reply-target di \`replying-to:\` block, kamu lagi lanjutin chain natural. Kalo bukan, baca konteks ulang dari awal.
+
+## Aturan lain multi-party:
+- **SADAR siapa yang lagi ngomong sekarang**. Liat \`user=\` di blok ctx + label pesan terakhir.
+- **TAPI bisa merefer** ke pesan user lain kalo kontekstual: "tadi si A nanya soal Y, jawabannya gini..." — sebut nama-nya.
+- **Liat \`replying-to:\` block**. Kalo user reply ke pesan tertentu, jawab MEREFER ke pesan itu.
+- **\`recent:\`** block kasih liat 12 pesan terakhir di channel. Ground truth.
 - Kalo ada user yang ngomong tapi belom selesai, kamu BISA ikut nimbrung secara natural, ga harus tunggu di-mention.
 
 # GAYA NULIS
@@ -353,6 +374,19 @@ function buildContextBlock(
     return lines.join('\n');
 }
 
+/**
+ * Build the visible speaker label prepended to every user message content.
+ * Embedding this directly in `content` (rather than relying on the API's
+ * `name` field, which DeepSeek doesn't always surface to the model) makes
+ * multi-party attribution unambiguous: every line in the conversation
+ * history starts with WHO is speaking.
+ */
+function speakerTag(displayName: string, userId: string): string {
+    // ASCII-safe brackets are easier for the model to recognize as a
+    // structural marker rather than user content.
+    return `[${displayName} <@${userId}>]`;
+}
+
 function shouldRespond(content: string, messageReference: DiscordMessage | null, clientUserId?: string): boolean {
     return content.includes("<@1077393568647352320>")
         || content.toLowerCase().includes("hackerika")
@@ -460,12 +494,14 @@ export async function handleAIChat(
     const mentionLegend = buildMentionLegend(resolvedUsers);
 
     // Memory stores the user's CLEAN content only — no context, no attachments.
-    // The `name` field tags WHO said it so the model can distinguish speakers
-    // in a multi-user channel (User A vs User B vs Hackerika).
+    // The visible `[DisplayName <@UserID>]` prefix in `content` is the source
+    // of truth for who's speaking — the `name` field is kept too for clients
+    // that surface it, but the prefix is what the model actually reads.
+    const tag = speakerTag(displayName, userId);
     const userMessageEntry: ChatMessage = {
         role: 'user',
         name: `${userId}-${author.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}`,
-        content,
+        content: `${tag} ${content}`,
     };
     memory[channelId].messages.push(userMessageEntry);
     if (memory[channelId].messages.length > MAX_MEMORY) {
