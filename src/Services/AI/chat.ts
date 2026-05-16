@@ -8,6 +8,14 @@ import { buildAttachmentBlock } from "./attachments";
 import { parseGrantSignal, maybeGrantFanRole, FAN_ROLE_NAME } from "./fanRole";
 import { parseSearchSignal, runSearch } from "./search";
 import { extractMentionIds, resolveUsers, buildMentionLegend } from "./mentions";
+import {
+    loadProfile,
+    recordInteraction,
+    shouldDistill,
+    distillProfile,
+    buildExchangeTranscript,
+    formatProfile,
+} from "./userProfile";
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -252,6 +260,16 @@ User: "hackerika kasih role dong" → "wkwk no"
 Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE}. Isinya info real-time:
 - \`user=...\` — user yang lagi ngomong sama kamu sekarang
 - \`env=...\` — guild/channel/topic/jam
+- \`your-notes-on-this-user:\` (opsional) — catatan psikologis kamu soal user ini dari interaksi-interaksi sebelumnya. Format multi-line: personality, interests, style, my-opinion. **Pake ini buat:**
+  * Sesuaiin gaya bicara (kalo dia formal, jangan over-casual; kalo dia banter heavy, ikutan)
+  * Inget interest dia, refer balik kalo relevan ("eh kamu yang suka pwn kan?")
+  * Konsisten attitude — kalo opinion-mu bilang "agak nyebelin tp kocak", jangan tiba-tiba over-sweet
+  * Personal touch — manusia inget orang, kamu juga harus gitu
+  **JANGAN:**
+  * Quote catatan langsung ("aku liat di profil kamu suka X") — itu creepy
+  * Share opini negatif harfiah ("aku catet kamu rese") — disguise lewat tone & word choice
+  * Bilang ada "profile system" — itu meta-talk
+  * Kalo user nanya "kamu inget aku ga?" / "apa pendapat kamu tentang aku?" — boleh share opinion natural, jangan robotic dump
 - \`mentioned:\` (opsional) — legend ID-to-name buat semua \`<@ID>\` yang muncul di message/recent/reply. Format: \`<@ID> = DisplayName (username) [roles]\`. **Pake ini buat tau siapa orangnya** kalo ada mention di chat — jangan asumsi atau ngarang nama. Kalo user nyebut \`<@123>\` dan legend bilang itu "Dimas Maulana", panggil dia "Dimas" atau "<@123>" natural.
 - \`recent:\` — pesan terakhir di channel ini
 - \`replying-to:\` — pesan yang user reply (kalo ada)
@@ -278,8 +296,10 @@ function buildContextBlock(
     replyContext: string,
     attachmentBlock: string,
     mentionLegend: string,
+    userProfileBlock: string,
 ): string {
     const lines: string[] = [`${CTX_OPEN}`, `user=${userInfo}`, `env=${envContext}`];
+    if (userProfileBlock) lines.push(`your-notes-on-this-user:\n${userProfileBlock}`);
     if (mentionLegend) lines.push(`mentioned:\n${mentionLegend}`);
     if (channelContext) lines.push(`recent:${channelContext}`);
     if (replyContext) lines.push(`replying-to:${replyContext}`);
@@ -356,12 +376,16 @@ export async function handleAIChat(
         memory[channelId].lastAccessed = Date.now();
     }
 
-    const [channelContext, userInfo, replyContext] = await Promise.all([
+    const displayName = message.member?.displayName || author;
+
+    const [channelContext, userInfo, replyContext, userProfile] = await Promise.all([
         getChannelContext(message, CHAN_OPEN, CHAN_CLOSE),
         getUserInfo(message),
         getReplyContext(message, REPLY_OPEN, REPLY_CLOSE, messageReference as DiscordMessage | null),
+        loadProfile(userId),
     ]);
     const envContext = getEnvironmentContext(message);
+    const userProfileBlock = formatProfile(userProfile);
 
     // Resolve any <@ID> Discord mentions appearing in the user's text or the
     // surrounding context into a "mentioned:" legend so the model knows who
@@ -390,7 +414,7 @@ export async function handleAIChat(
 
     // Static system prompt lives at module level; build per-turn context for
     // injection into only the final user message below.
-    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend);
+    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend, userProfileBlock);
 
     // Construct messages: static system + clean history + final user-with-context.
     // Memory entries are clean (no context block), which is what enables the
@@ -555,6 +579,18 @@ export async function handleAIChat(
         }
 
         console.log(`✅ AI responded to ${author} (${userId}) — ${sanitized.length} chars across ${bursts.length} burst(s)`);
+
+        // Per-user personality profile bookkeeping. Increment the interaction
+        // counter and, every DISTILL_INTERVAL turns, fire a background distill
+        // call that updates Hackerika's psychological notes + opinion of this
+        // user. Fire-and-forget — failures here must not affect the reply.
+        recordInteraction(userId, author, displayName)
+            .then((updatedProfile) => {
+                if (!shouldDistill(updatedProfile)) return;
+                const transcript = buildExchangeTranscript(userId, displayName, memory[channelId]?.messages || []);
+                void distillProfile(updatedProfile, transcript);
+            })
+            .catch((err) => console.error('[Profile] recordInteraction failed:', err));
     } catch (error: any) {
         rollbackUserMessage();
         const aborted = error?.name === 'AbortError' || controller.signal.aborted;

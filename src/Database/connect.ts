@@ -13,6 +13,7 @@ import {messageCacheSchema, type MessageCacheSchemaType} from './messageCacheSch
 import {guildChannelSchema, type GuildChannelSchemaType} from './guildChannelSchema';
 import {trakteerSchema, type TrakteerSchemaType} from './trakteerSchema';
 import {indexedMessageSchema, type IndexedMessageSchemaType} from './indexedMessageSchema';
+import {userProfileSchema, type UserProfileSchemaType} from './userProfileSchema';
 import { getMongoUri } from '../utils/env';
 
 const DEFAULT_RETRY_DELAY_MS = Number(process.env.MONGO_CONNECT_RETRY_DELAY_MS || 2000);
@@ -99,6 +100,7 @@ export const MessageCacheModel = mongoose.model("MessageCache", messageCacheSche
 export const GuildChannelModel = mongoose.model("GuildChannel", guildChannelSchema)
 export const TrakteerModel = mongoose.model("Trakteer", trakteerSchema)
 export const IndexedMessageModel = mongoose.model("IndexedMessage", indexedMessageSchema)
+export const UserProfileModel = mongoose.model("UserProfile", userProfileSchema)
 
 export {
     EventSchemaType,
@@ -115,6 +117,7 @@ export {
     GuildChannelSchemaType,
     TrakteerSchemaType,
     IndexedMessageSchemaType,
+    UserProfileSchemaType,
 }
 
 export default {connect};
