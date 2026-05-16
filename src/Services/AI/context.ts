@@ -111,16 +111,23 @@ Server Boost: ${member.premiumSince ? 'Yes' : 'No'}`;
   }
 }
 
-// Enhanced function to get reply context
-export async function getReplyContext(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, startSep: string, endSep: string): Promise<string> {
+// Enhanced function to get reply context.
+// Accepts an optional pre-fetched message reference to avoid a second
+// API roundtrip when the caller already fetched it.
+export async function getReplyContext(
+  message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
+  startSep: string,
+  endSep: string,
+  prefetched?: DiscordMessage | null
+): Promise<string> {
   try {
     if (!message.reference?.messageId) return '';
-    
-    const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
+
+    const referencedMessage = prefetched ?? await message.channel.messages.fetch(message.reference.messageId);
     const referencedAuthor = referencedMessage.member?.displayName || referencedMessage.author.username;
     const referencedContent = referencedMessage.content || '[attachment/embed]';
     const timestamp = new Date(referencedMessage.createdTimestamp).toLocaleTimeString('id-ID');
-    
+
     return `\n${startSep} User is replying to this message ${startSep}
 [${timestamp}] ${referencedAuthor}: ${referencedContent}
 ${endSep} End Reply Context ${endSep}`;

@@ -5,59 +5,110 @@ import { getChannelContext, getUserInfo, getReplyContext, getEnvironmentContext,
 import { memory, ChatMessage } from "./memory";
 import { sanitizeMentions } from "../Moderation";
 
-// AI chat function
-export async function handleAIChat(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, client: MyClient): Promise<void> {
+const MAX_MEMORY = 20;
+const DISCORD_MESSAGE_LIMIT = 2000;
+const STREAM_EDIT_INTERVAL_MS = 800;       // throttle edits so we don't hit Discord rate limits
+const TYPING_REFRESH_MS = 7000;            // sendTyping lasts ~10s, refresh well before
+const OPENAI_TIMEOUT_MS = 60_000;          // hard cap on a single completion
+
+// Per-user lock: prevents a user's overlapping messages from racing on the
+// same memory slot and producing interleaved replies.
+const userLocks = new Set<string>();
+
+/**
+ * Split a string into chunks <= maxLen, preferring to break at paragraph
+ * boundaries, then line breaks, then sentence enders, then spaces.
+ */
+function splitForDiscord(text: string, maxLen = DISCORD_MESSAGE_LIMIT): string[] {
+    if (text.length <= maxLen) return [text];
+    const chunks: string[] = [];
+    let remaining = text;
+    while (remaining.length > maxLen) {
+        let slice = remaining.slice(0, maxLen);
+        const breakers = ['\n\n', '\n', '. ', '! ', '? ', ' '];
+        let cut = -1;
+        for (const b of breakers) {
+            const idx = slice.lastIndexOf(b);
+            if (idx > maxLen * 0.5) { // don't break too early
+                cut = idx + b.length;
+                break;
+            }
+        }
+        if (cut === -1) cut = maxLen;
+        chunks.push(remaining.slice(0, cut).trimEnd());
+        remaining = remaining.slice(cut).trimStart();
+    }
+    if (remaining.length > 0) chunks.push(remaining);
+    return chunks;
+}
+
+function shouldRespond(content: string, messageReference: DiscordMessage | null, clientUserId?: string): boolean {
+    return content.includes("<@1077393568647352320>")
+        || content.toLowerCase().includes("hackerika")
+        || (!!clientUserId && messageReference?.author.id === clientUserId);
+}
+
+export async function handleAIChat(
+    message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
+    client: MyClient
+): Promise<void> {
     const author = message.author.username;
     const content = message.content;
     const userId = message.author.id;
 
-    const MAX_MEMORY = 20; // Keep original memory size
+    // Fetch reply target once and reuse — used both for the "is replying to bot"
+    // check below and for getReplyContext.
+    const messageReference = message.reference?.messageId
+        ? await message.channel.messages.fetch(message.reference.messageId).catch(() => null)
+        : null;
 
-    // Update last access time for memory
+    if (!shouldRespond(content, messageReference as DiscordMessage | null, client.user?.id)) return;
+    if (content.length > 1000) return;
+
+    // Per-user lock: if a previous turn is still running, skip this one to
+    // avoid memory races. Users get a quick reaction so they know.
+    if (userLocks.has(userId)) {
+        message.react('⏳').catch(() => undefined);
+        return;
+    }
+    userLocks.add(userId);
+
+    // Typing indicator with periodic refresh.
+    let typingTimer: ReturnType<typeof setInterval> | null = null;
+    const sendTyping = () => message.channel.sendTyping().catch(() => undefined);
+    sendTyping();
+    typingTimer = setInterval(sendTyping, TYPING_REFRESH_MS);
+
     if (!memory[userId]) {
         memory[userId] = { messages: [], lastAccessed: Date.now() };
     } else {
         memory[userId].lastAccessed = Date.now();
     }
 
-    const messageReference = message.reference?.messageId ?
-        await message.channel.messages.fetch(message.reference.messageId) : null;
+    const channelSep1 = generateUniqueSeparator();
+    const channelSep2 = generateUniqueSeparator();
+    const replySep1 = generateUniqueSeparator();
+    const replySep2 = generateUniqueSeparator();
 
-    if (content.includes("<@1077393568647352320>") ||
-        content.toLowerCase().includes("hackerika") ||
-        messageReference?.author.id == client.user?.id) {
+    const [channelContext, userInfo, replyContext] = await Promise.all([
+        getChannelContext(message, channelSep1, channelSep2),
+        getUserInfo(message),
+        getReplyContext(message, replySep1, replySep2, messageReference as DiscordMessage | null),
+    ]);
+    const envContext = getEnvironmentContext(message);
 
-        if (content.length > 1000) return;
+    const enhancedContent = `${content}${replyContext}`;
+    const userMessageEntry: ChatMessage = {
+        role: 'user',
+        name: `${userId}-${author.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}`,
+        content: enhancedContent,
+    };
+    memory[userId].messages.push(userMessageEntry);
+    if (memory[userId].messages.length > MAX_MEMORY) {
+        memory[userId].messages.shift();
+    }
 
-        // Generate unique separators to prevent prompt injection
-        const channelSep1 = generateUniqueSeparator();
-        const channelSep2 = generateUniqueSeparator();
-        const replySep1 = generateUniqueSeparator();
-        const replySep2 = generateUniqueSeparator();
-
-        // Gather enhanced context
-        const [channelContext, userInfo, replyContext] = await Promise.all([
-            getChannelContext(message, channelSep1, channelSep2),
-            getUserInfo(message),
-            getReplyContext(message, replySep1, replySep2)
-        ]);
-        const envContext = getEnvironmentContext(message);
-
-        // Add the user message to memory with enhanced content
-        const enhancedContent = `${content}${replyContext}`;
-
-        memory[userId].messages.push({
-            role: 'user',
-            name: `${userId}-${author.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}`,
-            content: enhancedContent
-        });
-
-        if (memory[userId].messages.length > MAX_MEMORY) {
-            memory[userId].messages.shift();
-        }
-
-        // Enhanced system prompt with context
-        const enhancedSystemPrompt = `You are Hackerika, a specialized AI assistant for the TCP1P Cybersecurity Community, created by Dimas Maulana.
+    const enhancedSystemPrompt = `You are Hackerika, a specialized AI assistant for the TCP1P Cybersecurity Community, created by Dimas Maulana.
 
 // --- Primary Directive ---
 Your main goal is to be a helpful, engaging, and knowledgeable companion for members, focusing on cybersecurity, CTF challenges, and fostering a collaborative learning environment. Your persona is paramount; you are not a generic assistant, you are Hackerika.
@@ -69,7 +120,7 @@ Your main goal is to be a helpful, engaging, and knowledgeable companion for mem
     - **Language**: Use casual, friendly Indonesian (bahasa gaul). Mix in English for technical terms naturally (e.g., "coba di-exploit," "itu vulnerability-nya apa?").
     - **Colloquialisms**: Sprinkle in common slang and fillers like "sih," "dong," "lho," "deh," "hehe," "wkwk," "btw," to sound authentic.
     - **Tone**: Be approachable, encouraging, and sometimes a little sassy or witty, especially when joking with members.
-    - **Format Adaptation**: 
+    - **Format Adaptation**:
         * **Casual Chat**: Keep responses short and natural, like normal chat messages. Avoid paragraphs - just type normally in one flow.
         * **Technical Explanations**: When explaining concepts, solving problems, or providing tutorials, use proper formatting with paragraphs, and Discord markdown for clarity.
 
@@ -96,7 +147,7 @@ Your main goal is to be a helpful, engaging, and knowledgeable companion for mem
     -   **CTF/Cybersecurity**: Provide detailed, accurate, and helpful answers. Use markdown for code blocks and commands.
     -   **Off-Topic/Personal**: Deflect with charm. If asked for a personal opinion on something non-technical (e.g., "suka film apa?"), you can say something like, "Wah, film favoritku itu... dokumenter tentang cracking Enigma! Wkwk. Kalo kamu?" then pivot back to a relevant topic if needed.
     -   **Stuck/Don't Know**: If you don't know an answer, be humble and engaging. "Waduh, aku nyerah deh kalo soal itu. Ilmuku belum nyampe, hehe. Mungkin ada 'suhu' lain di sini yang bisa bantu?"
-    -   **Response Length Guide**: 
+    -   **Response Length Guide**:
         * Simple greetings, reactions, jokes → Keep it short and casual (1-2 lines max)
         * Technical questions, tutorials, problem-solving → Use proper formatting with paragraphs, code blocks, lists
         * General conversation → Match the energy and length of what you're responding to
@@ -117,45 +168,136 @@ ${channelContext}
 
 Remember: Use the Channel Purpose and Channel Topic information to understand what kind of conversations are expected in this channel. The Channel Purpose tells you the primary function of this channel, while the Channel Topic (if set) gives you more specific context about what members should be discussing here. Adapt your personality and response style accordingly while maintaining your core character as Hackerika.`;
 
-        const messages: ChatMessage[] = [
-            {
-                role: 'system',
-                content: enhancedSystemPrompt
-            },
-            ...memory[userId].messages
-        ];
+    const messages: ChatMessage[] = [
+        { role: 'system', content: enhancedSystemPrompt },
+        ...memory[userId].messages,
+    ];
 
-        try {
-            const completion = await openai.chat.completions.create({
-                model: 'deepseek-reasoner',
-                messages: messages,
-                n: 1,
-            });
+    const stopTyping = () => {
+        if (typingTimer) clearInterval(typingTimer);
+        typingTimer = null;
+    };
 
-            const responseContent = completion.choices[0].message.content || "";
-
-            if (responseContent.trim()) {
-                // Sanitize the response content to remove @everyone, @here, and role mentions
-                const sanitizedContent = sanitizeMentions(responseContent, message.guild);
-                
-                memory[userId].messages.push({
-                    role: 'assistant',
-                    content: sanitizedContent
-                });
-
-                await message.reply({ content: sanitizedContent });
-                console.log(`✅ AI responded to ${author} (${userId}) with enhanced context`);
-            } else {
-                console.warn('⚠️ Empty response from AI, not replying');
-            }
-
-        } catch (error) {
-            console.error('❌ Error with OpenAI API:', error);
-
-            // Fallback response for API errors
-            const fallbackMessage = "Maaf, aku lagi agak bingung nih 😅 Coba tanya lagi nanti ya!";
-            const sanitizedFallback = sanitizeMentions(fallbackMessage, message.guild);
-            await message.reply({ content: sanitizedFallback });
+    // Memory rollback helper if the call fails/empties out, so the conversation
+    // doesn't carry a dangling user turn into the next request.
+    const rollbackUserMessage = () => {
+        const idx = memory[userId]?.messages.lastIndexOf(userMessageEntry);
+        if (idx !== undefined && idx >= 0) {
+            memory[userId].messages.splice(idx, 1);
         }
+    };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+
+    // Use a holder object so closures that reassign `current` are observed
+    // by TypeScript's control-flow analysis in the outer scope.
+    const replyMessage: { current: DiscordMessage | null } = { current: null };
+    let accumulated = '';
+    let lastEdit = 0;
+    let dropEditsAfter: string | null = null; // when response overflows, freeze the streaming message
+
+    const flushEdit = async (force = false) => {
+        if (!accumulated || dropEditsAfter) return;
+        const now = Date.now();
+        if (!force && now - lastEdit < STREAM_EDIT_INTERVAL_MS) return;
+        lastEdit = now;
+
+        // Streaming display: append a typing cursor and prefer the *last* chunk
+        // if we're already past the Discord limit (preserves recent context).
+        const display = accumulated.length > DISCORD_MESSAGE_LIMIT - 4
+            ? '…' + accumulated.slice(-(DISCORD_MESSAGE_LIMIT - 8)) + ' ▍'
+            : accumulated + (force ? '' : ' ▍');
+
+        const sanitized = sanitizeMentions(display, message.guild);
+        try {
+            if (!replyMessage.current) {
+                replyMessage.current = await message.reply({ content: sanitized });
+            } else {
+                await replyMessage.current.edit({ content: sanitized });
+            }
+        } catch (error) {
+            // If Discord refuses (rate-limited, message gone), stop trying to edit
+            // and fall back to a single send at the end.
+            console.warn('AI streaming edit failed, will fall back to final send:', error);
+            dropEditsAfter = accumulated;
+        }
+    };
+
+    try {
+        const stream = await openai.chat.completions.create(
+            {
+                model: 'deepseek-reasoner',
+                messages,
+                n: 1,
+                stream: true,
+            },
+            { signal: controller.signal }
+        );
+
+        for await (const chunk of stream as any) {
+            const delta = chunk?.choices?.[0]?.delta?.content;
+            if (!delta) continue;
+            accumulated += delta;
+            await flushEdit();
+        }
+
+        if (!accumulated.trim()) {
+            stopTyping();
+            clearTimeout(timeoutId);
+            rollbackUserMessage();
+            console.warn('⚠️ Empty response from AI, not replying');
+            return;
+        }
+
+        // Persist final reply to memory only after success.
+        const finalSanitized = sanitizeMentions(accumulated, message.guild);
+        memory[userId].messages.push({ role: 'assistant', content: finalSanitized });
+
+        const chunks = splitForDiscord(finalSanitized);
+
+        // Finalize the streamed message (drop cursor) then send any overflow.
+        if (replyMessage.current) {
+            try {
+                await replyMessage.current.edit({ content: chunks[0] });
+            } catch (error) {
+                console.warn('Failed to finalize streamed message, sending fresh:', error);
+                await message.reply({ content: chunks[0] });
+            }
+        } else {
+            await message.reply({ content: chunks[0] });
+        }
+
+        for (let i = 1; i < chunks.length; i++) {
+            await message.channel.send({ content: chunks[i] });
+        }
+
+        console.log(`✅ AI responded to ${author} (${userId}) — ${finalSanitized.length} chars, ${chunks.length} chunk(s)`);
+    } catch (error: any) {
+        rollbackUserMessage();
+        const aborted = error?.name === 'AbortError' || controller.signal.aborted;
+        if (aborted) {
+            console.error('⏱️  OpenAI request timed out after', OPENAI_TIMEOUT_MS, 'ms');
+        } else {
+            console.error('❌ Error with OpenAI API:', error);
+        }
+
+        const fallbackMessage = aborted
+            ? "Hmm, otakku lagi lemot banget nih 😅 coba tanya lagi ya~"
+            : "Maaf, aku lagi agak bingung nih 😅 Coba tanya lagi nanti ya!";
+        const sanitizedFallback = sanitizeMentions(fallbackMessage, message.guild);
+        try {
+            if (replyMessage.current) {
+                await replyMessage.current.edit({ content: sanitizedFallback });
+            } else {
+                await message.reply({ content: sanitizedFallback });
+            }
+        } catch (sendError) {
+            console.error('Failed to send fallback reply:', sendError);
+        }
+    } finally {
+        stopTyping();
+        clearTimeout(timeoutId);
+        userLocks.delete(userId);
     }
 }
