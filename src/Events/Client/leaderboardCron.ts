@@ -8,7 +8,7 @@ import { createLeaderboardEmbed } from "../../Commands/Public/Solve/utils";
 import crypto from 'crypto';
 
 export const event: Event = {
-    name: "clientReady",
+    name: "ready",
     once: true,
     async execute(client: MyClient) {
         console.log("Loading leaderboard auto-update cron jobs...");

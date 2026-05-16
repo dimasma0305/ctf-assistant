@@ -3,7 +3,7 @@ import { loadFiles } from '../Functions/fileLoader';
 import ascii from 'ascii-table';
 import { RestEvents } from 'discord.js';
 
-type EventExecute = (...args: any[]) => void;
+type EventExecute = (...args: any[]) => void | Promise<unknown>;
 
 interface Event {
   name: string;
@@ -20,7 +20,18 @@ const loadEvents = async (client: MyClient) => {
   Files.forEach((file: string) => {
     const event = require(file).event as Event;
 
-    const execute = (...args: any[]) => event.execute(...args, client);
+    const execute = (...args: any[]) => {
+      try {
+        const result = event.execute(...args, client);
+        if (result instanceof Promise) {
+          result.catch((error) => {
+            console.error(`[event:${event.name}] async handler error:`, error);
+          });
+        }
+      } catch (error) {
+        console.error(`[event:${event.name}] sync handler error:`, error);
+      }
+    };
     client.events.set(event.name, execute);
 
     if (event.rest) {

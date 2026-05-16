@@ -9,7 +9,7 @@ import { infoEvent } from "../../Functions/ctftime-v2";
 let fetchCronInitialized = false;
 
 export const event: Event = {
-    name: "clientReady",
+    name: "ready",
     once: true,
     async execute(client: MyClient) {
         if (fetchCronInitialized) {

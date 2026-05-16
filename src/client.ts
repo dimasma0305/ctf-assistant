@@ -69,10 +69,9 @@ function initializeBot() {
 }
 
 // Ready event - fired when bot first connects
-client.on(Events.ClientReady, (readyClient) => {
+client.on(Events.ClientReady, () => {
   console.log(`✅ Bot is ready! Logged in as ${client.user?.tag}`);
   initializeBot();
-  client.emit("clientReady", readyClient);
 });
 
 // Resumed event - fired when session is resumed
@@ -196,6 +195,18 @@ async function loginWithScheduler(maxRetries = 3) {
   console.log('ℹ️  Connection state:', connectionStateManager.getSummary());
   console.log('ℹ️  Session scheduler status:', sessionScheduler.getStatus());
 }
+
+// Process-level safety nets — keep the bot alive on otherwise-fatal errors.
+// Without these, a single throw inside any event handler / promise callback
+// (e.g. discord.js' InteractionNotReplied) will bring the whole process down.
+process.on('uncaughtException', (error, origin) => {
+  console.error(`💥 uncaughtException (${origin}):`, error);
+  connectionStateManager.setState(ConnectionState.ERROR, `uncaughtException: ${error.message}`);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('💥 unhandledRejection:', reason);
+});
 
 // Handle graceful shutdown with comprehensive cleanup
 process.on('SIGINT', async () => {

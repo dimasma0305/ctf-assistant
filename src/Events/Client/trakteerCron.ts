@@ -26,7 +26,7 @@ interface TrakteerResponse {
 }
 
 export const event: Event = {
-  name: "clientReady",
+  name: "ready",
   once: true,
   async execute(client: MyClient) {
     console.log("Loading Trakteer cron jobs...");

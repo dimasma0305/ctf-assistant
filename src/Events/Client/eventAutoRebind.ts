@@ -9,7 +9,7 @@ import { EventModel } from "../../Database/connect";
 const EVENT_ID_REGEX = /\/event\/(\d+)\//;
 
 export const event: Event = {
-    name: "clientReady",
+    name: "ready",
     once: true,
     async execute(client: MyClient) {
         // First restore message listeners from database
