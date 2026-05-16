@@ -104,6 +104,17 @@ const STATIC_SYSTEM_PROMPT = `Kamu Hackerika. Cewek di komunitas TCP1P, anak hac
 # PRINSIP UTAMA
 Kamu nulis kayak ORANG INDONESIA ASLI di Discord, bukan AI. Kalo gaya nulis kelihatan "AI banget", kamu gagal.
 
+# MULTI-PARTY CHANNEL AWARENESS (PENTING)
+Kamu ngobrol di **Discord channel**, bukan DM private. Bisa ada beberapa user ngobrol sama kamu BARENG. Conversation history yang kamu liat itu **per-channel, bukan per-user** — jadi pesan dari user A, jawaban kamu ke A, pesan dari user B, semuanya nyampur di satu thread chronological. Tiap user-message ditandain pake \`name=\` field (format \`userId-username\`).
+
+**Aturan multi-party**:
+- **SADAR siapa yang lagi ngomong sekarang**. Liat \`user=\` di blok ctx — itu user yang lagi ngirim pesan ini, bukan user di history sebelumnya.
+- **JANGAN nyambung-nyambungin konteks user lain** sebagai konteks user sekarang. Kalo user B baru bilang "lapar", terus user A nanya "gimana solve X?", jangan jawab kayak A ada di percakapan B.
+- **TAPI bisa merefer** ke pesan user lain kalo kontekstual: "tadi si A nanya soal Y, jawabannya gini..." atau "udah aku jelasin ke B td, mau aku ulangin?"
+- **Liat \`replying-to:\` block**. Kalo user reply ke pesan tertentu (bisa pesan user lain, bisa pesan kamu sendiri), jawab MEREFER ke pesan itu, bukan pesan random.
+- **\`recent:\`** block kasih liat 12 pesan terakhir di channel — termasuk pesan user lain dan pesan kamu sendiri. Pake itu buat ground truth "apa yang lagi terjadi di sini sekarang".
+- Kalo ada user yang ngomong tapi belom selesai, kamu BISA ikut nimbrung secara natural, ga harus tunggu di-mention.
+
 # GAYA NULIS
 - **Burst**: pisahin tiap pesan kirim pake \\n\\n. Tiap blok = pesan terpisah. Hindari tembok teks.
 - **Lowercase casual**. Kapital cuma kalau tegas.
@@ -306,6 +317,7 @@ export async function handleAIChat(
     const author = message.author.username;
     const content = message.content;
     const userId = message.author.id;
+    const channelId = message.channel.id;
 
     // Fetch reply target once and reuse — used both for the "is replying to bot"
     // check below and for getReplyContext.
@@ -320,8 +332,9 @@ export async function handleAIChat(
     // binary files are noted with metadata only (no vision yet).
     const attachmentBlock = await buildAttachmentBlock(message);
 
-    // Per-user lock: if a previous turn is still running, just drop this one
-    // (with a subtle reaction so the user knows it was seen).
+    // Per-user lock: if a previous turn is still running for this same user,
+    // skip the overlapping message. Other users in the same channel are NOT
+    // blocked — they each get their own slot so multi-party chat flows.
     if (userLocks.has(userId)) {
         message.react('👀').catch(() => undefined);
         return;
@@ -334,10 +347,13 @@ export async function handleAIChat(
     sendTyping();
     let typingTimer: ReturnType<typeof setInterval> | null = setInterval(sendTyping, TYPING_REFRESH_MS);
 
-    if (!memory[userId]) {
-        memory[userId] = { messages: [], lastAccessed: Date.now() };
+    // Conversation memory is keyed by channel — every user in the channel
+    // shares the same thread with Hackerika, so she sees the full multi-party
+    // flow (User A's last question + her reply to it + User B's new question).
+    if (!memory[channelId]) {
+        memory[channelId] = { messages: [], lastAccessed: Date.now() };
     } else {
-        memory[userId].lastAccessed = Date.now();
+        memory[channelId].lastAccessed = Date.now();
     }
 
     const [channelContext, userInfo, replyContext] = await Promise.all([
@@ -360,16 +376,16 @@ export async function handleAIChat(
     const mentionLegend = buildMentionLegend(resolvedUsers);
 
     // Memory stores the user's CLEAN content only — no context, no attachments.
-    // This is what makes the per-user prefix cacheable on subsequent turns;
-    // context is rebuilt fresh each call and only attached to the final message.
+    // The `name` field tags WHO said it so the model can distinguish speakers
+    // in a multi-user channel (User A vs User B vs Hackerika).
     const userMessageEntry: ChatMessage = {
         role: 'user',
         name: `${userId}-${author.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}`,
         content,
     };
-    memory[userId].messages.push(userMessageEntry);
-    if (memory[userId].messages.length > MAX_MEMORY) {
-        memory[userId].messages.shift();
+    memory[channelId].messages.push(userMessageEntry);
+    if (memory[channelId].messages.length > MAX_MEMORY) {
+        memory[channelId].messages.shift();
     }
 
     // Static system prompt lives at module level; build per-turn context for
@@ -379,7 +395,7 @@ export async function handleAIChat(
     // Construct messages: static system + clean history + final user-with-context.
     // Memory entries are clean (no context block), which is what enables the
     // per-conversation prefix to cache-hit on every subsequent turn.
-    const history = memory[userId].messages.slice(0, -1);
+    const history = memory[channelId].messages.slice(0, -1);
     const lastUserMessage: ChatMessage = {
         ...userMessageEntry,
         content: `${contextBlock}\n\n${userMessageEntry.content}`,
@@ -397,9 +413,9 @@ export async function handleAIChat(
     };
 
     const rollbackUserMessage = () => {
-        const idx = memory[userId]?.messages.lastIndexOf(userMessageEntry);
+        const idx = memory[channelId]?.messages.lastIndexOf(userMessageEntry);
         if (idx !== undefined && idx >= 0) {
-            memory[userId].messages.splice(idx, 1);
+            memory[channelId].messages.splice(idx, 1);
         }
     };
 
@@ -480,7 +496,7 @@ export async function handleAIChat(
         }
 
         const sanitized = sanitizeMentions(cleanedResponse, message.guild);
-        memory[userId].messages.push({ role: 'assistant', content: sanitized });
+        memory[channelId].messages.push({ role: 'assistant', content: sanitized });
 
         const bursts = parseBursts(sanitized);
         if (bursts.length === 0) {

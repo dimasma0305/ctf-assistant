@@ -271,11 +271,12 @@ loginWithScheduler();
 
 
 client.on(Events.MessageCreate, async (message) => {
-  if (message.author.bot) return;
-
-  // --- Update Channel Cache ---
+  // Cache + index EVERY message — including Hackerika's own replies and other
+  // bots — so channel context covers the full multi-party conversation flow.
+  // Only the AI / moderation paths skip bot-authored messages below.
   updateChannelCache(message as DiscordMessage)
-  // --- End Update Channel Cache ---
+
+  if (message.author.bot) return;
 
   // Check for spam first
   const isSpam = await handleSpamDetection(message);

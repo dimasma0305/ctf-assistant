@@ -7,8 +7,10 @@ export function generateUniqueSeparator(): string {
   return `---${Date.now()}-${Math.random().toString(36).substring(2, 15)}---`;
 }
 
-// Token-budget knobs for channel context.
-const CHANNEL_CONTEXT_LIMIT = 6;
+// Token-budget knobs for channel context. Bumped from 6→12 so multi-party
+// conversations (where Hackerika needs to track what User A asked, what she
+// answered, and what User B is now adding) have enough scroll-back.
+const CHANNEL_CONTEXT_LIMIT = 12;
 const PER_MESSAGE_CHAR_LIMIT = 200;
 
 function truncate(s: string, n: number): string {
