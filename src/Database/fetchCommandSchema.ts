@@ -44,4 +44,6 @@ export const schema = {
 }
 
 export const fetchCommandSchema = new Schema(schema);
+fetchCommandSchema.index({ ctf: 1, channel_id: 1 }, { unique: true });
+fetchCommandSchema.index({ is_active: 1 });
 export type FetchCommandSchemaType = InferSchemaType<typeof fetchCommandSchema>;

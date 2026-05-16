@@ -56,4 +56,5 @@ export const schema = {
 }
 
 export const ctfCacheSchema = new Schema(schema);
+ctfCacheSchema.index({ finish: 1 });
 export type CTFCacheSchemaType = InferSchemaType<typeof ctfCacheSchema>;

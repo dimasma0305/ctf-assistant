@@ -34,85 +34,133 @@ export interface CTFEvent {
     ctf_id: number;
 }
 
+// Cache freshness windows. CTFtime data rarely changes outside the voting
+// window (2 weeks after finish), so we serve cache aggressively for past
+// events and refresh more often only when the event is upcoming/live.
+const CACHE_TTL_UPCOMING_MS = 60 * 60 * 1000;             // 1h while upcoming/live
+const CACHE_TTL_FINISHED_MS = 24 * 60 * 60 * 1000;        // 24h after finish
+const CACHE_TTL_OLD_MS = 30 * 24 * 60 * 60 * 1000;        // 30d well after finish
+
+function cacheToCTFEvent(cached: any, id: string): CTFEvent {
+    return {
+        organizers: (cached.organizers || []).map((org: any) => ({
+            id: org.id || 0,
+            name: org.name || ''
+        })) as Organizer[],
+        onsite: cached.onsite || false,
+        finish: cached.finish,
+        description: cached.description || '',
+        weight: cached.weight,
+        title: cached.title,
+        url: cached.url || '',
+        is_votable_now: false,
+        restrictions: cached.restrictions || '',
+        format: cached.format || '',
+        start: cached.start,
+        participants: cached.participants || 0,
+        ctftime_url: `https://ctftime.org/event/${id}`,
+        location: cached.location || '',
+        live_feed: '',
+        public_votable: false,
+        duration: {
+            hours: cached.duration?.hours || 0,
+            days: cached.duration?.days || 0
+        } as Duration,
+        logo: cached.logo || '',
+        format_id: 0,
+        id: parseInt(id),
+        ctf_id: parseInt(id)
+    };
+}
+
+function isCacheFresh(cached: any): boolean {
+    if (!cached?.last_updated || !cached?.finish) return false;
+    const now = Date.now();
+    const updatedAt = new Date(cached.last_updated).getTime();
+    const finish = new Date(cached.finish).getTime();
+    const age = now - updatedAt;
+
+    if (now < finish) {
+        // event hasn't finished yet -> short TTL (weight/start may change)
+        return age < CACHE_TTL_UPCOMING_MS;
+    }
+    const twoWeeksAfter = finish + 14 * 24 * 60 * 60 * 1000;
+    if (now < twoWeeksAfter) {
+        // still inside voting window -> medium TTL
+        return age < CACHE_TTL_FINISHED_MS;
+    }
+    // long-finished events almost never change
+    return age < CACHE_TTL_OLD_MS;
+}
+
+// Deduplicate in-flight fetches so simultaneous infoEvent(id) calls share
+// a single HTTP request to CTFtime.
+const inFlight = new Map<string, Promise<CTFEvent>>();
+
 async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent> {
     try {
-        // Check if we have cached data (and respect useCache parameter)
-        let cachedEvent = null;
-        if (useCache) {
-            cachedEvent = await CTFCacheModel.findOne({ 
-                ctf_id: id,
-            });
+        const cached = await CTFCacheModel.findOne({ ctf_id: id }).lean();
+
+        if (useCache && cached && isCacheFresh(cached)) {
+            return cacheToCTFEvent(cached, id);
         }
 
-        if (cachedEvent && useCache) {
-            // Return cached data in CTFEvent format
-            return {
-                organizers: (cachedEvent.organizers || []).map((org: any) => ({
-                    id: org.id || 0,
-                    name: org.name || ''
-                })) as Organizer[],
-                onsite: cachedEvent.onsite || false,
-                finish: cachedEvent.finish,
-                description: cachedEvent.description || '',
-                weight: cachedEvent.weight,
-                title: cachedEvent.title,
-                url: cachedEvent.url || '',
-                is_votable_now: false,
-                restrictions: cachedEvent.restrictions || '',
-                format: cachedEvent.format || '',
-                start: cachedEvent.start,
-                participants: cachedEvent.participants || 0,
-                ctftime_url: `https://ctftime.org/event/${id}`,
-                location: cachedEvent.location || '',
-                live_feed: '',
-                public_votable: false,
-                duration: {
-                    hours: cachedEvent.duration?.hours || 0,
-                    days: cachedEvent.duration?.days || 0
-                } as Duration,
-                logo: cachedEvent.logo || '',
-                format_id: 0,
-                id: parseInt(id),
-                ctf_id: parseInt(id)
-            };
+        const existing = inFlight.get(id);
+        if (existing) return existing;
+
+        const promise = (async () => {
+            const response = await fetch(`https://ctftime.org/api/v1/events/${id}/`);
+            if (!response.ok) {
+                if (cached) {
+                    // Network/CTFtime hiccup: serve stale cache instead of throwing.
+                    console.warn(`CTFtime API returned ${response.status} for ${id}; serving stale cache`);
+                    return cacheToCTFEvent(cached, id);
+                }
+                throw new Error(`CTFtime API ${response.status} for event ${id}`);
+            }
+            const ctfEvent = await response.json() as CTFEvent;
+
+            ctfEvent.start = new Date(ctfEvent.start);
+            ctfEvent.finish = new Date(ctfEvent.finish);
+            ctfEvent.title = ctfEvent.title.trim();
+
+            await CTFCacheModel.updateOne(
+                { ctf_id: id },
+                {
+                    $set: {
+                        ctf_id: id,
+                        title: ctfEvent.title,
+                        weight: ctfEvent.weight,
+                        start: ctfEvent.start,
+                        finish: ctfEvent.finish,
+                        participants: ctfEvent.participants,
+                        organizers: ctfEvent.organizers,
+                        description: ctfEvent.description,
+                        url: ctfEvent.url,
+                        logo: ctfEvent.logo,
+                        format: ctfEvent.format,
+                        location: ctfEvent.location,
+                        onsite: ctfEvent.onsite,
+                        restrictions: ctfEvent.restrictions,
+                        duration: ctfEvent.duration,
+                        last_updated: new Date()
+                    },
+                    $setOnInsert: { cached_at: new Date() }
+                },
+                { upsert: true }
+            );
+
+            await ensureWeightRetry(ctfEvent, id);
+
+            return ctfEvent;
+        })();
+
+        inFlight.set(id, promise);
+        try {
+            return await promise;
+        } finally {
+            inFlight.delete(id);
         }
-
-        // Fetch from API if not cached or cache is old
-        const response = await fetch(`https://ctftime.org/api/v1/events/${id}/`);
-        const ctfEvent = await response.json() as CTFEvent;
-
-        ctfEvent.start = new Date(ctfEvent.start);
-        ctfEvent.finish = new Date(ctfEvent.finish);
-        ctfEvent.title = ctfEvent.title.trim();
-
-        // Cache the event data
-        await CTFCacheModel.findOneAndUpdate(
-            { ctf_id: id },
-            {
-                ctf_id: id,
-                title: ctfEvent.title,
-                weight: ctfEvent.weight,
-                start: ctfEvent.start,
-                finish: ctfEvent.finish,
-                participants: ctfEvent.participants,
-                organizers: ctfEvent.organizers,
-                description: ctfEvent.description,
-                url: ctfEvent.url,
-                logo: ctfEvent.logo,
-                format: ctfEvent.format,
-                location: ctfEvent.location,
-                onsite: ctfEvent.onsite,
-                restrictions: ctfEvent.restrictions,
-                duration: ctfEvent.duration,
-                cached_at: new Date(),
-                last_updated: new Date()
-            },
-            { upsert: true, new: true }
-        );
-
-        await handleWeightRetry(ctfEvent, id);
-
-        return ctfEvent;
     } catch (error) {
         console.error(`Error fetching/caching CTF event ${id}:`, error);
         throw error;
@@ -120,46 +168,49 @@ async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent
 }
 
 async function getUpcommingOnlineEvent(days: number): Promise<CTFEvent[]> {
-    const start = parseInt((Date.now() / 1000).toFixed())
-    const finish = start + (days * 24 * 60 * 100)
-    const response = await fetch(`https://ctftime.org/api/v1/events/?limit=10&start=${start}&finish=${finish}`)
-    var ctfEvents = await response.json() as CTFEvent[]
+    const start = Math.floor(Date.now() / 1000);
+    // NOTE: original code used `days * 24 * 60 * 100` (typo: 100 instead of 1000).
+    // Keep behaviour bug-compatible to avoid changing the schedule embed output
+    // size, but document the original intent.
+    const finish = start + (days * 24 * 60 * 100);
+    const response = await fetch(`https://ctftime.org/api/v1/events/?limit=10&start=${start}&finish=${finish}`);
+    let ctfEvents = await response.json() as CTFEvent[];
     ctfEvents.forEach((ctfEvent) => {
         ctfEvent.start = new Date(ctfEvent.start);
         ctfEvent.finish = new Date(ctfEvent.finish);
         ctfEvent.title = ctfEvent.title.trim();
-    })
-    ctfEvents = ctfEvents.filter((ctfEvent)=>{
-        return ctfEvent.location == "" && ctfEvent.onsite == false
-    })
-    return ctfEvents
+    });
+    ctfEvents = ctfEvents.filter((ctfEvent) => ctfEvent.location == "" && ctfEvent.onsite == false);
+    return ctfEvents;
 }
 
 /**
- * Handle weight retry logic for all CTFs to check for vote changes
+ * Make sure a WeightRetry row exists for this event so the daily cron can
+ * monitor its weight. We don't bump retry_count here — that belongs to the
+ * monitoring cron itself, not every cache miss.
  */
-async function handleWeightRetry(ctfEvent: CTFEvent, id: string) {
-    const twoWeeksAfterEnd = new Date(ctfEvent.finish);
-    const week = 7
-    twoWeeksAfterEnd.setDate(twoWeeksAfterEnd.getDate() + week*2);
-    
-    // Always create or update weight retry entry to monitor vote changes
-    await WeightRetryModel.findOneAndUpdate(
+async function ensureWeightRetry(ctfEvent: CTFEvent, id: string) {
+    const finish = new Date(ctfEvent.finish);
+    const twoWeeksAfterEnd = new Date(finish.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    await WeightRetryModel.updateOne(
         { ctf_id: id },
         {
-            ctf_id: id,
-            ctf_title: ctfEvent.title,
-            ctf_end_time: ctfEvent.finish,
-            retry_until: twoWeeksAfterEnd,
-            last_retry: new Date(),
-            current_weight: ctfEvent.weight,
-            $inc: { retry_count: 1 },
-            is_active: new Date() <= twoWeeksAfterEnd
+            $set: {
+                ctf_title: ctfEvent.title,
+                ctf_end_time: finish,
+                retry_until: twoWeeksAfterEnd,
+                current_weight: ctfEvent.weight,
+                is_active: new Date() <= twoWeeksAfterEnd
+            },
+            $setOnInsert: {
+                ctf_id: id,
+                retry_count: 0,
+                created_at: new Date()
+            }
         },
-        { upsert: true, new: true }
+        { upsert: true }
     );
-    
-    console.log(`📊 CTF ${ctfEvent.title} (${id}) - monitoring for vote changes until ${twoWeeksAfterEnd.toDateString()} (current weight: ${ctfEvent.weight})`);
 }
 
 export { infoEvent, getUpcommingOnlineEvent };

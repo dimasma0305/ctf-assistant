@@ -14,4 +14,5 @@ export const schema = {
 };
 
 export const messageSchema = new Schema(schema);
+messageSchema.index({ ctfEventId: 1 });
 export type MessageSchemaType = InferSchemaType<typeof messageSchema>;

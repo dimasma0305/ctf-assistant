@@ -39,6 +39,7 @@ const {
   GuildMembers,
   GuildMessages,
   GuildMessageReactions,
+  GuildScheduledEvents,
   MessageContent,
   DirectMessages,
 } = GatewayIntentBits;
@@ -46,7 +47,7 @@ const {
 const { User, Message, GuildMember, Channel } = Partials;
 
 const client = new Client({
-  intents: [Guilds, GuildMembers, GuildMessages, GuildMessageReactions, MessageContent, DirectMessages],
+  intents: [Guilds, GuildMembers, GuildMessages, GuildMessageReactions, GuildScheduledEvents, MessageContent, DirectMessages],
   partials: [User, Message, GuildMember, Channel]
 }) as MyClient;
 

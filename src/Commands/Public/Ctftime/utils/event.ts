@@ -1,8 +1,6 @@
-import { ActionRowBuilder, APIActionRowComponent, APIMessageActionRowComponent, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, ComponentType, DMChannel, Guild, GuildMember, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, JSONEncodable, Message, RESTJSONErrorCodes, Role, TextChannel, User } from "discord.js";
+import { ActionRowBuilder, APIActionRowComponent, APIMessageActionRowComponent, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, ComponentType, DMChannel, Guild, GuildMember, GuildScheduledEvent, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel, JSONEncodable, Message, PartialGuildScheduledEvent, RESTJSONErrorCodes, Role, TextChannel, User } from "discord.js";
 
 import { CTFEvent, infoEvent } from "../../../../Functions/ctftime-v2";
-import cron from 'node-cron';
-import { dateToCron } from "../../../../Functions/discord-utils";
 import { MessageModel } from "../../../../Database/connect";
 
 const ENV = process.env.ENV || 'production';
@@ -252,6 +250,59 @@ interface EventListenerOptions {
     author?: User
 }
 
+/**
+ * Global registry of active ReactionRoleEvent instances keyed by the
+ * Discord scheduled-event ID. Lets us route `guildScheduledEventUserAdd`
+ * and `…UserRemove` to the right handler without per-event polling.
+ */
+const activeEventHandlers = new Map<string, ReactionRoleEvent>();
+let discordEventListenersAttached = false;
+let reconcileInterval: ReturnType<typeof setInterval> | null = null;
+
+const RECONCILE_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes safety-net
+
+function attachDiscordEventListeners(guild: Guild) {
+    if (discordEventListenersAttached) return;
+    discordEventListenersAttached = true;
+
+    const client = guild.client;
+
+    client.on('guildScheduledEventUserAdd', (scheduledEvent: GuildScheduledEvent | PartialGuildScheduledEvent, user: User) => {
+        const handler = activeEventHandlers.get(scheduledEvent.id);
+        if (!handler) return;
+        handler.handleSubscriberAdd(user).catch((error) => {
+            logError('Error handling scheduled-event user add', error, {
+                scheduledEventId: scheduledEvent.id,
+                userId: user.id,
+            });
+        });
+    });
+
+    client.on('guildScheduledEventUserRemove', (scheduledEvent: GuildScheduledEvent | PartialGuildScheduledEvent, user: User) => {
+        const handler = activeEventHandlers.get(scheduledEvent.id);
+        if (!handler) return;
+        handler.handleSubscriberRemove(user).catch((error) => {
+            logError('Error handling scheduled-event user remove', error, {
+                scheduledEventId: scheduledEvent.id,
+                userId: user.id,
+            });
+        });
+    });
+
+    // Safety-net reconciliation in case we miss gateway events (restart, drop).
+    reconcileInterval = setInterval(async () => {
+        for (const handler of activeEventHandlers.values()) {
+            try {
+                await handler.reconcileSubscribers();
+            } catch (error) {
+                logError('Error during periodic subscriber reconciliation', error, {
+                    eventTitle: handler.options.ctfEvent.title,
+                });
+            }
+        }
+    }, RECONCILE_INTERVAL_MS);
+}
+
 export class ReactionRoleEvent {
     guild: Guild;
     initialChannel: TextChannel;
@@ -433,6 +484,10 @@ ${weight}
         }
         return false
     }
+    private scheduledEvent?: GuildScheduledEvent;
+    private knownSubscribers: Set<string> = new Set();
+    private endTimeout?: ReturnType<typeof setTimeout>;
+
     async addEvent() {
         await this.__initializeChannelAndRole()
         const role = await this.getRole()
@@ -443,10 +498,13 @@ ${weight}
             })
             return
         }
+        this.scheduledEvent = event;
 
-        let subsBefore = await event.fetchSubscribers({ withMember: true })
+        // Initial sync — assign the role to anyone already subscribed.
+        const initialSubs = await event.fetchSubscribers({ withMember: true });
+        this.knownSubscribers = new Set(initialSubs.map((s) => s.user.id));
 
-        await runWithConcurrency(Array.from(subsBefore.values()), 5, async (gUser) => {
+        await runWithConcurrency(Array.from(initialSubs.values()), 5, async (gUser) => {
             const member = gUser.member ?? await this.guild.members.fetch(gUser.user.id).catch((error) => {
                 logError('Failed to fetch member while syncing subscribers (initial)', error, {
                     userId: gUser.user.id,
@@ -464,78 +522,118 @@ ${weight}
             }
         })
 
-        const updateSubscribers = async () => {
-            const subs = await event.fetchSubscribers({ withMember: true });
+        // Register for native Discord gateway events instead of polling every 5s.
+        attachDiscordEventListeners(this.guild);
+        activeEventHandlers.set(event.id, this);
 
-            await runWithConcurrency(Array.from(subs.values()), 5, async (gUser) => {
-                const member = gUser.member ?? await this.guild.members.fetch(gUser.user.id).catch((error) => {
-                    logError('Failed to fetch member while syncing subscribers (add)', error, {
-                        userId: gUser.user.id,
-                        eventId: this.options.ctfEvent.id,
-                    })
-                    return null
-                });
-                if (!member || member.roles.cache.has(role.id)) return;
-                const wasAdded = await this.addRoleToUser(gUser.user);
-                if (wasAdded) {
-                    const dm = await openDMChannel(gUser.user);
-                    if (dm) {
-                        await this.sendSuccessMessage(dm);
-                    }
-                }
-            });
+        // Schedule end-of-event using setTimeout (cap at int32 max ~24.8 days,
+        // re-schedule beyond that). Far more reliable than a cron pattern derived
+        // from a date — it won't silently miss the firing minute.
+        this.scheduleEnd();
+    }
 
-            await runWithConcurrency(Array.from(subsBefore.values()), 5, async (gUser) => {
-                if (subs.get(gUser.user.id)) return;
-                const wasRemoved = await this.removeRoleFromUser(gUser.user);
-                if (wasRemoved) {
-                    const dm = await openDMChannel(gUser.user);
-                    if (dm) {
-                        await dm.send(`Successfully removed the role for "${this.options.ctfEvent.title}"`);
-                    }
-                }
-            });
-
-            subsBefore = subs;
-        };
-
-        const scheduleEndMessage = async () => {
-            const endMessage = await generateCtfEndMessage(this.options.ctfEvent.title, role.id);
-            let finalMessage = endMessage;
-
-            // If this event was initialized without a fetch command (manual JSON upload / modal),
-            // remind people to re-run /solve init after the CTF ends to refresh final points/solves.
-            try {
-                const ctfCache = await CTFCacheModel.findOne({ ctf_id: this.options.ctfEvent.id.toString() }, { _id: 1 }).lean();
-                if (ctfCache && this.discussChannel) {
-                    const fetchCmd = await FetchCommandModel.findOne({
-                        ctf: ctfCache._id,
-                        channel_id: this.discussChannel.id,
-                    }, { _id: 1 }).lean();
-
-                    if (!fetchCmd) {
-                        finalMessage += `\n\n⚠️ **Final Score Reminder:** Jalankan \`/solve init\` lagi di channel ini setelah CTF selesai untuk refresh data (points/solves) supaya scoreboard final akurat.`;
-                    }
-                }
-            } catch (error) {
-                logWarn('Failed to check fetch command status for end reminder', {
-                    eventId: this.options.ctfEvent.id,
-                    error,
-                });
+    private scheduleEnd() {
+        const MAX_TIMEOUT = 2147483647;
+        const ms = this.options.ctfEvent.finish.getTime() - Date.now();
+        if (ms <= 0) {
+            void this.handleEnd();
+            return;
+        }
+        this.endTimeout = setTimeout(() => {
+            if (Date.now() < this.options.ctfEvent.finish.getTime()) {
+                this.scheduleEnd();
+                return;
             }
+            void this.handleEnd();
+        }, Math.min(ms, MAX_TIMEOUT));
+    }
 
-            await this.discussChannel?.send(finalMessage);
-            stopTasks();
-            await this.archive()
-        };
+    private async handleEnd() {
+        const role = await this.getRole();
+        const endMessage = await generateCtfEndMessage(this.options.ctfEvent.title, role.id);
+        let finalMessage = endMessage;
 
-        const updateTask = cron.schedule('*/5 * * * * *', updateSubscribers);
-        const endTask = cron.schedule(dateToCron(new Date(this.options.ctfEvent.finish)), scheduleEndMessage);
+        try {
+            const ctfCache = await CTFCacheModel.findOne({ ctf_id: this.options.ctfEvent.id.toString() }, { _id: 1 }).lean();
+            if (ctfCache && this.discussChannel) {
+                const fetchCmd = await FetchCommandModel.findOne({
+                    ctf: ctfCache._id,
+                    channel_id: this.discussChannel.id,
+                }, { _id: 1 }).lean();
 
-        const stopTasks = () => {
-            updateTask.stop();
-            endTask.stop();
-        };
+                if (!fetchCmd) {
+                    finalMessage += `\n\n⚠️ **Final Score Reminder:** Jalankan \`/solve init\` lagi di channel ini setelah CTF selesai untuk refresh data (points/solves) supaya scoreboard final akurat.`;
+                }
+            }
+        } catch (error) {
+            logWarn('Failed to check fetch command status for end reminder', {
+                eventId: this.options.ctfEvent.id,
+                error,
+            });
+        }
+
+        await this.discussChannel?.send(finalMessage);
+        this.stop();
+        await this.archive();
+    }
+
+    private stop() {
+        if (this.endTimeout) {
+            clearTimeout(this.endTimeout);
+            this.endTimeout = undefined;
+        }
+        if (this.scheduledEvent) {
+            activeEventHandlers.delete(this.scheduledEvent.id);
+        }
+    }
+
+    /** Called from the global guildScheduledEventUserAdd listener. */
+    async handleSubscriberAdd(user: User) {
+        this.knownSubscribers.add(user.id);
+        const wasAdded = await this.addRoleToUser(user);
+        if (!wasAdded) return;
+        const dm = await openDMChannel(user);
+        if (dm) await this.sendSuccessMessage(dm);
+    }
+
+    /** Called from the global guildScheduledEventUserRemove listener. */
+    async handleSubscriberRemove(user: User) {
+        this.knownSubscribers.delete(user.id);
+        const wasRemoved = await this.removeRoleFromUser(user);
+        if (!wasRemoved) return;
+        const dm = await openDMChannel(user);
+        if (dm) await dm.send(`Successfully removed the role for "${this.options.ctfEvent.title}"`);
+    }
+
+    /** Safety-net periodic reconciliation against the gateway events. */
+    async reconcileSubscribers() {
+        if (!this.scheduledEvent) return;
+        const role = await this.getRole();
+        const subs = await this.scheduledEvent.fetchSubscribers({ withMember: true });
+        const currentIds = new Set(subs.map((s) => s.user.id));
+
+        // Adds we missed
+        for (const sub of subs.values()) {
+            if (this.knownSubscribers.has(sub.user.id)) continue;
+            const member = sub.member ?? await this.guild.members.fetch(sub.user.id).catch(() => null);
+            if (!member || member.roles.cache.has(role.id)) {
+                this.knownSubscribers.add(sub.user.id);
+                continue;
+            }
+            await this.handleSubscriberAdd(sub.user);
+        }
+
+        // Removes we missed — snapshot to a list so handleSubscriberRemove
+        // can safely mutate knownSubscribers during iteration.
+        for (const knownId of Array.from(this.knownSubscribers)) {
+            if (currentIds.has(knownId)) continue;
+            const member = await this.guild.members.fetch(knownId).catch(() => null);
+            if (!member) {
+                this.knownSubscribers.delete(knownId);
+                continue;
+            }
+            await this.handleSubscriberRemove(member.user);
+        }
     }
 
     async archive() {
@@ -732,118 +830,120 @@ export async function getEmbedCTFEvent(interaction: ChatInputCommandInteraction<
     return message;
 }
 
+const RESTORE_CONCURRENCY = 5;
+
 // Add a function to restore message listeners on bot restart
 export async function restoreEventMessageListeners(client: MyClient) {
     logInfo("Restoring event message listeners...")
     try {
-        const storedMessages = await MessageModel.find({});
+        const storedMessages = await MessageModel.find({}).lean();
         const now = Date.now();
 
-        for (const storedMessage of storedMessages) {
+        // Up-front cleanup: drop expired records in one query.
+        const expiredIds = storedMessages
+            .filter((m: any) => m.expireAt && new Date(m.expireAt).getTime() <= now)
+            .map((m: any) => m._id);
+        if (expiredIds.length > 0) {
+            await MessageModel.deleteMany({ _id: { $in: expiredIds } });
+        }
+
+        const candidates = storedMessages.filter((m: any) => {
+            if (!m.guildId || !m.channelId || !m.messageId || !m.ctfEventId) return false;
+            if (m.expireAt && new Date(m.expireAt).getTime() <= now) return false;
+            return true;
+        });
+
+        // Dedupe ctfEventIds → one infoEvent call each, shared across guilds.
+        const uniqueCtfIds = Array.from(new Set(candidates.map((m: any) => String(m.ctfEventId))));
+        const ctfEventCache = new Map<string, any>();
+        await Promise.all(uniqueCtfIds.map(async (id) => {
             try {
-                // Check for valid data
-                if (!storedMessage.guildId || !storedMessage.channelId || !storedMessage.messageId || !storedMessage.ctfEventId) {
-                    logWarn('Invalid stored message record encountered', {
-                        storedMessageId: storedMessage._id?.toString?.(),
-                    });
-                    continue;
-                }
+                const ctfEvent = await infoEvent(id);
+                if (ctfEvent) ctfEventCache.set(id, ctfEvent);
+            } catch (error) {
+                logWarn('Failed to resolve CTF event while restoring listeners', { ctfEventId: id, error });
+            }
+        }));
 
-                const storedExpiry = storedMessage.expireAt ? new Date(storedMessage.expireAt).getTime() : null;
-                if (storedExpiry !== null && storedExpiry <= now) {
-                    await MessageModel.deleteOne({ _id: storedMessage._id });
-                    logInfo('Deleted expired listener record before restore', {
-                        messageId: storedMessage.messageId,
-                        ctfEventId: storedMessage.ctfEventId,
-                    });
-                    continue;
-                }
+        // Drop records whose CTF has already ended (the cron-based scheduler is
+        // gone now, but the listener would still attach a no-op collector).
+        const staleIds = candidates
+            .filter((m: any) => {
+                const e = ctfEventCache.get(String(m.ctfEventId));
+                return e && e.finish && new Date(e.finish).getTime() <= now;
+            })
+            .map((m: any) => m._id);
+        if (staleIds.length > 0) {
+            await MessageModel.deleteMany({ _id: { $in: staleIds } });
+        }
 
-                // Fetch guild
-                const guild = await client.guilds.fetch(storedMessage.guildId);
-                if (!guild) {
-                    logWarn('Guild not found while restoring listener', {
-                        guildId: storedMessage.guildId,
-                        messageId: storedMessage.messageId,
-                    });
-                    continue;
-                }
+        const live = candidates.filter((m: any) => {
+            const e = ctfEventCache.get(String(m.ctfEventId));
+            return e && e.finish && new Date(e.finish).getTime() > now;
+        });
 
-                // Fetch channel
-                const channel = await guild.channels.fetch(storedMessage.channelId);
-                if (!channel || !(channel instanceof TextChannel)) {
-                    logWarn('Channel not found or not a text channel while restoring listener', {
-                        channelId: storedMessage.channelId,
-                        guildId: storedMessage.guildId,
-                        messageId: storedMessage.messageId,
-                    });
-                    continue;
-                }
-
-                // Fetch message
+        const queue = [...live];
+        const workers = Array.from({ length: Math.min(RESTORE_CONCURRENCY, queue.length) }, async () => {
+            while (queue.length) {
+                const storedMessage: any = queue.shift();
+                if (!storedMessage) break;
                 try {
-                    const message = await channel.messages.fetch(storedMessage.messageId);
-
-                    // Fetch CTF event
-                    const ctfEvent = await infoEvent(String(storedMessage.ctfEventId));
-                    if (!ctfEvent) {
-                        logWarn('CTF event not found while restoring listener', {
-                            ctfEventId: storedMessage.ctfEventId,
+                    const guild = await client.guilds.fetch(storedMessage.guildId).catch(() => null);
+                    if (!guild) {
+                        logWarn('Guild not found while restoring listener', {
+                            guildId: storedMessage.guildId,
                             messageId: storedMessage.messageId,
                         });
                         continue;
                     }
-
-                    if (ctfEvent.finish.getTime() <= now) {
-                        await MessageModel.deleteOne({ _id: storedMessage._id });
-                        logInfo('Deleted stale listener record for finished CTF event', {
+                    const channel = await guild.channels.fetch(storedMessage.channelId).catch(() => null);
+                    if (!channel || !(channel instanceof TextChannel)) {
+                        logWarn('Channel not found or not a text channel while restoring listener', {
+                            channelId: storedMessage.channelId,
+                            guildId: storedMessage.guildId,
                             messageId: storedMessage.messageId,
-                            ctfEventTitle: ctfEvent.title,
                         });
                         continue;
                     }
+                    let message;
+                    try {
+                        message = await channel.messages.fetch(storedMessage.messageId);
+                    } catch (error: any) {
+                        logError('Error fetching stored message while restoring listener', error, {
+                            messageId: storedMessage.messageId,
+                            guildId: storedMessage.guildId,
+                        });
+                        if (error?.code === 10008) {
+                            await MessageModel.deleteOne({ messageId: storedMessage.messageId });
+                            logInfo('Deleted record for missing message', { messageId: storedMessage.messageId });
+                        }
+                        continue;
+                    }
 
-                    // Create notification role
+                    const ctfEvent = ctfEventCache.get(String(storedMessage.ctfEventId));
                     const notificationRole = await createRoleIfNotExist({
                         name: "CTF Waiting Role",
-                        guild: guild,
+                        guild,
                         color: "#87CEEB"
                     });
-
-                    // Create reaction role event
                     const reactionRoleEvent = new ReactionRoleEvent(guild, channel, {
-                        ctfEvent: ctfEvent,
-                        notificationRole: notificationRole
+                        ctfEvent,
+                        notificationRole
                     });
-
-                    // Initialize channels and roles, then add message listener
                     await reactionRoleEvent.__initializeChannelAndRole();
                     await reactionRoleEvent.addMessageRoleEventListener(message);
-
                     logInfo('Restored event listener', {
                         messageId: message.id,
                         ctfEventTitle: ctfEvent.title,
                     });
-                } catch (error: any) {
-                    logError('Error fetching stored message while restoring listener', error, {
-                        messageId: storedMessage.messageId,
-                        guildId: storedMessage.guildId,
+                } catch (error) {
+                    logError('Error processing stored message during listener restore', error, {
+                        storedMessageId: storedMessage._id?.toString?.(),
                     });
-
-                    // If message not found, delete the record
-                    if (error.code === 10008) { // Discord error code for unknown message
-                        await MessageModel.deleteOne({ messageId: storedMessage.messageId });
-                        logInfo('Deleted record for missing message', {
-                            messageId: storedMessage.messageId,
-                        });
-                    }
                 }
-            } catch (error) {
-                logError('Error processing stored message during listener restore', error, {
-                    storedMessageId: storedMessage._id?.toString?.(),
-                });
             }
-        }
+        });
+        await Promise.all(workers);
     } catch (error) {
         logError('Error fetching stored messages', error);
     }

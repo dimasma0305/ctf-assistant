@@ -43,4 +43,5 @@ export const schema = {
 }
 
 export const weightRetrySchema = new Schema(schema);
+weightRetrySchema.index({ is_active: 1, retry_until: 1 });
 export type WeightRetrySchemaType = InferSchemaType<typeof weightRetrySchema>;

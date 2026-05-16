@@ -62,4 +62,5 @@ export const schema = {
 }
 
 export const challengeSchema = new Schema(schema);
+challengeSchema.index({ ctf_id: 1, name: 1 }, { unique: true });
 export type ChallengeSchemaType = InferSchemaType<typeof challengeSchema>;
