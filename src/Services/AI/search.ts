@@ -31,11 +31,20 @@ export function parseSearchSignal(modelOutput: string): SearchSignal {
 }
 
 interface RawHit {
+    authorId: string;
     authorName: string;
     content: string;
     createdTimestamp: number;
     source: 'cache' | 'discord';
 }
+
+interface ParsedQuery {
+    authorIds: string[];   // empty = no author filter
+    tokens: string[];      // content tokens (substring AND match), empty = no content filter
+}
+
+// Match Discord mention shapes: <@123>, <@!123>, <@&123> (roles, ignored here).
+const USER_MENTION_REGEX = /<@!?(\d{17,20})>/g;
 
 function relativeTime(ts: number): string {
     const diff = Date.now() - ts;
@@ -56,36 +65,54 @@ function truncate(s: string, n: number): string {
 }
 
 /**
- * Tokenize the query into lowercase word fragments. A message must contain
- * ALL of them (substring, case-insensitive) to be considered a match.
- * Quoted phrases are kept intact: `[SEARCH: "race condition" exploit]`.
+ * Parse `[SEARCH: …]` payload into:
+ *   - authorIds: any <@USERID> mentions found → treated as "messages BY this user"
+ *   - tokens: remaining text, split into case-insensitive substring tokens.
+ *     Quoted phrases are kept intact: `[SEARCH: "race condition" exploit]`.
+ *
+ * Either filter is optional; both being empty means the search has no signal
+ * and we return zero hits (handled in runSearch).
  */
-function tokenizeQuery(query: string): string[] {
+function parseQuery(query: string): ParsedQuery {
+    const authorIds: string[] = [];
+    const withoutMentions = query.replace(USER_MENTION_REGEX, (_full, id) => {
+        if (!authorIds.includes(id)) authorIds.push(id);
+        return ' ';
+    });
+
     const tokens: string[] = [];
     const quotedRegex = /"([^"]+)"|(\S+)/g;
     let m: RegExpExecArray | null;
-    while ((m = quotedRegex.exec(query)) !== null) {
+    while ((m = quotedRegex.exec(withoutMentions)) !== null) {
         const tok = (m[1] || m[2] || '').toLowerCase();
         if (tok.length >= 2) tokens.push(tok);
     }
-    return tokens;
+    return { authorIds, tokens };
 }
 
-function matchesAll(content: string, tokens: string[]): boolean {
-    if (tokens.length === 0) return false;
+function matchesContent(content: string, tokens: string[]): boolean {
+    if (tokens.length === 0) return true;  // no content filter = pass
     const lower = content.toLowerCase();
     return tokens.every((t) => lower.includes(t));
 }
 
-async function searchCache(channelId: string, tokens: string[]): Promise<RawHit[]> {
+function matchesAuthor(authorId: string, authorIds: string[]): boolean {
+    if (authorIds.length === 0) return true;  // no author filter = pass
+    return authorIds.includes(authorId);
+}
+
+async function searchCache(channelId: string, parsed: ParsedQuery): Promise<RawHit[]> {
     const cache = await MessageCacheModel.findOne({ channelId }).lean();
     if (!cache || !cache.messages) return [];
     const messages = cache.messages as any[];
     const hits: RawHit[] = [];
     for (const m of messages) {
+        const authorId = m.author?.id || '';
+        if (!matchesAuthor(authorId, parsed.authorIds)) continue;
         const content = m.content || '';
-        if (!matchesAll(content, tokens)) continue;
+        if (!matchesContent(content, parsed.tokens)) continue;
         hits.push({
+            authorId,
             authorName: m.member?.displayName || m.author?.username || 'unknown',
             content,
             createdTimestamp: m.createdTimestamp,
@@ -97,7 +124,7 @@ async function searchCache(channelId: string, tokens: string[]): Promise<RawHit[
 
 async function searchDiscord(
     message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
-    tokens: string[],
+    parsed: ParsedQuery,
 ): Promise<RawHit[]> {
     const channel = message.channel as TextChannel | NewsChannel | ThreadChannel;
     if (!('messages' in channel)) return [];
@@ -105,9 +132,12 @@ async function searchDiscord(
         const fetched = await channel.messages.fetch({ limit: DISCORD_FALLBACK_LIMIT, before: message.id });
         const hits: RawHit[] = [];
         for (const m of fetched.values()) {
+            const authorId = m.author.id;
+            if (!matchesAuthor(authorId, parsed.authorIds)) continue;
             const content = m.content || '';
-            if (!matchesAll(content, tokens)) continue;
+            if (!matchesContent(content, parsed.tokens)) continue;
             hits.push({
+                authorId,
                 authorName: m.member?.displayName || m.author.username,
                 content,
                 createdTimestamp: m.createdTimestamp,
@@ -129,21 +159,24 @@ export async function runSearch(
     message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
     query: string,
 ): Promise<string> {
-    const tokens = tokenizeQuery(query);
-    if (tokens.length === 0) return '';
+    const parsed = parseQuery(query);
+    // Need at least one filter to be meaningful — otherwise we'd return the
+    // entire channel cache.
+    if (parsed.authorIds.length === 0 && parsed.tokens.length === 0) return '';
 
     const channelId = message.channel.id;
 
-    let hits = await searchCache(channelId, tokens);
+    let hits = await searchCache(channelId, parsed);
 
-    // If the cache is sparse, fall back to a bounded Discord fetch.
-    if (hits.length < MIN_CACHE_HITS) {
-        const apiHits = await searchDiscord(message, tokens);
-        // Dedup by (author + content + timestamp) — Discord fetch may return
-        // entries already covered by the cache scan.
-        const seen = new Set(hits.map((h) => `${h.authorName}|${h.createdTimestamp}|${h.content.slice(0, 32)}`));
+    // Always also fetch from Discord when an author filter is set — the cache
+    // is only 20 messages deep, so author-scoped searches benefit most from
+    // the wider 100-message window.
+    const needFallback = hits.length < MIN_CACHE_HITS || parsed.authorIds.length > 0;
+    if (needFallback) {
+        const apiHits = await searchDiscord(message, parsed);
+        const seen = new Set(hits.map((h) => `${h.authorId}|${h.createdTimestamp}|${h.content.slice(0, 32)}`));
         for (const h of apiHits) {
-            const key = `${h.authorName}|${h.createdTimestamp}|${h.content.slice(0, 32)}`;
+            const key = `${h.authorId}|${h.createdTimestamp}|${h.content.slice(0, 32)}`;
             if (!seen.has(key)) {
                 hits.push(h);
                 seen.add(key);
@@ -151,8 +184,15 @@ export async function runSearch(
         }
     }
 
+    // Human-readable description of which filters were active — helps the
+    // model speak naturally in the followup ("ga nemu pesan dari X soal Y").
+    const filterDesc = [
+        parsed.authorIds.length > 0 ? `from=${parsed.authorIds.map((id) => `<@${id}>`).join(',')}` : null,
+        parsed.tokens.length > 0 ? `terms="${parsed.tokens.join(' ')}"` : null,
+    ].filter(Boolean).join(' ');
+
     if (hits.length === 0) {
-        return `[SEARCH_RESULTS query="${query}"] no matches in this channel`;
+        return `[SEARCH_RESULTS ${filterDesc}] no matches in this channel`;
     }
 
     hits.sort((a, b) => b.createdTimestamp - a.createdTimestamp);
@@ -163,5 +203,5 @@ export async function runSearch(
         return `- ${h.authorName} (${when}): ${truncate(h.content.replace(/\n/g, ' '), MAX_RESULT_CONTENT_CHARS)}`;
     });
     const more = hits.length > MAX_SEARCH_RESULTS ? `\n(+${hits.length - MAX_SEARCH_RESULTS} more older matches truncated)` : '';
-    return `[SEARCH_RESULTS query="${query}" matches=${hits.length}]\n${lines.join('\n')}${more}`;
+    return `[SEARCH_RESULTS ${filterDesc} matches=${hits.length}]\n${lines.join('\n')}${more}`;
 }

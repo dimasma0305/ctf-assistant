@@ -8,6 +8,9 @@ bun.lockb
 /Writeup/
 /volumes/
 
+# TypeScript incremental build cache
+*.tsbuildinfo
+
 # Documentation build output
 /site/
 

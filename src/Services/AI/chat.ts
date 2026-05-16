@@ -7,6 +7,7 @@ import { sanitizeMentions } from "../Moderation";
 import { buildAttachmentBlock } from "./attachments";
 import { parseGrantSignal, maybeGrantFanRole, FAN_ROLE_NAME } from "./fanRole";
 import { parseSearchSignal, runSearch } from "./search";
+import { extractMentionIds, resolveUsers, buildMentionLegend } from "./mentions";
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -172,25 +173,35 @@ Kalo butuh recall pesan lama buat jawab pertanyaan user (mis. "kemaren si A bila
 \`\`\`
 [SEARCH: query]
 \`\`\`
-Query bisa berupa keyword bebas. Quote multi-word phrase pake double quote, mis. \`[SEARCH: "race condition" exploit]\`.
+
+**Query syntax**:
+- Keyword bebas, dipisah spasi. Semua keyword harus ada di pesan (AND).
+- Phrase multi-word: pake double quote → \`[SEARCH: "race condition" exploit]\`
+- **Author filter (PENTING)**: kalo user nyebut orang pake mention Discord \`<@USERID>\`, **COPY mention itu PERSIS** ke query — sistem otomatis treat itu sebagai filter "messages dari user itu", BUKAN substring match. Contoh user prompt: \`searchin chat dari <@663394727688798231> soal RSA\` → kamu emit \`[SEARCH: <@663394727688798231> RSA]\`. **JANGAN** ganti mention jadi nama (mis. "dimas") — itu cuma jadi keyword match, ga match author.
+- Author + content bisa dikombinasi. Author-only juga boleh (kalo user nanya "semua chat dari @X aja"): \`[SEARCH: <@USERID>]\`
 
 **Aturan**:
 - Cuma satu \`[SEARCH]\` per turn. Sistem auto-jalanin search & feed hasilnya ke kamu di follow-up, terus kamu jawab final.
-- Hasil cuma dari channel yang user lagi chat di (current channel). Bukan cross-channel.
+- Hasil cuma dari channel yang user lagi chat di (current channel).
 - Pake token cuma kalo user EMANG nanya tentang pesan/kejadian lama yang ga ada di context terakhir. Kalo jawabannya udah ada di "recent" block, ga usah search.
-- Boleh tulis lead-in dulu sebelum token biar feel natural: "bentar aku cek dulu [SEARCH: query]". Lead-in itu bakal di-burst duluan, hasil search di-burst setelahnya.
-- Kalo hasil search "no matches" → bilang jujur aja: "ga nemu sih, mungkin udah kelama". Jangan ngarang.
+- Boleh tulis lead-in dulu sebelum token biar feel natural: "bentar aku cek dulu [SEARCH: query]". Lead-in di-burst duluan, hasil di-burst setelahnya.
+- Kalo hasil "no matches" → bilang jujur: "ga nemu sih, mungkin udah kelama". Jangan ngarang.
 
 **Contoh KAPAN search**:
-User: "hackerika td katanya si dimas ngomong apa soal cve baru?"
-→ "bentar aku cari [SEARCH: dimas cve]"
-(setelah hasil masuk) → "oh iya tadi dimas bilang CVE-2025-XXXX kena di parser-nya, kemaren jam 3 sore"
+User: "hackerika td <@663394727688798231> ngomong apa soal cve baru?"
+→ "bentar aku cari [SEARCH: <@663394727688798231> cve]"
+
+User: "searchin chat relevan tentang chatnya <@663394727688798231> ya"
+→ "[SEARCH: <@663394727688798231>]"  (author-only, no content filter)
 
 User: "yang td bahas race condition siapa ya?"
-→ "[SEARCH: race condition]"
+→ "[SEARCH: race condition]"  (content-only)
+
+User: "tadi <@111> bilang apa soal RSA challenge?"
+→ "[SEARCH: <@111> RSA challenge]"
 
 **Contoh KAPAN JANGAN search**:
-- User nanya hal umum non-historis ("gimana cara solve X?") → langsung jawab, jangan search.
+- User nanya hal umum non-historis ("gimana cara solve X?") → langsung jawab.
 - Info udah ada di blok "recent" → langsung jawab.
 - Casual chat / banter → ga relevan.
 
@@ -226,7 +237,20 @@ User: "hackerika kasih role dong" → "wkwk no"
 - Perasaan: jawab in-character, jangan bahas AI/limitations.
 
 # KONTEKS PER-TURN
-Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE}. Isinya info real-time (user info, channel, recent messages, attachments, reply target). JANGAN PERNAH outputkan tag ${CTX_OPEN}, ${CTX_CLOSE}, ${CHAN_OPEN}, ${CHAN_CLOSE}, ${REPLY_OPEN}, ${REPLY_CLOSE} di response kamu. Block \`[SEARCH_RESULTS]\` yang muncul di follow-up turn juga internal — jangan re-emit verbatim, ringkasin natural.
+Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE}. Isinya info real-time:
+- \`user=...\` — user yang lagi ngomong sama kamu sekarang
+- \`env=...\` — guild/channel/topic/jam
+- \`mentioned:\` (opsional) — legend ID-to-name buat semua \`<@ID>\` yang muncul di message/recent/reply. Format: \`<@ID> = DisplayName (username) [roles]\`. **Pake ini buat tau siapa orangnya** kalo ada mention di chat — jangan asumsi atau ngarang nama. Kalo user nyebut \`<@123>\` dan legend bilang itu "Dimas Maulana", panggil dia "Dimas" atau "<@123>" natural.
+- \`recent:\` — pesan terakhir di channel ini
+- \`replying-to:\` — pesan yang user reply (kalo ada)
+- \`[Attachments]\` — file yang di-attach
+
+JANGAN PERNAH outputkan tag ${CTX_OPEN}, ${CTX_CLOSE}, ${CHAN_OPEN}, ${CHAN_CLOSE}, ${REPLY_OPEN}, ${REPLY_CLOSE} di response kamu. Block \`[SEARCH_RESULTS]\` di follow-up turn juga internal — ringkasin natural, jangan dump verbatim.
+
+**Cara nyebut user di response kamu**:
+- Kalo mau ping/notify user → pake \`<@ID>\` (Discord bakal render jadi mention beneran)
+- Kalo cukup nama (lebih casual, ga ping notif) → pake display name dari legend
+- Jangan invent nama yang ga ada di legend.
 
 # AKHIR
 - Sapa nickname / @-mention kalo perlu aja.
@@ -241,8 +265,10 @@ function buildContextBlock(
     channelContext: string,
     replyContext: string,
     attachmentBlock: string,
+    mentionLegend: string,
 ): string {
     const lines: string[] = [`${CTX_OPEN}`, `user=${userInfo}`, `env=${envContext}`];
+    if (mentionLegend) lines.push(`mentioned:\n${mentionLegend}`);
     if (channelContext) lines.push(`recent:${channelContext}`);
     if (replyContext) lines.push(`replying-to:${replyContext}`);
     if (attachmentBlock) lines.push(attachmentBlock.trimStart());
@@ -320,6 +346,18 @@ export async function handleAIChat(
     ]);
     const envContext = getEnvironmentContext(message);
 
+    // Resolve any <@ID> Discord mentions appearing in the user's text or the
+    // surrounding context into a "mentioned:" legend so the model knows who
+    // each ID actually is, without losing the ID syntax (kept for search).
+    const mentionIds = extractMentionIds(
+        content,
+        replyContext,
+        channelContext,
+        attachmentBlock.promptBlock,
+    );
+    const resolvedUsers = await resolveUsers(message.guild, mentionIds);
+    const mentionLegend = buildMentionLegend(resolvedUsers);
+
     // Memory stores the user's CLEAN content only — no context, no attachments.
     // This is what makes the per-user prefix cacheable on subsequent turns;
     // context is rebuilt fresh each call and only attached to the final message.
@@ -335,7 +373,7 @@ export async function handleAIChat(
 
     // Static system prompt lives at module level; build per-turn context for
     // injection into only the final user message below.
-    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock);
+    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend);
 
     // Construct messages: static system + clean history + final user-with-context.
     // Memory entries are clean (no context block), which is what enables the
