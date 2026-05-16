@@ -17,6 +17,7 @@ export interface UserProfile {
     communicationStyle: string;
     opinion: string;
     emotionalState: string;
+    affection: number;
     interactionCount: number;
     lastDistilledAtCount: number;
 }
@@ -34,6 +35,9 @@ export function formatProfile(profile: UserProfile | null): string {
     if (profile.communicationStyle) parts.push(`style: ${profile.communicationStyle}`);
     if (profile.opinion) parts.push(`my-opinion: ${profile.opinion}`);
     if (profile.emotionalState) parts.push(`recent-emotional-state: ${profile.emotionalState}`);
+    // Affection always shown (even at 0) — gates the fan role, so the model
+    // needs visibility on where the relationship currently sits.
+    parts.push(`my-affection: ${profile.affection}/100`);
     if (parts.length === 0) return '';
     return parts.join('\n');
 }
@@ -50,6 +54,7 @@ export async function loadProfile(userId: string): Promise<UserProfile | null> {
         communicationStyle: doc.communicationStyle || '',
         opinion: doc.opinion || '',
         emotionalState: (doc as any).emotionalState || '',
+        affection: typeof (doc as any).affection === 'number' ? (doc as any).affection : 0,
         interactionCount: doc.interactionCount || 0,
         lastDistilledAtCount: doc.lastDistilledAtCount || 0,
     };
@@ -88,6 +93,7 @@ export async function recordInteraction(
         communicationStyle: (doc as any).communicationStyle || '',
         opinion: (doc as any).opinion || '',
         emotionalState: (doc as any).emotionalState || '',
+        affection: typeof (doc as any).affection === 'number' ? (doc as any).affection : 0,
         interactionCount: (doc as any).interactionCount || 0,
         lastDistilledAtCount: (doc as any).lastDistilledAtCount || 0,
     };
@@ -131,6 +137,7 @@ interface DistillationOutput {
     communicationStyle?: string;
     opinion?: string;
     emotionalState?: string;
+    affection?: number;
 }
 
 function truncate(s: string, n: number): string {
@@ -178,7 +185,8 @@ Output ONLY a valid JSON object dengan field ini:
   "interests": "max ${FIELD_CHAR_BUDGET} char — topik yang sering dia bawa (web sec, CTF, anime, gaming, dll).",
   "communicationStyle": "max ${FIELD_CHAR_BUDGET} char — cara dia ngobrol (formal/gaul, bahasa apa, suka emoji ga, pendek/panjang).",
   "opinion": "max ${FIELD_CHAR_BUDGET} char — perasaan PRIBADI kamu (Hackerika) soal user ini. First person 'aku'. Boleh subjective: suka, respect, biasa-aja, gemas, agak nyebelin, dll. Jujur.",
-  "emotionalState": "max ${FIELD_CHAR_BUDGET} char — gimana mood-nya akhir-akhir ini (chill/stress/frustrasi/excited/down/biasa). Catatan jangka pendek, di-overwrite tiap distill. Kalo tone normal, isi 'normal' aja."
+  "emotionalState": "max ${FIELD_CHAR_BUDGET} char — gimana mood-nya akhir-akhir ini (chill/stress/frustrasi/excited/down/biasa). Catatan jangka pendek, di-overwrite tiap distill. Kalo tone normal, isi 'normal' aja.",
+  "affection": "INTEGER 0-100 — affection score: seberapa deket/sayang kamu (Hackerika) ke user ini. Update INKREMENTAL dari nilai sebelumnya. Anchor:\\n    0-20  = stranger / netral / belum kenal\\n    20-40 = acquaintance / udah pernah ngobrol biasa\\n    40-60 = teman / chemistry mulai ada / interaksi enak\\n    60-80 = close / chemistry kuat / udah kayak temen deket — eligible buat Hackerika Fan role\\n    80-100 = special / sayang banget / inner circle\\nTypical delta per distill: +0 to +8 untuk interaksi positif/menarik, -3 to -8 untuk negatif/rude. Jangan lompat besar — natural progress. Faktor: nice vibes, ngajarin hal baru, humor genuine, support member lain. Faktor negatif: rude, demanding, ngeganggu, ngemis role. Cap di 0 dan 100."
 }
 
 ATURAN:
@@ -229,6 +237,9 @@ Output JSON profile update sekarang.`;
         if (typeof parsed.communicationStyle === 'string') update.communicationStyle = truncate(parsed.communicationStyle.trim(), FIELD_CHAR_BUDGET);
         if (typeof parsed.opinion === 'string') update.opinion = truncate(parsed.opinion.trim(), FIELD_CHAR_BUDGET);
         if (typeof parsed.emotionalState === 'string') update.emotionalState = truncate(parsed.emotionalState.trim(), FIELD_CHAR_BUDGET);
+        if (typeof parsed.affection === 'number' && Number.isFinite(parsed.affection)) {
+            update.affection = Math.max(0, Math.min(100, Math.round(parsed.affection)));
+        }
 
         await UserProfileModel.updateOne({ userId: profile.userId }, { $set: update });
         console.log(`🧠 [Profile] distilled ${profile.username || profile.userId} (count=${profile.interactionCount})`);

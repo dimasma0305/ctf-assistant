@@ -28,6 +28,16 @@ export const schema = {
     // Hackerika for proactive check-ins when distress signals persist.
     emotionalState: { type: String, default: '' },
 
+    // Affection score 0-100. Hackerika's emotional closeness to this user,
+    // updated incrementally by the distillation pass. Drives the Hackerika
+    // Fan role gate — user must reach affection >= 60 to be eligible.
+    //   0-20  stranger / netral
+    //   20-40 acquaintance
+    //   40-60 friend
+    //   60-80 close / fan-worthy
+    //   80-100 deep affection
+    affection: { type: Number, default: 0, min: 0, max: 100 },
+
     // Bookkeeping for the distillation schedule.
     interactionCount: { type: Number, default: 0 },
     lastDistilledAtCount: { type: Number, default: 0 },

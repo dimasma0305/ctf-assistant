@@ -1,16 +1,20 @@
 import { ColorResolvable, Guild, GuildMember, OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
-import { memory } from "./memory";
+import { UserProfileModel } from "../../Database/connect";
 
 export const FAN_ROLE_NAME = "Hackerika Fan";
 const FAN_ROLE_COLOR: ColorResolvable = "#FFB6D5"; // pastel pink
 const FAN_ROLE_REASON = "Hackerika approved this user";
 
-// Gates that make the role *hard* to obtain. Any of these failing silently
-// drops the grant attempt — the model can suggest, but we control whether it
-// actually happens.
-const MIN_USER_TURNS = 8;             // user must have ≥ N prior turns in memory
-const PER_USER_COOLDOWN_MS = 30 * 60 * 1000; // even if model wants to grant, only one attempt per 30 min
-const RANDOM_VETO_PROBABILITY = 0.35; // ~35% of model-approved grants are still vetoed by dice
+// Developer/creator gets a bypass — the DIMAS section in the system prompt
+// says full obedience, this enforces it at the code level too.
+const DEVELOPER_USER_ID = '663394727688798231';
+
+// Affection-based gating. User must build up an affection score with
+// Hackerika (via the profile distillation pass) before becoming eligible.
+// This makes the role feel earned through a real relationship arc rather
+// than gamed via raw interaction count.
+const AFFECTION_THRESHOLD = 60;       // 0-100; 60 = "close / fan-worthy" tier
+const PER_USER_COOLDOWN_MS = 5 * 60 * 1000; // 5 min — guards against tight retry loops
 
 // In-memory last-attempt tracker. Process-local is fine — restarts just reset
 // the cooldown, which only makes the role *slightly* easier to obtain after a
@@ -76,30 +80,45 @@ export async function maybeGrantFanRole(
     reason: string
 ): Promise<boolean> {
     const guild = message.guild;
-    if (!guild) return false;
+    if (!guild) {
+        console.log('[FanRole] denied: not in a guild (DM context)');
+        return false;
+    }
     const userId = message.author.id;
+    const isDeveloper = userId === DEVELOPER_USER_ID;
 
-    // Gate 1: enough conversational history with this user.
-    const turnsSoFar = memory[userId]?.messages.length ?? 0;
-    if (turnsSoFar < MIN_USER_TURNS) {
-        console.log(`[FanRole] denied for ${userId}: only ${turnsSoFar} prior turns (need ${MIN_USER_TURNS})`);
-        return false;
-    }
+    // Dev bypass: Dimas gets unconditional grants. Hard gates (Discord
+    // permissions, already-has-role) still apply below for everyone.
+    if (!isDeveloper) {
+        // Gate 1: affection threshold. The single softgate — user must have
+        // built up enough affection via the profile distillation cycle.
+        // No "interaction count" requirement: short genuine interactions can
+        // build affection faster than long shallow ones.
+        let affection = 0;
+        try {
+            const profile = await UserProfileModel.findOne({ userId }).select({ affection: 1 }).lean();
+            affection = (profile as any)?.affection ?? 0;
+        } catch (error) {
+            console.error('[FanRole] failed to read profile:', error);
+        }
+        if (affection < AFFECTION_THRESHOLD) {
+            console.log(`[FanRole] denied for ${userId}: affection ${affection}/100 (need ${AFFECTION_THRESHOLD})`);
+            return false;
+        }
 
-    // Gate 2: cooldown — even if approved, only try once per cooldown window.
-    const now = Date.now();
-    const lastAttempt = lastGrantAttempt.get(userId) ?? 0;
-    if (now - lastAttempt < PER_USER_COOLDOWN_MS) {
-        console.log(`[FanRole] denied for ${userId}: cooldown still active`);
-        return false;
-    }
-    lastGrantAttempt.set(userId, now);
+        // Gate 2: short cooldown — only guards against tight retry loops if
+        // the model spam-emits the token over consecutive turns.
+        const now = Date.now();
+        const lastAttempt = lastGrantAttempt.get(userId) ?? 0;
+        if (now - lastAttempt < PER_USER_COOLDOWN_MS) {
+            console.log(`[FanRole] denied for ${userId}: cooldown active (${Math.ceil((PER_USER_COOLDOWN_MS - (now - lastAttempt)) / 60000)}m left)`);
+            return false;
+        }
+        lastGrantAttempt.set(userId, now);
 
-    // Gate 3: random veto. Even when she wants to grant it, she changes her
-    // mind sometimes — keeps the role mysterious.
-    if (Math.random() < RANDOM_VETO_PROBABILITY) {
-        console.log(`[FanRole] random veto for ${userId}`);
-        return false;
+        console.log(`[FanRole] gate passed for ${userId}: affection ${affection}/100`);
+    } else {
+        console.log(`[FanRole] dev bypass active for ${userId} (Dimas)`);
     }
 
     // Resolve member.
@@ -112,22 +131,23 @@ export async function maybeGrantFanRole(
     }
 
     const role = await ensureFanRole(guild);
-    if (!role) return false;
-
-    // Already a fan? Nothing to do — silent no-op.
-    if (member.roles.cache.has(role.id)) {
+    if (!role) {
+        console.warn('[FanRole] role creation failed');
         return false;
     }
 
-    // Check we have permission to assign this role. Bots can only assign roles
-    // strictly below their highest role.
+    if (member.roles.cache.has(role.id)) {
+        console.log(`[FanRole] ${userId} already has role, no-op`);
+        return false;
+    }
+
     const botMember = guild.members.me;
     if (!botMember || !botMember.permissions.has('ManageRoles')) {
         console.warn('[FanRole] bot lacks ManageRoles permission');
         return false;
     }
     if (role.position >= botMember.roles.highest.position) {
-        console.warn(`[FanRole] role "${role.name}" is at or above bot's highest role, cannot assign`);
+        console.warn(`[FanRole] role "${role.name}" position=${role.position} is at or above bot's highest role position=${botMember.roles.highest.position}, cannot assign — move bot role above ${role.name} in server settings`);
         return false;
     }
 
