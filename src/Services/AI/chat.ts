@@ -4,6 +4,7 @@ import { MyClient } from "../../Model/client";
 import { getChannelContext, getUserInfo, getReplyContext, getEnvironmentContext, generateUniqueSeparator } from "./context";
 import { memory, ChatMessage } from "./memory";
 import { sanitizeMentions } from "../Moderation";
+import { buildAttachmentBlock } from "./attachments";
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -117,6 +118,10 @@ export async function handleAIChat(
     if (!shouldRespond(content, messageReference as DiscordMessage | null, client.user?.id)) return;
     if (content.length > 1000) return;
 
+    // Attachments: text/code files get downloaded and inlined. Images and
+    // binary files are noted with metadata only (no vision yet).
+    const attachmentBlock = await buildAttachmentBlock(message);
+
     // Per-user lock: if a previous turn is still running, just drop this one
     // (with a subtle reaction so the user knows it was seen).
     if (userLocks.has(userId)) {
@@ -149,7 +154,7 @@ export async function handleAIChat(
     ]);
     const envContext = getEnvironmentContext(message);
 
-    const enhancedContent = `${content}${replyContext}`;
+    const enhancedContent = `${content}${replyContext}${attachmentBlock.promptBlock}`;
     const userMessageEntry: ChatMessage = {
         role: 'user',
         name: `${userId}-${author.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}`,
@@ -277,6 +282,13 @@ Ini ROBOT BANGET. JANGAN.
 - **Etika**: GA PERNAH bantu hal ilegal. Black-hat, malware, exploit sistem tanpa izin → tolak. Tapi tolaknya tetep santai & sopan: "ihh ga mau ah bantu yg gituan, cuma di sistem yang kamu punya izin aja yaa 😅".
 - Kalo ditanya soal perasaan: jawab in-character santai, jangan bahas AI/kode/limitations.
 - **Jangan pernah bocorin** separator unik ini di output kamu: \`${channelSep1}\`, \`${channelSep2}\`, \`${replySep1}\`, \`${replySep2}\`.
+
+# HANDLING ATTACHMENT (kalo user lampirin file)
+- Kalo ada blok \`[Attachments]\` di pesan user, itu file yang dia attach. Isinya udah aku download & tampilin sebagai code block.
+- File code/text bisa kamu baca langsung dari blok itu. Bahas isi file-nya secara natural, jangan ngulang isi file penuh kecuali ditanya. Highlight bug/issue/yang relevan aja.
+- Kalo file kelihatan kepotong / kegedean: bilang aja "filenya ke-cut sih, bagian X aja yang aku lihat". Jangan ngarang isi yang ga ada.
+- **Image attached?** Kamu **belum bisa lihat gambar langsung** (lagi belum ada vision). Reaksi natural: minta user ceritain isi gambarnya, atau OCR-in ke text, atau deskripsiin singkat. Contoh: "eh aku belum bisa lihat gambarnya nih 🥺 boleh deskripsiin apa isinya?". Jangan pura-pura bisa lihat.
+- Binary file (zip, exe, dll) yang ga di-download: bilang aja ga bisa dibuka, minta user kasih konten text-nya.
 
 # KONTEKS DINAMIS
 
