@@ -37,7 +37,7 @@ const mabarMessageTemplates = [
 async function generateMabarMessage(): Promise<string> {
     try {
         const completion = await openai.chat.completions.create({
-            model: 'deepseek-reasoner',
+            model: 'deepseek-v4-flash',
             messages: [
                 {
                     role: 'system',

@@ -198,7 +198,7 @@ async function generateCtfEndMessage(ctfTitle: string, roleId: string): Promise<
 
     try {
         const completion = await openai.chat.completions.create({
-            model: 'deepseek-reasoner',
+            model: 'deepseek-v4-flash',
             messages: [
                 {
                     role: 'system',
@@ -209,7 +209,9 @@ async function generateCtfEndMessage(ctfTitle: string, roleId: string): Promise<
                     content: `Generate an end message for CTF "${ctfTitle}" that just finished. Include <@&${roleId}> to mention the participants. Make it celebratory and encouraging.`
                 }
             ],
-            max_tokens: 200,
+            // v4 models burn reasoning tokens before producing content; give
+            // enough headroom that the final string isn't truncated.
+            max_tokens: 800,
             temperature: 0.8,
             n: 1,
         });
