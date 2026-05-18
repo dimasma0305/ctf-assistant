@@ -8,6 +8,7 @@ import {
     getCurrentTimeForTool,
     setUserTimezoneForTool,
 } from "./reminders";
+import { webSearchForTool, fetchUrlForTool } from "./web";
 
 /**
  * Native function-calling tool registry for Hackerika.
@@ -171,6 +172,76 @@ export const TOOL_DEFINITIONS = [
     {
         type: 'function' as const,
         function: {
+            name: 'web_search',
+            description:
+                'Search internet via Mojeek (independent crawler) + DuckDuckGo Instant Answer API in parallel. Free, no key. ' +
+                'Returns 2 hal: (1) `instant` — kalo query-nya factual (definisi, math, fakta umum), ' +
+                'lo dapet abstract Wikipedia-style yang udah pre-summarized — sering bisa langsung jawab tanpa fetch lagi. ' +
+                '(2) `results` — list of top organic results (title, URL, snippet) buat eksplorasi lebih dalem. ' +
+                '\n\n**Kapan PAKE**:\n' +
+                '- User nanya info dunia luar / terkini (event, news, "siapa CEO X", "apa itu Y", "berita Z hari ini").\n' +
+                '- User minta cari informasi yg ga ada di context Discord channel.\n' +
+                '- Lo perlu ngecek fakta sebelum jawab confident.\n' +
+                '- Research mode: lo cari results, pilih URL yg paling relevan, baru `fetch_url` buat baca detail.\n\n' +
+                '**Kapan JANGAN**:\n' +
+                '- Kalo info-nya udah di context / lo udah tau (jangan over-search).\n' +
+                '- Casual chat / banter (jelas ga butuh search).\n' +
+                '- Pertanyaan teknis general yg lo bisa jawab dari pengetahuan internal.\n\n' +
+                '**Reply pattern**: jangan dump results verbatim. Ringkas natural, sebut source kalo important ' +
+                '("dari wikipedia, X itu ...", "kayaknya menurut artikel di Y, ..."). Boleh kasih URL satu yang paling relevan ' +
+                'kalo user pengen baca sendiri.\n\n' +
+                '**Kalo result kosong** (note=search_engine_blocked/no_results): JANGAN langsung nyerah atau bilang "search engine bermasalah". ' +
+                'Mojeek index-nya independent — coba 1-2 rephrase keyword sebelum bilang ga ada (Inggris vs Indonesian, lebih singkat/spesifik). ' +
+                'Kalo tetep nihil setelah 2-3 retry, baru bilang jujur: "topik ini kayaknya susah dicari di index-ku, mungkin coba search sendiri di google".',
+            parameters: {
+                type: 'object',
+                properties: {
+                    query: {
+                        type: 'string',
+                        description:
+                            'Search query. Pake bahasa yang DuckDuckGo paling probably nemu — biasanya English untuk topik teknis ' +
+                            'global, atau Indonesian untuk topik lokal. Singkat tapi specific (3-8 kata biasanya optimal).',
+                    },
+                    maxResults: {
+                        type: 'number',
+                        description: 'Berapa hasil organic max (default 5, max 8). Kasih lebih banyak kalo perlu eksplorasi lebar.',
+                    },
+                },
+                required: ['query'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'fetch_url',
+            description:
+                'Download isi sebuah URL dan return as plain-text (HTML stripped, max ~6000 char). ' +
+                'Pake buat: (1) baca detail page setelah `web_search` ngasih URL menarik, ' +
+                '(2) user share link minta lo bacain/summary-in, ' +
+                '(3) lo perlu konten spesifik yang ga muat di search snippet. ' +
+                '\n\n**Output**: { ok, content (extracted text), title, contentType, finalUrl, truncated }. ' +
+                'Title diekstrak dari <title> tag kalo ada. `truncated:true` artinya content kepotong di 6000 char — kalo butuh lebih, ' +
+                'fetch ulang dgn URL yg lebih spesifik (deep link ke section).\n\n' +
+                '**Errors**: invalid_url, bad_scheme (cuma http/https), private_target (SSRF guard — IP private/loopback diblokir), ' +
+                'http_error (status code-nya di status field), non_text_content (PDF/image/binary), body_too_large (>2MB), fetch_failed. ' +
+                '\n\n**Reply pattern**: ringkas content natural, jangan dump verbatim. Kalo article panjang, ' +
+                'highlight 2-3 poin utama. Always credit source ("dari [judul] di [domain]: ...").',
+            parameters: {
+                type: 'object',
+                properties: {
+                    url: {
+                        type: 'string',
+                        description: 'Full URL dengan scheme (http:// atau https://). Contoh: https://en.wikipedia.org/wiki/SQL_injection',
+                    },
+                },
+                required: ['url'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
             name: 'grant_fan_role',
             description:
                 'Kasih role "Hackerika Fan" ke user yang lagi ngobrol sama lo sekarang. ' +
@@ -246,6 +317,14 @@ export async function dispatchTool(
         }
         if (name === 'set_user_timezone') {
             const result = await setUserTimezoneForTool(message, args || {});
+            return JSON.stringify(result);
+        }
+        if (name === 'web_search') {
+            const result = await webSearchForTool(args || {});
+            return JSON.stringify(result);
+        }
+        if (name === 'fetch_url') {
+            const result = await fetchUrlForTool(args || {});
             return JSON.stringify(result);
         }
         return JSON.stringify({ error: 'unknown_tool', name });
