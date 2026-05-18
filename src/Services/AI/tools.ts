@@ -190,9 +190,11 @@ export const TOOL_DEFINITIONS = [
                 '**Reply pattern**: jangan dump results verbatim. Ringkas natural, sebut source kalo important ' +
                 '("dari wikipedia, X itu ...", "kayaknya menurut artikel di Y, ..."). Boleh kasih URL satu yang paling relevan ' +
                 'kalo user pengen baca sendiri.\n\n' +
-                '**Kalo result kosong** (note=search_engine_blocked/no_results): JANGAN langsung nyerah atau bilang "search engine bermasalah". ' +
-                'Mojeek index-nya independent — coba 1-2 rephrase keyword sebelum bilang ga ada (Inggris vs Indonesian, lebih singkat/spesifik). ' +
-                'Kalo tetep nihil setelah 2-3 retry, baru bilang jujur: "topik ini kayaknya susah dicari di index-ku, mungkin coba search sendiri di google".',
+                '**Kalo result kosong** (note=search_engine_blocked/no_results): coba MAX 1 rephrase ' +
+                '(misal: Indonesian→English, lebih singkat, hapus tahun/tanggal yang bikin spesifik). ' +
+                'Kalo retry kedua juga nihil, **STOP search — jangan loop lagi**. Langsung jawab user pake info yang udah ada ' +
+                'atau bilang jujur "topik ini lagi susah dicari, coba ke google sendiri ya". ' +
+                'JANGAN lakuin 5+ search consecutive untuk satu topik — itu bikin turn lo timeout & lo malah ga balas user.',
             parameters: {
                 type: 'object',
                 properties: {
@@ -226,7 +228,10 @@ export const TOOL_DEFINITIONS = [
                 '**Errors**: invalid_url, bad_scheme (cuma http/https), private_target (SSRF guard — IP private/loopback diblokir), ' +
                 'http_error (status code-nya di status field), non_text_content (PDF/image/binary), body_too_large (>2MB), fetch_failed. ' +
                 '\n\n**Reply pattern**: ringkas content natural, jangan dump verbatim. Kalo article panjang, ' +
-                'highlight 2-3 poin utama. Always credit source ("dari [judul] di [domain]: ...").',
+                'highlight 2-3 poin utama. Always credit source ("dari [judul] di [domain]: ...").' +
+                '\n\n**Batasan kritis**: MAX 2-3 fetch per turn. Kalo udah fetch 2-3 page dan kontennya thin/menu-only ' +
+                '(< 500 char useful text, atau cuma navigation/category listing), STOP fetching — page-nya client-side rendered ' +
+                'dan ga bisa lo akses. Langsung jawab user pake info yang ada, atau bilang "site-nya butuh JS, ga bisa aku baca langsung".',
             parameters: {
                 type: 'object',
                 properties: {

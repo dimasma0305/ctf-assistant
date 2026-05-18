@@ -21,7 +21,11 @@ import { loadBotState, formatBotState } from "./botState";
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
 const TYPING_REFRESH_MS = 7000;            // sendTyping lasts ~10s, refresh well before
-const OPENAI_TIMEOUT_MS = 60_000;          // hard cap on a single completion
+const OPENAI_TIMEOUT_MS = 120_000;         // hard cap covering the full tool-loop turn
+                                            // (multiple LLM calls + tool executions share this budget).
+                                            // Bumped from 60s because reasoner-model turns with 3-4
+                                            // tool iterations + 10-15s of thinking each routinely
+                                            // hit the old budget on research-shaped questions.
 
 // Hackerika's creator. When this user is the current speaker she gets a
 // special "DIMAS" marker in the context block; the system prompt's DIMAS
@@ -741,10 +745,13 @@ export async function handleAIChat(
     // structured result back as a `role:'tool'` message, and re-prompt until
     // it returns a final text completion (no more tool_calls). Capped at
     // MAX_TOOL_ITERATIONS to bound cost and prevent runaway loops.
-    const MAX_TOOL_ITERATIONS = 4;
+    const MAX_TOOL_ITERATIONS = 6;       // raised from 4: lets her do legit research (search→fetch→refine→fetch→reply)
+    const MAX_TOTAL_TOOL_CALLS = 8;      // absolute cap across all iterations — prevents runaway loops
+                                          // even if a single iteration emits multiple tool_calls.
     let conversation: any[] = [...messages];
     let finalContent = '';
     let grantSucceeded = false;
+    let totalToolCalls = 0;
 
     try {
         for (let iter = 0; iter < MAX_TOOL_ITERATIONS; iter++) {
@@ -779,6 +786,14 @@ export async function handleAIChat(
                         tool_call_id: tc.id,
                         content: resultStr,
                     });
+                    totalToolCalls++;
+                }
+                // Hard stop if we've blown the absolute cap. Inject a synthetic
+                // tool result so the model knows it has to give a final answer
+                // next, then loop one more time with tool_choice forced off.
+                if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) {
+                    console.warn(`[Tool] hit MAX_TOTAL_TOOL_CALLS (${MAX_TOTAL_TOOL_CALLS}); forcing final completion`);
+                    break;
                 }
                 continue;
             }
