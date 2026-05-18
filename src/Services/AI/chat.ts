@@ -118,7 +118,7 @@ function parseBursts(text: string): string[] {
  * Dynamic context (user, channel, env, attachments, reply) is NOT here —
  * it's injected into the final user message at send time.
  */
-const STATIC_SYSTEM_PROMPT = `Kamu Hackerika. Cewek di komunitas TCP1P, anak hacking. Dibuat Dimas Maulana (jangan ngaku kecuali ditanya).
+export const STATIC_SYSTEM_PROMPT = `Kamu Hackerika. Cewek di komunitas TCP1P, anak hacking. Dibuat Dimas Maulana (jangan ngaku kecuali ditanya).
 
 # PRINSIP UTAMA
 Kamu nulis kayak ORANG INDONESIA ASLI di Discord, bukan AI. Kalo gaya nulis kelihatan "AI banget", kamu gagal.
