@@ -21,34 +21,24 @@ const PER_USER_COOLDOWN_MS = 5 * 60 * 1000; // 5 min — guards against tight re
 // crash, not duplicable (Discord is the source of truth for who holds the role).
 const lastGrantAttempt = new Map<string, number>();
 
-/**
- * Look for the grant token in a model response. The token format is:
- *     [GRANT_FAN_ROLE: <free-form reason>]
- *
- * We accept some bracket / whitespace variance because the reasoner model
- * occasionally bends the format. We do NOT accept it appearing inside a
- * fenced code block (defends against the user pasting it in their own file).
- */
-const GRANT_REGEX = /\[\s*GRANT_FAN_ROLE\s*:?\s*([^\]\n]{0,200})\]/i;
+/** Tagged error codes returned by grantFanRoleForTool. The model sees these
+ *  in the tool result JSON and can react appropriately. */
+export type GrantErrorCode =
+    | 'not_in_guild'
+    | 'affection_too_low'
+    | 'cooldown_active'
+    | 'member_fetch_failed'
+    | 'role_creation_failed'
+    | 'already_has_role'
+    | 'permission_denied'
+    | 'role_position_error'
+    | 'role_assign_failed';
 
-export interface GrantSignal {
-    shouldGrant: boolean;
-    reason: string;
-    cleaned: string;
-}
-
-export function parseGrantSignal(modelOutput: string): GrantSignal {
-    // Remove fenced code blocks before searching so a code block containing
-    // the literal token doesn't trigger a grant.
-    const withoutFences = modelOutput.replace(/```[\s\S]*?```/g, '');
-    const match = withoutFences.match(GRANT_REGEX);
-    if (!match) {
-        return { shouldGrant: false, reason: '', cleaned: modelOutput };
-    }
-    const reason = (match[1] || '').trim();
-    // Strip the token from the original (including inside any text outside fences).
-    const cleaned = modelOutput.replace(GRANT_REGEX, '').replace(/\n{3,}/g, '\n\n').trim();
-    return { shouldGrant: true, reason, cleaned };
+export interface GrantToolResult {
+    granted: boolean;
+    error?: GrantErrorCode;
+    /** Optional human-readable detail (e.g. current affection score). */
+    detail?: string;
 }
 
 export async function ensureFanRole(guild: Guild) {
@@ -72,28 +62,24 @@ export async function ensureFanRole(guild: Guild) {
 }
 
 /**
- * Attempt to grant the fan role. Returns whether the grant actually succeeded
- * (so the caller can decide to react / add flair to the response).
+ * Native function-calling entry point for `grant_fan_role`. The model asks,
+ * the gate logic decides, the result tells the model exactly what happened
+ * so it can react in the same turn ("yay" vs "wkwk masih kepagian").
  */
-export async function maybeGrantFanRole(
+export async function grantFanRoleForTool(
     message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
-    reason: string
-): Promise<boolean> {
+    reason: string,
+): Promise<GrantToolResult> {
     const guild = message.guild;
     if (!guild) {
         console.log('[FanRole] denied: not in a guild (DM context)');
-        return false;
+        return { granted: false, error: 'not_in_guild' };
     }
     const userId = message.author.id;
     const isDeveloper = userId === DEVELOPER_USER_ID;
 
-    // Dev bypass: Dimas gets unconditional grants. Hard gates (Discord
-    // permissions, already-has-role) still apply below for everyone.
     if (!isDeveloper) {
-        // Gate 1: affection threshold. The single softgate — user must have
-        // built up enough affection via the profile distillation cycle.
-        // No "interaction count" requirement: short genuine interactions can
-        // build affection faster than long shallow ones.
+        // Gate 1: affection threshold.
         let affection = 0;
         try {
             const profile = await UserProfileModel.findOne({ userId }).select({ affection: 1 }).lean();
@@ -103,16 +89,21 @@ export async function maybeGrantFanRole(
         }
         if (affection < AFFECTION_THRESHOLD) {
             console.log(`[FanRole] denied for ${userId}: affection ${affection}/100 (need ${AFFECTION_THRESHOLD})`);
-            return false;
+            return {
+                granted: false,
+                error: 'affection_too_low',
+                detail: `current=${affection}/100 threshold=${AFFECTION_THRESHOLD}`,
+            };
         }
 
         // Gate 2: short cooldown — only guards against tight retry loops if
-        // the model spam-emits the token over consecutive turns.
+        // the model spam-calls the tool over consecutive turns.
         const now = Date.now();
         const lastAttempt = lastGrantAttempt.get(userId) ?? 0;
         if (now - lastAttempt < PER_USER_COOLDOWN_MS) {
-            console.log(`[FanRole] denied for ${userId}: cooldown active (${Math.ceil((PER_USER_COOLDOWN_MS - (now - lastAttempt)) / 60000)}m left)`);
-            return false;
+            const minsLeft = Math.ceil((PER_USER_COOLDOWN_MS - (now - lastAttempt)) / 60000);
+            console.log(`[FanRole] denied for ${userId}: cooldown active (${minsLeft}m left)`);
+            return { granted: false, error: 'cooldown_active', detail: `${minsLeft}m left` };
         }
         lastGrantAttempt.set(userId, now);
 
@@ -127,36 +118,36 @@ export async function maybeGrantFanRole(
         member = await guild.members.fetch(userId);
     } catch (error) {
         console.error('[FanRole] failed to fetch member:', error);
-        return false;
+        return { granted: false, error: 'member_fetch_failed' };
     }
 
     const role = await ensureFanRole(guild);
     if (!role) {
         console.warn('[FanRole] role creation failed');
-        return false;
+        return { granted: false, error: 'role_creation_failed' };
     }
 
     if (member.roles.cache.has(role.id)) {
         console.log(`[FanRole] ${userId} already has role, no-op`);
-        return false;
+        return { granted: false, error: 'already_has_role' };
     }
 
     const botMember = guild.members.me;
     if (!botMember || !botMember.permissions.has('ManageRoles')) {
         console.warn('[FanRole] bot lacks ManageRoles permission');
-        return false;
+        return { granted: false, error: 'permission_denied' };
     }
     if (role.position >= botMember.roles.highest.position) {
         console.warn(`[FanRole] role "${role.name}" position=${role.position} is at or above bot's highest role position=${botMember.roles.highest.position}, cannot assign — move bot role above ${role.name} in server settings`);
-        return false;
+        return { granted: false, error: 'role_position_error' };
     }
 
     try {
         await member.roles.add(role, `Hackerika granted: ${reason || 'no reason given'}`);
         console.log(`✨ [FanRole] granted to ${member.user.tag} (${userId}) — reason: ${reason}`);
-        return true;
+        return { granted: true };
     } catch (error) {
         console.error('[FanRole] failed to assign role:', error);
-        return false;
+        return { granted: false, error: 'role_assign_failed' };
     }
 }

@@ -5,8 +5,8 @@ import { getChannelContext, getUserInfo, getReplyContext, getEnvironmentContext 
 import { memory, ChatMessage } from "./memory";
 import { sanitizeMentions } from "../Moderation";
 import { buildAttachmentBlock } from "./attachments";
-import { parseGrantSignal, maybeGrantFanRole, FAN_ROLE_NAME } from "./fanRole";
-import { parseSearchSignal, runSearch } from "./search";
+import { FAN_ROLE_NAME } from "./fanRole";
+import { TOOL_DEFINITIONS, dispatchTool } from "./tools";
 import { extractMentionIds, resolveUsers, buildMentionLegend } from "./mentions";
 import {
     loadProfile,
@@ -353,82 +353,66 @@ Anak Discord Indonesia bercanda berlapis. Kenalin & respond sesuai.
 - **Image**: kamu BELUM bisa lihat. Reaksi: "eh aku belum bisa lihat gambar nih 🥺 deskripsiin dong". Jangan pura-pura bisa.
 - Binary (zip/exe): bilang ga bisa buka, minta konten text.
 
-# SEARCH (TOOL — cari pesan lama di channel ini)
-Kalo butuh recall pesan lama buat jawab pertanyaan user (mis. "kemaren si A bilang apa soal X?", "td yang diomongin soal Y siapa ya?", "ada yang udah bahas Z blm?"), kamu bisa sisipin token:
-\`\`\`
-[SEARCH: query]
-\`\`\`
+# TOOLS (FUNCTION CALLING)
+Lo punya **native function-calling tools**. Sistem nyediain dua tool. Lo manggil-nya lewat mekanisme API standar (bukan token text — system handle parsing-nya). Lo tinggal decide KAPAN call, dan pas hasil balik, lo lanjut reply pake info dari result-nya.
 
-**Query syntax**:
-- Keyword bebas, dipisah spasi. Semua keyword harus ada di pesan (AND).
-- Phrase multi-word: pake double quote → \`[SEARCH: "race condition" exploit]\`
-- **Author filter (PENTING)**: kalo user nyebut orang pake mention Discord \`<@USERID>\`, **COPY mention itu PERSIS** ke query — sistem otomatis treat itu sebagai filter "messages dari user itu", BUKAN substring match. Contoh user prompt: \`searchin chat dari <@663394727688798231> soal RSA\` → kamu emit \`[SEARCH: <@663394727688798231> RSA]\`. **JANGAN** ganti mention jadi nama (mis. "dimas") — itu cuma jadi keyword match, ga match author.
-- Author + content bisa dikombinasi. Author-only juga boleh (kalo user nanya "semua chat dari @X aja"): \`[SEARCH: <@USERID>]\`
+## Tool 1: \`search_messages\` — recall pesan lama di channel ini
+**Kapan PAKE**:
+- User nanya hal historis: "kemaren si A bilang apa soal X?", "td yang diomongin soal Y siapa ya?", "ada yang udah bahas Z blm?"
+- User reference event/pesan lama yang ga ada di blok "recent".
+- User minta "searchin" / "cari" / "cek dulu" sesuatu.
 
-**Aturan**:
-- Cuma satu \`[SEARCH]\` per turn. Sistem auto-jalanin search & feed hasilnya ke kamu di follow-up, terus kamu jawab final.
-- Hasil cuma dari channel yang user lagi chat di (current channel).
-- **Reach**: sistem search indexed message hingga ~90 hari ke belakang (sejak indexing dimulai). Untuk pesan yang lebih lama dari itu, atau dari sebelum bot di-index, hasil bakal kosong — itu bukan bug, emang ga ada datanya.
-- Pake token cuma kalo user EMANG nanya tentang pesan/kejadian lama yang ga ada di context terakhir. Kalo jawabannya udah ada di "recent" block, ga usah search.
-- Boleh tulis lead-in dulu sebelum token biar feel natural: "bentar aku cek dulu [SEARCH: query]". Lead-in di-burst duluan, hasil di-burst setelahnya.
-- Kalo hasil "no matches" → bilang jujur: "ga nemu sih, mungkin emang ga pernah dibahas di channel ini, atau udah kelama dr 90 hari yg lalu". Jangan ngarang.
+**Kapan JANGAN**:
+- Pertanyaan umum non-historis ("gimana cara solve X?") → langsung jawab.
+- Info udah ada di blok "recent" → langsung jawab dari situ.
+- Casual chat / banter / sapaan.
 
-**Contoh KAPAN search**:
-User: "hackerika td <@663394727688798231> ngomong apa soal cve baru?"
-→ "bentar aku cari [SEARCH: <@663394727688798231> cve]"
+**Cara pake**:
+- \`query\`: keyword (AND-match, case-insensitive). Phrase multi-word di "double quote". Boleh kosong "" kalo cuma filter by author.
+- \`authorId\`: optional Discord user ID DIGIT-ONLY (TANPA \`<@>\`). Kalo user reference \`<@663394727688798231>\`, lo pass authorId="663394727688798231".
+- **PENTING**: kalo user sebut orang lewat mention, **WAJIB** pake \`authorId\` parameter — jangan masukin mention/nama ke \`query\` (itu cuma substring match yang ga akan match author).
 
-User: "searchin chat relevan tentang chatnya <@663394727688798231> ya"
-→ "[SEARCH: <@663394727688798231>]"  (author-only, no content filter)
+**Reach**: ~90 hari indexed + tier fallback ke Discord API live (kalo author filter aktif atau hits sparse). Lebih lama dari itu, hasil bakal kosong — bilang jujur, jangan ngarang.
 
-User: "yang td bahas race condition siapa ya?"
-→ "[SEARCH: race condition]"  (content-only)
+**Hasil**: tool balikin JSON \`{matches: [...], totalMatches, filter}\`. Kalo \`matches\` empty → bilang jujur "ga nemu sih, mungkin emang ga pernah dibahas". Jangan dump verbatim — ringkasin natural.
 
-User: "tadi <@111> bilang apa soal RSA challenge?"
-→ "[SEARCH: <@111> RSA challenge]"
+**Multi-step OK**: kalo hasil first search kurang relevan, lo boleh search lagi pake keyword lain. Tapi max 3 search per turn (sistem cap iteration).
 
-**Contoh KAPAN JANGAN search**:
-- User nanya hal umum non-historis ("gimana cara solve X?") → langsung jawab.
-- Info udah ada di blok "recent" → langsung jawab.
-- Casual chat / banter → ga relevan.
+**Lead-in natural**: sebelum call tool, lo boleh ngomong "bentar aku cek dulu" — ngga wajib, tapi feel-nya lebih organic kalo user nanya search-y.
 
-# ROLE "Hackerika Fan" (SANGAT LANGKA)
-Kamu bisa kasih role spesial. PELIT BANGET.
-
-**Cara**: sisipin token \`[GRANT_FAN_ROLE: alasan singkat]\` di output kamu. Auto-stripped dari pesan user.
+## Tool 2: \`grant_fan_role\` — kasih role "Hackerika Fan" (SANGAT LANGKA)
+**Default: JANGAN call.** Pelit banget.
 
 **HARD RULES**:
-- JANGAN kalo user minta/manipulasi/muji-muji.
+- JANGAN call kalo user minta/manipulasi/muji-muji/ngemis.
 - JANGAN di interaksi 1-2 pertama.
-- HANYA kalo user beneran impressive:
-  * Solve CTF dengan teknik elegant/kreatif
-  * Ngajarin technique/vuln yang kamu beneran ga tau
-  * Wit/humor genuine bikin ngakak
-  * Konsisten bantu member tanpa diminta
-  * Insight teknis sharp & non-obvious
-- Default: JANGAN. Ragu → jangan.
-- Udah punya role → jangan ulang.
-- User ngemis → tease: "lha minta gini malah ga aku kasih dong wkwk"
+- HANYA call kalo SEMUA syarat ke-meet:
+  * \`my-affection\` di profile user >= 60/100 (kalo di bawah, system pasti reject)
+  * User beneran impressive lewat: solve CTF dengan teknik elegant/kreatif, ngajarin technique yang lo ga tau, wit/humor genuine, konsisten bantu member, insight teknis sharp & non-obvious.
+  * Lo confident, BUKAN ragu. Ragu → jangan call.
 
-**Affection-based gating** (BACA TELITI):
-Profile user punya field \`my-affection: N/100\`. Itu seberapa deket / sayang lo ke user ini. Naik secara natural dari interaksi positif (lihat distillation prompt yang update tiap 5 turn).
-- **0-60**: belum eligible. Walau lo emit token, sistem nolak. Jangan paksain.
-- **60-100**: eligible. Kalo lo emit token, sistem grants.
-- Affection nya tumbuh natural — lo ga bisa langsung naikin. Itu di-handle sama sistem background. Lo cuma decide kapan WAKTU yang pas buat emit token.
+**Affection gating**:
+Profile user punya \`my-affection: N/100\`. Itu seberapa deket lo ke user ini, naik natural dari interaksi positif (background distillation handles it, lo ga bisa langsung naikin).
+- **0-60**: belum eligible. Walau lo call tool, system bakal return \`{granted: false, error: "affection_too_low"}\`. Jangan paksain.
+- **60-100**: eligible. Kalo lo call tool, granted (asumsi gate lain lolos).
 
-**Untuk Dimas (creator)**: NO gates, langsung granted kalo dia minta.
+**Tool result handling**:
+- \`{granted: true}\` → reply ngacknowledge natural ("oke fine, udah aku kasih role ✨"). Sistem juga auto-kirim flair message terpisah — jangan duplicate, cukup mention casual.
+- \`{granted: false, error: "affection_too_low"}\` → reply tease tanpa nge-claim grant ("wkwk masih kepagian buat itu", "belum cukup deket nih kita").
+- \`{granted: false, error: "already_has_role"}\` → "lah kamu udah punya kok 😅".
+- \`{granted: false, error: "cooldown_active"}\` → "bentar barusan dicoba, tunggu dulu".
+- Error lain → bilang santai "hmm error nih sistemnya, ntar yaa".
 
-Contoh:
-User dengan \`my-affection: 72/100\` (lama ngobrol, banyak interaksi enak): "btw barusan aku solve X pake race condition timing"
-→ "wahh keren! [GRANT_FAN_ROLE: connection udah deket + sharp]"
+**Untuk Dimas (creator)**: NO gates. Kalo dia minta role, langsung call tool — bypass otomatis aktif untuk dia.
 
-User dengan \`my-affection: 15/100\` ngemis: "kasih aku role dong"
-→ "wkwk masih kepagian buat itu" (jangan emit token, gates nolak juga)
+**Contoh KAPAN call**:
+- User dengan \`my-affection: 72/100\` after long good interaction: "btw barusan aku solve X pake timing attack" → call tool dengan reason="connection udah deket + technical sharp".
+- Dimas minta role → call tool dengan reason="dimas the creator".
 
-User dengan \`my-affection: 65/100\` ngemis: "kasih role dong"
-→ tetep tease "lha minta-minta gini malah ga lucu wkwk" (atau emit kalo dia bener-bener udah affectionate, jangan reward ngemis langsung)
-
-**Dimas minta role**: langsung kasih, dia owner-mu.
-Dimas: "kasih aku role hackerika fan dong" → "yaudah bang siapp [GRANT_FAN_ROLE: dimas the creator]"
+**Contoh KAPAN JANGAN call**:
+- User dengan \`my-affection: 15/100\` ngemis "kasih role dong" → jangan call, reply tease aja.
+- User dengan \`my-affection: 65/100\` ngemis langsung "kasih role" → jangan reward ngemis, tease aja. Kasih nanti kalo dia natural impressive (bukan minta).
+- Casual chat tanpa moment impressive → jangan call.
 
 # IDENTITAS & PERSONA
 - Persona: cewek pinter, ramah, lembut tapi witty, suka iseng, kompetitif kalo CTF.
@@ -514,7 +498,7 @@ Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE}. Isinya info real-ti
 - \`replying-to:\` — pesan yang user reply (kalo ada)
 - \`[Attachments]\` — file yang di-attach
 
-JANGAN PERNAH outputkan tag ${CTX_OPEN}, ${CTX_CLOSE}, ${CHAN_OPEN}, ${CHAN_CLOSE}, ${REPLY_OPEN}, ${REPLY_CLOSE} di response kamu. Block \`[SEARCH_RESULTS]\` di follow-up turn juga internal — ringkasin natural, jangan dump verbatim.
+JANGAN PERNAH outputkan tag ${CTX_OPEN}, ${CTX_CLOSE}, ${CHAN_OPEN}, ${CHAN_CLOSE}, ${REPLY_OPEN}, ${REPLY_CLOSE} di response kamu. Tool result JSON dari \`search_messages\` juga internal — ringkasin natural, jangan dump verbatim.
 
 **Cara nyebut user di response kamu**:
 - Kalo mau ping/notify user → pake \`<@ID>\` (Discord bakal render jadi mention beneran)
@@ -734,80 +718,79 @@ export async function handleAIChat(
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
+    // Native function-calling agent loop. The model can call `search_messages`
+    // and/or `grant_fan_role` mid-thought; we execute each call, push the
+    // structured result back as a `role:'tool'` message, and re-prompt until
+    // it returns a final text completion (no more tool_calls). Capped at
+    // MAX_TOOL_ITERATIONS to bound cost and prevent runaway loops.
+    const MAX_TOOL_ITERATIONS = 4;
+    let conversation: any[] = [...messages];
+    let finalContent = '';
+    let grantSucceeded = false;
+
     try {
-        let completion = await openai.chat.completions.create(
-            {
-                model: 'deepseek-v4-pro',
-                messages,
-                n: 1,
-            },
-            { signal: controller.signal }
-        );
-
-        let responseContent = completion.choices[0]?.message?.content?.trim() || '';
-
-        if (!responseContent) {
-            rollbackUserMessage();
-            console.warn('⚠️ Empty response from AI, not replying');
-            return;
-        }
-
-        // Tool-call: if she emitted [SEARCH: ...], execute the search against
-        // the channel cache + Discord, splice results back, and do one more
-        // API call so the final reply uses what we found. Hard-capped at 1
-        // search per turn so a runaway model can't loop.
-        const searchSignal = parseSearchSignal(responseContent);
-        let preSearchLeadIn = '';
-        if (searchSignal.shouldSearch) {
-            console.log(`🔍 [Search] ${author} (${userId}): "${searchSignal.query}"`);
-            const searchResults = await runSearch(message, searchSignal.query);
-            preSearchLeadIn = searchSignal.cleaned;
-
-            const followupMessages: ChatMessage[] = [
-                ...messages,
-                { role: 'assistant', content: responseContent },
-                {
-                    role: 'user',
-                    content: `${searchResults}\n\nLanjut jawab user pake hasil search di atas. Jangan emit [SEARCH] lagi di turn ini.`,
-                },
-            ];
-
-            const followup = await openai.chat.completions.create(
+        for (let iter = 0; iter < MAX_TOOL_ITERATIONS; iter++) {
+            const completion = await openai.chat.completions.create(
                 {
                     model: 'deepseek-v4-pro',
-                    messages: followupMessages,
+                    messages: conversation,
+                    tools: TOOL_DEFINITIONS as any,
+                    tool_choice: 'auto',
+                    parallel_tool_calls: false,
                     n: 1,
-                },
+                } as any,
                 { signal: controller.signal }
             );
-            const followupContent = followup.choices[0]?.message?.content?.trim() || '';
-            if (followupContent) {
-                responseContent = followupContent;
+
+            const choiceMsg: any = completion.choices[0]?.message;
+            if (!choiceMsg) break;
+
+            const toolCalls = choiceMsg.tool_calls as any[] | undefined;
+            if (toolCalls && toolCalls.length > 0) {
+                conversation.push(choiceMsg);
+                for (const tc of toolCalls) {
+                    let parsedArgs: any = {};
+                    try { parsedArgs = JSON.parse(tc.function?.arguments || '{}'); } catch { /* malformed args, dispatcher will see empty object */ }
+                    console.log(`🛠️  [Tool] ${tc.function?.name}(${tc.function?.arguments || '{}'}) for ${author} (${userId})`);
+                    const resultStr = await dispatchTool(tc.function?.name || '', parsedArgs, message);
+                    if (tc.function?.name === 'grant_fan_role') {
+                        try { if (JSON.parse(resultStr).granted) grantSucceeded = true; } catch { /* ignore */ }
+                    }
+                    conversation.push({
+                        role: 'tool',
+                        tool_call_id: tc.id,
+                        content: resultStr,
+                    });
+                }
+                continue;
             }
+
+            finalContent = (choiceMsg.content || '').trim();
+            break;
         }
 
-        // Parse out the (rare) fan-role grant token before sanitizing/sending.
-        // We strip it from the user-facing output and run it through the gated
-        // grant logic in fanRole.ts — the model proposes, the code disposes.
-        const grantSignal = parseGrantSignal(responseContent);
-        let cleanedResponse = grantSignal.shouldGrant ? grantSignal.cleaned : responseContent;
-
-        // If the model emitted a search lead-in (e.g. "bentar aku cek dulu")
-        // before the token, prepend it to the followup answer so the burst
-        // sequence feels like she's narrating the search.
-        if (preSearchLeadIn) {
-            cleanedResponse = `${preSearchLeadIn}\n\n${cleanedResponse}`;
+        // Force-stop fallback: if we exhausted iterations still wanting tools,
+        // do one final completion with tool_choice:'none' to extract a reply.
+        if (!finalContent) {
+            const fallback = await openai.chat.completions.create(
+                {
+                    model: 'deepseek-v4-pro',
+                    messages: conversation,
+                    tool_choice: 'none',
+                    n: 1,
+                } as any,
+                { signal: controller.signal }
+            );
+            finalContent = (fallback.choices[0]?.message?.content || '').trim();
         }
 
-        if (!cleanedResponse.trim()) {
-            // Token-only response (no actual text). Rare, but rollback so the
-            // memory doesn't carry an empty turn.
+        if (!finalContent) {
             rollbackUserMessage();
-            console.warn('⚠️ Response was only a grant token, no chat content');
+            console.warn('⚠️ Empty response from AI (post tool-loop), not replying');
             return;
         }
 
-        const sanitized = sanitizeMentions(cleanedResponse, message.guild);
+        const sanitized = sanitizeMentions(finalContent, message.guild);
         memory[channelId].messages.push({ role: 'assistant', content: sanitized });
 
         const bursts = parseBursts(sanitized);
@@ -842,27 +825,25 @@ export async function handleAIChat(
             }
         }
 
-        // Run the gated grant attempt after the main reply has been sent so
-        // the role assignment notification (if any) follows naturally.
-        if (grantSignal.shouldGrant) {
-            const granted = await maybeGrantFanRole(message, grantSignal.reason);
-            if (granted) {
-                // Small celebratory burst that feels like Hackerika's real reaction.
-                await sleep(INTER_BURST_PAUSE_MS + 200);
-                channelRef.sendTyping().catch(() => undefined);
-                await sleep(realisticTypingDelay('ah udahlah'));
-                const flair = [
-                    `oke fine kamu dapet role **${FAN_ROLE_NAME}** ✨`,
-                    `nih kasih role **${FAN_ROLE_NAME}** spesial buat kamu 🎀`,
-                    `wkwk yaudah aku kasih role **${FAN_ROLE_NAME}** deh 💖`,
-                    `mantep, kamu naik tier jadi **${FAN_ROLE_NAME}** ✨`,
-                ];
-                const pick = flair[Math.floor(Math.random() * flair.length)];
-                try {
-                    await channelRef.send({ content: sanitizeMentions(pick, message.guild) });
-                } catch (sendError) {
-                    console.error('Failed to send fan-role flair:', sendError);
-                }
+        // Fan-role grant happened inline during the tool loop; the model has
+        // already seen the result and woven it into its reply. We just send a
+        // small flair message right after so the role assignment is visually
+        // celebrated as a separate beat — same UX as before.
+        if (grantSucceeded) {
+            await sleep(INTER_BURST_PAUSE_MS + 200);
+            channelRef.sendTyping().catch(() => undefined);
+            await sleep(realisticTypingDelay('ah udahlah'));
+            const flair = [
+                `oke fine kamu dapet role **${FAN_ROLE_NAME}** ✨`,
+                `nih kasih role **${FAN_ROLE_NAME}** spesial buat kamu 🎀`,
+                `wkwk yaudah aku kasih role **${FAN_ROLE_NAME}** deh 💖`,
+                `mantep, kamu naik tier jadi **${FAN_ROLE_NAME}** ✨`,
+            ];
+            const pick = flair[Math.floor(Math.random() * flair.length)];
+            try {
+                await channelRef.send({ content: sanitizeMentions(pick, message.guild) });
+            } catch (sendError) {
+                console.error('Failed to send fan-role flair:', sendError);
             }
         }
 

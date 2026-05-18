@@ -2,34 +2,10 @@ import { OmitPartialGroupDMChannel, Message as DiscordMessage, TextChannel, News
 import { MessageCacheModel, IndexedMessageModel } from "../../Database/connect";
 
 const MAX_SEARCH_RESULTS = 8;             // hard cap on result rows fed back to the model
-const MAX_RESULT_CONTENT_CHARS = 220;     // per-message truncation in the results block
+const MAX_RESULT_CONTENT_CHARS = 220;     // per-message truncation in the structured output
 const INDEX_QUERY_LIMIT = 50;             // how many indexed matches to evaluate before truncating
 const DISCORD_FALLBACK_LIMIT = 100;       // how many recent messages to pull when index is sparse
 const MIN_INDEX_HITS = 3;                 // if index returns fewer matches than this, also fetch from Discord API
-
-/**
- * Match `[SEARCH: query]` anywhere in the model output. Like the fan-role
- * token, we ignore tokens inside fenced code blocks so pasted code can't
- * trigger an unwanted search.
- */
-const SEARCH_REGEX = /\[\s*SEARCH\s*:\s*([^\]\n]{1,200})\]/i;
-
-export interface SearchSignal {
-    shouldSearch: boolean;
-    query: string;
-    cleaned: string;
-}
-
-export function parseSearchSignal(modelOutput: string): SearchSignal {
-    const withoutFences = modelOutput.replace(/```[\s\S]*?```/g, '');
-    const match = withoutFences.match(SEARCH_REGEX);
-    if (!match) {
-        return { shouldSearch: false, query: '', cleaned: modelOutput };
-    }
-    const query = (match[1] || '').trim();
-    const cleaned = modelOutput.replace(SEARCH_REGEX, '').replace(/\n{3,}/g, '\n\n').trim();
-    return { shouldSearch: query.length > 0, query, cleaned };
-}
 
 interface RawHit {
     authorId: string;
@@ -203,72 +179,90 @@ async function searchDiscord(
     }
 }
 
+export interface SearchToolMatch {
+    authorId: string;
+    authorName: string;
+    content: string;
+    relativeTime: string;    // e.g. "5m ago", "2d ago"
+    source: 'index' | 'cache' | 'discord';
+}
+
+export interface SearchToolResult {
+    matches: SearchToolMatch[];
+    totalMatches: number;
+    filter: {
+        authorIds: string[];
+        terms: string[];
+    };
+    /** Human-readable explanation when no useful filter was provided. */
+    note?: string;
+}
+
 /**
- * Run the search and return a compact text block to splice back into the
- * conversation. Empty string means "no matches".
+ * Native function-calling entry point for the `search_messages` tool.
+ * Returns a structured object (serialized to JSON by the dispatcher and fed
+ * back to the model as a `role:'tool'` message).
+ *
+ * Reuses every internal helper that runSearch used to use — only the output
+ * shape changed.
  */
-export async function runSearch(
+export async function searchMessagesForTool(
     message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
     query: string,
-): Promise<string> {
-    const parsed = parseQuery(query);
-    // Need at least one filter to be meaningful — otherwise we'd return
-    // every message in the index.
-    if (parsed.authorIds.length === 0 && parsed.tokens.length === 0) return '';
+    authorId?: string,
+): Promise<SearchToolResult> {
+    // Build the parsed-query directly: caller passes structured args, no
+    // need to round-trip through the old <@id> string-injection trick.
+    const parsed: ParsedQuery = parseQuery(query || '');
+    if (authorId && /^\d{17,20}$/.test(authorId) && !parsed.authorIds.includes(authorId)) {
+        parsed.authorIds.push(authorId);
+    }
+
+    const filter = { authorIds: [...parsed.authorIds], terms: [...parsed.tokens] };
+
+    if (parsed.authorIds.length === 0 && parsed.tokens.length === 0) {
+        return {
+            matches: [],
+            totalMatches: 0,
+            filter,
+            note: 'no_filter: either query keywords or authorId must be provided',
+        };
+    }
 
     const guildId = message.guildId;
     const channelId = message.channel.id;
 
-    // Tier 1: persistent MongoDB index (covers the full 90-day window for
-    // every channel the bot has been receiving messages in).
     const indexHits = await searchIndex(guildId, channelId, parsed);
-    const hits: RawHit[] = [...indexHits];
-
-    // Tier 2: short-lived per-channel cache. Covers very recent messages
-    // that may not yet have been flushed to the index.
     const cacheHits = await searchCache(channelId, parsed);
-
-    // Tier 3: live Discord fetch — only when index hits are sparse. Catches
-    // messages predating the index or any gaps in indexing (e.g. bot was
-    // offline). Author-scoped searches always pay for this because the
-    // index might miss messages from before the bot joined / restarted.
     const needDiscord = indexHits.length < MIN_INDEX_HITS || parsed.authorIds.length > 0;
     const discordHits = needDiscord ? await searchDiscord(message, parsed) : [];
 
-    // Merge with dedup by (authorId + timestamp + content-prefix).
     const seen = new Set<string>();
+    const all: RawHit[] = [];
     const merge = (src: RawHit[]) => {
         for (const h of src) {
             const key = `${h.authorId}|${h.createdTimestamp}|${h.content.slice(0, 32)}`;
             if (seen.has(key)) continue;
             seen.add(key);
-            hits.push(h);
+            all.push(h);
         }
     };
-    // index already in hits — record their keys, then merge the others.
-    for (const h of indexHits) {
-        seen.add(`${h.authorId}|${h.createdTimestamp}|${h.content.slice(0, 32)}`);
-    }
+    merge(indexHits);
     merge(cacheHits);
     merge(discordHits);
 
-    // Human-readable description of which filters were active.
-    const filterDesc = [
-        parsed.authorIds.length > 0 ? `from=${parsed.authorIds.map((id) => `<@${id}>`).join(',')}` : null,
-        parsed.tokens.length > 0 ? `terms="${parsed.tokens.join(' ')}"` : null,
-    ].filter(Boolean).join(' ');
+    all.sort((a, b) => b.createdTimestamp - a.createdTimestamp);
+    const top = all.slice(0, MAX_SEARCH_RESULTS).map<SearchToolMatch>((h) => ({
+        authorId: h.authorId,
+        authorName: h.authorName,
+        content: truncate(h.content.replace(/\n/g, ' '), MAX_RESULT_CONTENT_CHARS),
+        relativeTime: relativeTime(h.createdTimestamp),
+        source: h.source,
+    }));
 
-    if (hits.length === 0) {
-        return `[SEARCH_RESULTS ${filterDesc}] no matches in this channel`;
-    }
-
-    hits.sort((a, b) => b.createdTimestamp - a.createdTimestamp);
-    const top = hits.slice(0, MAX_SEARCH_RESULTS);
-
-    const lines = top.map((h) => {
-        const when = relativeTime(h.createdTimestamp);
-        return `- ${h.authorName} (${when}): ${truncate(h.content.replace(/\n/g, ' '), MAX_RESULT_CONTENT_CHARS)}`;
-    });
-    const more = hits.length > MAX_SEARCH_RESULTS ? `\n(+${hits.length - MAX_SEARCH_RESULTS} more older matches truncated)` : '';
-    return `[SEARCH_RESULTS ${filterDesc} matches=${hits.length}]\n${lines.join('\n')}${more}`;
+    return {
+        matches: top,
+        totalMatches: all.length,
+        filter,
+    };
 }
