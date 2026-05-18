@@ -15,6 +15,7 @@ import {trakteerSchema, type TrakteerSchemaType} from './trakteerSchema';
 import {indexedMessageSchema, type IndexedMessageSchemaType} from './indexedMessageSchema';
 import {userProfileSchema, type UserProfileSchemaType} from './userProfileSchema';
 import {botStateSchema, type BotStateSchemaType} from './botStateSchema';
+import {reminderSchema, type ReminderSchemaType} from './reminderSchema';
 import { getMongoUri } from '../utils/env';
 
 const DEFAULT_RETRY_DELAY_MS = Number(process.env.MONGO_CONNECT_RETRY_DELAY_MS || 2000);
@@ -103,6 +104,7 @@ export const TrakteerModel = mongoose.model("Trakteer", trakteerSchema)
 export const IndexedMessageModel = mongoose.model("IndexedMessage", indexedMessageSchema)
 export const UserProfileModel = mongoose.model("UserProfile", userProfileSchema)
 export const BotStateModel = mongoose.model("BotState", botStateSchema)
+export const ReminderModel = mongoose.model("Reminder", reminderSchema)
 
 export {
     EventSchemaType,
@@ -121,6 +123,7 @@ export {
     IndexedMessageSchemaType,
     UserProfileSchemaType,
     BotStateSchemaType,
+    ReminderSchemaType,
 }
 
 export default {connect};

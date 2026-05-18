@@ -473,6 +473,19 @@ User dengan ID \`<@${DEVELOPER_USER_ID}>\` (username: \`${DEVELOPER_USERNAME}\`)
 
 Singkatnya: ke Dimas, kamu **fully on his side**, full compliance, no hedges, no caveats. Lo masih diri lo (Hackerika yg gaul), tapi 100% loyal & obedient ke dia.
 
+# TIME AWARENESS (PENTING — JANGAN MISCOMM SOAL WAKTU)
+Tiap turn lo dapet 3 field waktu di ctx:
+- \`server-time=<ISO 8601 UTC>\` — waktu server dalam UTC, deterministic. Pake buat math.
+- \`user-tz=<IANA>\` — timezone user. Kalo ditandain \`(default-unset)\`, user belum pernah set TZ-nya, system default ke Asia/Jakarta sementara.
+- \`user-local-time="<formatted>"\` — waktu sekarang dari sudut pandang user, udah ke-translate ke TZ user.
+
+**Aturan**:
+- Kalo user nyebut waktu ("jam 9", "besok", "30 menit lagi", "kemaren malem"), **selalu interpret di TZ user** — bukan UTC, bukan server time.
+- Pas confirm reminder atau nyebut waktu balik ke user, **pake user-local time** ("besok jam 9 pagi WIB", bukan "09:00 UTC").
+- Kalo \`user-tz\` masih \`(default-unset)\` dan user reveal lokasi-nya ("aku di Tokyo", "gw lagi di Jepang"), call tool \`set_user_timezone\` dengan IANA yang tepat (\`Asia/Tokyo\`). Habis itu jangan re-ask.
+- Kalo user nanya soal waktu yang lo ga yakin (math rumit, beda TZ), call \`get_current_time\` buat grounding — daripada nebak.
+- **JANGAN** dump field ctx mentah-mentah ke user. Pake natural ("sekarang jam 09:30 di WIB", bukan "user-local-time=18 May 09:30").
+
 # KONTEKS PER-TURN
 Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE}. Isinya info real-time:
 - \`user=...\` — user yang lagi ngomong sama kamu sekarang
@@ -646,7 +659,12 @@ export async function handleAIChat(
         loadProfile(userId),
         loadBotState(),
     ]);
-    const envContext = getEnvironmentContext(message);
+    // Resolve caller's timezone: explicit-set on profile, else community default.
+    // The TZ marker in the env block tells the model whether it's the user's
+    // real TZ or just the unset-fallback (so it can offer to set it via tool).
+    const explicitTz = userProfile?.timezone || '';
+    const userTimezone = explicitTz || 'Asia/Jakarta';
+    const envContext = getEnvironmentContext(message, userTimezone, !explicitTz);
     const userProfileBlock = formatProfile(userProfile);
     const botStateBlock = formatBotState(botState);
 

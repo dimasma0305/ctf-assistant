@@ -18,6 +18,8 @@ export interface UserProfile {
     opinion: string;
     emotionalState: string;
     affection: number;
+    /** IANA timezone (e.g. "Asia/Jakarta"); '' means not set — callers default. */
+    timezone: string;
     interactionCount: number;
     lastDistilledAtCount: number;
 }
@@ -38,6 +40,10 @@ export function formatProfile(profile: UserProfile | null): string {
     // Affection always shown (even at 0) — gates the fan role, so the model
     // needs visibility on where the relationship currently sits.
     parts.push(`my-affection: ${profile.affection}/100`);
+    // Timezone only shown if set — when unset, the ctx block surfaces the
+    // default ("Asia/Jakarta") with an "unknown" marker so the model knows
+    // it can ask + persist via set_user_timezone.
+    if (profile.timezone) parts.push(`timezone: ${profile.timezone}`);
     if (parts.length === 0) return '';
     return parts.join('\n');
 }
@@ -55,6 +61,7 @@ export async function loadProfile(userId: string): Promise<UserProfile | null> {
         opinion: doc.opinion || '',
         emotionalState: (doc as any).emotionalState || '',
         affection: typeof (doc as any).affection === 'number' ? (doc as any).affection : 0,
+        timezone: typeof (doc as any).timezone === 'string' ? (doc as any).timezone : '',
         interactionCount: doc.interactionCount || 0,
         lastDistilledAtCount: doc.lastDistilledAtCount || 0,
     };
@@ -94,6 +101,7 @@ export async function recordInteraction(
         opinion: (doc as any).opinion || '',
         emotionalState: (doc as any).emotionalState || '',
         affection: typeof (doc as any).affection === 'number' ? (doc as any).affection : 0,
+        timezone: typeof (doc as any).timezone === 'string' ? (doc as any).timezone : '',
         interactionCount: (doc as any).interactionCount || 0,
         lastDistilledAtCount: (doc as any).lastDistilledAtCount || 0,
     };

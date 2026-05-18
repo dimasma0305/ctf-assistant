@@ -28,6 +28,12 @@ export const schema = {
     // Hackerika for proactive check-ins when distress signals persist.
     emotionalState: { type: String, default: '' },
 
+    // User's IANA timezone (e.g. "Asia/Jakarta", "America/New_York"). Set
+    // explicitly by Hackerika via the set_user_timezone tool when the user
+    // reveals their location. Empty string = not set; downstream code defaults
+    // to "Asia/Jakarta" (community default) until then.
+    timezone: { type: String, default: '' },
+
     // Affection score 0-100. Hackerika's emotional closeness to this user,
     // updated incrementally by the distillation pass. Drives the Hackerika
     // Fan role gate — user must reach affection >= 60 to be eligible.

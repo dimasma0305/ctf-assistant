@@ -1,6 +1,13 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { searchMessagesForTool } from "./search";
 import { grantFanRoleForTool } from "./fanRole";
+import {
+    setReminderForTool,
+    listRemindersForTool,
+    cancelReminderForTool,
+    getCurrentTimeForTool,
+    setUserTimezoneForTool,
+} from "./reminders";
 
 /**
  * Native function-calling tool registry for Hackerika.
@@ -48,6 +55,116 @@ export const TOOL_DEFINITIONS = [
                     },
                 },
                 required: ['query'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'set_reminder',
+            description:
+                'Schedule sebuah pesan reminder untuk caller. Sistem bakal kirim balik pesan "🔔 <@user> <content>" ke channel ini ' +
+                'pas waktu yang dijadwalkan. Pake kalo user minta diingetin/diingatkan sesuatu di waktu tertentu. ' +
+                'Reminder dijadwalkan KE CALLER aja (self-only — ga bisa untuk user lain). ' +
+                'Wajib provide EITHER `whenISO` (untuk waktu absolut) OR `relativeMinutes` (untuk offset dari sekarang) — pilih salah satu sesuai bahasa user. ' +
+                'Buat `whenISO`: HARUS pake offset TZ user (lihat `user-tz` di ctx). Contoh kalo user-tz=Asia/Jakarta dan user bilang "besok jam 9 pagi", emit ' +
+                '`whenISO="2026-05-19T09:00:00+07:00"` (TANPA Z di akhir, pake offset asli user). ' +
+                'Buat `relativeMinutes`: floating-point OK ("30 menit lagi" → 30, "1.5 jam lagi" → 90). ' +
+                'Reply: konfirm balik ke user pake user-local time, jangan ISO ("oke besok 9 pagi WIB ya"). ' +
+                'Errors: missing_content/missing_when/invalid_iso/past_time/too_far_future (>1 thn)/quota_exceeded (cap 25 per user). ' +
+                'Kalo error, reply natural ga teknis.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    content: {
+                        type: 'string',
+                        description:
+                            'Body pesan yang bakal di-deliver ke user pas waktunya tiba. ' +
+                            'Tulis sebagaimana lo bakal ngucapin ke user — pake gaya santai natural, bukan formal. ' +
+                            'Contoh: "makan siang yuk", "meeting CTF jam segini", "minum air". Max ~500 char.',
+                    },
+                    whenISO: {
+                        type: 'string',
+                        description:
+                            'Waktu absolut format ISO 8601 dengan offset TZ user (e.g. "2026-05-19T09:00:00+07:00"). ' +
+                            'Pake kalo user nyebut waktu spesifik (jam, hari, tanggal). Skip kalo lo pake relativeMinutes.',
+                    },
+                    relativeMinutes: {
+                        type: 'number',
+                        description:
+                            'Offset dari sekarang dalam menit (floating-point OK). Pake kalo user nyebut durasi ' +
+                            '("30 menit lagi" → 30, "2 jam lagi" → 120, "30 detik lagi" → 0.5). Skip kalo lo pake whenISO.',
+                    },
+                },
+                required: ['content'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'list_reminders',
+            description:
+                'Show semua reminder aktif (belum delivered) milik caller. Pake kalo user nanya "remindermu apa aja?", ' +
+                '"ada reminder ga buat aku?", dll. Tool balikin list dengan reminderId, content, dueAt, dan relative time. ' +
+                'Pas reply, ringkas natural — jangan dump JSON. Kalo kosong, bilang "ga ada reminder aktif". ' +
+                'reminderId penting kalo user mau cancel: lo perlu remember id-nya buat next turn.',
+            parameters: { type: 'object', properties: {}, required: [] },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'cancel_reminder',
+            description:
+                'Cancel sebuah reminder pending milik caller. WAJIB tau reminderId dulu (call list_reminders kalo belum). ' +
+                'Tool refuse kalo reminderId milik user lain (not_yours) atau udah delivered (already_delivered). ' +
+                'Setelah cancel berhasil, confirm casual ke user.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    reminderId: {
+                        type: 'string',
+                        description: 'MongoDB ObjectId (24 hex char) dari reminder yang mau di-cancel. Dapet dari list_reminders.',
+                    },
+                },
+                required: ['reminderId'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'get_current_time',
+            description:
+                'Get waktu sekarang dalam UTC + TZ user + format lokal. ' +
+                'Pake kalo lo BENERAN ga yakin soal waktu (math rumit, beda TZ, conversion), DARIPADA NEBAK. ' +
+                'Untuk pertanyaan ringan "jam berapa sekarang?", waktu udah ada di ctx — ga perlu call tool. ' +
+                'Buat math yang kritis (reminder absolute dgn besok/lusa, beda tahun, dll), call ini buat grounding.',
+            parameters: { type: 'object', properties: {}, required: [] },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'set_user_timezone',
+            description:
+                'Save IANA timezone user ke profile, supaya semua interaksi berikutnya tau TZ-nya. ' +
+                'Call PAS user reveal lokasi/TZ-nya (mis. "aku di Tokyo", "gw di Jakarta", "I\'m in Berlin", "lagi di US east coast"). ' +
+                'TANPA validasi keras: infer IANA yang paling cocok dari kota/region user. ' +
+                'Contoh inference: "Tokyo"→"Asia/Tokyo", "Jakarta"→"Asia/Jakarta", "Bali/Makassar"→"Asia/Makassar", ' +
+                '"Berlin"→"Europe/Berlin", "NYC/east coast"→"America/New_York", "LA/west coast"→"America/Los_Angeles". ' +
+                'JANGAN call kalo user-tz di ctx udah set ke nilai yang benar (idempotent — tapi update tetep boleh kalo user pindah lokasi). ' +
+                'Errors: invalid_timezone kalo IANA-nya salah. Setelah set sukses, jangan dump value — reply natural.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    timezone: {
+                        type: 'string',
+                        description: 'IANA timezone name. Contoh: "Asia/Jakarta", "Asia/Tokyo", "Europe/London", "America/New_York".',
+                    },
+                },
+                required: ['timezone'],
             },
         },
     },
@@ -109,6 +226,26 @@ export async function dispatchTool(
         if (name === 'grant_fan_role') {
             const reason = typeof args?.reason === 'string' ? args.reason : '';
             const result = await grantFanRoleForTool(message, reason);
+            return JSON.stringify(result);
+        }
+        if (name === 'set_reminder') {
+            const result = await setReminderForTool(message, args || {});
+            return JSON.stringify(result);
+        }
+        if (name === 'list_reminders') {
+            const result = await listRemindersForTool(message);
+            return JSON.stringify(result);
+        }
+        if (name === 'cancel_reminder') {
+            const result = await cancelReminderForTool(message, args || {});
+            return JSON.stringify(result);
+        }
+        if (name === 'get_current_time') {
+            const result = await getCurrentTimeForTool(message);
+            return JSON.stringify(result);
+        }
+        if (name === 'set_user_timezone') {
+            const result = await setUserTimezoneForTool(message, args || {});
             return JSON.stringify(result);
         }
         return JSON.stringify({ error: 'unknown_tool', name });

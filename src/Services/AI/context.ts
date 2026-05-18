@@ -114,7 +114,17 @@ export async function getReplyContext(
 }
 
 // Compact environment context — single line, only fields the model uses.
-export function getEnvironmentContext(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>): string {
+//
+// `userTimezone` is the caller's IANA timezone (resolved from UserProfile,
+// falling back to "Asia/Jakarta" when unset). `timezoneIsDefault` is `true`
+// when we fell back because the user never set one — the model uses this
+// signal to know whether it's safe to call `set_user_timezone` once it
+// learns the user's actual location.
+export function getEnvironmentContext(
+  message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
+  userTimezone: string = 'Asia/Jakarta',
+  timezoneIsDefault: boolean = true,
+): string {
   const guildName = message.guild?.name || 'DM';
   const channel = message.channel as any;
   const channelName = channel?.name ? `#${channel.name}` : 'DM';
@@ -131,8 +141,24 @@ export function getEnvironmentContext(message: OmitPartialGroupDMChannel<Discord
   else if (ln.includes('resource') || ln.includes('tool')) purpose = 'resources';
 
   const now = new Date();
-  const timeStr = now.toLocaleString('id-ID', { hour12: false, day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const serverIso = now.toISOString();
 
+  // User-local formatted time. We use a stable English format so the AI gets
+  // exact ISO-like ordering ("18 May 2026 09:30") without locale variance.
+  let userLocal: string;
+  try {
+    userLocal = new Intl.DateTimeFormat('en-GB', {
+      timeZone: userTimezone,
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: false,
+      weekday: 'short',
+    }).format(now);
+  } catch {
+    // Invalid TZ shouldn't reach here (loadUserTimezone validates), but be safe.
+    userLocal = now.toUTCString();
+  }
+
+  const tzMarker = timezoneIsDefault ? `${userTimezone} (default-unset)` : userTimezone;
   const topicPart = channelTopic ? ` topic="${channelTopic}"` : '';
-  return `guild=${guildName} channel=${channelName} purpose=${purpose}${isNSFW}${topicPart} time=${timeStr}`;
+  return `guild=${guildName} channel=${channelName} purpose=${purpose}${isNSFW}${topicPart} server-time=${serverIso} user-tz=${tzMarker} user-local-time="${userLocal}"`;
 }
