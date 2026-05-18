@@ -178,15 +178,24 @@ export const TOOL_DEFINITIONS = [
                 'Returns 2 hal: (1) `instant` — kalo query-nya factual (definisi, math, fakta umum), ' +
                 'lo dapet abstract Wikipedia-style yang udah pre-summarized — sering bisa langsung jawab tanpa fetch lagi. ' +
                 '(2) `results` — list of top organic results (title, URL, snippet) buat eksplorasi lebih dalem. ' +
-                '\n\n**Kapan PAKE**:\n' +
+                '\n\n**ATURAN UTAMA — SEARCH FIRST, DON\'T GUESS**:\n' +
+                'Kalo user sebut produk/tool/term/event/orang yang lo **ga 100% kenal atau ga yakin versi terkini-nya**, ' +
+                '**SEARCH DULU sebelum jawab**. JANGAN nanya "X yang mana?" / "X itu apa?" ke user kalo lo sebenernya bisa cari. ' +
+                'Contoh konkret: kalo user bilang "Codex login gagal", **JANGAN** tanya "Codex yang mana, platform CTF?" — ' +
+                'langsung `web_search({query:"Codex"})` buat tau Codex itu apa di 2026 (kemungkinan: OpenAI Codex coding agent, ' +
+                'atau hal lain yang lagi tren). Knowledge cutoff lo Januari 2026 — banyak produk/event setelah itu, atau yang ' +
+                'lo lupa detail-nya, harus dicek lewat search. **Better fast wrong-then-corrected via search, drpd nebak terus salah**.\n\n' +
+                '**Kapan PAKE**:\n' +
                 '- User nanya info dunia luar / terkini (event, news, "siapa CEO X", "apa itu Y", "berita Z hari ini").\n' +
+                '- User mention produk/tool/term yg lo ga familiar atau lo cuma samar-samar inget — SEARCH JANGAN NEBAK.\n' +
                 '- User minta cari informasi yg ga ada di context Discord channel.\n' +
                 '- Lo perlu ngecek fakta sebelum jawab confident.\n' +
+                '- Sebelum nanya clarifying question soal "X itu apa?" — search dulu, baru kalo masih ambigu baru tanya.\n' +
                 '- Research mode: lo cari results, pilih URL yg paling relevan, baru `fetch_url` buat baca detail.\n\n' +
                 '**Kapan JANGAN**:\n' +
-                '- Kalo info-nya udah di context / lo udah tau (jangan over-search).\n' +
+                '- Kalo info-nya udah di context / lo udah BENERAN tau (bukan samar-samar).\n' +
                 '- Casual chat / banter (jelas ga butuh search).\n' +
-                '- Pertanyaan teknis general yg lo bisa jawab dari pengetahuan internal.\n\n' +
+                '- Pertanyaan teknis fundamental yg lo confident jawab dari pengetahuan internal (mis. "apa itu race condition" — itu generic CS, lo tau).\n\n' +
                 '**Reply pattern**: jangan dump results verbatim. Ringkas natural, sebut source kalo important ' +
                 '("dari wikipedia, X itu ...", "kayaknya menurut artikel di Y, ..."). Boleh kasih URL satu yang paling relevan ' +
                 'kalo user pengen baca sendiri.\n\n' +
