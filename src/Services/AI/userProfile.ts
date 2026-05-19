@@ -31,19 +31,18 @@ export interface UserProfile {
  */
 export function formatProfile(profile: UserProfile | null): string {
     if (!profile) return '';
+    // Shorter labels save ~10-15 tokens per turn (drops "my-" prefix; "mood" instead
+    // of "recent-emotional-state"). The enclosing ctx block already says
+    // "your-notes-on-this-user:" so the possessive context is clear.
     const parts: string[] = [];
     if (profile.personality) parts.push(`personality: ${profile.personality}`);
     if (profile.interests) parts.push(`interests: ${profile.interests}`);
     if (profile.communicationStyle) parts.push(`style: ${profile.communicationStyle}`);
-    if (profile.opinion) parts.push(`my-opinion: ${profile.opinion}`);
-    if (profile.emotionalState) parts.push(`recent-emotional-state: ${profile.emotionalState}`);
-    // Affection always shown (even at 0) — gates the fan role, so the model
-    // needs visibility on where the relationship currently sits.
-    parts.push(`my-affection: ${profile.affection}/100`);
-    // Timezone only shown if set — when unset, the ctx block surfaces the
-    // default ("Asia/Jakarta") with an "unknown" marker so the model knows
-    // it can ask + persist via set_user_timezone.
-    if (profile.timezone) parts.push(`timezone: ${profile.timezone}`);
+    if (profile.opinion) parts.push(`opinion: ${profile.opinion}`);
+    if (profile.emotionalState) parts.push(`mood: ${profile.emotionalState}`);
+    // Affection always shown (even at 0) — gates the fan role.
+    parts.push(`affection: ${profile.affection}/100`);
+    if (profile.timezone) parts.push(`tz: ${profile.timezone}`);
     if (parts.length === 0) return '';
     return parts.join('\n');
 }
