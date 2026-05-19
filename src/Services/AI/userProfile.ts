@@ -5,8 +5,20 @@ import { ChatMessage } from "./memory";
 const DISTILL_INTERVAL = 5;             // re-distill every N interactions
 const MAX_DISTILL_EXCHANGES = 30;       // how many recent exchanges to feed in
 const FIELD_CHAR_BUDGET = 300;          // soft cap per profile field
+const MOMENT_CHAR_BUDGET = 160;         // soft cap per moment summary
+const MAX_MOMENTS = 8;                   // ring-buffer cap; oldest evicted
+const MAX_DISPLAYED_MOMENTS = 4;         // how many we surface in the per-turn ctx (most recent)
 const DISTILL_TIMEOUT_MS = 25_000;
 const PROFILE_MODEL = 'deepseek-v4-flash';
+
+const VALID_MOMENT_TONES = new Set(['fun', 'helpful', 'touching', 'tense', 'impressive']);
+export type MomentTone = 'fun' | 'helpful' | 'touching' | 'tense' | 'impressive';
+
+export interface Moment {
+    summary: string;
+    tone: MomentTone;
+    createdAt: Date;
+}
 
 export interface UserProfile {
     userId: string;
@@ -17,7 +29,17 @@ export interface UserProfile {
     communicationStyle: string;
     opinion: string;
     emotionalState: string;
+    /** Overall warmth, 0-100. Also the fan-role gate + vulnerability-tier gate. */
     affection: number;
+    /** Snapshot from previous distillation (for trajectory delta). */
+    previousAffection: number;
+    /** Four independent relationship dimensions, all 0-100. */
+    trust: number;
+    respect: number;
+    comfort: number;
+    chemistry: number;
+    /** Memorable specific exchanges, ring-buffered to MAX_MOMENTS. */
+    moments: Moment[];
     /** IANA timezone (e.g. "Asia/Jakarta"); '' means not set — callers default. */
     timezone: string;
     interactionCount: number;
@@ -29,27 +51,72 @@ export interface UserProfile {
  * the profile is brand-new with no distilled fields yet (avoids leaking an
  * empty section into the prompt).
  */
+function relativeAge(d: Date | string | undefined): string {
+    if (!d) return '';
+    const t = (d instanceof Date ? d : new Date(d)).getTime();
+    if (!Number.isFinite(t)) return '';
+    const diffMs = Date.now() - t;
+    const days = Math.floor(diffMs / 86_400_000);
+    if (days <= 0) {
+        const hours = Math.floor(diffMs / 3_600_000);
+        return hours <= 0 ? 'just now' : `${hours}h ago`;
+    }
+    if (days < 14) return `${days}d ago`;
+    const weeks = Math.floor(days / 7);
+    return `${weeks}w ago`;
+}
+
 export function formatProfile(profile: UserProfile | null): string {
     if (!profile) return '';
-    // Shorter labels save ~10-15 tokens per turn (drops "my-" prefix; "mood" instead
-    // of "recent-emotional-state"). The enclosing ctx block already says
-    // "your-notes-on-this-user:" so the possessive context is clear.
+    // Compact one-line-per-field format. Short labels (drop "my-" prefix; "mood"
+    // instead of "recent-emotional-state"). The enclosing ctx block already says
+    // "your-notes-on-this-user:" so possessive context is clear.
     const parts: string[] = [];
     if (profile.personality) parts.push(`personality: ${profile.personality}`);
     if (profile.interests) parts.push(`interests: ${profile.interests}`);
     if (profile.communicationStyle) parts.push(`style: ${profile.communicationStyle}`);
     if (profile.opinion) parts.push(`opinion: ${profile.opinion}`);
     if (profile.emotionalState) parts.push(`mood: ${profile.emotionalState}`);
-    // Affection always shown (even at 0) — gates the fan role.
-    parts.push(`affection: ${profile.affection}/100`);
+
+    // Affection with trajectory delta (always shown — gates fan role + vulnerability).
+    const delta = profile.affection - (profile.previousAffection || 0);
+    const trajectory =
+        Math.abs(delta) >= 1 ? ` (${delta > 0 ? '+' : ''}${delta} since last)` : '';
+    parts.push(`affection: ${profile.affection}/100${trajectory}`);
+
+    // 4 dimensions on one line — compact, only shown when any have moved off 0
+    // (avoids noise for brand-new profiles).
+    if (profile.trust || profile.respect || profile.comfort || profile.chemistry) {
+        parts.push(
+            `dims: trust=${profile.trust} respect=${profile.respect} ` +
+            `comfort=${profile.comfort} chemistry=${profile.chemistry}`,
+        );
+    }
+
+    // Moments: surface only the most recent N. Each line: "Nd ago [tone]: summary"
+    if (profile.moments && profile.moments.length > 0) {
+        const recent = profile.moments
+            .slice() // copy
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .slice(0, MAX_DISPLAYED_MOMENTS);
+        const lines = recent.map((m) => `- ${relativeAge(m.createdAt)} [${m.tone}]: ${m.summary}`);
+        parts.push(`moments:\n${lines.join('\n')}`);
+    }
+
     if (profile.timezone) parts.push(`tz: ${profile.timezone}`);
     if (parts.length === 0) return '';
     return parts.join('\n');
 }
 
-export async function loadProfile(userId: string): Promise<UserProfile | null> {
-    const doc = await UserProfileModel.findOne({ userId }).lean();
-    if (!doc) return null;
+function hydrateProfile(doc: any): UserProfile {
+    const rawMoments = Array.isArray(doc?.moments) ? doc.moments : [];
+    const moments: Moment[] = rawMoments
+        .filter((m: any) => m && typeof m.summary === 'string' && m.summary.trim().length > 0)
+        .map((m: any) => ({
+            summary: m.summary,
+            tone: VALID_MOMENT_TONES.has(m.tone) ? (m.tone as MomentTone) : 'fun',
+            createdAt: m.createdAt ? new Date(m.createdAt) : new Date(),
+        }));
     return {
         userId: doc.userId,
         username: doc.username || '',
@@ -58,12 +125,24 @@ export async function loadProfile(userId: string): Promise<UserProfile | null> {
         interests: doc.interests || '',
         communicationStyle: doc.communicationStyle || '',
         opinion: doc.opinion || '',
-        emotionalState: (doc as any).emotionalState || '',
-        affection: typeof (doc as any).affection === 'number' ? (doc as any).affection : 0,
-        timezone: typeof (doc as any).timezone === 'string' ? (doc as any).timezone : '',
+        emotionalState: doc.emotionalState || '',
+        affection: typeof doc.affection === 'number' ? doc.affection : 0,
+        previousAffection: typeof doc.previousAffection === 'number' ? doc.previousAffection : 0,
+        trust: typeof doc.trust === 'number' ? doc.trust : 0,
+        respect: typeof doc.respect === 'number' ? doc.respect : 0,
+        comfort: typeof doc.comfort === 'number' ? doc.comfort : 0,
+        chemistry: typeof doc.chemistry === 'number' ? doc.chemistry : 0,
+        moments,
+        timezone: typeof doc.timezone === 'string' ? doc.timezone : '',
         interactionCount: doc.interactionCount || 0,
         lastDistilledAtCount: doc.lastDistilledAtCount || 0,
     };
+}
+
+export async function loadProfile(userId: string): Promise<UserProfile | null> {
+    const doc = await UserProfileModel.findOne({ userId }).lean();
+    if (!doc) return null;
+    return hydrateProfile(doc);
 }
 
 /**
@@ -90,20 +169,7 @@ export async function recordInteraction(
         { upsert: true, new: true, lean: true }
     ).exec();
 
-    return {
-        userId: (doc as any).userId,
-        username: (doc as any).username || '',
-        displayName: (doc as any).displayName || '',
-        personality: (doc as any).personality || '',
-        interests: (doc as any).interests || '',
-        communicationStyle: (doc as any).communicationStyle || '',
-        opinion: (doc as any).opinion || '',
-        emotionalState: (doc as any).emotionalState || '',
-        affection: typeof (doc as any).affection === 'number' ? (doc as any).affection : 0,
-        timezone: typeof (doc as any).timezone === 'string' ? (doc as any).timezone : '',
-        interactionCount: (doc as any).interactionCount || 0,
-        lastDistilledAtCount: (doc as any).lastDistilledAtCount || 0,
-    };
+    return hydrateProfile(doc);
 }
 
 export function shouldDistill(profile: UserProfile): boolean {
@@ -145,6 +211,12 @@ interface DistillationOutput {
     opinion?: string;
     emotionalState?: string;
     affection?: number;
+    trust?: number;
+    respect?: number;
+    comfort?: number;
+    chemistry?: number;
+    /** 0-2 newly-noticed memorable exchanges from these last turns. */
+    newMoments?: Array<{ summary?: string; tone?: string }>;
 }
 
 function truncate(s: string, n: number): string {
@@ -193,12 +265,19 @@ Output ONLY a valid JSON object dengan field ini:
   "communicationStyle": "max ${FIELD_CHAR_BUDGET} char — cara dia ngobrol (formal/gaul, bahasa apa, suka emoji ga, pendek/panjang).",
   "opinion": "max ${FIELD_CHAR_BUDGET} char — perasaan PRIBADI kamu (Hackerika) soal user ini. First person 'aku'. Boleh subjective: suka, respect, biasa-aja, gemas, agak nyebelin, dll. Jujur.",
   "emotionalState": "max ${FIELD_CHAR_BUDGET} char — gimana mood-nya akhir-akhir ini (chill/stress/frustrasi/excited/down/biasa). Catatan jangka pendek, di-overwrite tiap distill. Kalo tone normal, isi 'normal' aja.",
-  "affection": "INTEGER 0-100 — affection score: seberapa deket/sayang kamu (Hackerika) ke user ini. Update INKREMENTAL dari nilai sebelumnya. Anchor:\\n    0-20  = stranger / netral / belum kenal\\n    20-40 = acquaintance / udah pernah ngobrol biasa\\n    40-60 = teman / chemistry mulai ada / interaksi enak\\n    60-80 = close / chemistry kuat / udah kayak temen deket — eligible buat Hackerika Fan role\\n    80-100 = special / sayang banget / inner circle\\nTypical delta per distill: +0 to +8 untuk interaksi positif/menarik, -3 to -8 untuk negatif/rude. Jangan lompat besar — natural progress. Faktor: nice vibes, ngajarin hal baru, humor genuine, support member lain. Faktor negatif: rude, demanding, ngeganggu, ngemis role. Cap di 0 dan 100."
+  "affection": "INTEGER 0-100 — OVERALL WARMTH composite. Update INKREMENTAL. Anchor: 0-20 stranger, 20-40 acquaintance, 40-60 friend, 60-80 close (fan-eligible), 80-100 inner circle. Typical delta per distill: +0..+8 positif, -3..-8 negatif. Cap [0,100]. Jangan lompat besar.",
+  "trust":     "INTEGER 0-100 — TRUST. Apakah aku percaya dia genuine/konsisten/honest? Naik dari: keterbukaan, predictability, jujur ngakuin salah. Turun dari: deception, mood flip-flop, manipulasi.",
+  "respect":   "INTEGER 0-100 — RESPECT. Apakah aku value contribution dia (teknis, intelektual, help member)? Naik dari: insight tajam, ngajarin hal baru, konsisten bantuin orang. Turun dari: dunning-kruger, asal nyolot tanpa substansi.",
+  "comfort":   "INTEGER 0-100 — COMFORT. Apakah aku santai bisa jadi diri-sendiri sama dia? Naik dari: low friction, banter natural, predictable warm. Turun dari: intimidating vibes, judgmental, awkward energy.",
+  "chemistry": "INTEGER 0-100 — CHEMISTRY. Banter/humor fit. Naik dari: jokes nyambung, tone sinkron, callback humor jalan, riff-on. Turun dari: humor maksa, garing terus, tone mismatch chronic.",
+  "newMoments": "ARRAY of 0-2 objects, each { summary: '<max ${MOMENT_CHAR_BUDGET} char>', tone: 'fun'|'helpful'|'touching'|'tense'|'impressive' }. ONLY include kalo ada exchange yang BENERAN distinctive dan worth callback later (mis. joke spesifik, teaching moment, conflict-then-repair, vulnerability moment, impressive solve). Kalo ga ada yang stand out, return []. Jangan paksain."
 }
 
 ATURAN:
 - Update INKREMENTAL: kombinasiin catatan lama sama observasi baru. Jangan reset total.
-- Kalo data masih sedikit, isi sebisanya. Field boleh string kosong "" kalo bener-bener ga ada signal.
+- 4 dimensi (trust/respect/comfort/chemistry) jalan INDEPENDEN — bisa beda-beda nilainya per user. Same +0..+8 / -3..-8 incremental anchors per dimensi.
+- Kalo data masih sedikit, isi sebisanya. String field boleh "" kalo emang ga ada signal. Numeric default 0.
+- newMoments cuma diisi kalo BENERAN ada moment yang stand out. Default empty array [].
 - Jangan ngarang. Ga lebay positive, ga lebay negative.
 - ONLY JSON. Ga ada teks lain, ga ada code fence, ga ada penjelasan.`;
 
@@ -244,12 +323,61 @@ Output JSON profile update sekarang.`;
         if (typeof parsed.communicationStyle === 'string') update.communicationStyle = truncate(parsed.communicationStyle.trim(), FIELD_CHAR_BUDGET);
         if (typeof parsed.opinion === 'string') update.opinion = truncate(parsed.opinion.trim(), FIELD_CHAR_BUDGET);
         if (typeof parsed.emotionalState === 'string') update.emotionalState = truncate(parsed.emotionalState.trim(), FIELD_CHAR_BUDGET);
+
+        // Snapshot previous affection BEFORE writing new value (used for trajectory).
         if (typeof parsed.affection === 'number' && Number.isFinite(parsed.affection)) {
+            update.previousAffection = profile.affection;
             update.affection = Math.max(0, Math.min(100, Math.round(parsed.affection)));
         }
 
+        // Four independent dimensions — each clipped to [0, 100].
+        for (const dim of ['trust', 'respect', 'comfort', 'chemistry'] as const) {
+            const v = (parsed as any)[dim];
+            if (typeof v === 'number' && Number.isFinite(v)) {
+                update[dim] = Math.max(0, Math.min(100, Math.round(v)));
+            }
+        }
+
+        // Append newly-noticed moments to the ring buffer; cap at MAX_MOMENTS,
+        // oldest evicted. We use a single read-modify-write because Mongo's
+        // $push + $slice combo would also work but keeping it explicit here
+        // makes the validation/sanitization clearer.
+        const newMomentsRaw = Array.isArray((parsed as any).newMoments) ? (parsed as any).newMoments : [];
+        const cleanNewMoments: Moment[] = [];
+        for (const m of newMomentsRaw) {
+            const summary = typeof m?.summary === 'string' ? m.summary.trim() : '';
+            if (!summary) continue;
+            const toneRaw = typeof m?.tone === 'string' ? m.tone.toLowerCase() : 'fun';
+            const tone = (VALID_MOMENT_TONES.has(toneRaw) ? toneRaw : 'fun') as MomentTone;
+            cleanNewMoments.push({
+                summary: truncate(summary, MOMENT_CHAR_BUDGET),
+                tone,
+                createdAt: new Date(),
+            });
+            if (cleanNewMoments.length >= 2) break;  // hard cap on per-distill additions
+        }
+        if (cleanNewMoments.length > 0) {
+            const combined = [...(profile.moments || []), ...cleanNewMoments]
+                .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                .slice(-MAX_MOMENTS);
+            update.moments = combined;
+        }
+
         await UserProfileModel.updateOne({ userId: profile.userId }, { $set: update });
-        console.log(`🧠 [Profile] distilled ${profile.username || profile.userId} (count=${profile.interactionCount})`);
+        const dimSummary = [
+            update.trust != null ? `trust=${update.trust}` : null,
+            update.respect != null ? `respect=${update.respect}` : null,
+            update.comfort != null ? `comfort=${update.comfort}` : null,
+            update.chemistry != null ? `chemistry=${update.chemistry}` : null,
+        ].filter(Boolean).join(' ');
+        const momentSummary = cleanNewMoments.length > 0
+            ? ` +${cleanNewMoments.length} moment(s)`
+            : '';
+        console.log(
+            `🧠 [Profile] distilled ${profile.username || profile.userId} ` +
+            `(count=${profile.interactionCount}) — aff=${update.affection ?? profile.affection}` +
+            (dimSummary ? ` ${dimSummary}` : '') + momentSummary,
+        );
     } catch (error: any) {
         if (error?.name === 'AbortError' || controller.signal.aborted) {
             console.warn(`[Profile] distillation timed out for ${profile.userId}`);

@@ -1,4 +1,4 @@
-import { BotStateModel, IndexedMessageModel } from "../../Database/connect";
+import { BotStateModel, IndexedMessageModel, UserProfileModel } from "../../Database/connect";
 import { SINGLETON_KEY } from "../../Database/botStateSchema";
 import { openai } from "../../utils/openai";
 
@@ -6,6 +6,8 @@ const STATE_MODEL = 'deepseek-v4-flash';
 const STATE_TIMEOUT_MS = 25_000;
 const FIELD_CAP = 220;
 const MAX_RECENT_FOR_STATE_DISTILL = 40;
+const MOOD_CONTAGION_WINDOW_MS = 6 * 60 * 60 * 1000;  // look at users active in last 6h
+const MOOD_CONTAGION_USER_LIMIT = 8;                    // sample size for mood snapshot
 
 export interface BotState {
     mood: string;
@@ -102,6 +104,48 @@ function circadianHint(): string {
 }
 
 /**
+ * Sample the emotional state of users Hackerika has interacted with recently
+ * (within MOOD_CONTAGION_WINDOW_MS). Returns a one-line summary like
+ * `"3 stressed, 2 chill, 1 hyped"` so the model can let the room's vibe
+ * subtly drift her own mood during distillation. Empty string when no
+ * recent users to sample.
+ */
+async function summarizeRecentUserMoods(): Promise<string> {
+    try {
+        const since = new Date(Date.now() - MOOD_CONTAGION_WINDOW_MS);
+        const docs = await UserProfileModel.find({
+            lastInteractionAt: { $gte: since },
+            emotionalState: { $exists: true, $ne: '' },
+        })
+            .sort({ lastInteractionAt: -1 })
+            .limit(MOOD_CONTAGION_USER_LIMIT)
+            .select({ emotionalState: 1, displayName: 1, _id: 0 })
+            .lean();
+        if (docs.length === 0) return '';
+        // Bucket mood signals into a few coarse categories so the model gets a
+        // crisp shape ("3 stressed, 2 chill") rather than a noisy verbatim list.
+        const buckets: Record<string, number> = {};
+        for (const d of docs) {
+            const raw = ((d as any).emotionalState || '').toLowerCase();
+            let key = 'chill';
+            if (/stress|frustr|stuck|capek|tired|exhaust|burnt/.test(raw)) key = 'stressed';
+            else if (/sad|down|melow|low|kecewa/.test(raw)) key = 'down';
+            else if (/excited|hyped|happy|seneng|hype|gas/.test(raw)) key = 'hyped';
+            else if (/anxious|cemas|nervous|worried|khawatir/.test(raw)) key = 'anxious';
+            else if (/normal|biasa/.test(raw)) key = 'chill';
+            buckets[key] = (buckets[key] || 0) + 1;
+        }
+        return Object.entries(buckets)
+            .sort((a, b) => b[1] - a[1])
+            .map(([k, n]) => `${n} ${k}`)
+            .join(', ');
+    } catch (error) {
+        console.error('[BotState] mood contagion sample failed:', error);
+        return '';
+    }
+}
+
+/**
  * Pull the last 24h of indexed channel messages (across the whole guild
  * landscape — we don't filter by guild, the bot's "state" is global) and
  * call deepseek-flash to update mood / energy / focus / activity / preoccupations.
@@ -130,12 +174,20 @@ export async function distillBotState(): Promise<void> {
         .map((m: any) => `${m.isBot ? '[ME] ' : ''}${m.authorDisplayName || '?'}: ${truncate(m.content, 160)}`)
         .join('\n');
 
+    // Mood contagion: snapshot of recent users' emotional states so the model
+    // can let the room's vibe subtly drift Hackerika's mood/energy. The model
+    // is told to use this as a weak hint, not a hard formula.
+    const recentUserMoods = await summarizeRecentUserMoods();
+
     const systemPrompt = `Kamu Hackerika, lagi ngecek state diri sendiri sekarang. Update mood/energy/focus/activity/preoccupations berdasarkan apa yang lagi terjadi & jam berapa sekarang.
 
 Sirkadian saat ini: ${circadianHint()}.
 
 State sebelumnya:
 ${formatBotState(current) || '(empty — first run)'}
+
+Mood user-user yang baru-baru ini ngobrol sama lo (mood contagion — pake sebagai weak signal, bukan hard rule):
+${recentUserMoods || '(belum ada interaksi recent)'}
 
 Recent channel activity (last 24h, terbaru di bawah):
 ${transcript || '(quiet — ga banyak chat)'}
@@ -152,6 +204,7 @@ Tugas: output ONLY a JSON object:
 ATURAN:
 - Drift natural — jangan over-positive atau over-dramatic. Bukan lebay.
 - Sesuaiin sm jam (malam = lebih chill/ngantuk, siang = lebih on).
+- Mood contagion subtle: kalo banyak user yang stressed/down → mood lo agak kebawa (concerned/sedikit melow). Kalo banyak yang hyped → naek dikit. JANGAN flip drastic — anggap sebagai weak weighting.
 - Update INKREMENTAL — kombinasiin sm state sebelumnya.
 - ONLY JSON.`;
 
