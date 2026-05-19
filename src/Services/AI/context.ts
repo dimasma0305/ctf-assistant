@@ -27,9 +27,15 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
     const sliceCount = CHANNEL_CONTEXT_LIMIT + 1; // +1 because the current msg may be at the tail
     const relevantCachedMessages = cachedMessages.slice(Math.max(0, cachedMessages.length - sliceCount), -1);
 
+    // Format lines as `[DisplayName <@ID>] content` — matches the speaker-tag
+    // format used everywhere else (user messages, assistant messages in memory,
+    // reply-to block) so the model can use ONE rule to identify speakers across
+    // all surfaces. `<@ID>` prevents display-name collisions when two users
+    // share a nickname.
     if (relevantCachedMessages.length >= 3) {
       contextMessages = relevantCachedMessages.slice(-CHANNEL_CONTEXT_LIMIT).map((msg: SimplifiedMessage) => {
         const authorName = msg.member?.displayName || msg.author.username;
+        const authorId = msg.author.id;
         let content = msg.content;
         if (!content) {
           if (msg.system || msg.type !== 0) content = '[sys]';
@@ -38,7 +44,7 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
           else if (msg.embeds) content = '[embed]';
           else content = '[empty]';
         }
-        return `${authorName}: ${truncate(content, PER_MESSAGE_CHAR_LIMIT)}`;
+        return `[${authorName} <@${authorId}>] ${truncate(content, PER_MESSAGE_CHAR_LIMIT)}`;
       });
     } else {
       const fetchedMessages = await message.channel.messages.fetch({ limit: CHANNEL_CONTEXT_LIMIT, before: message.id });
@@ -51,6 +57,7 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
 
       contextMessages = messageArray.map(msg => {
         const authorName = msg.member?.displayName || msg.author.username;
+        const authorId = msg.author.id;
         let content = msg.content;
         if (!content) {
           if (msg.system || msg.type !== 0) content = '[sys]';
@@ -59,7 +66,7 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
           else if (msg.embeds.length > 0) content = '[embed]';
           else content = '[empty]';
         }
-        return `${authorName}: ${truncate(content, PER_MESSAGE_CHAR_LIMIT)}`;
+        return `[${authorName} <@${authorId}>] ${truncate(content, PER_MESSAGE_CHAR_LIMIT)}`;
       });
     }
 
@@ -104,9 +111,12 @@ export async function getReplyContext(
 
     const referencedMessage = prefetched ?? await message.channel.messages.fetch(message.reference.messageId);
     const referencedAuthor = referencedMessage.member?.displayName || referencedMessage.author.username;
+    const referencedAuthorId = referencedMessage.author.id;
     const referencedContent = truncate(referencedMessage.content || '[attachment/embed]', REPLY_CONTEXT_CHAR_LIMIT);
 
-    return `\n${startSep}\n${referencedAuthor}: ${referencedContent}\n${endSep}`;
+    // Same `[Name <@ID>] content` format as the speaker-tag / channel block —
+    // disambiguates when two users share a display name.
+    return `\n${startSep}\n[${referencedAuthor} <@${referencedAuthorId}>] ${referencedContent}\n${endSep}`;
   } catch (error) {
     console.error('Error getting reply context:', error);
     return '';
