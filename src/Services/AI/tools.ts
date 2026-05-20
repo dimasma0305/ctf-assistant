@@ -1,5 +1,5 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
-import { searchMessagesForTool } from "./search";
+import { searchMessagesForTool, recallMemoryForTool } from "./search";
 import { grantFanRoleForTool } from "./fanRole";
 import {
     setReminderForTool,
@@ -30,8 +30,9 @@ export const TOOL_DEFINITIONS = [
         function: {
             name: 'search_messages',
             description:
-                'Cari pesan lama di channel ini (keyword + optional author). Pakai buat recall historis (user reference event/topik lewat yang ga ada di "recent"). ' +
-                'Reach: ~90 hari indexed + tier fallback ke Discord API. Returns ≤8 matches dengan author/timestamp/content (truncated ~220 char/pesan).',
+                'KEYWORD search di pesan lama channel ini (exact word/phrase match). Pakai kalo lo butuh EXACT TOKENS — CVE IDs, file names, nick spesifik, code fragments, URL paths, technical terms persis. ' +
+                'Buat query yang lebih fuzzy/semantik (mis. "ada yang pernah bahas cookie security?" — paraphrased), pake `recall_memory` instead. ' +
+                'Reach: ~90 hari indexed + tier fallback ke Discord API. Returns ≤8 matches diranking by recency + importance.',
             parameters: {
                 type: 'object',
                 properties: {
@@ -45,6 +46,39 @@ export const TOOL_DEFINITIONS = [
                         description:
                             'Optional Discord user ID (digit-only, TANPA <@>). Extract dari mention user (mis. "<@663..>" → "663.."). ' +
                             'Pake ini buat filter by author, bukan substring di content.',
+                    },
+                },
+                required: ['query'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'recall_memory',
+            description:
+                'SEMANTIC recall di pesan lama channel ini (vector embedding similarity). Beda dari `search_messages` yang exact-keyword: ' +
+                'ini ngerti PARAPHRASE — "ada yg pernah bahas cookie security?" bakal nemu thread soal "session token" / "XSS exfil" walau kata "cookie" ga muncul. ' +
+                'Pake kalo lo: (1) cari topik/konsep lewat — bukan kata persis, (2) recall "kita pernah ngomong soal X kan?", (3) topik tematis yang bisa diomongin pake banyak cara. ' +
+                'Buat exact-token search (CVE-2026-xxxx, file path, nick spesifik), pake `search_messages` instead. ' +
+                'Returns ≤8 matches dgn similarity 0-1, ranked by combined score (semantic 50% + recency 30% + importance 20%).',
+            parameters: {
+                type: 'object',
+                properties: {
+                    query: {
+                        type: 'string',
+                        description:
+                            'Natural-language description of what you remember/seek. ' +
+                            'Tulis kayak lo bakal jelasin ke teman — sentence/phrase, bukan keyword list. ' +
+                            'Contoh: "diskusi soal race condition di web", "saat user A ngajarin pwn trick", "candaan soal durian skill issue".',
+                    },
+                    authorId: {
+                        type: 'string',
+                        description: 'Optional Discord user ID (digit-only, no <@>). Restricts recall to messages by this author.',
+                    },
+                    limit: {
+                        type: 'number',
+                        description: 'Max results (default 5, max 8).',
                     },
                 },
                 required: ['query'],
@@ -233,6 +267,10 @@ export async function dispatchTool(
                 ? args.authorId.trim()
                 : undefined;
             const result = await searchMessagesForTool(message, query, authorId);
+            return JSON.stringify(result);
+        }
+        if (name === 'recall_memory') {
+            const result = await recallMemoryForTool(message, args || {});
             return JSON.stringify(result);
         }
         if (name === 'grant_fan_role') {

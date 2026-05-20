@@ -110,6 +110,14 @@ async function main() {
                     name: 'SHARED_SECRET',
                     text: SHARED_SECRET,
                 },
+                // Workers AI binding — gives env.AI.run(...) access to CF's
+                // inference endpoint. Used by the /embed route for the
+                // BGE-small-en-v1.5 embedding model. Free tier covers ~100k
+                // requests/day which is plenty for our message volume.
+                {
+                    type: 'ai',
+                    name: 'AI',
+                },
             ],
         };
         form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));

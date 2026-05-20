@@ -17,6 +17,7 @@ import {
     formatProfile,
 } from "./userProfile";
 import { loadBotState, formatBotState } from "./botState";
+import { buildLorebookBlock } from "./lorebook";
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -508,6 +509,7 @@ Setiap user message diawali blok ${CTX_OPEN}...${CTX_CLOSE} berisi info real-tim
 - \`my-current-state:\` — mood/energy/focus/activity/diary. Pake buat adjust tone & refer activity natural ("lagi ngopi nih"). **JANGAN** dump nilai mentah ("mood-ku 75/100"). Implicit aja.
 - \`your-notes-on-this-user:\` (opsional) — catatan psikologis user (personality/interests/style/opinion). Pake buat sesuaiin gaya, refer interest natural, jaga konsisten attitude. **JANGAN** quote catatan langsung ("aku liat di profil kamu...") atau bilang ada "profile system" — itu creepy/meta. Kalo user tanya "kamu inget aku ga?" → boleh share opinion natural.
 - \`mentioned:\` (opsional) — legend ID-to-name. Pake buat tau siapa di mention, jangan ngarang nama.
+- \`lorebook:\` (opsional) — community/server-specific facts yang ke-trigger sama keyword di pesan user (mis. "TCP1P", "Trakteer", "DEF CON"). Pake sebagai konteks tambahan tapi JANGAN dump verbatim ("aku liat di lorebook..."). Itu meta-talk.
 - \`recent:\` — 12 pesan terakhir di channel
 - \`replying-to:\` — pesan yang user reply (kalo ada)
 - \`[Attachments]\` — file attached
@@ -532,6 +534,7 @@ function buildContextBlock(
     mentionLegend: string,
     userProfileBlock: string,
     botStateBlock: string,
+    lorebookBlock: string,
     isDeveloper: boolean,
 ): string {
     const lines: string[] = [`${CTX_OPEN}`, `user=${userInfo}`, `env=${envContext}`];
@@ -546,6 +549,9 @@ function buildContextBlock(
     if (botStateBlock) lines.push(`my-current-state:\n${botStateBlock}`);
     if (userProfileBlock) lines.push(`your-notes-on-this-user:\n${userProfileBlock}`);
     if (mentionLegend) lines.push(`mentioned:\n${mentionLegend}`);
+    // Lorebook: keyword-triggered community facts. Sits between `mentioned:`
+    // and `recent:` so the model picks it up alongside identity context.
+    if (lorebookBlock) lines.push(`lorebook:\n${lorebookBlock}`);
     if (channelContext) lines.push(`recent:${channelContext}`);
     if (replyContext) lines.push(`replying-to:${replyContext}`);
     if (attachmentBlock) lines.push(attachmentBlock.trimStart());
@@ -703,9 +709,19 @@ export async function handleAIChat(
         memory[channelId].messages.shift();
     }
 
+    // Lorebook: scan user msg + recent channel context for keyword triggers,
+    // inject matched community facts into ctx. Falls back gracefully if Mongo
+    // or seed isn't ready (empty string).
+    const lorebookBlock = await buildLorebookBlock(
+        sanitizedUserContent,
+        channelContext,
+        replyContext,
+        message.guildId,
+    );
+
     // Static system prompt lives at module level; build per-turn context for
     // injection into only the final user message below.
-    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend, userProfileBlock, botStateBlock, isDeveloper);
+    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend, userProfileBlock, botStateBlock, lorebookBlock, isDeveloper);
 
     // If this is a spontaneous chime (she's nimbrung without being addressed),
     // tell the model so it shifts tone: shorter, lower-key, "joining the

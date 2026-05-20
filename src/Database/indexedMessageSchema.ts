@@ -45,6 +45,23 @@ export const schema = {
         type: Date,
         default: Date.now,
     },
+
+    // 384-dim semantic embedding from BGE-small-en-v1.5 via Cloudflare Workers
+    // AI. Populated async after insert (fire-and-forget); doc is still
+    // keyword-searchable while embedding is pending. `null` = not yet
+    // computed or compute failed.
+    embedding: {
+        type: [Number],
+        default: undefined,    // sparse — only stored when populated
+    },
+
+    // Importance score 1-10, set async by deepseek-v4-flash after insert.
+    // Used by retrieval to weight high-signal events over chit-chat.
+    //   1-3  filler / acknowledgements / "lol"
+    //   4-6  normal discussion / questions / casual help
+    //   7-8  technical insights / decisions / vulnerabilities found
+    //   9-10 critical announcements / lore-worthy moments
+    importance: { type: Number, default: 5, min: 1, max: 10 },
 };
 
 export const indexedMessageSchema = new Schema(schema);

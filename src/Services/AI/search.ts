@@ -1,11 +1,14 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage, TextChannel, NewsChannel, ThreadChannel } from "discord.js";
 import { MessageCacheModel, IndexedMessageModel } from "../../Database/connect";
+import { embedViaWorker, cosineSimilarity, combinedRecallScore } from "./embeddings";
 
 const MAX_SEARCH_RESULTS = 8;             // hard cap on result rows fed back to the model
 const MAX_RESULT_CONTENT_CHARS = 220;     // per-message truncation in the structured output
 const INDEX_QUERY_LIMIT = 50;             // how many indexed matches to evaluate before truncating
 const DISCORD_FALLBACK_LIMIT = 100;       // how many recent messages to pull when index is sparse
 const MIN_INDEX_HITS = 3;                 // if index returns fewer matches than this, also fetch from Discord API
+const RECALL_CANDIDATE_LIMIT = 500;       // how many vectorized candidates to score for semantic recall
+const RECALL_MIN_SIMILARITY = 0.35;       // floor for "good enough" cosine similarity
 
 interface RawHit {
     authorId: string;
@@ -13,6 +16,8 @@ interface RawHit {
     content: string;
     createdTimestamp: number;
     source: 'cache' | 'discord' | 'index';
+    /** Importance score from the LLM-side classifier (1-10, default 5). */
+    importance?: number;
 }
 
 interface ParsedQuery {
@@ -120,6 +125,7 @@ async function searchIndex(
                 content,
                 createdTimestamp: new Date(d.createdAt).getTime(),
                 source: 'index',
+                importance: typeof d.importance === 'number' ? d.importance : 5,
             });
         }
         return hits;
@@ -251,7 +257,21 @@ export async function searchMessagesForTool(
     merge(cacheHits);
     merge(discordHits);
 
-    all.sort((a, b) => b.createdTimestamp - a.createdTimestamp);
+    // Two-way weighted scoring: recency (70%) + importance (30%). Replaces
+    // the previous "newest-first only" approach so a recent "lol" doesn't
+    // outrank a 2-day-old technical insight when both match the query.
+    const now = Date.now();
+    all.sort((a, b) => {
+        const ageA = (now - a.createdTimestamp) / (1000 * 60 * 60); // hours
+        const ageB = (now - b.createdTimestamp) / (1000 * 60 * 60);
+        const recA = Math.exp(-Math.log(2) * ageA / 24);             // 24h half-life
+        const recB = Math.exp(-Math.log(2) * ageB / 24);
+        const impA = (a.importance || 5) / 10;
+        const impB = (b.importance || 5) / 10;
+        const scoreA = 0.7 * recA + 0.3 * impA;
+        const scoreB = 0.7 * recB + 0.3 * impB;
+        return scoreB - scoreA;
+    });
     const top = all.slice(0, MAX_SEARCH_RESULTS).map<SearchToolMatch>((h) => ({
         authorId: h.authorId,
         authorName: h.authorName,
@@ -264,5 +284,125 @@ export async function searchMessagesForTool(
         matches: top,
         totalMatches: all.length,
         filter,
+    };
+}
+
+/* ─────────────────────── Semantic recall (recall_memory tool) ─────────────────────── */
+
+export interface RecallMemoryArgs {
+    query?: string;
+    limit?: number;
+    authorId?: string;
+}
+
+export interface RecallToolMatch extends SearchToolMatch {
+    similarity: number;     // cosine similarity 0..1
+    importance: number;     // 1-10
+}
+
+export interface RecallToolResult {
+    ok: boolean;
+    error?: 'missing_query' | 'embed_failed' | 'no_results';
+    matches?: RecallToolMatch[];
+    totalCandidates?: number;
+    filter?: { authorId?: string; channelId: string; guildId: string | null };
+}
+
+/**
+ * Semantic recall over indexed messages. Embeds the query via the worker,
+ * pulls ≤500 recent candidates from the same channel (optionally filtered
+ * by author), computes cosine similarity in Node, ranks by the combined
+ * recency + importance + similarity score from embeddings.ts, returns top-N.
+ *
+ * Complements `search_messages` (keyword) for paraphrased queries where the
+ * exact words don't appear ("cookie security" finding prior "session token"
+ * discussions, etc.).
+ */
+export async function recallMemoryForTool(
+    message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>,
+    args: RecallMemoryArgs,
+): Promise<RecallToolResult> {
+    const query = (args?.query || '').trim();
+    if (!query) return { ok: false, error: 'missing_query' };
+    const limit = Math.max(1, Math.min(MAX_SEARCH_RESULTS, Number(args?.limit) || 5));
+    const authorId = args?.authorId && /^\d{17,20}$/.test(args.authorId) ? args.authorId : undefined;
+
+    const guildId = message.guildId;
+    const channelId = message.channel.id;
+
+    // 1. Embed the query.
+    const queryVector = await embedViaWorker(query);
+    if (!queryVector) {
+        return { ok: false, error: 'embed_failed' };
+    }
+
+    // 2. Pull candidates (must have embedding stored).
+    const filter: any = {
+        guildId,
+        channelId,
+        embedding: { $exists: true, $ne: null },
+    };
+    if (authorId) filter.authorId = authorId;
+
+    let docs: any[] = [];
+    try {
+        docs = await IndexedMessageModel.find(filter)
+            .sort({ createdAt: -1 })
+            .limit(RECALL_CANDIDATE_LIMIT)
+            .select({
+                authorId: 1, authorDisplayName: 1, authorUsername: 1,
+                content: 1, createdAt: 1, embedding: 1, importance: 1, _id: 0,
+            })
+            .lean();
+    } catch (error) {
+        console.error('[Recall] candidate fetch failed:', error);
+        return { ok: false, error: 'no_results' };
+    }
+    if (docs.length === 0) return { ok: true, matches: [], totalCandidates: 0, filter: { authorId, channelId, guildId } };
+
+    // 3. Score each candidate.
+    const now = Date.now();
+    const scored = docs.map((d: any) => {
+        const emb: number[] = Array.isArray(d.embedding) ? d.embedding : [];
+        const sim = cosineSimilarity(queryVector, emb);
+        const ageHours = (now - new Date(d.createdAt).getTime()) / (1000 * 60 * 60);
+        const importance = typeof d.importance === 'number' ? d.importance : 5;
+        const score = combinedRecallScore(sim, importance, ageHours, 24);
+        return {
+            authorId: d.authorId,
+            authorName: d.authorDisplayName || d.authorUsername || 'unknown',
+            content: truncate(String(d.content || '').replace(/\n/g, ' '), MAX_RESULT_CONTENT_CHARS),
+            createdTimestamp: new Date(d.createdAt).getTime(),
+            similarity: sim,
+            importance,
+            score,
+        };
+    });
+
+    // 4. Filter by minimum semantic similarity (rejects pure-recency noise)
+    //    and take top-N by combined score.
+    const filtered = scored.filter((s) => s.similarity >= RECALL_MIN_SIMILARITY);
+    filtered.sort((a, b) => b.score - a.score);
+    const top = filtered.slice(0, limit).map<RecallToolMatch>((s) => ({
+        authorId: s.authorId,
+        authorName: s.authorName,
+        content: s.content,
+        relativeTime: relativeTime(s.createdTimestamp),
+        source: 'index',
+        similarity: Math.round(s.similarity * 1000) / 1000,
+        importance: s.importance,
+    }));
+
+    console.log(
+        `🧠 [Recall] query="${truncate(query, 60)}" → ` +
+        `candidates=${docs.length} above-threshold=${filtered.length} returned=${top.length}` +
+        (authorId ? ` author=<@${authorId}>` : ''),
+    );
+
+    return {
+        ok: true,
+        matches: top,
+        totalCandidates: docs.length,
+        filter: { authorId, channelId, guildId },
     };
 }

@@ -327,6 +327,55 @@ function concatChunks(chunks) {
     return out;
 }
 
+/* ── /embed handler ── */
+
+const EMBEDDING_MODEL = '@cf/baai/bge-small-en-v1.5';
+const EMBED_MAX_INPUT_CHARS = 2000;
+const EMBED_BATCH_LIMIT = 32;
+
+/**
+ * Run BGE-small-en-v1.5 on the input via Workers AI. Accepts either a single
+ * `text` string param or `texts=` JSON array (for batch). Returns 384-dim
+ * float vectors. Workers AI free tier covers our expected volume comfortably.
+ */
+async function handleEmbed(request, env, url) {
+    if (!env.AI) {
+        return json({ ok: false, error: 'ai_binding_missing' }, 503);
+    }
+    // Single via query string (used by the bot's per-message indexer).
+    const singleText = url.searchParams.get('text');
+    let inputs;
+    if (singleText) {
+        inputs = [singleText.slice(0, EMBED_MAX_INPUT_CHARS)];
+    } else if (request.method === 'POST') {
+        let body;
+        try { body = await request.json(); } catch { return json({ ok: false, error: 'invalid_json' }, 400); }
+        const arr = Array.isArray(body?.texts) ? body.texts : (body?.text ? [body.text] : null);
+        if (!arr) return json({ ok: false, error: 'missing_text' }, 400);
+        inputs = arr.slice(0, EMBED_BATCH_LIMIT).map((t) => String(t || '').slice(0, EMBED_MAX_INPUT_CHARS));
+    } else {
+        return json({ ok: false, error: 'missing_text' }, 400);
+    }
+    if (inputs.length === 0 || inputs.every((t) => !t.trim())) {
+        return json({ ok: false, error: 'empty_text' }, 400);
+    }
+    try {
+        const result = await env.AI.run(EMBEDDING_MODEL, { text: inputs });
+        // Workers AI returns { shape: [...], data: [[...384...], ...] } for batch
+        // or sometimes wraps a single in the same shape. Normalize.
+        const vectors = result?.data || result?.embeddings || [];
+        if (!Array.isArray(vectors) || vectors.length === 0) {
+            return json({ ok: false, error: 'empty_embeddings' }, 502);
+        }
+        if (singleText) {
+            return json({ ok: true, embedding: vectors[0], dim: vectors[0]?.length || 0, model: EMBEDDING_MODEL });
+        }
+        return json({ ok: true, embeddings: vectors, dim: vectors[0]?.length || 0, model: EMBEDDING_MODEL });
+    } catch (e) {
+        return json({ ok: false, error: 'embed_failed', detail: String(e?.message || e).slice(0, 200) }, 502);
+    }
+}
+
 /* ── entry ── */
 
 export default {
@@ -335,7 +384,7 @@ export default {
 
         // Liveness probe — no auth, just confirms worker is up.
         if (url.pathname === '/' || url.pathname === '/health') {
-            return json({ ok: true, name: 'hackerika-search', version: 1 });
+            return json({ ok: true, name: 'hackerika-search', version: 2, hasAi: !!env.AI });
         }
 
         if (!authOk(request, env)) {
@@ -353,6 +402,10 @@ export default {
             const t = (url.searchParams.get('url') || '').trim();
             if (!t) return json({ ok: false, error: 'missing_url' }, 400);
             return handleFetch(t);
+        }
+
+        if (url.pathname === '/embed') {
+            return handleEmbed(request, env, url);
         }
 
         return json({ ok: false, error: 'not_found' }, 404);

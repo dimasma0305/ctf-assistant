@@ -1,5 +1,6 @@
 import { Message as DiscordMessage } from "discord.js";
 import {MessageCacheModel, IndexedMessageModel} from "../../Database/connect";
+import { embedViaWorker, scoreImportance } from "./embeddings";
 
 export const MAX_CACHE_SIZE = 20; // Max number of messages to keep per channel cache
 
@@ -92,8 +93,42 @@ async function indexMessage(message: DiscordMessage): Promise<void> {
             },
             { upsert: true }
         );
+
+        // Async enrichment: embedding + importance score. Both fire-and-forget
+        // — the doc is already keyword-searchable above. Skipping these never
+        // breaks anything, just degrades recall quality.
+        const content = (message.content || '').trim();
+        if (content.length >= 4) {
+            const displayName = message.member?.displayName || message.author.username;
+            void enrichIndexedMessage(message.id, content, displayName);
+        }
     } catch (error) {
         console.error('[IndexedMessage] failed to index message:', error);
+    }
+}
+
+/**
+ * Compute embedding + importance in parallel and patch them onto the indexed
+ * doc. Silent on all failures — these are optional retrieval signals, not
+ * critical-path data.
+ */
+async function enrichIndexedMessage(
+    messageId: string,
+    content: string,
+    displayName: string,
+): Promise<void> {
+    try {
+        const [embedding, importance] = await Promise.all([
+            embedViaWorker(content),
+            scoreImportance(content, displayName),
+        ]);
+        const update: any = {};
+        if (Array.isArray(embedding) && embedding.length > 0) update.embedding = embedding;
+        if (typeof importance === 'number' && Number.isFinite(importance)) update.importance = importance;
+        if (Object.keys(update).length === 0) return;
+        await IndexedMessageModel.updateOne({ messageId }, { $set: update }).catch(() => undefined);
+    } catch {
+        // Silent — enrichment is best-effort.
     }
 }
 
