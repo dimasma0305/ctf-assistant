@@ -9,6 +9,12 @@ import {
     setUserTimezoneForTool,
 } from "./reminders";
 import { webSearchForTool, fetchUrlForTool } from "./web";
+import {
+    createTaskForTool,
+    listTasksForTool,
+    updateTaskForTool,
+    completeTaskForTool,
+} from "./tasks";
 
 /**
  * Native function-calling tool registry for Hackerika.
@@ -175,6 +181,113 @@ export const TOOL_DEFINITIONS = [
     {
         type: 'function' as const,
         function: {
+            name: 'create_task',
+            description:
+                'Register a persistent TASK for the caller — different from set_reminder! ' +
+                'Tasks = ongoing work lo track across sessions (multi-step, has notes, status, optional recurring follow-up). ' +
+                'Reminders = atomic one-shot timed pings. ' +
+                'Pake create_task pas user voice intent yang multi-step / open-ended ("aku mau ningkatin pwn", "bantu gw prep DEF CON quals", "ingetin gw weekly soal X"). ' +
+                'Once created, lo bisa proaktif follow-up daily via cron (system handle ini — lo ga perlu khawatir scheduling). ' +
+                'Quota: 20 active tasks per user.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    description: {
+                        type: 'string',
+                        description: 'Natural-language description of the task in your voice. Max 300 char. Contoh: "improve pwn skill", "weekly CVE digest", "prep buat DEF CON quals 2026".',
+                    },
+                    dueAtISO: {
+                        type: 'string',
+                        description: 'Optional ISO 8601 deadline with user-TZ offset. Skip kalo task open-ended.',
+                    },
+                    recurrence: {
+                        type: 'string',
+                        enum: ['none', 'daily', 'weekly', 'biweekly', 'monthly'],
+                        description: 'Optional follow-up cadence (default "none"). Pake weekly/biweekly buat ongoing check-ins.',
+                    },
+                    initialNote: {
+                        type: 'string',
+                        description: 'Optional first note jotting down context. Max 300 char.',
+                    },
+                },
+                required: ['description'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'list_tasks',
+            description:
+                'List active tasks for the caller. Default returns pending + in_progress. Pake kalo user nanya "tasks gw apa aja?", atau lo perlu inventory context. ' +
+                'Returns: taskId, description, status, recurrence, dueAt, lastWorkedOn, notes count. Ringkas natural, jangan dump JSON.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    status: {
+                        type: 'string',
+                        enum: ['pending', 'in_progress', 'done', 'cancelled'],
+                        description: 'Optional filter; defaults to active (pending + in_progress).',
+                    },
+                    limit: {
+                        type: 'number',
+                        description: 'Max results (default 10, max 20).',
+                    },
+                },
+                required: [],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'update_task',
+            description:
+                'Update a task: add a progress note or change status. Pake kalo user share update soal task yang udah ada ("gw udah selesai modul 1 nih"), atau lo natural inget pas conversation nyentuh topic-nya. ' +
+                'WAJIB tau taskId (call list_tasks dulu kalo belum). Note di-append (max 20 per task, oldest dropped).',
+            parameters: {
+                type: 'object',
+                properties: {
+                    taskId: {
+                        type: 'string',
+                        description: 'MongoDB ObjectId 24-hex from list_tasks.',
+                    },
+                    addNote: {
+                        type: 'string',
+                        description: 'Optional progress note to append. Max 300 char.',
+                    },
+                    status: {
+                        type: 'string',
+                        enum: ['pending', 'in_progress', 'done', 'cancelled'],
+                        description: 'Optional status change.',
+                    },
+                },
+                required: ['taskId'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'complete_task',
+            description:
+                'Mark a task as done. Pake pas user explicitly bilang udah selesai/achieved goal-nya, atau lo confident from context. ' +
+                'Shortcut for update_task({status:"done"}). Closes the task — cron berhenti follow-up.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    taskId: {
+                        type: 'string',
+                        description: 'MongoDB ObjectId 24-hex from list_tasks.',
+                    },
+                },
+                required: ['taskId'],
+            },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
             name: 'web_search',
             description:
                 'Search internet via Mojeek + DuckDuckGo Instant Answer in parallel. Free, no key. ' +
@@ -296,6 +409,22 @@ export async function dispatchTool(
         }
         if (name === 'set_user_timezone') {
             const result = await setUserTimezoneForTool(message, args || {});
+            return JSON.stringify(result);
+        }
+        if (name === 'create_task') {
+            const result = await createTaskForTool(message, args || {});
+            return JSON.stringify(result);
+        }
+        if (name === 'list_tasks') {
+            const result = await listTasksForTool(message, args || {});
+            return JSON.stringify(result);
+        }
+        if (name === 'update_task') {
+            const result = await updateTaskForTool(message, args || {});
+            return JSON.stringify(result);
+        }
+        if (name === 'complete_task') {
+            const result = await completeTaskForTool(message, args || {});
             return JSON.stringify(result);
         }
         if (name === 'web_search') {

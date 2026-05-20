@@ -67,6 +67,14 @@ export const schema = {
     comfort: { type: Number, default: 0, min: -100, max: 100 },
     chemistry: { type: Number, default: 0, min: -100, max: 100 },
 
+    // Implicit goals — things the user has voiced wanting to do/become but
+    // hasn't directly asked Hackerika about. Extracted during distillation.
+    // Capped at 5 (oldest evicted). Hackerika MAY reference these naturally
+    // when contextually relevant — same "MAY reference, NEVER dump" rule
+    // as moments. Examples: "improve pwn skill", "win DEF CON quals 2026",
+    // "land first job in security".
+    implicitGoals: { type: [String], default: [] },
+
     // Specific memorable exchanges with this user — capped at 8 (oldest dropped).
     // Each is one short sentence + a tone tag. Hackerika MAY reference these in
     // future replies when contextually relevant (callback humor / shared history)

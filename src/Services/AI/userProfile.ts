@@ -7,6 +7,8 @@ const MAX_DISTILL_EXCHANGES = 30;       // how many recent exchanges to feed in
 const FIELD_CHAR_BUDGET = 300;          // soft cap per profile field
 const MOMENT_CHAR_BUDGET = 160;         // soft cap per moment summary
 const MAX_MOMENTS = 8;                   // ring-buffer cap; oldest evicted
+const MAX_GOALS = 5;                      // implicit-goal cap; oldest evicted
+const GOAL_CHAR_BUDGET = 120;            // soft cap per goal string
 const MIN_RELATIONSHIP_VALUE = -100;     // floor for affection + 4 dims (matches schema)
 const MAX_RELATIONSHIP_VALUE = 100;      // ceiling for affection + 4 dims
 const MAX_DISPLAYED_MOMENTS = 4;         // how many we surface in the per-turn ctx (most recent)
@@ -42,6 +44,8 @@ export interface UserProfile {
     chemistry: number;
     /** Memorable specific exchanges, ring-buffered to MAX_MOMENTS. */
     moments: Moment[];
+    /** Implicit goals the user has voiced — extracted by distillation, capped at 5. */
+    implicitGoals: string[];
     /** IANA timezone (e.g. "Asia/Jakarta"); '' means not set — callers default. */
     timezone: string;
     interactionCount: number;
@@ -105,6 +109,13 @@ export function formatProfile(profile: UserProfile | null): string {
         parts.push(`moments:\n${lines.join('\n')}`);
     }
 
+    // Implicit goals — things they want but haven't directly asked me about.
+    // Surfaced so Hackerika can MAY-reference them naturally when context aligns.
+    if (profile.implicitGoals && profile.implicitGoals.length > 0) {
+        const lines = profile.implicitGoals.map((g) => `- ${g}`);
+        parts.push(`their-implicit-goals:\n${lines.join('\n')}`);
+    }
+
     if (profile.timezone) parts.push(`tz: ${profile.timezone}`);
     if (parts.length === 0) return '';
     return parts.join('\n');
@@ -119,6 +130,11 @@ function hydrateProfile(doc: any): UserProfile {
             tone: VALID_MOMENT_TONES.has(m.tone) ? (m.tone as MomentTone) : 'fun',
             createdAt: m.createdAt ? new Date(m.createdAt) : new Date(),
         }));
+    const rawGoals = Array.isArray(doc?.implicitGoals) ? doc.implicitGoals : [];
+    const implicitGoals: string[] = rawGoals
+        .filter((g: any) => typeof g === 'string' && g.trim().length > 0)
+        .map((g: string) => g.trim())
+        .slice(0, MAX_GOALS);
     return {
         userId: doc.userId,
         username: doc.username || '',
@@ -135,6 +151,7 @@ function hydrateProfile(doc: any): UserProfile {
         comfort: typeof doc.comfort === 'number' ? doc.comfort : 0,
         chemistry: typeof doc.chemistry === 'number' ? doc.chemistry : 0,
         moments,
+        implicitGoals,
         timezone: typeof doc.timezone === 'string' ? doc.timezone : '',
         interactionCount: doc.interactionCount || 0,
         lastDistilledAtCount: doc.lastDistilledAtCount || 0,
@@ -219,6 +236,8 @@ interface DistillationOutput {
     chemistry?: number;
     /** 0-2 newly-noticed memorable exchanges from these last turns. */
     newMoments?: Array<{ summary?: string; tone?: string }>;
+    /** Full set of implicit goals (replaces the previous list). Up to MAX_GOALS. */
+    implicitGoals?: string[];
 }
 
 function truncate(s: string, n: number): string {
@@ -272,7 +291,8 @@ Output ONLY a valid JSON object dengan field ini:
   "respect":   "INTEGER -100..100 — RESPECT. Apakah aku value contribution dia (teknis, intelektual, help member)? Naik dari: insight tajam, ngajarin hal baru, konsisten bantuin orang. Turun dari: dunning-kruger, asal nyolot tanpa substansi. Negative = aku actively dismissive of them. Cap [-100,100].",
   "comfort":   "INTEGER -100..100 — COMFORT. Apakah aku santai bisa jadi diri-sendiri sama dia? Naik dari: low friction, banter natural, predictable warm. Turun dari: intimidating vibes, judgmental, awkward energy. Negative = weird/creepy vibes / boundary-pushing bikin aku ga nyaman. Cap [-100,100].",
   "chemistry": "INTEGER -100..100 — CHEMISTRY. Banter/humor fit. Naik dari: jokes nyambung, tone sinkron, callback humor jalan, riff-on. Turun dari: humor maksa, garing terus, tone mismatch chronic. Negative = humor mereka actively bikin aku cringe / ga nyambung total. Cap [-100,100].",
-  "newMoments": "ARRAY of 0-2 objects, each { summary: '<max ${MOMENT_CHAR_BUDGET} char>', tone: 'fun'|'helpful'|'touching'|'tense'|'impressive' }. ONLY include kalo ada exchange yang BENERAN distinctive dan worth callback later (mis. joke spesifik, teaching moment, conflict-then-repair, vulnerability moment, impressive solve). Kalo ga ada yang stand out, return []. Jangan paksain."
+  "newMoments": "ARRAY of 0-2 objects, each { summary: '<max ${MOMENT_CHAR_BUDGET} char>', tone: 'fun'|'helpful'|'touching'|'tense'|'impressive' }. ONLY include kalo ada exchange yang BENERAN distinctive dan worth callback later (mis. joke spesifik, teaching moment, conflict-then-repair, vulnerability moment, impressive solve). Kalo ga ada yang stand out, return []. Jangan paksain.",
+  "implicitGoals": "ARRAY of strings (max ${MAX_GOALS} entries, each ≤${GOAL_CHAR_BUDGET} char). User's IMPLICIT goals — hal yang dia ekspresiin pengen lakuin/jadi/capai TAPI BELUM minta Hackerika bantuin secara langsung. Contoh: 'improve pwn skill', 'win DEF CON quals 2026', 'land first job in security', 'jadi top 10 di leaderboard tahun ini'. **Full list, BUKAN incremental** — output adalah deduped union dari goals yang udah ada + yang baru ke-detect. Drop goals yang udah completed atau jelas abandon. Empty array [] kalo belum ada signal. JANGAN ngarang goal yang user ga pernah voice."
 }
 
 ATURAN:
@@ -367,6 +387,24 @@ Output JSON profile update sekarang.`;
                 .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
                 .slice(-MAX_MOMENTS);
             update.moments = combined;
+        }
+
+        // ImplicitGoals: model returns the FULL deduplicated list (not
+        // incremental). Sanitize, dedupe, cap at MAX_GOALS.
+        if (Array.isArray((parsed as any).implicitGoals)) {
+            const seen = new Set<string>();
+            const cleanGoals: string[] = [];
+            for (const g of (parsed as any).implicitGoals) {
+                if (typeof g !== 'string') continue;
+                const s = g.trim();
+                if (!s) continue;
+                const key = s.toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                cleanGoals.push(truncate(s, GOAL_CHAR_BUDGET));
+                if (cleanGoals.length >= MAX_GOALS) break;
+            }
+            update.implicitGoals = cleanGoals;
         }
 
         await UserProfileModel.updateOne({ userId: profile.userId }, { $set: update });

@@ -17,6 +17,7 @@ import {userProfileSchema, type UserProfileSchemaType} from './userProfileSchema
 import {botStateSchema, type BotStateSchemaType} from './botStateSchema';
 import {reminderSchema, type ReminderSchemaType} from './reminderSchema';
 import {lorebookSchema, type LorebookSchemaType} from './lorebookSchema';
+import {taskSchema, type TaskSchemaType} from './taskSchema';
 import { getMongoUri } from '../utils/env';
 
 const DEFAULT_RETRY_DELAY_MS = Number(process.env.MONGO_CONNECT_RETRY_DELAY_MS || 2000);
@@ -107,6 +108,7 @@ export const UserProfileModel = mongoose.model("UserProfile", userProfileSchema)
 export const BotStateModel = mongoose.model("BotState", botStateSchema)
 export const ReminderModel = mongoose.model("Reminder", reminderSchema)
 export const LorebookModel = mongoose.model("LorebookEntry", lorebookSchema)
+export const TaskModel = mongoose.model("Task", taskSchema)
 
 export {
     EventSchemaType,
@@ -127,6 +129,7 @@ export {
     BotStateSchemaType,
     ReminderSchemaType,
     LorebookSchemaType,
+    TaskSchemaType,
 }
 
 export default {connect};
