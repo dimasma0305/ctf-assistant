@@ -18,6 +18,7 @@ import {botStateSchema, type BotStateSchemaType} from './botStateSchema';
 import {reminderSchema, type ReminderSchemaType} from './reminderSchema';
 import {lorebookSchema, type LorebookSchemaType} from './lorebookSchema';
 import {taskSchema, type TaskSchemaType} from './taskSchema';
+import {sharingChannelSchema, type SharingChannelSchemaType} from './sharingChannelSchema';
 import { getMongoUri } from '../utils/env';
 
 const DEFAULT_RETRY_DELAY_MS = Number(process.env.MONGO_CONNECT_RETRY_DELAY_MS || 2000);
@@ -109,6 +110,7 @@ export const BotStateModel = mongoose.model("BotState", botStateSchema)
 export const ReminderModel = mongoose.model("Reminder", reminderSchema)
 export const LorebookModel = mongoose.model("LorebookEntry", lorebookSchema)
 export const TaskModel = mongoose.model("Task", taskSchema)
+export const SharingChannelConfigModel = mongoose.model("SharingChannelConfig", sharingChannelSchema)
 
 export {
     EventSchemaType,
@@ -130,6 +132,7 @@ export {
     ReminderSchemaType,
     LorebookSchemaType,
     TaskSchemaType,
+    SharingChannelSchemaType,
 }
 
 export default {connect};

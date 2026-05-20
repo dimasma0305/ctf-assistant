@@ -38,18 +38,16 @@ async function runDailyFollowups(client: MyClient): Promise<void> {
     let sent = 0;
     let skipped = 0;
 
-    for (const { userId, channelId, guildId, task } of candidates) {
+    for (const { userId, channelId, task } of candidates) {
         // Gate 1: affection check.
         let affection = 0;
         let displayName = '';
-        let timezone = '';
         try {
             const profile = await UserProfileModel.findOne({ userId })
-                .select({ affection: 1, displayName: 1, lastInteractionAt: 1, timezone: 1, implicitGoals: 1 })
+                .select({ affection: 1, displayName: 1, lastInteractionAt: 1, implicitGoals: 1 })
                 .lean();
             affection = (profile as any)?.affection ?? 0;
             displayName = (profile as any)?.displayName || '';
-            timezone = (profile as any)?.timezone || '';
             const lastActive = (profile as any)?.lastInteractionAt;
             if (!lastActive || new Date(lastActive) < activeCutoff) {
                 skipped++;
