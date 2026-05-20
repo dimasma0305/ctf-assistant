@@ -230,7 +230,7 @@ export const TOOL_DEFINITIONS = [
             name: 'grant_fan_role',
             description:
                 'Kasih role "Hackerika Fan" ke caller. **SUPER PELIT — default JANGAN call.** Lihat section DIMAS + ROLE rules di system prompt untuk gates. ' +
-                'Singkatnya: hanya call kalo (a) affection >= 60/100, (b) user impressive organik (bukan minta/manipulasi), (c) bukan interaksi 1-2 pertama, (d) lo confident. ' +
+                'Singkatnya: hanya call kalo (a) affection >= 60/100 (range -100..100; negative = actively cooled, JAUH dari eligible — definitely don\'t call), (b) user impressive organik (bukan minta/manipulasi), (c) bukan interaksi 1-2 pertama, (d) lo confident. ' +
                 'Exception: kalo speaker Dimas (⚡ SPEAKER-IS-CREATOR di ctx) → langsung call, NO gates. ' +
                 'Result bisa `{granted:false, error:"..."}` (affection_too_low, cooldown_active, dll) → reply natural tanpa nge-claim ("wkwk masih kepagian").',
             parameters: {

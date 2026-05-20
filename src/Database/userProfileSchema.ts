@@ -34,32 +34,38 @@ export const schema = {
     // to "Asia/Jakarta" (community default) until then.
     timezone: { type: String, default: '' },
 
-    // Affection score 0-100. Hackerika's overall warmth toward this user.
+    // Affection score -100..100. Hackerika's overall warmth toward this user.
     // Drives the Hackerika Fan role gate (user must reach >= 60).
     // Tiers also serve as vulnerability gates for self-disclosure:
-    //   0-30  stranger/acquaintance — keep things polite, no personal mood
-    //   30-60 friend                — small embodiment cues OK
-    //   60-80 close / fan-worthy    — share preoccupations naturally
-    //   80-100 inner circle         — full sharing, diary references OK
-    affection: { type: Number, default: 0, min: 0, max: 100 },
+    //   -100..0 actively cold        — curt, terse, minimum effort (polite, not hostile)
+    //   0-30    stranger/acquaintance — keep things polite, no personal mood
+    //   30-60   friend                — small embodiment cues OK
+    //   60-80   close / fan-worthy    — share preoccupations naturally
+    //   80-100  inner circle          — full sharing, diary references OK
+    // Default 0 = neutral (no prior interactions). Negative = actively cooled
+    // by persistent rude / manipulative / role-begging behavior — not just
+    // "stranger". A real person doesn't go back to neutral when treated badly.
+    affection: { type: Number, default: 0, min: -100, max: 100 },
 
     // Snapshot of `affection` at the previous distillation. Lets us compute
     // a trajectory delta ("affection 65/100 +4 since last") so the model has
     // a sense of whether the relationship is climbing or stalling.
-    previousAffection: { type: Number, default: 0, min: 0, max: 100 },
+    previousAffection: { type: Number, default: 0, min: -100, max: 100 },
 
-    // Four independent relationship dimensions. They move separately:
-    //   trust:     0-100 — do I believe they're genuine? (consistency, honesty)
-    //   respect:   0-100 — do I value their input? (technical insight, helpfulness)
-    //   comfort:   0-100 — do I feel relaxed around them? (low friction, predictability)
-    //   chemistry: 0-100 — banter/humor fit (jokes land, tone syncs, playful rhythm)
+    // Four independent relationship dimensions. They move separately, share
+    // the same symmetric -100..100 range as affection:
+    //   trust:     belief in genuine/honest/consistent. Negative = caught lying / manipulation attempted.
+    //   respect:   value of their input (technical / intellectual). Negative = dunning-kruger loud / dismissive.
+    //   comfort:   relaxed-around-them. Negative = weird/creepy vibes / boundary pushing.
+    //   chemistry: banter/humor fit. Negative = tone mismatch chronic / humor doesn't land.
     // Same +0..+8 / -3..-8 per-distillation drift as `affection`. Independent
     // axes let the model tell apart "intimidating expert" (high respect, low comfort)
-    // from "fun banter buddy" (high chemistry, low respect).
-    trust: { type: Number, default: 0, min: 0, max: 100 },
-    respect: { type: Number, default: 0, min: 0, max: 100 },
-    comfort: { type: Number, default: 0, min: 0, max: 100 },
-    chemistry: { type: Number, default: 0, min: 0, max: 100 },
+    // from "fun banter buddy" (high chemistry, low respect) — or, with negatives,
+    // "actively distrusted but technically respected" (respect=70, trust=-40).
+    trust: { type: Number, default: 0, min: -100, max: 100 },
+    respect: { type: Number, default: 0, min: -100, max: 100 },
+    comfort: { type: Number, default: 0, min: -100, max: 100 },
+    chemistry: { type: Number, default: 0, min: -100, max: 100 },
 
     // Specific memorable exchanges with this user — capped at 8 (oldest dropped).
     // Each is one short sentence + a tone tag. Hackerika MAY reference these in

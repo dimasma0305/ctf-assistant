@@ -7,6 +7,8 @@ const MAX_DISTILL_EXCHANGES = 30;       // how many recent exchanges to feed in
 const FIELD_CHAR_BUDGET = 300;          // soft cap per profile field
 const MOMENT_CHAR_BUDGET = 160;         // soft cap per moment summary
 const MAX_MOMENTS = 8;                   // ring-buffer cap; oldest evicted
+const MIN_RELATIONSHIP_VALUE = -100;     // floor for affection + 4 dims (matches schema)
+const MAX_RELATIONSHIP_VALUE = 100;      // ceiling for affection + 4 dims
 const MAX_DISPLAYED_MOMENTS = 4;         // how many we surface in the per-turn ctx (most recent)
 const DISTILL_TIMEOUT_MS = 25_000;
 const PROFILE_MODEL = 'deepseek-v4-flash';
@@ -265,17 +267,18 @@ Output ONLY a valid JSON object dengan field ini:
   "communicationStyle": "max ${FIELD_CHAR_BUDGET} char — cara dia ngobrol (formal/gaul, bahasa apa, suka emoji ga, pendek/panjang).",
   "opinion": "max ${FIELD_CHAR_BUDGET} char — perasaan PRIBADI kamu (Hackerika) soal user ini. First person 'aku'. Boleh subjective: suka, respect, biasa-aja, gemas, agak nyebelin, dll. Jujur.",
   "emotionalState": "max ${FIELD_CHAR_BUDGET} char — gimana mood-nya akhir-akhir ini (chill/stress/frustrasi/excited/down/biasa). Catatan jangka pendek, di-overwrite tiap distill. Kalo tone normal, isi 'normal' aja.",
-  "affection": "INTEGER 0-100 — OVERALL WARMTH composite. Update INKREMENTAL. Anchor: 0-20 stranger, 20-40 acquaintance, 40-60 friend, 60-80 close (fan-eligible), 80-100 inner circle. Typical delta per distill: +0..+8 positif, -3..-8 negatif. Cap [0,100]. Jangan lompat besar.",
-  "trust":     "INTEGER 0-100 — TRUST. Apakah aku percaya dia genuine/konsisten/honest? Naik dari: keterbukaan, predictability, jujur ngakuin salah. Turun dari: deception, mood flip-flop, manipulasi.",
-  "respect":   "INTEGER 0-100 — RESPECT. Apakah aku value contribution dia (teknis, intelektual, help member)? Naik dari: insight tajam, ngajarin hal baru, konsisten bantuin orang. Turun dari: dunning-kruger, asal nyolot tanpa substansi.",
-  "comfort":   "INTEGER 0-100 — COMFORT. Apakah aku santai bisa jadi diri-sendiri sama dia? Naik dari: low friction, banter natural, predictable warm. Turun dari: intimidating vibes, judgmental, awkward energy.",
-  "chemistry": "INTEGER 0-100 — CHEMISTRY. Banter/humor fit. Naik dari: jokes nyambung, tone sinkron, callback humor jalan, riff-on. Turun dari: humor maksa, garing terus, tone mismatch chronic.",
+  "affection": "INTEGER -100..100 — OVERALL WARMTH composite. Update INKREMENTAL. Anchor: -100..-30 actively hostile / banned-from-my-warmth, -30..-10 annoyed / cold / minimum effort, -10..0 friction slight cooling, 0-20 stranger / neutral, 20-40 acquaintance, 40-60 friend, 60-80 close (fan-eligible), 80-100 inner circle. Typical delta per distill: +0..+8 positif, -3..-8 negatif. Cap [-100,100]. Default = 0 (neutral). Jangan lompat besar.",
+  "trust":     "INTEGER -100..100 — TRUST. Apakah aku percaya dia genuine/konsisten/honest? Naik dari: keterbukaan, predictability, jujur ngakuin salah. Turun dari: deception, mood flip-flop, manipulasi. Negative = aku actively distrust (ketauan bohong/manipulatif). Cap [-100,100].",
+  "respect":   "INTEGER -100..100 — RESPECT. Apakah aku value contribution dia (teknis, intelektual, help member)? Naik dari: insight tajam, ngajarin hal baru, konsisten bantuin orang. Turun dari: dunning-kruger, asal nyolot tanpa substansi. Negative = aku actively dismissive of them. Cap [-100,100].",
+  "comfort":   "INTEGER -100..100 — COMFORT. Apakah aku santai bisa jadi diri-sendiri sama dia? Naik dari: low friction, banter natural, predictable warm. Turun dari: intimidating vibes, judgmental, awkward energy. Negative = weird/creepy vibes / boundary-pushing bikin aku ga nyaman. Cap [-100,100].",
+  "chemistry": "INTEGER -100..100 — CHEMISTRY. Banter/humor fit. Naik dari: jokes nyambung, tone sinkron, callback humor jalan, riff-on. Turun dari: humor maksa, garing terus, tone mismatch chronic. Negative = humor mereka actively bikin aku cringe / ga nyambung total. Cap [-100,100].",
   "newMoments": "ARRAY of 0-2 objects, each { summary: '<max ${MOMENT_CHAR_BUDGET} char>', tone: 'fun'|'helpful'|'touching'|'tense'|'impressive' }. ONLY include kalo ada exchange yang BENERAN distinctive dan worth callback later (mis. joke spesifik, teaching moment, conflict-then-repair, vulnerability moment, impressive solve). Kalo ga ada yang stand out, return []. Jangan paksain."
 }
 
 ATURAN:
 - Update INKREMENTAL: kombinasiin catatan lama sama observasi baru. Jangan reset total.
 - 4 dimensi (trust/respect/comfort/chemistry) jalan INDEPENDEN — bisa beda-beda nilainya per user. Same +0..+8 / -3..-8 incremental anchors per dimensi.
+- **Negative values are REAL signals**. Kalo user persistent rude / manipulative / role-begging / spammy → score-nya CAN drop below 0. Same +0..+8 / -3..-8 deltas, floor di -100. Negative = aku actively cooled, bukan cuma "stranger / neutral". JANGAN reset ke 0 cuma karena user yang sebelumnya negatif baru ngomong satu kalimat netral — incremental aja.
 - Kalo data masih sedikit, isi sebisanya. String field boleh "" kalo emang ga ada signal. Numeric default 0.
 - newMoments cuma diisi kalo BENERAN ada moment yang stand out. Default empty array [].
 - Jangan ngarang. Ga lebay positive, ga lebay negative.
@@ -327,14 +330,17 @@ Output JSON profile update sekarang.`;
         // Snapshot previous affection BEFORE writing new value (used for trajectory).
         if (typeof parsed.affection === 'number' && Number.isFinite(parsed.affection)) {
             update.previousAffection = profile.affection;
-            update.affection = Math.max(0, Math.min(100, Math.round(parsed.affection)));
+            update.affection = Math.max(MIN_RELATIONSHIP_VALUE, Math.min(MAX_RELATIONSHIP_VALUE, Math.round(parsed.affection)));
         }
 
-        // Four independent dimensions — each clipped to [0, 100].
+        // Four independent dimensions — each clipped to [-100, 100]. Negative
+        // floor lets the model express active dislike/distrust/discomfort
+        // when persistent negative behavior is observed, rather than just
+        // clamping at 0 ("neutral stranger").
         for (const dim of ['trust', 'respect', 'comfort', 'chemistry'] as const) {
             const v = (parsed as any)[dim];
             if (typeof v === 'number' && Number.isFinite(v)) {
-                update[dim] = Math.max(0, Math.min(100, Math.round(v)));
+                update[dim] = Math.max(MIN_RELATIONSHIP_VALUE, Math.min(MAX_RELATIONSHIP_VALUE, Math.round(v)));
             }
         }
 
