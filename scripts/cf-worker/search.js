@@ -125,28 +125,46 @@ function isDdgAd(rawHref, unwrappedUrl, chunk) {
 }
 
 function parseDdgHtml(html, max) {
+    // DDG's HTML layout changed (around mid-2026): they stopped wrapping each
+    // result with a unique outer container class `result results_links`. The
+    // old `html.split(/<div class="result results_links/i)` strategy now finds
+    // 0 chunks → 0 results. Result URLs are also now stored DIRECTLY in href
+    // (not via /l/?uddg= redirect wrapper).
+    //
+    // New strategy: scan for every `class="result__a"` anchor (which IS still
+    // stable), capture href + inner text, then for each title look ahead until
+    // the next title for the paired `result__snippet`.
     const results = [];
-    const chunks = html.split(/<div\s+class="result\s+results_links/i);
-    for (let i = 1; i < chunks.length && results.length < max; i++) {
-        const chunk = chunks[i].slice(0, 6000);
-        // Skip ad-shaped result containers up front.
-        if (/result\s+results_links\s+result--ad/i.test(chunk.slice(0, 200))) continue;
-        const title = chunk.match(/<a\b[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
-        if (!title) continue;
-        const rawHref = title[1].replace(/&amp;/g, '&');
-        const url = unwrapDdgRedirect(rawHref);
+    const anchorRegex = /<a\b[^>]*\bclass="result__a"[^>]*\bhref="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+    const titleHits = [];
+    let m;
+    while ((m = anchorRegex.exec(html)) !== null) {
+        titleHits.push({ pos: m.index, href: m[1], titleHtml: m[2] });
+    }
+
+    for (let i = 0; i < titleHits.length && results.length < max; i++) {
+        const hit = titleHits[i];
+        const segEnd = i + 1 < titleHits.length ? titleHits[i + 1].pos : html.length;
+        const segment = html.slice(hit.pos, Math.min(segEnd, hit.pos + 4000));
+
+        const rawHref = hit.href.replace(/&amp;/g, '&');
+        const url = unwrapDdgRedirect(rawHref);   // no-op on direct URLs, still unwraps legacy /l/?uddg= if present
         if (!/^https?:\/\//i.test(url)) continue;
-        if (isDdgAd(rawHref, url, chunk)) continue;
+        if (isDdgAd(rawHref, url, segment)) continue;
+
+        // Snippet is optional — some DDG results have none.
         let snippet = '';
-        const sA = chunk.match(/<a\b[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/i);
-        if (sA) snippet = stripHtml(sA[1]);
-        else {
-            const sD = chunk.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/(?:div|td|span)>/i);
+        const sA = segment.match(/<a\b[^>]*\bclass="result__snippet"[^>]*>([\s\S]*?)<\/a>/i);
+        if (sA) {
+            snippet = stripHtml(sA[1]);
+        } else {
+            const sD = segment.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/(?:div|td|span|a)>/i);
             if (sD) snippet = stripHtml(sD[1]);
         }
-        const ttl = stripHtml(title[2]);
-        if (!ttl) continue;
-        results.push({ title: ttl, url, snippet: truncate(snippet, 280) });
+
+        const title = stripHtml(hit.titleHtml);
+        if (!title) continue;
+        results.push({ title, url, snippet: truncate(snippet, 280) });
     }
     return results;
 }
@@ -236,10 +254,21 @@ async function handleSearch(query, max) {
             out.engine = ddg.results.length > 0 ? 'duckduckgo' : 'mojeek';
         } else {
             out.engine = 'none';
-            if (serp.error === 'blocked') {
-                out.note = `both engines blocked (ddg=${ddg.httpStatus || '?'}, mojeek=${serp.httpStatus || '?'})`;
+            // More precise note: distinguish "DDG parse-empty + Mojeek blocked" from
+            // "both blocked" from "genuinely 0 results".
+            const ddgState = ddg.error
+                ? `ddg=${ddg.error}(${ddg.httpStatus || '?'})`
+                : `ddg=0-results(http ${ddg.httpStatus || 200})`;
+            const mojeekState = serp === ddg
+                ? 'mojeek=not-tried'
+                : serp.error
+                    ? `mojeek=${serp.error}(${serp.httpStatus || '?'})`
+                    : `mojeek=0-results`;
+            if ((ddg.error === 'blocked' || ddg.error === 'http_error') &&
+                serp !== ddg && (serp.error === 'blocked' || serp.error === 'http_error')) {
+                out.note = `both engines blocked (${ddgState}, ${mojeekState})`;
             } else if (!instant) {
-                out.note = 'no results';
+                out.note = `no results (${ddgState}, ${mojeekState})`;
             }
         }
         return json(out);
@@ -406,6 +435,77 @@ export default {
 
         if (url.pathname === '/embed') {
             return handleEmbed(request, env, url);
+        }
+
+        // Diagnostic: introspect what DDG + Mojeek actually return from CF
+        // edge for a given query. Auth required. Output trims body to keep
+        // response manageable. Use this when /search returns 0 results to
+        // figure out whether the engine is blocking us, layout-changed, or
+        // genuinely empty.
+        if (url.pathname === '/debug-search') {
+            const q = (url.searchParams.get('q') || 'test').trim();
+            const out = { query: q };
+
+            // Probe DDG HTML
+            try {
+                const body = new URLSearchParams({ q, b: '', kl: 'wt-wt' });
+                const r = await fetch('https://html.duckduckgo.com/html/', {
+                    method: 'POST',
+                    headers: {
+                        'User-Agent': BROWSER_UA,
+                        'Accept': 'text/html,application/xhtml+xml',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Origin': 'https://duckduckgo.com',
+                        'Referer': 'https://duckduckgo.com/',
+                    },
+                    body: body.toString(),
+                });
+                const text = await r.text();
+                // Find the first occurrence of result__a and grab ~1500 chars
+                // around it so we can see the actual current HTML structure.
+                const firstAnchorIdx = text.indexOf('result__a');
+                const anchorContext = firstAnchorIdx >= 0
+                    ? text.slice(Math.max(0, firstAnchorIdx - 200), firstAnchorIdx + 1500)
+                    : '(no result__a found)';
+                out.ddg = {
+                    status: r.status,
+                    bodyLen: text.length,
+                    titleMatch: (text.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [, ''])[1].trim(),
+                    resultBlockCount: (text.match(/result\s+results_links/gi) || []).length,
+                    resultAnchorCount: (text.match(/class="result__a"/gi) || []).length,
+                    anomaly: text.toLowerCase().includes('anomaly'),
+                    rateLimit: text.toLowerCase().includes('rate limit') || text.includes('too many requests'),
+                    anchorContext,
+                };
+            } catch (e) {
+                out.ddg = { error: String(e && e.message || e) };
+            }
+
+            // Probe Mojeek
+            try {
+                const r = await fetch('https://www.mojeek.com/search?q=' + encodeURIComponent(q), {
+                    headers: {
+                        'User-Agent': BROWSER_UA,
+                        'Accept': 'text/html,application/xhtml+xml',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Referer': 'https://www.mojeek.com/',
+                    },
+                });
+                const text = await r.text();
+                out.mojeek = {
+                    status: r.status,
+                    bodyLen: text.length,
+                    titleMatch: (text.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [, ''])[1].trim(),
+                    resultLiCount: (text.match(/<li class="r\d+"/g) || []).length,
+                    anomaly: text.toLowerCase().includes('automated quer'),
+                    bodyHead: text.slice(0, 400),
+                };
+            } catch (e) {
+                out.mojeek = { error: String(e && e.message || e) };
+            }
+
+            return json(out);
         }
 
         return json({ ok: false, error: 'not_found' }, 404);
