@@ -83,6 +83,52 @@ function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// DeepSeek occasionally leaks its internal tool-call chat-template tokens as
+// plain text `content` instead of routing them through the structured
+// `tool_calls` field. The leaked block looks like:
+//   <｜｜DSML｜｜tool_calls>
+//   <｜｜DSML｜｜invoke name="search_messages">
+//   <｜｜DSML｜｜parameter name="query" string="true">foo</｜｜DSML｜｜parameter>
+//   </｜｜DSML｜｜invoke>
+//   </｜｜DSML｜｜tool_calls>
+// where `｜` is U+FF5C (fullwidth vertical line). We salvage by parsing,
+// executing through the normal dispatcher, and continuing the loop as if the
+// model had emitted structured tool_calls. If parsing yields nothing, we
+// strip the markers so the user never sees raw template tokens.
+const DSML_BLOCK_REGEX = /<｜｜DSML｜｜tool_calls>([\s\S]*?)<\/｜｜DSML｜｜tool_calls>/g;
+const DSML_INVOKE_REGEX = /<｜｜DSML｜｜invoke name="([^"]+)">([\s\S]*?)<\/｜｜DSML｜｜invoke>/g;
+const DSML_PARAM_REGEX = /<｜｜DSML｜｜parameter name="([^"]+)"[^>]*>([\s\S]*?)<\/｜｜DSML｜｜parameter>/g;
+const DSML_ORPHAN_TAG_REGEX = /<\/?｜｜DSML｜｜[^>]*>/g;
+
+function hasDsmlLeakage(text: string): boolean {
+    return text.includes('｜｜DSML｜｜');
+}
+
+function coerceArgValue(raw: string): any {
+    const trimmed = raw.trim();
+    if (trimmed === '') return '';
+    try { return JSON.parse(trimmed); } catch { /* fall through */ }
+    return trimmed;
+}
+
+function parseLeakedToolCalls(text: string): { calls: Array<{ name: string; args: any }>; stripped: string } {
+    const calls: Array<{ name: string; args: any }> = [];
+    const blockMatches = [...text.matchAll(DSML_BLOCK_REGEX)];
+    for (const block of blockMatches) {
+        const inner = block[1];
+        const invokeMatches = [...inner.matchAll(DSML_INVOKE_REGEX)];
+        for (const inv of invokeMatches) {
+            const args: Record<string, any> = {};
+            for (const p of inv[2].matchAll(DSML_PARAM_REGEX)) {
+                args[p[1]] = coerceArgValue(p[2]);
+            }
+            calls.push({ name: inv[1], args });
+        }
+    }
+    const stripped = text.replace(DSML_BLOCK_REGEX, '').replace(DSML_ORPHAN_TAG_REGEX, '').trim();
+    return { calls, stripped };
+}
+
 /**
  * Parse the model output into "burst" messages — the way a real person
  * splits chat into separate sends. A blank line between paragraphs counts
@@ -867,7 +913,49 @@ export async function handleAIChat(
                 continue;
             }
 
-            finalContent = (choiceMsg.content || '').trim();
+            const rawContent = choiceMsg.content || '';
+
+            // Tool-call leakage salvage: DeepSeek sometimes emits its internal
+            // chat-template tokens as plain text instead of structured tool_calls.
+            // Recover the intended calls, execute them, and keep looping as if
+            // the model had routed them properly.
+            if (hasDsmlLeakage(rawContent)) {
+                const { calls, stripped } = parseLeakedToolCalls(rawContent);
+                if (calls.length > 0) {
+                    console.warn(`[Tool] salvaged ${calls.length} leaked DSML tool call(s) from text content`);
+                    const synthesized = calls.map((c, i) => ({
+                        id: `salvage_${Date.now()}_${i}`,
+                        type: 'function' as const,
+                        function: { name: c.name, arguments: JSON.stringify(c.args) },
+                    }));
+                    conversation.push({ role: 'assistant', content: stripped || null, tool_calls: synthesized });
+                    for (let i = 0; i < calls.length; i++) {
+                        const { name, args } = calls[i];
+                        console.log(`🛠️  [Tool/salvaged] ${name}(${JSON.stringify(args)}) for ${author} (${userId})`);
+                        const resultStr = await dispatchTool(name, args, message);
+                        if (name === 'grant_fan_role') {
+                            try { if (JSON.parse(resultStr).granted) grantSucceeded = true; } catch { /* ignore */ }
+                        }
+                        conversation.push({
+                            role: 'tool',
+                            tool_call_id: synthesized[i].id,
+                            content: resultStr,
+                        });
+                        totalToolCalls++;
+                    }
+                    if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) {
+                        console.warn(`[Tool] hit MAX_TOTAL_TOOL_CALLS (${MAX_TOTAL_TOOL_CALLS}) after salvage; forcing final completion`);
+                        break;
+                    }
+                    continue;
+                }
+                // DSML markers present but unparseable — fall through with stripped text.
+                console.warn('[Tool] DSML markers present in content but no parseable calls; stripping markers');
+                finalContent = stripped;
+                break;
+            }
+
+            finalContent = rawContent.trim();
             break;
         }
 
@@ -884,6 +972,10 @@ export async function handleAIChat(
                 { signal: controller.signal }
             );
             finalContent = (fallback.choices[0]?.message?.content || '').trim();
+            if (hasDsmlLeakage(finalContent)) {
+                console.warn('[Tool] DSML leaked from tool_choice:none fallback; stripping');
+                finalContent = parseLeakedToolCalls(finalContent).stripped;
+            }
         }
 
         if (!finalContent) {
@@ -901,6 +993,12 @@ export async function handleAIChat(
         finalContent = finalContent.replace(LEADING_SPEAKER_TAG_REGEX, '').trim();
         if (finalContent !== beforeStrip.trim()) {
             console.log('[Attribution] stripped accidental self-prefix from model output');
+        }
+        // Final DSML guard: any leaked tool-template tokens that made it this
+        // far get stripped so the user never sees raw chat-template syntax.
+        if (hasDsmlLeakage(finalContent)) {
+            console.warn('[Tool] DSML markers reached final output — stripping defensively');
+            finalContent = parseLeakedToolCalls(finalContent).stripped;
         }
         if (!finalContent) {
             rollbackUserMessage();
