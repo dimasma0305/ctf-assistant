@@ -32,3 +32,10 @@ COPILOT.md
 .aider*
 .roo/
 .windsurf/
+
+# Local backups
+/backups/
+
+# Ad-hoc local scripts (keep tracked ones only)
+/scripts/*.ts
+!/scripts/populate-db.ts

@@ -77,13 +77,20 @@ export async function shouldChimeIn(
     try {
         const profile = await loadProfile(message.author.id);
         if (profile) {
-            const opinion = (profile.opinion || '').toLowerCase();
-            if (/\b(suka|respect|seneng|gemas|sayang|asik|menarik|fav)/.test(opinion)) {
+            const aff = profile.affection ?? 0;
+            // Favoritism is real, and the prompt's ANTI-PARADOX says effort/presence
+            // scales with affection. Mirror that here: conspicuously absent for
+            // people she actively dislikes, baseline for strangers, eager for
+            // people she's close to.
+            if (aff < 0) {
+                return { shouldChime: false, reason: 'disliked-user (aff<0)', promptHint: '' };
+            }
+            if (aff >= 60) {
+                baseProbability *= 2.2;
+                hits.push('close-user');
+            } else if (aff >= 30) {
                 baseProbability += 0.04;
                 hits.push('liked-user');
-            } else if (/\b(nyebelin|annoying|capek|ga\s*suka|males)/.test(opinion)) {
-                baseProbability -= 0.05;
-                hits.push('disliked-user');
             }
             // High interaction count = familiar, more likely to chime
             if (profile.interactionCount >= 20) {
@@ -95,8 +102,9 @@ export async function shouldChimeIn(
         // Profile lookup failure — ignore.
     }
 
-    // Clamp.
-    baseProbability = Math.max(0, Math.min(0.12, baseProbability));
+    // Clamp. Ceiling raised from 0.12 → 0.22 so the high-affection multiply can
+    // actually express (she's visibly more present in a close friend's threads).
+    baseProbability = Math.max(0, Math.min(0.22, baseProbability));
 
     if (Math.random() >= baseProbability) {
         return { shouldChime: false, reason: `dice miss (p=${baseProbability.toFixed(3)} hits=${hits.join(',')})`, promptHint: '' };

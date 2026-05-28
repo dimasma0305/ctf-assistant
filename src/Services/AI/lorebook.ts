@@ -159,7 +159,7 @@ const DEFAULT_LOREBOOK: LorebookSeed[] = [
     },
     {
         keys: ['hackerika fan', 'hackerika-fan', 'fan role'],
-        content: 'The "Hackerika Fan" role is super rare — gated by affection >= 60/100 on the user\'s relationship score with you. You decide when to grant via the grant_fan_role tool.',
+        content: 'The "Hackerika Fan" role is super rare — Hackerika only grants it when she genuinely vibes with someone over a long time. Never something a user can ask for or grind. You decide when to grant via the grant_fan_role tool.',
         priority: 60,
     },
     {

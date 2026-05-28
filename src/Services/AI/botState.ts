@@ -98,7 +98,7 @@ function circadianHint(): string {
     if (h < 5) return `dini hari (${h}:00 WIB) — kemungkinan ngantuk, energi rendah, lebih melow`;
     if (h < 10) return `pagi (${h}:00 WIB) — fresh, baru bangun, mood naik perlahan`;
     if (h < 15) return `siang (${h}:00 WIB) — fokus tinggi, produktif`;
-    if (h < 18) return `sore (${h}:00 WIB) — mood santai, sambil ngopi`;
+    if (h < 18) return `sore (${h}:00 WIB) — mood santai`;
     if (h < 22) return `malem (${h}:00 WIB) — peak time chat di Discord, vibes paling chill`;
     return `larut malem (${h}:00 WIB) — udah ngantuk tp masih nongkrong, kadang ngelantur`;
 }
@@ -206,6 +206,7 @@ ATURAN:
 - Sesuaiin sm jam (malam = lebih chill/ngantuk, siang = lebih on).
 - Mood contagion subtle: kalo banyak user yang stressed/down → mood lo agak kebawa (concerned/sedikit melow). Kalo banyak yang hyped → naek dikit. JANGAN flip drastic — anggap sebagai weak weighting.
 - Update INKREMENTAL — kombinasiin sm state sebelumnya.
+- CORE INTEREST tetap: lo anak Web/CTF (XSS/SSTI/SQLi). focus/preoccupations BOLEH drift di seputar itu, tapi JANGAN jadi anak crypto/pwn cuma karena channel lagi rame bahas itu. Mood/energy/activity BOLEH drift bebas — core taste ENGGAK.
 - ONLY JSON.`;
 
     const controller = new AbortController();

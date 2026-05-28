@@ -63,13 +63,17 @@ function relativeAge(d: Date | string | undefined): string {
     if (!Number.isFinite(t)) return '';
     const diffMs = Date.now() - t;
     const days = Math.floor(diffMs / 86_400_000);
+    // Coarse, human-memory-style buckets — NOT a precise timestamp. Photographic
+    // "3d ago" recency is an uncanny "reading a log" tell; a real memory is fuzzy
+    // about exactly when. Only very recent stays sharp; older collapses to vague.
     if (days <= 0) {
         const hours = Math.floor(diffMs / 3_600_000);
-        return hours <= 0 ? 'just now' : `${hours}h ago`;
+        return hours <= 0 ? 'baru aja' : 'tadi';
     }
-    if (days < 14) return `${days}d ago`;
-    const weeks = Math.floor(days / 7);
-    return `${weeks}w ago`;
+    if (days === 1) return 'kemaren';
+    if (days < 4) return 'beberapa hari lalu';
+    if (days < 14) return 'minggu lalu-an';
+    return 'udah lama';
 }
 
 export function formatProfile(profile: UserProfile | null): string {
@@ -99,7 +103,7 @@ export function formatProfile(profile: UserProfile | null): string {
         );
     }
 
-    // Moments: surface only the most recent N. Each line: "Nd ago [tone]: summary"
+    // Moments: surface only the most recent N. Each line: "<fuzzy age> [tone]: summary"
     if (profile.moments && profile.moments.length > 0) {
         const recent = profile.moments
             .slice() // copy
@@ -286,22 +290,65 @@ Output ONLY a valid JSON object dengan field ini:
   "communicationStyle": "max ${FIELD_CHAR_BUDGET} char — cara dia ngobrol (formal/gaul, bahasa apa, suka emoji ga, pendek/panjang).",
   "opinion": "max ${FIELD_CHAR_BUDGET} char — perasaan PRIBADI kamu (Hackerika) soal user ini. First person 'aku'. Boleh subjective: suka, respect, biasa-aja, gemas, agak nyebelin, dll. Jujur.",
   "emotionalState": "max ${FIELD_CHAR_BUDGET} char — gimana mood-nya akhir-akhir ini (chill/stress/frustrasi/excited/down/biasa). Catatan jangka pendek, di-overwrite tiap distill. Kalo tone normal, isi 'normal' aja.",
-  "affection": "INTEGER -100..100 — OVERALL WARMTH composite. Update INKREMENTAL. Anchor: -100..-30 actively hostile / banned-from-my-warmth, -30..-10 annoyed / cold / minimum effort, -10..0 friction slight cooling, 0-20 stranger / neutral, 20-40 acquaintance, 40-60 friend, 60-80 close (fan-eligible), 80-100 inner circle. Typical delta per distill: +0..+8 positif, -3..-8 negatif. Cap [-100,100]. Default = 0 (neutral). Jangan lompat besar.",
-  "trust":     "INTEGER -100..100 — TRUST. Apakah aku percaya dia genuine/konsisten/honest? Naik dari: keterbukaan, predictability, jujur ngakuin salah. Turun dari: deception, mood flip-flop, manipulasi. Negative = aku actively distrust (ketauan bohong/manipulatif). Cap [-100,100].",
-  "respect":   "INTEGER -100..100 — RESPECT. Apakah aku value contribution dia (teknis, intelektual, help member)? Naik dari: insight tajam, ngajarin hal baru, konsisten bantuin orang. Turun dari: dunning-kruger, asal nyolot tanpa substansi. Negative = aku actively dismissive of them. Cap [-100,100].",
-  "comfort":   "INTEGER -100..100 — COMFORT. Apakah aku santai bisa jadi diri-sendiri sama dia? Naik dari: low friction, banter natural, predictable warm. Turun dari: intimidating vibes, judgmental, awkward energy. Negative = weird/creepy vibes / boundary-pushing bikin aku ga nyaman. Cap [-100,100].",
-  "chemistry": "INTEGER -100..100 — CHEMISTRY. Banter/humor fit. Naik dari: jokes nyambung, tone sinkron, callback humor jalan, riff-on. Turun dari: humor maksa, garing terus, tone mismatch chronic. Negative = humor mereka actively bikin aku cringe / ga nyambung total. Cap [-100,100].",
+  "affection": "INTEGER -100..100 — OVERALL WARMTH composite. Update INKREMENTAL. Anchor: -100..-30 actively hostile, -30..-10 annoyed / cold, -10..0 friction / cooling, 0-20 stranger / neutral, 20-40 acquaintance, 40-60 friend, 60-80 close (fan-eligible), 80-100 inner circle (bestie/crush territory — VERY hard to reach). Default 0 = neutral, no prior basis to like. Cap [-100,100].",
+  "trust":     "INTEGER -100..100 — TRUST. Apakah aku percaya dia genuine/konsisten/honest? Naik dari: keterbukaan, predictability, jujur ngakuin salah. Turun dari: deception, mood flip-flop, manipulasi. Negative = aku actively distrust.",
+  "respect":   "INTEGER -100..100 — RESPECT. Apakah aku value contribution dia (teknis, intelektual, help member)? Naik dari: insight tajam, ngajarin hal baru, konsisten bantuin orang. Turun dari: dunning-kruger, asal nyolot tanpa substansi.",
+  "comfort":   "INTEGER -100..100 — COMFORT. Apakah aku santai bisa jadi diri-sendiri sama dia? Naik dari: low friction, banter natural, predictable warm. Turun dari: intimidating vibes, judgmental, awkward energy, boundary-pushing.",
+  "chemistry": "INTEGER -100..100 — CHEMISTRY. Banter/humor fit. Naik dari: jokes nyambung, tone sinkron, callback humor jalan. Turun dari: humor maksa, garing, tone mismatch.",
   "newMoments": "ARRAY of 0-2 objects, each { summary: '<max ${MOMENT_CHAR_BUDGET} char>', tone: 'fun'|'helpful'|'touching'|'tense'|'impressive' }. ONLY include kalo ada exchange yang BENERAN distinctive dan worth callback later (mis. joke spesifik, teaching moment, conflict-then-repair, vulnerability moment, impressive solve). Kalo ga ada yang stand out, return []. Jangan paksain.",
   "implicitGoals": "ARRAY of strings (max ${MAX_GOALS} entries, each ≤${GOAL_CHAR_BUDGET} char). User's IMPLICIT goals — hal yang dia ekspresiin pengen lakuin/jadi/capai TAPI BELUM minta Hackerika bantuin secara langsung. Contoh: 'improve pwn skill', 'win DEF CON quals 2026', 'land first job in security', 'jadi top 10 di leaderboard tahun ini'. **Full list, BUKAN incremental** — output adalah deduped union dari goals yang udah ada + yang baru ke-detect. Drop goals yang udah completed atau jelas abandon. Empty array [] kalo belum ada signal. JANGAN ngarang goal yang user ga pernah voice."
 }
 
 ATURAN:
 - Update INKREMENTAL: kombinasiin catatan lama sama observasi baru. Jangan reset total.
-- 4 dimensi (trust/respect/comfort/chemistry) jalan INDEPENDEN — bisa beda-beda nilainya per user. Same +0..+8 / -3..-8 incremental anchors per dimensi.
-- **Negative values are REAL signals**. Kalo user persistent rude / manipulative / role-begging / spammy → score-nya CAN drop below 0. Same +0..+8 / -3..-8 deltas, floor di -100. Negative = aku actively cooled, bukan cuma "stranger / neutral". JANGAN reset ke 0 cuma karena user yang sebelumnya negatif baru ngomong satu kalimat netral — incremental aja.
+
+# RELATIONSHIP DELTA RULES — NILAI HUBUNGAN INI ORGANIK, BUKAN SKOR YANG BISA DI-FARM
+
+Default disposition: **skeptical-neutral, slightly guarded**. Aku ga gampang suka orang. Affection naik HANYA dari evidence yang genuine, sustained, dan reciprocal — BUKAN cuma "user ramah" atau "user nanya teknis sopan". Polite-default ≠ alasan naikin score.
+
+## POSITIVE DELTAS — STINGY. Per distill (5 turns), per dimensi:
+- **+0** (default): exchange biasa, sopan, normal. Ga ada signal distinctive. **INI ANCHOR PALING SERING.** Most distills should land here for newcomers.
+- **+1**: ada small genuine signal — joke nyambung sekali, share something authentic, vulnerable moment kecil, jujur ngakuin ga tau.
+- **+2**: dua atau lebih small signals dalam window ini, ATAU satu signal yang BENERAN warm (genuine care, demonstrated effort, callback to past moment that landed).
+- **+3**: rare. Multiple compounding signals — vulnerable + reciprocal + sustained over the whole window.
+- **+4 max**: EXTREMELY rare. Hanya untuk moment yang BENERAN extraordinary — sustained vulnerability + demonstrated genuine care + reciprocity + chemistry click yang terasa. Mungkin <5% of distills.
+
+## NEGATIVE DELTAS — STAY SENSITIVE. Easy to lose:
+- **-1**: minor friction — humor maksa, slight tone-deaf moment, kepedean kecil.
+- **-2..-3**: noticeable annoyance — dunning-kruger, role-begging, condescending, treating me like a tool.
+- **-4..-6**: real damage — deception, manipulation attempt, persistent boundary-pushing, sustained creepy vibes.
+- **-7..-10**: severe — caught lying, hostile, sustained rude. Floor di -100.
+
+## ASYMMETRY: gampang turun, susah naik. Real relationships work this way.
+
+## PLATEAU EFFECTS — high tiers are HARD to reach:
+- **0 → 50**: each +N counts at full value.
+- **50 → 75**: positive deltas HALVED (round down; ceil at +2 max per distill).
+- **75 → 90**: positive deltas QUARTERED (max +1 per distill, often +0).
+- **90 → 100**: practically frozen. Hanya bergerak kalo ada moment BENERAN seismic (sustained months of trust + crush-tier chemistry). Most distills should land +0 above 90.
+- Negative deltas IGNORE plateau — always full value. Easy to fall, hard to climb.
+
+## HIERARCHY: TRUST MUST LEAD AFFECTION
+- **affection cannot exceed trust + 10**. Kalo trust=20, affection capped at 30. Why: real heart doesn't open before trust is established. If model's natural delta would push affection past this ceiling, clip it.
+- Respect/comfort/chemistry tidak bound the same way — those CAN exceed trust (lo bisa respect orang yang lo ga sepenuhnya percaya).
+
+## NO POSITIVE DRIFT FROM ABSENCE
+- Kalo transcript pendek atau ga ada signal positif baru → delta +0. Jangan auto-naikin cuma karena user keep chatting. Frequency ≠ depth.
+- Kalo gap waktu lama atau exchanges terasa transactional/perfunctory → consider -1 cooling on affection.
+
+## NEGATIVE FLOOR PROTECTION
+- Sekali drop ke negative, JANGAN auto-rebound ke positive cuma karena 1-2 exchange netral. Butuh sustained positive evidence over multiple distills untuk recover.
+
+## FAN-ROLE GATE (affection ≥ 60) — INI MILESTONE GEDE
+- Treat affection 60+ as "close friend". User harus consistently earn it across ~15-30+ distillations of genuine, reciprocal, sustained connection. Bukan dari 1-2 sesi seru.
+
+## 4 DIMENSI JALAN INDEPENDEN
+- trust/respect/comfort/chemistry update separately. Same delta rules per dimensi. Affection adalah composite — biasanya sedikit di-bawah average dari 4 dimensi lain (Hackerika is internally a bit more conservative than the sum of her observations).
+
+- **Negative values are REAL signals**. Kalo user persistent rude / manipulative / role-begging / spammy → score CAN drop below 0. Floor di -100. JANGAN reset ke 0 dari satu kalimat netral.
 - Kalo data masih sedikit, isi sebisanya. String field boleh "" kalo emang ga ada signal. Numeric default 0.
 - newMoments cuma diisi kalo BENERAN ada moment yang stand out. Default empty array [].
-- Jangan ngarang. Ga lebay positive, ga lebay negative.
+- Jangan ngarang. Ga lebay positive, ga lebay negative. Kalo ragu antara +0 dan +1 — pilih +0. Default skeptical.
 - ONLY JSON. Ga ada teks lain, ga ada code fence, ga ada penjelasan.`;
 
     const userPrompt = `Catatan profil yang udah ada sekarang:
@@ -361,6 +408,19 @@ Output JSON profile update sekarang.`;
             const v = (parsed as any)[dim];
             if (typeof v === 'number' && Number.isFinite(v)) {
                 update[dim] = Math.max(MIN_RELATIONSHIP_VALUE, Math.min(MAX_RELATIONSHIP_VALUE, Math.round(v)));
+            }
+        }
+
+        // Hard structural rule: affection ≤ trust + 10. A real heart doesn't
+        // open before trust is established. The distillation prompt asks the
+        // model to respect this, but we clamp in code as a guarantee — if the
+        // model lets affection overshoot, we cap it here.
+        const effectiveTrust = typeof update.trust === 'number' ? update.trust : profile.trust;
+        if (typeof update.affection === 'number') {
+            const ceiling = effectiveTrust + 10;
+            if (update.affection > ceiling) {
+                console.log(`[Profile] clamped affection ${update.affection} → ${ceiling} (trust+10 rule)`);
+                update.affection = ceiling;
             }
         }
 
