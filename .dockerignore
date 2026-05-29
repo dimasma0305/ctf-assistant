@@ -1,4 +1,9 @@
 /node_modules/
+ui/
+.git/
+docs/
+backups/
+*.tsbuildinfo
 yarn.lock
 pnpm-lock.yaml
 package-lock.json

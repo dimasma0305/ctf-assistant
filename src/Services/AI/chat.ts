@@ -72,6 +72,7 @@ const INTER_BURST_PAUSE_MS = 350;          // tiny gap between sending and the n
 const channelChains = new Map<string, Promise<void>>();
 const channelQueueDepth = new Map<string, number>();
 const MAX_CHANNEL_QUEUE_DEPTH = 5;   // pending + running turns per channel before we drop
+const MAX_SEND_CHAIN_DEPTH = 3;      // queued sends per channel before we shed load (drop + 👀)
 
 /**
  * Take a place in the channel's serial queue. Resolves with a `release`
@@ -117,18 +118,58 @@ async function acquireChannelSlot(channelId: string): Promise<(() => void) | nul
 // while this turn is still "typing". This chain only guarantees that bursts from
 // turn A fully land before turn B's, so messages never interleave across turns.
 const channelSendChains = new Map<string, Promise<void>>();
+const channelSendDepth = new Map<string, number>();   // queued+running sends per channel (backpressure)
 
 function enqueueChannelSend(channelId: string, job: () => Promise<void>): Promise<void> {
     const prev = channelSendChains.get(channelId) || Promise.resolve();
+    channelSendDepth.set(channelId, (channelSendDepth.get(channelId) || 0) + 1);
+    const dropDepth = () => {
+        const d = (channelSendDepth.get(channelId) || 1) - 1;
+        if (d <= 0) channelSendDepth.delete(channelId);
+        else channelSendDepth.set(channelId, d);
+    };
     const run = prev.then(job, job);            // run regardless of the prior job's outcome
     // The stored tail swallows errors so a throwing job can't break the next
-    // link, and drops the map entry once drained so it can't leak one promise
-    // per channel forever.
+    // link, decrements the depth counter, and drops the map entry once drained
+    // so it can't leak one promise per channel forever.
     const tail = run.catch(() => undefined).finally(() => {
+        dropDepth();
         if (channelSendChains.get(channelId) === tail) channelSendChains.delete(channelId);
     });
     channelSendChains.set(channelId, tail);
     return run;
+}
+
+// Channel-scoped, ref-counted typing indicator. After the produce/send split a
+// channel can have two turns in flight (turn A sending while turn B produces);
+// each previously ran its OWN setInterval(sendTyping), doubling pings and letting
+// A's "away" beat fail to pause B's. Sharing ONE timer per channel (acquired on
+// turn start, released at end and momentarily during an away beat) fixes both.
+const channelTypingRefs = new Map<string, number>();
+const channelTypingTimers = new Map<string, ReturnType<typeof setInterval>>();
+
+function acquireChannelTyping(channel: any): () => void {
+    const id: string = channel.id;
+    channelTypingRefs.set(id, (channelTypingRefs.get(id) || 0) + 1);
+    if (!channelTypingTimers.has(id)) {
+        const ping = () => { channel.sendTyping().catch(() => undefined); };
+        ping();
+        channelTypingTimers.set(id, setInterval(ping, TYPING_REFRESH_MS));
+    }
+    let released = false;
+    return () => {
+        if (released) return;
+        released = true;
+        const n = (channelTypingRefs.get(id) || 1) - 1;
+        if (n <= 0) {
+            channelTypingRefs.delete(id);
+            const t = channelTypingTimers.get(id);
+            if (t) clearInterval(t);
+            channelTypingTimers.delete(id);
+        } else {
+            channelTypingRefs.set(id, n);
+        }
+    };
 }
 
 function randomInt(min: number, max: number): number {
@@ -916,9 +957,11 @@ async function runChatTurn(
 
     // Typing indicator with periodic refresh — held across the whole turn.
     const channelRef = message.channel;
-    const sendTyping = () => channelRef.sendTyping().catch(() => undefined);
-    sendTyping();
-    let typingTimer: ReturnType<typeof setInterval> | null = setInterval(sendTyping, TYPING_REFRESH_MS);
+    // Channel-scoped, ref-counted typing (see acquireChannelTyping). Declared at
+    // function scope so the try/finally below can always release it, but ACQUIRED
+    // inside that try — so a context-build failure before the try can never leak
+    // the ref or the channel-shared timer.
+    let releaseTyping: () => void = () => {};
 
     // Conversation memory is keyed by channel — every user in the channel
     // shares the same thread with Hackerika, so she sees the full multi-party
@@ -1038,8 +1081,7 @@ async function runChatTurn(
 
 
     const stopTyping = () => {
-        if (typingTimer) clearInterval(typingTimer);
-        typingTimer = null;
+        releaseTyping();
     };
 
     const rollbackUserMessage = () => {
@@ -1066,6 +1108,8 @@ async function runChatTurn(
     let totalToolCalls = 0;
 
     try {
+        // Acquire typing now (inside the try) so the finally below always balances it.
+        releaseTyping = acquireChannelTyping(channelRef);
         for (let iter = 0; iter < MAX_TOOL_ITERATIONS; iter++) {
             const completion = await openai.chat.completions.create(
                 {
@@ -1218,6 +1262,19 @@ async function runChatTurn(
             return;
         }
 
+        // Send-chain backpressure: if this channel's serialized send queue is
+        // already saturated, shed this turn instead of growing the queue
+        // unboundedly (the produce-slot cap no longer bounds it — we release the
+        // slot before sending). Checked BEFORE committing the reply to memory so
+        // there's nothing to roll back beyond the user message and no race with a
+        // concurrent turn.
+        if ((channelSendDepth.get(channelId) || 0) >= MAX_SEND_CHAIN_DEPTH) {
+            rollbackUserMessage();
+            if (!spontaneous) message.react('👀').catch(() => undefined);
+            console.warn(`[Chat] send chain saturated (channel ${channelId}); dropping reply`);
+            return;
+        }
+
         const sanitized = sanitizeMentions(finalContent, message.guild);
         // Tag assistant message with the same `[Hackerika <@BOT_ID>]` prefix
         // user messages get, so the model sees a uniform speaker-tag format
@@ -1255,10 +1312,9 @@ async function runChatTurn(
                 // during this so it reads as "away" rather than "typing forever".
                 const tired = (botState?.energy ?? 70) < 30;
                 if (tired ? Math.random() < 0.18 : Math.random() < 0.06) {
-                    stopTyping();
+                    releaseTyping();                                  // pause our typing ("away")
                     await sleep(randomInt(6000, 18000));
-                    sendTyping();
-                    typingTimer = setInterval(sendTyping, TYPING_REFRESH_MS);
+                    releaseTyping = acquireChannelTyping(channelRef); // back — resume typing
                 }
                 await sleep(readPause);
             }

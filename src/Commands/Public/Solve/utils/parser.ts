@@ -450,24 +450,32 @@ async function runThreadStatusUpdate(challenges: ParsedChallenge[], channel: Tex
                 }
 
                 const botMessage = await findBotChallengeInfoMessage(existingThread, channel.client.user.id, challenge.id);
-                const allBotMessages = await findAllBotChallengeInfoMessages(existingThread, channel.client.user.id, challenge.id);
                 let primaryBotMessage = botMessage;
 
-                if (allBotMessages.length > 1) {
-                    const [primaryMessage, ...duplicateMessages] = allBotMessages;
-                    primaryBotMessage = primaryMessage;
-                    threadInfoMessageCache.set(existingThread.id, primaryMessage.id);
-                    for (const duplicateMessage of duplicateMessages) {
-                        try {
-                            await duplicateMessage.delete();
-                            console.log(`Deleted duplicate challenge info message ${duplicateMessage.id} in thread: ${existingThread.name}`);
-                        } catch (deleteError) {
-                            console.warn(`Failed to delete duplicate challenge info message ${duplicateMessage.id}:`, deleteError);
+                // Only run the UNCACHED full-thread scan (duplicate detection) on a
+                // cache MISS. On a hit, findBotChallengeInfoMessage already returned
+                // the message by id — re-scanning every thread every 5-min tick just
+                // to look for rare duplicates negated the cache entirely (~100-200
+                // redundant Discord REST fetches per CTF per tick). Duplicates created
+                // later linger harmlessly until the next cache miss re-runs this.
+                if (!botMessage) {
+                    const allBotMessages = await findAllBotChallengeInfoMessages(existingThread, channel.client.user.id, challenge.id);
+                    if (allBotMessages.length > 1) {
+                        const [primaryMessage, ...duplicateMessages] = allBotMessages;
+                        primaryBotMessage = primaryMessage;
+                        threadInfoMessageCache.set(existingThread.id, primaryMessage.id);
+                        for (const duplicateMessage of duplicateMessages) {
+                            try {
+                                await duplicateMessage.delete();
+                                console.log(`Deleted duplicate challenge info message ${duplicateMessage.id} in thread: ${existingThread.name}`);
+                            } catch (deleteError) {
+                                console.warn(`Failed to delete duplicate challenge info message ${duplicateMessage.id}:`, deleteError);
+                            }
                         }
+                    } else if (allBotMessages.length === 1) {
+                        primaryBotMessage = allBotMessages[0];
+                        threadInfoMessageCache.set(existingThread.id, allBotMessages[0].id);
                     }
-                } else if (!primaryBotMessage && allBotMessages.length === 1) {
-                    primaryBotMessage = allBotMessages[0];
-                    threadInfoMessageCache.set(existingThread.id, allBotMessages[0].id);
                 }
 
                 if (primaryBotMessage) {

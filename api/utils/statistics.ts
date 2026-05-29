@@ -173,17 +173,27 @@ export async function calculateCategoryStats(
             });
         }
 
+        // Precompute participant counts per normalized category in ONE pass over
+        // allUsers — this was an O(categories * users) re-filter INSIDE the map
+        // below, re-running categoryNormalize on every user's categories for each
+        // of the current user's categories.
+        const categoryParticipantCounts = new Map<string, number>();
+        for (const p of allUsers) {
+            const seen = new Set<string>();
+            for (const c of p.categories) {
+                const norm = categoryNormalize(c);
+                if (seen.has(norm)) continue;   // count each user at most once per category
+                seen.add(norm);
+                categoryParticipantCounts.set(norm, (categoryParticipantCounts.get(norm) || 0) + 1);
+            }
+        }
+
         // Convert to CategoryStat array with efficient ranking calculation
         return Array.from(categoryStats.entries())
             .filter(([_category, stats]) => stats.solves > 0)
             .map(([category, stats]) => {
-                // Simplified ranking calculation using existing data
-                const categoryParticipants = allUsers.filter((p) =>
-                    Array.from(p.categories).some((c) => categoryNormalize(c) === category)
-                );
-                
                 // Estimate ranking based on solve count and total score
-                const totalInCategory = categoryParticipants.length;
+                const totalInCategory = categoryParticipantCounts.get(category) || 0;
                 const categoryRank = totalInCategory > 0
                     ? Math.max(1, Math.floor(totalInCategory * 0.3)) // Rough estimate
                     : 1;

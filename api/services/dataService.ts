@@ -24,18 +24,26 @@ export async function getCachedUserScores(
     const cacheKey = generateCacheKey('userScores', { ...query, extended: includeExtendedMetrics, v: USER_SCORES_CACHE_VERSION });
 
     // Try to get from cache first
-    let userScores = cache.getCached<Map<string, UserProfile>>(cacheKey);
+    const cachedScores = cache.getCached<Map<string, UserProfile>>(cacheKey);
+    if (cachedScores) return cachedScores;
 
-    if (!userScores) {
+    // Single-flight: under concurrent load on an expired key, run the expensive
+    // recompute (full solve scan + scoring + enrichment) ONCE and share the
+    // result, instead of every concurrent request recomputing (cache stampede).
+    return cache.dedupe(cacheKey, async () => {
+        // Re-check: a concurrent caller may have just populated the cache.
+        const fresh = cache.get<Map<string, UserProfile>>(cacheKey);
+        if (fresh) return fresh;
+
         try {
             // Calculate fresh scoring data
             const scoringData = await FairScoringSystem.calculateUserScores(query);
 
             // Early return for empty results
             if (scoringData.size === 0) {
-                userScores = new Map<string, UserProfile>();
-                cache.set(cacheKey, userScores, ttl);
-                return userScores;
+                const empty = new Map<string, UserProfile>();
+                cache.set(cacheKey, empty, ttl);
+                return empty;
             }
 
             // Get all unique Discord IDs from the scoring data
@@ -109,7 +117,7 @@ export async function getCachedUserScores(
             }
 
             // Enrich profiles with extended metrics and rank improvement
-            userScores = new Map<string, UserProfile>();
+            const result = new Map<string, UserProfile>();
             for (const [discordId, baseProfile] of baseProfiles) {
                 const extendedMetrics = extendedMetricsMap.get(discordId) || {};
                 const rankImprovement = rankImprovementMap.get(discordId) || extendedMetrics.rankImprovement || 0;
@@ -120,21 +128,20 @@ export async function getCachedUserScores(
                     rankImprovement // Override with real data when available
                 };
 
-                userScores.set(discordId, enrichedProfile);
+                result.set(discordId, enrichedProfile);
             }
 
             // Cache the enriched result with appropriate TTL
             const cacheTTL = ttl || (includeExtendedMetrics ? 30 * 60 * 1000 : 10 * 60 * 1000); // 30min for extended, 10min for basic
-            cache.set(cacheKey, userScores, cacheTTL);
+            cache.set(cacheKey, result, cacheTTL);
+            return result;
 
         } catch (error) {
             console.error('Error in getCachedUserScores:', error);
             // Return empty map on error to prevent cascading failures
             return new Map<string, UserProfile>();
         }
-    }
-
-    return userScores;
+    });
 }
 
 /**

@@ -15,6 +15,8 @@ export class MemoryCache {
     private defaultTTL = 10 * 60 * 1000; // 10 minutes default
     private hitCount = 0;
     private missCount = 0;
+    // In-flight computations for single-flight / stampede protection.
+    private inflight = new Map<string, Promise<any>>();
 
     /**
      * Store data in cache with optional TTL
@@ -99,6 +101,25 @@ export class MemoryCache {
             this.missCount++;
         }
         return result;
+    }
+
+    /**
+     * Single-flight: dedupe concurrent computations for the same key. On a cache
+     * miss under concurrent load, the expensive `fn` runs ONCE and all callers
+     * share its result, instead of every request independently recomputing it
+     * (cache stampede / dogpile on TTL expiry). `fn` is responsible for its own
+     * cache.set; this only collapses concurrent in-flight executions.
+     */
+    async dedupe<T>(key: string, fn: () => Promise<T>): Promise<T> {
+        const pending = this.inflight.get(key);
+        if (pending) return pending as Promise<T>;
+        const p = fn();
+        this.inflight.set(key, p);
+        try {
+            return await p;
+        } finally {
+            this.inflight.delete(key);
+        }
     }
 
     /**

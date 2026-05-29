@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import bodyParser from 'body-parser';
 import client from "../src/client";
 import { MyClient } from "../src/Model/client";
@@ -12,6 +13,12 @@ import ctfRoutes from './routes/ctfs';
 import certificateRoutes from './routes/certificates';
 
 const app = express();
+
+/**
+ * Gzip responses — scoreboard/CTF JSON (repeated metadata + per-entry arrays)
+ * compresses ~5-10x. Registered first so it wraps all route responses.
+ */
+app.use(compression());
 
 /**
  * CORS Configuration

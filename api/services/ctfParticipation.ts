@@ -19,40 +19,47 @@ export async function getCTFParticipationMap(
   const cached = cache.getCached<Map<string, CTFParticipationEntry>>(cacheKey);
   if (cached) return cached;
 
-  const participationData = await solveModel.aggregate([
-    { $unwind: "$users" },
-    {
-      $group: {
-        _id: "$ctf_id",
-        totalSolves: { $sum: 1 },
-        uniqueParticipants: { $addToSet: "$users" },
-        firstSolve: { $min: "$solved_at" },
-        lastSolve: { $max: "$solved_at" },
-      },
-    },
-    {
-      $project: {
-        ctf_id: "$_id",
-        totalSolves: 1,
-        participantCount: { $size: "$uniqueParticipants" },
-        firstSolve: 1,
-        lastSolve: 1,
-      },
-    },
-  ]);
+  // Single-flight: concurrent requests landing on the expired key share ONE
+  // aggregation instead of each re-running the unwind+group over all solves.
+  return cache.dedupe(cacheKey, async () => {
+    const fresh = cache.get<Map<string, CTFParticipationEntry>>(cacheKey);
+    if (fresh) return fresh;
 
-  const map = new Map<string, CTFParticipationEntry>();
-  for (const row of participationData as any[]) {
-    if (!row?.ctf_id) continue;
-    map.set(String(row.ctf_id), {
-      totalSolves: row.totalSolves ?? 0,
-      participantCount: row.participantCount ?? 0,
-      firstSolve: row.firstSolve ? new Date(row.firstSolve) : null,
-      lastSolve: row.lastSolve ? new Date(row.lastSolve) : null,
-    });
-  }
+    const participationData = await solveModel.aggregate([
+      { $unwind: "$users" },
+      {
+        $group: {
+          _id: "$ctf_id",
+          totalSolves: { $sum: 1 },
+          uniqueParticipants: { $addToSet: "$users" },
+          firstSolve: { $min: "$solved_at" },
+          lastSolve: { $max: "$solved_at" },
+        },
+      },
+      {
+        $project: {
+          ctf_id: "$_id",
+          totalSolves: 1,
+          participantCount: { $size: "$uniqueParticipants" },
+          firstSolve: 1,
+          lastSolve: 1,
+        },
+      },
+    ]);
 
-  cache.set(cacheKey, map, ttlMs);
-  return map;
+    const map = new Map<string, CTFParticipationEntry>();
+    for (const row of participationData as any[]) {
+      if (!row?.ctf_id) continue;
+      map.set(String(row.ctf_id), {
+        totalSolves: row.totalSolves ?? 0,
+        participantCount: row.participantCount ?? 0,
+        firstSolve: row.firstSolve ? new Date(row.firstSolve) : null,
+        lastSolve: row.lastSolve ? new Date(row.lastSolve) : null,
+      });
+    }
+
+    cache.set(cacheKey, map, ttlMs);
+    return map;
+  });
 }
 
