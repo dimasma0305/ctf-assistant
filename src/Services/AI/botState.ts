@@ -158,7 +158,11 @@ export async function distillBotState(): Promise<void> {
     // Pull recent messages as "context the bot has been processing".
     let recent: any[] = [];
     try {
-        recent = await IndexedMessageModel.find({})
+        // Bound to the last 24h (matches the doc comment + the diary distiller)
+        // so this is an index-backed top-N on { createdAt: -1 } rather than a
+        // full-collection scan + sort over the whole 90-day retention window.
+        const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        recent = await IndexedMessageModel.find({ createdAt: { $gte: since } })
             .sort({ createdAt: -1 })
             .limit(MAX_RECENT_FOR_STATE_DISTILL)
             .select({ authorDisplayName: 1, content: 1, isBot: 1, createdAt: 1, _id: 0 })

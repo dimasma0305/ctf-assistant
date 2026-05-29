@@ -110,6 +110,27 @@ async function acquireChannelSlot(channelId: string): Promise<(() => void) | nul
     };
 }
 
+// Per-channel SEND chain — serializes the actual burst-sending (which includes
+// cosmetic typing/await delays) WITHOUT holding the produce-slot during it. The
+// produce-slot (acquireChannelSlot) is released as soon as a reply is finalized
+// + committed to memory, so the NEXT turn's context-build + LLM call can begin
+// while this turn is still "typing". This chain only guarantees that bursts from
+// turn A fully land before turn B's, so messages never interleave across turns.
+const channelSendChains = new Map<string, Promise<void>>();
+
+function enqueueChannelSend(channelId: string, job: () => Promise<void>): Promise<void> {
+    const prev = channelSendChains.get(channelId) || Promise.resolve();
+    const run = prev.then(job, job);            // run regardless of the prior job's outcome
+    // The stored tail swallows errors so a throwing job can't break the next
+    // link, and drops the map entry once drained so it can't leak one promise
+    // per channel forever.
+    const tail = run.catch(() => undefined).finally(() => {
+        if (channelSendChains.get(channelId) === tail) channelSendChains.delete(channelId);
+    });
+    channelSendChains.set(channelId, tail);
+    return run;
+}
+
 function randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -863,7 +884,7 @@ export async function handleAIChat(
     // The whole turn runs inside try/finally so the channel slot is ALWAYS
     // released — even if context-building throws — so the queue never deadlocks.
     try {
-        await runChatTurn(message, client, options, messageReference as DiscordMessage | null);
+        await runChatTurn(message, client, options, messageReference as DiscordMessage | null, releaseSlot);
     } finally {
         releaseSlot();
     }
@@ -880,6 +901,7 @@ async function runChatTurn(
     client: MyClient,
     options: HandleAIChatOptions,
     messageReference: DiscordMessage | null,
+    releaseSlot: (() => void) | null,
 ): Promise<void> {
     const author = message.author.username;
     const content = message.content;
@@ -1057,6 +1079,21 @@ async function runChatTurn(
                 { signal: controller.signal }
             );
 
+            // Visibility on DeepSeek prefix caching: the ~11.5K-token static
+            // system prompt is conversation[0] and re-sent every iteration, so
+            // it MUST cache-hit (~10% billing) to stay cheap. Log hit/miss so a
+            // silent cache regression (which would bill the prefix in full each
+            // call) is observable instead of invisible.
+            const usage: any = (completion as any).usage;
+            if (usage) {
+                console.log(
+                    `[Chat] tokens prompt=${usage.prompt_tokens} ` +
+                    `cache_hit=${usage.prompt_cache_hit_tokens ?? '?'} ` +
+                    `cache_miss=${usage.prompt_cache_miss_tokens ?? '?'} ` +
+                    `completion=${usage.completion_tokens}`,
+                );
+            }
+
             const choiceMsg: any = completion.choices[0]?.message;
             if (!choiceMsg) break;
 
@@ -1199,68 +1236,77 @@ async function runChatTurn(
         const repliedToBot = !!client.user?.id && messageReference?.author.id === client.user.id;
         const firstBurstIsReply = shouldQuoteReply(content, repliedToBot);
 
-        // Read/think beat before the FIRST burst — a real person reads & decides
-        // before typing, and that pause scales with how much there is to read
-        // (the incoming message), NOT with how long the reply is. Dimas never
-        // waits. (Per-burst typing delays below still scale with output length.)
-        if (!isDeveloper) {
-            const readPause = randomInt(700, 2200) + Math.min(2500, Math.floor(content.length / 4) * 30);
-            // Occasionally she's "tabbed away" and comes back a beat later —
-            // more likely when her energy is low. Typing indicator is paused
-            // during this so it reads as "away" rather than "typing forever".
-            const tired = (botState?.energy ?? 70) < 30;
-            if (tired ? Math.random() < 0.18 : Math.random() < 0.06) {
-                stopTyping();
-                await sleep(randomInt(6000, 18000));
-                sendTyping();
-                typingTimer = setInterval(sendTyping, TYPING_REFRESH_MS);
-            }
-            await sleep(readPause);
-        }
-
-        // Send bursts one by one with realistic typing delays.
-        for (let i = 0; i < bursts.length; i++) {
-            const burst = bursts[i];
-            if (i > 0) {
-                // brief beat before refreshing the typing indicator for the next burst
-                await sleep(INTER_BURST_PAUSE_MS);
-                channelRef.sendTyping().catch(() => undefined);
-            }
-            await sleep(realisticTypingDelay(burst));
-
-            try {
-                if (i === 0 && firstBurstIsReply) {
-                    await message.reply({ content: burst });
-                } else {
-                    await channelRef.send({ content: burst });
+        // Reply is finalized and committed to memory — release the channel
+        // produce-slot NOW so the next turn's context-build + LLM call can begin
+        // while we do the cosmetic typing/"away" theater below. The sends are
+        // serialized separately (enqueueChannelSend) so this turn's bursts still
+        // fully land before the next turn's — no interleaving. Idempotent: the
+        // finally in handleAIChat also calls release (no-op the second time).
+        releaseSlot?.();
+        await enqueueChannelSend(channelId, async () => {
+            // Read/think beat before the FIRST burst — a real person reads & decides
+            // before typing, and that pause scales with how much there is to read
+            // (the incoming message), NOT with how long the reply is. Dimas never
+            // waits. (Per-burst typing delays below still scale with output length.)
+            if (!isDeveloper) {
+                const readPause = randomInt(700, 2200) + Math.min(2500, Math.floor(content.length / 4) * 30);
+                // Occasionally she's "tabbed away" and comes back a beat later —
+                // more likely when her energy is low. Typing indicator is paused
+                // during this so it reads as "away" rather than "typing forever".
+                const tired = (botState?.energy ?? 70) < 30;
+                if (tired ? Math.random() < 0.18 : Math.random() < 0.06) {
+                    stopTyping();
+                    await sleep(randomInt(6000, 18000));
+                    sendTyping();
+                    typingTimer = setInterval(sendTyping, TYPING_REFRESH_MS);
                 }
-            } catch (sendError) {
-                console.error('Failed to send AI burst:', sendError);
-                break;
+                await sleep(readPause);
             }
-        }
 
-        // Fan-role grant happened inline during the tool loop; the model has
-        // already seen the result and woven it into its reply. We just send a
-        // small flair message right after so the role assignment is visually
-        // celebrated as a separate beat — same UX as before.
-        if (grantSucceeded) {
-            await sleep(INTER_BURST_PAUSE_MS + 200);
-            channelRef.sendTyping().catch(() => undefined);
-            await sleep(realisticTypingDelay('ah udahlah'));
-            const flair = [
-                `oke fine kamu dapet role **${FAN_ROLE_NAME}** ✨`,
-                `nih kasih role **${FAN_ROLE_NAME}** spesial buat kamu 🎀`,
-                `wkwk yaudah aku kasih role **${FAN_ROLE_NAME}** deh 💖`,
-                `mantep, kamu naik tier jadi **${FAN_ROLE_NAME}** ✨`,
-            ];
-            const pick = flair[Math.floor(Math.random() * flair.length)];
-            try {
-                await channelRef.send({ content: sanitizeMentions(pick, message.guild) });
-            } catch (sendError) {
-                console.error('Failed to send fan-role flair:', sendError);
+            // Send bursts one by one with realistic typing delays.
+            for (let i = 0; i < bursts.length; i++) {
+                const burst = bursts[i];
+                if (i > 0) {
+                    // brief beat before refreshing the typing indicator for the next burst
+                    await sleep(INTER_BURST_PAUSE_MS);
+                    channelRef.sendTyping().catch(() => undefined);
+                }
+                await sleep(realisticTypingDelay(burst));
+
+                try {
+                    if (i === 0 && firstBurstIsReply) {
+                        await message.reply({ content: burst });
+                    } else {
+                        await channelRef.send({ content: burst });
+                    }
+                } catch (sendError) {
+                    console.error('Failed to send AI burst:', sendError);
+                    break;
+                }
             }
-        }
+
+            // Fan-role grant happened inline during the tool loop; the model has
+            // already seen the result and woven it into its reply. We just send a
+            // small flair message right after so the role assignment is visually
+            // celebrated as a separate beat — same UX as before.
+            if (grantSucceeded) {
+                await sleep(INTER_BURST_PAUSE_MS + 200);
+                channelRef.sendTyping().catch(() => undefined);
+                await sleep(realisticTypingDelay('ah udahlah'));
+                const flair = [
+                    `oke fine kamu dapet role **${FAN_ROLE_NAME}** ✨`,
+                    `nih kasih role **${FAN_ROLE_NAME}** spesial buat kamu 🎀`,
+                    `wkwk yaudah aku kasih role **${FAN_ROLE_NAME}** deh 💖`,
+                    `mantep, kamu naik tier jadi **${FAN_ROLE_NAME}** ✨`,
+                ];
+                const pick = flair[Math.floor(Math.random() * flair.length)];
+                try {
+                    await channelRef.send({ content: sanitizeMentions(pick, message.guild) });
+                } catch (sendError) {
+                    console.error('Failed to send fan-role flair:', sendError);
+                }
+            }
+        });
 
         console.log(`✅ AI responded to ${author} (${userId}) — ${sanitized.length} chars across ${bursts.length} burst(s)`);
 

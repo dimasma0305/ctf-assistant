@@ -339,6 +339,7 @@ export async function selectFollowupCandidates(): Promise<Array<{
             ],
         })
             .sort({ lastWorkedOn: 1 })   // most stalled first
+            .limit(200)                  // safety bound; we keep only one task/user anyway
             .lean();
     } catch (error) {
         console.error('[Task] followup query failed:', error);

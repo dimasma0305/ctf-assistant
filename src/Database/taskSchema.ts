@@ -92,5 +92,8 @@ export const taskSchema = new Schema(schema);
 taskSchema.index({ userId: 1, status: 1, lastWorkedOn: 1 });
 // For list_tasks: active tasks per user sorted by creation.
 taskSchema.index({ userId: 1, status: 1, createdAt: -1 });
+// For the follow-up cron's cross-user query (status + lastWorkedOn, NO userId
+// prefix) — without this it collection-scans + sorts every Task.
+taskSchema.index({ status: 1, lastWorkedOn: 1 });
 
 export type TaskSchemaType = InferSchemaType<typeof taskSchema>;

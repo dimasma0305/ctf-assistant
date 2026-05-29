@@ -74,6 +74,10 @@ indexedMessageSchema.index({ content: 'text' });
 indexedMessageSchema.index({ guildId: 1, channelId: 1, createdAt: -1 });
 indexedMessageSchema.index({ guildId: 1, authorId: 1, createdAt: -1 });
 indexedMessageSchema.index({ guildId: 1, createdAt: -1 });
+// Bare recency index: the bot-state/diary distillers query the whole collection
+// ordered by createdAt (no guild filter), which the guildId-prefixed compounds
+// above cannot serve — without this it's a full collection scan + sort.
+indexedMessageSchema.index({ createdAt: -1 });
 
 // TTL — Mongo deletes docs RETENTION_SECONDS after indexedAt.
 indexedMessageSchema.index({ indexedAt: 1 }, { expireAfterSeconds: RETENTION_SECONDS });

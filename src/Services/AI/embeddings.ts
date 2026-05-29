@@ -1,17 +1,14 @@
-import { openai } from "../../utils/openai";
-
 /**
- * Embedding + importance scoring services. Both are fire-and-forget async
- * paths triggered when a message is indexed — failures never block the user
- * reply, and missing values gracefully degrade to keyword-only retrieval.
+ * Embedding + importance scoring services. Triggered when a message is indexed —
+ * failures never block the user reply, and missing values gracefully degrade to
+ * keyword-only retrieval. Importance is a fast LOCAL heuristic (no LLM call);
+ * only the embedding makes a network round-trip.
  */
 
 const CF_WORKER_URL = (process.env.CF_WORKER_URL || '').replace(/\/+$/, '');
 const CF_WORKER_TOKEN = process.env.CF_WORKER_TOKEN || '';
 
 const EMBED_TIMEOUT_MS = 8_000;
-const IMPORTANCE_TIMEOUT_MS = 8_000;
-const IMPORTANCE_MODEL = 'deepseek-v4-flash';
 
 /**
  * Get a 384-dim embedding for `text` via the Cloudflare Worker proxy.
@@ -64,63 +61,38 @@ export function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 /**
- * Score a message's importance 1-10 via the cheap flash model. Returns 5
- * (default neutral) on any failure so retrieval still works for that doc.
+ * Score a message's importance 1-10 with a fast LOCAL heuristic — NO LLM call.
  *
- * Heuristic in the prompt:
- *   1-3  filler / acknowledgements / "lol"
- *   4-6  normal discussion / questions / casual help
- *   7-8  technical insights / decisions / vulnerabilities found
- *   9-10 critical announcements / lore-worthy moments
+ * Previously this fired a deepseek-v4-flash completion for EVERY indexed message
+ * (i.e. nearly every message in every channel), which was pure background cost +
+ * rate-limit pressure at server scale. Since `combinedRecallScore` only weights
+ * importance at 0.2, a cheap deterministic approximation is more than good enough
+ * for recall ranking. Signal markers:
+ *   1-3  filler / acks / very short
+ *   4-6  normal discussion / questions
+ *   7-10 technical content: code, payloads, CVEs, flags, links, long explanations
  */
-export async function scoreImportance(content: string, authorDisplayName?: string): Promise<number> {
-    const clean = (content || '').trim();
-    if (!clean) return 1;
-    // Skip the LLM call for trivial short messages — almost certainly filler.
-    if (clean.length < 8) return 2;
-    if (clean.length < 20 && /^(ok|oke|wkwk|hehe|lol|nih|iya|yes|no|👍|ya|gas|gw)\b/i.test(clean)) return 2;
+export function scoreImportance(content: string, _authorDisplayName?: string): number {
+    const text = (content || '').trim();
+    if (!text) return 1;
+    const len = text.length;
+    if (len < 8) return 2;
+    // Short filler / acknowledgements.
+    if (len < 20 && /^(ok|oke|sip|siap|wkwk|hehe|lol|nih|iya|yes|no|👍|ya|gas|gw|noted|mantap)\b/i.test(text)) return 2;
 
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), IMPORTANCE_TIMEOUT_MS);
-    try {
-        const completion = await openai.chat.completions.create(
-            {
-                model: IMPORTANCE_MODEL,
-                messages: [
-                    {
-                        role: 'system',
-                        content:
-                            'Rate the importance of a Discord message on a 1-10 scale. Output ONLY a JSON object like {"importance": N}. ' +
-                            'Anchor: 1-3 chit-chat/filler/acks ("lol", "ok", "gw setuju"). ' +
-                            '4-6 normal discussion/questions/casual help. ' +
-                            '7-8 technical insight, decision made, conflict, vulnerability found, important question. ' +
-                            '9-10 critical announcements, role changes, CTF wins, lore-worthy moments. ' +
-                            'No prose, just JSON.',
-                    },
-                    {
-                        role: 'user',
-                        content: `${authorDisplayName ? `[${authorDisplayName}] ` : ''}${clean.slice(0, 500)}`,
-                    },
-                ],
-                response_format: { type: 'json_object' } as any,
-                temperature: 0.1,
-                max_tokens: 24,
-                n: 1,
-            },
-            { signal: controller.signal },
-        );
-        const raw = completion.choices[0]?.message?.content?.trim() || '';
-        try {
-            const parsed = JSON.parse(raw);
-            const v = Number(parsed?.importance);
-            if (Number.isFinite(v)) return Math.max(1, Math.min(10, Math.round(v)));
-        } catch { /* fall through */ }
-        return 5;
-    } catch (error) {
-        return 5;
-    } finally {
-        clearTimeout(timer);
-    }
+    const lower = text.toLowerCase();
+    let score = 4; // normal-discussion baseline
+
+    if (/```|`[^`]+`/.test(text)) score += 3;                              // code block / inline code
+    if (/\bhttps?:\/\/\S+/i.test(text)) score += 1;                        // link / resource
+    if (/\bcve-\d{4}-\d{3,}\b/i.test(lower)) score += 3;                    // CVE reference
+    if (/(flag|ctf|tcp1p|fakeflag)\{[^}]*\}/i.test(text)) score += 3;       // flag value
+    if (/\b(payload|exploit|vuln|rce|sqli|xss|ssrf|lfi|xxe|overflow|bypass|race condition|deserial|jwt|writeup|0day)\b/i.test(lower)) score += 2;
+    if (text.includes('?')) score += 1;                                    // a question
+    if (len > 280) score += 1;                                             // substantial explanation
+    if (len > 700) score += 1;
+
+    return Math.max(1, Math.min(10, score));
 }
 
 /**

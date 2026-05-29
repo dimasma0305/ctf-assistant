@@ -12,6 +12,20 @@ const SPAM_WINDOW_MS = 60_000;
 const SPAM_KICK_CLEANUP_WINDOW_MS = 5 * 60_000;
 const MESSAGE_FETCH_BATCH_SIZE = 100;
 
+// Periodic sweep: every message creates a recentMessages[userId] bucket, but the
+// only deletion is for kicked spammers — so a one-time visitor's key would live
+// forever (slow unbounded heap growth in a long-running container). This drops
+// any bucket whose 60s window has fully expired.
+const recentMessagesSweep = setInterval(() => {
+    const now = Date.now();
+    for (const userId of Object.keys(recentMessages)) {
+        const fresh = recentMessages[userId].filter((m) => now - m.timestamp < SPAM_WINDOW_MS);
+        if (fresh.length === 0) delete recentMessages[userId];
+        else recentMessages[userId] = fresh;
+    }
+}, SPAM_WINDOW_MS);
+recentMessagesSweep.unref?.();
+
 interface MessageFetchChannel {
   id: string;
   isTextBased(): boolean;

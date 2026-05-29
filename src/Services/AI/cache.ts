@@ -46,7 +46,7 @@ export async function updateChannelCache(message: DiscordMessage) {
         embeds: message.embeds.length > 0
     };
     
-    await MessageCacheModel.findOneAndUpdate(
+    await MessageCacheModel.updateOne(
         { channelId },
         {
             $push: {
@@ -70,6 +70,12 @@ async function indexMessage(message: DiscordMessage): Promise<void> {
     if (!message.guildId) return;
     if (!message.content && message.attachments.size === 0 && message.embeds.length === 0) return;
 
+    const content = (message.content || '').trim();
+    const displayName = message.member?.displayName || message.author.username;
+    // Importance is now a cheap LOCAL heuristic (no per-message LLM call) —
+    // compute it inline and store it directly in the main upsert.
+    const importance = scoreImportance(content, displayName);
+
     try {
         await IndexedMessageModel.updateOne(
             { messageId: message.id },
@@ -80,12 +86,13 @@ async function indexMessage(message: DiscordMessage): Promise<void> {
                     channelId: message.channelId,
                     authorId: message.author.id,
                     authorUsername: message.author.username,
-                    authorDisplayName: message.member?.displayName || message.author.username,
+                    authorDisplayName: displayName,
                     isBot: message.author.bot,
                     content: message.content || '',
                     hasAttachments: message.attachments.size > 0,
                     hasEmbeds: message.embeds.length > 0,
                     createdAt: new Date(message.createdTimestamp),
+                    importance,
                 },
                 // indexedAt drives the 90d TTL; only set on first insert so re-
                 // indexing an edit doesn't extend the lifetime artificially.
@@ -94,41 +101,42 @@ async function indexMessage(message: DiscordMessage): Promise<void> {
             { upsert: true }
         );
 
-        // Async enrichment: embedding + importance score. Both fire-and-forget
-        // — the doc is already keyword-searchable above. Skipping these never
-        // breaks anything, just degrades recall quality.
-        const content = (message.content || '').trim();
-        if (content.length >= 4) {
-            const displayName = message.member?.displayName || message.author.username;
-            void enrichIndexedMessage(message.id, content, displayName);
+        // Embedding enrichment: a network round-trip to the CF Worker. Skip the
+        // bot's own (often long) replies and trivial content, and bound total
+        // in-flight embeds (embedAndStore) so a message burst can't open
+        // hundreds of concurrent fetches. Fire-and-forget — best-effort recall.
+        if (content.length >= 4 && !message.author.bot) {
+            void embedAndStore(message.id, content);
         }
     } catch (error) {
         console.error('[IndexedMessage] failed to index message:', error);
     }
 }
 
+// Bounded fan-out for the embedding network call: DROP (do not queue) when
+// saturated. Embeddings are a best-effort recall signal, so skipping a few
+// under a burst is fine — and far better than spawning hundreds of concurrent
+// Worker fetches + sockets the moment a channel floods.
+const MAX_INFLIGHT_EMBEDS = 6;
+let inflightEmbeds = 0;
+
 /**
- * Compute embedding + importance in parallel and patch them onto the indexed
- * doc. Silent on all failures — these are optional retrieval signals, not
- * critical-path data.
+ * Compute an embedding for the message and patch it onto the indexed doc.
+ * Silent on all failures — the doc is already keyword-searchable and carries a
+ * local importance score; the embedding only improves semantic recall.
  */
-async function enrichIndexedMessage(
-    messageId: string,
-    content: string,
-    displayName: string,
-): Promise<void> {
+async function embedAndStore(messageId: string, content: string): Promise<void> {
+    if (inflightEmbeds >= MAX_INFLIGHT_EMBEDS) return;  // saturated — drop, don't pile up
+    inflightEmbeds++;
     try {
-        const [embedding, importance] = await Promise.all([
-            embedViaWorker(content),
-            scoreImportance(content, displayName),
-        ]);
-        const update: any = {};
-        if (Array.isArray(embedding) && embedding.length > 0) update.embedding = embedding;
-        if (typeof importance === 'number' && Number.isFinite(importance)) update.importance = importance;
-        if (Object.keys(update).length === 0) return;
-        await IndexedMessageModel.updateOne({ messageId }, { $set: update }).catch(() => undefined);
+        const embedding = await embedViaWorker(content);
+        if (Array.isArray(embedding) && embedding.length > 0) {
+            await IndexedMessageModel.updateOne({ messageId }, { $set: { embedding } }).catch(() => undefined);
+        }
     } catch {
         // Silent — enrichment is best-effort.
+    } finally {
+        inflightEmbeds--;
     }
 }
 
