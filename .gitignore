@@ -37,5 +37,6 @@ COPILOT.md
 /backups/
 
 # Ad-hoc local scripts (keep tracked ones only)
-/scripts/*.ts
+/scripts/*
 !/scripts/populate-db.ts
+!/scripts/cv-worker/

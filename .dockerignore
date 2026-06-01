@@ -1,5 +1,9 @@
 /node_modules/
 ui/
+# api/utils/statistics.ts imports ACHIEVEMENT_CRITERIA from this single,
+# dependency-free file. Re-include it so the bot image builds without pulling
+# in the whole ui/ app (esp. ui/node_modules). Keep the rest of ui/ excluded.
+!ui/lib/achievements.ts
 .git/
 docs/
 backups/
