@@ -30,7 +30,7 @@ import { MyClient } from "./Model/client";
 import { SessionScheduler } from "./Services/SessionScheduler";
 import { ConnectionStateManager, ConnectionState } from "./Services/ConnectionStateManager";
 import { handleAIChat, updateChannelCache } from "./Services/AI";
-import { handleSpamDetection, handlePhishingDetection } from "./Services/Moderation";
+import { handleSpamDetection, handlePhishingDetection, handleImageScamDetection } from "./Services/Moderation";
 import { maybeReactToMessage } from "./Services/AI/reactions";
 import { shouldChimeIn } from "./Services/AI/spontaneous";
 import "./Services/AI/memory";
@@ -283,6 +283,11 @@ client.on(Events.MessageCreate, async (message) => {
   // Check for spam first
   const isSpam = await handleSpamDetection(message);
   if (isSpam) return;
+
+  // Perceptual image-scam check (catches re-encoded scam images that byte-hash
+  // dedup misses, correlated across accounts/channels).
+  const isImageScam = await handleImageScamDetection(message);
+  if (isImageScam) return;
 
   // Check for phishing messages
   const isPhishing = await handlePhishingDetection(message);

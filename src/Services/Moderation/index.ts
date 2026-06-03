@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import { SharingChannelConfigModel } from "../../Database/connect";
 import { isNoDbMode } from "../../utils/env";
+import { dhashFromBuffer, isPerceptualMatch } from "./imageHash";
 
 type GuildMessage = OmitPartialGroupDMChannel<DiscordMessage<boolean>>;
 
@@ -310,7 +311,10 @@ async function warnInChannel(message: GuildMessage, text: string): Promise<void>
 /** Delete only the matched messages, grouped per channel, using bulkDelete
  * (with a single-message fallback). No guild-wide scan, no per-message fetch
  * storm. Targets are minutes old, well inside the 14-day bulk-delete window. */
-async function deleteMatchedMessages(message: GuildMessage, matched: RecentMessage[]): Promise<void> {
+async function deleteMatchedMessages(
+  message: GuildMessage,
+  matched: Pick<RecentMessage, "channelId" | "messageId">[],
+): Promise<void> {
   const byChannel = new Map<string, string[]>();
   for (const r of matched) {
     const list = byChannel.get(r.channelId) ?? [];
@@ -340,6 +344,17 @@ async function deleteMatchedMessages(message: GuildMessage, matched: RecentMessa
   }
 }
 
+/** Record a strike against a user and return the new level. Strikes decay after
+ * STRIKE_DECAY_MS so a one-off offence never lingers, while a repeat offender
+ * (spam OR phishing — they share this map) keeps climbing toward a kick. */
+function bumpStrike(userId: string): number {
+  const now = Date.now();
+  const prior = heat[userId];
+  const level = prior && now - prior.lastStrikeAt < STRIKE_DECAY_MS ? prior.strikes + 1 : 1;
+  heat[userId] = { strikes: level, lastStrikeAt: now };
+  return level;
+}
+
 /** Graduated enforcement: strike 1 = delete dupes + warn, strike 2 = timeout,
  * strike 3+ = kick. Strikes decay slowly so a paced abuser still climbs the
  * ladder, while a one-off accidental burst only ever earns a recoverable warn. */
@@ -349,10 +364,7 @@ async function enforce(
   signature: string,
   matched: RecentMessage[],
 ): Promise<void> {
-  const now = Date.now();
-  const prior = heat[userId];
-  const level = prior && now - prior.lastStrikeAt < STRIKE_DECAY_MS ? prior.strikes + 1 : 1;
-  heat[userId] = { strikes: level, lastStrikeAt: now };
+  const level = bumpStrike(userId);
 
   // Remove the handled records so the same messages don't re-trigger on the
   // next message; the strike map (not the bucket) carries escalation state.
@@ -455,11 +467,30 @@ export async function handleSpamDetection(message: GuildMessage): Promise<boolea
   }
 }
 
+/** Pull together every piece of text a message carries that a scammer might
+ * stuff a link/lure into — the raw content PLUS any embed url/title/description
+ * /author/footer. An image-only scam frequently has empty `content` and hides
+ * the link inside a link-preview embed (or inside the image itself, which we
+ * can't read — see the media branch in handlePhishingDetection). */
+function phishingHaystack(message: GuildMessage): string {
+  const parts: string[] = [message.content || ""];
+  for (const e of message.embeds) {
+    const anyE = e as any;
+    parts.push(anyE?.url || "", anyE?.title || "", anyE?.description || "", anyE?.author?.name || "", anyE?.footer?.text || "");
+  }
+  return parts.filter(Boolean).join(" ");
+}
+
 /**
- * Phishing/scam detection. Requires an actual link/invite PLUS a strong second
- * signal (mass-mention or a known lure phrase), so merely discussing or
- * reporting a scam never trips it. Soft-action first (delete + timeout); only
- * mass-mention raids escalate to kick.
+ * Phishing/scam detection. Requires a PRIMARY signal — a real link/invite OR an
+ * attached image/media that could hide one (QR code, screenshot of a "free
+ * nitro" page; we have no vision so we can't read inside it) — PLUS a strong
+ * SECOND signal (mass-mention or a known lure phrase). That keeps ordinary
+ * link-sharing AND ordinary image-sharing untouched, while closing the hole
+ * where an image-only @everyone scam slipped past entirely (the old code bailed
+ * on `if (!hasLink) return false`, and a single image never reaches the spam
+ * payload threshold). Soft-action first (delete + timeout); mass-mention raids
+ * escalate to kick.
  */
 export async function handlePhishingDetection(message: GuildMessage): Promise<boolean> {
   try {
@@ -467,12 +498,17 @@ export async function handlePhishingDetection(message: GuildMessage): Promise<bo
     if (await isExemptFromModeration(message)) return false;
 
     const content = message.content || "";
-    const hasLink = URL_OR_INVITE_RE.test(content);
-    if (!hasLink) return false;
+    const haystack = phishingHaystack(message);
+    const hasLink = URL_OR_INVITE_RE.test(haystack);
+    // Media we can't see into (image/sticker/embed) is treated as a possible
+    // carrier — but only ever actioned when a strong second signal is present.
+    const hasMedia =
+      message.attachments.size > 0 || message.embeds.length > 0 || message.stickers.size > 0;
+    if (!hasLink && !hasMedia) return false; // plain text with no link/media → not our job
 
     const massMention = !!message.mentions?.everyone || MASS_MENTION_RE.test(content);
-    const hasLure = PHISHING_LURE_RE.test(content);
-    if (!massMention && !hasLure) return false; // bare invite/link is fine
+    const hasLure = PHISHING_LURE_RE.test(haystack);
+    if (!massMention && !hasLure) return false; // bare invite / plain image-share is fine
 
     await message.delete().catch(() => undefined);
 
@@ -480,13 +516,39 @@ export async function handlePhishingDetection(message: GuildMessage): Promise<bo
     const canKick = !!member && safeCan(() => member.kickable);
     const canTimeout = !!member && safeCan(() => member.moderatable);
 
-    if (massMention && hasLure && canKick) {
+    // Immediate KICK on an unambiguous raid: a *readable* scam (known lure
+    // phrase or actual link) PLUS the @everyone ping. We deliberately do NOT
+    // kick on mass-mention + unreadable-image alone — that could be an innocent
+    // member pinging an event screenshot, and we have no vision to confirm.
+    if (massMention && (hasLure || hasLink) && canKick) {
       await notifyUser(message, "Your message was removed and you were removed from the server for posting a phishing/scam link with a mass mention. Contact a moderator if this was a mistake.");
       try {
         await member!.kick("Posting phishing/scam links with mass mention");
       } catch (error) {
         console.log(`[Moderation] phishing kick failed for ${message.author.id}: ${error}`);
       }
+      delete heat[message.author.id];
+      return true;
+    }
+
+    // Graduated escalation for everything else. The old code timed out EVERY
+    // scam post with no memory, so a scammer who kept posting (no @everyone) was
+    // muted for 5 min, came back, got muted again — forever, never kicked. Now a
+    // repeat offender climbs to a kick: 1st detected scam → timeout, 2nd within
+    // the decay window → kick. A single borderline message stays recoverable.
+    const level = bumpStrike(message.author.id);
+
+    if (level >= 2 && canKick) {
+      await notifyUser(
+        message,
+        "You were removed for repeatedly posting phishing/scam content after a warning. You're welcome to appeal to a moderator if this was a mistake.",
+      );
+      try {
+        await member!.kick("Repeated phishing/scam after timeout");
+      } catch (error) {
+        console.log(`[Moderation] phishing repeat-kick failed for ${message.author.id}: ${error}`);
+      }
+      delete heat[message.author.id];
       return true;
     }
 
@@ -499,13 +561,224 @@ export async function handlePhishingDetection(message: GuildMessage): Promise<bo
     }
     await notifyUser(
       message,
-      "Your message was removed because it looked like a phishing/scam link. If this was a mistake, contact a moderator.",
+      "Your message was removed because it looked like a phishing/scam link. If this was a mistake, contact a moderator. Repeated posts will get you removed.",
     );
     return true;
   } catch (error) {
     console.error("[Moderation] handlePhishingDetection error:", error);
     return false;
   }
+}
+
+// ── Image-scam detection (perceptual hashing) ────────────────────────────────
+/**
+ * Catches the scam pattern byte-hash dedup can't: the SAME scam image re-encoded
+ * per account so sha256 / name:size all differ. We fingerprint each image with a
+ * perceptual dHash (see ./imageHash) and correlate across accounts and channels.
+ *
+ * A non-exempt member is removed when their image:
+ *   - matches a fingerprint already confirmed as scam (known set), OR
+ *   - is the SAME image (≤ threshold) as one posted by ≥2 distinct accounts in
+ *     the last hour (coordinated ring), OR
+ *   - is fanned by the same account across ≥3 channels within seconds (solo raid).
+ * Validated on the real TCP1P scam set: ring copies hash 0-5 apart, the nearest
+ * legit writeup image is ~22 — so a single innocent screenshot never triggers.
+ */
+const IMG_FANOUT_CHANNELS = 3;            // same image to N channels by one account
+const IMG_FANOUT_WINDOW_MS = 30_000;      // …within this span → solo raid
+const IMG_RING_MIN_ACCOUNTS = 2;          // same image from N distinct accounts
+const IMG_RING_WINDOW_MS = 60 * 60_000;   // …within an hour → coordinated ring
+const IMG_MAX_ATTACH = 4;                 // decode at most N images per message
+const IMG_MAX_BYTES = 4 * 1024 * 1024;    // skip images larger than this
+const IMG_FETCH_TIMEOUT_MS = 6_000;
+const ATTACH_CACHE_CAP = 5_000;           // bound the attachment→hash cache
+const KNOWN_SCAM_CAP = 2_000;             // bound the learned-scam fingerprint set
+
+interface ImgPoster {
+  channels: Set<string>;
+  firstTs: number;
+  lastTs: number;
+  refs: { channelId: string; messageId: string }[];
+}
+interface ImgCluster {
+  hash: bigint;
+  posters: Map<string, ImgPoster>;
+  lastTs: number;
+}
+
+const imgClusters: ImgCluster[] = [];
+const knownScamHashes: bigint[] = [];
+const attachHashCache = new Map<string, bigint>(); // attachment id → dHash (never decode twice)
+
+function pruneImageState(now: number): void {
+  for (let i = imgClusters.length - 1; i >= 0; i--) {
+    if (now - imgClusters[i].lastTs > IMG_RING_WINDOW_MS) imgClusters.splice(i, 1);
+  }
+  if (attachHashCache.size > ATTACH_CACHE_CAP) attachHashCache.clear();
+  if (knownScamHashes.length > KNOWN_SCAM_CAP) knownScamHashes.splice(0, knownScamHashes.length - KNOWN_SCAM_CAP);
+}
+
+export interface ImageScamDecision {
+  confirmed: boolean;
+  reason: string;
+  matched: { channelId: string; messageId: string }[];
+}
+
+/** Record one image fingerprint and decide whether it confirms a scam. Pure over
+ * module state (no IO) so the correlation rules are unit-testable directly. */
+export function evaluateImageFingerprint(
+  userId: string,
+  channelId: string,
+  messageId: string,
+  hash: bigint,
+  now: number,
+): ImageScamDecision {
+  const known = knownScamHashes.some((k) => isPerceptualMatch(k, hash));
+
+  let cluster = imgClusters.find((c) => isPerceptualMatch(c.hash, hash));
+  if (!cluster) {
+    cluster = { hash, posters: new Map(), lastTs: now };
+    imgClusters.push(cluster);
+  }
+  cluster.lastTs = now;
+
+  let poster = cluster.posters.get(userId);
+  if (!poster) {
+    poster = { channels: new Set(), firstTs: now, lastTs: now, refs: [] };
+    cluster.posters.set(userId, poster);
+  }
+  poster.channels.add(channelId);
+  poster.lastTs = now;
+  poster.refs.push({ channelId, messageId });
+
+  const distinctAccounts = [...cluster.posters.values()].filter((p) => now - p.lastTs <= IMG_RING_WINDOW_MS).length;
+  const ring = distinctAccounts >= IMG_RING_MIN_ACCOUNTS;
+  const fanout = poster.channels.size >= IMG_FANOUT_CHANNELS && now - poster.firstTs <= IMG_FANOUT_WINDOW_MS;
+
+  const confirmed = known || ring || fanout;
+  if (confirmed && !known) knownScamHashes.push(cluster.hash);
+
+  const matched = [...cluster.posters.values()].flatMap((p) => p.refs);
+  const reason = known
+    ? "matches a known scam image"
+    : ring
+      ? `same image from ${distinctAccounts} accounts`
+      : `same image across ${poster.channels.size} channels in ${Math.round((now - poster.firstTs) / 1000)}s`;
+  return { confirmed, reason, matched };
+}
+
+function isImageAttachment(a: any): boolean {
+  if (typeof a.contentType === "string" && a.contentType.startsWith("image/")) return true;
+  const name: string = a.name ?? "";
+  const ext = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
+  return ["png", "jpg", "jpeg", "gif", "webp", "bmp", "avif"].includes(ext);
+}
+
+async function fetchImageBuffer(url: string): Promise<Buffer | null> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), IMG_FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    return buf.length > IMG_MAX_BYTES ? null : buf;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Download + perceptually hash a message's image attachments (cached per id). */
+async function hashMessageImages(message: GuildMessage): Promise<bigint[]> {
+  const atts = [...message.attachments.values()].filter(isImageAttachment).slice(0, IMG_MAX_ATTACH);
+  const out: bigint[] = [];
+  for (const a of atts) {
+    const cached = attachHashCache.get(a.id);
+    if (cached !== undefined) {
+      out.push(cached);
+      continue;
+    }
+    if ((a.size ?? 0) > IMG_MAX_BYTES) continue;
+    const buf = await fetchImageBuffer(a.url);
+    if (!buf) continue;
+    const h = await dhashFromBuffer(buf);
+    if (h !== null) {
+      attachHashCache.set(a.id, h);
+      out.push(h);
+    }
+  }
+  return out;
+}
+
+/**
+ * Perceptual image-scam detection. Returns true if handled (caller stops). Only
+ * decodes images for NON-exempt authors who actually attached an image, so the
+ * cost stays off the normal text hot path. High-confidence triggers (known
+ * scam, multi-account, multi-channel) remove the member directly; the offending
+ * copies across every channel are deleted in one pass.
+ */
+export async function handleImageScamDetection(
+  message: GuildMessage,
+  opts?: { hashesForTest?: bigint[] },
+): Promise<boolean> {
+  try {
+    if (message.author.bot || !message.guild) return false;
+    if (![...message.attachments.values()].some(isImageAttachment)) return false;
+    if (await isExemptFromModeration(message)) return false;
+
+    const now = Date.now();
+    pruneImageState(now);
+
+    const hashes = opts?.hashesForTest ?? (await hashMessageImages(message));
+    if (hashes.length === 0) return false;
+
+    let decision: ImageScamDecision | null = null;
+    for (const h of hashes) {
+      const d = evaluateImageFingerprint(message.author.id, message.channelId, message.id, h, now);
+      if (d.confirmed) {
+        decision = d;
+        break;
+      }
+    }
+    if (!decision) return false;
+
+    await deleteMatchedMessages(message, decision.matched);
+
+    const member = message.member;
+    const canKick = !!member && safeCan(() => member.kickable);
+    const canTimeout = !!member && safeCan(() => member.moderatable);
+
+    if (canKick) {
+      await notifyUser(
+        message,
+        "You were removed for posting a scam image (it matched a coordinated spam campaign). Contact a moderator if this was a mistake.",
+      );
+      try {
+        await member!.kick("Scam image — perceptual match");
+      } catch (error) {
+        console.log(`[Moderation] image-scam kick failed for ${message.author.id}: ${error}`);
+      }
+    } else if (canTimeout) {
+      try {
+        await member!.timeout(TIMEOUT_MS, "Scam image — perceptual match");
+      } catch (error) {
+        console.log(`[Moderation] image-scam timeout failed for ${message.author.id}: ${error}`);
+      }
+    }
+    console.log(`[Moderation] image-scam handled for ${message.author.id}: ${decision.reason}`);
+    return true;
+  } catch (error) {
+    console.error("[Moderation] handleImageScamDetection error:", error);
+    return false;
+  }
+}
+
+/** Test-only: clear perceptual-scam state between cases. */
+export function __resetImageScamState(): void {
+  imgClusters.length = 0;
+  knownScamHashes.length = 0;
+  attachHashCache.clear();
 }
 
 // Recursively sanitize content to remove @everyone, @here, and role mentions

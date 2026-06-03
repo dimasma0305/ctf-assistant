@@ -9,7 +9,13 @@
 process.env.NODB = "true";
 
 import { describe, test, expect, beforeEach } from "bun:test";
-import { handleSpamDetection, handlePhishingDetection } from "./index";
+import {
+  handleSpamDetection,
+  handlePhishingDetection,
+  handleImageScamDetection,
+  evaluateImageFingerprint,
+  __resetImageScamState,
+} from "./index";
 
 // ── Fakes ─────────────────────────────────────────────────────────────────────
 class FakeColl<V> extends Map<string, V> {
@@ -375,5 +381,305 @@ describe("phishing detection requires link + strong signal", () => {
     expect(handled).toBe(true);
     expect(fx.deletedIds.length).toBeGreaterThan(0);
     expect(fx.kicks).toBe(1); // massMention + lure + kickable → kick
+  });
+
+  // ── Image-only scam (the regression): a scam that posts ONLY an image ──────
+  test("image-only @everyone, NOTHING readable (link only in pixels) → removed + timed out, NOT kicked", async () => {
+    // We have no vision; an @everyone + bare image could be an innocent event
+    // screenshot. Action it (delete + recoverable timeout) but never kick.
+    const fx = freshEffects();
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "",
+        attachments: [{ name: "nitro.png", size: 48213 }],
+        everyone: true,
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(true);
+    expect(fx.deletedIds.length).toBeGreaterThan(0);
+    expect(fx.kicks).toBe(0); // ambiguous → no kick
+    expect(fx.timeouts).toBe(1);
+  });
+
+  test("image + readable lure caption + @everyone → kicked (clear scam)", async () => {
+    const fx = freshEffects();
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "free nitro @everyone claim now 🎁",
+        attachments: [{ name: "nitro.png", size: 48213 }],
+        everyone: true,
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(true);
+    expect(fx.kicks).toBe(1); // massMention + readable lure → kick
+  });
+
+  test("image with a lure caption but no mass-mention → removed + timed out (not kicked)", async () => {
+    const fx = freshEffects();
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "claim your free nitro here 🎁",
+        attachments: [{ name: "promo.jpg", size: 12000 }],
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(true);
+    expect(fx.deletedIds.length).toBeGreaterThan(0);
+    expect(fx.kicks).toBe(0); // no mass-mention → soft action only
+    expect(fx.timeouts).toBe(1);
+  });
+
+  test("scam link hidden in an embed + @everyone (no message text) → kicked", async () => {
+    const fx = freshEffects();
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "",
+        embeds: [{ url: "https://free-nitro-claim.example", title: "Free Nitro gift" }],
+        everyone: true,
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(true);
+    expect(fx.kicks).toBe(1);
+  });
+
+  test("ordinary image share (no mention, no lure) → NEVER touched", async () => {
+    const fx = freshEffects();
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "here's my heap layout screenshot",
+        attachments: [{ name: "heap.png", size: 90000 }],
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(false);
+    expect(fx.deletedIds.length).toBe(0);
+    expect(fx.kicks + fx.timeouts).toBe(0);
+  });
+
+  test("silent image, zero text / mention / lure → NEVER touched (no vision, no signal)", async () => {
+    const fx = freshEffects();
+    const handled = await handlePhishingDetection(
+      makeMessage({ userId: nextUser(), content: "", attachments: [{ name: "pic.png", size: 5000 }], effects: fx }),
+    );
+    expect(handled).toBe(false);
+    expect(fx.kicks + fx.timeouts + fx.deletedIds.length).toBe(0);
+  });
+});
+
+// ── Innocent people must NEVER be kicked by the image/phishing path ───────────
+describe("phishing path never kicks innocent people", () => {
+  test("innocent event ping: '@everyone CTF starts now!' + screenshot, no lure/link → NOT kicked", async () => {
+    // Has mention + media but nothing readable says scam → recoverable timeout
+    // at worst, but crucially never a kick.
+    const fx = freshEffects();
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "@everyone CTF starts now, good luck!",
+        attachments: [{ name: "scoreboard.png", size: 80000 }],
+        everyone: true,
+        effects: fx,
+      }),
+    );
+    expect(fx.kicks).toBe(0);
+    expect(handled).toBe(true); // still soft-actioned, but no kick
+  });
+
+  test("guild owner: image + @everyone + literal 'free nitro' lure → exempt, NOT kicked", async () => {
+    const fx = freshEffects();
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: "owner-id",
+        ownerId: "owner-id",
+        content: "free nitro @everyone discord.gg/x",
+        attachments: [{ name: "promo.png", size: 9000 }],
+        everyone: true,
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(false);
+    expect(fx.kicks + fx.timeouts + fx.deletedIds.length).toBe(0);
+  });
+
+  test("staff (ManageMessages): image + @everyone + lure → exempt, NOT kicked", async () => {
+    const fx = freshEffects();
+    const member = makeMember(fx, { staff: true });
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "free nitro @everyone claim now discord.gg/x",
+        attachments: [{ name: "promo.png", size: 9000 }],
+        everyone: true,
+        member,
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(false);
+    expect(fx.kicks).toBe(0);
+  });
+
+  test("repeat scammer WITHOUT @everyone escalates: 1st post → timeout, 2nd → KICK", async () => {
+    // The production failure: a scammer kept posting scam links, got timed out
+    // each time, came back, and was never kicked because the phishing path had
+    // no memory. Now repeats climb to a kick.
+    const fx = freshEffects();
+    const u = nextUser();
+    const member = makeMember(fx, { kickable: true, moderatable: true });
+    const post = () =>
+      handlePhishingDetection(
+        makeMessage({ userId: u, content: "claim your free nitro here https://nitro-free.example", member, effects: fx }),
+      );
+
+    expect(await post()).toBe(true); // strike 1 → timeout, no kick
+    expect(fx.timeouts).toBe(1);
+    expect(fx.kicks).toBe(0);
+
+    expect(await post()).toBe(true); // strike 2 (within decay) → kick
+    expect(fx.kicks).toBe(1);
+  });
+
+  test("a SINGLE borderline scam post → timeout only, never kicked (recoverable)", async () => {
+    const fx = freshEffects();
+    const member = makeMember(fx, { kickable: true, moderatable: true });
+    const handled = await handlePhishingDetection(
+      makeMessage({ userId: nextUser(), content: "free nitro, claim now https://x.example", member, effects: fx }),
+    );
+    expect(handled).toBe(true);
+    expect(fx.kicks).toBe(0);
+    expect(fx.timeouts).toBe(1);
+  });
+
+  test("un-kickable member: image + @everyone + lure → message removed but NEVER kicked", async () => {
+    const fx = freshEffects();
+    const member = makeMember(fx, { kickable: false, moderatable: false });
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "free nitro @everyone claim now discord.gg/x",
+        attachments: [{ name: "promo.png", size: 9000 }],
+        everyone: true,
+        member,
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(true);
+    expect(fx.kicks).toBe(0); // bot can't kick → never attempted
+    expect(fx.deletedIds.length).toBeGreaterThan(0); // scam still removed
+  });
+});
+
+// ── Perceptual image-scam detection (the otnieltym ring) ──────────────────────
+// Correlation rules tested with synthetic 64-bit hashes; the dHash↔real-image
+// behaviour is validated separately in scripts/verify-dhash-ts.ts (ring copies
+// land 0-5 bits apart, nearest legit writeup ~22).
+describe("perceptual image-scam: correlation rules", () => {
+  beforeEach(() => __resetImageScamState());
+
+  const H = 0n; // base fingerprint
+  const NEAR = 0b111n; // 3 bits away from H → within the ≤10 match threshold
+  const FAR = (1n << 63n) | (1n << 40n) | (1n << 20n) | 0xffffn; // many bits away
+
+  test("same image from 2 distinct accounts → ring confirmed on the 2nd", () => {
+    const t = 1_000_000;
+    expect(evaluateImageFingerprint("A", "c1", "m1", H, t).confirmed).toBe(false);
+    const d = evaluateImageFingerprint("B", "c2", "m2", H, t + 500);
+    expect(d.confirmed).toBe(true);
+    expect(d.reason).toContain("2 accounts");
+    expect(d.matched.length).toBe(2); // both posters' messages targeted for deletion
+  });
+
+  test("re-encoded copy (≤10 bits apart) still counts as the same image → ring", () => {
+    const t = 2_000_000;
+    expect(evaluateImageFingerprint("A", "c1", "m1", H, t).confirmed).toBe(false);
+    // Different account posts a perceptually-near (not identical) hash.
+    expect(evaluateImageFingerprint("B", "c2", "m2", NEAR, t + 1000).confirmed).toBe(true);
+  });
+
+  test("one account fanning the same image across 3 channels in seconds → confirmed", () => {
+    const t = 3_000_000;
+    expect(evaluateImageFingerprint("A", "c1", "m1", H, t).confirmed).toBe(false);
+    expect(evaluateImageFingerprint("A", "c2", "m2", H, t + 1000).confirmed).toBe(false);
+    const d = evaluateImageFingerprint("A", "c3", "m3", H, t + 2000);
+    expect(d.confirmed).toBe(true);
+    expect(d.reason).toContain("3 channels");
+  });
+
+  test("two DIFFERENT images from two accounts → NOT confirmed (no false ring)", () => {
+    const t = 4_000_000;
+    expect(evaluateImageFingerprint("A", "c1", "m1", H, t).confirmed).toBe(false);
+    expect(evaluateImageFingerprint("B", "c2", "m2", FAR, t + 500).confirmed).toBe(false);
+  });
+
+  test("one account, same image to only 2 channels → NOT confirmed (below fanout)", () => {
+    const t = 5_000_000;
+    expect(evaluateImageFingerprint("A", "c1", "m1", H, t).confirmed).toBe(false);
+    expect(evaluateImageFingerprint("A", "c2", "m2", H, t + 1000).confirmed).toBe(false);
+  });
+
+  test("once learned, the same image from a brand-new account is flagged as known", () => {
+    const t = 6_000_000;
+    evaluateImageFingerprint("A", "c1", "m1", H, t); // single account → not yet
+    evaluateImageFingerprint("B", "c2", "m2", H, t + 1); // ring → H added to known-scam set
+    const d = evaluateImageFingerprint("C", "c9", "m9", H, t + 10_000);
+    expect(d.confirmed).toBe(true);
+    expect(d.reason).toContain("known");
+  });
+});
+
+describe("perceptual image-scam: enforcement", () => {
+  beforeEach(() => __resetImageScamState());
+
+  test("ring of 2 accounts posting the same image → 2nd account is kicked + removed", async () => {
+    const fx = freshEffects();
+    const memberA = makeMember(fx, { kickable: true, moderatable: true });
+    const memberB = makeMember(fx, { kickable: true, moderatable: true });
+
+    const a = await handleImageScamDetection(
+      makeMessage({ userId: "ringA", channelId: "c1", attachments: [{ name: "s.png", size: 100 }], member: memberA, effects: fx }),
+      { hashesForTest: [0n] },
+    );
+    expect(a).toBe(false); // single account so far → no action
+    expect(fx.kicks).toBe(0);
+
+    const b = await handleImageScamDetection(
+      makeMessage({ userId: "ringB", channelId: "c2", attachments: [{ name: "s.png", size: 100 }], member: memberB, effects: fx }),
+      { hashesForTest: [0n] },
+    );
+    expect(b).toBe(true); // ring confirmed → handled
+    expect(fx.kicks).toBe(1);
+  });
+
+  test("plain image post that matches nothing → never touched", async () => {
+    const fx = freshEffects();
+    const handled = await handleImageScamDetection(
+      makeMessage({ userId: nextUser(), attachments: [{ name: "screenshot.png", size: 5000 }], effects: fx }),
+      { hashesForTest: [12345n] },
+    );
+    expect(handled).toBe(false);
+    expect(fx.kicks + fx.timeouts + fx.deletedIds.length).toBe(0);
+  });
+
+  test("exempt staff posting a matching image → never actioned", async () => {
+    const fx = freshEffects();
+    const staff = makeMember(fx, { staff: true });
+    // Two staff posts of the same image must not trip the ring (exempt short-circuits).
+    await handleImageScamDetection(
+      makeMessage({ userId: "staff1", channelId: "c1", attachments: [{ name: "s.png", size: 1 }], member: staff, effects: fx }),
+      { hashesForTest: [7n] },
+    );
+    const handled = await handleImageScamDetection(
+      makeMessage({ userId: "staff2", channelId: "c2", attachments: [{ name: "s.png", size: 1 }], member: makeMember(fx, { staff: true }), effects: fx }),
+      { hashesForTest: [7n] },
+    );
+    expect(handled).toBe(false);
+    expect(fx.kicks).toBe(0);
   });
 });
