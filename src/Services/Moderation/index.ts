@@ -648,6 +648,11 @@ export async function handlePhishingDetection(message: GuildMessage): Promise<bo
  */
 const IMG_FANOUT_CHANNELS = 3;            // same image to N channels by one account
 const IMG_FANOUT_WINDOW_MS = 30_000;      // …within this span → solo raid
+// Paced raid (2026-06-07 evasion): same image to ≥3 channels but ~1min apart —
+// outside the 30s raid window. Too ambiguous for instant removal (an innocent
+// might cross-post one image to a few channels), so this tier only deletes the
+// copies and climbs the shared strike ladder: warn → timeout → removal.
+const IMG_SLOW_FANOUT_WINDOW_MS = 10 * 60_000;
 const IMG_RING_MIN_ACCOUNTS = 2;          // same image from N distinct accounts
 const IMG_RING_WINDOW_MS = 60 * 60_000;   // …within an hour → coordinated ring
 const IMG_MAX_ATTACH = 4;                 // decode at most N images per message
@@ -681,9 +686,17 @@ function pruneImageState(now: number): void {
 }
 
 export interface ImageScamDecision {
+  /** High-confidence scam (known set / multi-account ring / tight fan-out) →
+   * immediate removal. */
   confirmed: boolean;
+  /** Ambiguous-but-suspicious (same image to ≥3 channels, paced over minutes)
+   * → delete copies + strike ladder, never instant removal. */
+  escalate: boolean;
   reason: string;
   matched: { channelId: string; messageId: string }[];
+  /** The cluster's representative hash — lets enforcement add it to the
+   * known-scam set once an escalation climbs to removal. */
+  clusterHash: bigint;
 }
 
 /** Record one image fingerprint and decide whether it confirms a scam. Pure over
@@ -724,13 +737,22 @@ export function evaluateImageFingerprint(
   const confirmed = known || ring || fanout;
   if (confirmed && !known) knownScamHashes.push(cluster.hash);
 
+  // Paced fan-out: enough channels for a raid, too slow for the tight window.
+  // NOT added to the known set here — an innocent cross-poster's image must
+  // never auto-remove the next person who posts it.
+  const slowFanout =
+    !confirmed && poster.channels.size >= IMG_FANOUT_CHANNELS && now - poster.firstTs <= IMG_SLOW_FANOUT_WINDOW_MS;
+
   const matched = [...cluster.posters.values()].flatMap((p) => p.refs);
+  const spread = `same image across ${poster.channels.size} channels in ${Math.round((now - poster.firstTs) / 1000)}s`;
   const reason = known
     ? "matches a known scam image"
     : ring
       ? `same image from ${distinctAccounts} accounts`
-      : `same image across ${poster.channels.size} channels in ${Math.round((now - poster.firstTs) / 1000)}s`;
-  return { confirmed, reason, matched };
+      : slowFanout
+        ? `${spread} (paced fan-out)`
+        : spread;
+  return { confirmed, escalate: slowFanout, reason, matched, clusterHash: cluster.hash };
 }
 
 function isImageAttachment(a: any): boolean {
@@ -803,14 +825,14 @@ async function hashMessageImages(message: GuildMessage): Promise<bigint[]> {
  */
 export async function handleImageScamDetection(
   message: GuildMessage,
-  opts?: { hashesForTest?: bigint[] },
+  opts?: { hashesForTest?: bigint[]; nowForTest?: number },
 ): Promise<boolean> {
   try {
     if (message.author.bot || !message.guild) return false;
     if (![...message.attachments.values()].some(isImageAttachment)) return false;
     if (await isExemptFromModeration(message)) return false;
 
-    const now = Date.now();
+    const now = opts?.nowForTest ?? Date.now();
     pruneImageState(now);
 
     const hashes = opts?.hashesForTest ?? (await hashMessageImages(message));
@@ -825,36 +847,79 @@ export async function handleImageScamDetection(
     }
 
     let decision: ImageScamDecision | null = null;
+    let escalation: ImageScamDecision | null = null;
     for (const h of hashes) {
       const d = evaluateImageFingerprint(message.author.id, message.channelId, message.id, h, now);
       if (d.confirmed) {
         decision = d;
         break;
       }
+      if (d.escalate && !escalation) escalation = d;
     }
-    if (!decision) return false;
-
-    await deleteMatchedMessages(message, decision.matched);
 
     const member = message.member;
     const canKick = !!member && (safeCan(() => member.kickable) || safeCan(() => (member as any).bannable));
     const canTimeout = !!member && safeCan(() => member.moderatable);
 
-    if (canKick) {
-      await notifyUser(
-        message,
-        "You were removed for posting a scam image (it matched a coordinated spam campaign). Contact a moderator if this was a mistake.",
-      );
-      await removeAndPurge(message, member!, "Scam image — perceptual match");
-    } else if (canTimeout) {
-      try {
-        await member!.timeout(TIMEOUT_MS, "Scam image — perceptual match");
-      } catch (error) {
-        console.log(`[Moderation] image-scam timeout failed for ${message.author.id}: ${error}`);
+    // High-confidence confirmation (known set / ring / tight fan-out) →
+    // immediate removal, as before.
+    if (decision) {
+      await deleteMatchedMessages(message, decision.matched);
+      if (canKick) {
+        await notifyUser(
+          message,
+          "You were removed for posting a scam image (it matched a coordinated spam campaign). Contact a moderator if this was a mistake.",
+        );
+        await removeAndPurge(message, member!, "Scam image — perceptual match");
+      } else if (canTimeout) {
+        try {
+          await member!.timeout(TIMEOUT_MS, "Scam image — perceptual match");
+        } catch (error) {
+          console.log(`[Moderation] image-scam timeout failed for ${message.author.id}: ${error}`);
+        }
       }
+      console.log(`[Moderation] image-scam handled for ${message.author.id}: ${decision.reason}`);
+      return true;
     }
-    console.log(`[Moderation] image-scam handled for ${message.author.id}: ${decision.reason}`);
-    return true;
+
+    // Paced fan-out (the 2026-06-07 kmndg evasion: same image to ≥3 channels,
+    // ~1min apart — outside the raid window). Ambiguous on its own, so NEVER an
+    // instant removal: delete the copies and climb the shared strike ladder.
+    // A persistent scammer reaches removal on his next wave; an innocent
+    // cross-poster only ever loses the duplicate copies and gets a warning.
+    if (escalation) {
+      await deleteMatchedMessages(message, escalation.matched);
+      const level = bumpStrike(message.author.id);
+
+      if (level >= 3 && canKick) {
+        await notifyUser(
+          message,
+          "You were removed for repeatedly spreading the same image across channels after warnings. Contact a moderator if this was a mistake.",
+        );
+        await removeAndPurge(message, member!, "Repeated image fan-out after warnings — scam pattern");
+        // Removal-grade now — remember the image so reposts die instantly.
+        knownScamHashes.push(escalation.clusterHash);
+        delete heat[message.author.id];
+      } else if (level >= 2 && canTimeout) {
+        try {
+          await member!.timeout(TIMEOUT_MS, "Repeated image fan-out across channels");
+        } catch (error) {
+          console.log(`[Moderation] image fan-out timeout failed for ${message.author.id}: ${error}`);
+        }
+        await warnInChannel(message, "you've been timed out briefly for spreading the same image across channels. please stop.");
+        await notifyUser(message, "You've been timed out for 5 minutes for posting the same image across multiple channels.");
+      } else {
+        await warnInChannel(
+          message,
+          "please don't post the same image across multiple channels — the copies were removed. continued spreading may lead to a timeout.",
+        );
+        await notifyUser(message, "Your image was posted across several channels, so the copies were removed. Feel free to post it again — in one channel only.");
+      }
+      console.log(`[Moderation] image fan-out escalation (strike ${level}) for ${message.author.id}: ${escalation.reason}`);
+      return true;
+    }
+
+    return false;
   } catch (error) {
     console.error("[Moderation] handleImageScamDetection error:", error);
     return false;

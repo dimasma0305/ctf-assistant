@@ -777,6 +777,124 @@ describe("softban purge of confirmed scammers", () => {
   });
 });
 
+// ── Paced fan-out (2026-06-07 kmndg evasion: same image to 3 channels ~1min
+// apart — outside the 30s raid window). Must escalate via the strike ladder,
+// NEVER instant-remove — an innocent cross-poster only ever gets a warning. ──
+describe("paced image fan-out escalation", () => {
+  beforeEach(() => __resetImageScamState());
+
+  const att = [{ name: "s.png", size: 9 }];
+
+  test("3 channels ~60s apart → copies deleted + warned, NOT removed, NOT timed out", async () => {
+    const fx = freshEffects();
+    const u = nextUser();
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true });
+    const t0 = 10_000_000;
+    const r1 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "pf1", attachments: att, member, effects: fx }),
+      { hashesForTest: [77n], nowForTest: t0 },
+    );
+    const r2 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "pf2", attachments: att, member, effects: fx }),
+      { hashesForTest: [77n], nowForTest: t0 + 60_000 },
+    );
+    expect(r1).toBe(false);
+    expect(r2).toBe(false);
+    const r3 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "pf3", attachments: att, member, effects: fx }),
+      { hashesForTest: [77n], nowForTest: t0 + 120_000 },
+    );
+    expect(r3).toBe(true); // handled: copies deleted, strike recorded
+    expect(fx.bans + fx.kicks + fx.timeouts).toBe(0); // first offence → warn only
+    expect(fx.warnings).toBeGreaterThanOrEqual(1);
+  });
+
+  test("persistent paced fan-out climbs the ladder: warn → timeout → softban; image then learned", async () => {
+    const fx = freshEffects();
+    const u = nextUser();
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true });
+    let t = 50_000_000;
+    const wave = async (hash: bigint, tag: string) => {
+      let last = false;
+      for (const ch of ["a", "b", "c"]) {
+        last = await handleImageScamDetection(
+          makeMessage({ userId: u, channelId: `${tag}-${ch}`, attachments: att, member, effects: fx }),
+          { hashesForTest: [hash], nowForTest: (t += 30_000) },
+        );
+      }
+      return last;
+    };
+
+    // Hashes are >10 bits apart so each wave forms its own cluster (a real
+    // scammer rotating images between waves).
+    expect(await wave(0n, "w1")).toBe(true); // strike 1 → warn
+    expect(fx.bans + fx.kicks + fx.timeouts).toBe(0);
+
+    expect(await wave(0xffffn, "w2")).toBe(true); // strike 2 → timeout
+    expect(fx.timeouts).toBe(1);
+    expect(fx.bans + fx.kicks).toBe(0);
+
+    expect(await wave(0xffff0000n, "w3")).toBe(true); // strike 3 → softban-purge
+    expect(fx.bans).toBe(1);
+    expect(fx.unbans).toBe(1);
+    expect(fx.kicks).toBe(0);
+
+    // Removal-grade → the wave-3 image joined the known-scam set: a different
+    // account posting it once is now removed on sight.
+    const fx2 = freshEffects();
+    const other = makeMember(fx2, { kickable: true, bannable: true, moderatable: true });
+    const handled = await handleImageScamDetection(
+      makeMessage({ userId: nextUser(), channelId: "fresh", attachments: att, member: other, effects: fx2 }),
+      { hashesForTest: [0xffff0000n], nowForTest: t + 30_000 },
+    );
+    expect(handled).toBe(true);
+    expect(fx2.bans).toBe(1); // instant removal via known set
+  });
+
+  test("tight fan-out (3 channels within 30s) still removes instantly — no ladder", async () => {
+    const fx = freshEffects();
+    const u = nextUser();
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true });
+    const t0 = 90_000_000;
+    await handleImageScamDetection(makeMessage({ userId: u, channelId: "ff1", attachments: att, member, effects: fx }), { hashesForTest: [555n], nowForTest: t0 });
+    await handleImageScamDetection(makeMessage({ userId: u, channelId: "ff2", attachments: att, member, effects: fx }), { hashesForTest: [555n], nowForTest: t0 + 5_000 });
+    const r3 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "ff3", attachments: att, member, effects: fx }),
+      { hashesForTest: [555n], nowForTest: t0 + 10_000 },
+    );
+    expect(r3).toBe(true);
+    expect(fx.bans).toBe(1); // immediate softban, no warn-first ladder
+    expect(fx.timeouts).toBe(0);
+  });
+
+  test("2 channels paced → no action at all", async () => {
+    const fx = freshEffects();
+    const u = nextUser();
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true });
+    const t0 = 130_000_000;
+    const r1 = await handleImageScamDetection(makeMessage({ userId: u, channelId: "tc1", attachments: att, member, effects: fx }), { hashesForTest: [888n], nowForTest: t0 });
+    const r2 = await handleImageScamDetection(makeMessage({ userId: u, channelId: "tc2", attachments: att, member, effects: fx }), { hashesForTest: [888n], nowForTest: t0 + 60_000 });
+    expect(r1).toBe(false);
+    expect(r2).toBe(false);
+    expect(fx.bans + fx.kicks + fx.timeouts + fx.warnings).toBe(0);
+  });
+
+  test("3 channels but spread over >10min → outside the slow window, no action", async () => {
+    const fx = freshEffects();
+    const u = nextUser();
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true });
+    const t0 = 170_000_000;
+    await handleImageScamDetection(makeMessage({ userId: u, channelId: "sl1", attachments: att, member, effects: fx }), { hashesForTest: [333n], nowForTest: t0 });
+    await handleImageScamDetection(makeMessage({ userId: u, channelId: "sl2", attachments: att, member, effects: fx }), { hashesForTest: [333n], nowForTest: t0 + 6 * 60_000 });
+    const r3 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "sl3", attachments: att, member, effects: fx }),
+      { hashesForTest: [333n], nowForTest: t0 + 12 * 60_000 },
+    );
+    expect(r3).toBe(false);
+    expect(fx.bans + fx.kicks + fx.timeouts).toBe(0);
+  });
+});
+
 // ── Matched-ref hygiene: multi-attachment messages must yield ONE ref ───────
 describe("image fingerprint ref dedup", () => {
   beforeEach(() => __resetImageScamState());
