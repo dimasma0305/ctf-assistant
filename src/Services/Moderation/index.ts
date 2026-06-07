@@ -310,37 +310,110 @@ async function warnInChannel(message: GuildMessage, text: string): Promise<void>
 
 /** Delete only the matched messages, grouped per channel, using bulkDelete
  * (with a single-message fallback). No guild-wide scan, no per-message fetch
- * storm. Targets are minutes old, well inside the 14-day bulk-delete window. */
+ * storm. Targets are minutes old, well inside the 14-day bulk-delete window.
+ *
+ * Every failure is LOGGED, never swallowed: the 2026-06-07 incident proved a
+ * fully-silent deletion path is undiagnosable (a scam message survived and the
+ * logs said nothing). Ids are deduped per channel — duplicate ids would make
+ * bulkDelete's 2-100 unique-id requirement misfire. */
 async function deleteMatchedMessages(
   message: GuildMessage,
   matched: Pick<RecentMessage, "channelId" | "messageId">[],
 ): Promise<void> {
-  const byChannel = new Map<string, string[]>();
+  const byChannel = new Map<string, Set<string>>();
   for (const r of matched) {
-    const list = byChannel.get(r.channelId) ?? [];
-    list.push(r.messageId);
-    byChannel.set(r.channelId, list);
+    const set = byChannel.get(r.channelId) ?? new Set<string>();
+    set.add(r.messageId);
+    byChannel.set(r.channelId, set);
   }
 
-  for (const [channelId, ids] of byChannel) {
+  let deleted = 0;
+  let failed = 0;
+  for (const [channelId, idSet] of byChannel) {
+    const ids = [...idSet];
     try {
       const channel: any =
         channelId === message.channelId
           ? message.channel
           : message.guild
-            ? await message.guild.channels.fetch(channelId).catch(() => null)
+            ? await message.guild.channels.fetch(channelId).catch((e: unknown) => {
+                console.log(`[Moderation] channel fetch ${channelId} failed: ${e}`);
+                return null;
+              })
             : null;
-      if (!channel) continue;
+      if (!channel) {
+        failed += ids.length;
+        console.log(`[Moderation] cannot resolve channel ${channelId} — skipping ${ids.length} deletion(s)`);
+        continue;
+      }
 
       if (ids.length === 1) {
-        const single = await channel.messages?.fetch(ids[0]).catch(() => null);
-        await single?.delete?.().catch(() => undefined);
+        const single = await channel.messages?.fetch(ids[0]).catch((e: any) => {
+          console.log(`[Moderation] fetch msg ${ids[0]} in ${channelId} failed: ${e?.code ?? e}`);
+          return null;
+        });
+        if (!single) {
+          failed++;
+          continue;
+        }
+        const ok = await Promise.resolve(single.delete?.())
+          .then(() => true)
+          .catch((e: any) => {
+            console.log(`[Moderation] delete msg ${ids[0]} in ${channelId} failed: ${e?.code ?? e}`);
+            return false;
+          });
+        ok ? deleted++ : failed++;
       } else if (typeof channel.bulkDelete === "function") {
-        await channel.bulkDelete(ids, true).catch(() => undefined);
+        const ok = await Promise.resolve(channel.bulkDelete(ids, true))
+          .then(() => true)
+          .catch((e: any) => {
+            console.log(`[Moderation] bulkDelete ${ids.length} msgs in ${channelId} failed: ${e?.code ?? e}`);
+            return false;
+          });
+        ok ? (deleted += ids.length) : (failed += ids.length);
       }
     } catch (error) {
+      failed += ids.length;
       console.log(`[Moderation] could not delete matched messages in ${channelId}: ${error}`);
     }
+  }
+  console.log(`[Moderation] matched-message cleanup: deleted ${deleted}, failed ${failed}`);
+}
+
+/** How far back a softban purges the removed scammer's messages. Matches the
+ * image-scam ring window — anything older was posted before the campaign. */
+const SOFTBAN_PURGE_SECONDS = 60 * 60;
+
+/** Remove a CONFIRMED scammer and purge their recent messages everywhere.
+ *
+ * Prefers a SOFTBAN — ban with a 1h server-wide message purge, then an
+ * immediate unban — which keeps kick semantics (they can rejoin) while Discord
+ * itself deletes EVERY message they sent in the window, in every channel. This
+ * is what guarantees cleanup even for messages we never matched: on 2026-06-07
+ * a scam message survived because its image downloads failed before hashing, so
+ * per-message deletion never knew about it. Falls back to a plain kick when
+ * banning isn't possible. Only ever called on high-confidence confirmations —
+ * the decision of WHO gets removed is unchanged, only the cleanup is stronger. */
+async function removeAndPurge(message: GuildMessage, member: any, reason: string): Promise<void> {
+  const canBan = safeCan(() => member.bannable) && typeof member.ban === "function";
+  if (canBan) {
+    try {
+      await member.ban({ deleteMessageSeconds: SOFTBAN_PURGE_SECONDS, reason });
+      try {
+        await (message.guild as any)?.members?.unban?.(message.author.id, "Softban purge complete — rejoining allowed");
+      } catch (error) {
+        console.log(`[Moderation] unban after softban failed for ${message.author.id}: ${error}`);
+      }
+      console.log(`[Moderation] softban-purged ${message.author.id}: ${reason}`);
+      return;
+    } catch (error) {
+      console.log(`[Moderation] softban failed for ${message.author.id}, falling back to kick: ${error}`);
+    }
+  }
+  try {
+    await member.kick(reason);
+  } catch (error) {
+    console.log(`[Moderation] kick failed for ${message.author.id}: ${error}`);
   }
 }
 
@@ -373,7 +446,7 @@ async function enforce(
   await deleteMatchedMessages(message, matched);
 
   const member = message.member;
-  const canKick = !!member && safeCan(() => member.kickable);
+  const canKick = !!member && (safeCan(() => member.kickable) || safeCan(() => (member as any).bannable));
   const canTimeout = !!member && safeCan(() => member.moderatable);
 
   if (level >= 3 && canKick) {
@@ -381,11 +454,7 @@ async function enforce(
       message,
       "You were removed for repeatedly posting the same content after warnings. You're welcome to rejoin — just don't flood the same message.",
     );
-    try {
-      await member!.kick("Repeated spam after warning and timeout");
-    } catch (error) {
-      console.log(`[Moderation] kick failed for ${userId}: ${error}`);
-    }
+    await removeAndPurge(message, member!, "Repeated spam after warning and timeout");
     delete heat[userId];
     return;
   }
@@ -513,20 +582,17 @@ export async function handlePhishingDetection(message: GuildMessage): Promise<bo
     await message.delete().catch(() => undefined);
 
     const member = message.member;
-    const canKick = !!member && safeCan(() => member.kickable);
+    const canKick = !!member && (safeCan(() => member.kickable) || safeCan(() => (member as any).bannable));
     const canTimeout = !!member && safeCan(() => member.moderatable);
 
-    // Immediate KICK on an unambiguous raid: a *readable* scam (known lure
+    // Immediate REMOVAL on an unambiguous raid: a *readable* scam (known lure
     // phrase or actual link) PLUS the @everyone ping. We deliberately do NOT
-    // kick on mass-mention + unreadable-image alone — that could be an innocent
-    // member pinging an event screenshot, and we have no vision to confirm.
+    // remove on mass-mention + unreadable-image alone — that could be an
+    // innocent member pinging an event screenshot, and we have no vision to
+    // confirm.
     if (massMention && (hasLure || hasLink) && canKick) {
       await notifyUser(message, "Your message was removed and you were removed from the server for posting a phishing/scam link with a mass mention. Contact a moderator if this was a mistake.");
-      try {
-        await member!.kick("Posting phishing/scam links with mass mention");
-      } catch (error) {
-        console.log(`[Moderation] phishing kick failed for ${message.author.id}: ${error}`);
-      }
+      await removeAndPurge(message, member!, "Posting phishing/scam links with mass mention");
       delete heat[message.author.id];
       return true;
     }
@@ -543,11 +609,7 @@ export async function handlePhishingDetection(message: GuildMessage): Promise<bo
         message,
         "You were removed for repeatedly posting phishing/scam content after a warning. You're welcome to appeal to a moderator if this was a mistake.",
       );
-      try {
-        await member!.kick("Repeated phishing/scam after timeout");
-      } catch (error) {
-        console.log(`[Moderation] phishing repeat-kick failed for ${message.author.id}: ${error}`);
-      }
+      await removeAndPurge(message, member!, "Repeated phishing/scam after timeout");
       delete heat[message.author.id];
       return true;
     }
@@ -649,7 +711,11 @@ export function evaluateImageFingerprint(
   }
   poster.channels.add(channelId);
   poster.lastTs = now;
-  poster.refs.push({ channelId, messageId });
+  // One ref per message — a multi-attachment message evaluates once per hash,
+  // and duplicate ids would corrupt the bulk-delete grouping downstream.
+  if (!poster.refs.some((r) => r.messageId === messageId)) {
+    poster.refs.push({ channelId, messageId });
+  }
 
   const distinctAccounts = [...cluster.posters.values()].filter((p) => now - p.lastTs <= IMG_RING_WINDOW_MS).length;
   const ring = distinctAccounts >= IMG_RING_MIN_ACCOUNTS;
@@ -674,25 +740,34 @@ function isImageAttachment(a: any): boolean {
   return ["png", "jpg", "jpeg", "gif", "webp", "bmp", "avif"].includes(ext);
 }
 
+/** Download an image, retrying once — a transient CDN hiccup during a raid
+ * burst (the bot is downloading a dozen images at once) must not silently
+ * drop a scam image out of correlation. */
 async function fetchImageBuffer(url: string): Promise<Buffer | null> {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), IMG_FETCH_TIMEOUT_MS);
-  try {
-    const res = await fetch(url, { signal: ctrl.signal });
-    if (!res.ok) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
-    return buf.length > IMG_MAX_BYTES ? null : buf;
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timer);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), IMG_FETCH_TIMEOUT_MS);
+    try {
+      const res = await fetch(url, { signal: ctrl.signal });
+      if (!res.ok) continue;
+      const buf = Buffer.from(await res.arrayBuffer());
+      return buf.length > IMG_MAX_BYTES ? null : buf;
+    } catch {
+      /* retry once, then give up */
+    } finally {
+      clearTimeout(timer);
+    }
   }
+  return null;
 }
 
-/** Download + perceptually hash a message's image attachments (cached per id). */
+/** Download + perceptually hash a message's image attachments (cached per id).
+ * Failures are logged — a hash that silently never happens is a scam message
+ * that silently never gets matched. */
 async function hashMessageImages(message: GuildMessage): Promise<bigint[]> {
   const atts = [...message.attachments.values()].filter(isImageAttachment).slice(0, IMG_MAX_ATTACH);
   const out: bigint[] = [];
+  let failures = 0;
   for (const a of atts) {
     const cached = attachHashCache.get(a.id);
     if (cached !== undefined) {
@@ -701,12 +776,20 @@ async function hashMessageImages(message: GuildMessage): Promise<bigint[]> {
     }
     if ((a.size ?? 0) > IMG_MAX_BYTES) continue;
     const buf = await fetchImageBuffer(a.url);
-    if (!buf) continue;
-    const h = await dhashFromBuffer(buf);
-    if (h !== null) {
-      attachHashCache.set(a.id, h);
-      out.push(h);
+    if (!buf) {
+      failures++;
+      continue;
     }
+    const h = await dhashFromBuffer(buf);
+    if (h === null) {
+      failures++;
+      continue;
+    }
+    attachHashCache.set(a.id, h);
+    out.push(h);
+  }
+  if (failures > 0) {
+    console.log(`[Moderation] image hashing: ${failures}/${atts.length} attachment(s) failed for msg ${message.id} in ${message.channelId}`);
   }
   return out;
 }
@@ -731,7 +814,15 @@ export async function handleImageScamDetection(
     pruneImageState(now);
 
     const hashes = opts?.hashesForTest ?? (await hashMessageImages(message));
-    if (hashes.length === 0) return false;
+    if (hashes.length === 0) {
+      // Every attachment failed to download/decode (or all were oversized).
+      // This is exactly the silent path that let a scam message survive the
+      // 2026-06-07 fan-out — never skip it quietly again.
+      console.log(
+        `[Moderation] image-scam: 0 hashable images for msg ${message.id} by ${message.author.id} in ${message.channelId} (${message.attachments.size} attachment(s)) — skipping correlation`,
+      );
+      return false;
+    }
 
     let decision: ImageScamDecision | null = null;
     for (const h of hashes) {
@@ -746,7 +837,7 @@ export async function handleImageScamDetection(
     await deleteMatchedMessages(message, decision.matched);
 
     const member = message.member;
-    const canKick = !!member && safeCan(() => member.kickable);
+    const canKick = !!member && (safeCan(() => member.kickable) || safeCan(() => (member as any).bannable));
     const canTimeout = !!member && safeCan(() => member.moderatable);
 
     if (canKick) {
@@ -754,11 +845,7 @@ export async function handleImageScamDetection(
         message,
         "You were removed for posting a scam image (it matched a coordinated spam campaign). Contact a moderator if this was a mistake.",
       );
-      try {
-        await member!.kick("Scam image — perceptual match");
-      } catch (error) {
-        console.log(`[Moderation] image-scam kick failed for ${message.author.id}: ${error}`);
-      }
+      await removeAndPurge(message, member!, "Scam image — perceptual match");
     } else if (canTimeout) {
       try {
         await member!.timeout(TIMEOUT_MS, "Scam image — perceptual match");

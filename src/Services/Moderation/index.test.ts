@@ -31,12 +31,18 @@ interface Effects {
   warnings: number;
   dms: number;
   selfDeletes: number;
+  bans: number;
+  unbans: number;
 }
 
-function makeMember(effects: Effects, opts: { kickable?: boolean; moderatable?: boolean; staff?: boolean } = {}) {
+function makeMember(
+  effects: Effects,
+  opts: { kickable?: boolean; moderatable?: boolean; staff?: boolean; bannable?: boolean; banThrows?: boolean } = {},
+) {
   return {
     kickable: opts.kickable ?? true,
     moderatable: opts.moderatable ?? true,
+    bannable: opts.bannable ?? false,
     roles: { cache: new Map<string, unknown>() },
     permissions: { has: () => !!opts.staff },
     async kick() {
@@ -44,6 +50,10 @@ function makeMember(effects: Effects, opts: { kickable?: boolean; moderatable?: 
     },
     async timeout() {
       effects.timeouts++;
+    },
+    async ban() {
+      if (opts.banThrows) throw new Error("Missing Permissions");
+      effects.bans++;
     },
   };
 }
@@ -133,6 +143,11 @@ function makeMessage(o: MsgOpts): any {
     guild: {
       ownerId: o.ownerId ?? "owner-id",
       channels: { async fetch() { return null; } },
+      members: {
+        async unban() {
+          effects.unbans++;
+        },
+      },
     },
     member: o.member === undefined ? makeMember(effects) : o.member,
     async delete() {
@@ -142,7 +157,7 @@ function makeMessage(o: MsgOpts): any {
 }
 
 function freshEffects(): Effects {
-  return { kicks: 0, timeouts: 0, deletedIds: [], warnings: 0, dms: 0, selfDeletes: 0 };
+  return { kicks: 0, timeouts: 0, deletedIds: [], warnings: 0, dms: 0, selfDeletes: 0, bans: 0, unbans: 0 };
 }
 
 // Unique user id per test so module-level state never bleeds across tests.
@@ -681,5 +696,98 @@ describe("perceptual image-scam: enforcement", () => {
     );
     expect(handled).toBe(false);
     expect(fx.kicks).toBe(0);
+  });
+});
+
+// ── Softban purge (2026-06-07 incident: a scam message survived because its
+// image downloads failed before hashing, so per-message deletion never knew
+// about it; a softban makes Discord purge EVERY recent message server-wide) ──
+describe("softban purge of confirmed scammers", () => {
+  beforeEach(() => __resetImageScamState());
+
+  function ringConfirm(fx: Effects, member: ReturnType<typeof makeMember>, tag: string) {
+    // 1st account seeds the cluster, 2nd (the member under test) confirms the ring.
+    return handleImageScamDetection(
+      makeMessage({ userId: `${tag}-seed`, channelId: "c1", attachments: [{ name: "s.png", size: 100 }], effects: fx, member: makeMember(fx, { kickable: false, moderatable: false }) }),
+      { hashesForTest: [99n] },
+    ).then(() =>
+      handleImageScamDetection(
+        makeMessage({ userId: `${tag}-scammer`, channelId: "c2", attachments: [{ name: "s.png", size: 100 }], member, effects: fx }),
+        { hashesForTest: [99n] },
+      ),
+    );
+  }
+
+  test("bannable scammer → softban (ban + unban), NOT a plain kick", async () => {
+    const fx = freshEffects();
+    const member = makeMember(fx, { kickable: true, moderatable: true, bannable: true });
+    const handled = await ringConfirm(fx, member, nextUser());
+    expect(handled).toBe(true);
+    expect(fx.bans).toBe(1); // ban carries deleteMessageSeconds → server-wide purge
+    expect(fx.unbans).toBe(1); // immediately unbanned → kick semantics, can rejoin
+    expect(fx.kicks).toBe(0);
+  });
+
+  test("ban fails → falls back to a plain kick (member still removed)", async () => {
+    const fx = freshEffects();
+    const member = makeMember(fx, { kickable: true, bannable: true, banThrows: true });
+    const handled = await ringConfirm(fx, member, nextUser());
+    expect(handled).toBe(true);
+    expect(fx.bans).toBe(0);
+    expect(fx.unbans).toBe(0);
+    expect(fx.kicks).toBe(1);
+  });
+
+  test("not bannable → plain kick, exactly the old behavior", async () => {
+    const fx = freshEffects();
+    const member = makeMember(fx, { kickable: true, bannable: false });
+    const handled = await ringConfirm(fx, member, nextUser());
+    expect(handled).toBe(true);
+    expect(fx.bans).toBe(0);
+    expect(fx.kicks).toBe(1);
+  });
+
+  test("phishing raid (@everyone + link) on a bannable member → softban, not kick", async () => {
+    const fx = freshEffects();
+    const member = makeMember(fx, { kickable: true, bannable: true });
+    const handled = await handlePhishingDetection(
+      makeMessage({
+        userId: nextUser(),
+        content: "@everyone free nitro here https://discord.gg/scam",
+        everyone: true,
+        member,
+        effects: fx,
+      }),
+    );
+    expect(handled).toBe(true);
+    expect(fx.bans).toBe(1);
+    expect(fx.unbans).toBe(1);
+    expect(fx.kicks).toBe(0);
+  });
+
+  test("innocent member is NEVER softbanned: image post matching nothing → no ban, no kick", async () => {
+    const fx = freshEffects();
+    const member = makeMember(fx, { kickable: true, bannable: true });
+    const handled = await handleImageScamDetection(
+      makeMessage({ userId: nextUser(), attachments: [{ name: "holiday.png", size: 4000 }], member, effects: fx }),
+      { hashesForTest: [424242n] },
+    );
+    expect(handled).toBe(false);
+    expect(fx.bans + fx.unbans + fx.kicks + fx.timeouts).toBe(0);
+  });
+});
+
+// ── Matched-ref hygiene: multi-attachment messages must yield ONE ref ───────
+describe("image fingerprint ref dedup", () => {
+  beforeEach(() => __resetImageScamState());
+
+  test("same message evaluated once per attachment-hash → matched lists it once", () => {
+    const now = 1_000_000;
+    // 4 attachments of the same image in one message → 4 evaluations, 1 ref.
+    evaluateImageFingerprint("u-dedup", "chA", "msg-1", 5n, now);
+    evaluateImageFingerprint("u-dedup", "chA", "msg-1", 5n, now + 1);
+    evaluateImageFingerprint("u-dedup", "chA", "msg-1", 5n, now + 2);
+    const d = evaluateImageFingerprint("u-dedup", "chA", "msg-1", 5n, now + 3);
+    expect(d.matched.filter((r) => r.messageId === "msg-1")).toHaveLength(1);
   });
 });
