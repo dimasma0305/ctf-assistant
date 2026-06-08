@@ -895,6 +895,98 @@ describe("paced image fan-out escalation", () => {
   });
 });
 
+// ── Two-channel multi-image flood (2026-06-08 zakayartistry evasion: the same
+// 4-image scam set to #introductions + #chat in 5s — under the 3-channel floor).
+// Catches the fat-multi-image-set-fanned shape WITHOUT touching a single
+// screenshot cross-posted to two channels. Graduated, never instant. ──────────
+describe("two-channel multi-image flood", () => {
+  beforeEach(() => __resetImageScamState())
+
+  const fat = [
+    { name: "1.png", size: 9 },
+    { name: "2.png", size: 9 },
+    { name: "3.png", size: 9 },
+    { name: "4.png", size: 9 },
+  ]
+  const one = [{ name: "1.png", size: 9 }]
+
+  test("REGRESSION: same multi-image set to 2 channels in 5s → escalate (copies deleted + warn), NOT instant removal", async () => {
+    const fx = freshEffects()
+    const u = nextUser()
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true })
+    const t0 = 200_000_000
+    const r1 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "zc1", attachments: fat, member, effects: fx }),
+      { hashesForTest: [42n], nowForTest: t0 },
+    )
+    expect(r1).toBe(false) // one channel so far
+    const r2 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "zc2", attachments: fat, member, effects: fx }),
+      { hashesForTest: [42n], nowForTest: t0 + 5_000 },
+    )
+    expect(r2).toBe(true) // 2nd channel + fat message → handled
+    expect(fx.bans + fx.kicks + fx.timeouts).toBe(0) // first strike → warn only, never instant
+    expect(fx.warnings).toBeGreaterThanOrEqual(1)
+  })
+
+  test("INNOCENT: a SINGLE screenshot cross-posted to 2 channels → no action", async () => {
+    const fx = freshEffects()
+    const u = nextUser()
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true })
+    const t0 = 210_000_000
+    const r1 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "ic1", attachments: one, member, effects: fx }),
+      { hashesForTest: [43n], nowForTest: t0 },
+    )
+    const r2 = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "ic2", attachments: one, member, effects: fx }),
+      { hashesForTest: [43n], nowForTest: t0 + 5_000 },
+    )
+    expect(r1).toBe(false)
+    expect(r2).toBe(false) // single-image message → multiImage gate not met
+    expect(fx.bans + fx.kicks + fx.timeouts + fx.warnings).toBe(0)
+  })
+
+  test("INNOCENT: a fat multi-image writeup in ONE channel → no action", async () => {
+    const fx = freshEffects()
+    const u = nextUser()
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true })
+    const handled = await handleImageScamDetection(
+      makeMessage({ userId: u, channelId: "single", attachments: fat, member, effects: fx }),
+      { hashesForTest: [44n, 45n, 46n, 47n], nowForTest: 220_000_000 },
+    )
+    expect(handled).toBe(false) // 4 distinct images, 1 channel → no fan-out
+    expect(fx.bans + fx.kicks + fx.timeouts + fx.warnings).toBe(0)
+  })
+
+  test("persistent 2-channel multi-image floods climb to softban", async () => {
+    const fx = freshEffects()
+    const u = nextUser()
+    const member = makeMember(fx, { kickable: true, bannable: true, moderatable: true })
+    let t = 230_000_000
+    // Each wave: same fat set to 2 channels (distinct image per wave so each is
+    // its own cluster — a scammer rotating images).
+    const wave = async (hash: bigint, tag: string) => {
+      await handleImageScamDetection(
+        makeMessage({ userId: u, channelId: `${tag}-a`, attachments: fat, member, effects: fx }),
+        { hashesForTest: [hash], nowForTest: (t += 1000) },
+      )
+      return handleImageScamDetection(
+        makeMessage({ userId: u, channelId: `${tag}-b`, attachments: fat, member, effects: fx }),
+        { hashesForTest: [hash], nowForTest: (t += 1000) },
+      )
+    }
+    expect(await wave(0n, "v1")).toBe(true) // strike 1 → warn
+    expect(fx.bans + fx.kicks + fx.timeouts).toBe(0)
+    expect(await wave(0xffffn, "v2")).toBe(true) // strike 2 → timeout
+    expect(fx.timeouts).toBe(1)
+    expect(await wave(0xffff0000n, "v3")).toBe(true) // strike 3 → softban-purge
+    expect(fx.bans).toBe(1)
+    expect(fx.unbans).toBe(1)
+    expect(fx.kicks).toBe(0)
+  })
+})
+
 // ── Matched-ref hygiene: multi-attachment messages must yield ONE ref ───────
 describe("image fingerprint ref dedup", () => {
   beforeEach(() => __resetImageScamState());

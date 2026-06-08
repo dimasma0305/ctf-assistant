@@ -653,6 +653,16 @@ const IMG_FANOUT_WINDOW_MS = 30_000;      // …within this span → solo raid
 // might cross-post one image to a few channels), so this tier only deletes the
 // copies and climbs the shared strike ladder: warn → timeout → removal.
 const IMG_SLOW_FANOUT_WINDOW_MS = 10 * 60_000;
+// Two-channel multi-image flood (2026-06-08 evasion: zakayartistry dropped the
+// SAME 4-image scam set to 2 channels in 5s — under the 3-channel floor). When
+// the SAME image lands in ≥2 channels AND it arrived inside a fat multi-image
+// message (≥3 attachments), that's the scam-set-fanned shape, not an innocent
+// one-screenshot cross-post. Still graduated (delete + warn → timeout →
+// removal), never instant — a player sharing a 4-shot writeup to two channels
+// only loses the copies and gets a warning.
+const IMG_MULTI_IMG_FANOUT_CHANNELS = 2;  // same image to N channels…
+const IMG_MULTI_IMG_MIN_ATTACH = 3;       // …when the message carried ≥N images
+const IMG_MULTI_IMG_WINDOW_MS = 10 * 60_000;
 const IMG_RING_MIN_ACCOUNTS = 2;          // same image from N distinct accounts
 const IMG_RING_WINDOW_MS = 60 * 60_000;   // …within an hour → coordinated ring
 const IMG_MAX_ATTACH = 4;                 // decode at most N images per message
@@ -689,8 +699,9 @@ export interface ImageScamDecision {
   /** High-confidence scam (known set / multi-account ring / tight fan-out) →
    * immediate removal. */
   confirmed: boolean;
-  /** Ambiguous-but-suspicious (same image to ≥3 channels, paced over minutes)
-   * → delete copies + strike ladder, never instant removal. */
+  /** Ambiguous-but-suspicious (same image to ≥3 channels paced over minutes, OR
+   * a fat multi-image set fanned to ≥2 channels) → delete copies + strike
+   * ladder, never instant removal. */
   escalate: boolean;
   reason: string;
   matched: { channelId: string; messageId: string }[];
@@ -707,6 +718,7 @@ export function evaluateImageFingerprint(
   messageId: string,
   hash: bigint,
   now: number,
+  opts?: { multiImage?: boolean },
 ): ImageScamDecision {
   const known = knownScamHashes.some((k) => isPerceptualMatch(k, hash));
 
@@ -743,6 +755,18 @@ export function evaluateImageFingerprint(
   const slowFanout =
     !confirmed && poster.channels.size >= IMG_FANOUT_CHANNELS && now - poster.firstTs <= IMG_SLOW_FANOUT_WINDOW_MS;
 
+  // Two-channel multi-image flood: same image to ≥2 channels, and it rode in on
+  // a fat multi-image message — the scam-set-fanned shape. Graduated, like slow
+  // fan-out.
+  const multiImageFanout =
+    !confirmed &&
+    !slowFanout &&
+    !!opts?.multiImage &&
+    poster.channels.size >= IMG_MULTI_IMG_FANOUT_CHANNELS &&
+    now - poster.firstTs <= IMG_MULTI_IMG_WINDOW_MS;
+
+  const escalate = slowFanout || multiImageFanout;
+
   const matched = [...cluster.posters.values()].flatMap((p) => p.refs);
   const spread = `same image across ${poster.channels.size} channels in ${Math.round((now - poster.firstTs) / 1000)}s`;
   const reason = known
@@ -751,8 +775,10 @@ export function evaluateImageFingerprint(
       ? `same image from ${distinctAccounts} accounts`
       : slowFanout
         ? `${spread} (paced fan-out)`
-        : spread;
-  return { confirmed, escalate: slowFanout, reason, matched, clusterHash: cluster.hash };
+        : multiImageFanout
+          ? `${spread} (multi-image flood)`
+          : spread;
+  return { confirmed, escalate, reason, matched, clusterHash: cluster.hash };
 }
 
 function isImageAttachment(a: any): boolean {
@@ -825,15 +851,20 @@ async function hashMessageImages(message: GuildMessage): Promise<bigint[]> {
  */
 export async function handleImageScamDetection(
   message: GuildMessage,
-  opts?: { hashesForTest?: bigint[]; nowForTest?: number },
+  opts?: { hashesForTest?: bigint[]; nowForTest?: number; multiImageForTest?: boolean },
 ): Promise<boolean> {
   try {
     if (message.author.bot || !message.guild) return false;
-    if (![...message.attachments.values()].some(isImageAttachment)) return false;
+    const imageAttachments = [...message.attachments.values()].filter(isImageAttachment);
+    if (imageAttachments.length === 0) return false;
     if (await isExemptFromModeration(message)) return false;
 
     const now = opts?.nowForTest ?? Date.now();
     pruneImageState(now);
+
+    // A "fat" multi-image message is the scam-set-fanned shape; it lets the
+    // 2-channel flood tier fire (a single cross-posted screenshot does not).
+    const multiImage = opts?.multiImageForTest ?? imageAttachments.length >= IMG_MULTI_IMG_MIN_ATTACH;
 
     const hashes = opts?.hashesForTest ?? (await hashMessageImages(message));
     if (hashes.length === 0) {
@@ -849,7 +880,7 @@ export async function handleImageScamDetection(
     let decision: ImageScamDecision | null = null;
     let escalation: ImageScamDecision | null = null;
     for (const h of hashes) {
-      const d = evaluateImageFingerprint(message.author.id, message.channelId, message.id, h, now);
+      const d = evaluateImageFingerprint(message.author.id, message.channelId, message.id, h, now, { multiImage });
       if (d.confirmed) {
         decision = d;
         break;
