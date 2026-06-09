@@ -8,6 +8,8 @@ import {
 } from "discord.js";
 
 export const command: SubCommand = {
+  // Removes channel access for arbitrary users — staff only (2026-06-09 audit fix).
+  allowedRoles: ["Mabar Manager"],
   data: new SlashCommandSubcommandBuilder()
     .setName("removeusers")
     .setDescription("Parse user mentions from a message and remove them from a channel")

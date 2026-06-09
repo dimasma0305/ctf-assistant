@@ -120,6 +120,18 @@ async function infoEvent(id: string, useCache: boolean = true): Promise<CTFEvent
             }
             const ctfEvent = await response.json() as CTFEvent;
 
+            // Validate shape before touching fields — a 200 with a malformed/HTML
+            // body (rate-limit page, schema change) would otherwise throw a
+            // TypeError on .title.trim() (2026-06-09 audit fix). Fall back to
+            // stale cache if available.
+            if (!ctfEvent || typeof ctfEvent.title !== 'string') {
+                if (cached) {
+                    console.warn(`CTFtime returned malformed data for ${id}; serving stale cache`);
+                    return cacheToCTFEvent(cached, id);
+                }
+                throw new Error(`CTFtime returned malformed data for event ${id}`);
+            }
+
             ctfEvent.start = new Date(ctfEvent.start);
             ctfEvent.finish = new Date(ctfEvent.finish);
             ctfEvent.title = ctfEvent.title.trim();
@@ -174,7 +186,13 @@ async function getUpcommingOnlineEvent(days: number): Promise<CTFEvent[]> {
     // size, but document the original intent.
     const finish = start + (days * 24 * 60 * 100);
     const response = await fetch(`https://ctftime.org/api/v1/events/?limit=10&start=${start}&finish=${finish}`);
-    let ctfEvents = await response.json() as CTFEvent[];
+    // Guard against a non-200 or a non-array body (rate-limit HTML, schema
+    // change) — `.forEach` on a non-array threw an uncaught rejection that
+    // bubbled to the cron (2026-06-09 audit fix).
+    if (!response.ok) throw new Error(`CTFtime events API ${response.status}`);
+    const parsed = await response.json().catch(() => null);
+    let ctfEvents = (Array.isArray(parsed) ? parsed : []) as CTFEvent[];
+    ctfEvents = ctfEvents.filter((e) => e && typeof e.title === 'string');
     ctfEvents.forEach((ctfEvent) => {
         ctfEvent.start = new Date(ctfEvent.start);
         ctfEvent.finish = new Date(ctfEvent.finish);

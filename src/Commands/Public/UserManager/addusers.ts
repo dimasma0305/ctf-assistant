@@ -11,6 +11,9 @@ import {
 } from "discord.js";
 
 export const command: SubCommand = {
+  // Grants channel access to arbitrary users — staff only (2026-06-09 audit
+  // fix: this had no gate, so any member could add users to private channels).
+  allowedRoles: ["Mabar Manager"],
   data: new SlashCommandSubcommandBuilder()
     .setName("addusers")
     .setDescription("Parse user mentions from a message and add them to a channel")

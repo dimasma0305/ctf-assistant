@@ -5,6 +5,7 @@ import cron from "node-cron";
 import { FetchCommandModel, WeightRetryModel, ChallengeModel, CTFCacheModel } from "../../Database/connect";
 import { parseChallenges, updateThreadsStatus } from "../../Commands/Public/Solve/utils";
 import { infoEvent } from "../../Functions/ctftime-v2";
+import { checkUrlSafe } from "../../utils/urlGuard";
 
 let fetchCronInitialized = false;
 
@@ -74,6 +75,14 @@ export const event: Event = {
                         const channel = client.channels.cache.get(fetchCmd.channel_id) as TextChannel | undefined;
                         if (!channel) {
                             console.log(`Channel ${fetchCmd.channel_id} not found for fetch command`);
+                            return;
+                        }
+
+                        // SSRF guard on every recurring fetch too — a saved command
+                        // could target an internal host (2026-06-09 audit fix).
+                        const urlGuard = await checkUrlSafe(fetchCmd.url);
+                        if (!urlGuard.ok) {
+                            console.log(`[fetchCron] rejected unsafe URL ${fetchCmd.url}: ${urlGuard.error}`);
                             return;
                         }
 

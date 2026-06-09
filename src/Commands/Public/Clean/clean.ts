@@ -6,6 +6,8 @@ export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("clean")
     .setDescription("Message Cleaner")
-    .setDefaultMemberPermissions(ManageRoles)
-    .setDefaultMemberPermissions(ManageMessages)
+    // Combine flags in ONE call — setDefaultMemberPermissions is a setter, so the
+    // two separate calls dropped ManageRoles and required only ManageMessages
+    // (2026-06-09 audit fix).
+    .setDefaultMemberPermissions(ManageRoles | ManageMessages)
 }

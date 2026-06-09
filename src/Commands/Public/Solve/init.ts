@@ -2,8 +2,13 @@ import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, TextChannel, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, AttachmentBuilder, ChatInputCommandInteraction, ModalSubmitInteraction, MessageFlags } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
 import { parseChallenges, ParsedChallenge, parseFetchCommand, ParsedFetchCommand, saveFetchCommand, updateThreadsStatus } from "./utils";
+import { checkUrlSafe } from "../../../utils/urlGuard";
 
 export const command: SubCommand = {
+    // Registers a persistent server-side fetch loop + mass-creates threads —
+    // organizers only (2026-06-09 audit fix: was ungated, enabling SSRF +
+    // thread spam by any member). URL safety is also enforced in utils.
+    allowedRoles: ["Mabar Manager", "Gas Mabar"],
     data: new SlashCommandSubcommandBuilder()
         .setName('init')
         .setDescription('Initialize challenges from CTF platform JSON (creates threads with ❌ prefix)')
@@ -169,7 +174,15 @@ export const command: SubCommand = {
         if (fetchCommand && !finalJsonData) {
             try {
                 parsedFetch = parseFetchCommand(fetchCommand);
-                
+
+                // SSRF guard: reject internal/metadata/private targets before the
+                // bot fetches an attacker-supplied URL (2026-06-09 audit fix).
+                const urlGuard = await checkUrlSafe(parsedFetch.url);
+                if (!urlGuard.ok) {
+                    await currentInteraction.editReply(`❌ Fetch URL rejected (${urlGuard.error}). Only public http(s) URLs are allowed.`);
+                    return;
+                }
+
                 const response = await fetch(parsedFetch.url, {
                     method: parsedFetch.method,
                     headers: parsedFetch.headers,

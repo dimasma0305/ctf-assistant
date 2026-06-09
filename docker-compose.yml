@@ -7,6 +7,11 @@ services:
       internal:
       traefik:
     restart: always
+    # Inject secrets at runtime from the host .env (read at container-create
+    # time, NOT baked into the image — see .dockerignore). `environment` below
+    # still wins for MONGO_URI so it points at the compose mongo service.
+    env_file:
+      - .env
     environment:
       - MONGO_URI=mongodb://root:example@mongo/
     labels:

@@ -8,6 +8,8 @@ import {
 } from "discord.js";
 
 export const command: SubCommand = {
+  // Reveals who has explicit access to a (possibly private) channel — staff only.
+  allowedRoles: ["Mabar Manager"],
   data: new SlashCommandSubcommandBuilder()
     .setName("listusers")
     .setDescription("List users who have explicit access to a channel")

@@ -1,4 +1,10 @@
 /node_modules/
+# Secrets must NEVER be baked into an image layer (2026-06-09 audit fix) — the
+# Dockerfile does `COPY . .`, so without this the live .env (TOKEN, API keys,
+# MONGO_URI) lands in the image. Inject at runtime via compose env_file instead.
+.env
+.env.*
+*.env
 ui/
 # api/utils/statistics.ts imports ACHIEVEMENT_CRITERIA from this single,
 # dependency-free file. Re-include it so the bot image builds without pulling

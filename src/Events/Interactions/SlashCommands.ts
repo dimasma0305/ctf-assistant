@@ -85,12 +85,13 @@ export const event: Event = {
       try {
         await execute(interaction, client)
       } catch (error) {
-        console.log(error)
-        
-        // Handle error response based on interaction state
-        const errorMessage = error?.toString() || "An error occurred while executing the command.";
-        const safeErrorMessage = truncateForDiscord(`❌ ${errorMessage}`);
-        
+        // Log the full error server-side, but NEVER echo it to Discord — raw
+        // error strings leak internal details (DB hosts, file paths, upstream
+        // URLs) and, after a public defer, leak them in-channel (2026-06-09
+        // audit fix). Reply with a fixed, generic message.
+        console.error('[SlashCommand] execution failed:', error)
+
+        const safeErrorMessage = "❌ Something went wrong running that command. Please try again later.";
         try {
           if (interaction.deferred) {
             await interaction.editReply({ content: safeErrorMessage });

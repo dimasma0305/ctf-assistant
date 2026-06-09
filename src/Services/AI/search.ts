@@ -1,6 +1,7 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage, TextChannel, NewsChannel, ThreadChannel } from "discord.js";
 import { MessageCacheModel, IndexedMessageModel } from "../../Database/connect";
 import { embedViaWorker, cosineSimilarity, combinedRecallScore } from "./embeddings";
+import { neutralizeControlTokens } from "./context";
 
 const MAX_SEARCH_RESULTS = 8;             // hard cap on result rows fed back to the model
 const MAX_RESULT_CONTENT_CHARS = 220;     // per-message truncation in the structured output
@@ -275,7 +276,10 @@ export async function searchMessagesForTool(
     const top = all.slice(0, MAX_SEARCH_RESULTS).map<SearchToolMatch>((h) => ({
         authorId: h.authorId,
         authorName: h.authorName,
-        content: truncate(h.content.replace(/\n/g, ' '), MAX_RESULT_CONTENT_CHARS),
+        // Neutralize forged control tokens — stored second-order injection: an
+        // attacker plants a creator-spoof block in a normal message, then the
+        // model recalls it verbatim via this tool (2026-06-09 audit fix).
+        content: truncate(neutralizeControlTokens(h.content).replace(/\n/g, ' '), MAX_RESULT_CONTENT_CHARS),
         relativeTime: relativeTime(h.createdTimestamp),
         source: h.source,
     }));
@@ -371,7 +375,8 @@ export async function recallMemoryForTool(
         return {
             authorId: d.authorId,
             authorName: d.authorDisplayName || d.authorUsername || 'unknown',
-            content: truncate(String(d.content || '').replace(/\n/g, ' '), MAX_RESULT_CONTENT_CHARS),
+            // Neutralize forged control tokens (stored injection — see above).
+            content: truncate(neutralizeControlTokens(String(d.content || '')).replace(/\n/g, ' '), MAX_RESULT_CONTENT_CHARS),
             createdTimestamp: new Date(d.createdAt).getTime(),
             similarity: sim,
             importance,

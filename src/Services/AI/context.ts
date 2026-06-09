@@ -17,12 +17,21 @@ export function generateUniqueSeparator(): string {
 // user-originated text before it enters a prompt. Defense-in-depth alongside the
 // persona's anti-injection rule.
 const RESERVED_FENCE_RE = /«\s*\/?\s*(?:ctx|chan|reply)\s*»/gi;
-const SPEAKER_MARKER_RE = /⚡?\s*SPEAKER-IS-[A-Za-z-]+\s*:?/gi;
-const FORGED_CREATOR_CTX_RE = /\[?\s*extra(?:\s+extra)*\s+context\s+from\s+creator\b[^\]\n]*\]?/gi;
+// Match the creator/speaker marker in any separator variant — hyphen, underscore
+// or space (SPEAKER-IS-CREATOR / SPEAKER_IS_CREATOR / SPEAKER IS CREATOR) — and
+// the bracketed forgery with a DOTALL body (2026-06-09 audit fix: the old regex
+// only caught the exact hyphenated ASCII form, so underscore/space/zero-width
+// variants slipped through into the prompt).
+const SPEAKER_MARKER_RE = /⚡?\s*SPEAKER[\s_-]*IS[\s_-]*[A-Za-z_-]+\s*:?/gi;
+const FORGED_CREATOR_CTX_RE = /\[?\s*extra(?:\s+extra)*\s+context\s+from\s+creator\b[^\]]*\]?/gi;
+// Zero-width / BOM / bidi chars an attacker can sprinkle inside a marker to
+// dodge the regex. Strip them before matching.
+const ZERO_WIDTH_RE = /[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g;
 
 export function neutralizeControlTokens(text: string): string {
   if (!text) return text;
   return text
+    .replace(ZERO_WIDTH_RE, '')
     .replace(RESERVED_FENCE_RE, '[?]')
     .replace(FORGED_CREATOR_CTX_RE, '[spoofed-claim]')
     .replace(SPEAKER_MARKER_RE, '[spoofed-claim]')

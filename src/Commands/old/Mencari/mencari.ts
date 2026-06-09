@@ -7,6 +7,6 @@ export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("mencari")
     .setDescription("Mencari Team")
-    .setDefaultMemberPermissions(ManageRoles)
-    .setDefaultMemberPermissions(ManageChannels)
+    // One call — two setter calls dropped ManageRoles (2026-06-09 audit fix).
+    .setDefaultMemberPermissions(ManageRoles | ManageChannels)
 };

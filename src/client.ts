@@ -276,7 +276,11 @@ client.on(Events.MessageCreate, async (message) => {
   // Cache + index EVERY message — including Hackerika's own replies and other
   // bots — so channel context covers the full multi-party conversation flow.
   // Only the AI / moderation paths skip bot-authored messages below.
-  updateChannelCache(message as DiscordMessage)
+  // Fire-and-forget but CATCH — a Mongo blip must not raise an unhandled
+  // rejection on every message (2026-06-09 audit fix).
+  void updateChannelCache(message as DiscordMessage).catch((e) =>
+    console.error('[Cache] updateChannelCache failed:', e),
+  )
 
   if (message.author.bot) return;
 

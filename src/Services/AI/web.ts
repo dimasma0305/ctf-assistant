@@ -1,4 +1,4 @@
-import dns from "node:dns/promises";
+import { checkUrlSafe } from "../../utils/urlGuard";
 
 /**
  * Web tools for Hackerika.
@@ -77,50 +77,8 @@ function truncate(s: string, n: number): string {
     return s.slice(0, n - 1) + '…';
 }
 
-/* ─────────────────────── SSRF protection ─────────────────────── */
-
-function isPrivateIp(ip: string): boolean {
-    if (!ip) return true;
-    // IPv4
-    if (ip === '0.0.0.0') return true;
-    if (ip.startsWith('127.')) return true;
-    if (ip.startsWith('10.')) return true;
-    if (/^172\.(1[6-9]|2[0-9]|3[01])\./.test(ip)) return true;
-    if (ip.startsWith('192.168.')) return true;
-    if (ip.startsWith('169.254.')) return true;        // link-local
-    if (ip.startsWith('100.64.')) return true;         // CGNAT
-    // IPv6
-    if (ip === '::' || ip === '::1') return true;
-    if (/^fe[89ab][0-9a-f]:/i.test(ip)) return true;   // link-local
-    if (/^f[cd][0-9a-f]{2}:/i.test(ip)) return true;   // unique-local
-    return false;
-}
-
-interface UrlGuardResult {
-    ok: boolean;
-    error?: 'invalid_url' | 'bad_scheme' | 'dns_lookup_failed' | 'private_target';
-    resolvedHost?: string;
-}
-
-async function checkUrlSafe(urlStr: string): Promise<UrlGuardResult> {
-    let u;
-    try { u = new URL(urlStr); } catch { return { ok: false, error: 'invalid_url' }; }
-    if (u.protocol !== 'http:' && u.protocol !== 'https:') {
-        return { ok: false, error: 'bad_scheme' };
-    }
-    // Block bare-IP literals up front (catches `http://127.0.0.1`, `http://[::1]`).
-    const hostNoBrackets = u.hostname.replace(/^\[|\]$/g, '');
-    if (isPrivateIp(hostNoBrackets)) return { ok: false, error: 'private_target', resolvedHost: hostNoBrackets };
-    // Then DNS-resolve the hostname and re-check, so `http://evil.com` resolving
-    // to 127.0.0.1 still gets blocked.
-    try {
-        const { address } = await dns.lookup(u.hostname);
-        if (isPrivateIp(address)) return { ok: false, error: 'private_target', resolvedHost: address };
-        return { ok: true, resolvedHost: address };
-    } catch {
-        return { ok: false, error: 'dns_lookup_failed' };
-    }
-}
+/* ── SSRF protection now lives in the shared ../utils/urlGuard so the /solve
+ * fetch loop reuses the exact same checks (see import at top). ── */
 
 /* ─────────────────────── DuckDuckGo Instant Answer ─────────────────────── */
 
@@ -408,8 +366,15 @@ export async function fetchUrlForTool(args: FetchUrlArgs): Promise<FetchUrlResul
     const target = (args?.url || '').trim();
     if (!target) return { ok: false, error: 'missing_url' };
 
-    // CF Worker path: skips the local SSRF guard because the worker runs in
-    // CF's network (not ours) and can't pivot into our internal services.
+    // Validate the target BEFORE choosing the worker vs direct path, so a
+    // private/internal target (metadata IP, mongo, gzctf api, localhost) is
+    // rejected regardless of which path runs (2026-06-09 audit fix — the worker
+    // path previously skipped this entirely).
+    const guard = await checkUrlSafe(target);
+    if (!guard.ok) return { ok: false, error: guard.error };
+
+    // CF Worker path: the worker runs in CF's network (not ours) and can't pivot
+    // into our internal services.
     if (CF_WORKER_URL && CF_WORKER_TOKEN) {
         const ctlW = new AbortController();
         const timerW = setTimeout(() => ctlW.abort(), FETCH_TIMEOUT_MS);
@@ -428,30 +393,41 @@ export async function fetchUrlForTool(args: FetchUrlArgs): Promise<FetchUrlResul
         // Worker failed — fall through to direct path below.
     }
 
-    const guard = await checkUrlSafe(target);
-    if (!guard.ok) return { ok: false, error: guard.error };
-
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
-        const resp = await fetch(target, {
-            signal: controller.signal,
-            headers: {
-                'User-Agent': BROWSER_UA,
-                'Accept': 'text/html,application/xhtml+xml,application/json,text/plain;q=0.9,*/*;q=0.1',
-                'Accept-Language': 'en-US,en;q=0.9,id;q=0.8',
-            },
-            redirect: 'follow',
-        });
-
-        if (!resp.ok) {
-            return { ok: false, error: 'http_error', status: resp.status, finalUrl: resp.url };
+        // Follow redirects MANUALLY, re-validating EACH hop — `redirect: 'follow'`
+        // would let a public→internal redirect actually hit the internal host
+        // before we could reject it (2026-06-09 audit fix: SSRF-via-redirect).
+        let currentUrl = target;
+        let resp: Response | undefined;
+        for (let hop = 0; hop < 6; hop++) {
+            if (hop > 0) {
+                const hopGuard = await checkUrlSafe(currentUrl);
+                if (!hopGuard.ok) return { ok: false, error: hopGuard.error, finalUrl: currentUrl };
+            }
+            resp = await fetch(currentUrl, {
+                signal: controller.signal,
+                headers: {
+                    'User-Agent': BROWSER_UA,
+                    'Accept': 'text/html,application/xhtml+xml,application/json,text/plain;q=0.9,*/*;q=0.1',
+                    'Accept-Language': 'en-US,en;q=0.9,id;q=0.8',
+                },
+                redirect: 'manual',
+            });
+            if (resp.status >= 300 && resp.status < 400) {
+                const loc = resp.headers.get('location');
+                if (loc) {
+                    currentUrl = new URL(loc, currentUrl).toString();
+                    continue;
+                }
+            }
+            break;
         }
 
-        // Re-check the final URL after redirects — DNS could differ.
-        if (resp.url && resp.url !== target) {
-            const reGuard = await checkUrlSafe(resp.url);
-            if (!reGuard.ok) return { ok: false, error: reGuard.error, finalUrl: resp.url };
+        if (!resp) return { ok: false, error: 'fetch_failed' };
+        if (!resp.ok) {
+            return { ok: false, error: 'http_error', status: resp.status, finalUrl: currentUrl };
         }
 
         const contentType = resp.headers.get('content-type') || '';
