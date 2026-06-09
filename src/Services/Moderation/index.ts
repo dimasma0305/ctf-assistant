@@ -417,15 +417,29 @@ async function removeAndPurge(message: GuildMessage, member: any, reason: string
   }
 }
 
-/** Record a strike against a user and return the new level. Strikes decay after
- * STRIKE_DECAY_MS so a one-off offence never lingers, while a repeat offender
- * (spam OR phishing — they share this map) keeps climbing toward a kick. */
-function bumpStrike(userId: string): number {
+/** Strikes are namespaced per detector LANE ("spam" | "phish" | "image") so
+ * three UNRELATED borderline events can't sum into a kick. Escalation now
+ * reflects repetition of the SAME kind of offence, not an aggregate of
+ * different heuristics each firing once (2026-06-09 audit fix — that aggregate
+ * could kick an innocent who tripped one image warn and one phishing warn). */
+type ModLane = "spam" | "phish" | "image";
+const heatKey = (userId: string, lane: ModLane): string => `${userId}:${lane}`;
+
+/** Record a strike against a user in a given lane and return the new level.
+ * Strikes decay after STRIKE_DECAY_MS so a one-off offence never lingers, while
+ * a repeat offender in the same lane keeps climbing toward a kick. */
+function bumpStrike(userId: string, lane: ModLane): number {
   const now = Date.now();
-  const prior = heat[userId];
+  const key = heatKey(userId, lane);
+  const prior = heat[key];
   const level = prior && now - prior.lastStrikeAt < STRIKE_DECAY_MS ? prior.strikes + 1 : 1;
-  heat[userId] = { strikes: level, lastStrikeAt: now };
+  heat[key] = { strikes: level, lastStrikeAt: now };
   return level;
+}
+
+/** Clear ALL lanes for a user (after they've been removed). */
+function clearHeat(userId: string): void {
+  for (const lane of ["spam", "phish", "image"] as ModLane[]) delete heat[heatKey(userId, lane)];
 }
 
 /** Graduated enforcement: strike 1 = delete dupes + warn, strike 2 = timeout,
@@ -437,7 +451,7 @@ async function enforce(
   signature: string,
   matched: RecentMessage[],
 ): Promise<void> {
-  const level = bumpStrike(userId);
+  const level = bumpStrike(userId, "spam");
 
   // Remove the handled records so the same messages don't re-trigger on the
   // next message; the strike map (not the bucket) carries escalation state.
@@ -455,7 +469,7 @@ async function enforce(
       "You were removed for repeatedly posting the same content after warnings. You're welcome to rejoin — just don't flood the same message.",
     );
     await removeAndPurge(message, member!, "Repeated spam after warning and timeout");
-    delete heat[userId];
+    clearHeat(userId);
     return;
   }
 
@@ -593,37 +607,47 @@ export async function handlePhishingDetection(message: GuildMessage): Promise<bo
     if (massMention && (hasLure || hasLink) && canKick) {
       await notifyUser(message, "Your message was removed and you were removed from the server for posting a phishing/scam link with a mass mention. Contact a moderator if this was a mistake.");
       await removeAndPurge(message, member!, "Posting phishing/scam links with mass mention");
-      delete heat[message.author.id];
+      clearHeat(message.author.id);
       return true;
     }
 
-    // Graduated escalation for everything else. The old code timed out EVERY
-    // scam post with no memory, so a scammer who kept posting (no @everyone) was
-    // muted for 5 min, came back, got muted again — forever, never kicked. Now a
-    // repeat offender climbs to a kick: 1st detected scam → timeout, 2nd within
-    // the decay window → kick. A single borderline message stays recoverable.
-    const level = bumpStrike(message.author.id);
+    // Graduated escalation for the non-@everyone case (lure+link without a mass
+    // mention). This OVERLAPS legitimate CTF vocabulary — "claim your flag",
+    // "free points", a writeup link — so the first hit is only a recoverable
+    // WARN (the message is removed, no timeout), climbing to timeout then kick
+    // only on repeat. (2026-06-09 audit fix: the old path timed-out on the very
+    // first such message and kicked on the second, punishing innocents for
+    // ordinary CTF phrasing.) Strikes live in the "phish" lane only.
+    const level = bumpStrike(message.author.id, "phish");
 
-    if (level >= 2 && canKick) {
+    if (level >= 3 && canKick) {
       await notifyUser(
         message,
-        "You were removed for repeatedly posting phishing/scam content after a warning. You're welcome to appeal to a moderator if this was a mistake.",
+        "You were removed for repeatedly posting phishing/scam content after warnings. You're welcome to appeal to a moderator if this was a mistake.",
       );
-      await removeAndPurge(message, member!, "Repeated phishing/scam after timeout");
-      delete heat[message.author.id];
+      await removeAndPurge(message, member!, "Repeated phishing/scam after warnings");
+      clearHeat(message.author.id);
       return true;
     }
 
-    if (canTimeout) {
+    if (level >= 2 && canTimeout) {
       try {
-        await member!.timeout(TIMEOUT_MS, "Posting phishing/scam links");
+        await member!.timeout(TIMEOUT_MS, "Repeated phishing/scam links");
       } catch (error) {
         console.log(`[Moderation] phishing timeout failed for ${message.author.id}: ${error}`);
       }
+      await notifyUser(
+        message,
+        "Your message was removed and you were timed out for repeatedly posting content that looks like a phishing/scam link. Contact a moderator if this was a mistake.",
+      );
+      return true;
     }
+
+    // Strike 1: remove the message + warn only. Recoverable — an innocent who
+    // used scam-shaped wording once is never timed out or kicked.
     await notifyUser(
       message,
-      "Your message was removed because it looked like a phishing/scam link. If this was a mistake, contact a moderator. Repeated posts will get you removed.",
+      "Your message was removed because it looked like a phishing/scam link. If this was a mistake, contact a moderator. Repeated posts will get you timed out, then removed.",
     );
     return true;
   } catch (error) {
@@ -638,13 +662,18 @@ export async function handlePhishingDetection(message: GuildMessage): Promise<bo
  * per account so sha256 / name:size all differ. We fingerprint each image with a
  * perceptual dHash (see ./imageHash) and correlate across accounts and channels.
  *
- * A non-exempt member is removed when their image:
- *   - matches a fingerprint already confirmed as scam (known set), OR
- *   - is the SAME image (≤ threshold) as one posted by ≥2 distinct accounts in
- *     the last hour (coordinated ring), OR
- *   - is fanned by the same account across ≥3 channels within seconds (solo raid).
- * Validated on the real TCP1P scam set: ring copies hash 0-5 apart, the nearest
- * legit writeup image is ~22 — so a single innocent screenshot never triggers.
+ * Two confidence levels, to honour the never-remove-an-innocent rule:
+ *   INSTANT removal (high confidence) when the image either
+ *     - matches a still-valid learned scam fingerprint (known set), OR
+ *     - is fanned by ONE account across ≥3 channels within 30s (solo raid).
+ *   GRADUATED (delete copies + warn→timeout→softban) — never an instant ban —
+ *   for the ambiguous tiers, where an innocent could plausibly match:
+ *     - the same image from ≥2 distinct accounts within a tight window (ring) —
+ *       because two strangers reposting the same meme also matches this,
+ *     - the same image to ≥3 channels paced over minutes (slow fan-out),
+ *     - a fat multi-image set fanned to ≥2 channels (multi-image flood).
+ * Only the solo-raid tier auto-learns into the known set, and learned hashes
+ * age out (KNOWN_SCAM_TTL_MS) so a stray match never becomes permanent.
  */
 const IMG_FANOUT_CHANNELS = 3;            // same image to N channels by one account
 const IMG_FANOUT_WINDOW_MS = 30_000;      // …within this span → solo raid
@@ -663,13 +692,24 @@ const IMG_SLOW_FANOUT_WINDOW_MS = 10 * 60_000;
 const IMG_MULTI_IMG_FANOUT_CHANNELS = 2;  // same image to N channels…
 const IMG_MULTI_IMG_MIN_ATTACH = 3;       // …when the message carried ≥N images
 const IMG_MULTI_IMG_WINDOW_MS = 10 * 60_000;
-const IMG_RING_MIN_ACCOUNTS = 2;          // same image from N distinct accounts
-const IMG_RING_WINDOW_MS = 60 * 60_000;   // …within an hour → coordinated ring
+// Cross-account "ring": the SAME image from ≥N distinct accounts. This is
+// AMBIGUOUS on a big server — two strangers reposting the same meme/scoreboard
+// also matches — so it is GRADUATED (delete copies + strike ladder), NEVER an
+// instant softban, and is never learned into the known-scam set. A genuinely
+// coordinated ring also fans each account across channels, which the per-account
+// fan-out tier catches instantly anyway. (2026-06-09 audit fix: the old code
+// instant-softbanned the 2nd of any two accounts posting the same image within
+// an HOUR — softbanning innocent meme-reposters and poisoning the known set.)
+const IMG_RING_MIN_ACCOUNTS = 2;          // same image from N distinct accounts…
+const IMG_RING_COORD_WINDOW_MS = 10 * 60_000; // …within this tight window → ring signal
+const IMG_CLUSTER_TTL_MS = 60 * 60_000;   // how long an image cluster is retained
 const IMG_MAX_ATTACH = 4;                 // decode at most N images per message
 const IMG_MAX_BYTES = 4 * 1024 * 1024;    // skip images larger than this
 const IMG_FETCH_TIMEOUT_MS = 6_000;
 const ATTACH_CACHE_CAP = 5_000;           // bound the attachment→hash cache
 const KNOWN_SCAM_CAP = 2_000;             // bound the learned-scam fingerprint set
+const KNOWN_SCAM_TTL_MS = 24 * 60 * 60_000; // auto-learned scam hashes age out (poisoning guard)
+const IMG_CLUSTER_CAP = 4_000;            // hard cap on retained image clusters
 
 interface ImgPoster {
   channels: Set<string>;
@@ -684,24 +724,43 @@ interface ImgCluster {
 }
 
 const imgClusters: ImgCluster[] = [];
-const knownScamHashes: bigint[] = [];
+// Auto-learned scam fingerprints carry their learn time so they age out — a
+// stale or wrongly-learned hash must not stay a permanent instant-removal
+// tripwire (2026-06-09 audit fix).
+const knownScamHashes: { hash: bigint; addedAt: number }[] = [];
 const attachHashCache = new Map<string, bigint>(); // attachment id → dHash (never decode twice)
+
+/** True if the hash perceptually matches a still-valid (non-expired) learned
+ * scam fingerprint. */
+function matchesKnownScam(hash: bigint, now: number): boolean {
+  return knownScamHashes.some((k) => now - k.addedAt <= KNOWN_SCAM_TTL_MS && isPerceptualMatch(k.hash, hash));
+}
 
 function pruneImageState(now: number): void {
   for (let i = imgClusters.length - 1; i >= 0; i--) {
-    if (now - imgClusters[i].lastTs > IMG_RING_WINDOW_MS) imgClusters.splice(i, 1);
+    if (now - imgClusters[i].lastTs > IMG_CLUSTER_TTL_MS) imgClusters.splice(i, 1);
+  }
+  // Hard cap on cluster count (oldest-first) so an image-heavy hour can't grow
+  // the linear-scanned array without bound.
+  if (imgClusters.length > IMG_CLUSTER_CAP) {
+    imgClusters.sort((a, b) => a.lastTs - b.lastTs).splice(0, imgClusters.length - IMG_CLUSTER_CAP);
+  }
+  // Drop expired learned hashes, then cap.
+  for (let i = knownScamHashes.length - 1; i >= 0; i--) {
+    if (now - knownScamHashes[i].addedAt > KNOWN_SCAM_TTL_MS) knownScamHashes.splice(i, 1);
   }
   if (attachHashCache.size > ATTACH_CACHE_CAP) attachHashCache.clear();
   if (knownScamHashes.length > KNOWN_SCAM_CAP) knownScamHashes.splice(0, knownScamHashes.length - KNOWN_SCAM_CAP);
 }
 
 export interface ImageScamDecision {
-  /** High-confidence scam (known set / multi-account ring / tight fan-out) →
-   * immediate removal. */
+  /** High-confidence scam (known-scam set match OR one account fanning the same
+   * image across ≥3 channels in 30s) → immediate removal. */
   confirmed: boolean;
-  /** Ambiguous-but-suspicious (same image to ≥3 channels paced over minutes, OR
-   * a fat multi-image set fanned to ≥2 channels) → delete copies + strike
-   * ladder, never instant removal. */
+  /** Ambiguous-but-suspicious (≥2 accounts posting the same image — a "ring", OR
+   * same image to ≥3 channels paced over minutes, OR a fat multi-image set
+   * fanned to ≥2 channels) → delete copies + strike ladder, never instant
+   * removal. */
   escalate: boolean;
   reason: string;
   matched: { channelId: string; messageId: string }[];
@@ -720,7 +779,7 @@ export function evaluateImageFingerprint(
   now: number,
   opts?: { multiImage?: boolean },
 ): ImageScamDecision {
-  const known = knownScamHashes.some((k) => isPerceptualMatch(k, hash));
+  const known = matchesKnownScam(hash, now);
 
   let cluster = imgClusters.find((c) => isPerceptualMatch(c.hash, hash));
   if (!cluster) {
@@ -742,12 +801,23 @@ export function evaluateImageFingerprint(
     poster.refs.push({ channelId, messageId });
   }
 
-  const distinctAccounts = [...cluster.posters.values()].filter((p) => now - p.lastTs <= IMG_RING_WINDOW_MS).length;
-  const ring = distinctAccounts >= IMG_RING_MIN_ACCOUNTS;
+  // Solo fan-out: one account spraying the same image across many channels fast.
+  // This is a strong, unambiguous signal (an innocent doesn't blast one image to
+  // 3+ channels in 30s) → instant removal, and the only auto-learned tier.
   const fanout = poster.channels.size >= IMG_FANOUT_CHANNELS && now - poster.firstTs <= IMG_FANOUT_WINDOW_MS;
 
-  const confirmed = known || ring || fanout;
-  if (confirmed && !known) knownScamHashes.push(cluster.hash);
+  const confirmed = known || fanout;
+  // Learn ONLY from a tight solo fan-out (never from a ring or a known echo) —
+  // and stamp the learn time so it ages out.
+  if (fanout && !known) knownScamHashes.push({ hash: cluster.hash, addedAt: now });
+
+  // Cross-account ring: same image from ≥2 distinct accounts within a tight
+  // coordination window. AMBIGUOUS (two strangers can repost the same meme), so
+  // GRADUATED — delete copies + strike ladder, NEVER an instant softban, and
+  // never learned. A real coordinated ring also fans each account across
+  // channels, which the solo fan-out tier above already catches instantly.
+  const distinctAccounts = [...cluster.posters.values()].filter((p) => now - p.lastTs <= IMG_RING_COORD_WINDOW_MS).length;
+  const ring = !confirmed && distinctAccounts >= IMG_RING_MIN_ACCOUNTS;
 
   // Paced fan-out: enough channels for a raid, too slow for the tight window.
   // NOT added to the known set here — an innocent cross-poster's image must
@@ -765,7 +835,7 @@ export function evaluateImageFingerprint(
     poster.channels.size >= IMG_MULTI_IMG_FANOUT_CHANNELS &&
     now - poster.firstTs <= IMG_MULTI_IMG_WINDOW_MS;
 
-  const escalate = slowFanout || multiImageFanout;
+  const escalate = ring || slowFanout || multiImageFanout;
 
   const matched = [...cluster.posters.values()].flatMap((p) => p.refs);
   const spread = `same image across ${poster.channels.size} channels in ${Math.round((now - poster.firstTs) / 1000)}s`;
@@ -920,7 +990,7 @@ export async function handleImageScamDetection(
     // cross-poster only ever loses the duplicate copies and gets a warning.
     if (escalation) {
       await deleteMatchedMessages(message, escalation.matched);
-      const level = bumpStrike(message.author.id);
+      const level = bumpStrike(message.author.id, "image");
 
       if (level >= 3 && canKick) {
         await notifyUser(
@@ -928,9 +998,10 @@ export async function handleImageScamDetection(
           "You were removed for repeatedly spreading the same image across channels after warnings. Contact a moderator if this was a mistake.",
         );
         await removeAndPurge(message, member!, "Repeated image fan-out after warnings — scam pattern");
-        // Removal-grade now — remember the image so reposts die instantly.
-        knownScamHashes.push(escalation.clusterHash);
-        delete heat[message.author.id];
+        // Removal-grade now — remember the image so reposts die instantly (ages
+        // out via KNOWN_SCAM_TTL_MS).
+        knownScamHashes.push({ hash: escalation.clusterHash, addedAt: now });
+        clearHeat(message.author.id);
       } else if (level >= 2 && canTimeout) {
         try {
           await member!.timeout(TIMEOUT_MS, "Repeated image fan-out across channels");

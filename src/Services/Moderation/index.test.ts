@@ -399,9 +399,10 @@ describe("phishing detection requires link + strong signal", () => {
   });
 
   // ── Image-only scam (the regression): a scam that posts ONLY an image ──────
-  test("image-only @everyone, NOTHING readable (link only in pixels) → removed + timed out, NOT kicked", async () => {
+  test("image-only @everyone, NOTHING readable (link only in pixels) → removed + WARNED (first strike), NOT timed out or kicked", async () => {
     // We have no vision; an @everyone + bare image could be an innocent event
-    // screenshot. Action it (delete + recoverable timeout) but never kick.
+    // screenshot. Remove it and warn — first strike is recoverable; only a
+    // repeat climbs to timeout then kick.
     const fx = freshEffects();
     const handled = await handlePhishingDetection(
       makeMessage({
@@ -414,8 +415,7 @@ describe("phishing detection requires link + strong signal", () => {
     );
     expect(handled).toBe(true);
     expect(fx.deletedIds.length).toBeGreaterThan(0);
-    expect(fx.kicks).toBe(0); // ambiguous → no kick
-    expect(fx.timeouts).toBe(1);
+    expect(fx.kicks + fx.timeouts).toBe(0); // first strike → warn only
   });
 
   test("image + readable lure caption + @everyone → kicked (clear scam)", async () => {
@@ -433,7 +433,9 @@ describe("phishing detection requires link + strong signal", () => {
     expect(fx.kicks).toBe(1); // massMention + readable lure → kick
   });
 
-  test("image with a lure caption but no mass-mention → removed + timed out (not kicked)", async () => {
+  test("image with a lure caption but no mass-mention → removed + WARNED first (not timed out or kicked)", async () => {
+    // Lure wording overlaps legit CTF phrasing ("claim your flag"), so the first
+    // hit is only a recoverable warn.
     const fx = freshEffects();
     const handled = await handlePhishingDetection(
       makeMessage({
@@ -445,8 +447,7 @@ describe("phishing detection requires link + strong signal", () => {
     );
     expect(handled).toBe(true);
     expect(fx.deletedIds.length).toBeGreaterThan(0);
-    expect(fx.kicks).toBe(0); // no mass-mention → soft action only
-    expect(fx.timeouts).toBe(1);
+    expect(fx.kicks + fx.timeouts).toBe(0); // no mass-mention → first strike warn only
   });
 
   test("scam link hidden in an embed + @everyone (no message text) → kicked", async () => {
@@ -541,10 +542,11 @@ describe("phishing path never kicks innocent people", () => {
     expect(fx.kicks).toBe(0);
   });
 
-  test("repeat scammer WITHOUT @everyone escalates: 1st post → timeout, 2nd → KICK", async () => {
-    // The production failure: a scammer kept posting scam links, got timed out
-    // each time, came back, and was never kicked because the phishing path had
-    // no memory. Now repeats climb to a kick.
+  test("repeat scammer WITHOUT @everyone escalates: warn → timeout → KICK", async () => {
+    // The production failure: a scammer kept posting scam links and was never
+    // kicked because the phishing path had no memory. Now repeats climb — but
+    // the FIRST hit is a recoverable warn (audit fix: lure+link overlaps legit
+    // CTF wording, so don't timeout an innocent on a single message).
     const fx = freshEffects();
     const u = nextUser();
     const member = makeMember(fx, { kickable: true, moderatable: true });
@@ -553,23 +555,25 @@ describe("phishing path never kicks innocent people", () => {
         makeMessage({ userId: u, content: "claim your free nitro here https://nitro-free.example", member, effects: fx }),
       );
 
-    expect(await post()).toBe(true); // strike 1 → timeout, no kick
+    expect(await post()).toBe(true); // strike 1 → warn only
+    expect(fx.timeouts + fx.kicks).toBe(0);
+
+    expect(await post()).toBe(true); // strike 2 → timeout
     expect(fx.timeouts).toBe(1);
     expect(fx.kicks).toBe(0);
 
-    expect(await post()).toBe(true); // strike 2 (within decay) → kick
+    expect(await post()).toBe(true); // strike 3 → kick
     expect(fx.kicks).toBe(1);
   });
 
-  test("a SINGLE borderline scam post → timeout only, never kicked (recoverable)", async () => {
+  test("a SINGLE borderline scam post → WARN only, never timed out or kicked (recoverable)", async () => {
     const fx = freshEffects();
     const member = makeMember(fx, { kickable: true, moderatable: true });
     const handled = await handlePhishingDetection(
       makeMessage({ userId: nextUser(), content: "free nitro, claim now https://x.example", member, effects: fx }),
     );
     expect(handled).toBe(true);
-    expect(fx.kicks).toBe(0);
-    expect(fx.timeouts).toBe(1);
+    expect(fx.kicks + fx.timeouts).toBe(0); // first strike → warn only
   });
 
   test("un-kickable member: image + @everyone + lure → message removed but NEVER kicked", async () => {
@@ -591,6 +595,36 @@ describe("phishing path never kicks innocent people", () => {
   });
 });
 
+// ── Strikes are namespaced per detector lane (2026-06-09 audit fix #9): three
+// unrelated borderline events must not sum into a kick. ──────────────────────
+describe("strike lanes don't combine across detectors", () => {
+  beforeEach(() => __resetImageScamState());
+
+  test("an image warn + a phishing warn on the same user do NOT escalate to a kick", async () => {
+    const fx = freshEffects();
+    const u = nextUser();
+    const member = makeMember(fx, { kickable: true, moderatable: true, bannable: true });
+
+    // Image lane: a single 2-channel multi-image flood → strike 1 (warn).
+    const fat = [
+      { name: "1.png", size: 9 },
+      { name: "2.png", size: 9 },
+      { name: "3.png", size: 9 },
+    ];
+    const t0 = 300_000_000;
+    await handleImageScamDetection(makeMessage({ userId: u, channelId: "x1", attachments: fat, member, effects: fx }), { hashesForTest: [7n], nowForTest: t0 });
+    await handleImageScamDetection(makeMessage({ userId: u, channelId: "x2", attachments: fat, member, effects: fx }), { hashesForTest: [7n], nowForTest: t0 + 1000 });
+
+    // Phishing lane: one borderline lure+link → strike 1 (warn).
+    await handlePhishingDetection(
+      makeMessage({ userId: u, content: "claim your free nitro https://x.example", member, effects: fx }),
+    );
+
+    // Two different lanes, one strike each → NEVER a timeout or kick.
+    expect(fx.kicks + fx.bans + fx.timeouts).toBe(0);
+  });
+});
+
 // ── Perceptual image-scam detection (the otnieltym ring) ──────────────────────
 // Correlation rules tested with synthetic 64-bit hashes; the dHash↔real-image
 // behaviour is validated separately in scripts/verify-dhash-ts.ts (ring copies
@@ -602,20 +636,37 @@ describe("perceptual image-scam: correlation rules", () => {
   const NEAR = 0b111n; // 3 bits away from H → within the ≤10 match threshold
   const FAR = (1n << 63n) | (1n << 40n) | (1n << 20n) | 0xffffn; // many bits away
 
-  test("same image from 2 distinct accounts → ring confirmed on the 2nd", () => {
+  test("same image from 2 distinct accounts → ESCALATE (graduated), never instant-confirmed", () => {
+    // 2026-06-09 audit fix: a bare 2-account match is AMBIGUOUS (two strangers
+    // reposting a meme look identical), so it must NOT instant-softban. It
+    // escalates (delete copies + strike ladder) instead.
     const t = 1_000_000;
     expect(evaluateImageFingerprint("A", "c1", "m1", H, t).confirmed).toBe(false);
     const d = evaluateImageFingerprint("B", "c2", "m2", H, t + 500);
-    expect(d.confirmed).toBe(true);
+    expect(d.confirmed).toBe(false); // NOT instant removal
+    expect(d.escalate).toBe(true); // graduated
     expect(d.reason).toContain("2 accounts");
     expect(d.matched.length).toBe(2); // both posters' messages targeted for deletion
   });
 
-  test("re-encoded copy (≤10 bits apart) still counts as the same image → ring", () => {
+  test("re-encoded copy (≤10 bits apart) still counts as the same image → escalate", () => {
     const t = 2_000_000;
     expect(evaluateImageFingerprint("A", "c1", "m1", H, t).confirmed).toBe(false);
     // Different account posts a perceptually-near (not identical) hash.
-    expect(evaluateImageFingerprint("B", "c2", "m2", NEAR, t + 1000).confirmed).toBe(true);
+    const d = evaluateImageFingerprint("B", "c2", "m2", NEAR, t + 1000);
+    expect(d.confirmed).toBe(false);
+    expect(d.escalate).toBe(true);
+  });
+
+  test("a bare 2-account ring is NOT learned into the known set (no poisoning)", () => {
+    // Critical anti-poisoning property: a meme two strangers reposted must not
+    // become a permanent instant-removal tripwire for everyone after.
+    const t = 2_500_000;
+    evaluateImageFingerprint("A", "c1", "m1", H, t);
+    evaluateImageFingerprint("B", "c2", "m2", H, t + 500); // ring → escalate, NOT learned
+    // A much later, lone poster of the same image is NOT auto-confirmed as known.
+    const d = evaluateImageFingerprint("C", "c9", "m9", H, t + 30 * 60_000);
+    expect(d.confirmed).toBe(false);
   });
 
   test("one account fanning the same image across 3 channels in seconds → confirmed", () => {
@@ -639,37 +690,57 @@ describe("perceptual image-scam: correlation rules", () => {
     expect(evaluateImageFingerprint("A", "c2", "m2", H, t + 1000).confirmed).toBe(false);
   });
 
-  test("once learned, the same image from a brand-new account is flagged as known", () => {
+  test("once learned (via SOLO fan-out), the same image from a brand-new account is flagged as known", () => {
     const t = 6_000_000;
-    evaluateImageFingerprint("A", "c1", "m1", H, t); // single account → not yet
-    evaluateImageFingerprint("B", "c2", "m2", H, t + 1); // ring → H added to known-scam set
+    // Learning only happens from the high-confidence solo-raid tier: one account
+    // fans H across 3 channels in seconds → confirmed + H added to known set.
+    evaluateImageFingerprint("A", "c1", "m1", H, t);
+    evaluateImageFingerprint("A", "c2", "m2", H, t + 1000);
+    expect(evaluateImageFingerprint("A", "c3", "m3", H, t + 2000).confirmed).toBe(true);
+    // A brand-new account posting the same image once is now removed on sight.
     const d = evaluateImageFingerprint("C", "c9", "m9", H, t + 10_000);
     expect(d.confirmed).toBe(true);
     expect(d.reason).toContain("known");
+  });
+
+  test("a learned scam hash ages out after the TTL (no permanent tripwire)", () => {
+    const t = 7_000_000;
+    // Learn H via solo fan-out.
+    evaluateImageFingerprint("A", "c1", "m1", H, t);
+    evaluateImageFingerprint("A", "c2", "m2", H, t + 1000);
+    expect(evaluateImageFingerprint("A", "c3", "m3", H, t + 2000).confirmed).toBe(true);
+    // >24h later, a lone poster of the same image is no longer auto-removed.
+    const later = t + 25 * 60 * 60_000;
+    const d = evaluateImageFingerprint("Z", "c9", "m9", H, later);
+    expect(d.confirmed).toBe(false);
   });
 });
 
 describe("perceptual image-scam: enforcement", () => {
   beforeEach(() => __resetImageScamState());
 
-  test("ring of 2 accounts posting the same image → 2nd account is kicked + removed", async () => {
+  test("ring of 2 accounts posting the same image → 2nd is GRADUATED (copies deleted + warned), NOT instant-banned", async () => {
+    // 2026-06-09 audit fix: the worst forbidden outcome is softbanning an
+    // innocent. A 2-account same-image match (which a meme repost also produces)
+    // must never instant-ban — it deletes the copies and issues a warning.
     const fx = freshEffects();
-    const memberA = makeMember(fx, { kickable: true, moderatable: true });
-    const memberB = makeMember(fx, { kickable: true, moderatable: true });
+    const memberA = makeMember(fx, { kickable: true, moderatable: true, bannable: true });
+    const memberB = makeMember(fx, { kickable: true, moderatable: true, bannable: true });
 
     const a = await handleImageScamDetection(
       makeMessage({ userId: "ringA", channelId: "c1", attachments: [{ name: "s.png", size: 100 }], member: memberA, effects: fx }),
       { hashesForTest: [0n] },
     );
     expect(a).toBe(false); // single account so far → no action
-    expect(fx.kicks).toBe(0);
+    expect(fx.kicks + fx.bans).toBe(0);
 
     const b = await handleImageScamDetection(
       makeMessage({ userId: "ringB", channelId: "c2", attachments: [{ name: "s.png", size: 100 }], member: memberB, effects: fx }),
       { hashesForTest: [0n] },
     );
-    expect(b).toBe(true); // ring confirmed → handled
-    expect(fx.kicks).toBe(1);
+    expect(b).toBe(true); // handled (escalated)
+    expect(fx.kicks + fx.bans + fx.timeouts).toBe(0); // first strike → warn only, NEVER instant ban
+    expect(fx.warnings).toBeGreaterThanOrEqual(1);
   });
 
   test("plain image post that matches nothing → never touched", async () => {
@@ -705,23 +776,29 @@ describe("perceptual image-scam: enforcement", () => {
 describe("softban purge of confirmed scammers", () => {
   beforeEach(() => __resetImageScamState());
 
-  function ringConfirm(fx: Effects, member: ReturnType<typeof makeMember>, tag: string) {
-    // 1st account seeds the cluster, 2nd (the member under test) confirms the ring.
-    return handleImageScamDetection(
-      makeMessage({ userId: `${tag}-seed`, channelId: "c1", attachments: [{ name: "s.png", size: 100 }], effects: fx, member: makeMember(fx, { kickable: false, moderatable: false }) }),
+  // Drive an INSTANT confirmation via the solo fan-out tier (one account, same
+  // image to 3 channels in seconds) — the high-confidence path that removes
+  // directly. (Ring is graduated now, so it can't be used to test instant ban.)
+  async function fanoutConfirm(fx: Effects, member: ReturnType<typeof makeMember>, tag: string) {
+    const att = [{ name: "s.png", size: 100 }];
+    await handleImageScamDetection(
+      makeMessage({ userId: `${tag}-s`, channelId: `${tag}-1`, attachments: att, member, effects: fx }),
       { hashesForTest: [99n] },
-    ).then(() =>
-      handleImageScamDetection(
-        makeMessage({ userId: `${tag}-scammer`, channelId: "c2", attachments: [{ name: "s.png", size: 100 }], member, effects: fx }),
-        { hashesForTest: [99n] },
-      ),
+    );
+    await handleImageScamDetection(
+      makeMessage({ userId: `${tag}-s`, channelId: `${tag}-2`, attachments: att, member, effects: fx }),
+      { hashesForTest: [99n] },
+    );
+    return handleImageScamDetection(
+      makeMessage({ userId: `${tag}-s`, channelId: `${tag}-3`, attachments: att, member, effects: fx }),
+      { hashesForTest: [99n] },
     );
   }
 
   test("bannable scammer → softban (ban + unban), NOT a plain kick", async () => {
     const fx = freshEffects();
     const member = makeMember(fx, { kickable: true, moderatable: true, bannable: true });
-    const handled = await ringConfirm(fx, member, nextUser());
+    const handled = await fanoutConfirm(fx, member, nextUser());
     expect(handled).toBe(true);
     expect(fx.bans).toBe(1); // ban carries deleteMessageSeconds → server-wide purge
     expect(fx.unbans).toBe(1); // immediately unbanned → kick semantics, can rejoin
@@ -731,7 +808,7 @@ describe("softban purge of confirmed scammers", () => {
   test("ban fails → falls back to a plain kick (member still removed)", async () => {
     const fx = freshEffects();
     const member = makeMember(fx, { kickable: true, bannable: true, banThrows: true });
-    const handled = await ringConfirm(fx, member, nextUser());
+    const handled = await fanoutConfirm(fx, member, nextUser());
     expect(handled).toBe(true);
     expect(fx.bans).toBe(0);
     expect(fx.unbans).toBe(0);
@@ -741,7 +818,7 @@ describe("softban purge of confirmed scammers", () => {
   test("not bannable → plain kick, exactly the old behavior", async () => {
     const fx = freshEffects();
     const member = makeMember(fx, { kickable: true, bannable: false });
-    const handled = await ringConfirm(fx, member, nextUser());
+    const handled = await fanoutConfirm(fx, member, nextUser());
     expect(handled).toBe(true);
     expect(fx.bans).toBe(0);
     expect(fx.kicks).toBe(1);
