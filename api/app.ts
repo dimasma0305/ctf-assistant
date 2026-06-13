@@ -54,6 +54,25 @@ app.get("/health", (req, res) => {
 });
 
 /**
+ * Cache-Control for GET reads. Lets browsers (and any CDN/proxy) serve a result
+ * for a few seconds and revalidate in the background instead of recomputing on
+ * every navigation/tab-switch. Data here is already cached server-side and only
+ * changes on new solves, so short TTLs are safe. Express's default (weak) ETag
+ * still yields cheap 304s; we deliberately don't touch it.
+ */
+app.use((req, res, next) => {
+    if (req.method === 'GET') {
+        if (req.path.startsWith('/api/profile') || req.path.startsWith('/api/certificates')) {
+            // User-scoped — keep private so shared caches don't store it.
+            res.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300');
+        } else if (req.path.startsWith('/api/scoreboard') || req.path.startsWith('/api/ctfs')) {
+            res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
+        }
+    }
+    next();
+});
+
+/**
  * Route Handlers
  */
 app.use("/api/scoreboard", scoreboardRoutes);

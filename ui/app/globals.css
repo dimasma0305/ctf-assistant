@@ -275,10 +275,14 @@
   }
 
   .animate-blob {
-    animation: blob 20s infinite alternate ease-in-out;
-    will-change: transform;
+    /* Static by design. These orbs sit in a fixed layer BEHIND the frosted
+       `backdrop-filter` surfaces (header + cards). Any motion here — translate
+       OR opacity — changes those surfaces' backdrop every frame and forces the
+       compositor to re-blur the whole page at 60fps even while idle, which is
+       the dominant cause of the "laggy" scroll/interaction. Keeping them static
+       lets the GPU cache the blurred result; the glassmorphism look is fully
+       preserved. (translateZ promotes a cheap static layer; no animation.) */
     transform: translateZ(0);
-    /* Hardware acceleration */
   }
 
   .animation-delay-2000 {
@@ -317,6 +321,33 @@
 @keyframes rotate-conic {
   to {
     --angle: 360deg;
+  }
+}
+
+/*
+  Respect the OS "reduce motion" setting (also what low-power devices report).
+  Kills every continuous animation + the noise overlay so the page does zero
+  steady-state GPU work. Placed outside @layer so the !important reliably wins.
+  Note: animate-in needs transform:none too — TabsContent uses fill-mode-both
+  slide-in, so opacity alone would leave it shifted ~16px.
+*/
+@media (prefers-reduced-motion: reduce) {
+
+  .animate-blob,
+  .conic-glow-border::before,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+
+  [class*="animate-in"] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .frosted-noise {
+    display: none;
   }
 }
 

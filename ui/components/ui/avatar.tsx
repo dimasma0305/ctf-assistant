@@ -4,7 +4,6 @@ import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
 
 import { cn } from '@/lib/utils'
-import { useImageCache } from '@/hooks/useImageCache'
 
 function Avatar({
   className,
@@ -64,46 +63,31 @@ interface CachedAvatarImageProps extends Omit<React.ComponentProps<typeof Avatar
 }
 
 /**
- * Avatar image component with built-in caching
- * Automatically caches images for better performance and offline support
+ * Avatar image backed by the native <img> loader (Radix Avatar.Image), which
+ * goes straight through the browser's HTTP cache. Avatar URLs (Discord CDN) are
+ * immutable and long-cached, so native loading is faster and caches better than
+ * the old fetch()->blob()->objectURL hook: no per-avatar XHR waterfall, no CORS
+ * requirement, no blob-URL leaks. While loading or on error, the sibling
+ * <AvatarFallback> shows initials (Radix only reveals the image once it loads).
+ *
+ * The caching-related props are kept for call-site compatibility but are no-ops.
  */
 function CachedAvatarImage({
   className,
   src,
-  showLoading = true,
-  loadingPlaceholder,
-  persistent = true,
-  maxAge,
+  showLoading: _showLoading,
+  loadingPlaceholder: _loadingPlaceholder,
+  persistent: _persistent,
+  maxAge: _maxAge,
   ...props
 }: CachedAvatarImageProps) {
-  const { imageUrl, loading, error } = useImageCache(src, { 
-    persistent, 
-    maxAge,
-    fallbackToOriginal: true 
-  })
-
-  // Show loading state if requested
-  if (showLoading && loading && loadingPlaceholder) {
-    return (
-      <div 
-        data-slot="avatar-image-loading"
-        className={cn('aspect-square size-full flex items-center justify-center', className)}
-      >
-        {loadingPlaceholder}
-      </div>
-    )
-  }
-
-  // If we have an error and no cached image, let AvatarFallback handle it
-  if (error && !imageUrl) {
-    return null
-  }
+  if (!src) return null
 
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn('aspect-square size-full', className)}
-      src={imageUrl || undefined}
+      src={src}
       {...props}
     />
   )

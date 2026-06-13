@@ -240,7 +240,7 @@ export default function Dashboard() {
               <TabsContent value="leaderboard" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
                 <Card className="glass-card border-none overflow-hidden relative shadow-2xl">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-primary via-accent to-primary" />
-                  <CardHeader className="bg-background/20 backdrop-blur-md border-b border-white/5 pb-4">
+                  <CardHeader className="bg-background/20 border-b border-white/5 pb-4">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-primary/10 rounded-lg">
                         <Trophy className="w-5 h-5 text-primary" />
@@ -260,7 +260,7 @@ export default function Dashboard() {
               <TabsContent value="ctfs" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
                 <Card className="glass-card border-none overflow-hidden relative shadow-2xl">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-accent via-chart-3 to-accent" />
-                  <CardHeader className="bg-background/20 backdrop-blur-md border-b border-white/5 pb-4">
+                  <CardHeader className="bg-background/20 border-b border-white/5 pb-4">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-accent/10 rounded-lg">
                         <Target className="w-5 h-5 text-accent" />
@@ -280,7 +280,7 @@ export default function Dashboard() {
               <TabsContent value="ctf-rankings" className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
                 <Card className="glass-card border-none overflow-hidden relative shadow-2xl">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-chart-2 via-primary to-chart-2" />
-                  <CardHeader className="bg-background/20 backdrop-blur-md border-b border-white/5 pb-4">
+                  <CardHeader className="bg-background/20 border-b border-white/5 pb-4">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-chart-2/10 rounded-lg">
                         <Users className="w-5 h-5 text-chart-2" />

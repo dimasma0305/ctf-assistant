@@ -71,11 +71,18 @@ function useAPICall<T>(
             setLoading(false)
 
             if (staleWhileRevalidate) {
-              setIsStale(true)
-              // Fetch fresh data in background
-              setTimeout(() => {
-                fetchData(false, true)
-              }, 100)
+              // Only revalidate in the background once the cached entry is at
+              // least halfway to its TTL. Previously this fired a full uncached
+              // refetch on EVERY mount/tab-switch (and flickered the "Syncing"
+              // badge), even when the cache was a few seconds old.
+              const age = dataCache.getAge(cacheKey) ?? Number.POSITIVE_INFINITY
+              if (age > ttl / 2) {
+                setIsStale(true)
+                // Fetch fresh data in background
+                setTimeout(() => {
+                  fetchData(false, true)
+                }, 100)
+              }
               return
             }
           }
@@ -98,6 +105,11 @@ function useAPICall<T>(
             inFlightRequests.set(cacheKey, fetchPromise)
             try {
               result = await fetchPromise
+              // Write the fresh result back so the entry's timestamp resets.
+              // Without this the forced refresh never updated the cache, so the
+              // gate above always saw a "half-stale" entry and SWR re-fired on
+              // every subsequent mount in a loop.
+              dataCache.set(cacheKey, result, ttl)
             } finally {
               inFlightRequests.delete(cacheKey)
             }
@@ -484,6 +496,13 @@ class DataCache {
       timestamp: Date.now(),
       ttl,
     })
+  }
+
+  /** Age of a cached entry in ms, or null if it isn't cached. */
+  getAge(key: string): number | null {
+    const entry = this.cache.get(key)
+    if (!entry) return null
+    return Date.now() - entry.timestamp
   }
 
   async getOrFetch<T>(key: string, fetcher: () => Promise<T>, ttl: number = 5 * 60 * 1000): Promise<T> {

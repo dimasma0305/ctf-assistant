@@ -31,5 +31,12 @@ export const solveSchema = new Schema(schema);
 //   - findOne({ challenge_ref, ctf_id }) — per-/solve dedupe (fires twice per solve)
 solveSchema.index({ ctf_id: 1 });
 solveSchema.index({ challenge_ref: 1, ctf_id: 1 });
+// Per-user metric queries — find({ users }) / find({ users, ctf_id }) in
+// api/utils/statistics.ts + api/routes/profiles.ts — were full COLLSCANs.
+// The compound also serves the bare {users} predicate via its index prefix.
+solveSchema.index({ users: 1, ctf_id: 1 });
+// Month/year leaderboard ranges — find({ solved_at: { $gte, $lte } }) in the
+// scoreboard route + dataService, and the min/max solved_at time-range aggregate.
+solveSchema.index({ solved_at: 1 });
 
 export type SolveSchemaType = InferSchemaType<typeof solveSchema>;

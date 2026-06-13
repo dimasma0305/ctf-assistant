@@ -264,7 +264,7 @@ function WindowBackdrop({ onClick }: { onClick: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[998] bg-black/5 backdrop-blur-[0.5px] transition-all duration-200"
+      className="fixed inset-0 z-[998] bg-black/5 transition-opacity duration-200"
       onClick={onClick}
       style={{ pointerEvents: "auto" }}
     />
@@ -733,7 +733,10 @@ export function Window({
         minHeight: window?.isMaximized ? "auto" : minSize.height,
         maxWidth: window?.isMaximized ? "none" : actualMaxSize.width,
         maxHeight: window?.isMaximized ? "none" : actualMaxSize.height,
-        backdropFilter: isDragging || isResizing ? "blur(1px)" : "none",
+        /* No backdrop blur while dragging/resizing — blurring the whole page
+           during the exact moment of interaction is the most expensive time to
+           do it and caused visible drag lag. */
+        backdropFilter: "none",
       }}
       onClick={(e) => {
         e.stopPropagation()

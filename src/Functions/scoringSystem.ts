@@ -173,7 +173,9 @@ export class FairScoringSystem {
      */
     static async calculateUserScores(globalQuery: any = {}): Promise<Map<string, UserScore>> {
         const instance = new FairScoringSystem();
-        const solves = await solveModel.find(globalQuery).populate<{challenge_ref: ChallengeSchemaType}>('challenge_ref').populate<{users: UserSchemaType[]}>('users').lean();
+        // Only discord_id is read off each populated user below; projecting it
+        // avoids hydrating full user docs for every solve on the global recompute.
+        const solves = await solveModel.find(globalQuery).populate<{challenge_ref: ChallengeSchemaType}>('challenge_ref').populate<{users: UserSchemaType[]}>('users', 'discord_id').lean();
         const userScores = new Map<string, UserScore>();
         let processedCount = 0;
         const errors: { solveId: string; message: string }[] = [];
