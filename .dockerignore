@@ -5,11 +5,15 @@
 .env
 .env.*
 *.env
-ui/
-# api/utils/statistics.ts imports ACHIEVEMENT_CRITERIA from this single,
-# dependency-free file. Re-include it so the bot image builds without pulling
-# in the whole ui/ app (esp. ui/node_modules). Keep the rest of ui/ excluded.
-!ui/lib/achievements.ts
+# This ONE build context is shared by both images (Dockerfile -> ctf-assistant
+# via `COPY . .`, and Dockerfile.ui -> ui via `COPY ui/`). Excluding all of `ui/`
+# kept ui/node_modules out of the bot image but ALSO broke the ui image build
+# (ui/package.json went missing -> "/ui/package.json: not found"), so the ui
+# container couldn't be rebuilt at all. Exclude only the regenerated heavy dirs:
+# the bot image still skips ui/node_modules, the ui build still gets its source,
+# and api/utils/statistics.ts's import of ui/lib/achievements.ts stays included.
+ui/node_modules/
+ui/.next/
 .git/
 docs/
 backups/
