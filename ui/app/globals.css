@@ -18,10 +18,10 @@
   /* Crisp light blue-gray */
   --foreground: oklch(0.15 0.05 250);
   /* Deep indigo */
-  --card: oklch(1 0 0 / 0.7);
-  /* Translucent white */
+  --card: oklch(1 0 0);
+  /* Opaque white (flat panels) */
   --card-foreground: oklch(0.15 0.05 250);
-  --popover: oklch(1 0 0 / 0.8);
+  --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0.05 250);
   --primary: oklch(0.45 0.2 280);
   /* Electric Purple */
@@ -81,10 +81,10 @@
   /* Deep Space Black/Indigo */
   --foreground: oklch(0.95 0.02 250);
   /* Crispy off-white */
-  --card: oklch(0.15 0.02 260 / 0.5);
-  /* Deep translucent card */
+  --card: oklch(0.16 0.02 260);
+  /* Opaque card (flat panels) */
   --card-foreground: oklch(0.95 0.02 250);
-  --popover: oklch(0.15 0.02 260 / 0.8);
+  --popover: oklch(0.16 0.02 260);
   --popover-foreground: oklch(0.95 0.02 250);
 
   --primary: oklch(0.7 0.15 280);
@@ -204,36 +204,31 @@
 }
 
 @layer utilities {
+  /* Flat, opaque panels — no backdrop-filter (it re-blurs the page on every
+     scroll/hover frame, the main remaining source of lag). Fast like a plain
+     content site; same colours, borders and radii. */
   .glass-card {
-    @apply bg-card border border-border shadow-md transform-gpu;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    @apply bg-card border border-border shadow-sm;
   }
 
   .glass-panel {
-    @apply bg-background/80 border-b border-border shadow-sm transform-gpu;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    @apply border-b border-border shadow-sm;
+    background-color: var(--background);
   }
 
-  .neon-glow-primary {
-    box-shadow: 0 0 15px -5px oklch(0.7 0.15 280 / 0.4);
-  }
-
+  .neon-glow-primary,
   .neon-glow-accent {
-    box-shadow: 0 0 15px -5px oklch(0.7 0.15 190 / 0.4);
+    box-shadow: none;
   }
 
-  /* 2026 UI Overhaul Utilities */
   .bento-card {
-    @apply relative overflow-hidden rounded-[var(--bento-radius)] bg-background/50 border border-white/5;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    @apply relative overflow-hidden rounded-[var(--bento-radius)] border border-border;
+    background-color: var(--card);
+    transition: border-color 0.2s ease, transform 0.2s ease;
   }
 
   .bento-card:hover {
-    @apply border-white/10 shadow-xl shadow-black/50;
+    @apply border-white/10;
     transform: translateY(-2px);
   }
 
@@ -274,15 +269,36 @@
     text-shadow: 0 0 8px var(--primary);
   }
 
+  /*
+    FLAT MODE (2026-06-13): reworked to be flat and GPU-cheap, "fast like
+    GitHub". Everything below is pure decoration that forced continuous
+    paint/compositing — the animated background blobs, the noise overlay, the
+    rotating conic glow and the text glow — so it's all disabled. Combined with
+    the backdrop-filter and decorative-blur kills below, the page does no
+    steady-state GPU work. Layout/colours/borders are unchanged.
+  */
+  .frosted-noise,
+  .conic-glow-border::before,
   .animate-blob {
-    /* Static by design. These orbs sit in a fixed layer BEHIND the frosted
-       `backdrop-filter` surfaces (header + cards). Any motion here — translate
-       OR opacity — changes those surfaces' backdrop every frame and forces the
-       compositor to re-blur the whole page at 60fps even while idle, which is
-       the dominant cause of the "laggy" scroll/interaction. Keeping them static
-       lets the GPU cache the blurred result; the glassmorphism look is fully
-       preserved. (translateZ promotes a cheap static layer; no animation.) */
-    transform: translateZ(0);
+    display: none !important;
+  }
+
+  .neon-text {
+    text-shadow: none;
+  }
+
+  /* Inline Tailwind backdrop-blur-* utilities (header, badges, dialogs, search,
+     profile/certificate panels). backdrop-filter is the expensive one. */
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Large decorative blur orbs inside cards — drop the costly blur filter. */
+  [class*="blur-xl"],
+  [class*="blur-2xl"],
+  [class*="blur-3xl"] {
+    filter: none !important;
   }
 
   .animation-delay-2000 {
