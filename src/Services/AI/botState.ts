@@ -1,8 +1,9 @@
 import { BotStateModel, IndexedMessageModel, UserProfileModel } from "../../Database/connect";
 import { SINGLETON_KEY } from "../../Database/botStateSchema";
 import { openai } from "../../utils/openai";
+import { MODELS } from "./models";
 
-const STATE_MODEL = 'deepseek-v4-flash';
+const STATE_MODEL = MODELS.light;
 const STATE_TIMEOUT_MS = 25_000;
 const FIELD_CAP = 220;
 const MAX_RECENT_FOR_STATE_DISTILL = 40;

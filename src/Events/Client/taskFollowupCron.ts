@@ -7,13 +7,14 @@ import {
     markTaskFollowedUp,
 } from "../../Services/AI/tasks";
 import { openai } from "../../utils/openai";
+import { MODELS } from "../../Services/AI/models";
 
 let cronInit = false;
 
 // Gating constants — bounds proactive outreach so it doesn't feel spammy.
 const MIN_AFFECTION = 30;                     // skip users below this affection
 const ACTIVE_WINDOW_DAYS = 7;                 // user must have chatted in last N days
-const DRAFT_MODEL = 'deepseek-v4-flash';
+const DRAFT_MODEL = MODELS.light;
 const DRAFT_TIMEOUT_MS = 20_000;
 
 /**

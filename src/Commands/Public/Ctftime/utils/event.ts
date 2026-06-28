@@ -68,6 +68,7 @@ import { APIEmbed } from "discord.js";
 import moment from "moment"
 import { MyClient } from "../../../../Model/client";
 import { openai, isOpenAIConfigured } from "../../../../utils/openai";
+import { MODELS } from "../../../../Services/AI/models";
 import { CTFCacheModel, FetchCommandModel } from "../../../../Database/connect";
 
 interface ScheduleEmbedTemplateProps {
@@ -198,7 +199,7 @@ async function generateCtfEndMessage(ctfTitle: string, roleId: string): Promise<
 
     try {
         const completion = await openai.chat.completions.create({
-            model: 'deepseek-v4-flash',
+            model: MODELS.light,
             messages: [
                 {
                     role: 'system',

@@ -6,6 +6,7 @@ import { getUpcommingOnlineEvent } from "../../Functions/ctftime-v2";
 import { scheduleEmbedTemplate } from "../../Commands/Public/Ctftime/utils/event";
 import { createCTFTimeHelpEmbed } from "../../Commands/Public/Ctftime/utils/helpEmbed";
 import { openai } from "../../utils/openai";
+import { MODELS } from "../../Services/AI/models";
 import { GuildChannelModel } from "../../Database/connect";
 
 // Template messages as fallback when OpenAI is unavailable
@@ -37,7 +38,7 @@ const mabarMessageTemplates = [
 async function generateMabarMessage(): Promise<string> {
     try {
         const completion = await openai.chat.completions.create({
-            model: 'deepseek-v4-flash',
+            model: MODELS.light,
             messages: [
                 {
                     role: 'system',

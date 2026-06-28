@@ -1,6 +1,7 @@
 import { UserProfileModel } from "../../Database/connect";
 import { openai } from "../../utils/openai";
 import { ChatMessage } from "./memory";
+import { MODELS } from "./models";
 
 const DISTILL_INTERVAL = 5;             // re-distill every N interactions
 const MAX_DISTILL_EXCHANGES = 30;       // how many recent exchanges to feed in
@@ -13,7 +14,7 @@ const MIN_RELATIONSHIP_VALUE = -100;     // floor for affection + 4 dims (matche
 const MAX_RELATIONSHIP_VALUE = 100;      // ceiling for affection + 4 dims
 const MAX_DISPLAYED_MOMENTS = 4;         // how many we surface in the per-turn ctx (most recent)
 const DISTILL_TIMEOUT_MS = 25_000;
-const PROFILE_MODEL = 'deepseek-v4-flash';
+const PROFILE_MODEL = MODELS.light;
 
 const VALID_MOMENT_TONES = new Set(['fun', 'helpful', 'touching', 'tense', 'impressive']);
 export type MomentTone = 'fun' | 'helpful' | 'touching' | 'tense' | 'impressive';
