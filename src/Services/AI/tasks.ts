@@ -1,6 +1,7 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { TaskModel } from "../../Database/connect";
 import { TASK_STATUSES, TASK_RECURRENCE, TaskStatus, TaskRecurrence } from "../../Database/taskSchema";
+import { loadUserTimezone, resolveIsoToUtc } from "./reminders";
 
 /**
  * Persistent Task service — the foundation of Hackerika's "agent" capability.
@@ -107,8 +108,10 @@ export async function createTaskForTool(
 
     let dueAt: Date | undefined;
     if (typeof args?.dueAtISO === 'string' && args.dueAtISO.trim().length > 0) {
-        const t = new Date(args.dueAtISO);
-        if (isNaN(t.getTime())) return { ok: false, error: 'invalid_dueAt' };
+        // Interpret an offset-less dueAtISO in the user's tz, not server-local.
+        const tz = await loadUserTimezone(message.author.id);
+        const t = resolveIsoToUtc(args.dueAtISO, tz);
+        if (!t) return { ok: false, error: 'invalid_dueAt' };
         dueAt = t;
     }
 
@@ -224,7 +227,7 @@ export interface UpdateTaskArgs {
 }
 export interface UpdateTaskResult {
     ok: boolean;
-    error?: 'missing_id' | 'invalid_id' | 'not_found' | 'not_yours' | 'invalid_status' | 'db_error';
+    error?: 'missing_id' | 'invalid_id' | 'not_found' | 'not_yours' | 'invalid_status' | 'no_changes' | 'db_error';
 }
 
 export async function updateTaskForTool(
@@ -245,7 +248,7 @@ export async function updateTaskForTool(
     if (!doc) return { ok: false, error: 'not_found' };
     if (doc.userId !== message.author.id) return { ok: false, error: 'not_yours' };
 
-    const update: any = { lastWorkedOn: new Date() };
+    const update: any = {};
 
     if (typeof args?.status === 'string' && args.status) {
         if (!VALID_STATUSES.has(args.status as TaskStatus)) return { ok: false, error: 'invalid_status' };
@@ -258,6 +261,14 @@ export async function updateTaskForTool(
         const existing = Array.isArray(doc.notes) ? doc.notes : [];
         update.notes = [...existing, note].slice(-MAX_NOTES);
     }
+
+    // No-op guard: a taskId-only "check" call (easy for flash) must NOT bump
+    // lastWorkedOn — that silently resets the stall clock in the follow-up cron
+    // and drops a genuinely-stalled task out of proactive check-ins.
+    if (update.status === undefined && update.notes === undefined) {
+        return { ok: false, error: 'no_changes' };
+    }
+    update.lastWorkedOn = new Date();
 
     try {
         await TaskModel.updateOne({ _id: id }, { $set: update });

@@ -435,10 +435,11 @@ export async function dispatchTool(
             const result = await fetchUrlForTool(args || {});
             return JSON.stringify(result);
         }
-        return JSON.stringify({ error: 'unknown_tool', name });
+        return JSON.stringify({ ok: false, error: 'unknown_tool', name });
     } catch (error: any) {
         console.error(`[Tool] dispatch failed for ${name}:`, error);
         return JSON.stringify({
+            ok: false,
             error: 'tool_execution_failed',
             detail: error?.message || 'unknown',
         });

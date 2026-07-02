@@ -203,9 +203,13 @@ export function shouldDistill(profile: UserProfile): boolean {
 
 /**
  * Extract the recent back-and-forth between a specific user and Hackerika
- * from the per-channel memory buffer. We treat any assistant turn as "from
- * Hackerika" and any user turn whose `name` field starts with `${userId}-`
- * as that user's message.
+ * from the per-channel memory buffer. A user turn counts if its `name` starts
+ * with `${userId}-`; an assistant turn counts ONLY if it directly answered this
+ * user — i.e. the immediately-preceding memory entry is this user's message.
+ * Turns are serialized per channel (acquireChannelSlot), so an assistant reply
+ * always immediately follows the message it answered; without this adjacency
+ * check, Hackerika's replies to users B/C leak into user A's psychological +
+ * affection distillation as orphan lines and corrupt A's profile.
  *
  * Returns a compact "Name: content" transcript.
  */
@@ -217,12 +221,16 @@ export function buildExchangeTranscript(
     const tag = `${userId}-`;
     const slice = channelMemory.slice(-MAX_DISTILL_EXCHANGES);
     const lines: string[] = [];
-    for (const m of slice) {
+    for (let i = 0; i < slice.length; i++) {
+        const m = slice[i];
         if (m.role === 'user') {
             if (!m.name || !m.name.startsWith(tag)) continue;
             lines.push(`${displayName}: ${m.content}`);
         } else if (m.role === 'assistant') {
-            lines.push(`Hackerika: ${m.content}`);
+            const prev = slice[i - 1];
+            if (prev && prev.role === 'user' && prev.name && prev.name.startsWith(tag)) {
+                lines.push(`Hackerika: ${m.content}`);
+            }
         }
     }
     return lines.join('\n');

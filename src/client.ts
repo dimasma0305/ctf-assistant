@@ -30,6 +30,7 @@ import { MyClient } from "./Model/client";
 import { SessionScheduler } from "./Services/SessionScheduler";
 import { ConnectionStateManager, ConnectionState } from "./Services/ConnectionStateManager";
 import { handleAIChat, updateChannelCache } from "./Services/AI";
+import { getLoopStatsSummary } from "./Services/AI/chat";
 import { handleSpamDetection, handlePhishingDetection, handleImageScamDetection } from "./Services/Moderation";
 import { maybeReactToMessage } from "./Services/AI/reactions";
 import { shouldChimeIn } from "./Services/AI/spontaneous";
@@ -265,6 +266,7 @@ setInterval(() => {
   
   const sessionUsage = sessionScheduler.getSessionUsage();
   console.log(`   Session: ${sessionUsage.identifyCalls} IDENTIFY, ${sessionUsage.resumeCalls} RESUME (${sessionUsage.usagePercent.toFixed(1)}% used)`);
+  console.log('   AI-loop: ' + getLoopStatsSummary());
 }, 30 * 60 * 1000); // Log every 30 minutes
 
 // Start login process with scheduler

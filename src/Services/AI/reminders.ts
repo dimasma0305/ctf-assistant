@@ -49,6 +49,51 @@ export function formatInTimezone(date: Date, tz: string): string {
     return `${fmt.format(date)} (${tz})`;
 }
 
+/**
+ * Does an ISO 8601 string carry an explicit UTC offset (Z or ±HH:MM/±HHMM)?
+ * A weak model routinely emits a naive datetime like "2026-07-03T09:00" with
+ * none — which `new Date()` would then parse in SERVER-local time.
+ */
+export function isoHasOffset(iso: string): boolean {
+    return /\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?\s*(?:[zZ]|[+-]\d{2}:?\d{2})$/.test(iso.trim());
+}
+
+/** Minutes `tz` is ahead of UTC at instant `at` (e.g. Asia/Jakarta → 420). */
+function tzOffsetMinutesAt(tz: string, at: Date): number {
+    const dtf = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz, hour12: false,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+    });
+    const g: Record<string, string> = {};
+    for (const p of dtf.formatToParts(at)) g[p.type] = p.value;
+    let hour = parseInt(g.hour, 10);
+    if (hour === 24) hour = 0; // some ICU builds render midnight as 24
+    const asIfUtc = Date.UTC(+g.year, +g.month - 1, +g.day, hour, +g.minute, +g.second);
+    return Math.round((asIfUtc - at.getTime()) / 60_000);
+}
+
+/**
+ * Resolve an ISO datetime to a UTC `Date`. A string WITH an explicit offset is
+ * honored as-is; an OFFSET-LESS string is interpreted as a wall-clock time in
+ * `tz` (NOT server-local) — this is the fix for reminders/tasks firing at the
+ * wrong hour for non-container-tz users. Correct year-round except within the
+ * ~1h DST-transition window (fine: the community default Asia/Jakarta is +7,
+ * no DST). Returns null on an unparseable string.
+ */
+export function resolveIsoToUtc(iso: string, tz: string): Date | null {
+    const s = (iso || '').trim();
+    if (!s) return null;
+    if (isoHasOffset(s)) {
+        const d = new Date(s);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    const hasTime = /\d{1,2}:\d{2}/.test(s);
+    const asIfUtc = new Date(hasTime ? s.replace(' ', 'T') + 'Z' : s);
+    if (isNaN(asIfUtc.getTime())) return null;
+    return new Date(asIfUtc.getTime() - tzOffsetMinutesAt(tz, asIfUtc) * 60_000);
+}
+
 /** "in 1h 4m" / "in 12s" / "overdue 30s" — short relative descriptor. */
 export function relativeFrom(now: Date, target: Date): string {
     const diffMs = target.getTime() - now.getTime();
@@ -101,10 +146,13 @@ export async function setReminderForTool(
     if (!content) return { ok: false, error: 'missing_content' };
     const truncated = content.length > MAX_CONTENT_CHARS ? content.slice(0, MAX_CONTENT_CHARS) : content;
 
+    // Load tz up front: an offset-less whenISO (which flash routinely emits) must
+    // be interpreted as the USER's wall-clock time, not the container's local time.
+    const tz = await loadUserTimezone(userId);
     let dueAt: Date;
     if (typeof args?.whenISO === 'string' && args.whenISO.trim().length > 0) {
-        const t = new Date(args.whenISO);
-        if (isNaN(t.getTime())) return { ok: false, error: 'invalid_iso' };
+        const t = resolveIsoToUtc(args.whenISO, tz);
+        if (!t) return { ok: false, error: 'invalid_iso' };
         dueAt = t;
     } else if (typeof args?.relativeMinutes === 'number' && Number.isFinite(args.relativeMinutes)) {
         dueAt = new Date(Date.now() + Math.round(args.relativeMinutes * 60_000));
@@ -139,7 +187,6 @@ export async function setReminderForTool(
         return { ok: false, error: 'db_error' };
     }
 
-    const tz = await loadUserTimezone(userId);
     const result: SetReminderResult = {
         ok: true,
         reminderId: String(doc._id),

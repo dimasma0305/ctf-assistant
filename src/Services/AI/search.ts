@@ -4,7 +4,11 @@ import { embedViaWorker, cosineSimilarity, combinedRecallScore } from "./embeddi
 import { neutralizeControlTokens } from "./context";
 
 const MAX_SEARCH_RESULTS = 8;             // hard cap on result rows fed back to the model
-const MAX_RESULT_CONTENT_CHARS = 220;     // per-message truncation in the structured output
+const MAX_RESULT_CONTENT_CHARS = 700;     // per-message truncation for EXPLICIT retrieval (search/recall).
+                                          // Raised from 220: pasted payloads/CVEs/writeups — the exact
+                                          // content most worth recalling in a security community — were
+                                          // being cut mid-string even when the model explicitly asked for
+                                          // them. Passive `recent:` context stays cheaper (context.ts).
 const INDEX_QUERY_LIMIT = 50;             // how many indexed matches to evaluate before truncating
 const DISCORD_FALLBACK_LIMIT = 100;       // how many recent messages to pull when index is sparse
 const MIN_INDEX_HITS = 3;                 // if index returns fewer matches than this, also fetch from Discord API
@@ -137,24 +141,31 @@ async function searchIndex(
 }
 
 async function searchCache(channelId: string, parsed: ParsedQuery): Promise<RawHit[]> {
-    const cache = await MessageCacheModel.findOne({ channelId }).lean();
-    if (!cache || !cache.messages) return [];
-    const messages = cache.messages as any[];
-    const hits: RawHit[] = [];
-    for (const m of messages) {
-        const authorId = m.author?.id || '';
-        if (!matchesAuthor(authorId, parsed.authorIds)) continue;
-        const content = m.content || '';
-        if (!matchesContent(content, parsed.tokens)) continue;
-        hits.push({
-            authorId,
-            authorName: m.member?.displayName || m.author?.username || 'unknown',
-            content,
-            createdTimestamp: m.createdTimestamp,
-            source: 'cache',
-        });
+    try {
+        const cache = await MessageCacheModel.findOne({ channelId }).maxTimeMS(15_000).lean();
+        if (!cache || !cache.messages) return [];
+        const messages = cache.messages as any[];
+        const hits: RawHit[] = [];
+        for (const m of messages) {
+            const authorId = m.author?.id || '';
+            if (!matchesAuthor(authorId, parsed.authorIds)) continue;
+            const content = m.content || '';
+            if (!matchesContent(content, parsed.tokens)) continue;
+            hits.push({
+                authorId,
+                authorName: m.member?.displayName || m.author?.username || 'unknown',
+                content,
+                createdTimestamp: m.createdTimestamp,
+                source: 'cache',
+            });
+        }
+        return hits;
+    } catch (error) {
+        // Degrade to [] like searchIndex/searchDiscord so a transient cache blip
+        // doesn't unwind a search that already collected index hits.
+        console.error('[Search] cache tier failed:', error);
+        return [];
     }
-    return hits;
 }
 
 async function searchDiscord(
@@ -195,6 +206,9 @@ export interface SearchToolMatch {
 }
 
 export interface SearchToolResult {
+    /** Uniform success flag so the model never mistakes a no-filter/no-result
+     *  envelope for a hit (matches recall_memory + the {ok} tool convention). */
+    ok: boolean;
     matches: SearchToolMatch[];
     totalMatches: number;
     filter: {
@@ -229,6 +243,7 @@ export async function searchMessagesForTool(
 
     if (parsed.authorIds.length === 0 && parsed.tokens.length === 0) {
         return {
+            ok: false,
             matches: [],
             totalMatches: 0,
             filter,
@@ -285,6 +300,7 @@ export async function searchMessagesForTool(
     }));
 
     return {
+        ok: true,
         matches: top,
         totalMatches: all.length,
         filter,

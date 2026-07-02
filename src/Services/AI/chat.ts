@@ -30,6 +30,85 @@ const OPENAI_TIMEOUT_MS = 120_000;         // hard cap covering the full tool-lo
                                             // 3-4 tool iterations (search → fetch → refine → reply) plus
                                             // the empty-reply retry, and one umbrella must cover them all.
 
+// ── Agentic-loop observability + tool-exec bounding ────────────────────────
+// Per-tool wall-clock cap. The OPENAI_TIMEOUT_MS umbrella (AbortController)
+// covers only the openai.* calls — a tool handler (Mongo/worker) is awaited
+// OUTSIDE it, so without this a hung call blocks the channel's serial queue
+// indefinitely. Bound each dispatch and still hand the model a usable result.
+const TOOL_EXEC_TIMEOUT_MS = 25_000;
+
+// Only these error codes mean the tool actually BROKE (infra/exception). Every
+// other `ok:false` is a legitimate business outcome (cooldown_active,
+// quota_exceeded, affection_too_low, past_time, no_changes, no_results, …) and
+// must NOT inflate toolErrors — otherwise a real dispatch-failure spike is
+// buried under normal negative results, defeating the metric.
+const REAL_TOOL_FAILURES = new Set(['tool_execution_failed', 'db_error', 'embed_failed']);
+
+const loopStats = {
+    turns: 0, iterations: 0, toolCalls: 0,
+    dsmlSalvage: 0, malformedArgs: 0, capHit: 0,
+    fallbackUsed: 0, emptyRetry: 0, emptyFinal: 0,
+    llmTimeouts: 0, toolTimeouts: 0, toolErrors: 0,
+    tokPrompt: 0, tokCacheHit: 0, tokCompletion: 0,
+};
+const turnLatencies: number[] = [];
+const MAX_LATENCY_SAMPLES = 500;
+function recordTurnLatency(ms: number) {
+    turnLatencies.push(ms);
+    while (turnLatencies.length > MAX_LATENCY_SAMPLES) turnLatencies.shift();
+}
+function percentile(sorted: number[], p: number): number {
+    if (!sorted.length) return 0;
+    return sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))];
+}
+/** One-line rolling health snapshot, folded into the periodic report (client.ts). */
+export function getLoopStatsSummary(): string {
+    const s = loopStats;
+    const sorted = [...turnLatencies].sort((a, b) => a - b);
+    const rate = (n: number) => (s.turns ? (100 * n / s.turns).toFixed(1) + '%' : '—');
+    const per = (n: number) => (s.turns ? (n / s.turns).toFixed(1) : '—');
+    const cacheRate = s.tokPrompt ? (100 * s.tokCacheHit / s.tokPrompt).toFixed(1) + '%' : '—';
+    return (
+        `turns=${s.turns} iters/turn=${per(s.iterations)} tools/turn=${per(s.toolCalls)} ` +
+        `lat p50=${percentile(sorted, 50)}ms p95=${percentile(sorted, 95)}ms cache_hit=${cacheRate} | ` +
+        `dsmlSalvage=${rate(s.dsmlSalvage)} malformedArgs=${rate(s.malformedArgs)} capHit=${rate(s.capHit)} ` +
+        `fallback=${rate(s.fallbackUsed)} emptyRetry=${rate(s.emptyRetry)} emptyFinal=${rate(s.emptyFinal)} ` +
+        `llmTimeout=${rate(s.llmTimeouts)} toolTimeout=${s.toolTimeouts} toolErr=${s.toolErrors}`
+    );
+}
+
+// Bound a single tool dispatch by wall-clock and record its outcome. dispatchTool
+// itself never throws (it JSON-encodes handler errors), so the only rejection here
+// is the timeout; we still return a role:'tool'-shaped JSON string so the model can
+// recover, and the caller always pushes a result for the tool_call_id (or the next
+// request 400s).
+// ACCEPTED TRADE-OFF: Promise.race abandons but does NOT cancel a losing dispatch,
+// so a non-idempotent create_* (reminder/task) that commits server-side just past
+// the 25s cap can be reported as tool_timeout → a rare false-fail / duplicate-on-
+// retry under severe DB degradation. Still strictly better than the pre-fix bug
+// (a hung tool blocked the whole channel queue forever). Follow-up: idempotency
+// guard on the create handlers, or exempt those cheap inserts from the cap.
+async function dispatchToolBounded(name: string, args: any, message: any, turnId: string): Promise<string> {
+    const t0 = Date.now();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+        const resultStr = await Promise.race([
+            dispatchTool(name, args, message),
+            new Promise<string>((_, reject) => { timer = setTimeout(() => reject(new Error('tool_timeout')), TOOL_EXEC_TIMEOUT_MS); }),
+        ]);
+        try { const p = JSON.parse(resultStr); if (p && REAL_TOOL_FAILURES.has(p.error)) loopStats.toolErrors++; } catch { /* non-JSON result */ }
+        console.log(`   [${turnId}] tool ${name} ok ${Date.now() - t0}ms`);
+        return resultStr;
+    } catch (err: any) {
+        const timedOut = err?.message === 'tool_timeout';
+        if (timedOut) loopStats.toolTimeouts++; else loopStats.toolErrors++;
+        console.warn(`   [${turnId}] tool ${name} ${timedOut ? 'TIMEOUT' : 'ERR'} ${Date.now() - t0}ms`);
+        return JSON.stringify({ ok: false, error: timedOut ? 'tool_timeout' : 'tool_execution_failed', detail: err?.message || 'unknown' });
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+}
+
 // Hackerika's creator. When this user is the current speaker she gets a
 // special "DIMAS" marker in the context block; the system prompt's DIMAS
 // section then instructs warmer + higher-priority handling.
@@ -1127,7 +1206,7 @@ async function runChatTurn(
         content: `${tag} ${sanitizedUserContent}`,
     };
     memory[channelId].messages.push(userMessageEntry);
-    if (memory[channelId].messages.length > MAX_MEMORY) {
+    while (memory[channelId].messages.length > MAX_MEMORY) {
         memory[channelId].messages.shift();
     }
 
@@ -1198,6 +1277,21 @@ async function runChatTurn(
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
+    // Turn-scoped correlation id + accumulators: concurrent channel turns
+    // interleave in the logs, so every loop line is prefixed `[turnId]` and the
+    // turn ends with one summary line. Tokens are summed across ALL completions
+    // (loop + fallback + retry) so per-turn cost is legible, not per-call-only.
+    const turnId = Math.random().toString(36).slice(2, 8);
+    const turnStart = Date.now();
+    let turnIters = 0;
+    let tokPrompt = 0, tokCacheHit = 0, tokCompletion = 0;
+    const accTokens = (u: any) => {
+        if (!u) return;
+        tokPrompt += u.prompt_tokens || 0;
+        tokCacheHit += u.prompt_cache_hit_tokens || 0;
+        tokCompletion += u.completion_tokens || 0;
+    };
+
     // Native function-calling agent loop. The model can call `search_messages`
     // and/or `grant_fan_role` mid-thought; we execute each call, push the
     // structured result back as a `role:'tool'` message, and re-prompt until
@@ -1215,6 +1309,7 @@ async function runChatTurn(
         // Acquire typing now (inside the try) so the finally below always balances it.
         releaseTyping = acquireChannelTyping(channelRef);
         for (let iter = 0; iter < MAX_TOOL_ITERATIONS; iter++) {
+            turnIters++;
             const completion = await openai.chat.completions.create(
                 {
                     model: MODELS.chat,
@@ -1234,8 +1329,9 @@ async function runChatTurn(
             // prefix each call) is observable instead of invisible.
             const usage: any = (completion as any).usage;
             if (usage) {
+                accTokens(usage);
                 console.log(
-                    `[Chat] tokens prompt=${usage.prompt_tokens} ` +
+                    `   [${turnId}] iter${iter} tokens prompt=${usage.prompt_tokens} ` +
                     `cache_hit=${usage.prompt_cache_hit_tokens ?? '?'} ` +
                     `cache_miss=${usage.prompt_cache_miss_tokens ?? '?'} ` +
                     `completion=${usage.completion_tokens}`,
@@ -1261,17 +1357,20 @@ async function runChatTurn(
                         // apart from a legit-empty one. Feed the parse error back so
                         // it re-emits the call with valid arguments. A tool result is
                         // still required for EVERY tool_call_id or the next request 400s.
-                        console.warn(`[Tool] malformed args for ${fnName}: ${rawArgs.slice(0, 200)}`);
+                        loopStats.malformedArgs++;
+                        console.warn(`   [${turnId}] malformed args for ${fnName}: ${rawArgs.slice(0, 200)}`);
                         conversation.push({
                             role: 'tool',
                             tool_call_id: tc.id,
                             content: JSON.stringify({ error: 'malformed_arguments', detail: 'arguments were not valid JSON — re-call this tool with valid JSON arguments' }),
                         });
+                        loopStats.toolCalls++;  // count the attempt so tools/turn matches the per-turn tools= line
                         totalToolCalls++;
                         continue;
                     }
-                    console.log(`🛠️  [Tool] ${fnName}(${rawArgs || '{}'}) for ${author} (${userId})`);
-                    const resultStr = await dispatchTool(fnName, parsedArgs, message);
+                    console.log(`🛠️  [${turnId}] ${fnName}(${rawArgs || '{}'}) for ${author} (${userId})`);
+                    loopStats.toolCalls++;
+                    const resultStr = await dispatchToolBounded(fnName, parsedArgs, message, turnId);
                     if (fnName === 'grant_fan_role') {
                         try { if (JSON.parse(resultStr).granted) grantSucceeded = true; } catch { /* ignore */ }
                     }
@@ -1286,7 +1385,8 @@ async function runChatTurn(
                 // tool result so the model knows it has to give a final answer
                 // next, then loop one more time with tool_choice forced off.
                 if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) {
-                    console.warn(`[Tool] hit MAX_TOTAL_TOOL_CALLS (${MAX_TOTAL_TOOL_CALLS}); forcing final completion`);
+                    loopStats.capHit++;
+                    console.warn(`   [${turnId}] hit MAX_TOTAL_TOOL_CALLS (${MAX_TOTAL_TOOL_CALLS}); forcing final completion`);
                     break;
                 }
                 continue;
@@ -1301,7 +1401,8 @@ async function runChatTurn(
             if (hasDsmlLeakage(rawContent)) {
                 const { calls, stripped } = parseLeakedToolCalls(rawContent);
                 if (calls.length > 0) {
-                    console.warn(`[Tool] salvaged ${calls.length} leaked DSML tool call(s) from text content`);
+                    loopStats.dsmlSalvage++;
+                    console.warn(`   [${turnId}] salvaged ${calls.length} leaked DSML tool call(s) from text content`);
                     const synthesized = calls.map((c, i) => ({
                         id: `salvage_${Date.now()}_${i}`,
                         type: 'function' as const,
@@ -1310,8 +1411,9 @@ async function runChatTurn(
                     conversation.push({ role: 'assistant', content: stripped || null, tool_calls: synthesized });
                     for (let i = 0; i < calls.length; i++) {
                         const { name, args } = calls[i];
-                        console.log(`🛠️  [Tool/salvaged] ${name}(${JSON.stringify(args)}) for ${author} (${userId})`);
-                        const resultStr = await dispatchTool(name, args, message);
+                        console.log(`🛠️  [${turnId}] [salvaged] ${name}(${JSON.stringify(args)}) for ${author} (${userId})`);
+                        loopStats.toolCalls++;
+                        const resultStr = await dispatchToolBounded(name, args, message, turnId);
                         if (name === 'grant_fan_role') {
                             try { if (JSON.parse(resultStr).granted) grantSucceeded = true; } catch { /* ignore */ }
                         }
@@ -1323,13 +1425,14 @@ async function runChatTurn(
                         totalToolCalls++;
                     }
                     if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) {
-                        console.warn(`[Tool] hit MAX_TOTAL_TOOL_CALLS (${MAX_TOTAL_TOOL_CALLS}) after salvage; forcing final completion`);
+                        loopStats.capHit++;
+                        console.warn(`   [${turnId}] hit MAX_TOTAL_TOOL_CALLS (${MAX_TOTAL_TOOL_CALLS}) after salvage; forcing final completion`);
                         break;
                     }
                     continue;
                 }
                 // DSML markers present but unparseable — fall through with stripped text.
-                console.warn('[Tool] DSML markers present in content but no parseable calls; stripping markers');
+                console.warn(`   [${turnId}] DSML markers present but no parseable calls; stripping markers`);
                 finalContent = stripped;
                 break;
             }
@@ -1341,6 +1444,7 @@ async function runChatTurn(
         // Force-stop fallback: if we exhausted iterations still wanting tools,
         // do one final completion with tool_choice:'none' to extract a reply.
         if (!finalContent) {
+            loopStats.fallbackUsed++;
             const fallback = await openai.chat.completions.create(
                 {
                     model: MODELS.chat,
@@ -1350,9 +1454,10 @@ async function runChatTurn(
                 } as any,
                 { signal: controller.signal }
             );
+            accTokens((fallback as any).usage);
             finalContent = (fallback.choices[0]?.message?.content || '').trim();
             if (hasDsmlLeakage(finalContent)) {
-                console.warn('[Tool] DSML leaked from tool_choice:none fallback; stripping');
+                console.warn(`   [${turnId}] DSML leaked from tool_choice:none fallback; stripping`);
                 finalContent = parseLeakedToolCalls(finalContent).stripped;
             }
         }
@@ -1363,7 +1468,8 @@ async function runChatTurn(
         // short direct reply. Bounded to a single extra call — a model that's
         // truly stuck still fails fast to the user-facing fallback below.
         if (!finalContent) {
-            console.warn('[Chat] empty after fallback — retrying once with a direct-reply nudge');
+            loopStats.emptyRetry++;
+            console.warn(`   [${turnId}] empty after fallback — retrying once with a direct-reply nudge`);
             try {
                 const retry = await openai.chat.completions.create(
                     {
@@ -1380,18 +1486,20 @@ async function runChatTurn(
                     } as any,
                     { signal: controller.signal },
                 );
+                accTokens((retry as any).usage);
                 finalContent = (retry.choices[0]?.message?.content || '').trim();
                 if (hasDsmlLeakage(finalContent)) {
                     finalContent = parseLeakedToolCalls(finalContent).stripped;
                 }
             } catch (retryErr: any) {
-                console.warn('[Chat] empty-reply retry failed:', retryErr?.message || retryErr);
+                console.warn(`   [${turnId}] empty-reply retry failed:`, retryErr?.message || retryErr);
             }
         }
 
         if (!finalContent) {
+            loopStats.emptyFinal++;
             rollbackUserMessage();
-            console.warn('⚠️ Empty response from AI (post retry), not replying');
+            console.warn(`⚠️ [${turnId}] empty response from AI (post retry), not replying`);
             return;
         }
 
@@ -1440,6 +1548,13 @@ async function runChatTurn(
         // unmarked text and she can lose track of which words were hers.
         const assistantTag = speakerTag(HACKERIKA_DISPLAY_NAME, HACKERIKA_BOT_ID);
         memory[channelId].messages.push({ role: 'assistant', content: `${assistantTag} ${sanitized}` });
+        // Enforce the cap after the assistant push too: each turn adds TWO entries
+        // (user + assistant) but the pre-generation trim ran only once, so without
+        // this the buffer grew +1/turn until the 1h inactivity wipe — inflating
+        // per-turn tokens/latency mid-CTF.
+        while (memory[channelId].messages.length > MAX_MEMORY) {
+            memory[channelId].messages.shift();
+        }
 
         const bursts = parseBursts(sanitized);
         if (bursts.length === 0) {
@@ -1539,9 +1654,10 @@ async function runChatTurn(
         rollbackUserMessage();
         const aborted = error?.name === 'AbortError' || controller.signal.aborted;
         if (aborted) {
-            console.error('⏱️  OpenAI request timed out after', OPENAI_TIMEOUT_MS, 'ms');
+            loopStats.llmTimeouts++;
+            console.error(`⏱️  [${turnId}] OpenAI request timed out after ${OPENAI_TIMEOUT_MS}ms`);
         } else {
-            console.error('❌ Error with OpenAI API:', error);
+            console.error(`❌ [${turnId}] Error with OpenAI API:`, error);
         }
 
         const fallbackMessage = aborted
@@ -1556,5 +1672,17 @@ async function runChatTurn(
     } finally {
         stopTyping();
         clearTimeout(timeoutId);
+        // Finalize turn stats + emit one correlation-tagged summary line. Fires
+        // for EVERY outcome (reply / empty / shed / error), so the periodic health
+        // report and any bad-reply forensics have a per-turn anchor.
+        loopStats.turns++;
+        loopStats.iterations += turnIters;
+        loopStats.tokPrompt += tokPrompt;
+        loopStats.tokCacheHit += tokCacheHit;
+        loopStats.tokCompletion += tokCompletion;
+        const elapsedMs = Date.now() - turnStart;
+        recordTurnLatency(elapsedMs);
+        const cachePct = tokPrompt ? Math.round(100 * tokCacheHit / tokPrompt) : 0;
+        console.log(`📊 [${turnId}] turn done iters=${turnIters} tools=${totalToolCalls} prompt=${tokPrompt} cache=${cachePct}% completion=${tokCompletion} ${elapsedMs}ms`);
     }
 }
