@@ -175,7 +175,7 @@ async function recentMessageCount(channelId: string, now: number): Promise<numbe
     }
 }
 
-interface Nearest { startMs: number; name: string; }
+interface Nearest { startMs: number; name: string; url: string; }
 
 async function processEvent(guild: Guild, ev: GuildScheduledEvent, mabarChannels: TextChannel[], now: number): Promise<Nearest | null> {
     const startMs = ev.scheduledStartTimestamp;
@@ -192,7 +192,10 @@ async function processEvent(guild: Guild, ev: GuildScheduledEvent, mabarChannels
         // claim ⇒ retry next tick.)
         if (await claimKey(ev.id, pub.fireKey, true)) {
             const isFinal = pub.fireOffsetMs === FINAL_OFFSET_MS;
-            const n = await sendTo(mabarChannels, fill(pick(isFinal ? PUBLIC_FINAL_HOUR : PUBLIC_COUNTDOWN), { title: ev.name, t: relTs(startMs) }));
+            const body = fill(pick(isFinal ? PUBLIC_FINAL_HOUR : PUBLIC_COUNTDOWN), { title: ev.name, t: relTs(startMs) });
+            // Re-share the Discord event so members can jump to it + click Interested
+            // (the bare URL on its own line renders the event card).
+            const n = await sendTo(mabarChannels, `${body}\n${ev.url}`);
             if (n > 0) { mabarChannels.forEach((c) => channelPublicPostAt.set(c.id, now)); console.log(`🔔 [EventReminder] public ${pub.fireKey} for "${ev.name}" (${guild.name})`); }
             else console.warn(`[EventReminder] claimed ${pub.fireKey} but 0 delivered — dropped: "${ev.name}"`);
         }
@@ -210,7 +213,7 @@ async function processEvent(guild: Guild, ev: GuildScheduledEvent, mabarChannels
         else console.warn(`[EventReminder] claimed private nudge but 0 delivered — dropped: "${ev.name}"`);
     }
 
-    return isUpcomingWithinHorizon(now, startMs, CFG) ? { startMs, name: ev.name } : null;
+    return isUpcomingWithinHorizon(now, startMs, CFG) ? { startMs, name: ev.name, url: ev.url } : null;
 }
 
 async function tick(client: MyClient) {
@@ -240,7 +243,7 @@ async function tick(client: MyClient) {
                     if (!isChannelOverflowing(await recentMessageCount(ch.id, now), CFG)) continue;
                     const lastAt = channelPublicPostAt.get(ch.id) ?? null;
                     if (!shouldActivityRemind(now, lastAt, true, true, CFG)) continue;
-                    const n = await sendTo([ch], fill(pick(ACTIVITY_RESURFACE), { title: nearest.name, t: relTs(nearest.startMs) }));
+                    const n = await sendTo([ch], `${fill(pick(ACTIVITY_RESURFACE), { title: nearest.name, t: relTs(nearest.startMs) })}\n${nearest.url}`);
                     if (n > 0) { channelPublicPostAt.set(ch.id, now); console.log(`📣 [EventReminder] activity re-surface for "${nearest.name}" (#${ch.name})`); }
                 }
             }
