@@ -50,7 +50,7 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
 }
 
 // Build query string from params
-function buildQueryString(params: Record<string, unknown>): string {
+function buildQueryString(params: object): string {
   const searchParams = new URLSearchParams()
 
   Object.entries(params).forEach(([key, value]) => {

@@ -75,12 +75,17 @@ interface CachedAvatarImageProps extends Omit<React.ComponentProps<typeof Avatar
 function CachedAvatarImage({
   className,
   src,
-  showLoading: _showLoading,
-  loadingPlaceholder: _loadingPlaceholder,
-  persistent: _persistent,
-  maxAge: _maxAge,
+  showLoading,
+  loadingPlaceholder,
+  persistent,
+  maxAge,
   ...props
 }: CachedAvatarImageProps) {
+  void showLoading
+  void loadingPlaceholder
+  void persistent
+  void maxAge
+
   if (!src) return null
 
   return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useSyncExternalStore } from "react"
 import { useTheme } from "next-themes"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -13,6 +13,8 @@ import { CTFRankings } from "@/components/ctf-rankings"
 import { useScoreboard, useCTFs } from "@/hooks/useAPI"
 import Image from "next/image"
 import { Footer } from "@/components/footer"
+
+const subscribeToHydration = () => () => {}
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("leaderboard")
@@ -47,8 +49,7 @@ export default function Dashboard() {
   const { data: leaderboardData, isStale: leaderboardStale } = useScoreboard({ limit: 1 })
   const { data: ctfsData, isStale: ctfsStale } = useCTFs({ limit: 1 })
   const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  const mounted = useSyncExternalStore(subscribeToHydration, () => true, () => false)
 
   const stats = useMemo(
     () => ({

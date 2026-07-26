@@ -1,17 +1,10 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback } from "react"
+import { useState, useEffect, useMemo, useCallback, useSyncExternalStore } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  Trophy,
-  Medal,
-  Award,
   ChevronLeft,
   ChevronRight,
   Copy,
@@ -19,25 +12,26 @@ import {
   AlertCircle,
   Calendar,
   Users,
-  ExternalLink,
-  TrendingUp,
-  Star,
-  Target,
-  AwardIcon,
 } from "lucide-react"
 import { Window, useWindow } from "@/components/ui/window"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { SearchLeaderboard } from "@/components/search-leaderboard"
 import { useScoreboard } from "@/hooks/useAPI"
-import type { LeaderboardEntry, Achievement } from "@/lib/types"
-import { calculatePercentile, getAchievements, getCategoryColor } from "@/lib/utils"
-import { ScoreDisplay } from "@/components/score-display"
-import Link from "next/link"
+import type { LeaderboardEntry } from "@/lib/types"
+import { calculatePercentile } from "@/lib/utils"
 import { toast } from "sonner"
-import { getUserInitials, getUserDisplayName, formatTimeAgo, getRankIcon } from "@/lib/format-helpers"
+import { getUserInitials, getUserDisplayName } from "@/lib/format-helpers"
 
 import { UserProfileContent } from "./user-profile-content"
 import { LeaderboardRow } from "./leaderboard-row"
+
+const subscribeToLocation = (onStoreChange: () => void) => {
+  window.addEventListener("popstate", onStoreChange)
+  return () => window.removeEventListener("popstate", onStoreChange)
+}
+
+const getLocationBase = () =>
+  `${window.location.origin}${window.location.pathname}${window.location.search}`
 
 export function LeaderboardTable() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -53,7 +47,7 @@ export function LeaderboardTable() {
     const lastMonth = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`
     const thisYear = now.getFullYear()
     const lastYear = now.getFullYear() - 1
-    return { now, thisMonth, lastMonth, thisYear, lastYear }
+    return { thisMonth, lastMonth, thisYear, lastYear }
   }, [])
 
   const canonicalizeTimePeriod = useCallback(
@@ -160,7 +154,7 @@ export function LeaderboardTable() {
     }
 
     return options
-  }, [leaderboardData?.metadata])
+  }, [leaderboardData])
 
   const handleUserClick = useCallback(
     (user: LeaderboardEntry) => {
@@ -201,12 +195,8 @@ export function LeaderboardTable() {
     return timePeriod === "all-time" ? "#all-time" : `#${timePeriod}`
   }, [timePeriod])
 
-  const [shareUrl, setShareUrl] = useState<string>("")
-  useEffect(() => {
-    // Build an absolute URL so users can share/copy a real link, not only the hash fragment.
-    if (typeof window === "undefined") return
-    setShareUrl(`${window.location.origin}${window.location.pathname}${window.location.search}${shareHash}`)
-  }, [shareHash])
+  const locationBase = useSyncExternalStore(subscribeToLocation, getLocationBase, () => "")
+  const shareUrl = locationBase ? `${locationBase}${shareHash}` : ""
 
   const copyShareLink = useCallback(async () => {
     const textToCopy = shareUrl || shareHash
@@ -285,7 +275,7 @@ export function LeaderboardTable() {
     }
 
     initializeFromHash()
-  }, [])
+  }, [canonicalizeTimePeriod])
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -320,7 +310,7 @@ export function LeaderboardTable() {
 
     window.addEventListener("hashchange", handleHashChange)
     return () => window.removeEventListener("hashchange", handleHashChange)
-  }, [selectedCtf, pageSize, updateParams])
+  }, [selectedCtf, pageSize, updateParams, canonicalizeTimePeriod, getTimeParams])
 
   useEffect(() => {
     if (timePeriod) {
@@ -334,7 +324,7 @@ export function LeaderboardTable() {
         ...timeParams,
       })
     }
-  }, [timePeriod, currentPage, pageSize, selectedCtf, updateParams])
+  }, [timePeriod, currentPage, pageSize, selectedCtf, updateParams, getTimeParams])
 
   const handleTimePeriodChange = useCallback((period: string) => {
     setTimePeriod(period)

@@ -8,26 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Window, useWindow } from "@/components/ui/window"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
-  Trophy,
-  Medal,
-  Award,
   Users,
   Target,
   Calendar,
-  ExternalLink,
-  Clock,
-  TrendingUp,
-  BarChart3,
-  CheckCircle2,
   Search,
 } from "lucide-react"
 import { getStatusColor, formatDate, getRankIcon } from "@/lib/format-helpers"
 import { Button } from "@/components/ui/button"
 import { getCTFProfile } from "@/lib/actions"
-import { getAchievements } from "@/lib/utils"
 import type { CTFRanking, CTFProfileResponse } from "@/lib/types"
 import { useCTFRankings } from "@/hooks/useAPI"
 import { CTFProfileContent } from "./ctf-profile-content"
@@ -41,7 +31,7 @@ export function CTFRankings() {
   const [displayLimit, setDisplayLimit] = useState(25)
   const [offset, setOffset] = useState(0)
   const [searchInput, setSearchInput] = useState("")
-  const debounceTimeoutRef = useRef<NodeJS.Timeout>()
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   // Access window management system
   const { windows, openWindow, restoreWindow, bringToFront } = useWindow()
@@ -159,9 +149,16 @@ export function CTFRankings() {
     }
   }, [windows])
 
+  const effectiveSelectedCTF =
+    selectedCTF === "all" || ctfRankings.some((ctf) => ctf.ctf_id === selectedCTF)
+      ? selectedCTF
+      : "all"
+
   const filteredRankings = useMemo(() => {
-    return selectedCTF === "all" ? ctfRankings : ctfRankings.filter((ctf) => ctf.ctf_id === selectedCTF)
-  }, [selectedCTF, ctfRankings])
+    return effectiveSelectedCTF === "all"
+      ? ctfRankings
+      : ctfRankings.filter((ctf) => ctf.ctf_id === effectiveSelectedCTF)
+  }, [effectiveSelectedCTF, ctfRankings])
 
   const ctfOptions = useMemo(() => {
     const uniqueCTFs = new Map<string, { id: string; title: string }>()
@@ -177,12 +174,6 @@ export function CTFRankings() {
 
     return Array.from(uniqueCTFs.values()).sort((a, b) => a.title.localeCompare(b.title))
   }, [ctfRankings])
-
-  useEffect(() => {
-    if (selectedCTF !== "all" && !ctfRankings.some((c) => c.ctf_id === selectedCTF)) {
-      setSelectedCTF("all")
-    }
-  }, [selectedCTF, ctfRankings])
 
   const pagination = useMemo(() => {
     const returned = rankingsData?.metadata?.returned ?? ctfRankings.length
@@ -244,7 +235,7 @@ export function CTFRankings() {
               className="pl-10"
             />
           </div>
-          <Select value={selectedCTF} onValueChange={setSelectedCTF} disabled={ctfOptions.length === 0}>
+          <Select value={effectiveSelectedCTF} onValueChange={setSelectedCTF} disabled={ctfOptions.length === 0}>
             <SelectTrigger className="w-full sm:w-64">
               <SelectValue placeholder="Select CTF" />
             </SelectTrigger>

@@ -19,19 +19,49 @@ export interface Achievement {
   readonly category: 'ranking' | 'participation' | 'skill' | 'contribution';
 }
 
+export interface AchievementUserProfile {
+  solveCount: number;
+  ctfCount: number;
+  categories: ReadonlySet<string>;
+  rankImprovement?: number;
+  fastSolves?: number;
+  ultraFastSolves?: number;
+  longestStreak?: number;
+  weekendSolveRatio?: number;
+  nightSolves?: number;
+  morningSolves?: number;
+  categorySolves?: Readonly<Record<string, number>>;
+  firstBloods?: number;
+  hardSolves?: number;
+  expertSolves?: number;
+  uniqueChallengeTypes?: number;
+  teamCTFs?: number;
+  helpedUsers?: number;
+  membershipDays?: number;
+}
+
+export interface GlobalAchievementStats {
+  totalSolves: number;
+}
+
+export interface CTFAchievementStats {
+  totalChallenges: number;
+  totalSolves: number;
+}
+
 export interface GlobalCheckParams {
-  userProfile: unknown;
+  userProfile: AchievementUserProfile;
   userRank: number;
   totalUsers: number;
-  globalStats: unknown;
+  globalStats: GlobalAchievementStats;
   allCategories: Set<string>;
 }
 
 export interface CTFCheckParams {
-  userProfile: unknown;
+  userProfile: AchievementUserProfile;
   userRank: number;
   totalUsers: number;
-  ctfStats: unknown;
+  ctfStats: CTFAchievementStats;
   allCategories: Set<string>;
   ctfTitle?: string;
 }
@@ -1176,13 +1206,15 @@ export function checkBulkAchievements(
 /**
  * Get achievement statistics efficiently
  */
-export function getAchievementStats(): {
+export interface AchievementStats {
   total: number;
   byCategory: Record<string, number>;
   withHierarchies: number;
-} {
+}
+
+export function getAchievementStats(): AchievementStats {
   const cacheKey = 'achievement_stats';
-  let cachedStats = computationCache.get(cacheKey);
+  let cachedStats = computationCache.get(cacheKey) as AchievementStats | undefined;
   
   if (!cachedStats) {
     cachedStats = {

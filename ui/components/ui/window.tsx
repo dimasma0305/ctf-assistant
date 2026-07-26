@@ -6,6 +6,15 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { X, Minus, Maximize2, Minimize2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/hooks/use-mobile"
+
+const subscribeToHydration = () => () => {}
+const subscribeToViewport = (onStoreChange: () => void) => {
+  globalThis.window.addEventListener("resize", onStoreChange)
+  return () => globalThis.window.removeEventListener("resize", onStoreChange)
+}
+const getViewportSnapshot = () => `${globalThis.window.innerWidth}:${globalThis.window.innerHeight}`
+const SERVER_VIEWPORT_SNAPSHOT = "1200:800"
 
 interface WindowState {
   id: string
@@ -37,7 +46,7 @@ const WindowContext = React.createContext<WindowContextType | null>(null)
 
 export function WindowProvider({ children }: { children: React.ReactNode }) {
   const [windows, setWindows] = useState<WindowState[]>([])
-  const [nextZIndex, setNextZIndex] = useState(1000)
+  const nextZIndexRef = useRef(1000)
   const [isMouseOverWindow, setIsMouseOverWindow] = useState(false)
   const mouseOverWindowRef = useRef(false)
 
@@ -79,14 +88,6 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [windows])
 
-  // Z-Index Normalization Pass
-  useEffect(() => {
-    if (windows.length === 0 && nextZIndex > 2000) {
-      // Periodic reset when all windows are closed to prevent integer scalar bloat
-      setNextZIndex(1000)
-    }
-  }, [windows, nextZIndex])
-
   const handleWindowMouseEnter = useCallback(() => {
     mouseOverWindowRef.current = true
     setIsMouseOverWindow(true)
@@ -101,13 +102,17 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
     }, 50)
   }, [])
 
+  const getNextZIndex = useCallback(() => {
+    nextZIndexRef.current += 1
+    return nextZIndexRef.current
+  }, [])
+
   const openWindow = useCallback(
     (id: string, title: string) => {
+      const newZIndex = getNextZIndex()
       setWindows((prev) => {
         const existing = prev.find((w) => w.id === id)
         if (existing) {
-          const newZIndex = nextZIndex + 1
-          setNextZIndex(newZIndex + 1)
           return prev.map((w) => (w.id === id ? { ...w, isMinimized: false, zIndex: newZIndex } : w))
         }
 
@@ -140,14 +145,13 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
             y: isNaN(positionY) ? 50 : positionY,
           },
           size: { width: windowWidth, height: windowHeight },
-          zIndex: nextZIndex + 1,
+          zIndex: newZIndex,
         }
 
-        setNextZIndex((curr) => curr + 1)
         return [...prev, newWindow]
       })
     },
-    [nextZIndex],
+    [getNextZIndex],
   )
 
   const closeWindow = useCallback((id: string) => {
@@ -160,11 +164,10 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
 
   const restoreWindow = useCallback(
     (id: string) => {
-      const newZIndex = nextZIndex + 1
-      setNextZIndex(newZIndex + 1)
+      const newZIndex = getNextZIndex()
       setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, isMinimized: false, zIndex: newZIndex } : w)))
     },
-    [nextZIndex],
+    [getNextZIndex],
   )
 
   const maximizeWindow = useCallback((id: string) => {
@@ -209,11 +212,10 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
 
   const bringToFront = useCallback(
     (id: string) => {
-      const newZIndex = nextZIndex + 1
-      setNextZIndex(newZIndex + 1)
+      const newZIndex = getNextZIndex()
       setWindows((prev) => prev.map((w) => (w.id === id ? { ...w, zIndex: newZIndex } : w)))
     },
-    [nextZIndex],
+    [getNextZIndex],
   )
 
   const updateWindow = useCallback((id: string, updates: Partial<WindowState>) => {
@@ -359,25 +361,21 @@ export function Window({
   const dragPositionRef = useRef({ x: 0, y: 0 })
   const resizeDimensionsRef = useRef({ width: 0, height: 0 })
   const windowRef = useRef<HTMLDivElement>(null)
-  const [isMobile, setIsMobile] = useState(false)
-  const [isClient, setIsClient] = useState(false)
+  const isMobile = useIsMobile()
+  const isClient = React.useSyncExternalStore(subscribeToHydration, () => true, () => false)
+  const viewportSnapshot = React.useSyncExternalStore(
+    subscribeToViewport,
+    getViewportSnapshot,
+    () => SERVER_VIEWPORT_SNAPSHOT,
+  )
+  const [viewportWidth, viewportHeight] = viewportSnapshot.split(":").map(Number)
   const isHandlingExternalChange = useRef(false)
-  const animationFrameRef = useRef<number>()
-  const isMountedRef = useRef(true)
+  const animationFrameRef = useRef<number | undefined>(undefined)
   const [dragPreview, setDragPreview] = useState({ x: 0, y: 0 })
   const [resizePreview, setResizePreview] = useState({ width: 0, height: 0 })
 
   const window = windows.find((w) => w.id === id)
   const isOpen = !!window && !window.isMinimized
-
-  useEffect(() => {
-    setIsClient(true)
-    isMountedRef.current = true
-
-    return () => {
-      isMountedRef.current = false
-    }
-  }, [])
 
   useEffect(() => {
     if (externalIsOpen !== undefined && !isHandlingExternalChange.current) {
@@ -402,18 +400,6 @@ export function Window({
   }, [isOpen, onOpenChange])
 
   useEffect(() => {
-    if (!isClient) return
-
-    const checkMobile = () => {
-      const mobile = globalThis.window.innerWidth < 768
-      setIsMobile(mobile)
-    }
-    checkMobile()
-    globalThis.window.addEventListener("resize", checkMobile)
-    return () => globalThis.window.removeEventListener("resize", checkMobile)
-  }, [isClient])
-
-  useEffect(() => {
     if (window && !window.size.width && !window.size.height && defaultSize) {
       updateWindow(id, { size: defaultSize })
     }
@@ -422,10 +408,10 @@ export function Window({
   const actualMaxSize = React.useMemo(() => {
     if (maxSize) return maxSize
     return {
-      width: isClient ? globalThis.window.innerWidth : 1200,
-      height: isClient ? globalThis.window.innerHeight : 800,
+      width: viewportWidth,
+      height: viewportHeight,
     }
-  }, [maxSize, isClient])
+  }, [maxSize, viewportWidth, viewportHeight])
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
@@ -492,8 +478,8 @@ export function Window({
         if (isNaN(clientX) || isNaN(clientY)) return
 
         if (isDragging && window) {
-          const maxX = isClient ? globalThis.window.innerWidth - 100 : 1100
-          const maxY = isClient ? globalThis.window.innerHeight - 50 : 750
+          const maxX = viewportWidth - 100
+          const maxY = viewportHeight - 50
           const newX = Math.max(0, Math.min(maxX, clientX - dragStart.x))
           const newY = Math.max(0, Math.min(maxY, clientY - dragStart.y))
 
@@ -570,7 +556,8 @@ export function Window({
     minSize,
     actualMaxSize,
     updateWindow,
-    isClient,
+    viewportWidth,
+    viewportHeight,
     defaultSize,
   ])
 
@@ -580,69 +567,6 @@ export function Window({
 
   if (!isOpen && trigger) {
     return <div onClick={() => openWindow(id, title)}>{trigger}</div>
-  }
-
-  if (!isMountedRef.current && window && !window.isMinimized) {
-    const errorWindow = (
-      <div
-        className={cn("fixed bg-background border rounded-lg shadow-2xl flex flex-col", className)}
-        style={{
-          left: isNaN(window.position.x) ? 0 : window.position.x,
-          top: isNaN(window.position.y) ? 0 : window.position.y,
-          width: isNaN(window.size.width) ? defaultSize.width : window.size.width,
-          height: isNaN(window.size.height) ? defaultSize.height : window.size.height,
-          zIndex: window.zIndex,
-          minWidth: minSize.width,
-          minHeight: minSize.height,
-          maxWidth: actualMaxSize.width,
-          maxHeight: actualMaxSize.height,
-        }}
-        onClick={() => bringToFront(id)}
-        onMouseEnter={handleWindowMouseEnter}
-        onMouseLeave={handleWindowMouseLeave}
-      >
-        <div className="flex items-center justify-between p-3 border-b bg-muted/50 rounded-t-lg select-none">
-          <h2 className="font-semibold truncate flex-1">{title}</h2>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.stopPropagation()
-                minimizeWindow(id)
-              }}
-              className="h-6 w-6 p-0 hover:bg-yellow-500/20"
-            >
-              <Minus className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.stopPropagation()
-                closeWindow(id)
-              }}
-              className="h-6 w-6 p-0 hover:bg-red-500/20"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-auto p-4 flex items-center justify-center text-muted-foreground">
-          <div className="text-center">
-            <p className="text-sm">Window content unavailable</p>
-            <p className="text-xs mt-1">Navigate back to CTF Rankings to restore content</p>
-          </div>
-        </div>
-      </div>
-    )
-    if (typeof document === "undefined") return null
-    return createPortal(errorWindow, document.body)
   }
 
   if (!isOpen) {

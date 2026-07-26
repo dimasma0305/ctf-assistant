@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
-import { Trophy, Medal, Award, Search, AlertCircle, X } from "lucide-react"
+import { Search, AlertCircle, X } from "lucide-react"
 import { getRankIcon, getUserInitials, getUserDisplayName } from "@/lib/format-helpers"
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -19,13 +19,11 @@ interface SearchLeaderboardProps {
 
 export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
   const [searchInput, setSearchInput] = useState("")
-  const [searchResults, setSearchResults] = useState<LeaderboardEntry[]>([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [showResults, setShowResults] = useState(false)
+  const [isDebouncing, setIsDebouncing] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
 
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const debounceTimeoutRef = useRef<NodeJS.Timeout>()
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const searchContainerRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -38,26 +36,27 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
     offset: 0,
     global: true,
   })
+  const searchResults = searchInput.trim() ? (searchData?.data ?? []) : []
+  const showResults = Boolean(searchData && searchInput.trim())
+  const isSearching = isDebouncing || searchLoading
 
   const handleSearchInputChange = (value: string) => {
     setSearchInput(value)
 
-    if (!value.trim()) {
-      setShowResults(false)
-      setSearchResults([])
-      setIsSearching(false)
-      return
-    }
-
-    setIsSearching(true)
-
-    // Clear existing timeout
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current)
     }
 
+    if (!value.trim()) {
+      setIsDebouncing(false)
+      return
+    }
+
+    setIsDebouncing(true)
+
     // Set new timeout for debounced search
     debounceTimeoutRef.current = setTimeout(() => {
+      setIsDebouncing(false)
       updateSearchParams({
         offset: 0,
         limit: 20,
@@ -75,13 +74,14 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
     }, 300)
   }
 
-  const handleSearchCollapse = () => {
+  const handleSearchCollapse = useCallback(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
     setIsExpanded(false)
-    setShowResults(false)
     setSearchInput("")
-    setSearchResults([])
-    setIsSearching(false)
-  }
+    setIsDebouncing(false)
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -149,7 +149,7 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
       document.removeEventListener("mousedown", handleClickOutside)
       document.body.style.overflow = "unset"
     }
-  }, [isExpanded])
+  }, [isExpanded, handleSearchCollapse])
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -160,15 +160,7 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
 
     document.addEventListener("keydown", handleEscapeKey)
     return () => document.removeEventListener("keydown", handleEscapeKey)
-  }, [isExpanded])
-
-  useEffect(() => {
-    if (searchData && searchInput.trim()) {
-      setSearchResults(searchData.data)
-      setShowResults(true)
-      setIsSearching(false)
-    }
-  }, [searchData, searchInput])
+  }, [isExpanded, handleSearchCollapse])
 
   // Clean up timeout on unmount
   useEffect(() => {
@@ -220,14 +212,14 @@ export function SearchLeaderboard({ onUserClick }: SearchLeaderboardProps) {
               <X className="w-4 h-4" />
             </Button>
           )}
-          {(isSearching || searchLoading) && searchInput && !isExpanded && (
+          {isSearching && searchInput && !isExpanded && (
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
               <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
         </div>
 
-        {isExpanded && (isSearching || searchLoading) && searchInput && (
+        {isExpanded && isSearching && searchInput && (
           <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
             <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>

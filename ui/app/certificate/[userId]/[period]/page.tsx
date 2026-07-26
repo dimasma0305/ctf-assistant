@@ -5,7 +5,12 @@ import { Certificate } from "@/components/certificate"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Share2, Clock } from "lucide-react"
 import { useCertificate } from "@/hooks/useAPI"
-import { useState, useEffect } from "react"
+import { useState, useSyncExternalStore } from "react"
+
+const subscribeToHistory = (onStoreChange: () => void) => {
+  window.addEventListener("popstate", onStoreChange)
+  return () => window.removeEventListener("popstate", onStoreChange)
+}
 
 export default function PublicCertificatePage() {
   const params = useParams()
@@ -13,14 +18,13 @@ export default function PublicCertificatePage() {
   const userId = params.userId as string
   const period = params.period as string
   const [shareSuccess, setShareSuccess] = useState(false)
-  const [canGoBack, setCanGoBack] = useState(false)
+  const canGoBack = useSyncExternalStore(
+    subscribeToHistory,
+    () => window.history.length > 1,
+    () => false,
+  )
 
   const { data: certificateData, loading, error } = useCertificate(userId, period)
-
-  useEffect(() => {
-    // Check if there's a previous page in history
-    setCanGoBack(window.history.length > 1)
-  }, [])
 
   const handleNavigation = () => {
     if (canGoBack) {

@@ -242,7 +242,7 @@ export function CTFPerformancePopup({ userId, ctfId, trigger }: CTFPerformancePo
                             </Badge>
                           )}
                         </div>
-                        {solve.teammates.length > 0 && (
+                        {solve.teammates && solve.teammates.length > 0 && (
                           <p className="text-xs text-muted-foreground mt-1">With: {solve.teammates.join(", ")}</p>
                         )}
                       </div>

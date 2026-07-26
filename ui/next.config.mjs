@@ -1,23 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-
   // Image optimization
   images: {
-    domains: [
-      'localhost',
-      // Add your production domains here
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
     ],
     unoptimized: true,
   },
 
-  // ESLint configuration
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
-  // TypeScript configuration
-  typescript: {
-    ignoreBuildErrors: true,
+  // Keep Turbopack scoped to this app when the repository has multiple lockfiles.
+  turbopack: {
+    root: process.cwd(),
   },
 
   // No longer need to proxy API calls to external backend

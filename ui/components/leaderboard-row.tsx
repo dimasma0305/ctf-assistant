@@ -3,11 +3,19 @@ import { TableRow, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { getRankIcon } from "@/lib/format-helpers"
+import type { LeaderboardEntry } from "@/lib/types"
 import { ScoreDisplay } from "./score-display"
 
+export interface FormattedLeaderboardEntry extends LeaderboardEntry {
+    userInitials: string
+    displayName: string
+    skillLevel: string
+    percentile: number
+}
+
 interface LeaderboardRowProps {
-    entry: any // Replacing with 'any' since FormattedLeaderboardEntry isn't exported directly in types.ts. The original component relied on inferred types from mapping over data.
-    onUserClick: (entry: any) => void
+    entry: FormattedLeaderboardEntry
+    onUserClick: (entry: LeaderboardEntry) => void
 }
 
 function LeaderboardRowComponent({ entry, onUserClick }: LeaderboardRowProps) {

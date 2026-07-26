@@ -6,10 +6,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Window, useWindow } from "@/components/ui/window"
+import { useWindow } from "@/components/ui/window"
 import { Avatar, AvatarFallback, CachedAvatarImage } from "@/components/ui/avatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Calendar, Users, Trophy, ExternalLink, Search, MapPin, AlertCircle, Target, X } from "lucide-react"
+import { Calendar, Users, Trophy, Search, MapPin, AlertCircle, Target } from "lucide-react"
 import { getStatusColor, formatDate } from "@/lib/format-helpers"
 import { useCTFs } from "@/hooks/useAPI"
 import type { CTFsParams, CTFResponse } from "@/lib/types"
@@ -90,7 +90,7 @@ export function CTFList() {
   const [offset, setOffset] = useState(0)
   const limit = 20
 
-  const debounceTimeoutRef = useRef<NodeJS.Timeout>()
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const { openWindow } = useWindow()
 
@@ -123,7 +123,7 @@ export function CTFList() {
     return () => {
       if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current)
     }
-  }, [searchInput, statusFilter, formatFilter, limit])
+  }, [searchInput, statusFilter, formatFilter, limit, updateParams])
 
   const pagination = useMemo(() => {
     const total = ctfsData?.metadata?.total ?? 0
@@ -182,7 +182,10 @@ export function CTFList() {
           )}
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
-          <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val as any)}>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}
+          >
             <SelectTrigger className="w-full sm:w-[140px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>

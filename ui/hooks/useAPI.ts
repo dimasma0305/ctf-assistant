@@ -15,100 +15,104 @@ import {
   getCertificates,
   getCertificate,
 } from "@/lib/actions"
-import type { ScoreboardParams, CTFsParams, CTFRankingsParams, CertificateResponse, SingleCertificateResponse } from "@/lib/types"
+import type { ScoreboardParams, CTFsParams, CTFRankingsParams } from "@/lib/types"
 
 // Global map to deduplicate concurrent requests for the same cacheKey
-const inFlightRequests = new Map<string, Promise<any>>()
+const inFlightRequests = new Map<string, Promise<unknown>>()
+
+interface APICallOptions {
+  cacheKey?: string
+  ttl?: number
+  enabled?: boolean
+  staleWhileRevalidate?: boolean
+}
+
+const wait = (duration: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, duration)
+  })
 
 // Generic API hook
 function useAPICall<T>(
   apiCall: () => Promise<T>,
-  dependencies: any[] = [],
-  options: {
-    cacheKey?: string
-    ttl?: number
-    enabled?: boolean
-    staleWhileRevalidate?: boolean
-  } = {},
+  options: APICallOptions = {},
 ) {
   const { cacheKey, ttl = 5 * 60 * 1000, enabled = true, staleWhileRevalidate = false } = options
 
   const [data, setData] = useState<T | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(enabled)
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
   const [isStale, setIsStale] = useState(false)
+  const [lastFetch, setLastFetch] = useState(0)
 
-  const lastFetchRef = useRef<number>(0)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const fetchData = useCallback(
-    async (isRetry = false, forceRefresh = false) => {
-      if (!enabled) return
+    async (forceRefresh = false) => {
+      if (!enabled) {
+        setLoading(false)
+        return
+      }
 
       // Cancel previous request
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-      }
+      abortControllerRef.current?.abort()
 
       const controller = new AbortController()
       abortControllerRef.current = controller
 
-      if (!isRetry && !forceRefresh) {
+      if (!forceRefresh) {
         setLoading(true)
         setIsStale(false)
       }
       setError(null)
 
-      try {
-        let result: T
+      let shouldForceRefresh = forceRefresh
 
-        if (cacheKey && !forceRefresh) {
-          // Use cached data with stale-while-revalidate
-          const cached = dataCache.get<T>(cacheKey)
-          if (cached !== null) {
-            setData(cached)
-            setLoading(false)
+      if (cacheKey && !shouldForceRefresh) {
+        const cached = dataCache.get<T>(cacheKey)
+        if (cached !== null) {
+          setData(cached)
+          setLoading(false)
 
-            if (staleWhileRevalidate) {
-              // Only revalidate in the background once the cached entry is at
-              // least halfway to its TTL. Previously this fired a full uncached
-              // refetch on EVERY mount/tab-switch (and flickered the "Syncing"
-              // badge), even when the cache was a few seconds old.
-              const age = dataCache.getAge(cacheKey) ?? Number.POSITIVE_INFINITY
-              if (age > ttl / 2) {
-                setIsStale(true)
-                // Fetch fresh data in background
-                setTimeout(() => {
-                  fetchData(false, true)
-                }, 100)
+          if (!staleWhileRevalidate) {
+            return
+          }
+
+          // Revalidate only after the cached value is at least halfway to its
+          // TTL, while continuing to render the cached value.
+          const age = dataCache.getAge(cacheKey) ?? Number.POSITIVE_INFINITY
+          if (age <= ttl / 2) {
+            return
+          }
+
+          setIsStale(true)
+          shouldForceRefresh = true
+        }
+      }
+
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        try {
+          let result: T
+
+          if (cacheKey && !shouldForceRefresh) {
+            const existingRequest = inFlightRequests.get(cacheKey) as Promise<T> | undefined
+            if (existingRequest) {
+              result = await existingRequest
+            } else {
+              const fetchPromise = dataCache.getOrFetch(cacheKey, apiCall, ttl)
+              inFlightRequests.set(cacheKey, fetchPromise)
+              try {
+                result = await fetchPromise
+              } finally {
+                inFlightRequests.delete(cacheKey)
               }
-              return
             }
-          }
-
-          // Check for existing in-flight request
-          if (inFlightRequests.has(cacheKey)) {
-            result = await inFlightRequests.get(cacheKey)!
-          } else {
-            const fetchPromise = dataCache.getOrFetch(cacheKey, apiCall, ttl)
-            inFlightRequests.set(cacheKey, fetchPromise)
-            try {
-              result = await fetchPromise
-            } finally {
-              inFlightRequests.delete(cacheKey)
-            }
-          }
-        } else {
-          if (cacheKey) {
+          } else if (cacheKey) {
             const fetchPromise = apiCall()
             inFlightRequests.set(cacheKey, fetchPromise)
             try {
               result = await fetchPromise
-              // Write the fresh result back so the entry's timestamp resets.
-              // Without this the forced refresh never updated the cache, so the
-              // gate above always saw a "half-stale" entry and SWR re-fired on
-              // every subsequent mount in a loop.
               dataCache.set(cacheKey, result, ttl)
             } finally {
               inFlightRequests.delete(cacheKey)
@@ -116,46 +120,51 @@ function useAPICall<T>(
           } else {
             result = await apiCall()
           }
-        }
 
-        if (!controller.signal.aborted) {
-          setData(result)
-          setRetryCount(0)
-          setIsStale(false)
-          lastFetchRef.current = Date.now()
-        }
-      } catch (err) {
-        if (!controller.signal.aborted) {
-          const errorMessage = err instanceof Error ? err.message : "An error occurred"
-          setError(errorMessage)
-
-          // Retry logic for network errors
-          if (retryCount < 2 && (errorMessage.includes("fetch") || errorMessage.includes("network"))) {
-            setTimeout(
-              () => {
-                setRetryCount((prev) => prev + 1)
-                fetchData(true)
-              },
-              1000 * Math.pow(2, retryCount), // Exponential backoff
-            )
+          if (!controller.signal.aborted) {
+            setData(result)
+            setRetryCount(0)
+            setIsStale(false)
+            setLastFetch(Date.now())
           }
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false)
+          break
+        } catch (err) {
+          if (controller.signal.aborted) {
+            return
+          }
+
+          const errorMessage = err instanceof Error ? err.message : "An error occurred"
+          const isNetworkError = /fetch|network/i.test(errorMessage)
+          const shouldRetry = isNetworkError && attempt < 2
+
+          if (!shouldRetry) {
+            setError(errorMessage)
+            break
+          }
+
+          setRetryCount(attempt + 1)
+          await wait(1000 * 2 ** attempt)
         }
       }
+
+      if (!controller.signal.aborted) {
+        setLoading(false)
+      }
     },
-    [...dependencies, retryCount, enabled, cacheKey, ttl],
+    [apiCall, cacheKey, enabled, staleWhileRevalidate, ttl],
   )
 
   useEffect(() => {
-    fetchData()
+    let active = true
+    queueMicrotask(() => {
+      if (active) {
+        void fetchData()
+      }
+    })
 
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-      }
+      active = false
+      abortControllerRef.current?.abort()
     }
   }, [fetchData])
 
@@ -173,7 +182,7 @@ function useAPICall<T>(
     retryCount,
     isStale,
     invalidateCache,
-    lastFetch: lastFetchRef.current,
+    lastFetch,
   }
 }
 
@@ -182,8 +191,9 @@ export function useScoreboard(initialParams: ScoreboardParams = {}) {
   const [currentParams, setCurrentParams] = useState(initialParams)
   const paramsKey = JSON.stringify(currentParams)
   const cacheKey = `scoreboard:${paramsKey}`
+  const apiCall = useCallback(() => getScoreboard(currentParams), [currentParams])
 
-  const result = useAPICall(() => getScoreboard(currentParams), [paramsKey], {
+  const result = useAPICall(apiCall, {
     cacheKey,
     ttl: 2 * 60 * 1000, // 2 minutes for leaderboard
     staleWhileRevalidate: true,
@@ -209,53 +219,50 @@ export function useScoreboard(initialParams: ScoreboardParams = {}) {
 // User profile hook
 export function useUserProfile(userId: string | null) {
   const cacheKey = userId ? `user-profile:${userId}` : undefined
-
-  return useAPICall(
+  const apiCall = useCallback(
     () => (userId ? getUserProfile(userId) : Promise.reject(new Error("No user ID provided"))),
     [userId],
-    {
-      cacheKey,
-      ttl: 5 * 60 * 1000, // 5 minutes for user profiles
-      enabled: !!userId,
-    },
   )
+
+  return useAPICall(apiCall, {
+    cacheKey,
+    ttl: 5 * 60 * 1000, // 5 minutes for user profiles
+    enabled: !!userId,
+  })
 }
 
 // CTF-specific profile hook
 export function useCTFProfile(ctfId: string | null, userId: string | null) {
   const cacheKey = ctfId && userId ? `ctf-profile:${ctfId}:${userId}` : undefined
-
-  return useAPICall(
+  const apiCall = useCallback(
     () =>
       ctfId && userId ? getCTFProfile(ctfId, userId) : Promise.reject(new Error("CTF ID and User ID are required")),
     [ctfId, userId],
-    {
-      cacheKey,
-      ttl: 3 * 60 * 1000, // 3 minutes for CTF profiles
-      enabled: !!(ctfId && userId),
-    },
   )
+
+  return useAPICall(apiCall, {
+    cacheKey,
+    ttl: 3 * 60 * 1000, // 3 minutes for CTF profiles
+    enabled: !!(ctfId && userId),
+  })
 }
 
 export function useCTFProfileDetailed(userId: string | null, ctfId: string | null, enabled = true) {
   const cacheKey = userId && ctfId ? `ctf-profile-detailed:${userId}:${ctfId}` : undefined
-
-  return useAPICall(
-    () => {
+  const apiCall = useCallback(() => {
       if (!userId || !ctfId) {
         return Promise.reject(new Error("User ID and CTF ID are required"))
       }
 
       // Use the same API base URL logic as the rest of the app (NEXT_PUBLIC_API_BASE_URL).
       return getCTFProfile(ctfId, userId)
-    },
-    [userId, ctfId, enabled],
-    {
-      cacheKey,
-      ttl: 3 * 60 * 1000, // 3 minutes
-      enabled: enabled && !!(userId && ctfId),
-    },
-  )
+    }, [userId, ctfId])
+
+  return useAPICall(apiCall, {
+    cacheKey,
+    ttl: 3 * 60 * 1000, // 3 minutes
+    enabled: enabled && !!(userId && ctfId),
+  })
 }
 
 // CTFs list hook
@@ -263,8 +270,9 @@ export function useCTFs(params: CTFsParams = {}) {
   const [currentParams, setCurrentParams] = useState(params)
   const paramsKey = JSON.stringify(currentParams)
   const cacheKey = `ctfs:${paramsKey}`
+  const apiCall = useCallback(() => getCTFs(currentParams), [currentParams])
 
-  const result = useAPICall(() => getCTFs(currentParams), [paramsKey], {
+  const result = useAPICall(apiCall, {
     cacheKey,
     ttl: 10 * 60 * 1000, // 10 minutes for CTF list
     staleWhileRevalidate: true,
@@ -284,8 +292,12 @@ export function useCTFs(params: CTFsParams = {}) {
 // CTF details hook
 export function useCTFDetails(ctfId: string | null) {
   const cacheKey = ctfId ? `ctf-details:${ctfId}` : undefined
+  const apiCall = useCallback(
+    () => (ctfId ? getCTFDetails(ctfId) : Promise.reject(new Error("No CTF ID provided"))),
+    [ctfId],
+  )
 
-  return useAPICall(() => (ctfId ? getCTFDetails(ctfId) : Promise.reject(new Error("No CTF ID provided"))), [ctfId], {
+  return useAPICall(apiCall, {
     cacheKey,
     ttl: 15 * 60 * 1000, // 15 minutes for CTF details
     enabled: !!ctfId,
@@ -294,12 +306,14 @@ export function useCTFDetails(ctfId: string | null) {
 
 // Cache status hook
 export function useCacheStatus() {
-  return useAPICall(() => getCacheStatus())
+  const apiCall = useCallback(() => getCacheStatus(), [])
+  return useAPICall(apiCall)
 }
 
 // Health check hook
 export function useHealth() {
-  return useAPICall(() => getHealth())
+  const apiCall = useCallback(() => getHealth(), [])
+  return useAPICall(apiCall)
 }
 
 // Cache management hook
@@ -382,7 +396,12 @@ export function usePolling<T>(
   useEffect(() => {
     if (!enabled) return
 
-    fetchData() // Initial fetch
+    let active = true
+    queueMicrotask(() => {
+      if (active) {
+        void fetchData()
+      }
+    })
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
@@ -399,6 +418,7 @@ export function usePolling<T>(
     }, interval)
 
     return () => {
+      active = false
       clearInterval(intervalId)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
     }
@@ -412,8 +432,9 @@ export function useCTFRankings(params: CTFRankingsParams = {}) {
   const [currentParams, setCurrentParams] = useState(params)
   const paramsKey = JSON.stringify(currentParams)
   const cacheKey = `ctf-rankings:${paramsKey}`
+  const apiCall = useCallback(() => getCTFRankings(currentParams), [currentParams])
 
-  const result = useAPICall(() => getCTFRankings(currentParams), [paramsKey], {
+  const result = useAPICall(apiCall, {
     cacheKey,
     ttl: 3 * 60 * 1000, // 3 minutes for rankings
     staleWhileRevalidate: true,
@@ -433,37 +454,31 @@ export function useCTFRankings(params: CTFRankingsParams = {}) {
 // Certificates hook
 export function useCertificates(userId: string | null) {
   const cacheKey = userId ? `certificates:${userId}` : undefined
+  const apiCall = useCallback(() => {
+    if (!userId) throw new Error("User ID is required")
+    return getCertificates(userId)
+  }, [userId])
 
-  return useAPICall(
-    () => {
-      if (!userId) throw new Error("User ID is required")
-      return getCertificates(userId)
-    },
-    [userId],
-    {
-      cacheKey,
-      ttl: 10 * 60 * 1000, // 10 minutes for certificates
-      enabled: !!userId,
-    }
-  )
+  return useAPICall(apiCall, {
+    cacheKey,
+    ttl: 10 * 60 * 1000, // 10 minutes for certificates
+    enabled: !!userId,
+  })
 }
 
 // Single certificate hook
 export function useCertificate(userId: string | null, period: string | null) {
   const cacheKey = userId && period ? `certificate:${userId}:${period}` : undefined
+  const apiCall = useCallback(() => {
+    if (!userId || !period) throw new Error("User ID and period are required")
+    return getCertificate(userId, period)
+  }, [userId, period])
 
-  return useAPICall(
-    () => {
-      if (!userId || !period) throw new Error("User ID and period are required")
-      return getCertificate(userId, period)
-    },
-    [userId, period],
-    {
-      cacheKey,
-      ttl: 10 * 60 * 1000, // 10 minutes for certificates
-      enabled: !!userId && !!period,
-    }
-  )
+  return useAPICall(apiCall, {
+    cacheKey,
+    ttl: 10 * 60 * 1000, // 10 minutes for certificates
+    enabled: !!userId && !!period,
+  })
 }
 
 // Comprehensive caching system with TTL and request deduplication
@@ -474,8 +489,8 @@ interface CacheEntry<T> {
 }
 
 class DataCache {
-  private cache = new Map<string, CacheEntry<any>>()
-  private pendingRequests = new Map<string, Promise<any>>()
+  private cache = new Map<string, CacheEntry<unknown>>()
+  private pendingRequests = new Map<string, Promise<unknown>>()
 
   get<T>(key: string): T | null {
     const entry = this.cache.get(key)
@@ -487,7 +502,7 @@ class DataCache {
       return null
     }
 
-    return entry.data
+    return entry.data as T
   }
 
   set<T>(key: string, data: T, ttl: number = 5 * 60 * 1000): void {
@@ -514,7 +529,7 @@ class DataCache {
 
     // Check if request is already pending
     if (this.pendingRequests.has(key)) {
-      return this.pendingRequests.get(key)!
+      return this.pendingRequests.get(key) as Promise<T>
     }
 
     // Make new request
@@ -564,7 +579,7 @@ class DataCache {
 // Global cache instance
 const dataCache = new DataCache()
 
-export default {
+const apiHooks = {
   useScoreboard,
   useUserProfile,
   useCTFProfile,
@@ -577,3 +592,5 @@ export default {
   usePolling,
   useCTFRankings,
 }
+
+export default apiHooks
