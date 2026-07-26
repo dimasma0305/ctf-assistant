@@ -77,14 +77,53 @@ export function formatErrorResponse(status: number, error: string, message?: str
 /**
  * Validate common parameters
  */
-export function validatePaginationParams(limit?: string, offset?: string): ValidationResult {
-    const parsedLimit = parseInt(limit as string) || 10;
-    const parsedOffset = parseInt(offset as string) || 0;
+export interface PaginationValidationOptions {
+    defaultLimit?: number;
+    maxLimit?: number;
+    maxOffset?: number;
+}
+
+function parseUnsignedInteger(value: unknown, fallback: number): number | null {
+    if (value === undefined) return fallback;
+    if (typeof value !== "string" || !/^\d+$/.test(value)) return null;
+
+    const parsed = Number(value);
+    return Number.isSafeInteger(parsed) ? parsed : null;
+}
+
+export function validatePaginationParams(
+    limit?: unknown,
+    offset?: unknown,
+    options: PaginationValidationOptions = {},
+): ValidationResult {
+    const defaultLimit = options.defaultLimit ?? 10;
+    const maxLimit = options.maxLimit ?? 100;
+    const maxOffset = options.maxOffset ?? 100_000;
+    const parsedLimit = parseUnsignedInteger(limit, defaultLimit);
+    const parsedOffset = parseUnsignedInteger(offset, 0);
+
+    if (parsedLimit === null) {
+        return {
+            isValid: false,
+            error: "Limit must be a whole number",
+            limit: defaultLimit,
+            offset: parsedOffset ?? 0,
+        };
+    }
+
+    if (parsedOffset === null) {
+        return {
+            isValid: false,
+            error: "Offset must be a whole number",
+            limit: parsedLimit,
+            offset: 0,
+        };
+    }
     
-    if (parsedLimit < 1 || parsedLimit > 100) {
+    if (parsedLimit < 1 || parsedLimit > maxLimit) {
         return { 
             isValid: false, 
-            error: "Limit must be between 1 and 100", 
+            error: `Limit must be between 1 and ${maxLimit}`,
             limit: parsedLimit, 
             offset: parsedOffset 
         };
@@ -98,8 +137,73 @@ export function validatePaginationParams(limit?: string, offset?: string): Valid
             offset: parsedOffset 
         };
     }
+
+    if (parsedOffset > maxOffset) {
+        return {
+            isValid: false,
+            error: `Offset must not exceed ${maxOffset}`,
+            limit: parsedLimit,
+            offset: parsedOffset,
+        };
+    }
     
     return { isValid: true, limit: parsedLimit, offset: parsedOffset };
+}
+
+export interface QueryStringValidationResult {
+    isValid: boolean;
+    value?: string;
+    error?: string;
+}
+
+/**
+ * Express query values are not necessarily strings: repeated or bracketed
+ * parameters can become arrays/objects. Validate before a value reaches
+ * string methods or a Mongo query.
+ */
+export function validateQueryString(
+    value: unknown,
+    name: string,
+    maxLength: number = 200,
+): QueryStringValidationResult {
+    if (value === undefined) return { isValid: true };
+    if (typeof value !== "string") {
+        return { isValid: false, error: `${name} must be a single string` };
+    }
+
+    const normalized = value.trim();
+    if (normalized.length > maxLength) {
+        return {
+            isValid: false,
+            error: `${name} must not exceed ${maxLength} characters`,
+        };
+    }
+
+    return {
+        isValid: true,
+        value: normalized || undefined,
+    };
+}
+
+export interface QueryBooleanValidationResult {
+    isValid: boolean;
+    value: boolean;
+    error?: string;
+}
+
+export function validateQueryBoolean(
+    value: unknown,
+    name: string,
+    defaultValue: boolean,
+): QueryBooleanValidationResult {
+    if (value === undefined) return { isValid: true, value: defaultValue };
+    if (value === "true") return { isValid: true, value: true };
+    if (value === "false") return { isValid: true, value: false };
+    return {
+        isValid: false,
+        value: defaultValue,
+        error: `${name} must be true or false`,
+    };
 }
 
 /**

@@ -170,7 +170,6 @@ export const event: Event = {
                 console.error("❌ Error in scheduled CTF notification job:", error);
             }
         }, {
-            scheduled: true,
             timezone: "Asia/Singapore"
         });
 

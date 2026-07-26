@@ -256,7 +256,7 @@ async function tick(client: MyClient) {
 let cronInit = false;
 let ticking = false;   // re-entrancy guard: node-cron does not prevent an overlapping tick
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(client: MyClient) {
         if (cronInit) return;   // guard against a second `ready` (reconnect) double-scheduling

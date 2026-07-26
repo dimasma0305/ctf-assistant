@@ -26,7 +26,7 @@ interface TrakteerResponse {
 }
 
 export const event: Event = {
-  name: "ready",
+  name: "clientReady",
   once: true,
   async execute(client: MyClient) {
     console.log("Loading Trakteer cron jobs...");
@@ -143,7 +143,6 @@ export const event: Event = {
         await checkTrakteerSupports();
       },
       {
-        scheduled: true,
         timezone: "Asia/Singapore",
       }
     );
@@ -207,4 +206,3 @@ async function sendTrakteerNotification(
     console.error("Error sending Trakteer notification:", error);
   }
 }
-

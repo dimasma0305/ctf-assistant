@@ -184,7 +184,6 @@ export class SessionScheduler {
         console.log('🔄 Session limit reset time reached, attempting reconnection...');
         await this.attemptReconnection();
       }, {
-        scheduled: true,
         timezone: 'UTC'
       });
       

@@ -5,7 +5,7 @@ import { seedDefaultsIfEmpty } from "../../Services/AI/lorebook";
 let seeded = false;
 
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(_client: MyClient) {
         if (seeded) return;

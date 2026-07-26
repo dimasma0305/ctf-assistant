@@ -1,12 +1,20 @@
-FROM node:20-alpine AS ui-builder
+FROM oven/bun:1.3.14-alpine AS ui-builder
 WORKDIR /app/
-COPY ui/package.json /app/package.json
-RUN npm install --include=optional
+COPY ui/package.json ui/bun.lock /app/
+RUN bun install --frozen-lockfile
 COPY ui/ /app/
 ARG NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
-RUN npm run build
+RUN bun run build
+
+FROM oven/bun:1.3.14-alpine AS ui
+WORKDIR /app/
+COPY ui/package.json ui/bun.lock /app/
+RUN bun install --production --frozen-lockfile
+COPY --from=ui-builder /app/.next /app/.next
+COPY --from=ui-builder /app/public /app/public
+COPY --from=ui-builder /app/next.config.mjs /app/next.config.mjs
 ENV PORT=3000
 ENV HOST=0.0.0.0
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["bun", "run", "start"]

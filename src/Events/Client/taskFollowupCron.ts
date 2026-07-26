@@ -148,7 +148,7 @@ async function runDailyFollowups(client: MyClient): Promise<void> {
 }
 
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(client: MyClient) {
         if (cronInit) return;
@@ -164,7 +164,7 @@ export const event: Event = {
             } catch (error) {
                 console.error('[TaskCron] tick failed:', error);
             }
-        }, { scheduled: true, timezone: 'Asia/Jakarta' });
+        }, { timezone: 'Asia/Jakarta' });
 
         console.log('✅ Task follow-up cron loaded (daily 9am Jakarta)');
     },

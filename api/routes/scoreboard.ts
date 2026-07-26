@@ -1,7 +1,14 @@
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { getCachedUserScores, getAvailableTimeRanges } from '../services/dataService';
 import { calculateExtendedMetricsForUsers, calculateGlobalStats, generateAchievementIds } from '../utils/statistics';
-import { formatErrorResponse, validatePaginationParams, filterUsersBySearch, categoryNormalize } from '../utils/common';
+import {
+    categoryNormalize,
+    filterUsersBySearch,
+    formatErrorResponse,
+    validatePaginationParams,
+    validateQueryBoolean,
+    validateQueryString,
+} from '../utils/common';
 import { UserSolve } from '../types';
 
 const router = Router();
@@ -11,16 +18,11 @@ const router = Router();
  * 
  * Returns paginated leaderboard data with optional filtering and time-based scoping
  */
-router.get("/", async (req, res) => {
+export async function getScoreboard(req: Request, res: Response) {
     try {
-        // Parse query parameters
-        const ctfId = req.query.ctf_id as string;
-        const isGlobal = req.query.global !== 'false'; // default to true unless explicitly set to false
-        const searchTerm = req.query.search as string; // new search parameter
-        const month = req.query.month as string; // YYYY-MM format
-        const year = req.query.year ? parseInt(req.query.year as string) : undefined;
-        
-        // Validate parameters using utility function
+        // Query values may be arrays/objects at runtime even when TypeScript
+        // casts say otherwise. Validate primitives before constructing Mongo
+        // filters so bracketed parameters cannot become query operators.
         const validation = validatePaginationParams(req.query.limit as string, req.query.offset as string);
         if (!validation.isValid) {
             res.status(400).json(formatErrorResponse(400, validation.error!, undefined, req));
@@ -28,13 +30,42 @@ router.get("/", async (req, res) => {
         }
         const { limit, offset } = validation;
 
+        const ctfIdValidation = validateQueryString(req.query.ctf_id, "ctf_id", 64);
+        const globalValidation = validateQueryBoolean(req.query.global, "global", true);
+        const searchValidation = validateQueryString(req.query.search, "search", 100);
+        const monthValidation = validateQueryString(req.query.month, "month", 7);
+        const yearValidation = validateQueryString(req.query.year, "year", 4);
+        const invalidQuery = [
+            ctfIdValidation,
+            globalValidation,
+            searchValidation,
+            monthValidation,
+            yearValidation,
+        ].find((result) => !result.isValid);
+        if (invalidQuery) {
+            res.status(400).json(formatErrorResponse(400, invalidQuery.error!, undefined, req));
+            return;
+        }
+
+        const ctfId = ctfIdValidation.value;
+        const isGlobal = globalValidation.value;
+        const searchTerm = searchValidation.value;
+        const month = monthValidation.value;
+        const yearText = yearValidation.value;
+        const year = yearText ? Number(yearText) : undefined;
+
         // Validate monthly parameters
-        if (month && !/^\d{4}-\d{2}$/.test(month)) {
+        if (month && !/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
             res.status(400).json(formatErrorResponse(400, "Month must be in YYYY-MM format", undefined, req));
             return;
         }
 
-        if (year && (year < 2020 || year > 2100)) {
+        if (yearText && !/^\d{4}$/.test(yearText)) {
+            res.status(400).json(formatErrorResponse(400, "Year must be a four-digit number", undefined, req));
+            return;
+        }
+
+        if (year !== undefined && (year < 2020 || year > 2100)) {
             res.status(400).json(formatErrorResponse(400, "Year must be between 2020 and 2100", undefined, req));
             return;
         }
@@ -231,6 +262,8 @@ router.get("/", async (req, res) => {
             req
         ));
     }
-});
+}
+
+router.get("/", getScoreboard);
 
 export default router;

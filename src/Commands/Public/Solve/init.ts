@@ -1,8 +1,17 @@
 import { SubCommand } from "../../../Model/command";
 import { SlashCommandSubcommandBuilder, TextChannel, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, AttachmentBuilder, ChatInputCommandInteraction, ModalSubmitInteraction, MessageFlags } from "discord.js";
 import { CTFEvent, infoEvent } from "../../../Functions/ctftime-v2";
-import { parseChallenges, ParsedChallenge, parseFetchCommand, ParsedFetchCommand, saveFetchCommand, updateThreadsStatus } from "./utils";
-import { checkUrlSafe } from "../../../utils/urlGuard";
+import { parseChallenges, ParsedChallenge, parseCTFEventIdFromTopic, parseFetchCommand, ParsedFetchCommand, saveFetchCommand, updateThreadsStatus } from "./utils";
+import {
+    readResponseTextWithLimit,
+    ResponseTooLargeError,
+    safeFetch,
+    SafeFetchError,
+} from "../../../utils/urlGuard";
+
+const FETCH_TIMEOUT_MS = 20_000;
+const MAX_FETCH_JSON_BYTES = 10 * 1024 * 1024;
+const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024;
 
 export const command: SubCommand = {
     // Registers a persistent server-side fetch loop + mass-creates threads —
@@ -54,26 +63,33 @@ export const command: SubCommand = {
             }
 
             // Validate file size (Discord limit is 25MB for nitro, 8MB for regular users)
-            if (jsonFile.size > 25 * 1024 * 1024) {
+            if (jsonFile.size > MAX_ATTACHMENT_BYTES) {
                 await interaction.editReply("❌ File is too large. Maximum file size is 25MB.");
                 return;
             }
 
             try {
-                const response = await fetch(jsonFile.url);
+                const response = await safeFetch(jsonFile.url, {
+                    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+                });
                 if (!response.ok) {
                     await interaction.editReply(`❌ Failed to download file: ${response.status} ${response.statusText}`);
                     return;
                 }
                 
-                finalJsonData = await response.text();
+                finalJsonData = await readResponseTextWithLimit(response, MAX_ATTACHMENT_BYTES);
                 
                 if (!finalJsonData.trim()) {
                     await interaction.editReply("❌ The uploaded file is empty.");
                     return;
                 }
             } catch (error) {
-                await interaction.editReply(`❌ Failed to read file: ${error}`);
+                if (error instanceof ResponseTooLargeError) {
+                    await interaction.editReply("❌ The uploaded file exceeds the 25MB size limit.");
+                } else {
+                    console.error("[solve/init] failed to read uploaded challenge file:", error instanceof Error ? error.name : "unknown error");
+                    await interaction.editReply("❌ Failed to read the uploaded file.");
+                }
                 return;
             }
         } else if (fetchCommand) {
@@ -148,23 +164,37 @@ export const command: SubCommand = {
             }
         }
 
-        // Parse channel topic to get CTF event data
-        let ctfData: CTFEvent;
+        // Parse the channel metadata separately from the CTFtime lookup. A
+        // database/network failure in infoEvent must not be reported as a
+        // malformed Discord topic.
+        let ctfEventId: string | null;
         try {
-            const id = JSON.parse(channel.topic || "{}").id;
-
-            if (!id) {
-                await currentInteraction.editReply("This channel does not have a valid CTF event associated with it.");
-                return;
-            }
-
-            ctfData = await infoEvent(id, false);
-            if (!ctfData.id) {
-                await currentInteraction.editReply("This channel does not have a valid CTF event associated with it.");
-                return;
-            }
+            ctfEventId = parseCTFEventIdFromTopic(channel.topic);
         } catch (error) {
             await currentInteraction.editReply("Failed to parse channel topic. Make sure this is a CTF event channel.");
+            return;
+        }
+
+        if (!ctfEventId) {
+            await currentInteraction.editReply("This channel does not have a valid CTF event associated with it.");
+            return;
+        }
+
+        let ctfData: CTFEvent;
+        try {
+            ctfData = await infoEvent(ctfEventId, false);
+        } catch (error) {
+            console.error("Failed to load CTF event data for solve init:", {
+                channelId: channel.id,
+                ctfEventId,
+                error,
+            });
+            await currentInteraction.editReply("Failed to load CTF event data right now. Please try again later.");
+            return;
+        }
+
+        if (!ctfData.id) {
+            await currentInteraction.editReply("This channel does not have a valid CTF event associated with it.");
             return;
         }
 
@@ -175,18 +205,14 @@ export const command: SubCommand = {
             try {
                 parsedFetch = parseFetchCommand(fetchCommand);
 
-                // SSRF guard: reject internal/metadata/private targets before the
-                // bot fetches an attacker-supplied URL (2026-06-09 audit fix).
-                const urlGuard = await checkUrlSafe(parsedFetch.url);
-                if (!urlGuard.ok) {
-                    await currentInteraction.editReply(`❌ Fetch URL rejected (${urlGuard.error}). Only public http(s) URLs are allowed.`);
-                    return;
-                }
-
-                const response = await fetch(parsedFetch.url, {
+                // Validate the initial URL and every redirect hop. Native
+                // redirect following would allow a public URL to redirect the
+                // bot into localhost, metadata, Mongo, or another private host.
+                const response = await safeFetch(parsedFetch.url, {
                     method: parsedFetch.method,
                     headers: parsedFetch.headers,
-                    body: parsedFetch.body
+                    body: parsedFetch.body,
+                    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
                 });
 
                 if (!response.ok) {
@@ -194,14 +220,21 @@ export const command: SubCommand = {
                     return;
                 }
 
-                finalJsonData = await response.text();
+                finalJsonData = await readResponseTextWithLimit(response, MAX_FETCH_JSON_BYTES);
                 
                 if (!finalJsonData.trim()) {
                     await currentInteraction.editReply("❌ Fetch command returned empty data.");
                     return;
                 }
             } catch (error) {
-                await currentInteraction.editReply(`❌ Fetch command failed: ${error}`);
+                if (error instanceof SafeFetchError) {
+                    await currentInteraction.editReply(`❌ Fetch URL rejected (${error.code}). Only public http(s) URLs are allowed.`);
+                } else if (error instanceof ResponseTooLargeError) {
+                    await currentInteraction.editReply("❌ Fetch response is too large (maximum 10MB).");
+                } else {
+                    console.error("[solve/init] challenge fetch failed:", error instanceof Error ? error.name : "unknown error");
+                    await currentInteraction.editReply("❌ Fetch command failed. Check the URL and request options, then try again.");
+                }
                 return;
             }
         }

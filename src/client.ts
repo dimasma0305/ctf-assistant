@@ -34,6 +34,7 @@ import { getLoopStatsSummary } from "./Services/AI/chat";
 import { handleSpamDetection, handlePhishingDetection, handleImageScamDetection } from "./Services/Moderation";
 import { maybeReactToMessage } from "./Services/AI/reactions";
 import { shouldChimeIn } from "./Services/AI/spontaneous";
+import { redactDiscordSecrets } from "./utils/redactSecrets";
 import "./Services/AI/memory";
 
 
@@ -53,6 +54,12 @@ const client = new Client({
   intents: [Guilds, GuildMembers, GuildMessages, GuildMessageReactions, GuildScheduledEvents, MessageContent, DirectMessages],
   partials: [User, Message, GuildMember, Channel]
 }) as MyClient;
+
+// The bot intentionally registers several independent startup jobs on the
+// ready event. Keep a bounded warning threshold above that known count; Bun's
+// default MaxListeners warning serializes the Discord client (including its
+// credential) into logs.
+client.setMaxListeners(20);
 
 client.events = new Collection();
 client.commands = new Collection();
@@ -92,13 +99,14 @@ client.on(Events.ShardReady, async (shardId: number) => {
 
 // Debug events - monitor gateway messages
 client.on(Events.Debug, async (message) => {
+  const safeMessage = redactDiscordSecrets(message, TOKEN);
   // Only log important debug messages to reduce noise
   if (message.includes('READY')) {
     console.log('🔍 Gateway: READY received');
   } else if (message.includes('RESUMED')) {
     console.log('🔍 Gateway: RESUMED received');
   } else if (message.includes('Session Limit Information')) {
-    console.log('🔍 Gateway:', message);
+    console.log('🔍 Gateway:', safeMessage);
   } else if (message.includes('Heartbeat acknowledged')) {
     // Heartbeat is working - connection is healthy (don't log to reduce noise)
   } else if (message.includes('Session is invalid') || message.includes('Invalid session')) {
@@ -107,7 +115,7 @@ client.on(Events.Debug, async (message) => {
     // Suppress these messages - they occur during normal connection establishment
   } else {
     // Log any other debug messages that might be important
-    console.log('🔍 Gateway:', message);
+    console.log('🔍 Gateway:', safeMessage);
   }
 });
 

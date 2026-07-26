@@ -16,7 +16,7 @@ let cronInit = false;
  * pruning kicks in.
  */
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(client: MyClient) {
         if (cronInit) return;
@@ -31,7 +31,7 @@ export const event: Event = {
             } catch (error) {
                 console.error('[SharingChannelCron] tick failed:', error);
             }
-        }, { scheduled: true, timezone: 'Asia/Jakarta' });
+        }, { timezone: 'Asia/Jakarta' });
 
         // Catch-up run shortly after boot so we don't have to wait up to 30
         // minutes for the first sweep after a deploy.

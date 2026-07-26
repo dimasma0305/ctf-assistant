@@ -21,7 +21,7 @@ async function refreshPresence(client: MyClient) {
 }
 
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(client: MyClient) {
         if (botStateCronInitialized) return;
@@ -41,18 +41,18 @@ export const event: Event = {
         cron.schedule('*/30 * * * *', async () => {
             await distillBotState();
             await refreshPresence(client);
-        }, { scheduled: true, timezone: 'Asia/Jakarta' });
+        }, { timezone: 'Asia/Jakarta' });
 
         // Presence-only refresh every 5 minutes so the visible status feels
         // alive even between full state distillations (caches don't go stale).
         cron.schedule('*/5 * * * *', async () => {
             await refreshPresence(client);
-        }, { scheduled: true, timezone: 'Asia/Jakarta' });
+        }, { timezone: 'Asia/Jakarta' });
 
         // Daily diary consolidation at 3 AM Jakarta time.
         cron.schedule('0 3 * * *', async () => {
             await distillDiary();
-        }, { scheduled: true, timezone: 'Asia/Jakarta' });
+        }, { timezone: 'Asia/Jakarta' });
 
         console.log('✅ Bot-state cron jobs loaded');
     },

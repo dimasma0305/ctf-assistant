@@ -2,7 +2,13 @@ import { Router } from 'express';
 import { CTFCacheModel, solveModel } from "../../src/Database/connect";
 import { getCachedUserScores } from '../services/dataService';
 import { getCTFParticipationMap } from '../services/ctfParticipation';
-import { categoryNormalize, escapeRegex } from '../utils/common';
+import {
+    categoryNormalize,
+    escapeRegex,
+    validatePaginationParams,
+    validateQueryBoolean,
+    validateQueryString,
+} from '../utils/common';
 
 const router = Router();
 
@@ -13,28 +19,48 @@ const router = Router();
  */
 router.get("/", async (req, res) => {
     try {
-        // Parse query parameters
-        const limit = parseInt(req.query.limit as string) || 20;
-        const offset = parseInt(req.query.offset as string) || 0;
-        const status = req.query.status as string; // upcoming, active, completed
-        const format = req.query.format as string; // jeopardy, attack-defense, etc.
-        const organizer = req.query.organizer as string;
-        const q = req.query.q as string; // full-text-ish search (title/organizer/description)
-        const hasParticipation = req.query.hasParticipation === 'true'; // only CTFs with solves
-        const sortBy = (req.query.sortBy as string) || 'start_desc'; // start_desc, start_asc, title, participants
-        
-        // Validate parameters
-        if (limit < 1 || limit > 100) {
-            res.status(400).json({
-                error: "Limit must be between 1 and 100"
-            });
+        const pagination = validatePaginationParams(req.query.limit, req.query.offset, {
+            defaultLimit: 20,
+            maxLimit: 100,
+        });
+        if (!pagination.isValid) {
+            res.status(400).json({ error: pagination.error });
             return;
         }
-        
-        if (offset < 0) {
-            res.status(400).json({
-                error: "Offset must be non-negative"
-            });
+
+        const statusValidation = validateQueryString(req.query.status, "status", 16);
+        const formatValidation = validateQueryString(req.query.format, "format", 100);
+        const organizerValidation = validateQueryString(req.query.organizer, "organizer", 100);
+        const searchValidation = validateQueryString(req.query.q, "q", 100);
+        const sortValidation = validateQueryString(req.query.sortBy, "sortBy", 20);
+        const participationValidation = validateQueryBoolean(req.query.hasParticipation, "hasParticipation", false);
+        const invalidQuery = [
+            statusValidation,
+            formatValidation,
+            organizerValidation,
+            searchValidation,
+            sortValidation,
+            participationValidation,
+        ].find((result) => !result.isValid);
+        if (invalidQuery) {
+            res.status(400).json({ error: invalidQuery.error });
+            return;
+        }
+
+        const { limit, offset } = pagination;
+        const status = statusValidation.value;
+        const format = formatValidation.value;
+        const organizer = organizerValidation.value;
+        const q = searchValidation.value;
+        const sortBy = sortValidation.value || "start_desc";
+        const hasParticipation = participationValidation.value;
+
+        if (status && !["upcoming", "active", "completed"].includes(status)) {
+            res.status(400).json({ error: "status must be upcoming, active, or completed" });
+            return;
+        }
+        if (!["start_desc", "start_asc", "title", "participants"].includes(sortBy)) {
+            res.status(400).json({ error: "sortBy is not supported" });
             return;
         }
 
@@ -218,25 +244,35 @@ router.get("/", async (req, res) => {
  */
 router.get("/rankings", async (req, res) => {
     try {
-        // Parse query parameters
-        const limit = parseInt(req.query.limit as string) || 10;
-        const offset = parseInt(req.query.offset as string) || 0;
-        const status = req.query.status as string; // upcoming, active, completed
-        const q = req.query.q as string; // search title/organizer/description
-        const hasParticipation = req.query.hasParticipation !== 'false'; // default to true
-        
-        // Validate parameters
-        if (limit < 1 || limit > 50) {
-            res.status(400).json({
-                error: "Limit must be between 1 and 50"
-            });
+        const pagination = validatePaginationParams(req.query.limit, req.query.offset, {
+            defaultLimit: 10,
+            maxLimit: 50,
+        });
+        if (!pagination.isValid) {
+            res.status(400).json({ error: pagination.error });
             return;
         }
-        
-        if (offset < 0) {
-            res.status(400).json({
-                error: "Offset must be non-negative"
-            });
+
+        const statusValidation = validateQueryString(req.query.status, "status", 16);
+        const searchValidation = validateQueryString(req.query.q, "q", 100);
+        const participationValidation = validateQueryBoolean(req.query.hasParticipation, "hasParticipation", true);
+        const invalidQuery = [
+            statusValidation,
+            searchValidation,
+            participationValidation,
+        ].find((result) => !result.isValid);
+        if (invalidQuery) {
+            res.status(400).json({ error: invalidQuery.error });
+            return;
+        }
+
+        const { limit, offset } = pagination;
+        const status = statusValidation.value;
+        const q = searchValidation.value;
+        const hasParticipation = participationValidation.value;
+
+        if (status && !["upcoming", "active", "completed"].includes(status)) {
+            res.status(400).json({ error: "status must be upcoming, active, or completed" });
             return;
         }
 

@@ -6,7 +6,7 @@ import { deliverDueReminders } from "../../Services/AI/reminders";
 let reminderCronInitialized = false;
 
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(client: MyClient) {
         if (reminderCronInitialized) return;
@@ -25,7 +25,7 @@ export const event: Event = {
             } catch (error) {
                 console.error('[ReminderCron] tick failed:', error);
             }
-        }, { scheduled: true, timezone: 'Asia/Jakarta' });
+        }, { timezone: 'Asia/Jakarta' });
 
         // Also fire once a few seconds after boot to catch anything that came
         // due while the bot was offline.

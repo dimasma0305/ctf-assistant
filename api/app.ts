@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import compression from "compression";
-import bodyParser from 'body-parser';
 import client from "../src/client";
 import { MyClient } from "../src/Model/client";
 import { getCachedUserScores } from './services/dataService';
@@ -13,6 +12,10 @@ import ctfRoutes from './routes/ctfs';
 import certificateRoutes from './routes/certificates';
 
 const app = express();
+app.disable("x-powered-by");
+// This API has no nested query-object contract. Keeping query values flat
+// reduces parser attack surface; route-level validation still rejects arrays.
+app.set("query parser", "simple");
 
 /**
  * Gzip responses — scoreboard/CTF JSON (repeated metadata + per-entry arrays)
@@ -25,15 +28,21 @@ app.use(compression());
  */
 app.use(cors({
     origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
     credentials: false
 }));
 
 /**
- * Middleware Configuration
+ * Basic response hardening. A full CSP is intentionally left to the static UI
+ * because it may load assets from origins configured at deployment time.
  */
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use((_req, res, next) => {
+    res.set("X-Content-Type-Options", "nosniff");
+    res.set("Referrer-Policy", "no-referrer");
+    res.set("X-Frame-Options", "DENY");
+    next();
+});
 app.use(express.static('public', { index: 'index.html' }));
 
 /**

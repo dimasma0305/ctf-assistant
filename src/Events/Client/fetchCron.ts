@@ -5,12 +5,19 @@ import cron from "node-cron";
 import { FetchCommandModel, WeightRetryModel, ChallengeModel, CTFCacheModel } from "../../Database/connect";
 import { parseChallenges, updateThreadsStatus } from "../../Commands/Public/Solve/utils";
 import { infoEvent } from "../../Functions/ctftime-v2";
-import { checkUrlSafe } from "../../utils/urlGuard";
+import {
+    readResponseTextWithLimit,
+    ResponseTooLargeError,
+    safeFetch,
+    SafeFetchError,
+} from "../../utils/urlGuard";
 
 let fetchCronInitialized = false;
 
 const FETCH_CONCURRENCY = 5;
 const WEIGHT_CONCURRENCY = 5;
+const FETCH_TIMEOUT_MS = 20_000;
+const MAX_FETCH_JSON_BYTES = 10 * 1024 * 1024;
 
 async function runWithConcurrency<T>(items: T[], limit: number, task: (item: T) => Promise<void>): Promise<void> {
     if (items.length === 0) return;
@@ -26,7 +33,7 @@ async function runWithConcurrency<T>(items: T[], limit: number, task: (item: T) 
 }
 
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(client: MyClient) {
         if (fetchCronInitialized) {
@@ -78,26 +85,22 @@ export const event: Event = {
                             return;
                         }
 
-                        // SSRF guard on every recurring fetch too — a saved command
-                        // could target an internal host (2026-06-09 audit fix).
-                        const urlGuard = await checkUrlSafe(fetchCmd.url);
-                        if (!urlGuard.ok) {
-                            console.log(`[fetchCron] rejected unsafe URL ${fetchCmd.url}: ${urlGuard.error}`);
-                            return;
-                        }
-
-                        const response = await fetch(fetchCmd.url, {
+                        // Re-check the initial target and every redirect on every
+                        // recurring run. Saved commands can outlive DNS/redirect
+                        // changes made by the upstream CTF platform.
+                        const response = await safeFetch(fetchCmd.url, {
                             method: fetchCmd.method,
                             headers: fetchCmd.headers as any,
-                            body: fetchCmd.body || undefined
+                            body: fetchCmd.body || undefined,
+                            signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
                         });
 
                         if (!response.ok) {
-                            console.log(`Fetch command failed for ${fetchCmd.url}: ${response.status} ${response.statusText}`);
+                            console.log(`[fetchCron] upstream returned HTTP ${response.status} for command ${fetchCmd._id}`);
                             return;
                         }
 
-                        const jsonData = await response.text();
+                        const jsonData = await readResponseTextWithLimit(response, MAX_FETCH_JSON_BYTES);
 
                         await updateChallengesFromFetch(jsonData, fetchCmd, channel);
 
@@ -106,7 +109,15 @@ export const event: Event = {
                             { $set: { last_executed: new Date() } }
                         );
                     } catch (error) {
-                        console.error(`Error executing fetch command for ${fetchCmd.url}:`, error);
+                        if (error instanceof SafeFetchError) {
+                            console.error(`[fetchCron] rejected command ${fetchCmd._id}: ${error.code}`);
+                        } else if (error instanceof ResponseTooLargeError) {
+                            console.error(`[fetchCron] response for command ${fetchCmd._id} exceeded 10MB`);
+                        } else {
+                            // Do not log the saved URL: it may contain an API
+                            // token in its query string.
+                            console.error(`[fetchCron] command ${fetchCmd._id} failed:`, error instanceof Error ? error.name : "unknown error");
+                        }
                     }
                 });
             } catch (error) {
@@ -118,7 +129,6 @@ export const event: Event = {
         cron.schedule("*/5 * * * *", async () => {
             await executeFetchCommands();
         }, {
-            scheduled: true,
             timezone: "Asia/Singapore"
         });
 
@@ -126,7 +136,6 @@ export const event: Event = {
         cron.schedule("0 2 * * *", async () => {
             await retryWeightFetch();
         }, {
-            scheduled: true,
             timezone: "Asia/Singapore"
         });
 

@@ -8,7 +8,7 @@ import { createLeaderboardEmbed } from "../../Commands/Public/Solve/utils";
 import crypto from 'crypto';
 
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(client: MyClient) {
         console.log("Loading leaderboard auto-update cron jobs...");
@@ -97,7 +97,6 @@ export const event: Event = {
             console.log("Running hourly leaderboard updates...");
             await updateLeaderboards();
         }, {
-            scheduled: true,
             timezone: "Asia/Singapore"
         });
 

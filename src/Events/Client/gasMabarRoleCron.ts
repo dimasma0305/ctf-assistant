@@ -118,7 +118,7 @@ async function runGrant(client: MyClient) {
 
 let cronInit = false;
 export const event: Event = {
-    name: "ready",
+    name: "clientReady",
     once: true,
     async execute(client: MyClient) {
         if (cronInit) return;
