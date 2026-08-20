@@ -1,5 +1,6 @@
 import { CTFEvent } from "../../../../Functions/ctftime-v2";
 import { FetchCommandModel, CTFCacheModel } from "../../../../Database/connect";
+import { encryptJson, encryptSecret } from "../../../../utils/secretBox";
 
 // Interface for parsed fetch command
 interface ParsedFetchCommand {
@@ -124,11 +125,11 @@ async function saveFetchCommand(
         });
         
         if (existingCommand) {
-            existingCommand.url = parsedFetch.url;
+            existingCommand.url = encryptSecret(parsedFetch.url);
             existingCommand.method = parsedFetch.method;
-            existingCommand.headers = parsedFetch.headers;
+            existingCommand.headers = encryptJson(parsedFetch.headers || {});
             if (parsedFetch.body) {
-                existingCommand.body = parsedFetch.body;
+                existingCommand.body = encryptSecret(parsedFetch.body);
             }
             existingCommand.is_active = true;
             await existingCommand.save();
@@ -136,14 +137,14 @@ async function saveFetchCommand(
             const fetchCommandData: any = {
                 ctf: ctfCache._id,
                 channel_id: channelId,
-                url: parsedFetch.url,
+                url: encryptSecret(parsedFetch.url),
                 method: parsedFetch.method,
-                headers: parsedFetch.headers,
+                headers: encryptJson(parsedFetch.headers || {}),
                 is_active: true
             };
             
             if (parsedFetch.body) {
-                fetchCommandData.body = parsedFetch.body;
+                fetchCommandData.body = encryptSecret(parsedFetch.body);
             }
             
             const fetchCommandDoc = new FetchCommandModel(fetchCommandData);

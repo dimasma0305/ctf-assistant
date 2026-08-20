@@ -3,6 +3,8 @@
  */
 
 import { getMongoUri, isNoDbMode } from "./env";
+import { validateIntegrationEncryptionKey } from "./secretBox";
+import { validateRoleAuthorizationConfig } from "./roleAuthorization";
 
 export interface ValidationResult {
   valid: boolean;
@@ -69,6 +71,13 @@ export function validateEnvironment(): ValidationResult {
     if (!getMongoUri()) {
       warnings.push('No MongoDB connection string found (MONGO_URI, MONGODB_URI, or DATABASE_URL)');
     }
+    if (!validateIntegrationEncryptionKey()) {
+      errors.push('INTEGRATION_ENCRYPTION_KEY must be configured as a base64-encoded 32-byte key');
+    }
+  }
+
+  if (!validateRoleAuthorizationConfig()) {
+    errors.push('DISCORD_ROLE_IDS_JSON must contain at least one guild role-ID mapping');
   }
 
   return { valid: errors.length === 0, errors, warnings };

@@ -227,6 +227,9 @@ export async function getAvailableTimeRanges(): Promise<AvailableTimeRanges> {
  * Calculate monthly ranks for all users for a specific month
  */
 export async function calculateMonthlyRanks(month: string): Promise<Map<string, number>> {
+    const match = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(month);
+    const maxYear = new Date().getFullYear();
+    if (!match || Number(match[1]) < 2020 || Number(match[1]) > maxYear) return new Map();
     const cacheKey = `monthly_ranks_${month}`;
 
     // Try to get from cache first
@@ -279,6 +282,7 @@ export async function calculateMonthlyRanks(month: string): Promise<Map<string, 
  * Calculate yearly ranks for all users for a specific year
  */
 export async function calculateYearlyRanks(year: number): Promise<Map<string, number>> {
+    if (!Number.isInteger(year) || year < 2020 || year > new Date().getFullYear()) return new Map();
     const cacheKey = `yearly_ranks_${year}`;
 
     // Try to get from cache first

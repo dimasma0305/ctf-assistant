@@ -7,7 +7,7 @@ import {
     calculatePerformanceComparison, 
     generateAchievementIds     
 } from '../utils/statistics';
-import { formatErrorResponse, categoryNormalize } from '../utils/common';
+import { formatErrorResponse, categoryNormalize, isDiscordSnowflake } from '../utils/common';
 import { CTFCacheModel, UserModel, solveModel } from '../../src/Database/connect';
 import type { UserSchemaType, ChallengeSchemaType } from '../../src/Database/connect';
 
@@ -74,8 +74,8 @@ router.get("/:id", async (req, res) => {
     try {
         const { id: userId } = req.params;
         
-        if (!userId) {
-            res.status(400).json(formatErrorResponse(400, "User ID is required", undefined, req));
+        if (!isDiscordSnowflake(userId)) {
+            res.status(400).json(formatErrorResponse(400, "A valid Discord user ID is required", undefined, req));
             return;
         }
 
@@ -210,8 +210,8 @@ router.get("/:userId/ctf/:ctfId", async (req, res) => {
     try {
         const { ctfId, userId } = req.params;
         
-        if (!ctfId || !userId) {
-            res.status(400).json(formatErrorResponse(400, "Both CTF ID and User ID are required", undefined, req));
+        if (!isDiscordSnowflake(userId) || !ctfId || ctfId.length > 64 || /[\u0000-\u001f]/.test(ctfId)) {
+            res.status(400).json(formatErrorResponse(400, "Valid CTF and Discord user IDs are required", undefined, req));
             return;
         }
 

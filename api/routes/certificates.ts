@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { getCachedUserScores, calculateMonthlyRanks, calculateYearlyRanks } from '../services/dataService';
 import { calculateUserRank, calculateGlobalStats } from '../utils/statistics';
-import { formatErrorResponse } from '../utils/common';
+import { formatErrorResponse, isDiscordSnowflake } from '../utils/common';
 import { UserModel, solveModel } from '../../src/Database/connect';
 
 const router = Router();
+const MIN_CERTIFICATE_YEAR = 2020;
 
 /**
  * GET /api/certificates/:userId
@@ -15,8 +16,8 @@ router.get("/:userId", async (req, res) => {
     try {
         const { userId } = req.params;
 
-        if (!userId) {
-            res.status(400).json(formatErrorResponse(400, "User ID is required", undefined, req));
+        if (!isDiscordSnowflake(userId)) {
+            res.status(400).json(formatErrorResponse(400, "A valid Discord user ID is required", undefined, req));
             return;
         }
 
@@ -248,8 +249,8 @@ router.get("/:userId/:period", async (req, res) => {
     try {
         const { userId, period } = req.params;
 
-        if (!userId || !period) {
-            res.status(400).json(formatErrorResponse(400, "User ID and period are required", undefined, req));
+        if (!isDiscordSnowflake(userId) || !period) {
+            res.status(400).json(formatErrorResponse(400, "A valid Discord user ID and period are required", undefined, req));
             return;
         }
 
@@ -291,6 +292,23 @@ router.get("/:userId/:period", async (req, res) => {
                 "Invalid period format",
                 "Period must be YYYY (yearly) or YYYY-MM (monthly)",
                 req
+            ));
+            return;
+        }
+
+        const requestedYear = Number(period.slice(0, 4));
+        const requestedMonth = isMonthly ? Number(period.slice(5, 7)) : undefined;
+        const currentYear = new Date().getFullYear();
+        if (
+            requestedYear < MIN_CERTIFICATE_YEAR ||
+            requestedYear > currentYear ||
+            (requestedMonth !== undefined && (requestedMonth < 1 || requestedMonth > 12))
+        ) {
+            res.status(400).json(formatErrorResponse(
+                400,
+                `Period must be between ${MIN_CERTIFICATE_YEAR} and ${currentYear}, with month 01-12`,
+                undefined,
+                req,
             ));
             return;
         }

@@ -7,6 +7,7 @@ import {
   TextChannel,
 } from "discord.js";
 import { TrakteerModel } from "../../../Database/connect";
+import { encryptSecret } from "../../../utils/secretBox";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -89,7 +90,7 @@ export const command: SubCommand = {
       if (existingConfig) {
         // Update existing configuration
         existingConfig.channel_id = channel.id;
-        existingConfig.api_key = apiKey;
+        existingConfig.api_key = encryptSecret(apiKey);
         existingConfig.page_url = pageUrl || existingConfig.page_url || "";
         existingConfig.is_active = true;
         existingConfig.updated_at = new Date();
@@ -122,7 +123,7 @@ export const command: SubCommand = {
         const newConfig = new TrakteerModel({
           guild_id: interaction.guild.id,
           channel_id: channel.id,
-          api_key: apiKey,
+          api_key: encryptSecret(apiKey),
           page_url: pageUrl,
           is_active: true,
           created_at: new Date(),
@@ -176,12 +177,7 @@ export const command: SubCommand = {
       }
     } catch (error) {
       console.error("Error setting up Trakteer integration:", error);
-      return interaction.editReply({
-        content: `❌ Failed to set up Trakteer integration: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      });
+      return interaction.editReply({ content: "❌ Failed to set up Trakteer integration. Please try again later." });
     }
   },
 };
-

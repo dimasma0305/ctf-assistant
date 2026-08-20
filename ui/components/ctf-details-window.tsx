@@ -91,7 +91,14 @@ function CTFDetailsWindowComponent({
                                             size="sm"
                                             className="flex items-center gap-2 hover:bg-primary/10 border-primary/20 bg-transparent text-xs sm:text-sm"
                                             onClick={() => {
-                                                window.open(ctfDetails.url, "_blank")
+                                                try {
+                                                    const target = new URL(ctfDetails.url)
+                                                    if (target.protocol !== "http:" && target.protocol !== "https:") return
+                                                    const opened = window.open(target.toString(), "_blank", "noopener,noreferrer")
+                                                    if (opened) opened.opener = null
+                                                } catch {
+                                                    return
+                                                }
                                             }}
                                         >
                                             <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />

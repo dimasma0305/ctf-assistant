@@ -11,6 +11,7 @@ import {
     safeFetch,
     SafeFetchError,
 } from "../../utils/urlGuard";
+import { decryptJson, decryptSecret } from "../../utils/secretBox";
 
 let fetchCronInitialized = false;
 
@@ -88,10 +89,13 @@ export const event: Event = {
                         // Re-check the initial target and every redirect on every
                         // recurring run. Saved commands can outlive DNS/redirect
                         // changes made by the upstream CTF platform.
-                        const response = await safeFetch(fetchCmd.url, {
+                        const targetUrl = decryptSecret(fetchCmd.url);
+                        const requestHeaders = decryptJson<Record<string, string>>(fetchCmd.headers || {});
+                        const requestBody = fetchCmd.body ? decryptSecret(fetchCmd.body) : undefined;
+                        const response = await safeFetch(targetUrl, {
                             method: fetchCmd.method,
-                            headers: fetchCmd.headers as any,
-                            body: fetchCmd.body || undefined,
+                            headers: requestHeaders,
+                            body: requestBody,
                             signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
                         });
 

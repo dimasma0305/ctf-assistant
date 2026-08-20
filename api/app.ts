@@ -10,9 +10,11 @@ import scoreboardRoutes from './routes/scoreboard';
 import profileRoutes from './routes/profiles';
 import ctfRoutes from './routes/ctfs';
 import certificateRoutes from './routes/certificates';
+import { createRateLimiter } from './middleware/rateLimit';
 
 const app = express();
 app.disable("x-powered-by");
+app.set("trust proxy", 1);
 // This API has no nested query-object contract. Keeping query values flat
 // reduces parser attack surface; route-level validation still rejects arrays.
 app.set("query parser", "simple");
@@ -44,6 +46,17 @@ app.use((_req, res, next) => {
     next();
 });
 app.use(express.static('public', { index: 'index.html' }));
+
+const apiRateLimit = createRateLimiter({
+    namespace: "api",
+    windowMs: 60_000,
+    max: Number(process.env.API_RATE_LIMIT_PER_MINUTE || 180),
+});
+const expensiveRateLimit = createRateLimiter({
+    namespace: "expensive",
+    windowMs: 60_000,
+    max: Number(process.env.API_EXPENSIVE_RATE_LIMIT_PER_MINUTE || 30),
+});
 
 /**
  * Health Check Endpoint
@@ -84,6 +97,9 @@ app.use((req, res, next) => {
 /**
  * Route Handlers
  */
+app.use("/api", apiRateLimit);
+app.use("/api/profile", expensiveRateLimit);
+app.use("/api/certificates", expensiveRateLimit);
 app.use("/api/scoreboard", scoreboardRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/ctfs", ctfRoutes);

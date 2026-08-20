@@ -221,6 +221,22 @@ export function escapeRegex(input: string): string {
     return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+export function isDiscordSnowflake(value: unknown): value is string {
+    return typeof value === "string" && /^\d{17,20}$/.test(value);
+}
+
+export function normalizePublicHttpUrl(value: unknown): string {
+    if (typeof value !== "string" || value.length > 2_048) return "";
+    try {
+        const url = new URL(value);
+        if (!["http:", "https:"].includes(url.protocol)) return "";
+        if (url.username || url.password) return "";
+        return url.toString();
+    } catch {
+        return "";
+    }
+}
+
 /**
  * Filter users by search term
  */

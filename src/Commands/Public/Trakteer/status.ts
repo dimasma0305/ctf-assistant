@@ -5,6 +5,7 @@ import {
   EmbedBuilder,
 } from "discord.js";
 import { TrakteerModel } from "../../../Database/connect";
+import { decryptSecret } from "../../../utils/secretBox";
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -45,7 +46,7 @@ export const command: SubCommand = {
           {
             method: "GET",
             headers: {
-              key: config.api_key,
+              key: decryptSecret(config.api_key),
               Accept: "application/json",
               "X-Requested-With": "XMLHttpRequest",
             },
@@ -91,12 +92,7 @@ export const command: SubCommand = {
       return interaction.editReply({ embeds: [embed] });
     } catch (error) {
       console.error("Error checking Trakteer status:", error);
-      return interaction.editReply({
-        content: `❌ Failed to check Trakteer status: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      });
+      return interaction.editReply({ content: "❌ Failed to check Trakteer status. Please try again later." });
     }
   },
 };
-

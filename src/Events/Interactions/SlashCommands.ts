@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, TextChannel, ThreadChannel } from "discord.js";
 import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
+import { hasConfiguredRole } from "../../utils/roleAuthorization";
 
 export const event: Event = {
   name: "interactionCreate",
@@ -59,19 +60,14 @@ export const event: Event = {
       }
 
       const memberRoles = interaction.member.roles;
-      const hasRequiredRole = commandToCheck.allowedRoles.some((roleName: string) => {
-        if (Array.isArray(memberRoles)) {
-          // APIGuildMember - roles is string array
-          const guildRoles = interaction.guild!.roles.cache;
-          return memberRoles.some((roleId: string) => {
-            const role = guildRoles.get(roleId);
-            return role && role.name === roleName;
-          });
-        } else {
-          // GuildMember - roles is GuildMemberRoleManager
-          return memberRoles.cache.some((role: any) => role.name === roleName);
-        }
-      });
+      const memberRoleIds = Array.isArray(memberRoles)
+        ? memberRoles
+        : Array.from(memberRoles.cache.keys());
+      const hasRequiredRole = hasConfiguredRole(
+        interaction.guild.id,
+        memberRoleIds,
+        commandToCheck.allowedRoles,
+      );
 
       if (!hasRequiredRole) {
         const requiredRoles = commandToCheck.allowedRoles.join(', ');

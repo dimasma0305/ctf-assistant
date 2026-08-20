@@ -13,7 +13,13 @@ services:
     env_file:
       - .env
     environment:
-      - MONGO_URI=mongodb://root:example@mongo/
+      - NODE_ENV=production
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ctf-assistant.rule=Host(`api.assistant.1pc.tf`)"
@@ -38,6 +44,12 @@ services:
       internal:
       traefik:
     restart: always
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ui.rule=Host(`scoring.1pc.tf`)"
@@ -49,13 +61,17 @@ services:
 
       
   mongo:
-    image: mongo
+    image: mongo@sha256:bf5995bcccb65725aa81fd92e68449323c94b96bf1c1fa9f7acbc2a8ad518114
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?MONGO_ROOT_USERNAME is required}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?MONGO_ROOT_PASSWORD is required}
+      MONGO_APP_USERNAME: ${MONGO_APP_USERNAME:?MONGO_APP_USERNAME is required}
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:?MONGO_APP_PASSWORD is required}
+      MONGO_APP_DB: ${MONGO_APP_DB:-test}
     restart: always
     volumes:
       - mongo_data:/data/db
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/10-app-user.js:ro
     networks:
       internal:
 

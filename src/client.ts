@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import db from "./Database/connect";
 import { isNoDbMode } from "./utils/env";
+import { migrateIntegrationSecrets } from "./Services/Security/secretMigration";
 config();
 
 // Validate environment before proceeding
@@ -13,6 +14,7 @@ if (!runStartupValidation()) {
 const { TOKEN } = process.env;
 if (!isNoDbMode()) {
   await db.connect();
+  await migrateIntegrationSecrets();
 } else {
   console.warn('⚠️  NODB mode enabled, skipping MongoDB connection');
 }

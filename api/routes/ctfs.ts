@@ -8,6 +8,7 @@ import {
     validatePaginationParams,
     validateQueryBoolean,
     validateQueryString,
+    normalizePublicHttpUrl,
 } from '../utils/common';
 
 const router = Router();
@@ -134,7 +135,7 @@ router.get("/", async (req, res) => {
                 organizer: ctf.organizers?.[0]?.name || 'Unknown',
                 organizers: ctf.organizers || [],
                 description: ctf.description || '',
-                url: ctf.url,
+                url: normalizePublicHttpUrl(ctf.url),
                 logo: ctf.logo,
                 format: ctf.format || 'jeopardy',
                 location: ctf.location,
@@ -509,7 +510,7 @@ router.get("/:ctfId", async (req, res) => {
             organizer: ctf.organizers?.[0]?.name || 'Unknown',
             organizers: ctf.organizers || [],
             description: ctf.description || '',
-            url: ctf.url,
+            url: normalizePublicHttpUrl(ctf.url),
             logo: ctf.logo,
             format: ctf.format || 'jeopardy',
             location: ctf.location,

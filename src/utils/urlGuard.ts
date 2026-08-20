@@ -8,6 +8,9 @@
  */
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
+import { Readable } from "node:stream";
 
 export function isPrivateIp(ip: string): boolean {
   if (!ip) return true;
@@ -64,6 +67,7 @@ export async function checkUrlSafe(urlStr: string): Promise<UrlGuardResult> {
   if (u.protocol !== "http:" && u.protocol !== "https:") {
     return { ok: false, error: "bad_scheme" };
   }
+  if (u.username || u.password) return { ok: false, error: "invalid_url" };
   // Block bare-IP literals up front (catches http://127.0.0.1, http://[::1]).
   const hostNoBrackets = u.hostname.replace(/^\[|\]$/g, "");
   if (isPrivateIp(hostNoBrackets)) return { ok: false, error: "private_target", resolvedHost: hostNoBrackets };
@@ -75,6 +79,7 @@ export async function checkUrlSafe(urlStr: string): Promise<UrlGuardResult> {
   // than only the resolver's first result; fetch may select a different answer.
   try {
     const addresses = await lookup(u.hostname, { all: true, verbatim: true });
+    if (!addresses.length) return { ok: false, error: "dns_lookup_failed" };
     const unsafeAddress = addresses.find(({ address }) => isPrivateIp(address));
     if (unsafeAddress) {
       return { ok: false, error: "private_target", resolvedHost: unsafeAddress.address };
@@ -123,6 +128,70 @@ const CROSS_ORIGIN_SECRET_HEADERS = [
   "cookie2",
 ];
 
+async function requestBodyBuffer(body: BodyInit | null | undefined): Promise<Buffer | undefined> {
+  if (body == null) return undefined;
+  if (typeof body === "string") return Buffer.from(body);
+  if (body instanceof URLSearchParams) return Buffer.from(body.toString());
+  if (body instanceof Blob) return Buffer.from(await body.arrayBuffer());
+  if (body instanceof ArrayBuffer) return Buffer.from(body);
+  if (ArrayBuffer.isView(body)) return Buffer.from(body.buffer, body.byteOffset, body.byteLength);
+  throw new TypeError("Unsupported request body for pinned fetch");
+}
+
+/** Connect to the exact IP approved by checkUrlSafe while preserving Host and TLS SNI. */
+async function pinnedFetch(urlStr: string, init: RequestInit, resolvedHost: string): Promise<Response> {
+  const url = new URL(urlStr);
+  const body = await requestBodyBuffer(init.body);
+  const headers = new Headers(init.headers);
+  if (body && !headers.has("content-length")) headers.set("content-length", String(body.byteLength));
+  const family = isIP(resolvedHost);
+  if (family !== 4 && family !== 6) throw new SafeFetchError("dns_lookup_failed", urlStr);
+
+  return await new Promise<Response>((resolve, reject) => {
+    const requestFn = url.protocol === "https:" ? httpsRequest : httpRequest;
+    const req = requestFn({
+      protocol: url.protocol,
+      hostname: url.hostname,
+      port: url.port || undefined,
+      path: `${url.pathname}${url.search}`,
+      method: init.method || "GET",
+      headers: Object.fromEntries(headers.entries()),
+      signal: init.signal || undefined,
+      servername: url.hostname,
+      lookup: (
+        _hostname: string,
+        options: { all?: boolean } | undefined,
+        callback: Function,
+      ) => {
+        if (options?.all) {
+          callback(null, [{ address: resolvedHost, family }]);
+          return;
+        }
+
+        callback(null, resolvedHost, family);
+      },
+    } as any, (incoming) => {
+      const responseHeaders = new Headers();
+      for (const [name, value] of Object.entries(incoming.headers)) {
+        if (Array.isArray(value)) value.forEach((item) => responseHeaders.append(name, item));
+        else if (value !== undefined) responseHeaders.set(name, value);
+      }
+      const status = incoming.statusCode || 500;
+      const noBody = status === 204 || status === 205 || status === 304;
+      const response = new Response(noBody ? null : Readable.toWeb(incoming) as any, {
+        status,
+        statusText: incoming.statusMessage,
+        headers: responseHeaders,
+      });
+      try { Object.defineProperty(response, "url", { value: urlStr }); } catch { /* non-critical */ }
+      resolve(response);
+    });
+    req.once("error", reject);
+    if (body) req.write(body);
+    req.end();
+  });
+}
+
 /**
  * Fetch a public URL while validating the initial URL and every redirect hop.
  *
@@ -136,7 +205,7 @@ export async function safeFetch(
   init: RequestInit = {},
   dependencies: SafeFetchDependencies = {},
 ): Promise<Response> {
-  const fetchImpl = dependencies.fetchImpl ?? fetch;
+  const fetchImpl = dependencies.fetchImpl;
   const checkUrl = dependencies.checkUrl ?? checkUrlSafe;
   const maxRedirects = dependencies.maxRedirects ?? 5;
 
@@ -155,13 +224,10 @@ export async function safeFetch(
       throw new SafeFetchError(guard.error ?? "invalid_url", currentUrl);
     }
 
-    const response = await fetchImpl(currentUrl, {
-      ...init,
-      method,
-      body,
-      headers,
-      redirect: "manual",
-    });
+    const requestInit: RequestInit = { ...init, method, body, headers, redirect: "manual" };
+    const response = fetchImpl
+      ? await fetchImpl(currentUrl, requestInit)
+      : await pinnedFetch(currentUrl, requestInit, guard.resolvedHost || "");
 
     if (!REDIRECT_STATUSES.has(response.status)) {
       return response;

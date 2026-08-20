@@ -13,6 +13,7 @@ interface CacheEntry<T> {
 export class MemoryCache {
     private cache = new Map<string, CacheEntry<any>>();
     private defaultTTL = 10 * 60 * 1000; // 10 minutes default
+    private maxEntries = Math.max(16, Math.min(2_000, Number(process.env.API_CACHE_MAX_ENTRIES) || 256));
     private hitCount = 0;
     private missCount = 0;
     // In-flight computations for single-flight / stampede protection.
@@ -22,6 +23,13 @@ export class MemoryCache {
      * Store data in cache with optional TTL
      */
     set<T>(key: string, data: T, ttl?: number): void {
+        this.cache.delete(key);
+        if (this.cache.size >= this.maxEntries) this.cleanup();
+        while (this.cache.size >= this.maxEntries) {
+            const oldest = this.cache.keys().next().value as string | undefined;
+            if (!oldest) break;
+            this.cache.delete(oldest);
+        }
         this.cache.set(key, {
             data,
             timestamp: Date.now(),
@@ -42,6 +50,8 @@ export class MemoryCache {
             return null;
         }
 
+        this.cache.delete(key);
+        this.cache.set(key, entry);
         return entry.data as T;
     }
 
@@ -86,6 +96,7 @@ export class MemoryCache {
             totalEntries: this.cache.size,
             validEntries,
             expiredEntries,
+            maxEntries: this.maxEntries,
             hitRate: this.hitCount / (this.hitCount + this.missCount) || 0
         };
     }

@@ -1,4 +1,4 @@
-import { checkUrlSafe } from "../../utils/urlGuard";
+import { checkUrlSafe, safeFetch } from "../../utils/urlGuard";
 
 /**
  * Web tools for Hackerika.
@@ -406,7 +406,7 @@ export async function fetchUrlForTool(args: FetchUrlArgs): Promise<FetchUrlResul
                 const hopGuard = await checkUrlSafe(currentUrl);
                 if (!hopGuard.ok) return { ok: false, error: hopGuard.error, finalUrl: currentUrl };
             }
-            resp = await fetch(currentUrl, {
+            resp = await safeFetch(currentUrl, {
                 signal: controller.signal,
                 headers: {
                     'User-Agent': BROWSER_UA,

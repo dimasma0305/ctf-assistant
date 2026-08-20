@@ -4,6 +4,7 @@ import { MyClient } from "../../Model/client";
 import cron from "node-cron";
 import { TrakteerModel, TrakteerSchemaType } from "../../Database/connect";
 import { EmbedBuilder } from "discord.js";
+import { decryptSecret } from "../../utils/secretBox";
 
 interface TrakteerSupport {
   supporter_name: string;
@@ -57,7 +58,7 @@ export const event: Event = {
               {
                 method: "GET",
                 headers: {
-                  key: config.api_key,
+                  key: decryptSecret(config.api_key),
                   Accept: "application/json",
                   "X-Requested-With": "XMLHttpRequest",
                 },

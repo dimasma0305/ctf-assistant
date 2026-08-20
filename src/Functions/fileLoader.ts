@@ -2,9 +2,10 @@ import fg from 'fast-glob';
 import path from 'path';
 
 const paths = path.join(process.cwd()).replace(/\\/g, '/');
+const globOptions = { dot: false, ignore: ['**/old/**'] };
 
 const loadChildFiles = async (dirName: string): Promise<string[]> => {
-  const files: string[] = fg.sync(`${paths}/src/${dirName}/**/*.{js,ts}`, { dot: false });
+  const files: string[] = fg.sync(`${paths}/src/${dirName}/**/*.{js,ts}`, globOptions);
   const childFiles: string[] = [];
   files.forEach((file) => {
     const folderName = path.basename(path.dirname(file));
@@ -18,7 +19,7 @@ const loadChildFiles = async (dirName: string): Promise<string[]> => {
 };
 
 const loadInitFile = async (dirName: string): Promise<string[]> => {
-  const files: string[] = fg.sync(`${paths}/src/${dirName}/**/*.{js,ts}`, { dot: false });
+  const files: string[] = fg.sync(`${paths}/src/${dirName}/**/*.{js,ts}`, globOptions);
   const initFiles: string[] = [];
   files.forEach((file) => {
     const folderName = path.basename(path.dirname(file));
@@ -32,7 +33,7 @@ const loadInitFile = async (dirName: string): Promise<string[]> => {
 };
 
 const loadFiles = async (dirName: string): Promise<string[]> => {
-  const files: string[] = fg.sync(`${paths}/src/${dirName}/**/*.{js,ts}`, { dot: false });
+  const files: string[] = fg.sync(`${paths}/src/${dirName}/**/*.{js,ts}`, globOptions);
   files.forEach((file) => delete require.cache[require.resolve(file)]);
   return files;
 };
