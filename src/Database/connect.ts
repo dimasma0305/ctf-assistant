@@ -21,6 +21,7 @@ import {taskSchema, type TaskSchemaType} from './taskSchema';
 import {sharingChannelSchema, type SharingChannelSchemaType} from './sharingChannelSchema';
 import {eventReminderStateSchema, type EventReminderStateSchemaType} from './eventReminderStateSchema';
 import {instagramWatchStateSchema, type InstagramWatchStateSchemaType} from './instagramWatchStateSchema';
+import {memberWelcomeStateSchema, type MemberWelcomeStateSchemaType} from './memberWelcomeStateSchema';
 import { getMongoUri } from '../utils/env';
 
 const DEFAULT_RETRY_DELAY_MS = Number(process.env.MONGO_CONNECT_RETRY_DELAY_MS || 2000);
@@ -115,6 +116,7 @@ export const TaskModel = mongoose.model("Task", taskSchema)
 export const SharingChannelConfigModel = mongoose.model("SharingChannelConfig", sharingChannelSchema)
 export const EventReminderStateModel = mongoose.model("EventReminderState", eventReminderStateSchema)
 export const InstagramWatchStateModel = mongoose.model("InstagramWatchState", instagramWatchStateSchema)
+export const MemberWelcomeStateModel = mongoose.model("MemberWelcomeState", memberWelcomeStateSchema)
 
 export {
     EventSchemaType,
@@ -139,6 +141,7 @@ export {
     SharingChannelSchemaType,
     EventReminderStateSchemaType,
     InstagramWatchStateSchemaType,
+    MemberWelcomeStateSchemaType,
 }
 
 export default {connect};
