@@ -1305,12 +1305,70 @@ async function runChatTurn(
     let grantSucceeded = false;
     let totalToolCalls = 0;
 
+    // DeepSeek occasionally rejects an otherwise valid SDK request when a
+    // Discord message contains a malformed Unicode surrogate or an escape-like
+    // backslash sequence. Keep normal requests byte-for-byte unchanged; only
+    // repair and retry the narrow 400 parse failure so code snippets are not
+    // altered during healthy turns.
+    const sanitizeMalformedRequestString = (value: string): string => {
+        let repaired = '';
+        for (let i = 0; i < value.length; i++) {
+            const code = value.charCodeAt(i);
+            if (code >= 0xd800 && code <= 0xdbff) {
+                const next = value.charCodeAt(i + 1);
+                if (next >= 0xdc00 && next <= 0xdfff) {
+                    repaired += value[i] + value[i + 1];
+                    i++;
+                } else {
+                    repaired += '\ufffd';
+                }
+                continue;
+            }
+            if (code >= 0xdc00 && code <= 0xdfff) {
+                repaired += '\ufffd';
+                continue;
+            }
+            if (code < 0x20 && code !== 0x09 && code !== 0x0a && code !== 0x0d) {
+                repaired += ' ';
+                continue;
+            }
+            repaired += value[i];
+        }
+        return repaired.replace(/\\/g, '\\\\');
+    };
+    const sanitizeMalformedRequestValue = (value: any): any => {
+        if (typeof value === 'string') return sanitizeMalformedRequestString(value);
+        if (Array.isArray(value)) return value.map(sanitizeMalformedRequestValue);
+        if (value && typeof value === 'object') {
+            return Object.fromEntries(
+                Object.entries(value).map(([key, item]) => [key, sanitizeMalformedRequestValue(item)]),
+            );
+        }
+        return value;
+    };
+    const createChatCompletion = async (payload: any, requestOptions?: any) => {
+        try {
+            return await openai.chat.completions.create(payload, requestOptions);
+        } catch (error: any) {
+            const detail = String(error?.message || error || '');
+            const malformedBody = error?.status === 400
+                && /parse (?:the )?request body as JSON|hex escape|invalid (?:unicode|escape)/i.test(detail);
+            if (!malformedBody) throw error;
+
+            console.warn(`   [${turnId}] DeepSeek rejected message encoding; retrying once with repaired strings`);
+            return await openai.chat.completions.create(
+                { ...payload, messages: sanitizeMalformedRequestValue(payload.messages) },
+                requestOptions,
+            );
+        }
+    };
+
     try {
         // Acquire typing now (inside the try) so the finally below always balances it.
         releaseTyping = acquireChannelTyping(channelRef);
         for (let iter = 0; iter < MAX_TOOL_ITERATIONS; iter++) {
             turnIters++;
-            const completion = await openai.chat.completions.create(
+            const completion = await createChatCompletion(
                 {
                     model: MODELS.chat,
                     messages: conversation,
@@ -1445,7 +1503,7 @@ async function runChatTurn(
         // do one final completion with tool_choice:'none' to extract a reply.
         if (!finalContent) {
             loopStats.fallbackUsed++;
-            const fallback = await openai.chat.completions.create(
+            const fallback = await createChatCompletion(
                 {
                     model: MODELS.chat,
                     messages: conversation,
@@ -1471,7 +1529,7 @@ async function runChatTurn(
             loopStats.emptyRetry++;
             console.warn(`   [${turnId}] empty after fallback — retrying once with a direct-reply nudge`);
             try {
-                const retry = await openai.chat.completions.create(
+                const retry = await createChatCompletion(
                     {
                         model: MODELS.chat,
                         messages: [

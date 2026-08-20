@@ -370,7 +370,11 @@ ${transcript}
 Output JSON profile update sekarang.`;
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), DISTILL_TIMEOUT_MS);
+    // Background distillation regularly needs longer than an interactive flash
+    // reply. A 60s floor avoids aborting healthy, nearly-complete JSON responses
+    // while remaining below the shared client's 120s hard ceiling.
+    const distillTimeoutMs = Math.max(DISTILL_TIMEOUT_MS, 60_000);
+    const timer = setTimeout(() => controller.abort(), distillTimeoutMs);
 
     try {
         const completion = await openai.chat.completions.create(
@@ -494,7 +498,7 @@ Output JSON profile update sekarang.`;
         );
     } catch (error: any) {
         if (error?.name === 'AbortError' || controller.signal.aborted) {
-            console.warn(`[Profile] distillation timed out for ${profile.userId}`);
+            console.warn(`[Profile] distillation timed out after ${distillTimeoutMs}ms for ${profile.userId}`);
         } else {
             console.error(`[Profile] distillation failed for ${profile.userId}:`, error);
         }

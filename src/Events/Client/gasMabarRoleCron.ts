@@ -32,6 +32,7 @@ const GRANT_CRON = "0 */6 * * *"; // every 6 hours
 const BACKFILL_DELAY_MS = 60_000; // let the member cache warm after ready before the first run
 const FETCH_CONCURRENCY = 8;
 const GRANT_CONCURRENCY = 5;
+const permissionWarnings = new Set<string>();
 
 async function runWithConcurrency<T>(items: T[], limit: number, task: (item: T) => Promise<void>): Promise<void> {
     let i = 0;
@@ -67,6 +68,19 @@ async function qualifyingDiscordIds(): Promise<string[]> {
 }
 
 async function grantRoleInGuild(guild: Guild, discordIds: string[]): Promise<number> {
+    // This is a server configuration issue, not a transient job failure. Skip
+    // before doing member fetches and log it once per guild instead of emitting
+    // the same warning every six hours.
+    const me = guild.members.me;
+    if (!me || !me.permissions.has("ManageRoles")) {
+        if (!permissionWarnings.has(guild.id)) {
+            permissionWarnings.add(guild.id);
+            console.warn(`[GasMabar] disabled in ${guild.name} — grant the bot Manage Roles to enable it`);
+        }
+        return 0;
+    }
+    permissionWarnings.delete(guild.id);
+
     // Which qualifying players are actually in THIS guild? (Fetch bounded; misses tolerated.)
     const present: GuildMember[] = [];
     await runWithConcurrency(discordIds, FETCH_CONCURRENCY, async (id) => {
@@ -75,12 +89,6 @@ async function grantRoleInGuild(guild: Guild, discordIds: string[]): Promise<num
     });
     if (!present.length) return 0;
 
-    // Check ManageRoles BEFORE attempting to create the role (roles.create needs it).
-    const me = guild.members.me;
-    if (!me || !me.permissions.has("ManageRoles")) {
-        console.warn(`[GasMabar] cannot manage roles in ${guild.name} — bot lacks ManageRoles`);
-        return 0;
-    }
     const role = await createRoleIfNotExist({ name: ROLE_NAME, guild, color: ROLE_COLOR });
     if (role.position >= me.roles.highest.position) {
         console.warn(`[GasMabar] "${ROLE_NAME}" in ${guild.name} is at/above the bot's highest role — cannot assign`);
