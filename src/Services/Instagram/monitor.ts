@@ -446,3 +446,33 @@ export async function fetchLatestInstagramPost(
 export const getLatestInstagramPost = fetchLatestInstagramPost;
 export const getLatestPost = fetchLatestInstagramPost;
 export type InstagramMedia = InstagramPost;
+
+export interface ResolvedInstagramAccount {
+    id: string;
+    accountId: string;
+    username: string;
+    name: string;
+    toString(): string;
+}
+
+/**
+ * Compatibility resolver for the existing Instagram watch command.
+ *
+ * Bright Data does not expose a free username-to-Meta-ID lookup, and resolving
+ * every account while creating a watch would spend an additional dataset row.
+ * The monitor uses normalized usernames as stable account keys instead; the
+ * scheduled batch fetch validates and hydrates them when it runs.
+ */
+export async function resolveInstagramAccountByUsername(
+    username: string
+): Promise<ResolvedInstagramAccount | null> {
+    const normalized = normalizeInstagramUsername(username);
+    if (!normalized) return null;
+
+    return Object.assign(new String(normalized), {
+        id: normalized,
+        accountId: normalized,
+        username: normalized,
+        name: normalized,
+    }) as unknown as ResolvedInstagramAccount;
+}

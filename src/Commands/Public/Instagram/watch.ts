@@ -1,12 +1,46 @@
 import { SubCommand } from "../../../Model/command";
 import { EmbedBuilder, SlashCommandSubcommandBuilder } from "discord.js";
 import { InstagramWatchStateModel } from "../../../Database/connect";
-import {
-  getInstagramApiConfig,
-  getInstagramConfigDiagnostics,
-  parseInstagramProfileUrl,
-  resolveInstagramAccountByUsername,
-} from "../../../Services/Instagram/monitor";
+import { normalizeInstagramUsername } from "../../../Services/Instagram/monitor";
+
+const RESERVED_INSTAGRAM_PATHS = new Set([
+  "accounts",
+  "direct",
+  "directory",
+  "explore",
+  "p",
+  "reel",
+  "reels",
+  "stories",
+]);
+
+function parseInstagramProfileUrl(input: string): { username: string; profileUrl: string } | null {
+  try {
+    const url = new URL(input.trim());
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    const pathParts = url.pathname.split("/").filter(Boolean);
+
+    if (url.protocol !== "https:" || hostname !== "instagram.com" || pathParts.length !== 1) {
+      return null;
+    }
+
+    const username = normalizeInstagramUsername(pathParts[0]);
+    if (
+      !username ||
+      RESERVED_INSTAGRAM_PATHS.has(username) ||
+      !/^[a-z0-9._]{1,30}$/i.test(username)
+    ) {
+      return null;
+    }
+
+    return {
+      username,
+      profileUrl: `https://www.instagram.com/${username}/`,
+    };
+  } catch {
+    return null;
+  }
+}
 
 export const command: SubCommand = {
   data: new SlashCommandSubcommandBuilder()
@@ -41,19 +75,9 @@ export const command: SubCommand = {
       return;
     }
 
-    const diagnostics = getInstagramConfigDiagnostics();
-    if (!diagnostics.isConfigured) {
+    if (!process.env.BRIGHTDATA_API_TOKEN?.trim()) {
       await interaction.reply({
-        content: `❌ Instagram monitor is not fully configured. Set ${diagnostics.missing.join(" and ")} in env.`,
-        flags: ["Ephemeral"],
-      });
-      return;
-    }
-
-    const config = getInstagramApiConfig();
-    if (!config) {
-      await interaction.reply({
-        content: "❌ Instagram monitor configuration is invalid. Check Instagram env vars and restart the bot.",
+        content: "❌ Instagram monitor is not configured. Set BRIGHTDATA_API_TOKEN in env and restart the bot.",
         flags: ["Ephemeral"],
       });
       return;
@@ -62,7 +86,10 @@ export const command: SubCommand = {
     await interaction.deferReply({ flags: ["Ephemeral"] });
 
     try {
-      const resolved = await resolveInstagramAccountByUsername(parsedProfile.username, config);
+      const resolved = {
+        accountId: parsedProfile.username,
+        username: parsedProfile.username,
+      };
 
       const existing = await InstagramWatchStateModel.findOne({
         guild_id: interaction.guild.id,
@@ -73,7 +100,7 @@ export const command: SubCommand = {
         existing.account_id = resolved.accountId;
         existing.username = resolved.username;
         existing.profile_url = parsedProfile.profileUrl;
-        existing.source_account_id = config.sourceAccountId;
+        existing.source_account_id = "brightdata";
         existing.is_active = true;
         existing.last_post_id = null;
         existing.configured_by = interaction.user.id;
@@ -86,7 +113,7 @@ export const command: SubCommand = {
           profile_url: parsedProfile.profileUrl,
           username: resolved.username,
           account_id: resolved.accountId,
-          source_account_id: config.sourceAccountId,
+          source_account_id: "brightdata",
           is_active: true,
           configured_by: interaction.user.id,
           created_at: new Date(),
@@ -98,11 +125,11 @@ export const command: SubCommand = {
       const embed = new EmbedBuilder()
         .setTitle("✅ Instagram monitor started")
         .setColor(0x00ae86)
-        .setDescription(`This channel will post updates whenever **@${resolved.username}** uploads a new post.`)
+        .setDescription(`This channel will receive weekly batched post updates from **@${resolved.username}**.`)
         .addFields(
           { name: "Channel", value: `<#${channel.id}>`, inline: true },
           { name: "Profile", value: `[${resolved.username}](${parsedProfile.profileUrl})`, inline: true },
-          { name: "Mode", value: config.notifyFirst ? "Send latest post immediately" : "Send only future posts", inline: false }
+          { name: "Mode", value: "Bright Data weekly batch", inline: false }
         );
 
       await interaction.editReply({ embeds: [embed] });
