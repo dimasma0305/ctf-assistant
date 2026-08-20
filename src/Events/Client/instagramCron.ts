@@ -1,6 +1,13 @@
 import cron from "node-cron";
 import mongoose, { Model } from "mongoose";
-import { EmbedBuilder, TextChannel } from "discord.js";
+import {
+    ActionRowBuilder,
+    AttachmentBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    TextChannel,
+} from "discord.js";
 import { Event } from "../../Handlers/eventHandler";
 import { MyClient } from "../../Model/client";
 import * as Database from "../../Database/connect";
@@ -407,10 +414,56 @@ async function enqueueProfilePosts(
     return operations.length;
 }
 
-function safeDescription(caption: unknown): string {
+function safeDescription(caption: unknown): string | null {
     const text = typeof caption === "string" ? caption.trim() : "";
-    if (!text) return "A new post was published.";
+    if (!text) return null;
     return text.length > 4_000 ? text.slice(0, 3_997) + "..." : text;
+}
+
+async function buildPostAttachment(
+    imageUrl: unknown,
+    postId: unknown
+): Promise<{ attachment: AttachmentBuilder; imageUrl: string } | null> {
+    if (typeof imageUrl !== "string" || !/^https:\/\//i.test(imageUrl)) {
+        return null;
+    }
+
+    try {
+        const response = await fetch(imageUrl, {
+            headers: {
+                "User-Agent": "Mozilla/5.0",
+                Referer: "https://www.instagram.com/",
+            },
+            signal: AbortSignal.timeout(15_000),
+        });
+        if (!response.ok) return null;
+
+        const contentType = (response.headers.get("content-type") || "")
+            .split(";", 1)[0]
+            .toLowerCase();
+        const extension = new Map([
+            ["image/gif", "gif"],
+            ["image/jpeg", "jpg"],
+            ["image/png", "png"],
+            ["image/webp", "webp"],
+        ]).get(contentType);
+        if (!extension) return null;
+
+        const data = Buffer.from(await response.arrayBuffer());
+        if (!data.length || data.length > 8 * 1024 * 1024) return null;
+
+        const safePostId = String(postId || "post")
+            .replace(/[^a-z0-9_-]/gi, "-")
+            .slice(0, 64) || "post";
+        const filename = "instagram-" + safePostId + "." + extension;
+
+        return {
+            attachment: new AttachmentBuilder(data, { name: filename }),
+            imageUrl: "attachment://" + filename,
+        };
+    } catch {
+        return null;
+    }
 }
 
 async function resolveTextChannel(
@@ -431,19 +484,31 @@ async function sendDelivery(
     delivery: any
 ): Promise<void> {
     const channel = await resolveTextChannel(client, watch.channelId);
+    const postUrl = String(delivery.postUrl || "");
+    if (!/^https:\/\/(?:www\.)?instagram\.com\/(?:p|reel|reels)\//i.test(postUrl)) {
+        throw new Error("Instagram delivery has an invalid post URL");
+    }
+
     const embed = new EmbedBuilder()
         .setColor(0xe1306c)
         .setAuthor({
-            name: "Instagram: @" + watch.username,
+            name: "@" + watch.username + " on Instagram",
             ...(delivery.profileImageUrl
                 ? { iconURL: String(delivery.profileImageUrl) }
                 : {}),
-        })
-        .setTitle("New Instagram post")
-        .setURL(String(delivery.postUrl))
-        .setDescription(safeDescription(delivery.caption));
+        });
 
-    if (
+    const description = safeDescription(delivery.caption);
+    if (description) embed.setDescription(description);
+
+    const postAttachment = await buildPostAttachment(
+        delivery.imageUrl,
+        delivery.postId
+    );
+
+    if (postAttachment) {
+        embed.setImage(postAttachment.imageUrl);
+    } else if (
         typeof delivery.imageUrl === "string" &&
         /^https:\/\//i.test(delivery.imageUrl)
     ) {
@@ -453,10 +518,18 @@ async function sendDelivery(
     const publishedAt = validDate(delivery.publishedAt);
     if (publishedAt) embed.setTimestamp(publishedAt);
 
+    const actions = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+            .setLabel("View on Instagram")
+            .setStyle(ButtonStyle.Link)
+            .setURL(postUrl)
+    );
+
     const payload = {
-        content: "**@" + watch.username + "** posted on Instagram",
         embeds: [embed],
+        components: [actions],
         allowedMentions: { parse: [] as string[] },
+        ...(postAttachment ? { files: [postAttachment.attachment] } : {}),
     };
 
     let lastError: unknown;
