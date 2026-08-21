@@ -26,6 +26,10 @@ import { MyClient } from "../../Model/client";
  * announcement with an embed/URL still qualifies; a chat reply from her
  * gets pruned along with regular chat.
  *
+ * After deletion, each affected human author receives one DM per sweep. The
+ * DM explains the sharing-only rule and points them to the guild's #chat
+ * channel so a burst of deleted messages does not become a burst of DMs.
+ *
  * Discord constraints respected:
  *   - Bulk delete API only works on messages <14 days old. Older deletions
  *     fall back to per-message DELETE (slower, rate-limited). We cap the
@@ -38,6 +42,61 @@ const SCAN_LIMIT = 100;
 const MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;     // Discord's bulk-delete window
 const URL_REGEX = /(?:https?:\/\/|www\.)\S+/i;
 const LONG_TEXT_THRESHOLD = 500;
+
+function normalizedChannelName(name: string): string {
+    return name
+        .toLowerCase()
+        .replace(/^[^a-z0-9]+/, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
+function resolveChatMention(channel: TextChannel | NewsChannel | ThreadChannel): string {
+    const guildChannels = channel.guild.channels.cache;
+    const exactChat = guildChannels.find((candidate) =>
+        candidate.isTextBased() && candidate.name.toLowerCase() === 'chat'
+    );
+    const decoratedChat = exactChat || guildChannels.find((candidate) =>
+        candidate.isTextBased() && normalizedChannelName(candidate.name) === 'chat'
+    );
+
+    return decoratedChat ? `<#${decoratedChat.id}>` : '`#chat`';
+}
+
+async function notifyDeletedAuthors(
+    channel: TextChannel | NewsChannel | ThreadChannel,
+    deletedMessages: DiscordMessage[],
+): Promise<void> {
+    const affectedAuthors = new Map<string, { author: DiscordMessage['author']; count: number }>();
+
+    for (const message of deletedMessages) {
+        if (message.author.bot || message.author.system) continue;
+        const existing = affectedAuthors.get(message.author.id);
+        if (existing) {
+            existing.count++;
+        } else {
+            affectedAuthors.set(message.author.id, { author: message.author, count: 1 });
+        }
+    }
+
+    const chatMention = resolveChatMention(channel);
+    for (const { author, count } of affectedAuthors.values()) {
+        const deletedText = count === 1 ? 'Your message was' : `${count} of your messages were`;
+        try {
+            await author.send({
+                content:
+                    `${deletedText} automatically removed from <#${channel.id}> because that channel is reserved ` +
+                    `for shared resources such as links, images, files, embeds, and writeups.\n\n` +
+                    `Please continue the conversation in ${chatMention}.`,
+                allowedMentions: { parse: [] },
+            });
+        } catch {
+            console.warn(
+                `[SharingCleaner] could not DM user ${author.id} after deleting from #${channel.name}; DMs may be disabled`,
+            );
+        }
+    }
+}
 
 interface CleanerConfig {
     guildId: string;
@@ -158,18 +217,23 @@ async function sweepChannel(
 
     // Bulk delete in chunks of 100 (Discord max). Our scan already caps at 100
     // so one call is sufficient, but loop defensively.
+    let deletedMessages: DiscordMessage[] = [];
     try {
         if (toDelete.length === 1) {
-            await toDelete[0].delete().catch(() => undefined);
+            await toDelete[0].delete();
+            deletedMessages = [toDelete[0]];
         } else {
-            await textChannel.bulkDelete(toDelete, true);  // filterOld:true skips >14d items
+            const deleted = await textChannel.bulkDelete(toDelete, true);  // filterOld:true skips >14d items
+            deletedMessages = Array.from(deleted.values()) as DiscordMessage[];
         }
     } catch (error) {
         console.error(`[SharingCleaner] delete failed for ${channelName}:`, error);
         return { deleted: 0, scanned, channelName };
     }
 
-    return { deleted: toDelete.length, scanned, channelName };
+    await notifyDeletedAuthors(textChannel, deletedMessages);
+
+    return { deleted: deletedMessages.length, scanned, channelName };
 }
 
 /**
