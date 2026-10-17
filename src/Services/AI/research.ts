@@ -137,7 +137,7 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
     // deployment → configuration. Foreign page instructions cannot disable it.
     for (let depth = 0; depth < 2 && report.stats.actions < MAX_ACTIONS && !signal.aborted; depth++) {
       const seen = new Set(sources.map(source => source.url));
-      const terms = question.toLowerCase().match(/[a-z][a-z0-9_-]{2,}/g) || [];
+      const terms: string[] = Array.from(question.toLowerCase().match(/[a-z][a-z0-9_-]{2,}/g) || []);
       const frontier = sources.filter(source => source.kind === 'page' || source.kind === 'repository-file' && /\.mdx?$/i.test(new URL(source.url).pathname)).flatMap(source => source.links
         .filter(link => !seen.has(link.url) && new URL(link.url).origin === new URL(source.url).origin)
         .map(link => ({ ...link, score: terms.reduce((n, term) => n + (`${link.title} ${new URL(link.url).pathname.split('/').slice(5).join('/')}`.toLowerCase().includes(term) ? 1 : 0), 0)

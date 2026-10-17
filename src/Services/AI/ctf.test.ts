@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { requiresCTFSolve, ctfToolAvailable, publicCTFQuery } from './ctf';
 import { ctfScope, loadCTFCase, saveCTFCase, type CTFCaseNotes } from './ctfCases';
-import { collectCTFInputs } from './ctfInputs';
+import { collectCTFInputs, collectCodexArtifacts } from './ctfInputs';
 test('CTF intent routes team help but leaves research recommendations and banter alone', () => {
   for(const text of ['bantuin osint','bantu solve CTF crypto','decode ciphertext ini','lanjut flag yang tadi']) expect(requiresCTFSolve(text)).toBe(true);
   expect(requiresCTFSolve('hackerika bantuin','[W] CTF crypto cipher hex 3132')).toBe(true);
@@ -32,6 +32,13 @@ test('teammate artifacts include real same-channel source attribution and exclud
   current.channel={messages:{fetch:async()=>new Map([['1',source('1','public','CTF ciphertext 3132')],['2',source('2','private','PRIVATE-NOT-FOR-PUBLIC')]])}};
   const result=await collectCTFInputs(current,{text:'initial'},new AbortController().signal);
   expect(result.text).toContain('CTF ciphertext 3132');expect(result.text).toContain('teammate');expect(result.text).not.toContain('PRIVATE-NOT-FOR-PUBLIC');
+});
+test('isolated runner receives bounded original Discord bytes with magic-checked image metadata',async()=>{
+  const png=Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,0,0,0,0]);
+  const original=globalThis.fetch;globalThis.fetch=async()=>new Response(png,{headers:{'content-length':String(png.length)}});
+  try{const artifacts=await collectCodexArtifacts([{id:'800000000000000111',channelId:'700000000000000111',authorId:'u',authorName:'W',isBot:false,content:'',createdAt:Date.now(),attachments:[{name:'clue.png',url:'https://cdn.discordapp.com/attachments/700000000000000111/800000000000000111/clue.png',size:png.length,contentType:'image/png'}]}],new AbortController().signal);
+    expect(artifacts).toHaveLength(1);expect(artifacts[0]).toMatchObject({name:'clue.png',image:true,sourceMessageId:'800000000000000111'});expect(Buffer.from(artifacts[0].data,'base64')).toEqual(png);
+  }finally{globalThis.fetch=original;}
 });
 
 const scenario = "import assert from 'node:assert/strict';\nconst {openai}=await import('./src/utils/openai.ts');\nconst {solveCTFForTurn,setCTFTurnContext,getCTFReport}=await import('./src/Services/AI/ctf.ts');\nconst {loadCTFCase,ctfScope}=await import('./src/Services/AI/ctfCases.ts');\nlet calls=0;\nopenai.chat.completions.create=async(payload,options)=>{\n calls++;const input=JSON.parse(payload.messages.at(-1).content);\n assert(!input.channelContext.includes('FOREIGN-PRIVATE'));\n const result=input.computations.length?{done:true,title:'unit decode',summary:'Computed deterministic decode.',findings:[],candidates:[{flag:'UnitCTF{abcd}',basis:'actual calculator output'}],unresolved:[],actions:[]}:{done:false,title:'unit decode',summary:'Need calculation.',actions:[{type:'compute',code:'return input.message.match(/UnitCTF\\\\{[^}]+\\\\}/)[0]',purpose:'Decode bytes'}]};\n return {choices:[{message:{content:JSON.stringify(result)}}]};\n};\nconst turn={content:'bantu solve CTF decode UnitCTF{abcd}',guildId:'g',channelId:'unit-worker'};\nsetCTFTurnContext(turn,{text:'supplied deterministic clue'});\nconst first=solveCTFForTurn({},turn);assert.equal(first,solveCTFForTurn({newCase:true},turn));\nconst report=await first;assert.equal(report.status,'candidate');assert.equal(report.checkerVerified,false);assert.equal(report.computations[0].result.value,'UnitCTF{abcd}');assert.equal(report.notes.candidates[0].flag,'UnitCTF{abcd}');assert.equal(calls,3);assert.equal(getCTFReport(turn),report);\nassert.equal((await loadCTFCase(ctfScope(turn))).title,'unit decode');assert.equal(await loadCTFCase('g:other-channel'),null);\nconsole.log('CTF_WORKER_OK');\n";

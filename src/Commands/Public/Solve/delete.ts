@@ -1,6 +1,6 @@
-import { SlashCommandSubcommandBuilder, EmbedBuilder } from "discord.js";
+import { SlashCommandSubcommandBuilder, MessageFlags } from "discord.js";
 import { SubCommand } from "../../../Model/command";
-import { solveModel, ChallengeSchemaType, ChallengeModel } from "../../../Database/connect";
+import { solveModel, ChallengeModel } from "../../../Database/connect";
 import { 
     getChallengeInfo, 
     getChannelAndCTFData, 
@@ -15,13 +15,13 @@ export const command: SubCommand = {
     async execute(interaction, _client) {
         const channel = interaction.channel;
         if (!channel) {
-            interaction.reply("This command can only be used in a channel.");
+            await interaction.reply({ content: "This command can only be used in a channel.", flags: MessageFlags.Ephemeral });
             return;
         }
 
         const challengeInfo = getChallengeInfo(interaction);
         if (!challengeInfo) {
-            interaction.reply("This command can only be used in a thread.");
+            await interaction.reply({ content: "This command can only be used in a thread.", flags: MessageFlags.Ephemeral });
             return;
         }
         
@@ -29,57 +29,42 @@ export const command: SubCommand = {
 
         const result = await getChannelAndCTFData(channel);
         if (!result) {
-            interaction.reply("This command can only be used in a server.");
+            await interaction.reply({ content: "This command can only be used in a server.", flags: MessageFlags.Ephemeral });
             return;
         }
 
         const { ctfData } = result;
         
         if (!validateCTFEvent(ctfData)) {
-            interaction.reply("This channel does not have a valid CTF event associated with it.");
+            await interaction.reply({ content: "This channel does not have a valid CTF event associated with it.", flags: MessageFlags.Ephemeral });
             return;
         }
         
         if (interaction.guild?.ownerId !== interaction.user.id) {
-            interaction.reply("Only the server owner can delete solve lists.");
+            await interaction.reply({ content: "Only the server owner can delete solve lists.", flags: MessageFlags.Ephemeral });
             return;
         }
-        
-        const challenge = await ChallengeModel.findOne({ 
-            name: challengeName, 
-            category 
-          });
-          
-        if (!challenge) {
-            throw new Error("Challenge not found");
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        try {
+            const ctfId = ctfData.id.toString();
+            const challenge = await ChallengeModel.findOne({
+                ctf_id: ctfId, name: challengeName,
+                ...(category !== "Unknown" ? { category } : {}),
+            });
+            if (!challenge) {
+                await interaction.editReply(`Challenge "${challengeName}" tidak ditemukan di event ini.`);
+                return;
+            }
+            const deletedSolve = await solveModel.deleteOne({ ctf_id: ctfId, challenge_ref: challenge._id });
+            challenge.is_solved = await solveModel.exists({ ctf_id: ctfId, challenge_ref: challenge._id }) !== null;
+            await challenge.save();
+            if (!challenge.is_solved) await markThreadAsUnsolved(channel);
+            await interaction.editReply(deletedSolve.deletedCount
+                ? `Solve "${challengeName}" dihapus. /solve list berikutnya akan mengikuti data terbaru.`
+                : `Solve "${challengeName}" memang sudah tidak ada; status challenge sudah diselaraskan.`);
+        } catch (error) {
+            console.error('[solve/delete] failed:', error);
+            await interaction.editReply('Gagal menghapus solve. Cek log bot sebelum mencoba lagi.');
         }
-          
-        const deletedSolve = await solveModel.deleteOne({
-            ctf_id: ctfData.id,
-            challenge_ref: challenge._id
-        });
-
-        if (deletedSolve.deletedCount === 0) {
-            interaction.reply("This challenge solve does not exist.");
-            return;
-        }
-
-        // Update thread name to show unsolved status
-        await markThreadAsUnsolved(interaction.channel!);
-        
-        // Send notification in the thread
-        if (interaction.channel && interaction.channel.isThread()) {
-            const threadNotificationEmbed = new EmbedBuilder()
-                .setColor('#ff6600')
-                .setTitle('↩️ Challenge Solve Revoked')
-                .setDescription(`The solve status for this challenge has been revoked by <@${interaction.user.id}>`)
-                .setTimestamp()
-                .setFooter({ text: 'Challenge Status Update', iconURL: 'https://tcp1p.team/favicon.ico' });
-            
-            await interaction.reply({ embeds: [threadNotificationEmbed] });
-            return;
-        }
-        
-        await interaction.reply({ content: `Challenge solve for "[${category}] ${challengeName}" has been deleted`, flags: ["Ephemeral"] });
     },
 };

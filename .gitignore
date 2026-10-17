@@ -43,6 +43,7 @@ COPILOT.md
 !/scripts/reset-affection.ts
 !/scripts/chatgpt-auth.ts
 !/scripts/chatgpt-login-portal.ts
+!/scripts/codex-runner/
 
 # OAuth sessions and rotating refresh tokens stay outside source control.
 /runtime-secrets/

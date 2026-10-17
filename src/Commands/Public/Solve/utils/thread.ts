@@ -10,7 +10,7 @@ export function extractChallengeNameFromThread(threadName: string): string {
     if (formatMatch) {
         return formatMatch[2].trim(); // Extract the challenge name part
     }
-    return threadName; // Fallback to full thread name
+    return threadName.replace(/^[❌✅]\s*/, '').trim();
 }
 
 /**
@@ -27,7 +27,7 @@ export function extractChallengeInfoFromThread(threadName: string): { category: 
     }
     return {
         category: "Unknown",
-        challengeName: threadName
+        challengeName: extractChallengeNameFromThread(threadName)
     };
 }
 
@@ -39,13 +39,17 @@ export async function getChannelAndCTFData(channel: Channel): Promise<{ textChan
     
     if (channel instanceof TextChannel) {
         textChannel = channel;
-    } else if (channel.isThread() && channel.parent instanceof TextChannel) {
-        textChannel = channel.parent;
+    } else if (channel.isThread()) {
+        const parent = channel.parent instanceof TextChannel ? channel.parent
+            : channel.parentId ? await channel.guild.channels.fetch(channel.parentId).catch(() => null) : null;
+        if (!(parent instanceof TextChannel)) return null;
+        textChannel = parent;
     } else {
         return null;
     }
-    
-    const ctfData = JSON.parse(textChannel.topic || "{}") as CTFEvent;
+    let ctfData: CTFEvent;
+    try { ctfData = JSON.parse(textChannel.topic || "{}") as CTFEvent; }
+    catch { return null; }
     return { textChannel, ctfData };
 }
 

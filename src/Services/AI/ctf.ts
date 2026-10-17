@@ -1,6 +1,7 @@
 import { mergeTeamProgress } from './ctfProgress';
 import type { ThreadSnapshot } from './threadContext';
-import { collectCTFInputs } from './ctfInputs';
+import { collectCTFInputs, collectCodexArtifacts } from './ctfInputs';
+import { codexSolverEnabled, submitCodexJob, type CodexPublicJob, type CodexRoute } from './codexJobs';
 import { createHash } from 'node:crypto';
 import { openai } from '../../utils/openai';
 import { MODELS } from './models';
@@ -11,10 +12,10 @@ import { groundedFindings } from './research';
 import { webSearchForTool } from './web';
 import { prepareVisionMessages, groundVisionDelivery, hasVisionContent, type ImageReference } from './vision';
 import { inlineDiscordImages } from './visionTransport';
-interface Turn { content?: string; guildId?: string | null; channelId?: string }
+interface Turn { id?:string;content?: string; guildId?: string | null; channelId?: string;author?:{id?:string} }
 interface Context { text: string; images?: ImageReference[]; thread?: ThreadSnapshot | null }
 export interface CTFReport {
-  ok: boolean; status: 'candidate' | 'partial' | 'needs_input' | 'busy';
+  ok: boolean; status: 'queued' | 'candidate' | 'partial' | 'needs_input' | 'busy'; job?:CodexPublicJob;
   notes: CTFCaseNotes; computations: { id: string; purpose: string; code: string; result: ComputeResult }[];
   observations: any[]; checkerVerified: false; checkpointPersisted: boolean;
   stats: { modelCalls: number; actions: number; searches: number; elapsedMs: number };
@@ -61,15 +62,36 @@ export function publicCTFQuery(value: unknown): string | null {
 function strings(value: unknown, max: number, length: number): string[] {
   return Array.isArray(value) ? value.filter((s): s is string => typeof s === 'string' && !!s.trim()).slice(0, max).map(s => s.trim().slice(0, length)) : [];
 }
-export function solveCTFForTurn(args: { question?: string; newCase?: boolean }, turn: Turn, options: { signal?: AbortSignal } = {}): Promise<CTFReport> {
+export function solveCTFForTurn(args: { question?: string; newCase?: boolean; solver?:CodexRoute }, turn: Turn, options: { signal?: AbortSignal } = {}): Promise<CTFReport> {
   if (jobs.has(turn)) return jobs.get(turn)!;
   const job = investigate(args, turn, options).then(report => { reports.set(turn, report); return report; });
   jobs.set(turn, job); return job;
 }
-async function investigate(args: { question?: string; newCase?: boolean }, turn: Turn, options: { signal?: AbortSignal }): Promise<CTFReport> {
+async function investigate(args: { question?: string; newCase?: boolean; solver?:CodexRoute }, turn: Turn, options: { signal?: AbortSignal }): Promise<CTFReport> {
   const start = performance.now(), scope = ctfScope(turn);
   const report: CTFReport = { ok: false, status: 'needs_input', notes: emptyNotes(), computations: [], observations: [], checkerVerified: false, checkpointPersisted: false,
     stats: { modelCalls: 0, actions: 0, searches: 0, elapsedMs: 0 } };
+  if(scope&&codexSolverEnabled()&&/^\d{17,20}$/.test(turn.guildId||'')&&/^\d{17,20}$/.test(turn.channelId||'')&&/^\d{17,20}$/.test(turn.id||'')&&/^\d{17,20}$/.test(turn.author?.id||'')){
+    const signal=AbortSignal.any([AbortSignal.timeout(30_000),...(options.signal?[options.signal]:[])]);
+    try{
+      const context=await collectCTFInputs(turn,contexts.get(turn)||{text:turn.content||''},signal);
+      const previous=await loadCTFCase(scope);let checkpoint:any=previous?{title:previous.title,summary:previous.summary,findings:previous.findings,
+        candidates:previous.candidates,unresolved:previous.unresolved,teamProgress:previous.teamProgress,calculations:previous.calculations,
+        sources:previous.sources.map(source=>({id:source.id,url:source.url,title:source.title,kind:source.kind,content:source.content.slice(0,500)}))}:undefined;
+      if(checkpoint&&JSON.stringify(checkpoint).length>23_000)checkpoint={title:previous?.title,summary:previous?.summary,candidates:previous?.candidates,
+        unresolved:previous?.unresolved,teamProgress:previous?.teamProgress};
+      const artifacts=await collectCodexArtifacts(context.originals,signal,turn.id);
+      const queued=await submitCodexJob({scope,guildId:turn.guildId!,channelId:turn.channelId!,messageId:turn.id!,userId:turn.author!.id!,
+        question:`${context.thread?.name?`[thread ${context.thread.name}] `:''}${String(args.question||turn.content||'')}`.slice(0,8000),context:context.text.slice(0,50_000),checkpoint,
+        route:['auto','luna','daybreak'].includes(args.solver||'')?args.solver!:'auto',artifacts},signal);
+      report.ok=true;report.status='queued';report.job=queued.job;report.notes=previous||emptyNotes();report.notes.summary=`Job solver ${queued.job.id.slice(0,8)} masuk antrean.`;
+      report.notes.unresolved=['Hasil akan dikirim otomatis ke channel asal setelah sandbox selesai.'];report.stats.elapsedMs=performance.now()-start;return report;
+    }catch(error:any){
+      if(error?.job){report.ok=true;report.status='queued';report.job=error.job;report.notes.summary=`Job solver ${error.job.id.slice(0,8)} masih aktif.`;
+        report.notes.unresolved=['Tunggu hasil job aktif; satu channel hanya menjalankan satu solver.'];report.stats.elapsedMs=performance.now()-start;return report;}
+      report.observations.push({type:'isolated_solver_unavailable',error:String(error?.message||'unavailable').slice(0,100)});
+    }
+  }
   if (!scope || !openai) { report.notes.unresolved = ['Konteks channel atau model belum tersedia.']; return report; }
   if (scopes.has(scope) || scopes.size >= 2) { report.status = 'busy'; report.notes.unresolved = ['Investigasi masih berjalan; tunggu hasil langkah aktif.']; return report; }
   scopes.add(scope);
@@ -187,7 +209,7 @@ async function investigate(args: { question?: string; newCase?: boolean }, turn:
     for (let depth = 0; depth < 2 && !signal.aborted && report.stats.actions < 8; depth++) {
       const inspected = new Set(notes.sources.map(source => source.url));
       const origins = new Set(notes.sources.map(source => new URL(source.url).origin));
-      const terms = `${turn.content || ''} ${args.question || ''}`.toLowerCase().match(/[a-z][a-z0-9_-]{3,}/g) || [];
+      const terms: string[] = Array.from(`${turn.content || ''} ${args.question || ''}`.toLowerCase().match(/[a-z][a-z0-9_-]{3,}/g) || []);
       const links = report.observations.flatMap(item => Array.isArray(item.links) ? item.links : [])
         .filter((link: any) => publicCTFQuery(link.url) && publicResearchUrl(link.url) && !inspected.has(link.url)
           && !failedSources.has(link.url) && origins.has(new URL(link.url).origin));
@@ -234,6 +256,7 @@ async function investigate(args: { question?: string; newCase?: boolean }, turn:
  * must not drop the provenance that made an OSINT candidate defensible. */
 export function groundCTFReply(text: string, report?: CTFReport): string {
   if (!report) return text;
+  if(report.status==='queued'&&report.job){const id=report.job.id.slice(0,8);return text.includes(id)?text:`${text.trim()}\njob: \`${id}\` — hasilnya bakal kukirim lagi ke channel ini pas selesai.`;}
   const ids = new Set(report.notes.findings.flatMap(f => f.evidence.map(e => e.sourceId)));
   const sources = report.notes.sources.filter(s => ids.has(s.id) && s.kind !== 'search');
   const missing = sources.filter(s => !text.includes(s.url)).slice(0, 2);

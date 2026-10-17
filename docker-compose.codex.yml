@@ -1,0 +1,12 @@
+services:
+  ctf-assistant:
+    environment:
+      CODEX_SOLVER_ENABLED: "true"
+      CODEX_CONTROL_SOCKET: /run/hackerika-codex/control.sock
+    volumes:
+      - type: bind
+        source: ${CODEX_CONTROL_DIR:-/run/hackerika-codex}
+        target: /run/hackerika-codex
+        read_only: true
+        bind:
+          create_host_path: false

@@ -20,6 +20,7 @@ import {
     updateTaskForTool,
     completeTaskForTool,
 } from "./tasks";
+import { cancelCodexJob, codexSolverEnabled, getCodexJob } from './codexJobs';
 
 /**
  * Native function-calling tool registry for Hackerika.
@@ -41,12 +42,23 @@ export const TOOL_DEFINITIONS = [
         type: 'function' as const,
         function: {
             name: 'solve_ctf',
-            description: 'Kerjakan challenge CTF/OSINT/crypto/misc yang diminta: investigasi multi-langkah, baca sumber primer dan gambar asli, perhitungan JavaScript terisolasi, catatan progres per channel untuk diteruskan tim. Pakai sebelum mengklaim hasil decode/flag; bukan sekadar saran generik. Tidak submit flag atau menjalankan shell. Pertahankan hipotesis vs bukti dan minta clue asli yang benar-benar hilang. Perkiraan sampai 80 detik per langkah investigasi.',
+            description: 'Kerjakan challenge CTF/OSINT/crypto/misc yang diminta. Saat solver terisolasi aktif, ini mengantrekan Codex dengan file/gambar asli dan konteks thread lengkap; hasil dikirim otomatis sesudah selesai. Pakai sebelum mengklaim hasil decode/flag. Tidak submit flag ke checker. Pertahankan hipotesis vs bukti dan minta clue asli yang benar-benar hilang.',
             parameters: { type: 'object', properties: {
                 question: { type: 'string', maxLength: 4000, description: 'Challenge dan bagian yang perlu diselesaikan; konteks tim/gambar dilampirkan sistem. Jangan mengarang isi clue.' },
                 newCase: { type: 'boolean', description: 'true HANYA jika user jelas mulai challenge berbeda; false untuk melanjutkan checkpoint channel ini.' },
+                solver: { type:'string',enum:['auto','luna','daybreak'],description:'Default auto. Luna untuk challenge ringan/hemat. Daybreak hanya bila user yang terverifikasi memang meminta atau challenge eksploitasi memerlukannya.' },
             }, required: ['question'], additionalProperties: false },
         },
+    },
+    {
+        type:'function' as const,
+        function:{name:'ctf_job_status',description:'Cek status job CTF terakhir milik speaker sekarang di channel ini. jobId boleh dikosongkan.',
+            parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job CTF jika diketahui.'}},additionalProperties:false}},
+    },
+    {
+        type:'function' as const,
+        function:{name:'cancel_ctf_job',description:'Batalkan job CTF aktif milik speaker sekarang di channel ini. jobId boleh dikosongkan untuk job aktif terakhir. Tidak bisa membatalkan job orang/channel lain.',
+            parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job CTF jika diketahui.'}},additionalProperties:false}},
     },
     {
         type: 'function' as const,
@@ -456,6 +468,15 @@ export async function dispatchTool(
 ): Promise<string> {
     try {
         if (name === 'solve_ctf') return JSON.stringify(await solveCTFForTurn(args || {}, message, options));
+        if(name==='ctf_job_status'||name==='cancel_ctf_job'){
+            if(!codexSolverEnabled())return JSON.stringify({ok:false,error:'isolated_solver_disabled'});
+            const jobId=typeof args?.jobId==='string'&&/^[0-9a-f-]{36}$/i.test(args.jobId)?args.jobId:undefined;
+            const scope=message.guildId?`${message.guildId}:${message.channelId}`:'';
+            if(!scope||args?.jobId&& !jobId)return JSON.stringify({ok:false,error:'invalid_job'});
+            const result=name==='ctf_job_status'?await getCodexJob(jobId,scope,message.author.id,options.signal)
+                :await cancelCodexJob(jobId,scope,message.author.id,options.signal);
+            return JSON.stringify(result);
+        }
         if (name === 'research_topic') {
             const suppliedUrls = [...(message.content || '').matchAll(/https?:\/\/[^\s<>]+/g)]
                 .map(match => match[0].replace(/[),.!?;]+$/, ''));

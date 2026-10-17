@@ -24,9 +24,19 @@ const same = (a: string, b: string) => a.length === b.length && timingSafeEqual(
 
 export async function writePrivateJson(filename: string, value: unknown): Promise<void> {
     await mkdir(dirname(filename), { recursive: true, mode: 0o700 });
+    // A trusted host controller may refresh a session also mounted into the
+    // unprivileged bot. Atomic replacement must preserve that file's owner.
+    const previous = await lstat(filename).catch((error: any) => {
+        if (error?.code !== 'ENOENT') throw error;
+        return null;
+    });
+    if (previous && (!previous.isFile() || previous.isSymbolicLink())) throw new ChatGPTError('unsafe_credential_file');
     const temporary = `${filename}.${randomUUID()}.tmp`;
     const handle = await open(temporary, 'wx', 0o600);
-    try { await handle.writeFile(JSON.stringify(value, null, 2) + '\n'); await handle.sync(); }
+    try {
+        if (previous && process.getuid?.() === 0) await handle.chown(previous.uid, previous.gid);
+        await handle.writeFile(JSON.stringify(value, null, 2) + '\n'); await handle.sync();
+    }
     finally { await handle.close(); }
     try { await rename(temporary, filename); await chmod(filename, 0o600); }
     finally { await unlink(temporary).catch(() => {}); }

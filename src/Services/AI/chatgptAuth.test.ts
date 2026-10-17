@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { mkdtemp, rm, readFile, stat, chmod } from 'node:fs/promises';
+import { mkdtemp, rm, readFile, stat, chmod, chown } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { generateKeyPair, exportJWK, SignJWT } from 'jose';
@@ -100,4 +100,13 @@ test('sign-out clears secrets and keeps registration even if remote revocation f
     expect(await auth.signOut()).toEqual({ revoked: false }); await expect(auth.read()).rejects.toThrow('sign_in_required');
     const registration = await readFile(`${auth.file}.registration.json`, 'utf8');
     expect(registration).toContain('oaiapp_fixture'); expect(registration).not.toContain('private-refresh-fixture');
+});
+
+test('a root controller atomically refreshes credentials without taking ownership from the bot user', async () => {
+    if (process.getuid?.() !== 0) return;
+    const auth = await fixture(); await writePrivateJson(auth.file, saved());
+    await chown(auth.file, 1000, 1000); await writePrivateJson(auth.file, { ...saved(), access_token: 'rotated' });
+    const metadata = await stat(auth.file);
+    expect({ uid: metadata.uid, gid: metadata.gid, mode: metadata.mode & 0o777 }).toEqual({ uid: 1000, gid: 1000, mode: 0o600 });
+    expect((await auth.read()).access_token).toBe('rotated');
 });

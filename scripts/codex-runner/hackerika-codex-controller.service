@@ -1,0 +1,37 @@
+[Unit]
+Description=Hackerika isolated Codex job controller
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/root/app/ctf-assistant
+EnvironmentFile=/etc/hackerika-codex-controller.env
+Environment=AI_PROVIDER=chatgpt
+ExecStart=/root/.bun/bin/bun /root/app/ctf-assistant/scripts/codex-runner/controller.ts
+Restart=on-failure
+RestartSec=3
+UMask=0077
+RuntimeDirectory=hackerika-codex hackerika-codex-jobs
+RuntimeDirectoryMode=0700
+StateDirectory=hackerika-codex
+StateDirectoryMode=0700
+ReadWritePaths=/run/hackerika-codex /run/hackerika-codex-jobs /var/lib/hackerika-codex /root/app/ctf-assistant/runtime-secrets/chatgpt
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE CAP_FOWNER
+
+[Install]
+WantedBy=multi-user.target

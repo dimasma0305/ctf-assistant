@@ -22,7 +22,8 @@
     "docs:deploy": "mkdocs gh-deploy --force",
     "benchmark:research": "bun run benchmarks/hackerika-research/run.ts",
     "benchmark:research:judge": "bun run benchmarks/hackerika-research/judge.ts",
-    "benchmark:research:compare": "bun run benchmarks/hackerika-research/compare.ts"
+    "benchmark:research:compare": "bun run benchmarks/hackerika-research/compare.ts",
+    "benchmark:codex": "bun run benchmarks/hackerika-codex/run.ts"
   },
   "keywords": [],
   "author": "",
