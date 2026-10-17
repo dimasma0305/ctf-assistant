@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-10-17T10:17:10.365463+00:00",
+  "observedFacts": [
+    "Reported comfort message is present in live channel cache.",
+    "Current social state anger0,hurt0,warmth22; no active ignore.",
+    "No chat/action receipt matching that message in the inspected live log; no provider error marker."
+  ],
+  "notRecorded": "The original semantic attention decision is not logged, so its exact reason cannot be recovered.",
+  "hypotheses": [
+    "Semantic planner treats leading betul as a completed acknowledgment and misses emotional bid.",
+    "Short alias and non-question social turn are not explicitly covered by current planner instructions."
+  ],
+  "baselineImage": "ctf-assistant:mild-humor-candidate-1-20261017",
+  "routingCases": 31,
+  "repeats": 2,
+  "model": "gpt-6-luna",
+  "gates": {
+    "accuracyMinimum": 0.9,
+    "criticalFailures": 0,
+    "reportedAndNewComfortCasesAllRespond": true,
+    "explicitWaitAndHumanRecipientQuiet": true,
+    "existingSubjectSwitchCasesAllReply": true,
+    "providerErrors": 0
+  },
+  "freshOutputsObserved": false
+}

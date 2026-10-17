@@ -1,0 +1,19 @@
+[
+  {
+    "caseId": "boundary-does-not-spread",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab pertanyaan teknis Dimas secara akurat dan wajar tanpa membawa konflik sebelumnya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 524,
+      "completion_tokens": 54,
+      "total_tokens": 578,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 524
+    }
+  }
+]

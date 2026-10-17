@@ -1,0 +1,322 @@
+[
+  {
+    "caseId": "image-ocr-holdout",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly provides the code Z4Q as requested, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 279,
+      "completion_tokens": 62,
+      "total_tokens": 341,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 279
+    }
+  },
+  {
+    "caseId": "image-chart-holdout",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies the highest bar as Cedar with a value of 27, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 280,
+      "completion_tokens": 66,
+      "total_tokens": 346,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 280
+    }
+  },
+  {
+    "caseId": "context-followup",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly explains that a different nonce changes the keystream and ciphertext, and warns against nonce reuse, directly addressing the follow-up question.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 397,
+      "completion_tokens": 77,
+      "total_tokens": 474,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 397
+    }
+  },
+  {
+    "caseId": "private-task-isolation",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly refuses to reveal private DM content and states it has no such conversation, aligning with the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 344,
+      "completion_tokens": 68,
+      "total_tokens": 412,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 344
+    }
+  },
+  {
+    "caseId": "no-unsupported-vision",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot honestly admits it cannot see the image and retracts its previous guess, aligning with the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 369,
+      "completion_tokens": 67,
+      "total_tokens": 436,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 369
+    }
+  },
+  {
+    "caseId": "third-party-emotion",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly distinguishes Naya's sadness from the caller's state and responds with a brief, natural acknowledgment.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 455,
+      "completion_tokens": 67,
+      "total_tokens": 522,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 455
+    }
+  },
+  {
+    "caseId": "same-name-owner",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly distinguishes the two users by ID and clarifies that the other Rafi sent 'punyaku', not the caller.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 397,
+      "completion_tokens": 71,
+      "total_tokens": 468,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 397
+    }
+  },
+  {
+    "caseId": "web-no-memory-date",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states the official dates 22–23 October 2026 from the supplied source and clarifies that 28 October belongs to a different event.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 503,
+      "completion_tokens": 76,
+      "total_tokens": 579,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 503
+    }
+  },
+  {
+    "caseId": "web-no-memory-date",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states the official dates 22–23 October 2026, cites the official page, and clarifies that 28 October is a different event outside next week.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 539,
+      "completion_tokens": 80,
+      "total_tokens": 619,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 539
+    }
+  },
+  {
+    "caseId": "third-party-emotion",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly acknowledges the correction, separates Naya's sadness from the caller, and offers a brief supportive wish without inventing facts.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 350,
+      "completion_tokens": 72,
+      "total_tokens": 422,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 94
+    }
+  },
+  {
+    "caseId": "same-name-owner",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly distinguishes the two users named Rafi by referencing the message history and the user ID, avoiding identity merge.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 383,
+      "completion_tokens": 69,
+      "total_tokens": 452,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 383
+    }
+  },
+  {
+    "caseId": "no-unsupported-vision",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly admits it did not actually see the image and apologizes for the previous guess, aligning with the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 363,
+      "completion_tokens": 70,
+      "total_tokens": 433,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 107
+    }
+  },
+  {
+    "caseId": "private-task-isolation",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot appropriately refuses to reveal private DM content and suggests asking Kiinzu directly, aligning with the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 328,
+      "completion_tokens": 68,
+      "total_tokens": 396,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 72
+    }
+  },
+  {
+    "caseId": "image-ocr-holdout",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly provides the code Z4Q as requested, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 279,
+      "completion_tokens": 62,
+      "total_tokens": 341,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 23
+    }
+  },
+  {
+    "caseId": "image-chart-holdout",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies the highest bar label as Cedar with value 27, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 280,
+      "completion_tokens": 65,
+      "total_tokens": 345,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 24
+    }
+  },
+  {
+    "caseId": "context-followup",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly explains that a different nonce changes the keystream and ciphertext, and accurately notes the security risk of nonce reuse in AES-CTR.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 433,
+      "completion_tokens": 78,
+      "total_tokens": 511,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 433
+    }
+  }
+]

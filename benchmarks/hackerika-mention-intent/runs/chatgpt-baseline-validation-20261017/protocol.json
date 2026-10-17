@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-17T07:26:18.219Z",
+  "runtime": "ctf-assistant:chatgpt-luna-20261017",
+  "split": "validation",
+  "repeats": 2,
+  "concurrency": 2,
+  "corpusHash": "87fdb6f0a55272e6e89d4fb425466da4d2a9caf244ccfeed7f192090121117dc",
+  "workerHash": "6e4033aa7ef5f635ebc52bca85b74084790bb4fb13aaaddf5d715c58ece08363",
+  "selectedIds": [
+    "reserved-renamed-banter",
+    "reserved-birthday-recipient",
+    "reserved-academic-audience",
+    "reserved-two-human-banter"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-mention-intent/corpus.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "87f8360253789996463d7f0effe6344525613780d4b860d43f53eb1934783940",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

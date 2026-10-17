@@ -1,0 +1,139 @@
+{
+  "verifiedAt": "2026-10-17T10:26:27.528238+00:00",
+  "status": "active_verified",
+  "image": "ctf-assistant:comfort-candidate-1-20261017",
+  "imageId": "sha256:8f7abcaa005d031fb6c68f9f51e527e0a99e7206f20c6cb94c245338bfcaf3ce",
+  "startedAt": "2026-10-17T10:25:38.790537998Z",
+  "provider": "chatgpt",
+  "modelRoles": {
+    "chat": "gpt-6-luna",
+    "light": "gpt-6-luna",
+    "vision": "gpt-6-luna",
+    "research": "gpt-6-luna",
+    "judge": "gpt-6-luna"
+  },
+  "productionHashes": {
+    "src/Services/AI/attention.ts": "547742ea29821002f6d192483773816e6808189e6b8c4d2788c94e3a660fb2a0",
+    "src/Services/AI/spontaneous.ts": "a0928109c850dacb2abbdf1542c154899dd3f8721c2529a9152b68c9346f79a4"
+  },
+  "preservationChecks": {
+    "Config.Cmd": true,
+    "Config.Entrypoint": true,
+    "Config.User": true,
+    "Config.WorkingDir": true,
+    "Config.Healthcheck": true,
+    "Config.Env": true,
+    "HostConfig.CapDrop": true,
+    "HostConfig.SecurityOpt": true,
+    "HostConfig.Tmpfs": true,
+    "HostConfig.RestartPolicy": true,
+    "HostConfig.Memory": true,
+    "HostConfig.NanoCpus": true,
+    "HostConfig.ReadonlyRootfs": true,
+    "HostConfig.PortBindings": true,
+    "bindMounts": true,
+    "operationalLabels": true,
+    "networks": true,
+    "selectedImage": true,
+    "healthy": true,
+    "noRestarts": true,
+    "otherServicesUnchanged": true,
+    "runtimeHashesMatch": true,
+    "providerPreserved": true,
+    "modelsPreserved": true,
+    "resetMarkerUnchanged": true
+  },
+  "otherServices": [
+    {
+      "name": "ctf-assistant-mongo-1",
+      "sameContainerAndStartedAt": true
+    },
+    {
+      "name": "ctf-assistant-ui-1",
+      "sameContainerAndStartedAt": true
+    },
+    {
+      "name": "traefik",
+      "sameContainerAndStartedAt": true
+    },
+    {
+      "name": "rsctf-rsctf-proxy-firewall-1",
+      "sameContainerAndStartedAt": true
+    }
+  ],
+  "health": {
+    "status": "healthy",
+    "bot": {
+      "ready": true,
+      "waitingForSessionReset": false
+    },
+    "database": {
+      "required": true,
+      "ready": true
+    },
+    "timestamp": "2026-10-17T10:26:27.525Z"
+  },
+  "resetMarkerUnchanged": true,
+  "resetExecutedByThisChange": false,
+  "development": {
+    "routing": {
+      "baselineCorrect": 58,
+      "candidateCorrect": 62,
+      "samples": 62,
+      "baselineErrors": 0,
+      "candidateErrors": 0
+    },
+    "delivery": {
+      "baselineCombinedPasses": 11,
+      "candidateCombinedPasses": 14,
+      "samples": 14,
+      "baselineProviderErrors": 1,
+      "candidateProviderErrors": 0,
+      "candidateJudgeErrors": 0,
+      "candidateCriticalFlags": 0,
+      "baselineIsolatedProviderRecheckSucceeded": true,
+      "rawErrorPreserved": true
+    }
+  },
+  "localChecks": {
+    "testsPassed": 367,
+    "testsFailed": 0,
+    "assertions": 1171,
+    "files": 39,
+    "scopedStrictTypes": "passed",
+    "bundle": "passed"
+  },
+  "freshValidation": "fresh-validation-2026-10-17.json",
+  "freshRoutingPasses": 8,
+  "freshRoutingSamples": 8,
+  "freshDeliveryPasses": 8,
+  "freshDeliverySamples": 8,
+  "imageAudit": "image-audit-2026-10-17.json",
+  "manualDiscordMessagesSent": 0,
+  "manualDMsSent": 0,
+  "manualRealReactionsSent": 0,
+  "readOnlyLiveReactionPermissions": {
+    "channelType": 0,
+    "viewChannel": true,
+    "readMessageHistory": true,
+    "addReactions": true,
+    "apiCalls": 3,
+    "readOnly": true
+  },
+  "limitations": [
+    "The original production planner decision was not recorded. Its omission was reproduced in same-text live model probes.",
+    "Baseline development delivery includes one provider error; isolated recheck succeeded and original row is retained.",
+    "Small synthetic evaluation and model judging, no certainty for every future turn, human equivalence or global optimum."
+  ],
+  "liveInferenceAfterDeployment": {
+    "model": "gpt-6-luna",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 10
+    }
+  }
+}

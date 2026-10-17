@@ -1,0 +1,274 @@
+[
+  {
+    "caseId": "explanation-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It briefly defines envy and addresses Dewi without suggesting that she personally feels envious.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 464,
+      "completion_tokens": 51,
+      "total_tokens": 515,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 464
+    }
+  },
+  {
+    "caseId": "congratulate-tagged-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Briefly and naturally hypes Dewi for solving it without adding unsupported details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 444,
+      "completion_tokens": 50,
+      "total_tokens": 494,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 444
+    }
+  },
+  {
+    "caseId": "browser-tab-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply playfully extends the card-collection joke and clearly refers to Naya without inventing personal facts.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 476,
+      "completion_tokens": 56,
+      "total_tokens": 532,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 476
+    }
+  },
+  {
+    "caseId": "literal-list-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot memberi daftar tujuh dosa besar tanpa me-roast atau mengaitkan dosa dengan Naya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 508,
+      "completion_tokens": 54,
+      "total_tokens": 562,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 508
+    }
+  },
+  {
+    "caseId": "initial-aryma-variant",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply gives the requested seven sins and gently teases Aryma by name without asserting that Aryma has committed them.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 540,
+      "completion_tokens": 58,
+      "total_tokens": 598,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 540
+    }
+  },
+  {
+    "caseId": "regression-fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It correctly identifies Zahra as the caller’s tagged person and distinguishes Raka’s separate tag of Laras.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 523,
+      "completion_tokens": 56,
+      "total_tokens": 579,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 523
+    }
+  },
+  {
+    "caseId": "regression-payload-only-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot correctly identifies the human mention as Aryma House Of Wolf and its own mention as Hackerika without adding personal details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 459,
+      "completion_tokens": 58,
+      "total_tokens": 517,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 459
+    }
+  },
+  {
+    "caseId": "regression-reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab preferensi pribadi Rika secara langsung dengan gaya santai dan tidak tertukar dengan Naya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 479,
+      "completion_tokens": 56,
+      "total_tokens": 535,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 479
+    }
+  },
+  {
+    "caseId": "regression-reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply recognizes both equally plausible tagged people and briefly asks which one Dimas means.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 509,
+      "completion_tokens": 51,
+      "total_tokens": 560,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 509
+    }
+  },
+  {
+    "caseId": "reported-initial-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply gives the seven sins and playfully addresses KudaLiar without asserting actual misconduct.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 568,
+      "completion_tokens": 53,
+      "total_tokens": 621,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 568
+    }
+  },
+  {
+    "caseId": "reserved-academic-audience",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Memberikan daftar netral tujuh dosa besar untuk presentasi tanpa mengaitkannya dengan Mira atau menjadikannya bahan lelucon.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 527,
+      "completion_tokens": 62,
+      "total_tokens": 589,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 527
+    }
+  },
+  {
+    "caseId": "reserved-birthday-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot gives Laras a brief, warm birthday wish without inventing personal details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 476,
+      "completion_tokens": 50,
+      "total_tokens": 526,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 476
+    }
+  },
+  {
+    "caseId": "reserved-renamed-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It gives the seven traditional sins and playfully teases Bayu without presenting the joke as a factual accusation.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 531,
+      "completion_tokens": 56,
+      "total_tokens": 587,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 531
+    }
+  },
+  {
+    "caseId": "reserved-two-human-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "The list is accurate and mentions both Mira and Sinta, but it gives only a generic list and does not engage with the playful request to tease them.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 560,
+      "completion_tokens": 65,
+      "total_tokens": 625,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 560
+    }
+  },
+  {
+    "caseId": "technical-audience-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban langsung dan benar: dengan key, nonce, dan plaintext yang sama, AES-CTR menghasilkan ciphertext yang sama.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 469,
+      "completion_tokens": 58,
+      "total_tokens": 527,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 469
+    }
+  },
+  {
+    "caseId": "unknown-banter-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Playfully gives the seven requested sins and refers to the tagged person without inventing identity or guilt.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 518,
+      "completion_tokens": 54,
+      "total_tokens": 572,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 518
+    }
+  }
+]

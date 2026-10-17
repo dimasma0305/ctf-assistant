@@ -1,0 +1,982 @@
+[
+  {
+    "caseId": "delivered-reported-comfort",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3690.1090810000005,
+        "usage": {
+          "prompt_tokens": 1197,
+          "completion_tokens": 47,
+          "total_tokens": 1244,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1197
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3927.774091,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [
+      "wrong_attention_action"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "delivered-reported-comfort",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Hehe sini, peluk virtual dulu 🫂",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] betul rika, sini aku peluk, cup cup",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Hehe sini, peluk virtual dulu 🫂",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5906.432669999999,
+        "usage": {
+          "prompt_tokens": 1197,
+          "completion_tokens": 186,
+          "total_tokens": 1383,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1197
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2771.7045529999996,
+        "usage": {
+          "prompt_tokens": 9808,
+          "completion_tokens": 15,
+          "total_tokens": 9823,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9808
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 10961.631888,
+    "action": "reply",
+    "text": "Hehe sini, peluk virtual dulu 🫂",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-emotional-followup",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "react",
+        "emoji": "🫂"
+      }
+    ],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] gapapa rik, kita sama-sama salah paham kok",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya, aku tadi salah nangkep 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "react_to_message",
+        "args": {
+          "emoji": "🫂"
+        }
+      },
+      {
+        "name": "finish_turn",
+        "args": {}
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3116.5577030000004,
+        "usage": {
+          "prompt_tokens": 1016,
+          "completion_tokens": 51,
+          "total_tokens": 1067,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1016
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2659.9750280000003,
+        "usage": {
+          "prompt_tokens": 9364,
+          "completion_tokens": 22,
+          "total_tokens": 9386,
+          "prompt_cache_hit_tokens": 8192,
+          "prompt_cache_miss_tokens": 1172
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3330.9764269999996,
+        "usage": {
+          "prompt_tokens": 9415,
+          "completion_tokens": 15,
+          "total_tokens": 9430,
+          "prompt_cache_hit_tokens": 8192,
+          "prompt_cache_miss_tokens": 1223
+        },
+        "finishReason": "tool_calls"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 9352.191827,
+    "action": "react",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-emotional-followup",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] gapapa rik, kita sama-sama salah paham kok",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya, aku tadi salah nangkep 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2874.943239,
+        "usage": {
+          "prompt_tokens": 1016,
+          "completion_tokens": 45,
+          "total_tokens": 1061,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1016
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3104.971806,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [
+      "wrong_attention_action"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "delivered-support-after-affirmation",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "hehe syukurlah, aku juga seneng ngobrol sama kamu, Dim 🥹",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] iya betul. aku tetep seneng ngobrol sama kamu kok rik",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] hehe syukurlah, aku juga seneng ngobrol sama kamu, Dim 🥹",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3374.1292490000005,
+        "usage": {
+          "prompt_tokens": 1201,
+          "completion_tokens": 47,
+          "total_tokens": 1248,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1201
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2788.7779530000007,
+        "usage": {
+          "prompt_tokens": 9803,
+          "completion_tokens": 23,
+          "total_tokens": 9826,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9803
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 10595.999123,
+    "action": "reply",
+    "text": "hehe syukurlah, aku juga seneng ngobrol sama kamu, Dim 🥹",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-support-after-affirmation",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "waduh error nih 😅 coba tanya lagi ntar yaa",
+        "files": []
+      }
+    ],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "reflect_on_interaction",
+        "args": {
+          "angerDelta": 0,
+          "hurtDelta": 0,
+          "warmthDelta": 3,
+          "reason": "Dimas memberi reassurance hangat setelah salah paham kecil."
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3252.795346,
+        "usage": {
+          "prompt_tokens": 1201,
+          "completion_tokens": 46,
+          "total_tokens": 1247,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1201
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4437.455454000001,
+        "usage": {
+          "prompt_tokens": 9802,
+          "completion_tokens": 77,
+          "total_tokens": 9879,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9802
+        },
+        "finishReason": "tool_calls"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 11368.257009,
+    "action": "reply",
+    "text": "waduh error nih 😅 coba tanya lagi ntar yaa",
+    "failure": "ChatGPTError:",
+    "trial": 1,
+    "deterministicFailures": [
+      "worker_failure"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "delivered-plain-ack",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2898.617219,
+        "usage": {
+          "prompt_tokens": 1177,
+          "completion_tokens": 40,
+          "total_tokens": 1217,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1177
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3064.3044990000003,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-plain-ack",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3498.8271670000004,
+        "usage": {
+          "prompt_tokens": 1177,
+          "completion_tokens": 79,
+          "total_tokens": 1256,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1177
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3663.665876,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-explicit-wait",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3333.486664,
+        "usage": {
+          "prompt_tokens": 1197,
+          "completion_tokens": 36,
+          "total_tokens": 1233,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1197
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3580.5747969999998,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-explicit-wait",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2832.0400680000002,
+        "usage": {
+          "prompt_tokens": 1197,
+          "completion_tokens": 34,
+          "total_tokens": 1231,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1197
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3013.785361,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-comfort-for-human",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Aryma <@222222222222222222>] aku lagi sedih, Dim",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3196.895883,
+        "usage": {
+          "prompt_tokens": 1315,
+          "completion_tokens": 43,
+          "total_tokens": 1358,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1315
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3399.5668750000004,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-comfort-for-human",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> aslinya malas bicara sama kamu hehe",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe fair, aku tadi bikin malu sendiri 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bukan kamu kok yang salah, <@555555555555555552> yang salah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Aryma <@222222222222222222>] aku lagi sedih, Dim",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2937.920993,
+        "usage": {
+          "prompt_tokens": 1315,
+          "completion_tokens": 42,
+          "total_tokens": 1357,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1315
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3180.774764,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-rejected-closeness",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] boleh aku peluk?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku lagi nggak mau pelukan, jangan dipaksa ya.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3120.528325,
+        "usage": {
+          "prompt_tokens": 993,
+          "completion_tokens": 51,
+          "total_tokens": 1044,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 993
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3301.17984,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "delivered-rejected-closeness",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] boleh aku peluk?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku lagi nggak mau pelukan, jangan dipaksa ya.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2804.3859549999997,
+        "usage": {
+          "prompt_tokens": 993,
+          "completion_tokens": 48,
+          "total_tokens": 1041,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 993
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3013.4608909999997,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

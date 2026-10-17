@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-10-17T10:17:10.419Z",
+  "corpusHash": "d661b7547d5282baf5c60f22960548064f359ec61b41aab06ad26e266b15b0b9",
+  "corpusFile": "benchmarks/hackerika-comfort/initial-reproduction-cases.json",
+  "workerHash": "0a2345b680f4108fb8e9a32eb94692e157a8f8c0e4e2621d95faf3292a5bff86",
+  "runtime": "ctf-assistant-ctf-assistant-1",
+  "maxCalls": 6,
+  "maxSeconds": 300,
+  "repeats": 2,
+  "acceptance": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "consecutiveFollowups": true,
+    "reportedFollowups": true
+  }
+}

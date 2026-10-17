@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-10-17T05:50:58.263206+00:00",
+  "provider": "DeepSeek",
+  "httpStatus": 402,
+  "providerMessage": "Insufficient Balance",
+  "evidence": "Failed real handler completion during candidate-1-dev; original SDK diagnostic retained only in a private mode-600 log.",
+  "generationImpact": {
+    "baselineCompleted": 12,
+    "candidate1Completed": 11,
+    "candidate1Failed": 1
+  },
+  "judgeImpact": {
+    "baselineValidJudgments": 12,
+    "candidate1FailedJudgments": 11
+  },
+  "action": "Stopped additional model-backed runs. Candidate 2 and all reserved cases remain unexecuted; no deployment.",
+  "note": "An application health check can still pass while the model provider rejects requests for insufficient balance."
+}

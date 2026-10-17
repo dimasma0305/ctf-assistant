@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-10-17T10:20:04.782Z",
+  "corpusHash": "b7d999fd6a21fc7a453f37fa423156093249c5297cc62021958b6d02f5ab6dd9",
+  "corpusFile": "benchmarks/hackerika-comfort/routing-corpus.json",
+  "workerHash": "0a2345b680f4108fb8e9a32eb94692e157a8f8c0e4e2621d95faf3292a5bff86",
+  "runtime": "ctf-assistant:mild-humor-candidate-1-20261017",
+  "maxCalls": 62,
+  "maxSeconds": 300,
+  "repeats": 2,
+  "acceptance": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "consecutiveFollowups": true,
+    "reportedFollowups": true
+  }
+}

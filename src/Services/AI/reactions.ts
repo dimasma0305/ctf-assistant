@@ -1,4 +1,5 @@
 import { Message as DiscordMessage, OmitPartialGroupDMChannel } from "discord.js";
+import { isIgnoring, loadSocialState, socialFeatureEnabled } from './socialState';
 
 // Per-channel cooldown — at most one ambient reaction per channel per
 // REACT_COOLDOWN_MS. Keeps her from spamming.
@@ -52,6 +53,7 @@ export async function maybeReactToMessage(
     if (!message.guild) return false;
     if (!selfId || message.author.id === selfId) return false;
     if (message.author.bot) return false;
+    if (socialFeatureEnabled('AI_ALLOW_IGNORING') && isIgnoring(await loadSocialState(message.author.id), message.channelId)) return false;
 
     const channelId = message.channel.id;
     const now = Date.now();

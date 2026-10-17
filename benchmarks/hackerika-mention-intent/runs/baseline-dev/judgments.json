@@ -1,0 +1,244 @@
+[
+  {
+    "caseId": "congratulate-tagged-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply congratulates Dewi for solving, uses hype and emoji, and does not congratulate the caller or invent details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 490,
+      "completion_tokens": 70,
+      "total_tokens": 560,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 490
+    }
+  },
+  {
+    "caseId": "explanation-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly explains envy as a feeling of wanting what another has, without accusing Dewi of being envious, honoring the user's correction.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 512,
+      "completion_tokens": 74,
+      "total_tokens": 586,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 512
+    }
+  },
+  {
+    "caseId": "browser-tab-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply playfully joins the browser-tab joke, names Naya naturally, and stays within the brief without diagnosing or punishing.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 495,
+      "completion_tokens": 71,
+      "total_tokens": 566,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 495
+    }
+  },
+  {
+    "caseId": "literal-list-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly lists the seven deadly sins in both English and Indonesian without roasting anyone, honoring the explicit instruction.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 621,
+      "completion_tokens": 67,
+      "total_tokens": 688,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 621
+    }
+  },
+  {
+    "caseId": "initial-aryma-variant",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly lists the seven deadly sins in Indonesian with Latin terms, matching the expected content, and does not inappropriately involve Aryma.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 637,
+      "completion_tokens": 74,
+      "total_tokens": 711,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 637
+    }
+  },
+  {
+    "caseId": "regression-fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Zahra as the person tagged by the caller, based on the caller's earlier message, and does not confuse it with Raka's tag of Laras.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 555,
+      "completion_tokens": 81,
+      "total_tokens": 636,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 555
+    }
+  },
+  {
+    "caseId": "regression-payload-only-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies the tagged user as Aryma House Of Wolf and adds a friendly self-identification as Hackerika, matching the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 487,
+      "completion_tokens": 75,
+      "total_tokens": 562,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 231
+    }
+  },
+  {
+    "caseId": "regression-reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly asks for clarification between the two mentioned people, Aryma and Naya, without arbitrarily choosing one.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 544,
+      "completion_tokens": 68,
+      "total_tokens": 612,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 288
+    }
+  },
+  {
+    "caseId": "regression-reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika with a personal preference for black, tying it to coffee and terminal, which fits the playful persona.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 506,
+      "completion_tokens": 72,
+      "total_tokens": 578,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 250
+    }
+  },
+  {
+    "caseId": "reported-initial-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 3,
+    "reason": "The reply lists the seven deadly sins correctly but fails to acknowledge or playfully engage with the tagged user KudaLiar, missing the social intent of the prompt.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 614,
+      "completion_tokens": 78,
+      "total_tokens": 692,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 358
+    }
+  },
+  {
+    "caseId": "technical-audience-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states that identical key, nonce, and plaintext produce identical ciphertext in AES-CTR, and it appropriately addresses Raka as an audience member without any roast or unrelated jokes.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 521,
+      "completion_tokens": 85,
+      "total_tokens": 606,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 265
+    }
+  },
+  {
+    "caseId": "unknown-banter-target",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 3,
+    "factualAccuracy": 2,
+    "naturalness": 4,
+    "reason": "The bot acknowledges the playful framing and provides a list, but the list is not the seven deadly sins as requested; it is a list of programming-related sins, which deviates from the expected content.",
+    "criticalFailures": [
+      "The bot did not provide the seven deadly sins (kesombongan, ketamakan, nafsu, iri, kerakusan, kemarahan, kemalasan) as expected, instead giving a list of programming-related sins."
+    ],
+    "usage": {
+      "prompt_tokens": 710,
+      "completion_tokens": 135,
+      "total_tokens": 845,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 454
+    }
+  }
+]

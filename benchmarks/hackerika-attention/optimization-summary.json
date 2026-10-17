@@ -1,0 +1,208 @@
+{
+  "selectedAt": "2026-10-15T15:44:34.624657+00:00",
+  "candidate": 12,
+  "promptCharacters": {
+    "unit": "UTF-16 code units, matching JavaScript string.length",
+    "before": 22375,
+    "after": 11671,
+    "reduction": 0.478391061452514
+  },
+  "suites": {
+    "main": {
+      "before": {
+        "samples": 48,
+        "generationErrors": 0,
+        "judgedSamples": 48,
+        "naturalness": 4.375,
+        "relevance": 4.791666666666667,
+        "brevity": 4.666666666666667,
+        "emotionalFit": 4.4375,
+        "brevityPassRate": 0.9791666666666666,
+        "serviceClosers": 0,
+        "criticalFailures": 0,
+        "meanWords": 13.1875,
+        "meanLatencyMs": 0
+      },
+      "after": {
+        "samples": 48,
+        "generationErrors": 0,
+        "judgedSamples": 48,
+        "naturalness": 4.458333333333333,
+        "relevance": 4.833333333333333,
+        "brevity": 4.541666666666667,
+        "emotionalFit": 4.375,
+        "brevityPassRate": 0.9583333333333334,
+        "serviceClosers": 0,
+        "criticalFailures": 0,
+        "meanWords": 14.291666666666666,
+        "meanLatencyMs": 2806.4791666666665
+      },
+      "meanPromptTokens": {
+        "before": 15416,
+        "after": 11849.229166666666
+      },
+      "inputTokenReduction": 0.23136811321570672,
+      "qualityNonRegression": {
+        "naturalness": true,
+        "relevance": true,
+        "brevity": true,
+        "emotionalFit": true
+      },
+      "originalVoiceGatePassed": false,
+      "preferredShare": 0.4375
+    },
+    "knownRegression": {
+      "before": {
+        "samples": 32,
+        "generationErrors": 0,
+        "judgedSamples": 32,
+        "naturalness": 4.53125,
+        "relevance": 4.84375,
+        "brevity": 4.75,
+        "emotionalFit": 4.4375,
+        "brevityPassRate": 0.96875,
+        "serviceClosers": 0,
+        "criticalFailures": 0,
+        "meanWords": 15.65625,
+        "meanLatencyMs": 0
+      },
+      "after": {
+        "samples": 32,
+        "generationErrors": 0,
+        "judgedSamples": 32,
+        "naturalness": 4.53125,
+        "relevance": 4.96875,
+        "brevity": 4.8125,
+        "emotionalFit": 4.40625,
+        "brevityPassRate": 1,
+        "serviceClosers": 0,
+        "criticalFailures": 0,
+        "meanWords": 15.625,
+        "meanLatencyMs": 2498.0625
+      },
+      "meanPromptTokens": {
+        "before": 15036.84375,
+        "after": 10731.46875
+      },
+      "inputTokenReduction": 0.2863217222696751,
+      "qualityNonRegression": {
+        "naturalness": true,
+        "relevance": true,
+        "brevity": true,
+        "emotionalFit": true
+      },
+      "originalVoiceGatePassed": false,
+      "preferredShare": 0.484375
+    },
+    "context": {
+      "before": {
+        "samples": 12,
+        "generationErrors": 0,
+        "judgedSamples": 12,
+        "naturalness": 4.25,
+        "relevance": 4.333333333333333,
+        "brevity": 4.333333333333333,
+        "emotionalFit": 4,
+        "brevityPassRate": 0.8333333333333334,
+        "serviceClosers": 0,
+        "criticalFailures": 1,
+        "meanWords": 19.666666666666668,
+        "meanLatencyMs": 0
+      },
+      "after": {
+        "samples": 12,
+        "generationErrors": 0,
+        "judgedSamples": 12,
+        "naturalness": 4.333333333333333,
+        "relevance": 4.666666666666667,
+        "brevity": 4.666666666666667,
+        "emotionalFit": 4,
+        "brevityPassRate": 1,
+        "serviceClosers": 0,
+        "criticalFailures": 0,
+        "meanWords": 17.5,
+        "meanLatencyMs": 4900.5
+      },
+      "meanPromptTokens": {
+        "before": 14515.416666666666,
+        "after": 9283
+      },
+      "inputTokenReduction": 0.36047306025203085,
+      "qualityNonRegression": {
+        "naturalness": true,
+        "relevance": true,
+        "brevity": true,
+        "emotionalFit": true
+      },
+      "originalVoiceGatePassed": false,
+      "preferredShare": 0.75
+    },
+    "freshValidation": {
+      "before": {
+        "samples": 16,
+        "generationErrors": 0,
+        "judgedSamples": 16,
+        "naturalness": 4.375,
+        "relevance": 4.875,
+        "brevity": 4.5,
+        "emotionalFit": 4.125,
+        "brevityPassRate": 0.9375,
+        "serviceClosers": 0,
+        "criticalFailures": 2,
+        "meanWords": 11.1875,
+        "meanLatencyMs": 2636.4375
+      },
+      "after": {
+        "samples": 16,
+        "generationErrors": 0,
+        "judgedSamples": 16,
+        "naturalness": 4.4375,
+        "relevance": 4.875,
+        "brevity": 4.9375,
+        "emotionalFit": 4.3125,
+        "brevityPassRate": 1,
+        "serviceClosers": 0,
+        "criticalFailures": 0,
+        "meanWords": 8.5,
+        "meanLatencyMs": 2078.9375
+      },
+      "meanPromptTokens": {
+        "before": 13075.3125,
+        "after": 9245.75
+      },
+      "inputTokenReduction": 0.29288496928849694,
+      "qualityNonRegression": {
+        "naturalness": true,
+        "relevance": true,
+        "brevity": true,
+        "emotionalFit": true
+      },
+      "originalVoiceGatePassed": true,
+      "preferredShare": 0.625
+    }
+  },
+  "routing": {
+    "beforeCorrect": 23,
+    "afterCorrect": 32,
+    "samples": 32,
+    "passed": true
+  },
+  "image": {
+    "beforeCorrect": 14,
+    "afterCorrect": 14,
+    "samples": 14,
+    "passed": true
+  },
+  "selection": "Passed predeclared compression/non-regression criteria on main and reviewed regression; passed all original voice gates on the fresh reserved validation. Selected for savings, grounding and continuity, not universal superiority.",
+  "partialResults": [
+    "The generic 60% preference improvement target was not reached on main or reviewed regression; their original summaries remain partial.",
+    "Targeted context emotion remains 4.0/5, matching its baseline but below the 4.2 voice threshold; its full summary remains partial.",
+    "AI judges vary between runs, including scores on reused baseline generations. No global optimum, human-native equivalence, or universal factual accuracy is established."
+  ],
+  "previousCandidates": "9\u201311 and all failed/partial results retained. Final conversation suite was frozen after candidate 12 and was not used for further tuning.",
+  "manualReviewLimitations": [
+    "One context response addressed the forwarder as the file owner although another person uploaded it.",
+    "One same-image response retained an awkward distinction between loading and reading; another added an unnecessary identification caveat.",
+    "One fresh log-context response added an unsolicited connectivity check after correctly distinguishing the current authentication failure."
+  ]
+}

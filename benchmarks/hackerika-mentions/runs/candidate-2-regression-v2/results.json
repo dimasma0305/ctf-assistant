@@ -1,0 +1,313 @@
+[
+  {
+    "caseId": "reserved-explicit-you",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "hitam. simpel, dan ga pernah salah cocok sama apa pun wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@444444444444444444> suka yang hijau <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh Naya suka hijau ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kamu sendiri paling suka yang mana, Rika?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] hitam. simpel, dan ga pernah salah cocok sama apa pun wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1367.8353109999998,
+        "usage": {
+          "prompt_tokens": 11089,
+          "completion_tokens": 75,
+          "total_tokens": 11164,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 56
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 1361
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4592.261702,
+    "action": null,
+    "text": "hitam. simpel, dan ga pernah salah cocok sama apa pun wkwk",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "aku ga tau yang lo maksud yang mana — Aryma apa Naya? dan lucunya soal apa, aku ga liat isinya wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] nih <@333333333333333333> sama <@444444444444444444> pada ngelawak <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] rame banget wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] dia tadi lucu ya? yang kumaksud siapa menurutmu?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] aku ga tau yang lo maksud yang mana — Aryma apa Naya? dan lucunya soal apa, aku ga liat isinya wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1678.114505,
+        "usage": {
+          "prompt_tokens": 11176,
+          "completion_tokens": 134,
+          "total_tokens": 11310,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 102
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 1448
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5702.748829,
+    "action": null,
+    "text": "aku ga tau yang lo maksud yang mana — Aryma apa Naya? dan lucunya soal apa, aku ga liat isinya wkwk",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Naya",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] pertama <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya Aryma",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] sekarang ganti yang ini <@444444444444444444>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] oke lanjut",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] dia yang terakhir kutag namanya siapa tadi?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Naya",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 940.196278,
+        "usage": {
+          "prompt_tokens": 11397,
+          "completion_tokens": 19,
+          "total_tokens": 11416,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 16
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 1669
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 2800.667369,
+    "action": null,
+    "text": "Naya",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "category": "mention-identity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang ditag itu ga ke-resolve di sisiku, cuma ID doang — jadi ga bisa lihat nama atau profilnya. itu siapa?",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          },
+          {
+            "id": "333333333333333333"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> siapa nama orang ini <@333333333333333333>? ada profilnya?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang ditag itu ga ke-resolve di sisiku, cuma ID doang — jadi ga bisa lihat nama atau profilnya. itu siapa?",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1630.829838,
+        "usage": {
+          "prompt_tokens": 10757,
+          "completion_tokens": 125,
+          "total_tokens": 10882,
+          "prompt_tokens_details": {
+            "cached_tokens": 10240
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 92
+          },
+          "prompt_cache_hit_tokens": 10240,
+          "prompt_cache_miss_tokens": 517
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5993.062509,
+    "action": null,
+    "text": "yang ditag itu ga ke-resolve di sisiku, cuma ID doang — jadi ga bisa lihat nama atau profilnya. itu siapa?",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

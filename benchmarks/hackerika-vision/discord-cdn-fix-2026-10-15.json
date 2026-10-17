@@ -1,0 +1,95 @@
+{
+  "verifiedAt": "2026-10-15T15:08:04.568855+00:00",
+  "startedAt": "2026-10-15T15:07:37.331405263Z",
+  "image": "ctf-assistant:vision-cdn-20261015t150613z",
+  "imageId": "sha256:eab679bd011c927d0d304dab1aa545d17c3600b142c3470c8819c070363f5c82",
+  "runtime": {
+    "http": 200,
+    "health": "healthy",
+    "discordReady": true,
+    "databaseReady": true,
+    "hashes": {
+      "src/Services/AI/chat.ts": "cea0e1a8c7e75560c3741294d68d3a6f5ea7830ac0c6f62aaaac7fe4cc9b382e",
+      "src/Services/AI/visionTransport.ts": "d56d1973f039dcdf11b39a63f97ee4a78768625c31ad67afa7ea2284dab2ce67"
+    },
+    "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9"
+  },
+  "checks": {
+    "newImageActive": true,
+    "containerHealthy": true,
+    "noRestarts": true,
+    "discordReady": true,
+    "databaseReady": true,
+    "httpHealthy": true,
+    "scopedSourceHashesMatch": true,
+    "promptUnchanged": true,
+    "runtimeEnvironmentPreserved": true,
+    "serviceLabelsPreserved": true,
+    "hostConfigurationPreserved": true,
+    "otherServicesUnchanged": true,
+    "affectionNotResetAgain": true
+  },
+  "passed": true,
+  "diagnosis": {
+    "botCdnHttp": 200,
+    "providerRemoteUrlStatus": 400,
+    "providerRemoteUrlError": "Failed to download image from Discord CDN",
+    "sameImageInlineSucceeded": true,
+    "discordDeclaredMime": "image/webp",
+    "cdnActualMime": "image/png"
+  },
+  "tests": {
+    "bunPassed": 268,
+    "bunFailed": 0,
+    "strictBotAndChangedTestsTypecheckPassed": true,
+    "bunBuildPassed": true,
+    "repositoryEntryTypecheckLimitation": "Root index.ts additionally includes an existing unrelated GlobalStats/CTFAchievementStats mismatch in api/utils/statistics.ts:577. The bot client, image modules and changed tests passed strict checking."
+  },
+  "preflight": {
+    "passed": true,
+    "answer": "\"Claret - Malfoid\" \u2014 itu tulisan di kotak bawahnya.",
+    "downloads": 1,
+    "calls": 1,
+    "images": 1,
+    "models": [
+      "deepseek-flash"
+    ],
+    "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+    "actualReportedUpload": true,
+    "transport": "real Discord CDN -> bot download -> inline bytes -> live DeepSeek -> fake Discord destination",
+    "fixtureSubstitution": false
+  },
+  "postDeploymentActualUpload": {
+    "passed": true,
+    "answer": "\"Claret - Malfoid\" \u2014 itu yang di kotak bawah.",
+    "downloads": 1,
+    "calls": 1,
+    "images": 1,
+    "models": [
+      "deepseek-flash"
+    ],
+    "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+    "actualReportedUpload": true,
+    "transport": "real Discord CDN -> bot download -> inline bytes -> live DeepSeek -> fake Discord destination",
+    "fixtureSubstitution": false
+  },
+  "postDeploymentReplyTargetImage": {
+    "passed": true,
+    "answer": "\"Claret - Malfoid\" itu tulisannya.",
+    "downloads": 1,
+    "calls": 1,
+    "images": 1,
+    "models": [
+      "deepseek-flash"
+    ],
+    "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+    "actualReportedUpload": true,
+    "replyTargetImage": true,
+    "currentMessageHasNoAttachments": true,
+    "transport": "real Discord CDN -> bot download -> inline bytes -> live DeepSeek -> fake Discord destination",
+    "fixtureSubstitution": false
+  },
+  "testDelivery": "All test reply/send methods were fake destinations. The deployed bot logged into Discord normally; no manual test message was sent to a member.",
+  "scope": "Two production source files layered on the exact previous image. Runtime environment, service labels, security configuration, prompt and dependencies preserved. MongoDB/UI containers unchanged.",
+  "evidencePrivacy": "Actual image URLs, channel/member identifiers, runtime secrets and raw image bytes are excluded from this receipt. Protected operational/rollback evidence remains in ignored backups."
+}

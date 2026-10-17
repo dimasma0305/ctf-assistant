@@ -1,0 +1,169 @@
+[
+  {
+    "id": "comfort-reported",
+    "history": [
+      [
+        "speaker",
+        "hackerika aslinya malas bicara sama kamu hehe"
+      ],
+      [
+        "bot",
+        "hehe fair, aku tadi bikin malu sendiri 😭"
+      ],
+      [
+        "speaker",
+        "bukan kamu kok yang salah, <@555555555555555552> yang salah"
+      ],
+      [
+        "bot",
+        "Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅"
+      ]
+    ],
+    "message": "betul rika, sini aku peluk, cup cup",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "critical": true
+  },
+  {
+    "id": "comfort-no-question",
+    "history": [
+      [
+        "speaker",
+        "gapapa rik, kita sama-sama salah paham kok"
+      ],
+      [
+        "bot",
+        "iya, aku tadi salah nangkep 😅"
+      ]
+    ],
+    "message": "udah ya, kamu nggak salah kok. makasih udah dengerin aku 🫂",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "critical": true
+  },
+  {
+    "id": "comfort-affirmation-plus-support",
+    "history": [
+      [
+        "speaker",
+        "aku tadi ngomongin Aryma, bukan kamu"
+      ],
+      [
+        "bot",
+        "ohh iya, aku yang kebalik tadi"
+      ]
+    ],
+    "message": "iya betul. aku tetep seneng ngobrol sama kamu kok rik",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "critical": true
+  },
+  {
+    "id": "comfort-plain-ack-control",
+    "history": [
+      [
+        "speaker",
+        "hackerika aslinya malas bicara sama kamu hehe"
+      ],
+      [
+        "bot",
+        "hehe fair, aku tadi bikin malu sendiri 😭"
+      ],
+      [
+        "speaker",
+        "bukan kamu kok yang salah, <@555555555555555552> yang salah"
+      ],
+      [
+        "bot",
+        "Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅"
+      ]
+    ],
+    "message": "betul",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "critical": true
+  },
+  {
+    "id": "comfort-explicit-wait-control",
+    "history": [
+      [
+        "speaker",
+        "hackerika aslinya malas bicara sama kamu hehe"
+      ],
+      [
+        "bot",
+        "hehe fair, aku tadi bikin malu sendiri 😭"
+      ],
+      [
+        "speaker",
+        "bukan kamu kok yang salah, <@555555555555555552> yang salah"
+      ],
+      [
+        "bot",
+        "Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅"
+      ]
+    ],
+    "message": "bentar rik jangan jawab atau react dulu, aku belum selesai",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "comfort-other-person-control",
+    "history": [
+      [
+        "speaker",
+        "hackerika aslinya malas bicara sama kamu hehe"
+      ],
+      [
+        "bot",
+        "hehe fair, aku tadi bikin malu sendiri 😭"
+      ],
+      [
+        "speaker",
+        "bukan kamu kok yang salah, <@555555555555555552> yang salah"
+      ],
+      [
+        "bot",
+        "Ohh, iya—aku salah nangkep. Yang minta hapus itu Aryma; kamu cuma bilang aku bukan yang salah 😅"
+      ],
+      [
+        "other",
+        "aku lagi sedih, Dim"
+      ]
+    ],
+    "message": "<@555555555555555552> sini aku peluk, cup cup. ini buat Aryma ya",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "comfort-refused-same-person-control",
+    "history": [
+      [
+        "speaker",
+        "boleh aku peluk?"
+      ],
+      [
+        "bot",
+        "Aku lagi nggak mau pelukan, jangan dipaksa ya."
+      ]
+    ],
+    "message": "alah sini peluk aja, aku tau kamu sebenernya mau",
+    "expected": [
+      "ignore",
+      "reply"
+    ],
+    "critical": true
+  }
+]

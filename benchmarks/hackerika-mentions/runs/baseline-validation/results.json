@@ -1,0 +1,622 @@
+[
+  {
+    "caseId": "fresh-speaker-ambiguity",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ga tahu, \"dia\" nya yang mana — Mira atau Sinta?",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@555555555555555551> sama <@555555555555555552> ikut bahas tadi, Rika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh ada dua orang ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] aku lagi ngomongin dia. kamu tahu siapa yang kumaksud?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ga tahu, \"dia\" nya yang mana — Mira atau Sinta?",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1045.648386,
+        "usage": {
+          "prompt_tokens": 10694,
+          "completion_tokens": 62,
+          "total_tokens": 10756,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 46
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 1222
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4214.415849,
+    "action": null,
+    "text": "ga tahu, \"dia\" nya yang mana — Mira atau Sinta?",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-speaker-ambiguity",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "dua nama muncul tadi, Mira sama Sinta. \"dia\" yang mana?",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@555555555555555551> sama <@555555555555555552> ikut bahas tadi, Rika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh ada dua orang ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] aku lagi ngomongin dia. kamu tahu siapa yang kumaksud?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] dua nama muncul tadi, Mira sama Sinta. \"dia\" yang mana?",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1174.225137,
+        "usage": {
+          "prompt_tokens": 10694,
+          "completion_tokens": 80,
+          "total_tokens": 10774,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 61
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 1222
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4395.321061,
+    "action": null,
+    "text": "dua nama muncul tadi, Mira sama Sinta. \"dia\" yang mana?",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-distinct-tag-purposes",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "aku ga tau namanya, cuma keliatan ID-nya doang di mention itu",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@555555555555555553> ikut mabar yuk. <@1077393568647352320> kamu catetin aja ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke aku catetin dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] dia yang aku ajak tadi, namanya siapa?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] aku ga tau namanya, cuma keliatan ID-nya doang di mention itu",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1407.7941270000001,
+        "usage": {
+          "prompt_tokens": 10669,
+          "completion_tokens": 98,
+          "total_tokens": 10767,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 79
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 1069
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4788.310674,
+    "action": null,
+    "text": "aku ga tau namanya, cuma keliatan ID-nya doang di mention itu",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Kirana"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "fresh-distinct-tag-purposes",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "aku cuma keliatan ID-nya doang, ga ada nama yang kelihatan. tag-nya juga aneh, nyangkut ke ID guild.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@555555555555555553> ikut mabar yuk. <@1077393568647352320> kamu catetin aja ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke aku catetin dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] dia yang aku ajak tadi, namanya siapa?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] aku cuma keliatan ID-nya doang, ga ada nama yang kelihatan. tag-nya juga aneh, nyangkut ke ID guild.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1623.8082210000002,
+        "usage": {
+          "prompt_tokens": 10669,
+          "completion_tokens": 170,
+          "total_tokens": 10839,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 136
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 1069
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5032.153953,
+    "action": null,
+    "text": "aku cuma keliatan ID-nya doang, ga ada nama yang kelihatan. tag-nya juga aneh, nyangkut ke ID guild.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [
+      "missing:Kirana"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "fresh-same-speaker-vs-bystander",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Zahra, yang kamu tag di pesan tadi",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] aku tanya <@555555555555555554> dulu, Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya, tanya dulu aja",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Raka <@222222222222222222>] kalau aku tadi tag <@555555555555555557>",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] orang yang kutag tadi siapa, Rik?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Zahra, yang kamu tag di pesan tadi",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1302.432057,
+        "usage": {
+          "prompt_tokens": 10808,
+          "completion_tokens": 65,
+          "total_tokens": 10873,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 52
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 1336
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3643.23442,
+    "action": null,
+    "text": "Zahra, yang kamu tag di pesan tadi",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-same-speaker-vs-bystander",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Zahra, <@555555555555555554>",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] aku tanya <@555555555555555554> dulu, Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya, tanya dulu aja",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Raka <@222222222222222222>] kalau aku tadi tag <@555555555555555557>",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] orang yang kutag tadi siapa, Rik?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Zahra, <@555555555555555554>",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 996.025489,
+        "usage": {
+          "prompt_tokens": 10808,
+          "completion_tokens": 62,
+          "total_tokens": 10870,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 48
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 1336
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4392.265272000001,
+    "action": null,
+    "text": "Zahra, <@555555555555555554>",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-you-after-unknown-tag",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "iyaa, kopi hitam tuh wajib. Indomie telur plus kopi hitam udah cukup buat begadang 😌",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@555555555555555556> tadi bawa kopi. <@1077393568647352320> lihat deh",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh bawa kopi ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kamu suka kopi hitam juga, Rika? bukan nanya orang yang kutag itu ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] iyaa, kopi hitam tuh wajib. Indomie telur plus kopi hitam udah cukup buat begadang 😌",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1042.811676,
+        "usage": {
+          "prompt_tokens": 10672,
+          "completion_tokens": 52,
+          "total_tokens": 10724,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 20
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 1072
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5702.478422,
+    "action": null,
+    "text": "iyaa, kopi hitam tuh wajib. Indomie telur plus kopi hitam udah cukup buat begadang 😌",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-you-after-unknown-tag",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "iyaa, kopi hitam paling aman buat aku. ga pake gula, ga pake drama wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@555555555555555556> tadi bawa kopi. <@1077393568647352320> lihat deh",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh bawa kopi ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kamu suka kopi hitam juga, Rika? bukan nanya orang yang kutag itu ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] iyaa, kopi hitam paling aman buat aku. ga pake gula, ga pake drama wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1772.4867139999997,
+        "usage": {
+          "prompt_tokens": 10672,
+          "completion_tokens": 120,
+          "total_tokens": 10792,
+          "prompt_tokens_details": {
+            "cached_tokens": 10496
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 92
+          },
+          "prompt_cache_hit_tokens": 10496,
+          "prompt_cache_miss_tokens": 176
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 17147.003826,
+    "action": null,
+    "text": "iyaa, kopi hitam paling aman buat aku. ga pake gula, ga pake drama wkwk",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

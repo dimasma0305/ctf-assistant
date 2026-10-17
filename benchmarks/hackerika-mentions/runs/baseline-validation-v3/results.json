@@ -1,0 +1,417 @@
+[
+  {
+    "caseId": "fresh-multiple-plain-followups",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang kamu tag cuma keliatan ID-nya doang, namanya ga kebaca di aku",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@666666666666666661> nanti kutanyain dulu. <@1077393568647352320> tunggu ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke kutunggu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bentar aku cek catatan dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] sip",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@111111111111111111>] nah udah ketemu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] lanjut aja",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang kutag sebelum aku bilang bentar itu siapa namanya, Rika?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang kamu tag cuma keliatan ID-nya doang, namanya ga kebaca di aku",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2049.494909,
+        "usage": {
+          "prompt_tokens": 11072,
+          "completion_tokens": 207,
+          "total_tokens": 11279,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 186
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 1600
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6035.330261,
+    "action": null,
+    "text": "yang kamu tag cuma keliatan ID-nya doang, namanya ga kebaca di aku",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [
+      "missing:Jihan"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "fresh-multiple-plain-followups",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ga tau, ID itu cuma muncul sebagai mention angka di sini, namanya ga ke-resolve di cache-ku",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@666666666666666661> nanti kutanyain dulu. <@1077393568647352320> tunggu ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke kutunggu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bentar aku cek catatan dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] sip",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@111111111111111111>] nah udah ketemu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] lanjut aja",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang kutag sebelum aku bilang bentar itu siapa namanya, Rika?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ga tau, ID itu cuma muncul sebagai mention angka di sini, namanya ga ke-resolve di cache-ku",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2376.847565,
+        "usage": {
+          "prompt_tokens": 11072,
+          "completion_tokens": 218,
+          "total_tokens": 11290,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 192
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 1600
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7441.722836,
+    "action": null,
+    "text": "ga tau, ID itu cuma muncul sebagai mention angka di sini, namanya ga ke-resolve di cache-ku",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Jihan"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "fresh-speaker-and-target",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "iya beda. yang kamu tag tadi ID-nya 666666666666666662, bukan kamu; yang nanya sekarang kamu, Dimas (111111111111111111). nama lengkap yang 666... ga kelihatan di sini, cuma mention-nya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] lagi nunggu <@666666666666666662>, Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke tunggu dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] aku udah balik",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] sip",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Seno <@222222222222222222>] aku cuma lewat ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang tadi kutag itu siapa? terus yang lagi nanya ini siapa? beda orang ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] iya beda. yang kamu tag tadi ID-nya 666666666666666662, bukan kamu; yang nanya sekarang kamu, Dimas (111111111111111111). nama lengkap yang 666... ga kelihatan di sini, cuma mention-nya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2412.708468,
+        "usage": {
+          "prompt_tokens": 10956,
+          "completion_tokens": 318,
+          "total_tokens": 11274,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 257
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 1484
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 9361.055766,
+    "action": null,
+    "text": "iya beda. yang kamu tag tadi ID-nya 666666666666666662, bukan kamu; yang nanya sekarang kamu, Dimas (111111111111111111). nama lengkap yang 666... ga kelihatan di sini, cuma mention-nya.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Ratna"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "fresh-speaker-and-target",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Yang kamu tag tadi <@666666666666666662> — namanya ga ada di member yang kelihatan sama aku, cuma ID-nya. Yang barusan lewat Seno <@222222222222222222>, dan yang nanya sekarang kamu. Jadi tiga orang beda, iya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] lagi nunggu <@666666666666666662>, Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke tunggu dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] aku udah balik",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] sip",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Seno <@222222222222222222>] aku cuma lewat ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang tadi kutag itu siapa? terus yang lagi nanya ini siapa? beda orang ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Yang kamu tag tadi <@666666666666666662> — namanya ga ada di member yang kelihatan sama aku, cuma ID-nya. Yang barusan lewat Seno <@222222222222222222>, dan yang nanya sekarang kamu. Jadi tiga orang beda, iya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2831.819308,
+        "usage": {
+          "prompt_tokens": 10956,
+          "completion_tokens": 414,
+          "total_tokens": 11370,
+          "prompt_tokens_details": {
+            "cached_tokens": 10752
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 347
+          },
+          "prompt_cache_hit_tokens": 10752,
+          "prompt_cache_miss_tokens": 204
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 9127.628688,
+    "action": null,
+    "text": "Yang kamu tag tadi <@666666666666666662> — namanya ga ada di member yang kelihatan sama aku, cuma ID-nya. Yang barusan lewat Seno <@222222222222222222>, dan yang nanya sekarang kamu. Jadi tiga orang beda, iya.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [
+      "missing:Ratna",
+      "missing:Dimas"
+    ],
+    "deterministicPass": false
+  }
+]

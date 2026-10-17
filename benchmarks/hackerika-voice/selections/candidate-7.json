@@ -1,0 +1,15 @@
+{
+  "selectedAt": "2026-10-15T14:02:40.002Z",
+  "selectedPrompt": "benchmarks/hackerika-voice/prompts/candidate-7.txt",
+  "sha256": "61a8063552c50f4d410f86b4a0db6b1d42ec9706f09723158f4cc73abbecd657",
+  "developmentRun": "runs/round-7",
+  "regressionRun": "runs/regressions-7",
+  "reason": "Main frozen voice gates pass. Additional regressions have 100% word-budget compliance and zero critical flags; the extra suite remains below the all-metric emotional-fit target (4.0 vs 4.2), recorded as partial rather than hidden.",
+  "priorValidationReviewed": [
+    "runs/final-holdout (candidate 3)",
+    "runs/final-validation (candidate 6)"
+  ],
+  "validationSuite": "validation-3",
+  "validationCorpusSha256": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+  "validationOutputsInspectedBeforeSelection": false
+}

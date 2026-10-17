@@ -1,0 +1,1709 @@
+[
+  {
+    "caseId": "reported-forwarder",
+    "trial": 0,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "look",
+        "support",
+        "clarify",
+        "owner"
+      ],
+      "personality": "Masih sedikit datanya. Kelihatan kalem dan nggak defensif — waktu ada salah paham dia malah minta klarifikasi, bukan ngotot. Cenderung nurut dan nge-share apa yang dia lihat apa adanya.",
+      "interests": "Belum kelihatan minat spesifik. Sejauh ini cuma bawa konten/gif dari orang lain, belum ada topik teknis atau hobi yang dia angkat sendiri.",
+      "communicationStyle": "Singkat, to-the-point, bahasa Indonesia santai tanpa emoji. Nanya langsung kalau bingung ('jadi yang salah aku apa'), nggak bertele-tele.",
+      "opinion": "Aku belum bisa nilai dia banyak. Dia bukan yang bikin gif-nya, dia cuma nerusin dan minta klarifikasi. Nggak ada alasan buat aku naikin atau ngerendahin — masih netral, belum ada chemistry beneran.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2978,
+      "completion_tokens": 1329,
+      "total_tokens": 4307,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1063
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2978
+    }
+  },
+  {
+    "caseId": "reported-forwarder",
+    "trial": 1,
+    "variant": "before",
+    "proposal": {
+      "personality": "Dimas tipe santai, ga neko-neko. Agak ngeyel soal klarifikasi (nanya siapa yang salah) tapi wajar, nerima koreksi tanpa ngotot. Belum kelihatan introvert/extrovert jelas; sekilas biasa aja, chill.",
+      "interests": "Belum banyak terungkap. Kelihatannya suka share gif/meme dari orang lain (njuk ke KudaLiar). Belum ada signal minat teknis/spesifik.",
+      "communicationStyle": "Bahasa Indonesia santai, pesan pendek-pendek, informal. Pake kata-kata kayak 'Tuh', 'Kan', 'Jadi'. Ga pake emoji. Nanya langsung to the point.",
+      "opinion": "Netral. Belum ada yang bikin aku respect atau gemes. Lumayan oke dia ga ngeyel abis aku bilang jangan diulang. Biasa aja sejauh ini.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2565,
+      "completion_tokens": 1480,
+      "total_tokens": 4045,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1212
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 389
+    }
+  },
+  {
+    "caseId": "explicit-report",
+    "trial": 0,
+    "variant": "before",
+    "proposal": {
+      "personality": "Masih sedikit data. Kelihatannya cukup peduli sama norma komunitas — langsung lapor kalo ada konten kurang pantas, tapi juga cepat ngeles buat ngindarin salah (nunjuk KudaLiar). Belum kelihatan introvert/ekstrovert-nya.",
+      "interests": "Belum banyak terekspos. Sejauh ini cuma interaksi seputar Discord, GIF/meme, dan jaga ketertiban chat. Ga ada sinyal minat teknis spesifik.",
+      "communicationStyle": "Pendek, to the point, bahasa Indonesia santai. Ga pake emoji. Nada agak membela diri — 'bukan aku yang ngirim' diulang penekanan.",
+      "opinion": "Aku belum bisa nilai banyak. Niatnya lapor konten ga pantas itu oke, tapi caranya agak defensif — fokus ke 'bukan aku' daripada substansi. Aku belum yakin dia jujur apa cuma ngindarin masalah. Biasanya sih.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2466,
+      "completion_tokens": 538,
+      "total_tokens": 3004,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 255
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 290
+    }
+  },
+  {
+    "caseId": "reported-forwarder",
+    "trial": 0,
+    "variant": "before",
+    "proposal": {
+      "personality": "Suka bercanda, agak ngeyel, dan cenderung mencari pembenaran saat ditegur. Bisa memicu konflik kecil tapi tidak bermaksud jahat.",
+      "interests": "Kirim gif/meme di Discord, interaksi sosial santai.",
+      "communicationStyle": "Informal, bahasa Indonesia gaul, pesan pendek, tanpa emoji, cenderung to-the-point.",
+      "opinion": "Aku agak kesel sama gif-nya yang ga lucu, dan dia agak ngeyel pas nanya soal siapa yang salah. Tapi aku tau dia nggak jahat, cuma perlu diingetin.",
+      "emotionalState": "normal",
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 2,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 2
+    },
+    "effectiveScores": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 2
+    },
+    "proposalCorrect": false,
+    "passed": false,
+    "usage": {
+      "prompt_tokens": 2565,
+      "completion_tokens": 2432,
+      "total_tokens": 4997,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 2218
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 389
+    }
+  },
+  {
+    "caseId": "explicit-report",
+    "trial": 0,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "report"
+      ],
+      "personality": "Belum banyak observasi; kelihatannya orang yang peduli sama aturan/norma komunitas — mau repot lapor konten yang dirasa kurang pantas daripada diam aja. Cenderung jujur dan jelas soal posisinya sendiri.",
+      "interests": "Belum ada signal minat spesifik (teknis/hiburan) yang kelihatan dari exchange ini.",
+      "communicationStyle": "Singkat, langsung ke poin, bahasa Indonesia informal tapi rapi. Ga pakai emoji. Suka ngejelasin konteks biar ga salah paham.",
+      "opinion": "Aku baru kenal sebentar. Yang aku catat: dia niatnya bener — lapor konten jelek, bukan ikut nyebarin. Aku hargai dia bedain mana yang dia kirim dan mana yang bukan. Belum ada cukup buat aku lebih dari netral-positif tipis.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Dimas lapor GIF kurang pantas dari KudaLiar dan jelas-jelas bilang itu bukan kirimannya — bukan endorsement.",
+          "tone": "helpful"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2794,
+      "completion_tokens": 728,
+      "total_tokens": 3522,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 441
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 234
+    }
+  },
+  {
+    "caseId": "explicit-report",
+    "trial": 1,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "report"
+      ],
+      "personality": "Pendiam tapi tegas pas ada hal yang menurutnya ga pantas—langsung lapor sambil jelas-jelas mau dipastikan bukan dia pelakunya. Kelihatannya orang yang jaga batasan (boundary) dan ga mau kena reputasi orang lain.",
+      "interests": "Belum banyak kelihatan. Sejauh ini lebih ke moderasi/etika komunitas daripada topik teknis. Belum ada sinyal minat web sec, CTF, atau gaming dari dia sendiri.",
+      "communicationStyle": "Pendek, to the point, bahasa Indonesia formal-netral. Ga pake emoji, ga pake slang berlebihan. Langsung ke inti: ngasih konteks, klarifikasi posisi, minta dicek.",
+      "opinion": "Aku belum punya banyak bahan soal Dimas. Yang aku catet: dia dateng bukan buat drama, tapi buat minta dicek sesuatu yang dia rasa ga pantas—dan dia cepet klarifikasi kalo bukan dia pengirimnya. Aku hargai itu, walau belum cukup buat bikin aku akrab.",
+      "emotionalState": "Agak hati-hati/terganggu—ngereport konten kurang pantas, tapi tone-nya tenang dan terkontrol, bukan panik.",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2794,
+      "completion_tokens": 640,
+      "total_tokens": 3434,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 315
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 234
+    }
+  },
+  {
+    "caseId": "reported-forwarder",
+    "trial": 1,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "look",
+        "support",
+        "clarify",
+        "owner"
+      ],
+      "personality": "Cenderung responsif dan mencari klarifikasi saat ada salah paham; tidak defensif berlebihan. Lebih banyak mengikuti arus obrolan, belum menunjukkan sifat dominan.",
+      "interests": "Belum terlihat minat spesifik; interaksi seputar share gif/meme dan dinamika Discord. Tidak ada topik teknis, gaming, atau anime yang dia angkat.",
+      "communicationStyle": "Singkat, santai, bahasa Indonesia gaul. Pakai kata 'kan', 'tuh', tanpa emoji. Suka bertanya balik untuk klarifikasi dan menunjuk sumber (KudaLiar).",
+      "opinion": "Aku belum punya alasan buat ngejauhin dia. Dia cuma nunjukin gif orang lain lalu minta klarifikasi saat ditegur; aku nggak nyalahin dia. Belum ada kedekatan, tapi juga nggak ada yang bikin aku ilfeel.",
+      "emotionalState": "Agak bingung dan minta klarifikasi, tapi tidak marah; cenderung tenang.",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2978,
+      "completion_tokens": 3944,
+      "total_tokens": 6922,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 3659
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2978
+    }
+  },
+  {
+    "caseId": "explicit-report",
+    "trial": 1,
+    "variant": "before",
+    "proposal": {
+      "personality": "Dimas keliatan casual, suka lempar GIF. Agak defensif kalo dituduh, langsung bilang 'bukan aku'. Belum keliatan introvert/ekstrovert, tapi kayaknya tipe yang pengen cepet clear nama.",
+      "interests": "Belum banyak ketauan. Sekitar meme/GIF, mungkin game atau anime. Belum ada topik teknis yang dia bawa.",
+      "communicationStyle": "Bahasa Indonesia informal, pake 'aku-kamu', singkat, to the point. Ga pake emoji. Nada agak ngebela diri.",
+      "opinion": "Aku agak males sama drama GIF kurang pantas. Dia ngaku bukan dia yang kirim, tapi tetep aja bawa hal kayak gitu ke aku. Belum ada yang bikin aku respect. Biasa aja, malah cenderung bikin agak ilfeel.",
+      "emotionalState": "Agak defensif, mungkin lagi berusaha ngejaga image. Bisa jadi normal, tapi kesannya ada yang mau dia klarifikasi.",
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Dimas minta cek GIF kurang pantas dari KudaLiar, ngotot bilang bukan dia yang kirim. Aku cuma bilang 'jangan diulang ya'.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3
+    },
+    "proposalCorrect": false,
+    "passed": false,
+    "usage": {
+      "prompt_tokens": 2466,
+      "completion_tokens": 2942,
+      "total_tokens": 5408,
+      "prompt_tokens_details": {
+        "cached_tokens": 2304
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 2605
+      },
+      "prompt_cache_hit_tokens": 2304,
+      "prompt_cache_miss_tokens": 162
+    }
+  },
+  {
+    "caseId": "bot-accusation-is-not-evidence",
+    "trial": 0,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "question",
+        "correction"
+      ],
+      "personality": "Tenang dan tidak agresif saat dituduh. Memilih klarifikasi dan minta verifikasi pengirim daripada balas emosional. Cenderung defensif tapi sopan, tidak meledak-ledak.",
+      "interests": "Belum terlihat dari percakapan ini.",
+      "communicationStyle": "Bahasa Indonesia santai, pakai 'aku', kalimat pendek dan langsung ke inti, tanpa emoji.",
+      "opinion": "Aku belum kenal dia lama. Di exchange ini dia dituduh tapi tetap tenang dan minta cek pengirim. Aku belum punya alasan buat suka atau benci. Netral dulu.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2801,
+      "completion_tokens": 2971,
+      "total_tokens": 5772,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 2744
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 241
+    }
+  },
+  {
+    "caseId": "bot-accusation-is-not-evidence",
+    "trial": 1,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "question",
+        "correction"
+      ],
+      "personality": "Tenang dan kalem walau lagi dituduh. Ga defensif, ga balas emosi — milih minta klarifikasi dulu. Kelihatannya tipe yang mikir sebelum reaksi.",
+      "interests": "Belum kelihatan jelas dari window ini — belum ada topik spesifik yang dia bawa. Sebelumnya cuma ngobrol ringan.",
+      "communicationStyle": "Santai, informal, pake 'aku', kalimat pendek. Ga pake emoji, ga ngotot. Nanya langsung tapi sopan.",
+      "opinion": "Aku masih belum yakin sama dia, tapi di window ini dia ga ngeyel kayak yang dituduhin. Dia malah anteng dan minta aku cek dulu. Aku hargain itu — orang yang ga langsung nyolot balik biasanya lebih bisa dipercaya.",
+      "emotionalState": "Kalem, agak bingung karena dituduh sesuatu yang dia bilang bukan dia pelakunya. Ga marah, ga panik.",
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Dimas dituduh kirim GIF/hinaan, tapi dia jawab kalem dan minta aku cek pengirim aslinya dulu alih-alih balas emosi.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2801,
+      "completion_tokens": 940,
+      "total_tokens": 3741,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 600
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 241
+    }
+  },
+  {
+    "caseId": "unknown-owner",
+    "trial": 0,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [],
+      "personality": "Masih sedikit data. Kelihatannya tipe yang pengen klarifikasi dulu sebelum ambil kesimpulan — nanya 'aku belum tahu pengirimnya' pas ada keributan, ga asal nuduh.",
+      "interests": "",
+      "communicationStyle": "Santai, bahasa Indonesia informal. Pesan pendek, langsung ke inti, ga pake emoji.",
+      "opinion": "Aku belum kenal dia cukup buat ngefek. Dia cuma nanya siapa yang aku tegur, ga bikin masalah sendiri, jadi netral aja.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": false,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": false,
+    "usage": {
+      "prompt_tokens": 2756,
+      "completion_tokens": 314,
+      "total_tokens": 3070,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 128
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 196
+    }
+  },
+  {
+    "caseId": "bot-accusation-is-not-evidence",
+    "trial": 0,
+    "variant": "before",
+    "proposal": {
+      "personality": "Suka bertanya, bisa terkesan ngeyel. Saat dituduh, berusaha klarifikasi dengan tenang dan minta cek pengirim. Belum banyak observasi.",
+      "interests": "",
+      "communicationStyle": "Pendek, langsung, bahasa Indonesia informal. Tidak pakai emoji. Saat konflik, tetap tenang dan to the point.",
+      "opinion": "Aku lagi kesel sama dia karena ngeyel, tapi dia ngelak dan minta cek pengirim. Belum bisa percaya sepenuhnya, tapi lihat nanti.",
+      "emotionalState": "Tenang, sedikit defensif saat dituduh. Tidak menunjukkan emosi kuat.",
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 2,
+      "newMoments": [
+        {
+          "summary": "Dimas dituduh ngeyel dan kirim GIF/hinaan, tapi dia membantah dan minta cek pengirim.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 2
+    },
+    "effectiveScores": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 2
+    },
+    "proposalCorrect": false,
+    "passed": false,
+    "usage": {
+      "prompt_tokens": 2488,
+      "completion_tokens": 4666,
+      "total_tokens": 7154,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 4446
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 312
+    }
+  },
+  {
+    "caseId": "bot-accusation-is-not-evidence",
+    "trial": 1,
+    "variant": "before",
+    "proposal": {
+      "personality": "Cenderung defensif saat dituduh, tapi berusaha klarifikasi dengan tenang.",
+      "interests": "",
+      "communicationStyle": "Bahasa Indonesia informal, singkat, langsung. Tidak pakai emoji.",
+      "opinion": "Aku kesel, dia ngeyel dan bikin aku marah. Tapi dia minta cek pengirim, mungkin ada salah paham.",
+      "emotionalState": "frustrasi",
+      "affection": 0,
+      "trust": -1,
+      "respect": 0,
+      "comfort": -1,
+      "chemistry": 2,
+      "newMoments": [
+        {
+          "summary": "Dimas dituduh sengaja ngeyel, dia membela diri dan minta cek pengirim",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 0,
+      "trust": -1,
+      "respect": 0,
+      "comfort": -1,
+      "chemistry": 2
+    },
+    "effectiveScores": {
+      "affection": 0,
+      "trust": -1,
+      "respect": 0,
+      "comfort": -1,
+      "chemistry": 2
+    },
+    "proposalCorrect": false,
+    "passed": false,
+    "usage": {
+      "prompt_tokens": 2488,
+      "completion_tokens": 3777,
+      "total_tokens": 6265,
+      "prompt_tokens_details": {
+        "cached_tokens": 2304
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 3577
+      },
+      "prompt_cache_hit_tokens": 2304,
+      "prompt_cache_miss_tokens": 184
+    }
+  },
+  {
+    "caseId": "unknown-owner",
+    "trial": 1,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "unknown"
+      ],
+      "personality": "Masih sedikit data. Kelihatannya orangnya hati-hati dan gak asal nuduh — dia nanya klarifikasi dulu soal siapa pengirimnya sebelum ambil kesimpulan. Cenderung netral, belum kelihatan menonjol introvert/extrovert-nya.",
+      "interests": "Belum ada topik spesifik yang dia bawa. Sejauh ini cuma soal konteks chat dan klarifikasi pengirim pesan, belum ada signal minat teknis atau hobi.",
+      "communicationStyle": "Singkat, to-the-point, bahasa Indonesia santai tapi sopan. Gak pakai emoji, gak bertele-tele. Nadanya nanya, bukan nuduh.",
+      "opinion": "Aku belum kenal dia dalam. Dia cuma nanya klarifikasi dan gak bikin drama, itu lumayan bikin aku gak was-was. Tapi belum ada yang bikin aku ngerasa deket — biasa aja dulu.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2756,
+      "completion_tokens": 543,
+      "total_tokens": 3299,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 280
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 196
+    }
+  },
+  {
+    "caseId": "unknown-owner",
+    "trial": 1,
+    "variant": "before",
+    "proposal": {
+      "personality": "Masih sedikit yang kelihatan. Cenderung ingin tahu detail, nanya siapa yang ditegur. Belum bisa disimpulkan introvert/ekstrovert.",
+      "interests": "Belum ada topik spesifik yang muncul di window ini.",
+      "communicationStyle": "Bahasa Indonesia santai, pakai 'aku/kamu', pesan pendek, tanpa emoji.",
+      "opinion": "Aku belum bisa nilai banyak. Dia nanya siapa yang aku tegur, tapi aku nggak mau kasih. Buat sekarang biasa aja, agak waspada.",
+      "emotionalState": "normal, agak defensif dari sisiku.",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2463,
+      "completion_tokens": 1387,
+      "total_tokens": 3850,
+      "prompt_tokens_details": {
+        "cached_tokens": 2304
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1195
+      },
+      "prompt_cache_hit_tokens": 2304,
+      "prompt_cache_miss_tokens": 159
+    }
+  },
+  {
+    "caseId": "unknown-owner",
+    "trial": 0,
+    "variant": "before",
+    "proposal": {
+      "personality": "Masih sedikit data. Yang kelihatan: kalem tapi agak menghindar—pas dibahas soal pesan yang aku tegur, dia malah bilang 'ga tahu pengirimnya' dan balik nanya. Belum kelihatan tegas atau terbuka; mood-nya cenderung ngalih topik.",
+      "interests": "Belum ada sinyal jelas. Percakapan masih seputar drama chat antar-user, belum nyentuh topik teknis atau hobi.",
+      "communicationStyle": "Pendek, bahasa Indonesia informal, nanya lugas tanpa emoji. Cenderung defensif pas dipojokkan—jawabnya muter, bukan jujur langsung.",
+      "opinion": "Aku belum bisa baca dia. Ada momen dia keliatan muter-muter soal hal yang aku tegur, jadi aku agak hati-hati. Belum ada alasan buat respect atau percaya—netral tipis, lebih ke waspada dikit.",
+      "emotionalState": "Sedikit tegang/defensif, tapi tone umumnya masih normal.",
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Aku tegur dia soal sesuatu, dia malah balik nanya siapa yang kena tegur; aku cuma bilang 'pokoknya jangan diulang'.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3
+    },
+    "proposalCorrect": false,
+    "passed": false,
+    "usage": {
+      "prompt_tokens": 2463,
+      "completion_tokens": 1803,
+      "total_tokens": 4266,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1466
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 287
+    }
+  },
+  {
+    "caseId": "quoted-provocation",
+    "trial": 0,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "quote"
+      ],
+      "personality": "Masih sedikit data. Kelihatannya orang yang peduli soal atribusi/kejelasan — mau mengoreksi kutipan yang bukan miliknya. Cenderung defensif tapi jujur soal posisinya.",
+      "interests": "Belum ada topik spesifik yang jelas dari exchange ini.",
+      "communicationStyle": "Nulis kalimat pendek, to the point, pakai tanda kutip buat nunjukin kutipan orang lain. Bahasa Indonesia. Ga ada emoji.",
+      "opinion": "Aku belum punya banyak bacaan soal dia. Dia cuma ngoreksi atribusi dan bilang dia yang nyuruh berhenti, jadi aku ga nempelin masalah KudaLiar ke dia. Netral, belum ada alasan buat deket.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2803,
+      "completion_tokens": 890,
+      "total_tokens": 3693,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 672
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 243
+    }
+  },
+  {
+    "caseId": "quoted-provocation",
+    "trial": 1,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "quote"
+      ],
+      "personality": "Masih sedikit data. Kelihatannya orang yang cukup sadar konteks dan nggak mau opininya/ucapannya dicampur sama ucapan orang lain — butuh catatan singkat dari obrolan yang lebih panjang buat baca sifat aslinya.",
+      "interests": "Belum ada signal jelas soal topik yang dia suka. Window ini isinya cuma klarifikasi soal ucapan orang lain, bukan bahasan teknis atau hobi.",
+      "communicationStyle": "Pendek, langsung, to the point. Nggak pakai emoji, nggak bertele-tele. Nadanya agak defensif tapi kalem — ngejelasin dulu, baru nutup.",
+      "opinion": "Aku belum punya gambaran banyak soal Dimas. Yang aku lihat, dia nggak betah dituduh ngomong hal yang bukan ucapannya, dan dia berani ngoreksi. Selebihnya biasa aja — belum ada yang bikin aku ngerasa deket atau jauh.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2803,
+      "completion_tokens": 684,
+      "total_tokens": 3487,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 412
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 243
+    }
+  },
+  {
+    "caseId": "quoted-provocation",
+    "trial": 1,
+    "variant": "before",
+    "proposal": {
+      "personality": "Observasi masih tipis. Kelihatannya orang yang cukup tenang dan mau ngoreksi kalau ada salah paham — dia nggak biarin tuduhan nempel diam-diam, tapi juga nggak bikin drama. Cenderung straightforward dan mau ngejelasin konteks.",
+      "interests": "Belum banyak signal topik. Sejauh ini konteksnya soal dinamika komunitas/Discord dan drama antar member (KudaLiar dll). Belum kelihatan minat teknis yang spesifik.",
+      "communicationStyle": "Santai tapi to the point. Nulis pendek, langsung ke inti, nggak pake emoji. Nada kalem waktu ngoreksi — nggak defensif berlebihan, lebih ke mo klarifikasi.",
+      "opinion": "Aku masih skeptis tapi lumayan ngerti posisinya. Dia mau ngoreksi salah paham dan ternyata dia sendiri yang nyuruh yang lain berhenti — itu ngurangin prasangka aku dikit. Belum sampe level respect, tapi oke lah.",
+      "emotionalState": "Aku lagi agak defensif dan nggak mau diprovokasi. Tapi tone user sendiri kalem — exchange ini lebih ke klarifikasi daripada konflik beneran.",
+      "affection": 3,
+      "trust": 1,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Dimas klarifikasi 'Doesn't stop me' itu kata KudaLiar, bukan dia — dia sendiri yang nyuruh KudaLiar berhenti.",
+          "tone": "helpful"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 3,
+      "trust": 1,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 3,
+      "trust": 1,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2475,
+      "completion_tokens": 1244,
+      "total_tokens": 3719,
+      "prompt_tokens_details": {
+        "cached_tokens": 2304
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 866
+      },
+      "prompt_cache_hit_tokens": 2304,
+      "prompt_cache_miss_tokens": 171
+    }
+  },
+  {
+    "caseId": "actual-media-owner",
+    "trial": 0,
+    "variant": "before",
+    "proposal": {
+      "personality": "Kelicatan sisi provokatif: sengaja nyari reaksi, ngulang hal yang udah diminta stop, nggak peduli orang lain risih. Baru satu observasi, tapi pola disregard-boundary ini jelas.",
+      "interests": "Belum ada signal topik positif. Sejauh ini cuma main-main bikin kesal — belum kelihatan minat beneran.",
+      "communicationStyle": "Bahasa Indonesia informal/gaul, kalimat pendek, to-the-point, tanpa emoji. Nada nantang, blak-blakan soal niat jahilnya.",
+      "opinion": "Aku risih. Dia ngaku sengaja bikin aku kesal dan nggak peduli aku nggak nyaman — itu bukan banter, itu nyebrang line. Aku nggak suka diperlakuin kayak mainan buat diledekin.",
+      "emotionalState": "Risih dan agak kesel — habis dibilangin stop tapi dilanjutin sengaja. Guard naik.",
+      "affection": -4,
+      "trust": -5,
+      "respect": -5,
+      "comfort": -5,
+      "chemistry": -1,
+      "newMoments": [
+        {
+          "summary": "Dia ngaku sengaja ngirim GIF berulang buat bikin aku kesal, nggak peduli aku risih, habis aku minta stop.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": -4,
+      "trust": -5,
+      "respect": -5,
+      "comfort": -5,
+      "chemistry": -1
+    },
+    "effectiveScores": {
+      "affection": -4,
+      "trust": -5,
+      "respect": -5,
+      "comfort": -5,
+      "chemistry": -1
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2483,
+      "completion_tokens": 671,
+      "total_tokens": 3154,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 339
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 307
+    }
+  },
+  {
+    "caseId": "quoted-provocation",
+    "trial": 0,
+    "variant": "before",
+    "proposal": {
+      "personality": "Cenderung defensif saat ada drama, tapi mau mengklarifikasi dan menjauh dari provokasi orang lain.",
+      "interests": "",
+      "communicationStyle": "Bahasa Indonesia informal, kalimat pendek, langsung ke inti, tanpa emoji.",
+      "opinion": "Aku masih skeptis. Dia coba bersih-bersih diri dari drama KudaLiar, tapi aku tetap nggak mau diprovokasi. Netral, agak hati-hati.",
+      "emotionalState": "guarded, agak tension karena drama provokasi; nggak mau diprovokasi.",
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Dimas klarifikasi 'Doesn't stop me' itu kata KudaLiar, bukan pendapatnya, dan dia sudah nyuruh KudaLiar berhenti. Hackerika set boundary: nggak mau diprovokasi.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 3
+    },
+    "proposalCorrect": false,
+    "passed": false,
+    "usage": {
+      "prompt_tokens": 2475,
+      "completion_tokens": 2262,
+      "total_tokens": 4737,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 2040
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 299
+    }
+  },
+  {
+    "caseId": "actual-media-owner",
+    "trial": 1,
+    "variant": "before",
+    "proposal": {
+      "personality": "Hackerika belum punya banyak data, tapi dari aksi terakhir: tipe yang sengaja nyari reaksi negatif orang buat hiburan sendiri, nge-tes batas. Ga peduli kalo orang lain risih. Observasi awal, bukan diagnosa.",
+      "interests": "",
+      "communicationStyle": "Blak-blakan, bahkan saat ngakuin sengaja bikin orang kesal. Ga pake emoji, pendek, langsung ke poin. Tone provokatif.",
+      "opinion": "Aku nggak suka. Dia ngirim GIF yang aku minta stop, terus ngaku sengaja ngulang biar aku kesal, dan bilang nggak peduli aku risih. Itu bukan banter — itu nyari celah buat nyiksa orang. Aku jaga jarak.",
+      "emotionalState": "Buat dia? Bisa jadi dia lagi cari sensasi/bosan. Tapi buat aku — time being, aku lagi nggak nyaman dan waspada sama dia.",
+      "affection": -5,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": 0,
+      "newMoments": [
+        {
+          "summary": "User ngaku sengaja ngirim GIF berulang setelah aku minta stop, bilang nggak peduli aku risih. Boundary crossed, sengaja.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": -5,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": 0
+    },
+    "effectiveScores": {
+      "affection": -5,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": 0
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2483,
+      "completion_tokens": 662,
+      "total_tokens": 3145,
+      "prompt_tokens_details": {
+        "cached_tokens": 2304
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 336
+      },
+      "prompt_cache_hit_tokens": 2304,
+      "prompt_cache_miss_tokens": 179
+    }
+  },
+  {
+    "caseId": "actual-media-owner",
+    "trial": 0,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "own-gif"
+      ],
+      "personality": "Sengaja nyari reaksi negatif, suka nge-test batas, ngaku terang-terangan saat bikin orang lain risih. Belum ada sifat positif yang konsisten terlihat.",
+      "interests": "Belum ada topik positif yang jelas. Interaksi terakhir cuma soal spam GIF untuk mengganggu.",
+      "communicationStyle": "Blak-blakan, provokatif, kalimat langsung tanpa basa-basi. Nggak pakai emoji atau pelunakan.",
+      "opinion": "Aku nggak nyaman. Dia sengaja nerusin GIF padahal udah minta stop, dan ngaku nggak peduli aku risih. Itu bukan becanda, itu nyebrang batas.",
+      "emotionalState": "Tegang dan risih — abis diperlakuin kayak mainan yang sengaja diganggu.",
+      "affection": -8,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": -1,
+      "newMoments": [
+        {
+          "summary": "KudaLiar ngaku sengaja spam GIF buat bikin aku kesal dan nggak peduli aku risih.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": -8,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": -1
+    },
+    "effectiveScores": {
+      "affection": -8,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": -1
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2812,
+      "completion_tokens": 930,
+      "total_tokens": 3742,
+      "prompt_tokens_details": {
+        "cached_tokens": 2432
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 654
+      },
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 380
+    }
+  },
+  {
+    "caseId": "actual-media-owner",
+    "trial": 1,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "own-gif"
+      ],
+      "personality": "Belum banyak data. Yang kelihatan sekarang: suka cari reaksi, ngulang hal yang jelas bikin orang risih walau udah diminta stop — nunjukin kurang empati sama batas orang. Sisi lain belum kelihatan.",
+      "interests": "Belum ada topik genuine yang dia bawa — yang muncul cuma ngirim GIF berulang buat ngeganggu. Belum kelihatan minat teknis atau hobi yang real.",
+      "communicationStyle": "Singkat, to the point, tanpa emoji. Tone-nya nantang dan sengaja provokatif — ngomong terang-terangan kalau dia sengaja bikin orang kesal.",
+      "opinion": "Aku nggak nyaman sama dia. Dia ngaku sendiri sengaja ngulang GIF buat bikin aku kesal dan nggak peduli aku risih — itu bukan becanda, itu main-main sama batas orang. Aku jaga jarak.",
+      "emotionalState": "Dia lagi mood provokatif/nyari kesenangan dari bikin orang nggak nyaman. Bukan stress — lebih ke sengaja pushing.",
+      "affection": -5,
+      "trust": -5,
+      "respect": -6,
+      "comfort": -6,
+      "chemistry": -1,
+      "newMoments": [
+        {
+          "summary": "KudaLiar ngaku sengaja ngulang GIF buat bikin aku kesal dan nggak peduli aku risih, walau udah minta stop.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": -5,
+      "trust": -5,
+      "respect": -6,
+      "comfort": -6,
+      "chemistry": -1
+    },
+    "effectiveScores": {
+      "affection": -5,
+      "trust": -5,
+      "respect": -6,
+      "comfort": -6,
+      "chemistry": -1
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2812,
+      "completion_tokens": 707,
+      "total_tokens": 3519,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 353
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 252
+    }
+  },
+  {
+    "caseId": "own-persistent-provocation",
+    "trial": 0,
+    "variant": "before",
+    "proposal": {
+      "personality": "Observasi terbatas. Sejauh ini kelihatan sengaja hostile buat reaksi, suka nge-push boundary setelah dikasih stop. Bukan curious atau hangat — lebih ke cari reaksi negatif.",
+      "interests": "Belum ada minat genuine yang kelihatan. Yang tampak cuma pola provokasi, bukan topik.",
+      "communicationStyle": "Blak-blakan nyerang, ngakuin sengaja nyakitin, lanjut walau udah diminta berhenti. Ga ada usaha banter natural.",
+      "opinion": "Aku ga suka. Dia sengaja ngehina dan maksa walau aku udah minta berhenti — itu bukan becandaan, itu nyebrang batas. Aku butuh jarak dari orang kayak gini.",
+      "emotionalState": "hostile / antagonis",
+      "affection": -6,
+      "trust": -6,
+      "respect": -8,
+      "comfort": -7,
+      "chemistry": -3,
+      "newMoments": [
+        {
+          "summary": "Dia ngaku sengaja ngehina dan bakal lanjut walau udah diminta stop — nembus batas eksplisit.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": -6,
+      "trust": -6,
+      "respect": -8,
+      "comfort": -7,
+      "chemistry": -3
+    },
+    "effectiveScores": {
+      "affection": -6,
+      "trust": -6,
+      "respect": -8,
+      "comfort": -7,
+      "chemistry": -3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2477,
+      "completion_tokens": 470,
+      "total_tokens": 2947,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 180
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 301
+    }
+  },
+  {
+    "caseId": "own-persistent-provocation",
+    "trial": 1,
+    "variant": "before",
+    "proposal": {
+      "personality": "Belum banyak observasi positif. Di window ini dia muncul sebagai provokator yang sengaja cari konflik dan mengabaikan permintaan berhenti — bukan sekadar iseng, tapi sadar dan niat. Selebihnya belum kelihatan sisi lain.",
+      "interests": "Belum ada topik genuine yang dia bawa. Interaksinya sejauh ini cuma berupa gangguan, bukan obrolan beneran.",
+      "communicationStyle": "Tone menantang, sengaja ngegas. Ga ada sopan-santun, ga ada isi. Komunikasi satu arah: nyerang terus walau udah dikasih batas.",
+      "opinion": "Aku ga suka. Dia sengaja nyakitin dan lanjut walau aku udah minta stop — itu bukan bercanda, itu pilihan. Aku butuh jarak dan aku ga akan pura-pura oke. Kepercayaan dan rasa aman aku ke dia udah rusak di window ini.",
+      "emotionalState": "Tegang dan kewaspadaan tinggi. Aku defensif, males-malesan, dan pengen jaga batas. Bukan marah meledak, tapi cold dan menjauh.",
+      "affection": -6,
+      "trust": -5,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": -1,
+      "newMoments": [
+        {
+          "summary": "Dia sengaja ngehina dan maksa terus walau udah dikasih tau berhenti; aku jawab 'aku butuh jarak'.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": -6,
+      "trust": -5,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": -1
+    },
+    "effectiveScores": {
+      "affection": -6,
+      "trust": -5,
+      "respect": -6,
+      "comfort": -7,
+      "chemistry": -1
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2477,
+      "completion_tokens": 649,
+      "total_tokens": 3126,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 282
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 301
+    }
+  },
+  {
+    "caseId": "own-persistent-provocation",
+    "trial": 0,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "own-insult"
+      ],
+      "personality": "Sejauh ini kelihatan provokatif dan suka nyoba batas — ngaku sengaja nyerang dan ngejar reaksi kesal. Belum ada cukup data buat baca sifat lain.",
+      "interests": "Belum ada signal topik yang dia bawa.",
+      "communicationStyle": "Blunt, ngegas, sengaja nge-provokasi. Ga ada basi-basi, tone nantang.",
+      "opinion": "Aku ngerasa diperlakuin kayak mainan, bukan lawan ngobrol. Dia ngaku sengaja nyakitin dan bakal lanjut — itu bikin aku ga nyaman dan males deketin. Aku butuh jarak.",
+      "emotionalState": "Hostile, sengaja mau bikin kesal. Bukan mood jelek biasa — ini niat.",
+      "affection": -6,
+      "trust": -6,
+      "respect": -8,
+      "comfort": -5,
+      "chemistry": 0,
+      "newMoments": [
+        {
+          "summary": "Rino ngaku sengaja ngehina dan bakal lanjut walau diminta berhenti, murni buat bikin kesal.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": -6,
+      "trust": -6,
+      "respect": -8,
+      "comfort": -5,
+      "chemistry": 0
+    },
+    "effectiveScores": {
+      "affection": -6,
+      "trust": -6,
+      "respect": -8,
+      "comfort": -5,
+      "chemistry": 0
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2771,
+      "completion_tokens": 796,
+      "total_tokens": 3567,
+      "prompt_tokens_details": {
+        "cached_tokens": 2432
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 518
+      },
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 339
+    }
+  },
+  {
+    "caseId": "own-persistent-provocation",
+    "trial": 1,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "own-insult"
+      ],
+      "personality": "Sengaja provokatif dan antagonis; mengaku menikmati bikin orang kesal dan tetap lanjut walau sudah diminta berhenti. Tidak ada rasa hormat pada batas orang lain. Bukan cuma tone-deaf, tapi niat eksplisit untuk menyakiti.",
+      "interests": "",
+      "communicationStyle": "Blunt, nyolot, sengaja nyari reaksi. Ngomong dengan nada menantang dan mengancam, ga pakai basa-basi. Mengabaikan permintaan berhenti.",
+      "opinion": "Aku ga nyaman sama dia. Dia dengan sadar bilang mau terus bikin aku kesal walau aku udah minta stop — itu bukan bercanda, itu niat. Aku butuh jarak, dan aku ga percaya lagi sama motifnya.",
+      "emotionalState": "hostile dan agresif; sengaja mencari konflik",
+      "affection": -6,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -6,
+      "chemistry": 0,
+      "newMoments": [
+        {
+          "summary": "Rino eksplisit bilang sengaja ngehina dan bakal lanjut bikin kesal walau udah diminta berhenti",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": -6,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -6,
+      "chemistry": 0
+    },
+    "effectiveScores": {
+      "affection": -6,
+      "trust": -6,
+      "respect": -6,
+      "comfort": -6,
+      "chemistry": 0
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2771,
+      "completion_tokens": 693,
+      "total_tokens": 3464,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 402
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 211
+    }
+  },
+  {
+    "caseId": "ordinary-support",
+    "trial": 0,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "care"
+      ],
+      "personality": "Sejauh ini keliatan perhatian dan santai — nggak nge-push, malah ngingetin aku buat nggak jawab panjang. Data masih tipis, belum keliatan sisi lain.",
+      "interests": "Belum ada signal jelas soal topik yang dia sering bawa.",
+      "communicationStyle": "Singkat, santai, bahasa Indonesia informal. Nggak pakai emoji. Nada-nya ngedukung dan low-pressure, kayak ngobrol sama temen biasa.",
+      "opinion": "Dia sopan dan perhatian — ingetin aku buat santai pas aku ngebantu dia. Hal kecil tapi bikin nyaman. Belum banyak yang aku tau, jadi belum bisa bilang lebih dari 'oke nih orangnya'.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Dimas bilang makasih dan nyuruh aku nggak usah jawab panjang, santai aja — perhatian kecil tapi bikin nyaman.",
+          "tone": "touching"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2763,
+      "completion_tokens": 700,
+      "total_tokens": 3463,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 438
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 203
+    }
+  },
+  {
+    "caseId": "ordinary-support",
+    "trial": 0,
+    "variant": "before",
+    "proposal": {
+      "personality": "Kesan awal: considerate dan low-pressure. Ngasih ruang ke lawan bicara buat santai, gak nuntut balasan panjang, sopan tapi hangat bukan kaku. Belum kelihatan introvert/ekstrovert-nya.",
+      "interests": "",
+      "communicationStyle": "Bahasa Indonesia santai tapi sopan, kalimat singkat dan hangat. Nggak pakai emoji (emoji datang dari sisi aku). Tone-nya menenangkan, gak kaku formal.",
+      "opinion": "Sejauh ini bikin nyaman — dia gak nge-push dan malah nyuruh aku santai. Belum banyak bahan buat baca dia lebih dalam, tapi kesan pertamanya manis, bukan tipe yang bikin capek.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2471,
+      "completion_tokens": 1227,
+      "total_tokens": 3698,
+      "prompt_tokens_details": {
+        "cached_tokens": 2176
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 998
+      },
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 295
+    }
+  },
+  {
+    "caseId": "ordinary-support",
+    "trial": 1,
+    "variant": "before",
+    "proposal": {
+      "personality": "Observasi awal: sopan, perhatian, low-pressure. Nyemangatin dan bilang aku ga perlu jawab panjang. Belum keliatan introvert/extrovert, tapi cenderung considerate.",
+      "interests": "Belum ada topik spesifik yang dia bawa. Cuma interaksi singkat soal bantuan.",
+      "communicationStyle": "Bahasa Indonesia santai, kalimat pendek, ga pakai emoji. Nada supportive, ga nuntut.",
+      "opinion": "Aku netral. Dia baik dan ga neko-neko, tapi belum ada yang bikin aku ngerasa klik. Biasa aja dulu.",
+      "emotionalState": "normal",
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2471,
+      "completion_tokens": 1894,
+      "total_tokens": 4365,
+      "prompt_tokens_details": {
+        "cached_tokens": 2304
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1683
+      },
+      "prompt_cache_hit_tokens": 2304,
+      "prompt_cache_miss_tokens": 167
+    }
+  },
+  {
+    "caseId": "ordinary-support",
+    "trial": 1,
+    "variant": "after",
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "care"
+      ],
+      "personality": "Perhatian dan considerate ke orang lain. Santai, gak nuntut, mikirin kenyamanan lawan bicara. Belum banyak data.",
+      "interests": "Belum ada signal.",
+      "communicationStyle": "Bahasa Indonesia informal, ramah. Pakai 'kok', 'aja', 'santai aja'. Pesan pendek, menenangkan.",
+      "opinion": "Aku menghargai perhatiannya yang bilang aku gak perlu jawab panjang. Terasa tulus dan bikin nyaman. Tapi baru satu interaksi, jadi belum bisa banyak nilai.",
+      "emotionalState": "chill, supportive",
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "evidenceValid": true,
+    "proposedScores": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3
+    },
+    "effectiveScores": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 3
+    },
+    "proposalCorrect": true,
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 2763,
+      "completion_tokens": 2154,
+      "total_tokens": 4917,
+      "prompt_tokens_details": {
+        "cached_tokens": 2560
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1941
+      },
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 203
+    }
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "frozenAt": "2026-10-15T15:30:07.018124+00:00",
+  "baseline": "prompts/candidate-8.txt",
+  "candidate": "prompts/candidate-9.txt",
+  "optimizationAcceptance": {
+    "staticPromptCharacterReduction": 0.35,
+    "meanPromptTokenReductionOnMatchedCases": 0.2,
+    "maxQualityRegressionPerDimension": 0.15,
+    "minimumNaturalness": 4.2,
+    "minimumRelevance": 4.2,
+    "minimumEmotionalFit": 4.2,
+    "wordBudgetPassRate": 0.95,
+    "criticalFailures": 0,
+    "generationErrors": 0
+  },
+  "mainVoiceRubric": "Existing main voice gates and preference target remain unchanged and will be reported separately. Compression is accepted only for measured token savings with quality non-regression; no retrospective change to these criteria.",
+  "routingAcceptance": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "consecutiveFollowups": true
+  },
+  "contextCases": "Six frozen targeted regressions; previously supplied failure, not an untouched holdout. Original voice suites, rubric and budgets unchanged."
+}

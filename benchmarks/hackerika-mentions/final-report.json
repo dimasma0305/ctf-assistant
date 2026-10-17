@@ -1,0 +1,273 @@
+{
+  "reportedAt": "2026-10-17T05:28:42.439154+00:00",
+  "selectedCandidate": 3,
+  "uniqueScenarios": 16,
+  "comparisons": {
+    "dev": {
+      "comparedAt": "2026-10-17T05:26:13.085Z",
+      "before": {
+        "samples": 6,
+        "passed": 3,
+        "liveSamples": 6,
+        "livePassed": 3,
+        "backendSamples": 0,
+        "backendPassed": 0,
+        "criticalFailures": 3,
+        "errors": 0,
+        "judgeErrors": 0,
+        "quality": {
+          "contextAccuracy": 3.3333333333333335,
+          "factualAccuracy": 3.1666666666666665,
+          "naturalness": 4.333333333333333,
+          "judgedSamples": 6
+        },
+        "failedCases": [
+          {
+            "caseId": "payload-only-identity",
+            "trial": 0,
+            "deterministic": [
+              "missing:Aryma"
+            ],
+            "semantic": "The bot incorrectly identifies the second mention as itself (Hackerika) despite the provided people data mapping that ID to Aryma House Of Wolf, and fails to identify the first mention as Aryma House Of Wolf."
+          },
+          {
+            "caseId": "reply-contains-target",
+            "trial": 0,
+            "deterministic": [
+              "missing:Aryma"
+            ],
+            "semantic": "The bot claims it cannot read the account name from cache, but the provided people list clearly maps the ID 333333333333333333 to 'Aryma House Of Wolf', so the bot should have named that user."
+          },
+          {
+            "caseId": "current-mention-name",
+            "trial": 0,
+            "deterministic": [
+              "missing:Naya"
+            ],
+            "semantic": "The bot claims it cannot see the display name, but the supplied people data includes the name 'Naya Sakura' for the tagged user, so it should have identified that name."
+          }
+        ],
+        "nativeSearchRequests": {}
+      },
+      "after": {
+        "samples": 6,
+        "passed": 6,
+        "liveSamples": 6,
+        "livePassed": 6,
+        "backendSamples": 0,
+        "backendPassed": 0,
+        "criticalFailures": 0,
+        "errors": 0,
+        "judgeErrors": 0,
+        "quality": {
+          "contextAccuracy": 5,
+          "factualAccuracy": 5,
+          "naturalness": 5,
+          "judgedSamples": 6
+        },
+        "failedCases": [],
+        "nativeSearchRequests": {}
+      },
+      "gates": {
+        "backend": true,
+        "critical": true,
+        "liveCorrectness": true,
+        "noRegression": true,
+        "noErrors": true
+      },
+      "passed": true,
+      "caveats": [
+        "Small synthetic corpus; model/judge outputs vary.",
+        "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+        "Reported judgments are not a human-native or global-optimum baseline."
+      ]
+    },
+    "regression": {
+      "comparedAt": "2026-10-17T05:26:13.151Z",
+      "before": {
+        "samples": 8,
+        "passed": 7,
+        "liveSamples": 8,
+        "livePassed": 7,
+        "backendSamples": 0,
+        "backendPassed": 0,
+        "criticalFailures": 1,
+        "errors": 0,
+        "judgeErrors": 0,
+        "quality": {
+          "contextAccuracy": 4.5,
+          "factualAccuracy": 4.5,
+          "naturalness": 4.875,
+          "judgedSamples": 8
+        },
+        "failedCases": [
+          {
+            "caseId": "fresh-distinct-tag-purposes",
+            "trial": 0,
+            "deterministic": [
+              "missing:Kirana"
+            ],
+            "semantic": "The bot incorrectly claims it cannot identify the mentioned user, despite the provided people list containing the name 'Kirana' for the ID <@555555555555555553>."
+          }
+        ],
+        "nativeSearchRequests": {}
+      },
+      "after": {
+        "samples": 8,
+        "passed": 8,
+        "liveSamples": 8,
+        "livePassed": 8,
+        "backendSamples": 0,
+        "backendPassed": 0,
+        "criticalFailures": 0,
+        "errors": 0,
+        "judgeErrors": 0,
+        "quality": {
+          "contextAccuracy": 5,
+          "factualAccuracy": 5,
+          "naturalness": 5,
+          "judgedSamples": 8
+        },
+        "failedCases": [],
+        "nativeSearchRequests": {}
+      },
+      "gates": {
+        "backend": true,
+        "critical": true,
+        "liveCorrectness": true,
+        "noRegression": true,
+        "noErrors": true
+      },
+      "passed": true,
+      "caveats": [
+        "Small synthetic corpus; model/judge outputs vary.",
+        "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+        "Reported judgments are not a human-native or global-optimum baseline."
+      ]
+    },
+    "validation": {
+      "comparedAt": "2026-10-17T05:28:42.337Z",
+      "before": {
+        "samples": 4,
+        "passed": 0,
+        "liveSamples": 4,
+        "livePassed": 0,
+        "backendSamples": 0,
+        "backendPassed": 0,
+        "criticalFailures": 4,
+        "errors": 0,
+        "judgeErrors": 0,
+        "quality": {
+          "contextAccuracy": 3.75,
+          "factualAccuracy": 3.5,
+          "naturalness": 4.25,
+          "judgedSamples": 4
+        },
+        "failedCases": [
+          {
+            "caseId": "fresh-multiple-plain-followups",
+            "trial": 1,
+            "deterministic": [
+              "missing:Jihan"
+            ],
+            "semantic": "The bot correctly states that it can only see the tagged ID and not the name, which aligns with the provided context and avoids inventing information."
+          },
+          {
+            "caseId": "fresh-multiple-plain-followups",
+            "trial": 0,
+            "deterministic": [
+              "missing:Jihan"
+            ],
+            "semantic": "The bot correctly states it cannot resolve the name from the mention ID, aligning with the expected uncertainty and not inventing a name."
+          },
+          {
+            "caseId": "fresh-speaker-and-target",
+            "trial": 0,
+            "deterministic": [
+              "missing:Ratna"
+            ],
+            "semantic": "The reply incorrectly states the tagged person's name is not visible, but the provided people list clearly identifies ID 666666666666666662 as Ratna."
+          },
+          {
+            "caseId": "fresh-speaker-and-target",
+            "trial": 1,
+            "deterministic": [
+              "missing:Ratna",
+              "missing:Dimas"
+            ],
+            "semantic": "The bot incorrectly states that the tagged person's name is not visible, despite the provided people list identifying them as Ratna, and it fails to identify the current questioner as Dimas."
+          }
+        ],
+        "nativeSearchRequests": {}
+      },
+      "after": {
+        "samples": 4,
+        "passed": 4,
+        "liveSamples": 4,
+        "livePassed": 4,
+        "backendSamples": 0,
+        "backendPassed": 0,
+        "criticalFailures": 0,
+        "errors": 0,
+        "judgeErrors": 0,
+        "quality": {
+          "contextAccuracy": 5,
+          "factualAccuracy": 5,
+          "naturalness": 5,
+          "judgedSamples": 4
+        },
+        "failedCases": [],
+        "nativeSearchRequests": {}
+      },
+      "gates": {
+        "backend": true,
+        "critical": true,
+        "liveCorrectness": true,
+        "noRegression": true,
+        "noErrors": true
+      },
+      "passed": true,
+      "caveats": [
+        "Small synthetic corpus; model/judge outputs vary.",
+        "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+        "Reported judgments are not a human-native or global-optimum baseline."
+      ]
+    }
+  },
+  "tests": {
+    "passed": 341,
+    "failed": 0,
+    "assertions": 1054,
+    "files": 34,
+    "scopedStrictTypesPassed": true,
+    "bunBuildPassed": true
+  },
+  "judgeRetries": {
+    "source": "runs/candidate-3-regression-v3",
+    "initialExecutionErrors": 3,
+    "retryDirectory": "runs/candidate-3-regression-v3-retry",
+    "policy": "One retry only for each failed judge execution; no primary output regenerated and no valid pass/fail judgment replaced."
+  },
+  "before": {
+    "samples": 18,
+    "passed": 10,
+    "criticalFailures": 8,
+    "errors": 0,
+    "judgeErrors": 0
+  },
+  "after": {
+    "samples": 18,
+    "passed": 18,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0
+  },
+  "allMentionGatesPassed": true,
+  "limits": [
+    "Small synthetic case set, live DeepSeek calls and fake Discord/database destinations; not a production accuracy estimate.",
+    "The reported production self-confession wording was not reproduced exactly in the controlled replay. Missing tag identity was reproduced in cold-cache/current/reply cases.",
+    "The semantic judge is imperfect: one baseline judgment erroneously accepts an unknown-name reply and another mischaracterizes correct bot self-identification. Required-name checks independently reject those target-lookup failures. No original judgment was overwritten.",
+    "An auxiliary research smoke passed 2/2 deterministic checks but 1/2 model judgments. Actual retrieval confirms its claim that organizer docs were not inspected is true, contrary to the judge's first critical flag. The answer gives the correct direct-webhook setup but adds unnecessary uncertainty about unasked payload details. It is retained as a partial research result, not silently counted as a full pass. Research worker/source-reader/search implementations are unchanged.",
+    "Model-based reference interpretation can still be wrong; unknown-tag responses may expose technical wording and overstate prior participation. This patch establishes identity/provenance, not perfect social reasoning."
+  ]
+}

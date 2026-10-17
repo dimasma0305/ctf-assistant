@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-17T08:38:32.156Z",
+  "runtime": "ctf-assistant:attention-followup-candidate-1-20261017",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 2,
+  "corpusHash": "c16cffb6659f0c57a277a14c0135fe08cc6a3a2a2283bd55ba4a310c2540e8e6",
+  "workerHash": "008b704f0692706551e1eb6a9b3c3e696e182e29bded4713754ead98226b51b4",
+  "selectedIds": [
+    "followup-delivered-after-aside",
+    "followup-delivered-in-burst",
+    "followup-ack-keeps-quiet",
+    "followup-explicit-human-handoff"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-attention/followup-delivery-corpus.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "6ec43c01e40a75ea73914c9f1a9e1bc34a6de063dc3e47be61a4b9ffe9da2280",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

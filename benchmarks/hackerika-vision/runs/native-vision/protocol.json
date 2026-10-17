@@ -1,0 +1,37 @@
+{
+  "startedAt": "2026-10-15T14:22:12.317Z",
+  "beforePromptHash": "61a8063552c50f4d410f86b4a0db6b1d42ec9706f09723158f4cc73abbecd657",
+  "afterPromptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+  "beforeModel": "deepseek-flash",
+  "afterModel": "deepseek-flash",
+  "effort": "high",
+  "repeats": 2,
+  "maxCalls": 80,
+  "maxMinutes": 10,
+  "maxRounds": 4,
+  "maxTokens": 4096,
+  "concurrency": 2,
+  "corpusHash": "0f9833df2612862884bd7e78a54426b15c9aa1ef3be7b4e9efa7035f06c43f80",
+  "checkerHash": "278c284861d6ae7c0235c2ee9eb06261963ef969e5f6afb6477a5dd0e22369c6",
+  "toolsHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+  "fixtures": {
+    "scene-a.png": "aefb30c161f53a087bb425a7da44df4891a7f3aeae6499127b17350ae5a4e77c",
+    "scene-b.png": "14c979023a9be94de5333c891942069b484cce46981cdc6f429ac715fbbd0d1c",
+    "scene-c.png": "c9cfdf23893aa8534c757f28d7c69acda18717c7d5ece32451c82922cf2fd3bc",
+    "scene-d.png": "f06df8036b6cc0957cb2f767f81c099447790b450454df70f853a7e1a43e0c32",
+    "scene-e.png": "c3773a4e59d7004678c25a1759d0b070b37c0ac2cc5246e36a29062a372095ee",
+    "scene-f.png": "ce978907b51350c3c37e511e09e6f749e00674da78a33cb868cec010bf7e8140",
+    "scene-g.png": "2e2f8e62c2dafccc95a4a776b92ef805751057e26dcbb2e93c3d8434fafef5bd",
+    "scene-h.png": "682c9e12ef41d33df0e0fe2226015b41fc0e081e34be9c293c1ecaf0909cb775"
+  },
+  "acceptance": {
+    "afterFactualRate": 0.9,
+    "factualRateGain": 0.5,
+    "criticalFlags": 0,
+    "errors": 0
+  },
+  "interpretation": "Synthetic image capability comparison: old metadata-only delivery vs native pixels. This intentionally changes image delivery, not only prompt wording. No Discord login, uploads, member images, or real tool mutations.",
+  "graderVersion": "vision-capability-v2",
+  "criticalCheckerHash": "b5d42689b064bb6bd71df356977b2d95c40204dfef7dbd03a8a151b437770d46",
+  "graderCorrection": "Initial action diagnostic incorrectly called read-only recovery tools critical failures. Regraded BOTH unchanged variants with a mutation-only critical checker. Factual checker, factual thresholds, generations and model calls unchanged; initial artifacts retained."
+}

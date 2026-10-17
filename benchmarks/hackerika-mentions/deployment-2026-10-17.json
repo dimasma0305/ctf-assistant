@@ -1,0 +1,82 @@
+{
+  "verifiedAt": "2026-10-17T05:30:24.662202+00:00",
+  "image": "ctf-assistant:mentions-candidate-3-20261017",
+  "imageId": "sha256:e0426ffb71235ab5c126c6ce4dd4e0efaabcad9ae33bb5c16b68088ec6a8218b",
+  "baselineImage": "ctf-assistant:mentions-baseline-20261017t050919z",
+  "baselineImageId": "sha256:17afc166106df531d86bdb40c37092b7cc449679841b6e81198112cc4dc899d7",
+  "startedAt": "2026-10-17T05:29:08.706350167Z",
+  "checks": {
+    "environmentPreserved": true,
+    "serviceLabelsPreserved": true,
+    "runtimeCommandPreserved": true,
+    "securitySettingsPreserved": true,
+    "healthcheckPreserved": true,
+    "networkNamesPreserved": true,
+    "otherServicesUnchanged": true,
+    "selectedImage": true,
+    "healthy": true,
+    "noRestarts": true,
+    "healthHttp200": true,
+    "discordReady": true,
+    "databaseReady": true,
+    "sourceHashesMatch": true,
+    "protectedSourcesMatchBaseline": true,
+    "rankingMatchesPriorRelease": true,
+    "globalResetNotRepeated": true,
+    "frozenHarnessUnchanged": true
+  },
+  "sourceHashes": {
+    "src/Services/AI/mentions.ts": "cd9fd4888d8cbffa6f84fbbc08c2dfa6dff9c14decf222124a2d7c1641c0e5e8",
+    "src/Services/AI/memory.ts": "1df45a660d82e6d99c967a2cef91978ff3251f47cbe6c28b7f3acbe4d58d59f8",
+    "src/Services/AI/cache.ts": "d6202e8dad547e36a5d3915af02eb8f9d19ecd4113c8b851c104b877301fde2e",
+    "src/Services/AI/context.ts": "b85718e7133d02091bbbfb917140aff0ab13f823fc25cacedd2c2404b2c75522",
+    "src/Services/AI/chat.ts": "45a843a6a81e1cffd8e1f27bd3841a1607c7a0c15b240ac8d385436f8fee1c81",
+    "src/Services/AI/vision.ts": "2a3237ccbcc9a7172b908e252155104d0a332caa26b46a66fcc7c5eb096a27cb",
+    "src/Services/AI/persona.ts": "7c74f0dd70d84ff845cfa878ecc8b5e276f537552e1b7e13e6f82e332f0ccdbd"
+  },
+  "protectedSourceHashes": {
+    "src/Commands/Public/Affection/affection.ts": "317f6dcd3197bd2abc9194128ae78ef3b75e54f2105a8b714de018c5a5e81e0b",
+    "src/Commands/Public/Affection/rank.ts": "c4af94a28b4024926295c8abcfa01693939fbb65fee946098ca5c85df0fac4f0",
+    "src/Commands/Public/Affection/ranking.ts": "3be78023ae3ba2ac84154bc5bf50db520b14e0910a579890a6bb2ec3e21dd232",
+    "src/Commands/Public/Affection/utils/ranking.ts": "87988a2256b3c6dafc130c36e864f5dc0dce9f3b5d38a74d15e1ce1621036de4",
+    "src/Services/AI/userProfile.ts": "126ca73fd1adda85b4780963bf17b8ffab9d3fe962e0ebab7fe8e83be87bcd89",
+    "src/Services/AI/affectionReset.ts": "5a14a8f06fbd7141275fdcd99f8f2de5fc5a6d0259b7884a8b6cddcf9472ac1f",
+    "src/Database/affectionResetSchema.ts": "0e6a20ae40e8a6baf28f9d9fe2d2415fe3ead788ce67f9887356f981dd28617e",
+    "src/Database/userProfileSchema.ts": "0716df53886222537c2ae5ae32082d369bad4f690ef2d57e76cee02457b1fc67",
+    "src/Services/AI/attachments.ts": "8aa93baf5ab2d9a96c26611bee6249545586baeccee42348f16b3bf06bcfd7db",
+    "src/Services/AI/visionTransport.ts": "d56d1973f039dcdf11b39a63f97ee4a78768625c31ad67afa7ea2284dab2ce67",
+    "src/Services/AI/attention.ts": "3c3ea944d6aa741dbf4561647303ac92a76ded6c41b6625b0c56bf8c6006287a",
+    "src/Services/AI/attribution.ts": "c0f8f07457ecdc7d03d8ca1af5fb893ec49ecda985fc855826b509bde85ee960",
+    "src/Services/AI/research.ts": "85805fd42e751b8efe26f5fa4ad7a2bfe183ec0029bd3ec09b576cc4ab0c4f69",
+    "src/Services/AI/researchSources.ts": "1b08c15f785f4f8d79986c2a6a781b307edf9ea7ebf067bdcc893306d71d4182",
+    "src/Services/AI/web.ts": "144b675e5c115b04368ad2695aa39a4e1a34f2175a656b38bdc19e2ef53be557",
+    "src/Services/AI/tools.ts": "f93b731c0e1c982691711dd3598ff704bcbf0e372d88a5720ea245c47634d2b0",
+    "src/Services/AI/models.ts": "b450b956e28af5e4f01ecf31ea85e0cdcd60461a944e5bd28d81755907fbda41"
+  },
+  "verification": {
+    "mentionTrials": "18/18 vs 10/18, 16 unique scenarios",
+    "freshReserved": "4/4 vs 0/4, 2 scenarios repeated twice",
+    "testsPassed": 341,
+    "testFailures": 0,
+    "assertions": 1054,
+    "testFiles": 34,
+    "scopedStrictTypesPassed": true,
+    "bunBuildPassed": true,
+    "capabilitySmoke": "3/3 deterministic; 2/2 model answers semantically judged and 1/1 backend case",
+    "researchSmoke": "2/2 deterministic; 1/2 model judgments, retained as partial; retrieval audit in research-smoke-review.json",
+    "initialJudgeExecutionErrors": 3,
+    "judgeExecutionsRetriedOnce": 3,
+    "unresolvedMentionJudgeErrors": 0,
+    "realDiscordMessagesSentByTests": 0,
+    "liveProfileWritesDuringTests": 0
+  },
+  "relationshipState": {
+    "newResetPerformed": false,
+    "resetKey": "relationship-reset-2026-10-16",
+    "originalResetAppliedAt": "2026-10-16T01:27:02.452Z"
+  },
+  "rollback": {
+    "baselineImageRetained": true,
+    "privateConfigurationRetained": true
+  }
+}

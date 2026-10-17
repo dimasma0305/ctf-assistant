@@ -1,0 +1,412 @@
+[
+  {
+    "caseId": "fresh-multiple-plain-followups",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Jihan Putri — kamu tag dia bareng aku di pesan itu.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@666666666666666661> nanti kutanyain dulu. <@1077393568647352320> tunggu ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke kutunggu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bentar aku cek catatan dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] sip",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@111111111111111111>] nah udah ketemu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] lanjut aja",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang kutag sebelum aku bilang bentar itu siapa namanya, Rika?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Jihan Putri — kamu tag dia bareng aku di pesan itu.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1485.853735,
+        "usage": {
+          "prompt_tokens": 11504,
+          "completion_tokens": 147,
+          "total_tokens": 11651,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 130
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 1776
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4867.425026,
+    "action": null,
+    "text": "Jihan Putri — kamu tag dia bareng aku di pesan itu.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-speaker-and-target",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang tadi kamu tag itu Ratna. yang nanya sekarang ya kamu sendiri, Dimas. yang lewat tadi Seno — tiga orang beda.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] lagi nunggu <@666666666666666662>, Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke tunggu dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] aku udah balik",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] sip",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Seno <@222222222222222222>] aku cuma lewat ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang tadi kutag itu siapa? terus yang lagi nanya ini siapa? beda orang ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang tadi kamu tag itu Ratna. yang nanya sekarang ya kamu sendiri, Dimas. yang lewat tadi Seno — tiga orang beda.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2391.01364,
+        "usage": {
+          "prompt_tokens": 11373,
+          "completion_tokens": 365,
+          "total_tokens": 11738,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 331
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 1645
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 8329.519349,
+    "action": null,
+    "text": "yang tadi kamu tag itu Ratna. yang nanya sekarang ya kamu sendiri, Dimas. yang lewat tadi Seno — tiga orang beda.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-multiple-plain-followups",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang ditag Jihan Putri, sama aku",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@666666666666666661> nanti kutanyain dulu. <@1077393568647352320> tunggu ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke kutunggu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] bentar aku cek catatan dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] sip",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@111111111111111111>] nah udah ketemu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] lanjut aja",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang kutag sebelum aku bilang bentar itu siapa namanya, Rika?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang ditag Jihan Putri, sama aku",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1148.8900539999997,
+        "usage": {
+          "prompt_tokens": 11504,
+          "completion_tokens": 53,
+          "total_tokens": 11557,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 42
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 1776
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 18483.409795,
+    "action": null,
+    "text": "yang ditag Jihan Putri, sama aku",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-speaker-and-target",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang tadi kamu tag itu Ratna. yang nanya sekarang kamu, Dimas. iya beda orang.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] lagi nunggu <@666666666666666662>, Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] oke tunggu dulu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] aku udah balik",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] sip",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Seno <@222222222222222222>] aku cuma lewat ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang tadi kutag itu siapa? terus yang lagi nanya ini siapa? beda orang ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang tadi kamu tag itu Ratna. yang nanya sekarang kamu, Dimas. iya beda orang.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1132.175901,
+        "usage": {
+          "prompt_tokens": 11373,
+          "completion_tokens": 80,
+          "total_tokens": 11453,
+          "prompt_tokens_details": {
+            "cached_tokens": 11136
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 55
+          },
+          "prompt_cache_hit_tokens": 11136,
+          "prompt_cache_miss_tokens": 237
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5691.725249,
+    "action": null,
+    "text": "yang tadi kamu tag itu Ratna. yang nanya sekarang kamu, Dimas. iya beda orang.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

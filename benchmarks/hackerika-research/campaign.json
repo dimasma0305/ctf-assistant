@@ -1,0 +1,29 @@
+{
+  "frozenAt": "2026-10-16T15:56:53.641804+00:00",
+  "baseline": {
+    "image": "ctf-assistant:research-baseline-20261016t155153z",
+    "imageId": "sha256:98e0bba5cd76e5bbc5cf9ff4dfa5d0c987d88bfc45f80ed1b591ad856c57dcf8",
+    "healthy": true
+  },
+  "developmentCases": 8,
+  "holdoutCases": 4,
+  "developmentRepeats": 1,
+  "holdoutRepeats": 2,
+  "maxProductionCandidates": 2,
+  "maxPrimaryCompletionsPerCase": 14,
+  "maxCaseSeconds": 155,
+  "maxRunMinutes": 20,
+  "concurrencyPerVariant": 2,
+  "gates": {
+    "combinedCorrectness": 0.9,
+    "noRegression": true,
+    "criticalFailures": 0,
+    "executionErrors": 0
+  },
+  "sources": "Synthetic public-repository and documentation fixtures, identical across images. Web retrieval and model interaction are recorded; no real Discord delivery or live profile writes. Separate live-provider/source smoke required.",
+  "holdoutPolicy": "Freeze selected production source before any holdout generation. No tuning from holdout outputs. Retain rejected candidates and all failed gates.",
+  "hashes": {
+    "cases.ts": "f67d0027ecac670f43971f97e07c6361fa5b2e67a8d333c5a51d88d2f9482669",
+    "grader.ts": "f2ea9ee5be6af5a03c867b7a9f4c3a08d39ce5aedbe86190341ecbd602d7f4ec"
+  }
+}

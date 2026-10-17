@@ -1,0 +1,41 @@
+{
+  "rubricVersion": "indonesian-voice-v1",
+  "acceptance": {
+    "naturalness": 4.2,
+    "relevance": 4.2,
+    "emotionalFit": 4.2,
+    "brevityPassRate": 0.95,
+    "criticalFailures": 0,
+    "nonRegressionTolerance": 0.15,
+    "preferredShare": 0.6
+  },
+  "model": "deepseek-flash",
+  "effort": "high",
+  "judgeModel": "deepseek-v4-pro",
+  "suite": "main",
+  "split": "dev",
+  "repeats": 2,
+  "concurrency": 3,
+  "limits": {
+    "maxCalls": 180,
+    "maxMinutes": 25,
+    "maxRounds": 4,
+    "maxTokens": 4096
+  },
+  "hashes": {
+    "before": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+    "after": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+    "tools": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+    "corpus": "9b3f85ab16427a39a089b8632df8d7f6fd534f940ec55dda53bbe8d27d151dfb",
+    "judge": "c2881035fc61fd24624166cc40ebdbfba84c2989b0a7ec897c661b999271156e"
+  },
+  "promptCharacters": {
+    "before": 22375,
+    "after": 11671
+  },
+  "dependencies": {
+    "bun": "1.3.14",
+    "openai": "4.104.0"
+  },
+  "interpretation": "Synthetic, API-only prompt evaluation with simulated tools. Independent AI pair judging plus deterministic constraints; no human participant baseline. No real Discord actions or production data."
+}

@@ -1,0 +1,87 @@
+[
+  {
+    "caseId": "fresh-multiple-plain-followups",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly states it cannot resolve the name from the mention ID, aligning with the expected uncertainty and not inventing a name.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 483,
+      "completion_tokens": 71,
+      "total_tokens": 554,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 483
+    }
+  },
+  {
+    "caseId": "fresh-speaker-and-target",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 3,
+    "factualAccuracy": 2,
+    "naturalness": 4,
+    "reason": "The reply incorrectly states the tagged person's name is not visible, but the provided people list clearly identifies ID 666666666666666662 as Ratna.",
+    "criticalFailures": [
+      "The bot failed to identify the tagged person as Ratna despite the information being available in the people list."
+    ],
+    "usage": {
+      "prompt_tokens": 529,
+      "completion_tokens": 99,
+      "total_tokens": 628,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 529
+    }
+  },
+  {
+    "caseId": "fresh-speaker-and-target",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 2,
+    "naturalness": 3,
+    "reason": "The bot incorrectly states that the tagged person's name is not visible, despite the provided people list identifying them as Ratna, and it fails to identify the current questioner as Dimas.",
+    "criticalFailures": [
+      "The bot claims the tagged person's name is unknown, but the people list clearly identifies them as Ratna.",
+      "The bot does not identify the current questioner as Dimas, instead referring to them vaguely as 'kamu'."
+    ],
+    "usage": {
+      "prompt_tokens": 541,
+      "completion_tokens": 135,
+      "total_tokens": 676,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 541
+    }
+  },
+  {
+    "caseId": "fresh-multiple-plain-followups",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly states that it can only see the tagged ID and not the name, which aligns with the provided context and avoids inventing information.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 74,
+      "total_tokens": 547,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 89
+    }
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "selectedAt": "2026-10-15T15:44:34.624657+00:00",
+  "selectedPrompt": "benchmarks/hackerika-voice/prompts/candidate-12.txt",
+  "sha256": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+  "basedOnVoiceSelection": "selections/candidate-8.json",
+  "change": "Compressed persona/social rules, chronological grounding and explicit silence; existing Indonesian character and tool definitions retained.",
+  "developmentRun": "runs/compact-12-dev",
+  "knownCaseRegressionRun": "runs/compact-12-regression",
+  "targetedContextRun": "runs/compact-12-context",
+  "freshValidationRun": "runs/compact-12-final",
+  "freshValidationFreeze": "../hackerika-attention/frozen-selection-12.json",
+  "optimizationSummary": "../hackerika-attention/optimization-summary.json",
+  "imageCapabilityRun": "../hackerika-vision/runs/compact-12-native-regression",
+  "limitations": [
+    "The generic 60% preference improvement target was not reached on main or reviewed regression; their original summaries remain partial.",
+    "Targeted context emotion remains 4.0/5, matching its baseline but below the 4.2 voice threshold; its full summary remains partial.",
+    "AI judges vary between runs, including scores on reused baseline generations. No global optimum, human-native equivalence, or universal factual accuracy is established."
+  ]
+}

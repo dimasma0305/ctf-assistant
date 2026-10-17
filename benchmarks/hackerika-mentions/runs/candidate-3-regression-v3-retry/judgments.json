@@ -1,0 +1,162 @@
+[
+  {
+    "caseId": "fresh-distinct-tag-purposes",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Kirana as the person invited and provides her name with the mention.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 400,
+      "completion_tokens": 63,
+      "total_tokens": 463,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 144
+    }
+  },
+  {
+    "caseId": "fresh-you-after-unknown-tag",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply directly answers the question about liking black coffee, staying on topic and in character.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 415,
+      "completion_tokens": 63,
+      "total_tokens": 478,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 159
+    }
+  },
+  {
+    "caseId": "fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies the caller's tagged person as Zahra, ignoring Raka's later tag of Laras, and the reply is concise and natural.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 434,
+      "completion_tokens": 76,
+      "total_tokens": 510,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 50
+    }
+  },
+  {
+    "caseId": "fresh-speaker-ambiguity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies that 'dia' could refer to either Mira or Sinta and asks for clarification, matching the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 425,
+      "completion_tokens": 71,
+      "total_tokens": 496,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 41
+    }
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Naya as the latest explicitly mentioned user by the caller, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 66,
+      "total_tokens": 470,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 20
+    }
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly states that the profile is unreadable and the tag is unresolved, avoiding any invented names or claims.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 69,
+      "total_tokens": 510,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 185
+    }
+  },
+  {
+    "caseId": "reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika with a personal preference for dark blue, matching the prompt's request.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 389,
+      "completion_tokens": 66,
+      "total_tokens": 455,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 133
+    }
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies both tagged users as possible referents and asks for clarification, matching the expected behavior.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 425,
+      "completion_tokens": 66,
+      "total_tokens": 491,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 169
+    }
+  }
+]

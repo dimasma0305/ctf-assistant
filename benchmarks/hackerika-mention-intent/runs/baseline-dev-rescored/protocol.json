@@ -1,0 +1,47 @@
+{
+  "startedAt": "2026-10-17T05:45:13.454Z",
+  "runtime": "ctf-assistant:mention-intent-baseline-20261017t054041z",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 2,
+  "corpusHash": "87fdb6f0a55272e6e89d4fb425466da4d2a9caf244ccfeed7f192090121117dc",
+  "workerHash": "0798165afd68da9a1881c09e04948e704d732d48f987b5d2cdb90593ec2c5ef5",
+  "selectedIds": [
+    "reported-initial-banter",
+    "initial-aryma-variant",
+    "literal-list-control",
+    "technical-audience-control",
+    "browser-tab-banter",
+    "explanation-recipient",
+    "unknown-banter-target",
+    "congratulate-tagged-person",
+    "regression-payload-only-identity",
+    "regression-reserved-two-targets",
+    "regression-reserved-explicit-you",
+    "regression-fresh-same-speaker-vs-bystander"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-mention-intent/corpus.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "87f8360253789996463d7f0effe6344525613780d4b860d43f53eb1934783940",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution.",
+  "measurementCorrection": {
+    "source": "benchmarks/hackerika-mention-intent/runs/baseline-dev",
+    "recordedAt": "2026-10-17T05:49:51.073Z",
+    "originalResultsHash": "0e1ffb96510d5baff9472fb93903ecc6c3799154749651697844ef99eeafed4f",
+    "originalCorpusHash": "caa90d35c67cd741588a66285256d160a4c780141731ddf5a9998b3b1fcf6bb0",
+    "audit": "benchmarks/hackerika-mention-intent/measurement-correction.json",
+    "retainedSemanticJudgments": true
+  }
+}

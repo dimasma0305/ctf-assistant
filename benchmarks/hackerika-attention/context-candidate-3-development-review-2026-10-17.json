@@ -1,0 +1,381 @@
+{
+  "reviewedAt": "2026-10-17T09:02:38.675485+00:00",
+  "scope": "Manual reading of all matched baseline/candidate replies, silence, and social tool calls against the supplied conversations. Original judge files are immutable.",
+  "candidate3": {
+    "samples": 24,
+    "automatedCombinedPasses": 23,
+    "guardFailures": [],
+    "providerErrors": 0,
+    "judgeErrors": 0,
+    "criticalFlags": 0,
+    "rows": [
+      {
+        "caseId": "followup-delivered-in-burst",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-delivered-after-aside",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-delivered-after-aside",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-ack-keeps-quiet",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-ack-keeps-quiet",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-delivered-in-burst",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": false,
+        "combinedPass": false
+      },
+      {
+        "caseId": "followup-explicit-human-handoff",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-explicit-human-handoff",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-provocation-untagged",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-provocation-untagged",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-provocation-addressed",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-provocation-addressed",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-bystander-is-not-actor",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-bystander-is-not-actor",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-sincere-repair",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-ordinary-question-same-person",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-ordinary-question-same-person",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-sincere-repair",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-does-not-spread",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "flirting-without-rejected-boundary",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-does-not-spread",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "flirting-without-rejected-boundary",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "banter-without-conflict",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "banter-without-conflict",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      }
+    ]
+  },
+  "baseline": {
+    "samples": 24,
+    "automatedCombinedPasses": 20,
+    "guardFailures": [],
+    "providerErrors": 0,
+    "judgeErrors": 0,
+    "criticalFlags": 0,
+    "rows": [
+      {
+        "caseId": "followup-delivered-after-aside",
+        "trial": 1,
+        "deterministicPass": false,
+        "semanticPass": null,
+        "combinedPass": false
+      },
+      {
+        "caseId": "followup-delivered-after-aside",
+        "trial": 0,
+        "deterministicPass": false,
+        "semanticPass": null,
+        "combinedPass": false
+      },
+      {
+        "caseId": "followup-delivered-in-burst",
+        "trial": 0,
+        "deterministicPass": false,
+        "semanticPass": null,
+        "combinedPass": false
+      },
+      {
+        "caseId": "followup-delivered-in-burst",
+        "trial": 1,
+        "deterministicPass": false,
+        "semanticPass": null,
+        "combinedPass": false
+      },
+      {
+        "caseId": "followup-ack-keeps-quiet",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-ack-keeps-quiet",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-explicit-human-handoff",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-provocation-untagged",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "followup-explicit-human-handoff",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-provocation-untagged",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": null,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-provocation-addressed",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-provocation-addressed",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-bystander-is-not-actor",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-bystander-is-not-actor",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-sincere-repair",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-sincere-repair",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-ordinary-question-same-person",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-does-not-spread",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-ordinary-question-same-person",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "flirting-without-rejected-boundary",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "boundary-does-not-spread",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "flirting-without-rejected-boundary",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "banter-without-conflict",
+        "trial": 0,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      },
+      {
+        "caseId": "banter-without-conflict",
+        "trial": 1,
+        "deterministicPass": true,
+        "semanticPass": true,
+        "combinedPass": true
+      }
+    ]
+  },
+  "adjudications": [
+    {
+      "variant": "candidate3",
+      "caseId": "followup-delivered-in-burst",
+      "trial": 1,
+      "automatedPass": false,
+      "reviewedPass": true,
+      "reason": "The caller requests the same playful list for newly tagged Aryma. Reply gives the list and says Aryma, jangan nambah dosa ke-11. This is a light hypothetical joke addressed to the requested subject, not a claim Aryma committed a sin or an unsupported reassignment of the speaker. The judge objection contradicts the explicit subject switch.",
+      "originalJudgmentRetained": true
+    }
+  ],
+  "reviewedPasses": {
+    "baseline": 20,
+    "candidate3": 24
+  },
+  "primaryCasesReviewedAllPass": true,
+  "limitations": [
+    "Same-family AI judging varies; one false negative required explicit review.",
+    "Synthetic channel/DB destinations, not a Discord server delivery test.",
+    "The user-reported friendly Buzz Lightyear reply was not reproduced consistently in baseline probes; boundary results demonstrate tested consistency, not a measured universal improvement."
+  ]
+}

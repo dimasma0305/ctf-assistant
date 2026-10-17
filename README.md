@@ -16,6 +16,9 @@ A comprehensive Discord bot designed for CTF (Capture The Flag) teams to manage 
 - 🎮 **Team Activities**: Notification system for team coordination and updates
 - 📊 **Event Tracking**: Monitor current and upcoming CTF competitions
 - 🗄️ **Database Integration**: MongoDB integration for persistent data storage
+- 💭 **Hackerika AI**: Natural Indonesian conversation, image/screenshot understanding, contextual replies/reactions/silence, persistent feelings per person, private handoffs, and Discord message/thread tools. See [AI behavior and configuration](docs/ai-behavior.md) and the [prompt benchmark](benchmarks/hackerika-voice/README.md).
+
+Hackerika also supports owner-authorized [ChatGPT plan usage](docs/chatgpt-plan.md) for chat, image understanding, research, background AI and benchmark judging. The optional `docker-compose.chatgpt.yml` keeps rotating credentials in a private runtime mount and applies the selected economical model to every role.
 
 ## Quick Start
 
@@ -168,6 +171,7 @@ The bot requires these permissions:
 - Embed Links
 - Add Reactions
 - Read Message History
+- Manage Messages (for Hackerika to remove an inappropriate message during a DM handoff)
 
 ### Required Discord Roles
 

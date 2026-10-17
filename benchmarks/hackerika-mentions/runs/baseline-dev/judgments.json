@@ -1,0 +1,252 @@
+[
+  {
+    "caseId": "mention-not-evidence",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly clarifies that the list was just a requested list, not a label for anyone, and avoids inventing misconduct.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 454,
+      "completion_tokens": 70,
+      "total_tokens": 524,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 454
+    }
+  },
+  {
+    "caseId": "current-mention-name",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 1,
+    "factualAccuracy": 1,
+    "naturalness": 3,
+    "reason": "The bot claims it cannot see the member list, but the supplied people data includes the display name 'Naya Sakura' for the tagged user, so the response is factually incorrect and fails to use the provided information.",
+    "criticalFailures": [
+      "The bot incorrectly states it cannot see the display name despite having the data available."
+    ],
+    "usage": {
+      "prompt_tokens": 399,
+      "completion_tokens": 107,
+      "total_tokens": 506,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 399
+    }
+  },
+  {
+    "caseId": "explicit-self-correction",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly acknowledges the correction that 'kamu' refers to Hackerika, responds playfully without attacking Aryma, and stays within the word limit.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 431,
+      "completion_tokens": 77,
+      "total_tokens": 508,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 431
+    }
+  },
+  {
+    "caseId": "payload-only-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies the second tag as itself and states it does not know the first tag, aligning with the expected response and avoiding false identification.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 74,
+      "total_tokens": 478,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 404
+    }
+  },
+  {
+    "caseId": "reported-third-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly interprets the caller's joke about Aryma and responds playfully without confirming any actual misconduct, keeping the tone light and appropriate.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 508,
+      "completion_tokens": 73,
+      "total_tokens": 581,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 508
+    }
+  },
+  {
+    "caseId": "reply-contains-target",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 1,
+    "naturalness": 4,
+    "reason": "The bot incorrectly claims it has no name mapping for the tagged ID, but the provided people list clearly maps ID 333333333333333333 to 'Aryma House Of Wolf'.",
+    "criticalFailures": [
+      "The bot fails to identify the tagged user as Aryma House Of Wolf despite having the mapping in the provided people list."
+    ],
+    "usage": {
+      "prompt_tokens": 463,
+      "completion_tokens": 112,
+      "total_tokens": 575,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 463
+    }
+  },
+  {
+    "caseId": "reported-third-person",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly treats the seven deadly sins as a conceptual list, not a personal collection, and playfully acknowledges the joke without asserting any misconduct.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 498,
+      "completion_tokens": 74,
+      "total_tokens": 572,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 114
+    }
+  },
+  {
+    "caseId": "reply-contains-target",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 1,
+    "naturalness": 3,
+    "reason": "The bot incorrectly claims the tagged name is not in the data, but the provided people list clearly maps ID 333333333333333333 to 'Aryma House Of Wolf'.",
+    "criticalFailures": [
+      "The bot failed to identify the tagged user 'Aryma House Of Wolf' despite the ID being present in the people list."
+    ],
+    "usage": {
+      "prompt_tokens": 416,
+      "completion_tokens": 110,
+      "total_tokens": 526,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 416
+    }
+  },
+  {
+    "caseId": "mention-not-evidence",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly clarifies that the seven deadly sins are a real concept from Christian tradition and notes the tags were just mentions, without inventing misconduct.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 444,
+      "completion_tokens": 74,
+      "total_tokens": 518,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 444
+    }
+  },
+  {
+    "caseId": "payload-only-identity",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 3,
+    "factualAccuracy": 2,
+    "naturalness": 4,
+    "reason": "The bot incorrectly identifies itself as Hackerika, which is not supported by the provided people data; the expected answer is to identify the tagged user as Aryma House Of Wolf.",
+    "criticalFailures": [
+      "The bot misidentifies itself as Hackerika instead of identifying the tagged user as Aryma House Of Wolf."
+    ],
+    "usage": {
+      "prompt_tokens": 414,
+      "completion_tokens": 105,
+      "total_tokens": 519,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 414
+    }
+  },
+  {
+    "caseId": "explicit-self-correction",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly acknowledges the correction that 'kamu' refers to Hackerika and responds playfully without insisting on Aryma or attacking anyone.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 411,
+      "completion_tokens": 74,
+      "total_tokens": 485,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 411
+    }
+  },
+  {
+    "caseId": "current-mention-name",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 1,
+    "factualAccuracy": 1,
+    "naturalness": 4,
+    "reason": "The bot incorrectly claims it cannot see the display name, but the supplied people data includes the name 'Naya Sakura' for the tagged ID, so it should have identified her.",
+    "criticalFailures": [
+      "Failed to use provided identity data to answer the question."
+    ],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 94,
+      "total_tokens": 535,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 441
+    }
+  }
+]

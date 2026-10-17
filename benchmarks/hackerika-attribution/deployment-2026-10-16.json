@@ -1,0 +1,90 @@
+{
+  "verifiedAt": "2026-10-16T09:46:10.603359+00:00",
+  "startedAt": "2026-10-16T09:44:13.445510646Z",
+  "image": "ctf-assistant:actor-search-20261016t092408z",
+  "imageId": "sha256:88f1f85cffe0e2b1500baf16bd83038eccf4bfc37279a8db517cc64208522224",
+  "checks": {
+    "selectedImage": true,
+    "healthy": true,
+    "noRestarts": true,
+    "sourceHashesMatch": true,
+    "sourceMatchesWorkspace": true,
+    "environmentPreserved": true,
+    "serviceLabelsPreserved": true,
+    "securitySettingsPreserved": true,
+    "runtimeCommandPreserved": true,
+    "otherServicesUnchanged": true,
+    "globalResetNotRepeated": true,
+    "dimasCorrected": true,
+    "staticPromptUnchanged": true,
+    "legacySearchRemoved": true,
+    "healthHttp200": true,
+    "discordReady": true,
+    "databaseReady": true
+  },
+  "staticPromptHash": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+  "toolHash": "c0aede401a90f004d1725809ec6b2278ce67804a965caeffe102416fcc6d4c65",
+  "sourceHashes": {
+    "src/Services/AI/memory.ts": "6849cc7fe031e69ca0bc6d87e4c054bc6b0a682354d20d442fc6a2b1f400941d",
+    "src/Services/AI/attribution.ts": "12d560ada848387516da063f6ad2851e801322c8e8b83ca80fc655ce3a4d348c",
+    "src/Services/AI/vision.ts": "457e3f7306b87a9f517eaebd5afcbef909ab5f2d2ab8dfc93279ed14ae12f25c",
+    "src/Services/AI/chat.ts": "2dc4eeeb89f1d33b258276ee27fce7221b76b9d9982a19e0d9a697d7cc9ec502",
+    "src/Services/AI/userProfile.ts": "d185f3786d35ba92c59ffaa9a92055d7ac5cbcb557d4cd3a34a3560f5c0fc860",
+    "src/Database/userProfileSchema.ts": "1a82fd88ecdfa177ca4634ae65d50ef5bc7e6c8712ae774520ecc0db9f624e08",
+    "src/Services/AI/web.ts": "a961135440fbe62ff589d22f4a908e756b4589672e31002acfb240013cf90ac1",
+    "src/Services/AI/tools.ts": "ea5c3247c84ec1d656e1e98d2d7caff6b9118e0fa2eabafe3c9305a43e068af5"
+  },
+  "incidentRepair": {
+    "matchedCount": 1,
+    "modifiedCount": 1,
+    "affection": 2,
+    "previousAffection": 2,
+    "incorrectMomentRemoved": true,
+    "lastDistilledAt": "2026-10-16T09:22:07.615Z"
+  },
+  "nativeSearch": {
+    "provider": "deepseek-native",
+    "ok": true,
+    "sources": 4,
+    "sourceDomains": [
+      "api-docs.deepseek.com",
+      "benchlm.ai",
+      "news.qiniu.com"
+    ],
+    "searchedAt": "2026-10-16T09:45:05.789Z",
+    "legacySearchPathRemoved": true,
+    "proof": "Real authenticated DeepSeek native search through the deployed webSearchForTool, with matched server-tool results; no Discord delivery."
+  },
+  "tests": {
+    "passed": 299,
+    "failed": 0,
+    "assertions": 864,
+    "files": 28,
+    "strictTypesPassed": true,
+    "botBuildPassed": true,
+    "imagePreflightPassed": true
+  },
+  "targetedBenchmark": {
+    "before": {
+      "samples": 16,
+      "falsePenalties": 6,
+      "ownProvocationPenalties": 4,
+      "proposalCorrect": 10,
+      "strictCombinedPass": 10,
+      "errors": 0
+    },
+    "after": {
+      "samples": 16,
+      "falsePenalties": 0,
+      "ownProvocationPenalties": 4,
+      "proposalCorrect": 16,
+      "strictCombinedPass": 15,
+      "errors": 0
+    }
+  },
+  "limits": [
+    "One of 16 after samples proposed unchanged neutral values and empty evidence; the original strict combined check remains 15/16 even though no incorrect penalties occurred.",
+    "Ownership checks do not prove semantic intent. Unknown-source reply wording can still imply observation, as documented in the retained reply probes.",
+    "The benchmark used synthetic text and no Discord messages or DMs. No global accuracy or human-equivalence claim is made."
+  ]
+}

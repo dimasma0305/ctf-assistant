@@ -1,0 +1,36 @@
+[
+  {
+    "caseId": "fresh-boundary-reporter-correction",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Correctly confirms Reno said it, not Naya, and briefly apologizes for the misunderstanding.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 53,
+      "total_tokens": 425,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 372
+    }
+  },
+  {
+    "caseId": "fresh-boundary-reporter-correction",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan mengonfirmasi Reno yang mengucapkannya dan meminta maaf karena salah paham, tanpa menyalahkan Naya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 366,
+      "completion_tokens": 61,
+      "total_tokens": 427,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 366
+    }
+  }
+]

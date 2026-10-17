@@ -1,0 +1,90 @@
+{
+  "verifiedAt": "2026-10-17T06:49:05.654457+00:00",
+  "image": "ctf-assistant:all-flash-20261017",
+  "imageId": "sha256:65b86d6b19ad228a5b96a605358b301963df26225eea702c94d7dc730b827a69",
+  "sourceSha256": "6655949215e47d72fdc4fc2348fde6c57eb8070864c2c29096a880eaec77831b",
+  "productionFilesChanged": [
+    "src/Services/AI/models.ts"
+  ],
+  "modelRoles": {
+    "chat": "deepseek-flash",
+    "light": "deepseek-flash",
+    "vision": "deepseek-flash",
+    "research": "deepseek-flash",
+    "judge": "deepseek-flash"
+  },
+  "health": {
+    "httpStatus": 200,
+    "health": {
+      "status": "healthy",
+      "bot": {
+        "ready": true,
+        "waitingForSessionReset": false
+      },
+      "database": {
+        "required": true,
+        "ready": true
+      },
+      "timestamp": "2026-10-17T06:49:05.524Z"
+    },
+    "models": {
+      "chat": "deepseek-flash",
+      "light": "deepseek-flash",
+      "vision": "deepseek-flash",
+      "research": "deepseek-flash",
+      "judge": "deepseek-flash"
+    }
+  },
+  "containerHealth": "healthy",
+  "restartCount": 0,
+  "runtimePreservationChecks": {
+    "Cmd": true,
+    "Entrypoint": true,
+    "User": true,
+    "WorkingDir": true,
+    "Healthcheck": true,
+    "labels": true,
+    "HostConfig.CapDrop": true,
+    "HostConfig.SecurityOpt": true,
+    "HostConfig.Tmpfs": true,
+    "HostConfig.RestartPolicy": true,
+    "HostConfig.Memory": true,
+    "HostConfig.NanoCpus": true,
+    "HostConfig.ReadonlyRootfs": true,
+    "HostConfig.PortBindings": true,
+    "HostConfig.Binds": true,
+    "networks": true
+  },
+  "changedEnvironmentKeys": [
+    "AI_CHAT_MODEL",
+    "AI_JUDGE_MODEL",
+    "AI_RESEARCH_MODEL",
+    "AI_VISION_MODEL"
+  ],
+  "otherServices": [
+    {
+      "name": "ctf-assistant-mongo-1",
+      "sameContainer": true,
+      "sameStartedAt": true
+    },
+    {
+      "name": "ctf-assistant-ui-1",
+      "sameContainer": true,
+      "sameStartedAt": true
+    }
+  ],
+  "affectionResetMarkerUnchanged": true,
+  "historicalRunFilesUnchanged": 1521,
+  "tests": {
+    "passed": 341,
+    "failed": 0,
+    "assertions": 1054,
+    "files": 34
+  },
+  "strictTypes": "passed",
+  "bundle": "passed",
+  "benchmarkJudgeMockChecks": 8,
+  "liveModelValidation": "Pending: provider balance endpoint returned HTTP200, available=false. No paid requests attempted.",
+  "pendingPersonaActivated": false,
+  "rollback": "Original image and exact runtime settings retained privately."
+}

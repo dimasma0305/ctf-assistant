@@ -1,0 +1,190 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Rp53.000",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "replyToMessageId": "800000000000000001",
+        "sources": [
+          {
+            "messageId": "800000000000000001",
+            "authorId": "222222222222222222",
+            "authorName": "KudaLiar",
+            "kind": "reply"
+          }
+        ],
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] berapa total belanjanya? cukup totalnya aja.",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Rp53.000",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1206.585201,
+        "usage": {
+          "prompt_tokens": 11219,
+          "completion_tokens": 85,
+          "total_tokens": 11304,
+          "prompt_tokens_details": {
+            "cached_tokens": 11008
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 80
+          },
+          "prompt_cache_hit_tokens": 11008,
+          "prompt_cache_miss_tokens": 211
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3759.8280889999996,
+    "action": null,
+    "text": "Rp53.000",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "backend-native-send",
+    "category": "delivery-accounting",
+    "backend": "native-send",
+    "effects": [
+      {
+        "kind": "send",
+        "content": "jawaban uji",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] hackerika jawab singkat",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000001",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] jawaban uji",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "send_discord_message",
+        "args": {
+          "content": "jawaban uji"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 0.035481000000004315,
+        "usage": null
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 252.58716300000003,
+    "action": null,
+    "text": "jawaban uji",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "ctr-facts",
+    "category": "technical",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sama persis. CTR itu deterministik: keystream dari key+nonce sama, XOR plaintext sama ya hasilnya sama. Itu sebabnya jangan pakai nonce ulang.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] AES-CTR: key, nonce, sama plaintext persis sama. ciphertext-nya sama atau beda? jawab singkat.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sama persis. CTR itu deterministik: keystream dari key+nonce sama, XOR plaintext sama ya hasilnya sama. Itu sebabnya jangan pakai nonce ulang.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1304.8925129999998,
+        "usage": {
+          "prompt_tokens": 10603,
+          "completion_tokens": 80,
+          "total_tokens": 10683,
+          "prompt_tokens_details": {
+            "cached_tokens": 10368
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 37
+          },
+          "prompt_cache_hit_tokens": 10368,
+          "prompt_cache_miss_tokens": 235
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6975.841472,
+    "action": null,
+    "text": "Sama persis. CTR itu deterministik: keystream dari key+nonce sama, XOR plaintext sama ya hasilnya sama. Itu sebabnya jangan pakai nonce ulang.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

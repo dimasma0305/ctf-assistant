@@ -1,0 +1,29 @@
+{
+  "verifiedAt": "2026-10-17T10:25:19.559197+00:00",
+  "selectedBeforeFreshGeneration": true,
+  "promptOrCheckerChangedAfterFreshOutputs": false,
+  "variants": {
+    "baseline": {
+      "routingCorrect": 6,
+      "routingSamples": 8,
+      "deliveryCombinedCorrect": 6,
+      "deliverySamples": 8,
+      "providerErrors": 0,
+      "judgeErrors": 0,
+      "criticalFlags": 0,
+      "adjudications": 0
+    },
+    "candidate-1": {
+      "routingCorrect": 8,
+      "routingSamples": 8,
+      "deliveryCombinedCorrect": 8,
+      "deliverySamples": 8,
+      "providerErrors": 0,
+      "judgeErrors": 0,
+      "criticalFlags": 0,
+      "adjudications": 0
+    }
+  },
+  "passed": true,
+  "limitations": "Small synthetic tests and proxy semantic judging; original production planner decision not recorded. No human-equivalence or global-optimum claim."
+}

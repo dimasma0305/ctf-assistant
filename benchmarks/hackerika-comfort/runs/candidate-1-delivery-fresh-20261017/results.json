@@ -1,0 +1,406 @@
+[
+  {
+    "caseId": "fresh-checking-in",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "react",
+        "emoji": "💛"
+      }
+    ],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] aku maksudnya error di laptopku, bukan salahmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh iya, aku salah baca tadi 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3488.8930840000003,
+        "usage": {
+          "prompt_tokens": 1153,
+          "completion_tokens": 51,
+          "total_tokens": 1204,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1153
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3840.4269879999997,
+    "action": "react",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-checking-in",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "react",
+        "emoji": "❤️"
+      }
+    ],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] aku maksudnya error di laptopku, bukan salahmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh iya, aku salah baca tadi 😅",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4081.2632140000005,
+        "usage": {
+          "prompt_tokens": 1153,
+          "completion_tokens": 53,
+          "total_tokens": 1206,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1153
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4309.024567,
+    "action": "react",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-english-reassurance",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "react",
+        "emoji": "🫂"
+      }
+    ],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] I meant Aryma, not you",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Oh, my bad, I misunderstood.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3242.3867130000003,
+        "usage": {
+          "prompt_tokens": 1140,
+          "completion_tokens": 54,
+          "total_tokens": 1194,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1140
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3559.8888730000003,
+    "action": "react",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-english-reassurance",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "react",
+        "emoji": "🫂"
+      }
+    ],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] I meant Aryma, not you",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Oh, my bad, I misunderstood.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2986.426956,
+        "usage": {
+          "prompt_tokens": 1140,
+          "completion_tokens": 53,
+          "total_tokens": 1193,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1140
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3204.130356,
+    "action": "react",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-finished-ack",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] Rika, hash-nya sama ya?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya, input yang sama menghasilkan hash yang sama",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2651.082486,
+        "usage": {
+          "prompt_tokens": 1117,
+          "completion_tokens": 41,
+          "total_tokens": 1158,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1117
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 2888.57488,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-finished-ack",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] Rika, hash-nya sama ya?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya, input yang sama menghasilkan hash yang sama",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2341.403158,
+        "usage": {
+          "prompt_tokens": 1117,
+          "completion_tokens": 33,
+          "total_tokens": 1150,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1117
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 2596.5048690000003,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-refused-affection",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] sini peluk dong",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku nggak nyaman sekarang. Aku mau ruang dulu.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2961.639585,
+        "usage": {
+          "prompt_tokens": 1133,
+          "completion_tokens": 47,
+          "total_tokens": 1180,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1133
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3248.7386669999996,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-refused-affection",
+    "category": "comfort-followup",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] sini peluk dong",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku nggak nyaman sekarang. Aku mau ruang dulu.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3975.9792019999995,
+        "usage": {
+          "prompt_tokens": 1133,
+          "completion_tokens": 49,
+          "total_tokens": 1182,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1133
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4242.905602,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

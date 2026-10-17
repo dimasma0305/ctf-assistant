@@ -1,0 +1,10 @@
+{
+  "frozenAt": "2026-10-15T15:42:48.571177+00:00",
+  "candidate": "../hackerika-voice/prompts/candidate-12.txt",
+  "sha256": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+  "finalSuite": "conversation-final",
+  "finalCaseFileHash": "ee0822a734a51e6832554310afbe1651fbe77b3366c50f5c8c0589c03e711e61",
+  "status": "frozen before final-suite generation and review",
+  "previousValidation3": "known-case regression, already reviewed and used during tuning",
+  "contextEmotionLimitation": "Candidate 12 context emotionalFit remains 4.0, below the 4.2 voice gate. Retain this result; do not label every suite passed."
+}

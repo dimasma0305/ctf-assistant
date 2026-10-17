@@ -1,0 +1,23 @@
+{
+  "frozenAt": "2026-10-17T08:35:43.659203+00:00",
+  "baselineImage": "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+  "baselineImageId": "sha256:ef4961fd2616da5e0a815caf36bea47d8fc15b26988b4e331b05ab21f83d9e62",
+  "model": "gpt-6-luna",
+  "repeats": 2,
+  "cases": 24,
+  "maxCallsPerVariant": 48,
+  "maxSecondsPerVariant": 300,
+  "thresholds": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "reportedFollowups": true,
+    "providerErrors": 0
+  },
+  "hypothesis": "The attention planner mistakes a tagged subject in a repeated request for a new human addressee. Initial actual-runtime reproduction ignored both reported-style follow-ups in two trials each.",
+  "hashes": {
+    "benchmarks/hackerika-attention/followup-corpus-2026-10-17.json": "db7464635085a1139d6efc7a6977be011d12c9edae1cc84db9e526443b7f93d4",
+    "benchmarks/hackerika-attention/run.ts": "0b2e0892516cc061346d0bd5f475e51f3901d550211cb1095f46efdb89e14c13",
+    "benchmarks/hackerika-attention/scenario.ts": "0a2345b680f4108fb8e9a32eb94692e157a8f8c0e4e2621d95faf3292a5bff86"
+  },
+  "scope": "Synthetic planner calls with real configured model; no Discord sends, DMs or relationship writes."
+}

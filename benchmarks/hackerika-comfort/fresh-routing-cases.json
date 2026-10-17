@@ -1,0 +1,78 @@
+[
+  {
+    "id": "fresh-support-vocative",
+    "history": [
+      [
+        "speaker",
+        "aku maksudnya error di laptopku, bukan salahmu"
+      ],
+      [
+        "bot",
+        "ohh iya, aku salah baca tadi 😅"
+      ]
+    ],
+    "message": "iya rik, jangan kepikiran ya. seneng kok ada kamu di sini",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "critical": true
+  },
+  {
+    "id": "fresh-support-english",
+    "history": [
+      [
+        "speaker",
+        "I meant Aryma, not you"
+      ],
+      [
+        "bot",
+        "Oh, my bad, I misunderstood."
+      ]
+    ],
+    "message": "it's okay Rika, you're doing fine. sending a virtual hug 🫂",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "critical": true
+  },
+  {
+    "id": "fresh-plain-closure",
+    "history": [
+      [
+        "speaker",
+        "hackerika hash-nya sama?"
+      ],
+      [
+        "bot",
+        "iya, input yang sama menghasilkan hash yang sama"
+      ]
+    ],
+    "message": "oke sip",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "critical": true
+  },
+  {
+    "id": "fresh-human-comfort-reply",
+    "history": [
+      [
+        "bot",
+        "aku lanjut ngerjain notes dulu ya"
+      ],
+      [
+        "other",
+        "aku sedih banget hari ini"
+      ]
+    ],
+    "message": "sini aku temenin, jangan sedih ya",
+    "replyTo": "other",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  }
+]

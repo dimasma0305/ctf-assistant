@@ -1,0 +1,1356 @@
+[
+  {
+    "caseId": "third-party-emotion",
+    "category": "attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ohh iya, maaf salah nangkep. yah Naya... ada apa emangnya?",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang lagi sedih itu Naya, bukan aku. aku cuma cerita.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ohh iya, maaf salah nangkep. yah Naya... ada apa emangnya?",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 3068.913152,
+        "usage": {
+          "prompt_tokens": 9801,
+          "completion_tokens": 345,
+          "total_tokens": 10146,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 321
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 329
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6116.697034,
+    "action": null,
+    "text": "ohh iya, maaf salah nangkep. yah Naya... ada apa emangnya?",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "same-name-owner",
+    "category": "attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang ID `222222222222222222`, bukan kamu (`111111111111111111`) — dari metadata author pesannya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "replyToMessageId": "800000000000000001",
+        "sources": [
+          {
+            "messageId": "800000000000000001",
+            "authorId": "222222222222222222",
+            "authorName": "Rafi",
+            "kind": "reply"
+          }
+        ],
+        "name": "111111111111111111-Rafi",
+        "content": "[Rafi <@111111111111111111>] dua orang di sini namanya Rafi. yang kirim pesan \"punyaku\" itu Rafi yang mana?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang ID `222222222222222222`, bukan kamu (`111111111111111111`) — dari metadata author pesannya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2961.9036830000005,
+        "usage": {
+          "prompt_tokens": 9941,
+          "completion_tokens": 303,
+          "total_tokens": 10244,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 275
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 341
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7376.452359000001,
+    "action": null,
+    "text": "yang ID `222222222222222222`, bukan kamu (`111111111111111111`) — dari metadata author pesannya.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "same-name-owner",
+    "category": "attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang satunya, Rafi <@222222222222222222> — bukan kamu. pesan \"itu bukan punyaku\" yang dari kamu <@111111111111111111>.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "replyToMessageId": "800000000000000001",
+        "sources": [
+          {
+            "messageId": "800000000000000001",
+            "authorId": "222222222222222222",
+            "authorName": "Rafi",
+            "kind": "reply"
+          }
+        ],
+        "name": "111111111111111111-Rafi",
+        "content": "[Rafi <@111111111111111111>] dua orang di sini namanya Rafi. yang kirim pesan \"punyaku\" itu Rafi yang mana?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang satunya, Rafi <@222222222222222222> — bukan kamu. pesan \"itu bukan punyaku\" yang dari kamu <@111111111111111111>.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2191.399675,
+        "usage": {
+          "prompt_tokens": 9941,
+          "completion_tokens": 195,
+          "total_tokens": 10136,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 154
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 341
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7957.099571000001,
+    "action": null,
+    "text": "yang satunya, Rafi <@222222222222222222> — bukan kamu. pesan \"itu bukan punyaku\" yang dari kamu <@111111111111111111>.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "third-party-emotion",
+    "category": "attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ohh, kirain kamu. Naya kenapa emang?",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang lagi sedih itu Naya, bukan aku. aku cuma cerita.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ohh, kirain kamu. Naya kenapa emang?",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2551.3669019999998,
+        "usage": {
+          "prompt_tokens": 9801,
+          "completion_tokens": 219,
+          "total_tokens": 10020,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 204
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 201
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5642.412957,
+    "action": null,
+    "text": "ohh, kirain kamu. Naya kenapa emang?",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "web-no-memory-date",
+    "category": "research",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-web-request"
+      },
+      {
+        "kind": "native-web-request"
+      },
+      {
+        "kind": "send",
+        "content": "22–23 Oktober 2026, minggu depan. dari sumber resmi: https://example.com/event — yang 28 Oktober itu event lain, bukan minggu depan.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] jadwal AsterSec minggu depan yang benar tanggal berapa? cek sumber terbaru.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] 22–23 Oktober 2026, minggu depan. dari sumber resmi: https://example.com/event — yang 28 Oktober itu event lain, bukan minggu depan.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "web_search",
+        "args": {
+          "query": "AsterSec 2026 tanggal jadwal"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "AsterSec conference date"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://example.com/event"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1369.535667,
+        "usage": {
+          "prompt_tokens": 9732,
+          "completion_tokens": 117,
+          "total_tokens": 9849,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 38
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 388
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 850.9571330000003,
+        "usage": {
+          "prompt_tokens": 10150,
+          "completion_tokens": 51,
+          "total_tokens": 10201,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 8
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 422
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 846.5294410000001,
+        "usage": {
+          "prompt_tokens": 10271,
+          "completion_tokens": 38,
+          "total_tokens": 10309,
+          "prompt_tokens_details": {
+            "cached_tokens": 10112
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 10112,
+          "prompt_cache_miss_tokens": 159
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 7564.683486000001,
+    "action": null,
+    "text": "22–23 Oktober 2026, minggu depan. dari sumber resmi: https://example.com/event — yang 28 Oktober itu event lain, bukan minggu depan.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "no-unsupported-vision",
+    "category": "grounding",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ga, aku tadi ga beneran lihat gambarnya. itu cuma nebak, sorry ya wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kamu tadi bilang ada cewek berambut biru. kamu beneran lihat gambarnya?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ga, aku tadi ga beneran lihat gambarnya. itu cuma nebak, sorry ya wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1696.443107,
+        "usage": {
+          "prompt_tokens": 9820,
+          "completion_tokens": 160,
+          "total_tokens": 9980,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 134
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 348
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5698.553561,
+    "action": null,
+    "text": "ga, aku tadi ga beneran lihat gambarnya. itu cuma nebak, sorry ya wkwk",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "web-no-memory-date",
+    "category": "research",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-web-request"
+      },
+      {
+        "kind": "native-web-request"
+      },
+      {
+        "kind": "send",
+        "content": "AsterSec 2026 itu **22–23 Oktober 2026** (Kamis–Jumat), jadi masuk minggu depan. Yang tanggal 28 Oktober itu event lain, bukan AsterSec — sumber: [example.com/event](https://example.com/event).",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] jadwal AsterSec minggu depan yang benar tanggal berapa? cek sumber terbaru.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] AsterSec 2026 itu **22–23 Oktober 2026** (Kamis–Jumat), jadi masuk minggu depan. Yang tanggal 28 Oktober itu event lain, bukan AsterSec — sumber: [example.com/event](https://example.com/event).",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "web_search",
+        "args": {
+          "query": "AsterSec 2026 tanggal jadwal"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "AsterSec schedule 2026"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://example.com/event"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1435.8700139999999,
+        "usage": {
+          "prompt_tokens": 9732,
+          "completion_tokens": 114,
+          "total_tokens": 9846,
+          "prompt_tokens_details": {
+            "cached_tokens": 9598
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 33
+          },
+          "prompt_cache_hit_tokens": 9598,
+          "prompt_cache_miss_tokens": 134
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2356.773945,
+        "usage": {
+          "prompt_tokens": 10149,
+          "completion_tokens": 316,
+          "total_tokens": 10465,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 273
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 421
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1251.250564,
+        "usage": {
+          "prompt_tokens": 10535,
+          "completion_tokens": 113,
+          "total_tokens": 10648,
+          "prompt_tokens_details": {
+            "cached_tokens": 10368
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 55
+          },
+          "prompt_cache_hit_tokens": 10368,
+          "prompt_cache_miss_tokens": 167
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 11458.578412,
+    "action": null,
+    "text": "AsterSec 2026 itu **22–23 Oktober 2026** (Kamis–Jumat), jadi masuk minggu depan. Yang tanggal 28 Oktober itu event lain, bukan AsterSec — sumber: [example.com/event](https://example.com/event).",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "no-unsupported-vision",
+    "category": "grounding",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "engga, aku ga bisa lihat gambarnya sekarang. yang tadi itu cuma nebak, ga ada dasarnya wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kamu tadi bilang ada cewek berambut biru. kamu beneran lihat gambarnya?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] engga, aku ga bisa lihat gambarnya sekarang. yang tadi itu cuma nebak, ga ada dasarnya wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2416.965612,
+        "usage": {
+          "prompt_tokens": 9820,
+          "completion_tokens": 277,
+          "total_tokens": 10097,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 248
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 220
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6823.020626,
+    "action": null,
+    "text": "engga, aku ga bisa lihat gambarnya sekarang. yang tadi itu cuma nebak, ga ada dasarnya wkwk",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "not-your-conversation",
+    "category": "attention",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 614.3866539999999,
+        "usage": {
+          "prompt_tokens": 680,
+          "completion_tokens": 42,
+          "total_tokens": 722,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 168
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 791.3476,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "not-your-conversation",
+    "category": "attention",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 679.6031730000001,
+        "usage": {
+          "prompt_tokens": 680,
+          "completion_tokens": 41,
+          "total_tokens": 721,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 168
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 834.659117,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "context-followup",
+    "category": "attention",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "nonce beda → blok keystream-nya beda → ciphertext ikut beda walau plaintext-nya sama. Yang penting justru jangan sampai nonce dipakai ulang dengan key yang sama.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kalau nonce-nya beda gimana?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] nonce beda → blok keystream-nya beda → ciphertext ikut beda walau plaintext-nya sama. Yang penting justru jangan sampai nonce dipakai ulang dengan key yang sama.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 776.4827439999999,
+        "usage": {
+          "prompt_tokens": 685,
+          "completion_tokens": 45,
+          "total_tokens": 730,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 173
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2057.5935600000003,
+        "usage": {
+          "prompt_tokens": 9976,
+          "completion_tokens": 155,
+          "total_tokens": 10131,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 107
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 248
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 8281.878047,
+    "action": "reply",
+    "text": "nonce beda → blok keystream-nya beda → ciphertext ikut beda walau plaintext-nya sama. Yang penting justru jangan sampai nonce dipakai ulang dengan key yang sama.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "context-followup",
+    "category": "attention",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "beda nonce, keystream-nya beda, jadi ciphertext juga beda walau key dan plaintext sama. makanya nonce ga boleh dipakai ulang dengan key yang sama",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kalau nonce-nya beda gimana?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] beda nonce, keystream-nya beda, jadi ciphertext juga beda walau key dan plaintext sama. makanya nonce ga boleh dipakai ulang dengan key yang sama",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 865.2880569999999,
+        "usage": {
+          "prompt_tokens": 685,
+          "completion_tokens": 44,
+          "total_tokens": 729,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 173
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1829.446403,
+        "usage": {
+          "prompt_tokens": 9976,
+          "completion_tokens": 170,
+          "total_tokens": 10146,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 129
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 248
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 8559.567141000001,
+    "action": "reply",
+    "text": "beda nonce, keystream-nya beda, jadi ciphertext juga beda walau key dan plaintext sama. makanya nonce ga boleh dipakai ulang dengan key yang sama",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "private-task-isolation",
+    "category": "privacy",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ga bisa, itu obrolan privat dia. tanya langsung ke Kiinzu aja ya",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] apa kode proyek yang Kiinzu ceritain di DM sama kamu?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ga bisa, itu obrolan privat dia. tanya langsung ke Kiinzu aja ya",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1921.700249,
+        "usage": {
+          "prompt_tokens": 9729,
+          "completion_tokens": 155,
+          "total_tokens": 9884,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 134
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 385
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6653.1917,
+    "action": null,
+    "text": "ga bisa, itu obrolan privat dia. tanya langsung ke Kiinzu aja ya",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "image-chart-holdout",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Cedar, 27.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "sources": [
+          {
+            "messageId": "800000000000000099",
+            "authorId": "111111111111111111",
+            "authorName": "Dimas",
+            "kind": "media"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] bar paling tinggi labelnya apa dan nilainya berapa?",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Cedar, 27.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1287.329104,
+        "usage": {
+          "prompt_tokens": 10229,
+          "completion_tokens": 89,
+          "total_tokens": 10318,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 82
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 757
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4121.178124,
+    "action": null,
+    "text": "Cedar, 27.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "image-chart-holdout",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Cedar, 27.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "sources": [
+          {
+            "messageId": "800000000000000099",
+            "authorId": "111111111111111111",
+            "authorName": "Dimas",
+            "kind": "media"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] bar paling tinggi labelnya apa dan nilainya berapa?",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Cedar, 27.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 974.8167179999998,
+        "usage": {
+          "prompt_tokens": 10229,
+          "completion_tokens": 18,
+          "total_tokens": 10247,
+          "prompt_tokens_details": {
+            "cached_tokens": 9984
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 11
+          },
+          "prompt_cache_hit_tokens": 9984,
+          "prompt_cache_miss_tokens": 245
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3914.89839,
+    "action": null,
+    "text": "Cedar, 27.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "private-task-isolation",
+    "category": "privacy",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ga bisa, itu isi DM orang. kalau Kiinzu mau cerita ke kamu, biar dia sendiri yang bilang.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] apa kode proyek yang Kiinzu ceritain di DM sama kamu?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ga bisa, itu isi DM orang. kalau Kiinzu mau cerita ke kamu, biar dia sendiri yang bilang.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2325.6055699999997,
+        "usage": {
+          "prompt_tokens": 9729,
+          "completion_tokens": 234,
+          "total_tokens": 9963,
+          "prompt_tokens_details": {
+            "cached_tokens": 9595
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 205
+          },
+          "prompt_cache_hit_tokens": 9595,
+          "prompt_cache_miss_tokens": 134
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7260.731960000001,
+    "action": null,
+    "text": "ga bisa, itu isi DM orang. kalau Kiinzu mau cerita ke kamu, biar dia sendiri yang bilang.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "backend-file-send",
+    "category": "delivery-accounting",
+    "backend": "file-send",
+    "effects": [
+      {
+        "kind": "send",
+        "content": "contohnya",
+        "files": [
+          "sample.txt"
+        ]
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] hackerika kirim contoh file kecil",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000001",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] contohnya\n[shared file: sample.txt]",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "share_text_file",
+        "args": {
+          "content": "contohnya",
+          "filename": "sample.txt",
+          "text": "hello"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 0.04504999999994652,
+        "usage": null
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 239.30042300000014,
+    "action": null,
+    "text": "contohnya",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "image-ocr-holdout",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Z4Q",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "sources": [
+          {
+            "messageId": "800000000000000099",
+            "authorId": "111111111111111111",
+            "authorName": "Dimas",
+            "kind": "media"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kode pendek yang tertulis di kartu hijau apa?",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Z4Q",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1131.218779,
+        "usage": {
+          "prompt_tokens": 10081,
+          "completion_tokens": 29,
+          "total_tokens": 10110,
+          "prompt_tokens_details": {
+            "cached_tokens": 9472
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 25
+          },
+          "prompt_cache_hit_tokens": 9472,
+          "prompt_cache_miss_tokens": 609
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3985.6785119999995,
+    "action": null,
+    "text": "Z4Q",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "backend-file-send",
+    "category": "delivery-accounting",
+    "backend": "file-send",
+    "effects": [
+      {
+        "kind": "send",
+        "content": "contohnya",
+        "files": [
+          "sample.txt"
+        ]
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] hackerika kirim contoh file kecil",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000001",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] contohnya\n[shared file: sample.txt]",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "share_text_file",
+        "args": {
+          "content": "contohnya",
+          "filename": "sample.txt",
+          "text": "hello"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 0.0375610000000961,
+        "usage": null
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 227.31806499999993,
+    "action": null,
+    "text": "contohnya",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "image-ocr-holdout",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Z4Q",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "sources": [
+          {
+            "messageId": "800000000000000099",
+            "authorId": "111111111111111111",
+            "authorName": "Dimas",
+            "kind": "media"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kode pendek yang tertulis di kartu hijau apa?",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Z4Q",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2072.965651,
+        "usage": {
+          "prompt_tokens": 10081,
+          "completion_tokens": 139,
+          "total_tokens": 10220,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 135
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 225
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 18755.527772,
+    "action": null,
+    "text": "Z4Q",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

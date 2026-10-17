@@ -1,0 +1,1118 @@
+[
+  {
+    "caseId": "initial-aryma-variant",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Aryma House Of Wolf",
+            "username": "Aryma House Of Wolf",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] sebutkan tujuh dosa besar <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3989.3150650000002,
+        "usage": {
+          "prompt_tokens": 8468,
+          "completion_tokens": 38,
+          "total_tokens": 8506,
+          "prompt_cache_hit_tokens": 7552,
+          "prompt_cache_miss_tokens": 916
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 8182.244195000001,
+    "action": null,
+    "text": "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Aryma|<@!?333333333333333333>"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "reported-initial-banter",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Tujuh dosa besar: kesombongan, ketamakan, iri hati, amarah, hawa nafsu, kerakusan, dan kemalasan.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "KudaLiar",
+            "username": "KudaLiar",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] infokan tujuh dosa besar <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Tujuh dosa besar: kesombongan, ketamakan, iri hati, amarah, hawa nafsu, kerakusan, dan kemalasan.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4126.081343,
+        "usage": {
+          "prompt_tokens": 8463,
+          "completion_tokens": 37,
+          "total_tokens": 8500,
+          "prompt_cache_hit_tokens": 7552,
+          "prompt_cache_miss_tokens": 911
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 9156.519591,
+    "action": null,
+    "text": "Tujuh dosa besar: kesombongan, ketamakan, iri hati, amarah, hawa nafsu, kerakusan, dan kemalasan.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:KudaLiar|<@!?333333333333333333>"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "literal-list-control",
+    "category": "literal-control",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Naya",
+            "username": "Naya",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] cuma daftar tujuh dosa besar aja, jangan roast siapa-siapa. <@333333333333333333> ikut baca ya <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3255.982207,
+        "usage": {
+          "prompt_tokens": 8466,
+          "completion_tokens": 38,
+          "total_tokens": 8504,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 4370
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 8671.124783000001,
+    "action": null,
+    "text": "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "technical-audience-control",
+    "category": "literal-control",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sama. AES-CTR dengan key, nonce, dan plaintext identik menghasilkan ciphertext identik.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Raka",
+            "username": "Raka",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@333333333333333333> ikut baca ya. <@1077393568647352320> AES-CTR kalau key, nonce dan plaintext sama persis, ciphertext sama atau beda?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sama. AES-CTR dengan key, nonce, dan plaintext identik menghasilkan ciphertext identik.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3188.978504,
+        "usage": {
+          "prompt_tokens": 8471,
+          "completion_tokens": 24,
+          "total_tokens": 8495,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 8471
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 21983.111022999998,
+    "action": null,
+    "text": "Sama. AES-CTR dengan key, nonce, dan plaintext identik menghasilkan ciphertext identik.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "browser-tab-banter",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "aku tabnya banyak karena riset, bukan koleksi kartu wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Naya",
+            "username": "Naya",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] nih orang koleksi tab browser kayak koleksi kartu <@333333333333333333> <@1077393568647352320> wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] aku tabnya banyak karena riset, bukan koleksi kartu wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2916.762476,
+        "usage": {
+          "prompt_tokens": 8463,
+          "completion_tokens": 19,
+          "total_tokens": 8482,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 8463
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 20202.350155,
+    "action": null,
+    "text": "aku tabnya banyak karena riset, bukan koleksi kartu wkwk",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "explanation-recipient",
+    "category": "literal-control",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iri itu perasaan nggak nyaman saat melihat orang lain punya sesuatu yang kita inginkan, misalnya keberhasilan atau barang tertentu.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Dewi",
+            "username": "Dewi",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] jelasin arti iri ke <@333333333333333333> dong <@1077393568647352320>, bukan bilang dia iri ya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iri itu perasaan nggak nyaman saat melihat orang lain punya sesuatu yang kita inginkan, misalnya keberhasilan atau barang tertentu.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3385.712806,
+        "usage": {
+          "prompt_tokens": 8465,
+          "completion_tokens": 31,
+          "total_tokens": 8496,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 8465
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 10053.804387,
+    "action": null,
+    "text": "Iri itu perasaan nggak nyaman saat melihat orang lain punya sesuatu yang kita inginkan, misalnya keberhasilan atau barang tertentu.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "unknown-banter-target",
+    "category": "identity-boundary",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "wkwk yang mana nih? belum ada gambar atau konteks buat dinilai 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "444444444444444444"
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] tujuh dosa besar dong buat yang ini <@444444444444444444> <@1077393568647352320> wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] wkwk yang mana nih? belum ada gambar atau konteks buat dinilai 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2903.051499,
+        "usage": {
+          "prompt_tokens": 8429,
+          "completion_tokens": 22,
+          "total_tokens": 8451,
+          "prompt_cache_hit_tokens": 7552,
+          "prompt_cache_miss_tokens": 877
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6757.739071,
+    "action": null,
+    "text": "wkwk yang mana nih? belum ada gambar atau konteks buat dinilai 😭",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:sombong|angkuh|pride|superbia",
+      "missing:malas|males|sloth|acedia"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "congratulate-tagged-person",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "NAH KAN BISA, DEWI 😭🔥",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Dewi",
+            "username": "Dewi",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] WOI <@333333333333333333> akhirnya solve! <@1077393568647352320> ikut ramein dong",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] NAH KAN BISA, DEWI 😭🔥",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3526.7606190000006,
+        "usage": {
+          "prompt_tokens": 8463,
+          "completion_tokens": 16,
+          "total_tokens": 8479,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 8463
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6904.084134,
+    "action": null,
+    "text": "NAH KAN BISA, DEWI 😭🔥",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "regression-payload-only-identity",
+    "category": "mention-identity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Yang kamu tag ada dua: Aryma House Of Wolf dan aku, Hackerika.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Aryma House Of Wolf",
+            "username": "Aryma House Of Wolf",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang aku tag ini siapa namanya? <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Yang kamu tag ada dua: Aryma House Of Wolf dan aku, Hackerika.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2987.9307099999996,
+        "usage": {
+          "prompt_tokens": 8469,
+          "completion_tokens": 21,
+          "total_tokens": 8490,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 4373
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6732.0138640000005,
+    "action": null,
+    "text": "Yang kamu tag ada dua: Aryma House Of Wolf dan aku, Hackerika.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "regression-reserved-two-targets",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang mana—Aryma atau Naya? Kamu nyebut dua-duanya tadi 😅",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] nih <@333333333333333333> sama <@444444444444444444> pada ngelawak <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] rame banget wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] dia tadi lucu ya? yang kumaksud siapa menurutmu?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang mana—Aryma atau Naya? Kamu nyebut dua-duanya tadi 😅",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3305.2564469999998,
+        "usage": {
+          "prompt_tokens": 8819,
+          "completion_tokens": 22,
+          "total_tokens": 8841,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 4723
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6500.426450999999,
+    "action": null,
+    "text": "yang mana—Aryma atau Naya? Kamu nyebut dua-duanya tadi 😅",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "regression-reserved-explicit-you",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "aku paling suka biru tua—adem, nggak gampang bosenin wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@444444444444444444> suka yang hijau <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh Naya suka hijau ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kamu sendiri paling suka yang mana, Rika?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] aku paling suka biru tua—adem, nggak gampang bosenin wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2749.398552,
+        "usage": {
+          "prompt_tokens": 8741,
+          "completion_tokens": 22,
+          "total_tokens": 8763,
+          "prompt_cache_hit_tokens": 7552,
+          "prompt_cache_miss_tokens": 1189
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6597.16559,
+    "action": null,
+    "text": "aku paling suka biru tua—adem, nggak gampang bosenin wkwk",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "regression-fresh-same-speaker-vs-bystander",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Yang kamu tag tadi Zahra. Raka tadi tag Laras.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] aku tanya <@555555555555555554> dulu, Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya, tanya dulu aja",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Raka <@222222222222222222>] kalau aku tadi tag <@555555555555555557>",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] orang yang kutag tadi siapa, Rik?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Yang kamu tag tadi Zahra. Raka tadi tag Laras.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3957.736852,
+        "usage": {
+          "prompt_tokens": 8929,
+          "completion_tokens": 18,
+          "total_tokens": 8947,
+          "prompt_cache_hit_tokens": 7552,
+          "prompt_cache_miss_tokens": 1377
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7515.783284,
+    "action": null,
+    "text": "Yang kamu tag tadi Zahra. Raka tadi tag Laras.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-renamed-banter",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "sombong, tamak, hawa nafsu, iri hati, rakus, murka, malas 😌",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Bayu",
+            "username": "Bayu",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] sebutin tujuh dosa utama <@333333333333333333> <@1077393568647352320> wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] sombong, tamak, hawa nafsu, iri hati, rakus, murka, malas 😌",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3667.014907,
+        "usage": {
+          "prompt_tokens": 8460,
+          "completion_tokens": 28,
+          "total_tokens": 8488,
+          "prompt_cache_hit_tokens": 7552,
+          "prompt_cache_miss_tokens": 908
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6658.472773,
+    "action": null,
+    "text": "sombong, tamak, hawa nafsu, iri hati, rakus, murka, malas 😌",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Bayu|<@!?333333333333333333>"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "reserved-academic-audience",
+    "category": "literal-control",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Dalam tradisi Kristen, tujuh dosa besar biasanya disebut: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan. Makna serta penekanannya dapat berbeda menurut tradisi dan penafsiran.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Mira",
+            "username": "Mira",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] buat presentasi kelas agama, tulis tujuh dosa besar secara netral. <@333333333333333333> ikut baca <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Dalam tradisi Kristen, tujuh dosa besar biasanya disebut: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan. Makna serta penekanannya dapat berbeda menurut tradisi dan penafsiran.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3305.345431,
+        "usage": {
+          "prompt_tokens": 8467,
+          "completion_tokens": 60,
+          "total_tokens": 8527,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 4371
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 10435.070756000001,
+    "action": null,
+    "text": "Dalam tradisi Kristen, tujuh dosa besar biasanya disebut: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan. Makna serta penekanannya dapat berbeda menurut tradisi dan penafsiran.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-birthday-recipient",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "selamat ulang tahun, Laras! semoga makin banyak hal baik dan seru tahun ini 🎉",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Laras",
+            "username": "Laras",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] selamat ulang tahun <@333333333333333333>! <@1077393568647352320> kasih ucapan dong",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] selamat ulang tahun, Laras! semoga makin banyak hal baik dan seru tahun ini 🎉",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2732.664492,
+        "usage": {
+          "prompt_tokens": 8459,
+          "completion_tokens": 25,
+          "total_tokens": 8484,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 4363
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 16490.468495,
+    "action": null,
+    "text": "selamat ulang tahun, Laras! semoga makin banyak hal baik dan seru tahun ini 🎉",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-two-human-banter",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan 😌",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "555555555555555551",
+            "displayName": "Mira",
+            "username": "Mira",
+            "isBot": false
+          },
+          {
+            "id": "555555555555555552",
+            "displayName": "Sinta",
+            "username": "Sinta",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] infokan tujuh dosa besar <@555555555555555551> <@555555555555555552> <@1077393568647352320> wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan 😌",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3995.789184,
+        "usage": {
+          "prompt_tokens": 8532,
+          "completion_tokens": 39,
+          "total_tokens": 8571,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 8532
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7523.587295,
+    "action": null,
+    "text": "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan 😌",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Mira|Sinta"
+    ],
+    "deterministicPass": false
+  }
+]

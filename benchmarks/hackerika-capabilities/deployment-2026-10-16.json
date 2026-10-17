@@ -1,0 +1,90 @@
+{
+  "verifiedAt": "2026-10-16T10:43:18.565487+00:00",
+  "image": "ctf-assistant:capability-candidate-4-20261016",
+  "imageId": "sha256:842147b5c3ac5bc536607f4457d4ff160136ef4cf792b24179b0de9f663917f7",
+  "startedAt": "2026-10-16T10:40:46.232183345Z",
+  "checks": {
+    "environmentPreserved": true,
+    "serviceLabelsPreserved": true,
+    "runtimeCommandPreserved": true,
+    "securitySettingsPreserved": true,
+    "networkNamesPreserved": true,
+    "otherServicesUnchanged": true,
+    "selectedImage": true,
+    "healthy": true,
+    "noAutomaticRestarts": true,
+    "sourceHashesMatch": true,
+    "staticPromptUnchanged": true,
+    "globalResetNotRepeated": true,
+    "healthHttp200": true,
+    "discordReady": true,
+    "databaseReady": true,
+    "nativeSearchSucceeded": true,
+    "duplicateQueryCached": true
+  },
+  "sourceHashes": {
+    "src/Services/AI/chat.ts": "3b8cf349af36d0fadc13ea0a92802363a07abb9b5e3b61d6e2b968120597825d",
+    "src/Services/AI/userProfile.ts": "126ca73fd1adda85b4780963bf17b8ffab9d3fe962e0ebab7fe8e83be87bcd89",
+    "src/Database/userProfileSchema.ts": "0716df53886222537c2ae5ae32082d369bad4f690ef2d57e76cee02457b1fc67",
+    "src/Services/AI/web.ts": "f395bf77252c4507faea5fe13fecb1e25bdca7bd2ab78861fb0646a3cfeb7add",
+    "src/Services/AI/tools.ts": "00b100489c6e047b5e1a97bde6bb62aec66c19c5c60edaa96338f1144ef3ed55",
+    "src/Services/AI/vision.ts": "cc52ed3d425d0732da3332659a3e3581bb2a146577f55ba2f61a5a41e9b939dc",
+    "src/Services/AI/attribution.ts": "c0f8f07457ecdc7d03d8ca1af5fb893ec49ecda985fc855826b509bde85ee960"
+  },
+  "staticPromptHash": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+  "staticPromptChars": 11671,
+  "toolHash": "db736f1a49a7d856999211c7ff95e3f869a1f3cfcc6102d3ca7f869979d10bff",
+  "relationshipState": {
+    "resetKey": "relationship-reset-2026-10-16",
+    "originalResetAppliedAt": "2026-10-16T01:27:02.452Z",
+    "originalResetAffectedProfiles": 112,
+    "profilesBefore": 117,
+    "profilesAfter": 117,
+    "existingProfilesWithUnchangedSixScores": 116,
+    "profileResetVersionsPreserved": true,
+    "newResetPerformed": false
+  },
+  "startupRecovery": {
+    "manualRestarts": 1,
+    "reason": "The initial Discord gateway HTTP upgrade failed. Existing login retry emitted ready while HTTP health stayed false. One clean restart of the same image/configuration restored readiness; original logs retained privately.",
+    "automaticRestarts": 0
+  },
+  "nativeSearch": {
+    "ok": true,
+    "provider": "deepseek-native",
+    "sources": 3,
+    "sourceDomains": [
+      "api-docs.deepseek.com"
+    ],
+    "searchedAt": "2026-10-16T10:39:08.337Z",
+    "actualProviderRequests": 1,
+    "duplicateQueryCached": true,
+    "proof": "Authenticated real deployed webSearchForTurn with native server-tool source results; identical query reused the result. No Discord delivery."
+  },
+  "tests": {
+    "passed": 306,
+    "failed": 0,
+    "assertions": 892,
+    "files": 29,
+    "scopedStrictTypesPassed": true,
+    "botBuildPassed": true,
+    "fullIndexTypecheckLimit": "Existing api/utils/statistics.ts:577 GlobalStats/CTFAchievementStats mismatch; unrelated file unchanged."
+  },
+  "benchmark": {
+    "report": "report-2026-10-16.json",
+    "uniqueCases": 36,
+    "categories": 12,
+    "trialsPerVariant": 54,
+    "baselinePasses": 46,
+    "candidatePasses": 54,
+    "freshValidationPasses": 16,
+    "freshValidationTrials": 16,
+    "currentCriticalFailures": 0,
+    "originalFailedHoldoutRetained": true
+  },
+  "rollback": {
+    "image": "ctf-assistant:capability-baseline-20261016",
+    "imageId": "sha256:88f1f85cffe0e2b1500baf16bd83038eccf4bfc37279a8db517cc64208522224",
+    "privateConfigurationRetained": true
+  }
+}

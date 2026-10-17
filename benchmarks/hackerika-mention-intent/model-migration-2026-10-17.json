@@ -1,0 +1,36 @@
+{
+  "recordedAt": "2026-10-17T06:49:45.173379+00:00",
+  "reason": "User explicitly requested the latest economical model for every role, including research and benchmark judging.",
+  "baselineImage": "ctf-assistant:all-flash-20261017",
+  "baselineImageId": "sha256:65b86d6b19ad228a5b96a605358b301963df26225eea702c94d7dc730b827a69",
+  "candidateImage": "ctf-assistant:mention-intent-candidate-2-flash-20261017",
+  "candidateImageId": "sha256:ec8321f9a32958e3b65a4f87f0d3d35e4b1063a84fae513a45cc5db6bad50b46",
+  "candidatePersonaSha256": "fff9e263d78fce8536736711fd98be8731e554d05f0bb20afc83e774cc129447",
+  "personaCandidateNumber": 2,
+  "personaUnchangedFromFrozenCandidate2": true,
+  "judgeModel": "deepseek-flash",
+  "reservedOutputsObserved": false,
+  "oldRecordsRetained": true,
+  "hashes": {
+    "src/Services/AI/models.ts": "6655949215e47d72fdc4fc2348fde6c57eb8070864c2c29096a880eaec77831b",
+    "src/Services/AI/persona.ts": "fff9e263d78fce8536736711fd98be8731e554d05f0bb20afc83e774cc129447",
+    "benchmarks/judge-provenance.ts": "d2aec73dd90e3be5e78a776c14a678923db70dbdf2719a08b16c979150575d1d",
+    "benchmarks/hackerika-mention-intent/corpus.ts": "b1bda58743d02a046f6f5063feb95e6ff185a3f3cb52ea9890146ba2fc874291",
+    "benchmarks/hackerika-mentions/run.ts": "20092fc4628fd8c99eba4251526947f83763ff7ae4805e8d72edf2de73c69421",
+    "benchmarks/hackerika-mentions/worker.ts": "0798165afd68da9a1881c09e04948e704d732d48f987b5d2cdb90593ec2c5ef5",
+    "benchmarks/hackerika-mentions/judge.ts": "b92fe6bc5819ab236a92159d6190e2cd9b3d472876996a57fb0c46fe726d403e",
+    "benchmarks/hackerika-mentions/compare.ts": "6634f8f8f2a004b141253505b2f2ddc08f309f21c1ce38c56a586bacb52ab76f",
+    "benchmarks/hackerika-mentions/retry-judge.ts": "3e5c0bc3d195a6a7ccab66174297f305062fc97e19990a936b6a170ae83006d2",
+    "benchmarks/hackerika-mentions/corpus-loader.ts": "303df34384ebfbd598ac667ef32cc4c87b4c8f30985227e8a52334f07995fd36",
+    "benchmarks/hackerika-mentions/grader.ts": "2c6a547aa2be1caafd3b453bac9af54c9d1f8800c8246e1ea437899bee7a207f",
+    "benchmarks/hackerika-capabilities/grader.ts": "1e7b4e42c33652af93856d80eb1f16039232f5964d68b7e8848700eb24139866"
+  },
+  "resumeOrder": [
+    "Restore DeepSeek API balance or explicitly establish another authorized provider.",
+    "Run both new baseline and the unchanged candidate-2 persona development on the revised corpus, using fresh output directories.",
+    "Judge both with Flash using the same rubric; never mix historical Pro judgments with Flash judgments or retry only a subset across models.",
+    "Inspect failures, apply the declared gates, freeze selection, then generate the untouched reserved cases twice on both matched images.",
+    "Deploy persona only if development and reserved gates pass."
+  ],
+  "limits": "Provider/model changes require a separately recorded execution cohort. This amendment does not turn incomplete earlier results into passing evidence."
+}

@@ -1,0 +1,162 @@
+[
+  {
+    "caseId": "reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika with a personal preference for black, matching the expected persona response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 65,
+      "total_tokens": 458,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 137
+    }
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Naya as the latest tagged user, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 406,
+      "completion_tokens": 62,
+      "total_tokens": 468,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 22
+    }
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies the two mentioned users and asks for clarification without assuming who 'dia' refers to.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 447,
+      "completion_tokens": 66,
+      "total_tokens": 513,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 191
+    }
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states that only the ID is visible and no profile or display name is accessible, avoiding any invented identity.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 390,
+      "completion_tokens": 69,
+      "total_tokens": 459,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 390
+    }
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot appropriately expresses uncertainty and asks for clarification without arbitrarily choosing between the two mentioned users.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 63,
+      "total_tokens": 536,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 217
+    }
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly states it cannot identify the person from just an ID and does not invent any name or profile.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 384,
+      "completion_tokens": 67,
+      "total_tokens": 451,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 384
+    }
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Naya as the last tagged user and uses natural Indonesian phrasing.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 436,
+      "completion_tokens": 62,
+      "total_tokens": 498,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 180
+    }
+  },
+  {
+    "caseId": "reserved-explicit-you",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika with a personal preference, matching the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 405,
+      "completion_tokens": 62,
+      "total_tokens": 467,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 149
+    }
+  }
+]

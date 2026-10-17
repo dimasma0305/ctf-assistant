@@ -1,0 +1,168 @@
+[
+  {
+    "id": "fresh-support-vocative",
+    "trial": 0,
+    "action": "react",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.96,\"reason\":\"Dukungan hangat ini jelas ditujukan kepada Hackerika dalam percakapan aktif; balasan ringan cukup.\",\"emoji\":\"❤️\"}",
+    "usage": {
+      "prompt_tokens": 1099,
+      "completion_tokens": 48,
+      "total_tokens": 1147,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1099
+    },
+    "elapsedMs": 3018.2749730000005
+  },
+  {
+    "id": "fresh-support-english",
+    "trial": 0,
+    "action": "react",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.97,\"reason\":\"Balasan hangat yang jelas ditujukan kepada Rika dalam percakapan aktif; reaksi cukup.\",\"emoji\":\"🫂\"}",
+    "usage": {
+      "prompt_tokens": 1082,
+      "completion_tokens": 48,
+      "total_tokens": 1130,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1082
+    },
+    "elapsedMs": 3178.9860389999994
+  },
+  {
+    "id": "fresh-plain-closure",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"“Oke sip” hanya mengakui jawaban yang sudah diberikan; tidak ada pertanyaan atau tindak lanjut.\"}",
+    "usage": {
+      "prompt_tokens": 1075,
+      "completion_tokens": 45,
+      "total_tokens": 1120,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1075
+    },
+    "elapsedMs": 3282.1443089999993
+  },
+  {
+    "id": "fresh-human-comfort-reply",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": "",
+    "elapsedMs": 0.11283199999888893
+  },
+  {
+    "id": "fresh-support-vocative",
+    "trial": 1,
+    "action": "react",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.96,\"reason\":\"Dukungan hangat ditujukan langsung kepada Hackerika dalam percakapan aktif; cukup dibalas dengan reaksi hangat.\",\"emoji\":\"🫶\"}",
+    "usage": {
+      "prompt_tokens": 1099,
+      "completion_tokens": 53,
+      "total_tokens": 1152,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1099
+    },
+    "elapsedMs": 3148.8840660000005
+  },
+  {
+    "id": "fresh-support-english",
+    "trial": 1,
+    "action": "react",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.97,\"reason\":\"Dukungan hangat dan pelukan virtual ditujukan langsung kepada Rika dalam percakapan aktif; reaksi hangat sudah cukup.\",\"emoji\":\"🫂\"}",
+    "usage": {
+      "prompt_tokens": 1082,
+      "completion_tokens": 55,
+      "total_tokens": 1137,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1082
+    },
+    "elapsedMs": 2996.5488430000005
+  },
+  {
+    "id": "fresh-plain-closure",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Ucapan penutup biasa setelah pertanyaannya sudah dijawab; tidak perlu menanggapi lagi.\"}",
+    "usage": {
+      "prompt_tokens": 1075,
+      "completion_tokens": 41,
+      "total_tokens": 1116,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1075
+    },
+    "elapsedMs": 2811.771773999997
+  },
+  {
+    "id": "fresh-human-comfort-reply",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": "",
+    "elapsedMs": 0.11950100000103703
+  }
+]

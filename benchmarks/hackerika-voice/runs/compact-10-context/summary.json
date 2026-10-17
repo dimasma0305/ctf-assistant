@@ -1,0 +1,81 @@
+{
+  "rubricVersion": "indonesian-voice-v1",
+  "acceptance": {
+    "naturalness": 4.2,
+    "relevance": 4.2,
+    "emotionalFit": 4.2,
+    "brevityPassRate": 0.95,
+    "criticalFailures": 0,
+    "nonRegressionTolerance": 0.15,
+    "preferredShare": 0.6
+  },
+  "model": "deepseek-flash",
+  "effort": "high",
+  "judgeModel": "deepseek-v4-pro",
+  "suite": "context",
+  "split": "dev",
+  "repeats": 2,
+  "concurrency": 3,
+  "limits": {
+    "maxCalls": 180,
+    "maxMinutes": 25,
+    "maxRounds": 4,
+    "maxTokens": 4096
+  },
+  "hashes": {
+    "before": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+    "after": "b55eecad9d10672f9d913692f1a74042c5a6c950248f1520c4581e15470e1f29",
+    "tools": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+    "corpus": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+    "judge": "c2881035fc61fd24624166cc40ebdbfba84c2989b0a7ec897c661b999271156e"
+  },
+  "promptCharacters": {
+    "before": 22375,
+    "after": 11004
+  },
+  "dependencies": {
+    "bun": "1.3.14",
+    "openai": "4.104.0"
+  },
+  "interpretation": "Synthetic, API-only prompt evaluation with simulated tools. Independent AI pair judging plus deterministic constraints; no human participant baseline. No real Discord actions or production data.",
+  "elapsedMs": 38492,
+  "apiCalls": 25,
+  "cachedGenerations": 12,
+  "usage": {
+    "prompt": 130363,
+    "completion": 10314,
+    "cacheHit": 101499
+  },
+  "before": {
+    "samples": 12,
+    "generationErrors": 0,
+    "judgedSamples": 12,
+    "naturalness": 4,
+    "relevance": 3.75,
+    "brevity": 4.25,
+    "emotionalFit": 3.3333333333333335,
+    "brevityPassRate": 0.8333333333333334,
+    "serviceClosers": 0,
+    "criticalFailures": 1,
+    "meanWords": 19.666666666666668,
+    "meanLatencyMs": 0
+  },
+  "after": {
+    "samples": 12,
+    "generationErrors": 0,
+    "judgedSamples": 12,
+    "naturalness": 4.25,
+    "relevance": 4.833333333333333,
+    "brevity": 4.416666666666667,
+    "emotionalFit": 4.083333333333333,
+    "brevityPassRate": 0.9166666666666666,
+    "serviceClosers": 0,
+    "criticalFailures": 0,
+    "meanWords": 20.166666666666668,
+    "meanLatencyMs": 5295.083333333333
+  },
+  "preferredShare": 0.6666666666666666,
+  "judgeErrors": 0,
+  "result": "partial_result",
+  "passed": false
+}

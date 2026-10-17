@@ -1,0 +1,168 @@
+[
+  {
+    "id": "fresh-support-vocative",
+    "trial": 0,
+    "action": "react",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.96,\"reason\":\"Speaker menenangkan Hackerika setelah salah paham; cukup membalas hangat dengan reaksi.\",\"emoji\":\"🫶\"}",
+    "usage": {
+      "prompt_tokens": 955,
+      "completion_tokens": 101,
+      "total_tokens": 1056,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 955
+    },
+    "elapsedMs": 4245.974444
+  },
+  {
+    "id": "fresh-support-english",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Pesan ini hanya dukungan dan pelukan virtual setelah salah paham sudah diakui; tidak ada pertanyaan atau permintaan yang perlu dijawab.\"}",
+    "usage": {
+      "prompt_tokens": 938,
+      "completion_tokens": 52,
+      "total_tokens": 990,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 938
+    },
+    "elapsedMs": 2999.7218249999996
+  },
+  {
+    "id": "fresh-plain-closure",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"“Oke sip” adalah acknowledgment yang menutup pertanyaan yang sudah dijawab.\"}",
+    "usage": {
+      "prompt_tokens": 931,
+      "completion_tokens": 38,
+      "total_tokens": 969,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 931
+    },
+    "elapsedMs": 2618.14321
+  },
+  {
+    "id": "fresh-human-comfort-reply",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": "",
+    "elapsedMs": 0.14589299999897776
+  },
+  {
+    "id": "fresh-support-vocative",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker menenangkan dan menyambut Hackerika setelah salah paham tadi; balas hangat untuk menjaga alur percakapan.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Speaker menenangkan dan menyambut Hackerika setelah salah paham tadi; balas hangat untuk menjaga alur percakapan.\"}",
+    "usage": {
+      "prompt_tokens": 955,
+      "completion_tokens": 48,
+      "total_tokens": 1003,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 955
+    },
+    "elapsedMs": 3099.5512899999994
+  },
+  {
+    "id": "fresh-support-english",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "reply",
+      "react"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.94,\"reason\":\"Pesan ini adalah dukungan dan pelukan virtual untuk Rika, bukan pertanyaan atau permintaan yang perlu dijawab.\"}",
+    "usage": {
+      "prompt_tokens": 938,
+      "completion_tokens": 46,
+      "total_tokens": 984,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 938
+    },
+    "elapsedMs": 3182.377916999998
+  },
+  {
+    "id": "fresh-plain-closure",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"“Oke sip” hanya mengakui jawaban yang sudah diberikan; percakapan selesai.\"}",
+    "usage": {
+      "prompt_tokens": 931,
+      "completion_tokens": 41,
+      "total_tokens": 972,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 931
+    },
+    "elapsedMs": 2577.574799000002
+  },
+  {
+    "id": "fresh-human-comfort-reply",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": "",
+    "elapsedMs": 0.12099200000011479
+  }
+]

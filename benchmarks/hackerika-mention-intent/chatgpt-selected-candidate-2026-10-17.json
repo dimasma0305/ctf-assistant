@@ -1,0 +1,23 @@
+{
+  "selectedAt": "2026-10-17T07:26:06.273337+00:00",
+  "candidate": {
+    "image": "ctf-assistant:mention-intent-candidate-2-chatgpt-20261017",
+    "imageId": "sha256:4ecc3434641f0c5c4a5e4dace06a5076e6df29635e494c76797bb172eb571a87",
+    "changedSourceFiles": [
+      "src/Services/AI/persona.ts"
+    ]
+  },
+  "baseline": {
+    "image": "ctf-assistant:chatgpt-luna-20261017",
+    "imageId": "sha256:f543affdb2756cef22c7aabc8b2ebb2b6fca0185c9ea43f226c2052a58be50ab"
+  },
+  "personaSha256": "fff9e263d78fce8536736711fd98be8731e554d05f0bb20afc83e774cc129447",
+  "model": "gpt-6-luna",
+  "reasoningEffort": "low",
+  "developmentComparison": "chatgpt-development-comparison-2026-10-17.json",
+  "allCandidateDevelopmentOutputsReviewed": true,
+  "selectionRationale": "12/12 combined passes versus baseline9/12; no critical/provider/judge errors. Named playful targets are noticed, literal and technical controls stay factual, identities and speaker ownership remain correct, and effects contain only synthetic replies.",
+  "reservedGenerationStarted": false,
+  "reservedOutputsObserved": false,
+  "deployment": "pending reserved and capability transport regression gates"
+}

@@ -1,0 +1,4 @@
+{
+  "source": "benchmarks/hackerika-models/runs/chatgpt-luna-handler-smoke-20261017",
+  "reason": "Supply native image fixtures to the evaluator; previous judgments remain unchanged."
+}

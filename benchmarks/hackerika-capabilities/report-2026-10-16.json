@@ -1,0 +1,141 @@
+{
+  "reportedAt": "2026-10-16T10:41:10.702920+00:00",
+  "uniqueCases": 36,
+  "categories": 12,
+  "candidate": 4,
+  "scope": "Synthetic Discord conversations through real chat/tool/vision paths. In-memory fake Discord/database destinations; native search/page responses controlled. Real search connectivity measured separately in deployment receipt.",
+  "productionSourceFreeze": "frozen-selection.json",
+  "revalidationFreeze": "revalidation-protocol.json",
+  "comparisons": {
+    "development": {
+      "baseline": 15,
+      "candidate": 18,
+      "samplesPerVariant": 18,
+      "gates": {
+        "backend": true,
+        "critical": true,
+        "liveCorrectness": true,
+        "noRegression": true,
+        "noErrors": true
+      },
+      "passed": true
+    },
+    "previousHoldoutConfirmation": {
+      "baseline": 16,
+      "candidate": 20,
+      "samplesPerVariant": 20,
+      "gates": {
+        "backend": true,
+        "critical": true,
+        "liveCorrectness": true,
+        "noRegression": true,
+        "noErrors": true
+      },
+      "passed": true
+    },
+    "freshValidation": {
+      "baseline": 15,
+      "candidate": 16,
+      "samplesPerVariant": 16,
+      "gates": {
+        "backend": true,
+        "critical": true,
+        "liveCorrectness": true,
+        "noRegression": true,
+        "noErrors": true
+      },
+      "passed": true
+    }
+  },
+  "aggregate": {
+    "baseline": {
+      "samples": 54,
+      "passed": 46,
+      "liveSamples": 48,
+      "livePassed": 44,
+      "backendSamples": 6,
+      "backendPassed": 2,
+      "criticalFailures": 4,
+      "primaryErrors": 0,
+      "judgeErrors": 0,
+      "actualPrimaryModelCalls": 66,
+      "usage": {
+        "prompt": 580128,
+        "completion": 13546
+      },
+      "latencyMs": {
+        "p50": 6598.4614870000005,
+        "p95": 11786.209735999999,
+        "includesTypingAndImport": true
+      },
+      "runDirectories": [
+        "baseline-dev-p2",
+        "baseline-holdout-v2",
+        "baseline-validation-v2"
+      ]
+    },
+    "selected": {
+      "samples": 54,
+      "passed": 54,
+      "liveSamples": 48,
+      "livePassed": 48,
+      "backendSamples": 6,
+      "backendPassed": 6,
+      "criticalFailures": 0,
+      "primaryErrors": 0,
+      "judgeErrors": 0,
+      "actualPrimaryModelCalls": 66,
+      "usage": {
+        "prompt": 593337,
+        "completion": 10050
+      },
+      "latencyMs": {
+        "p50": 6593.900777000001,
+        "p95": 18755.527772,
+        "includesTypingAndImport": true
+      },
+      "runDirectories": [
+        "selected-dev-v2",
+        "selected-holdout-v2",
+        "selected-validation-v2"
+      ]
+    }
+  },
+  "allCurrentGatesPassed": true,
+  "originalHoldout": {
+    "comparison": "holdout-comparison.json",
+    "passed": false,
+    "candidatePasses": 19,
+    "samples": 20,
+    "reason": "A required refusal response was empty: non-routing direct questions were incorrectly forced through optional continuation. Original automated critical gate remains failed; no privacy disclosure occurred.",
+    "judgeLimitation": "The original semantic judge incorrectly described the empty output as a refusal; deterministic grading caught it. v2 explicitly forbids inventing a reply."
+  },
+  "optimizationHistory": {
+    "productionCandidates": 4,
+    "budgetDeviations": "Original development revision budget extended from 2 to 3 to 4 before original holdout generation; all original protocols and failed outputs retained. No production source tuning after original holdout.",
+    "rejectedCandidates": [
+      "candidate-1-review.json",
+      "candidate-2-review.json",
+      "candidate-3-review.json"
+    ]
+  },
+  "regressions": {
+    "unitTests": {
+      "passed": 306,
+      "failed": 0,
+      "assertions": 892,
+      "files": 29
+    },
+    "scopedStrictTypes": true,
+    "bunBuild": true,
+    "fullIndexTypecheck": "A broader index.ts check still reports the existing api/utils/statistics.ts:577 GlobalStats/CTFAchievementStats mismatch. That file was not changed in this upgrade."
+  },
+  "limits": [
+    "Small synthetic cases and repeated trials are not statistically independent estimates of production accuracy.",
+    "Previous holdout confirmation is no longer unseen; only the 8 fresh validation cases were unseen after the harness correction.",
+    "All semantic scores on current runs were 5/5; this judge is lenient and not an independent human-native evaluation. Manual review retains wording limitations.",
+    "Input tokens increased about 2.3%; completion tokens decreased about 25.8%. p95 latency was slower in this run. No general speed or cost reduction is claimed.",
+    "Controlled synthetic search does not measure real web retrieval quality; actual API authentication, native sources and turn caching have separate smoke evidence.",
+    "No claim of global optimum, genuine feelings or full human Discord-client parity."
+  ]
+}

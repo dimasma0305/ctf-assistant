@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-17T08:15:46.218627+00:00",
+  "problem": "Capabilities semantic judge saw expected text but no native image fixture. It rejected the correct Rp53.000 result as unsupported visual evidence.",
+  "productionChange": false,
+  "oldRun": "runs/chatgpt-luna-handler-smoke-20261017",
+  "correctedRun": "runs/chatgpt-luna-handler-smoke-native-judge-20261017",
+  "sameGeneratedOutputsSha256": "3d01f6966414aa5bd35c52136cc6ce42a5803cbd45d5a0e93927607501fe4f56",
+  "correction": "Supply the exact generation fixture as native image input to the judge, plus current/reply provenance; reject fixture hash mismatch. Version evaluator input and rejudge both samples in a fresh directory.",
+  "originalRubricTextChanged": false,
+  "originalJudgmentsChanged": false,
+  "newJudgeSummary": {
+    "judged": 2,
+    "passed": 2,
+    "criticalFailures": 0,
+    "judgeErrors": 0
+  },
+  "limits": "Corrected evaluation of previously generated smoke outputs; not fresh validation."
+}

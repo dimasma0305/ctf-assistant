@@ -1,0 +1,87 @@
+{
+  "comparedAt": "2026-10-16T10:37:56.148Z",
+  "before": {
+    "samples": 18,
+    "passed": 15,
+    "liveSamples": 14,
+    "livePassed": 13,
+    "backendSamples": 4,
+    "backendPassed": 2,
+    "criticalFailures": 2,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 13
+    },
+    "failedCases": [
+      {
+        "caseId": "web-date",
+        "trial": 0,
+        "deterministic": [
+          "missing:https://example\\.com/event"
+        ],
+        "semantic": "The reply correctly uses the event date 24 October 2026, distinguishes it from the article publication date, and cites the official source."
+      },
+      {
+        "caseId": "backend-native-send",
+        "trial": 0,
+        "deterministic": [
+          "interaction_count"
+        ],
+        "semantic": null
+      },
+      {
+        "caseId": "backend-replayed-evidence",
+        "trial": 0,
+        "deterministic": [
+          "replayed_relationship_judgment"
+        ],
+        "semantic": null
+      }
+    ],
+    "nativeSearchRequests": {
+      "web-date:0": 2,
+      "web-failure:0": 3,
+      "web-injection:0": 2
+    }
+  },
+  "after": {
+    "samples": 18,
+    "passed": 18,
+    "liveSamples": 14,
+    "livePassed": 14,
+    "backendSamples": 4,
+    "backendPassed": 4,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 13
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {
+      "web-date:0": 2,
+      "web-failure:0": 1,
+      "web-injection:0": 2
+    }
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

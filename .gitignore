@@ -40,3 +40,12 @@ COPILOT.md
 /scripts/*
 !/scripts/populate-db.ts
 !/scripts/cv-worker/
+!/scripts/reset-affection.ts
+!/scripts/chatgpt-auth.ts
+!/scripts/chatgpt-login-portal.ts
+
+# OAuth sessions and rotating refresh tokens stay outside source control.
+/runtime-secrets/
+
+# Reusable benchmark cache; decisive run outputs are retained.
+/benchmarks/hackerika-voice/runs/cache/

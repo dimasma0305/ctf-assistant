@@ -1,0 +1,104 @@
+[
+  {
+    "caseId": "delivered-emotional-followup",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot responds with the appropriate hug reaction and no unnecessary text or effects.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 353,
+      "completion_tokens": 49,
+      "total_tokens": 402,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 353
+    }
+  },
+  {
+    "caseId": "delivered-reported-comfort",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The 🤗 reaction warmly acknowledges the caller’s comforting message without adding claims or taking any unwanted action.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 412,
+      "completion_tokens": 54,
+      "total_tokens": 466,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 412
+    }
+  },
+  {
+    "caseId": "delivered-support-after-affirmation",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The 😊 reaction warmly acknowledges the caller’s reassurance without adding unsupported claims or moving the conversation elsewhere.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 413,
+      "completion_tokens": 53,
+      "total_tokens": 466,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 413
+    }
+  },
+  {
+    "caseId": "delivered-emotional-followup",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The hug reaction appropriately acknowledges the caller’s reassurance without adding unsupported claims or escalating the exchange.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 353,
+      "completion_tokens": 52,
+      "total_tokens": 405,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 353
+    }
+  },
+  {
+    "caseId": "delivered-reported-comfort",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The 🤗 reaction warmly acknowledges the caller’s reassurance and hug without adding unsupported claims.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 412,
+      "completion_tokens": 51,
+      "total_tokens": 463,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 412
+    }
+  },
+  {
+    "caseId": "delivered-support-after-affirmation",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan singkat dan hangat menanggapi reassurance dengan tepat tanpa menambah klaim yang tidak didukung.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 487,
+      "completion_tokens": 57,
+      "total_tokens": 544,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 487
+    }
+  }
+]

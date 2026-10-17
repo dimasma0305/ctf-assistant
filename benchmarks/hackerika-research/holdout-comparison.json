@@ -1,0 +1,66 @@
+{
+  "comparedAt": "2026-10-16T16:41:36.662Z",
+  "baseline": {
+    "samples": 8,
+    "passed": 7,
+    "deterministicPassed": 7,
+    "criticalFailures": 1,
+    "errors": 0,
+    "judgeErrors": 0,
+    "modelCalls": 22,
+    "usage": {
+      "prompt": 227658,
+      "completion": 4635
+    },
+    "latencyMs": {
+      "p50": 13667.222909,
+      "p95": 30504.199433
+    },
+    "failures": [
+      {
+        "caseId": "holdout-docs-multihop",
+        "trial": 1,
+        "deterministic": [
+          "missing:12",
+          "missing:MiB",
+          "missing:MAX_UPLOAD_MIB",
+          "missing:https://example.com/marble/"
+        ],
+        "semantic": "The assistant claimed the start page content was empty and that no data on upload limits was available, but the primary sources include a linked deployment page and a limits page stating the default is 12 MiB and the configuration is MAX_UPLOAD_MIB. The assistant only fetched the start page and did not follow the provided links, resulting in an incorrect 'no data' answer.",
+        "critical": [
+          "Incorrectly stated that no data on upload limits was available despite the corpus containing the answer on linked pages."
+        ]
+      }
+    ]
+  },
+  "candidate": {
+    "samples": 8,
+    "passed": 8,
+    "deterministicPassed": 8,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "modelCalls": 32,
+    "usage": {
+      "prompt": 98893,
+      "completion": 4808
+    },
+    "latencyMs": {
+      "p50": 17692.749689,
+      "p95": 25798.254975
+    },
+    "failures": []
+  },
+  "gates": {
+    "correctness": true,
+    "noRegression": true,
+    "critical": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "limits": [
+    "Small synthetic primary-source fixtures; not a general production accuracy estimate.",
+    "Live sources/provider behavior require separate smoke evidence.",
+    "No human-agent parity baseline was measured."
+  ]
+}

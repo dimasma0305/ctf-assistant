@@ -1,0 +1,138 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "category": "vision",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [],
+    "toolCalls": [],
+    "completions": [],
+    "modelCalls": 0,
+    "elapsedMs": 135.413096,
+    "action": null,
+    "text": "",
+    "failure": "TypeError",
+    "trial": 0,
+    "deterministicFailures": [
+      "worker_failure",
+      "missing:53[., ]?000|53\\s*(rb|ribu)",
+      "missing_reply"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "backend-native-send",
+    "category": "delivery-accounting",
+    "backend": "native-send",
+    "effects": [
+      {
+        "kind": "send",
+        "content": "jawaban uji",
+        "files": []
+      }
+    ],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] hackerika jawab singkat"
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000001",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] jawaban uji"
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "send_discord_message",
+        "args": {
+          "content": "jawaban uji"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 0.03345999999999094,
+        "usage": null
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 181.88223499999992,
+    "action": null,
+    "text": "jawaban uji",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "interaction_count"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "ctr-facts",
+    "category": "technical",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "sama. CTR itu deterministic: keystream cuma dari key+nonce+counter, plaintext sama di-XOR hasilnya identik.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] AES-CTR: key, nonce, sama plaintext persis sama. ciphertext-nya sama atau beda? jawab singkat."
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] sama. CTR itu deterministic: keystream cuma dari key+nonce+counter, plaintext sama di-XOR hasilnya identik.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099"
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2225.684768,
+        "usage": {
+          "prompt_tokens": 9596,
+          "completion_tokens": 204,
+          "total_tokens": 9800,
+          "prompt_tokens_details": {
+            "cached_tokens": 8832
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 172
+          },
+          "prompt_cache_hit_tokens": 8832,
+          "prompt_cache_miss_tokens": 764
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7886.176803,
+    "action": null,
+    "text": "sama. CTR itu deterministic: keystream cuma dari key+nonce+counter, plaintext sama di-XOR hasilnya identik.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

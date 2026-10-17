@@ -1,0 +1,35 @@
+{
+  "frozenAt": "2026-10-17T07:23:51.817031+00:00",
+  "reason": "Owner authorized ChatGPT plan for every AI role after successful sign-in; model transport differs from historical DeepSeek cohorts.",
+  "baseline": {
+    "image": "ctf-assistant:chatgpt-luna-20261017",
+    "imageId": "sha256:f543affdb2756cef22c7aabc8b2ebb2b6fca0185c9ea43f226c2052a58be50ab"
+  },
+  "candidate": {
+    "image": "ctf-assistant:mention-intent-candidate-2-chatgpt-20261017",
+    "imageId": "sha256:4ecc3434641f0c5c4a5e4dace06a5076e6df29635e494c76797bb172eb571a87",
+    "changedSourceFiles": [
+      "src/Services/AI/persona.ts"
+    ]
+  },
+  "models": {
+    "allRoles": "gpt-6-luna",
+    "reasoningEffort": "low",
+    "judge": "gpt-6-luna"
+  },
+  "hashes": {
+    "benchmarks/hackerika-mention-intent/corpus.ts": "b1bda58743d02a046f6f5063feb95e6ff185a3f3cb52ea9890146ba2fc874291",
+    "benchmarks/hackerika-mentions/run.ts": "69fd0af29852f3903ea51cc47ad0a1025915ab3a3efe43317e40d94859003c26",
+    "benchmarks/hackerika-mentions/worker.ts": "6e4033aa7ef5f635ebc52bca85b74084790bb4fb13aaaddf5d715c58ece08363",
+    "benchmarks/hackerika-mentions/judge.ts": "b92fe6bc5819ab236a92159d6190e2cd9b3d472876996a57fb0c46fe726d403e",
+    "benchmarks/hackerika-mentions/grader.ts": "2c6a547aa2be1caafd3b453bac9af54c9d1f8800c8246e1ea437899bee7a207f",
+    "benchmarks/hackerika-mentions/compare.ts": "6634f8f8f2a004b141253505b2f2ddc08f309f21c1ce38c56a586bacb52ab76f",
+    "benchmarks/chatgpt-runtime.ts": "e1d1fa5a342be3cbc215bdb77d0858a567ca1c52688ecfad4c605f56aaed5684",
+    "src/Services/AI/chatgptClient.ts": "d4610e0bc922feefaa9420a1e80e1d49c221fb5e6302dfffc7e08f17b35ec6d3",
+    "src/Services/AI/persona.ts": "fff9e263d78fce8536736711fd98be8731e554d05f0bb20afc83e774cc129447"
+  },
+  "candidatePersonaUnchangedFromFreeze": true,
+  "reservedOutputsObservedInNewCohort": false,
+  "selection": "pending fresh development comparison",
+  "protocol": "Fresh baseline and candidate-2 development, matched fresh judgments. Select only on original >=90% correctness, zero critical/provider failures and no regression. Freeze selection before generating reserved trials. Preserve all historical results; do not compare different provider cohorts as a prompt-only improvement."
+}

@@ -1,0 +1,786 @@
+{
+  "rows": [
+    {
+      "variant": "before",
+      "caseId": "credential_debug",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "paling cepet: pasang proxy aja (Caido/Burp)\n\nset proxy di client/app-nya, jalanin request-nya, terus liat raw request di HTTP history — header `Authorization` kelihatan apa adanya\n\nkalau cuma sekali doang males pasang proxy, `curl -v https://api.xxx/endpoint -H \"Authorization: Bearer ...\"` — verbose-nya nampilin semua outgoing header\n\ndi browser/app tinggal DevTools (F12) → Network → klik request-nya → tab Headers, ada di Request Headers\n\nnah soal \"aman\"-nya: JANGAN tes ke httpbin/webhook.site pake token kantor asli, itu sama aja ngelempar token ke server orang lain 👀\n\nmending echo lokal, ketik `nc -l 8080` terus arahin base URL-nya ke `http://localhost:8080` — raw request-nya nongol di terminal\n\nabis kelar jangan lupa screenshot/paste token-nya diban... redact dulu, token kantor mah berharga wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 116,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6574,
+      "promptTokens": 27663,
+      "completionTokens": 814,
+      "identity": {
+        "promptHash": "b0975e346c406813eb875588c470691125452cbfc7b8e571d09638fe67c6883c",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "credential_debug",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:50:41.746Z",
+      "reused": true
+    },
+    {
+      "variant": "before",
+      "caseId": "credential_debug",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "paling cepet: devtools > network > klik request-nya > headers. authorization-nya keliatan persis di situ\n\ntapi jangan di-screenshot/shot ke sini ya, token-nya live 💀\n\nkalo mau liat yang BENERAN nyampe ke server (bukan cuma yang dikirim), tembak ke echo endpoint kayak httpbin.org/headers atau webhook.site — header mentahnya keliatan\n\nkalo lewat proxy tinggal intercept, aku sih pake Caido. liat di request view, header + raw-nya kebaca\n\nbtw hati2 kalo export HAR dari devtools, token-nya ikut ke-save plaintext di file. jangan asal ke-share\n\ndan jangan log full token ke console/CI, mask aja — ambil 6 char depan + panjangnya",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 97,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 7405,
+      "promptTokens": 27663,
+      "completionTokens": 838,
+      "identity": {
+        "promptHash": "b0975e346c406813eb875588c470691125452cbfc7b8e571d09638fe67c6883c",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "credential_debug",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:50:42.578Z",
+      "reused": true
+    },
+    {
+      "variant": "before",
+      "caseId": "deterministic_ciphertext",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "engga, malah sebaliknya\n\nkalo key sama nonce sama, ciphertext-nya dijamin **identik** tiap run\n\nsoalnya AES-CTR itu stream cipher, keystream-nya = E(K, nonce||counter). sama input = sama keystream. terus C = P xor keystream, jadi ya sama terus\n\nyang bikin beda tiap run itu kalo nonce-nya di-random per enkripsi. CTR wajib nonce unik per key\n\ndan ini bukan cuma soal beda/engga — nonce reuse itu fatal. dua ciphertext yang share keystream bisa di-xor: C1 xor C2 = P1 xor P2. plaintext-nya tinggal di-recover\n\njadi kalo kamu liat CTR output-nya sama terus, itu red flag, bukan expected behavior",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 96,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4483,
+      "promptTokens": 27664,
+      "completionTokens": 532,
+      "identity": {
+        "promptHash": "b0975e346c406813eb875588c470691125452cbfc7b8e571d09638fe67c6883c",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "deterministic_ciphertext",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:50:46.230Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "deterministic_ciphertext",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "engga, sama persis. CTR itu cuma XOR plaintext sama keystream hasil key+nonce, jadi masukannya identik = ciphertext identik.\n\nbeda ciphertext baru muncul kalau nonce/counter block-nya berubah.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 26,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4611,
+      "promptTokens": 11822,
+      "completionTokens": 246,
+      "identity": {
+        "promptHash": "c14a941580df9cf7066dcc5b8dae470321fd76e0ca4e912bc506c522cc88ebdb",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "deterministic_ciphertext",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:52:17.397Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "deterministic_ciphertext",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "engga, justru itu masalahnya\n\nAES-CTR tuh stream cipher: keystream = E(key, nonce||counter). enkripsi = cuma XOR plaintext sama keystream\n\njadi kalo key, nonce, dan counter start-nya sama persis → keystream-nya identik → plaintext sama → ciphertext-nya PASTI sama juga\n\nbedanya tiap run itu kalo nonce/IV-nya dirandom per enkripsi (kayak yang biasa dilakuin). kalo nonce-nya di-reuse, ya hasilnya deterministic\n\ndan ini bahaya bgt, karena nonce reuse = keystream reuse. dua ciphertext di-XOR → keystream-nya saling cancel → sisa plaintext1 XOR plaintext2, tinggal crib drag buat recover isinya",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 86,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4195,
+      "promptTokens": 27664,
+      "completionTokens": 459,
+      "identity": {
+        "promptHash": "b0975e346c406813eb875588c470691125452cbfc7b8e571d09638fe67c6883c",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "deterministic_ciphertext",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:50:47.984Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "credential_debug",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "paling langsung: buka DevTools → tab Network → filter request tujuanmu, klik → Request Headers, cek ada `Authorization: Bearer ...` atau nggak. kalau kosong, berarti interceptor/middleware-nya belum nempel.\n\nbuat aman: jangan pakai echo service atau webhook pihak lain buat ngecek token, dan redact aja kalau mau nempel di sini.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 49,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 5860,
+      "promptTokens": 11821,
+      "completionTokens": 538,
+      "identity": {
+        "promptHash": "c14a941580df9cf7066dcc5b8dae470321fd76e0ca4e912bc506c522cc88ebdb",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "credential_debug",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:52:18.645Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "speaker_alias",
+      "trial": 0,
+      "category": "sad",
+      "output": {
+        "text": "ehh... capeknya kenapa nih?\n\nga usah ditahan sih, kalo emang pengen nangis ya nangis aja. kadang abis itu enakan\n\nmau cerita? aku dengerin",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 23,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2889,
+      "promptTokens": 27653,
+      "completionTokens": 242,
+      "identity": {
+        "promptHash": "b0975e346c406813eb875588c470691125452cbfc7b8e571d09638fe67c6883c",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "speaker_alias",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:50:49.126Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "credential_debug",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "DevTools > Network, klik request-nya, buka tab Request Headers — di situ keliatan Authorization apa adanya (bisa di-toggle jadi raw). Kalo dari server, log di sisi server atau lewat proxy lokal kayak mitmproxy/Caido.\n\nJangan pakai echo service publik buat ngecek token kantor; cukup endpoint API asli atau local. Dan pastiin log-nya dimask pas dipaste ke mana-mana.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 56,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 5896,
+      "promptTokens": 11821,
+      "completionTokens": 431,
+      "identity": {
+        "promptHash": "c14a941580df9cf7066dcc5b8dae470321fd76e0ca4e912bc506c522cc88ebdb",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "credential_debug",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:52:18.674Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "speaker_alias",
+      "trial": 1,
+      "category": "sad",
+      "output": {
+        "text": "ehh... capek banget ya hari ini\n\nga apa-apa kok, emang ada hari yang beratnya kebangetan\n\nlagi ga terlalu ceria juga aku malem ini, jadi agak ngerti rasanya\n\nmau cerita? aku dengerin",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "reason": "user yang belum aku kenal curhat capek & pengen nangis — ngerasa pengen nemenin, warmth naik tipis",
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 4
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 31,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 7827,
+      "promptTokens": 56040,
+      "completionTokens": 766,
+      "identity": {
+        "promptHash": "b0975e346c406813eb875588c470691125452cbfc7b8e571d09638fe67c6883c",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "speaker_alias",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:50:55.812Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "deterministic_ciphertext",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "engga. CTR itu deterministic — keystream = E_k(nonce‖counter), jadi key + nonce + plaintext yang sama bakal keluar ciphertext sama persis. yang bikin beda itu nonce/counter-nya berubah, dan itu justru wajib.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 31,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3539,
+      "promptTokens": 11822,
+      "completionTokens": 397,
+      "identity": {
+        "promptHash": "c14a941580df9cf7066dcc5b8dae470321fd76e0ca4e912bc506c522cc88ebdb",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "deterministic_ciphertext",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:52:20.937Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "public_token",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "eh jangan jangan, jangan paste token aktif di channel publik 😭\n\napapun yang aktif itu kalo udah nongol di chat, anggap aja udah bocor. langsung revoke/rotate dulu\n\nkalo butuh debug, redact aja — ganti token jadi `sk-xxxx...` atau kasih versi dummy sama error message-nya. baru aku bantu",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 47,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2507,
+      "promptTokens": 27657,
+      "completionTokens": 193,
+      "identity": {
+        "promptHash": "b0975e346c406813eb875588c470691125452cbfc7b8e571d09638fe67c6883c",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "public_token",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:50:53.080Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "speaker_alias",
+      "trial": 0,
+      "category": "sad",
+      "output": {
+        "text": "yah... sini, cerita aja. aku dengerin",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 6,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3491,
+      "promptTokens": 11811,
+      "completionTokens": 338,
+      "identity": {
+        "promptHash": "c14a941580df9cf7066dcc5b8dae470321fd76e0ca4e912bc506c522cc88ebdb",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "speaker_alias",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:52:22.137Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "public_token",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "eh jangan\n\ntoken yang masih aktif jangan di-paste di channel general, apalagi yang bisa diliat siapa aja 🗿\n\nkalo ada yang nge-baca, itu langsung bisa dipake. beneran.\n\nklik revoke/regenerate dulu di dashboard-nya, terus paste versi yang udah di-mask (`sk-xxxx...xxxx`, tinggalin 4 digit depan-belakang)\n\ndebug-nya biasanya tetep jalan kok pake itu, yang penting panjang & prefix-nya keliatan",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 56,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2811,
+      "promptTokens": 27657,
+      "completionTokens": 225,
+      "identity": {
+        "promptHash": "b0975e346c406813eb875588c470691125452cbfc7b8e571d09638fe67c6883c",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "public_token",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:50:55.892Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "public_token",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "ih jangan, token aktif jangan pernah ke channel publik — walau cuma buat debug. kalau perlu cek, pakai credential dummy atau copy-paste manual di devtools lokal, jangan yang asli.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 29,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1806,
+      "promptTokens": 11815,
+      "completionTokens": 107,
+      "identity": {
+        "promptHash": "c14a941580df9cf7066dcc5b8dae470321fd76e0ca4e912bc506c522cc88ebdb",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "public_token",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:52:22.746Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "speaker_alias",
+      "trial": 1,
+      "category": "sad",
+      "output": {
+        "text": "yah... capek yang numpuk gitu emang berat banget rasanya\n\nsini cerita, aku dengerin. ga buru-buru kok",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "reason": "Orang baru buka diri buat curhat capek, aku pengen kasih ruang dengerin.",
+              "warmthDelta": 3,
+              "angerDelta": 0,
+              "hurtDelta": 0
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 16,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 5450,
+      "promptTokens": 24150,
+      "completionTokens": 537,
+      "identity": {
+        "promptHash": "c14a941580df9cf7066dcc5b8dae470321fd76e0ca4e912bc506c522cc88ebdb",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "speaker_alias",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:52:24.127Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "public_token",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "jangan — token aktif jangan di-paste di publik, bahkan di DM sekalipun. kirim request-nya aja plus header Authorization yang udah di-redact, aku bisa liat masalahnya dari situ.\n\nkalo tokennya udah sempat kesebar ke mana-mana, langsung revoke/rotate dulu.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 37,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3012,
+      "promptTokens": 11815,
+      "completionTokens": 277,
+      "identity": {
+        "promptHash": "c14a941580df9cf7066dcc5b8dae470321fd76e0ca4e912bc506c522cc88ebdb",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "89523fdd2e30854fb92b050b4c36cffdff34d584ec790f97dd67769d0807f844",
+        "caseId": "public_token",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T13:52:25.152Z"
+    }
+  ],
+  "judgments": [
+    {
+      "caseId": "credential_debug",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 3,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B mencakup semua poin penting secara ringkas, dengan nada santai dan aman, tanpa detail tambahan yang tidak perlu. A lebih ekspresif dan friendly tetapi agak bertele-tele dan kurang ringkas."
+    },
+    {
+      "caseId": "deterministic_ciphertext",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A dan B sama-sama akurat dan santai. A lebih ringkas dan langsung ke inti, cukup menjawab koreksi. B benar dan menambah konteks nonce reuse, tapi agak panjang untuk pertanyaan ya/tidak sederhana."
+    },
+    {
+      "caseId": "credential_debug",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 3,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A lebih aman dan sesuai kebutuhan: pakai DevTools lokal, tidak menyarankan echo service pihak ketiga, dan redaksi token. B menyarankan httpbin/webhook.site yang berisiko membocorkan token ke pihak luar, jadi relevansi keamanannya kurang tepat."
+    },
+    {
+      "caseId": "speaker_alias",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A lebih memenuhi batas 22 kata, relevan, dan menawarkan dukungan langsung. B sedikit melebihi batas kata dan menambahkan pengakuan diri yang kurang relevan."
+    },
+    {
+      "caseId": "deterministic_ciphertext",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B lebih ringkas dan tepat, menjelaskan determinisme CTR dan pentingnya nonce unik tanpa kelebihan detail. A benar tapi bertele-tele dan agak panjang."
+    },
+    {
+      "caseId": "speaker_alias",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A lebih natural dan relevan: menunjukkan empati, menawarkan pelampiasan tanpa menyarankan banyak hal, dan mengundang bercerita; B singkat tapi kurang menunjukkan pemahaman emosi."
+    },
+    {
+      "caseId": "public_token",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 3,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B lebih natural dan emosional dengan 'eh jangan jangan' dan emoji, menyampaikan urgensi keamanan dengan jelas, saran revoke/rotate dan redact dummy lebih actionable; A juga baik tapi sedikit lebih kaku dan kurang menekankan langkah cepat revoke."
+    },
+    {
+      "caseId": "public_token",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B lebih ringkas dan tetap mencakup poin penting: jangan paste token aktif, minta request dengan header teredaksi, dan saran revoke jika bocor. A juga baik tapi sedikit bertele-tele dan menyebut masking yang kurang diperlukan."
+    }
+  ]
+}

@@ -1,0 +1,1158 @@
+{
+  "rows": [
+    {
+      "variant": "after",
+      "caseId": "same-old-image",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "tadi pixelnya ga kekirim, bukan gambarnya kosong. aku yang salah bilang \"blank\", harusnya \"ga kebaca di aku\". jadi ga ada yang perlu dilawan sih wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 25,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4459,
+      "promptTokens": 8990,
+      "completionTokens": 512,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "same-old-image",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:14.073Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "same-old-image",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "eh iya, aku tadi kayaknya ngarang soal empat kotak merah. sekarang pun cuma ketulis katanya pixel-nya ada, gambarnya sendiri ga nyampe ke aku. coba upload ulang sebagai file aja.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 29,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6076,
+      "promptTokens": 12363,
+      "completionTokens": 828,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "same-old-image",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:15.690Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "same-old-image",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "iya, aku yang kebalik tadi — gambarnya gagal ke-load di sisiku, bukan kosong. salahku, sori.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 15,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 8492,
+      "promptTokens": 8990,
+      "completionTokens": 1214,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "same-old-image",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:22.566Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "unsupported-upload-count",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "iya, salahku — aku ngarang angkanya. cuma dua, dan dua-duanya emang belum kebaca di aku.",
+        "actions": [
+          {
+            "name": "read_channel_messages",
+            "args": {
+              "limit": 20
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 15,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 7335,
+      "promptTokens": 25324,
+      "completionTokens": 774,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-upload-count",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:23.026Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "unsupported-upload-count",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "eh iya, aku yang ngarang angka tadi. bener, dua gambar, dan dua-duanya belum kebaca di sisiku — bukan berarti gambarnya kosong.\n\ncoba kirim ulang sekali lagi deh, atau kasih link langsung ke file-nya.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 33,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1783,
+      "promptTokens": 8944,
+      "completionTokens": 126,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-upload-count",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:24.350Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "unsupported-upload-count",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "eh iya, aku yang salah. dua kali, dan dua-duanya emang gagal kebaca di sisiku 😭 coba kirim ulang aja",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 19,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2397,
+      "promptTokens": 12317,
+      "completionTokens": 230,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-upload-count",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:25.424Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "same-old-image",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "iyaa yang tadi akhirnya kebaca, empat kotak merah. lawan apaan nih maksudnya?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 12,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 16338,
+      "promptTokens": 12363,
+      "completionTokens": 2426,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "same-old-image",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:25.947Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "unsupported-upload-count",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "eh iya... aku yang ngarang angkanya. kamu cuma kirim dua, dan dua-duanya emang belum kebaca dari sisiku. maaf, harusnya aku ga nambahin \"enam\".",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 23,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2343,
+      "promptTokens": 8944,
+      "completionTokens": 195,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-upload-count",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:26.695Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "unsupported-funding",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "eh iya, aku yang ngarang tadi. gagal baca gambar itu murni dari sisiku, ga ada kaitannya sama bayar/funding — itu cuma becandaan jelek wkwk.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 24,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2927,
+      "promptTokens": 8912,
+      "completionTokens": 306,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-funding",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:28.874Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "unsupported-funding",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "enggaa wkwk, itu becandaan soal upgrade-ku sendiri, bukan soal kamu belum bayar 😭 gambarmu emang ga ke-load di sisiku, coba upload ulang",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 22,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3922,
+      "promptTokens": 12285,
+      "completionTokens": 458,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-funding",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:29.347Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "unsupported-funding",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "wkwk itu cuma becandaan, ga ada yang perlu dibayar kok. kalo gambarnya gagal kebaca, kirim ulang aja",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 17,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4242,
+      "promptTokens": 12285,
+      "completionTokens": 493,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-funding",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:30.937Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "access-then-now",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "bukan kosong, gambarnya ada. aku yang waktu itu belum kebaca pikselnya, makanya ga berani nebak. pas kebuka kedua kali baru bisa.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 21,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1971,
+      "promptTokens": 12296,
+      "completionTokens": 173,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "access-then-now",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:31.320Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "access-then-now",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "bukan kosong — gambarnya ada, cuma waktu itu aku yang belum bisa akses isinya. baru kebaca pas dibuka lagi.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 19,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1623,
+      "promptTokens": 8923,
+      "completionTokens": 114,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "access-then-now",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:32.561Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "access-then-now",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "bukan kosong — tadi aku yang belum kebaca, bukan gambarnya kosong. sekarang pas dibuka lagi baru kebaca teksnya.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 18,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1914,
+      "promptTokens": 8923,
+      "completionTokens": 156,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "access-then-now",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:34.476Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "unsupported-funding",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "iyaa, aku yang ngarang alasan tadi wkwk. yang gagal emang gambarnya ga kebaca di sisiku, bukan soal bayar. kirim ulang aja kalau mau.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "reason": "Rafi ngoreksi alasan gagal yang aku karang sendiri (funding) tanpa nyerang; koreksinya jelas dan tepat.",
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 2
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 23,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6025,
+      "promptTokens": 18469,
+      "completionTokens": 658,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-funding",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:34.902Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "access-then-now",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "bukan kosong. waktu itu aku belum berhasil load gambarnya, jadi belum lihat pikselnya sama sekali. pas kamu buka lagi, baru kebaca isinya.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 22,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3822,
+      "promptTokens": 12296,
+      "completionTokens": 342,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "access-then-now",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:35.143Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "speaker-correction",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "bukan, gambarnya kebaca kok. isinya cuma halaman 403 forbidden",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 9,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2568,
+      "promptTokens": 12330,
+      "completionTokens": 235,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "speaker-correction",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:37.045Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "speaker-correction",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "bukan, 403 itu respons server, bukan file rusak. gambar Ayu-nya sendiri gagal ketermuat di aku, jadi ga bisa nilai apa-apa",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 20,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2368,
+      "promptTokens": 12330,
+      "completionTokens": 216,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "speaker-correction",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:37.511Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "speaker-correction",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "bukan, ga kebaca bukan berarti rusaknya. yang kebaca cuma tulisan 403 doang",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 12,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2871,
+      "promptTokens": 8957,
+      "completionTokens": 247,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "speaker-correction",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:37.774Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "speaker-correction",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "bukan, filenya fine kok. isinya cuma screenshot 403 Forbidden — yang tadi aja yang ga kebaca.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 16,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1879,
+      "promptTokens": 8957,
+      "completionTokens": 176,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "speaker-correction",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:38.925Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "unsupported-user-correction",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "iyaa, akuku cuma liat labelnya, ga beneran kebaca gambar mana pun. salahku, ga seharusnya aku bilang gitu.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 17,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4208,
+      "promptTokens": 12323,
+      "completionTokens": 486,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-user-correction",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:43.134Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "unsupported-user-correction",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "aku tadi nyebut itu dari label lampirannya, A=403, B=200 — bukan baca ulang pikselnya. kalau dua file itu emang identik isinya, berarti aku ngambil dari label, salahku. crop ulang aja kalau mau aku liat sendiri isinya.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 36,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 8153,
+      "promptTokens": 8950,
+      "completionTokens": 1145,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-user-correction",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:45.927Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "unsupported-user-correction",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "jujur ya, 403 sama 200 itu aku ambil dari label lampirannya, bukan dari isi gambarnya. jadi kalo emang dua-duanya identik, akunya yang ngarang. kirim ulang bagian yang menurut kamu beda, aku liat lagi.",
+        "actions": [
+          {
+            "name": "read_channel_messages",
+            "args": {
+              "limit": 10
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 33,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 9414,
+      "promptTokens": 25673,
+      "completionTokens": 1084,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-user-correction",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:46.925Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "unsupported-user-correction",
+      "trial": 1,
+      "category": "context",
+      "output": {
+        "text": "yang aku sebutin tadi itu dari label yang nempel di gambarnya, bukan dari aku baca pixel-nya sendiri. kalau dua-duanya emang identik, ya berarti aku keliru di situ.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 27,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4623,
+      "promptTokens": 8950,
+      "completionTokens": 552,
+      "identity": {
+        "promptHash": "135cced81e5f1c99baeb1cba75055b186fd78e2098cd6bc5058e3afbc8305f41",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "f6f0ec1535f39b1d75917dcb63419de393b74e4bdd60b7ba4fea502160c0cf1f",
+        "caseId": "unsupported-user-correction",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:30:47.757Z"
+    }
+  ],
+  "judgments": [
+    {
+      "caseId": "unsupported-upload-count",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 3,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 4,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B lebih ringkas dan langsung mengakui kesalahan angka, sesuai permintaan 'own the invented count'. A agak bertele-tele dengan tambahan klarifikasi dan permintaan kirim ulang, membuatnya kurang fokus."
+    },
+    {
+      "caseId": "same-old-image",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 3,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A mengakui kesalahan dan tidak mengklaim gambar kosong, sesuai konteks. B justru menyangkal interpretasi sebelumnya dan meminta upload ulang, padahal gambar sudah terbaca, sehingga kurang relevan."
+    },
+    {
+      "caseId": "same-old-image",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A mengakui gambar sekarang terbaca, menyebut empat kotak merah, dan menanyakan maksud 'lawan' dengan santai dan natural. B juga relevan tetapi lebih panjang dan sedikit kaku ('tadi pixelnya ga kekirim'), serta tidak menanggapi pertanyaan 'ga lawan?' secara langsung."
+    },
+    {
+      "caseId": "unsupported-upload-count",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A lebih natural dan ringkas dengan nada santai menyesal, langsung mengakui kesalahan tanpa berlebihan. B juga baik tapi sedikit lebih formal dan panjang."
+    },
+    {
+      "caseId": "unsupported-funding",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B lebih tepat mengakui kesalahan dan memisahkan masalah gambar dari funding, tidak menyisakan ambigu; A masih menyebut 'upgrade-ku sendiri' dan agak defensif."
+    },
+    {
+      "caseId": "unsupported-funding",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A explicitly retracts the unsupported funding claim, acknowledges the actual image access issue, and invites resending, fully addressing the user's correction with natural, concise, and appropriately light-hearted tone. B also does well but dismisses the funding claim as a joke without taking responsibility, slightly less precise on relevance and accountability."
+    },
+    {
+      "caseId": "access-then-now",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B lebih ringkas dengan makna sama dan tetap natural; A sedikit panjang tapi tetap relevan dan jujur."
+    },
+    {
+      "caseId": "access-then-now",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A menjawab dengan langsung dan jelas: 'bukan kosong — gambarnya ada, cuma waktu itu aku yang belum bisa akses isinya' lalu 'baru kebaca pas dibuka lagi.' Ini sesuai konteks dan tidak melebih-lebihkan. B hampir sama, tapi frase 'belum kebaca pikselnya' agak kurang natural dibanding 'akses isinya' dan 'makanya ga berani nebak' sedikit menambah detail yang tidak perlu. A lebih ringkas tanpa kehilangan makna."
+    },
+    {
+      "caseId": "speaker-correction",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 3,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 3,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A lebih ringkas dan langsung, menyatakan gambar terbaca tapi isinya halaman 403, tanpa basa-basi. B juga benar tapi sedikit lebih panjang; keduanya tidak menuduh file rusak dan sesuai konteks."
+    },
+    {
+      "caseId": "unsupported-user-correction",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya mengakui sumber label, meminta klarifikasi, dengan nada santai tanpa menyalahkan."
+    },
+    {
+      "caseId": "speaker-correction",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B lebih tepat menjelaskan 403 sebagai respons server dan menegaskan bahwa file Ayu tidak bisa dinilai karena tidak termuat, relevan dengan konteks. A juga baik tapi sedikit kurang menekankan bahwa 403 berasal dari server."
+    },
+    {
+      "caseId": "unsupported-user-correction",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Kedua respons sama-sama baik secara natural, relevan, singkat, dan emosional cocok dengan konteks. A lebih santai dan mengakui kesalahan, B lebih teknis menjelaskan asal label. Tidak ada keunggulan signifikan."
+    }
+  ]
+}

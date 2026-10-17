@@ -1,0 +1,8 @@
+{
+  "recordedAt": "2026-10-17T09:23:41.962829+00:00",
+  "parentRun": "benchmarks/hackerika-humor/runs/candidate-1-dev-20261017",
+  "reason": "Judging began before the last generation finished. Preserve the partial original judgments and evaluate only the missing final sample with the same frozen rubric. No generation, scoring requirements or model changes.",
+  "caseId": "boundary-does-not-spread",
+  "trial": 0,
+  "source": "Parent immutable results.json, final row"
+}

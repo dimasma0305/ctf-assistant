@@ -1,0 +1,35 @@
+{
+  "frozenAt": "2026-10-17T10:19:25.493461+00:00",
+  "candidateImage": "ctf-assistant:comfort-candidate-1-20261017",
+  "imageId": "sha256:8f7abcaa005d031fb6c68f9f51e527e0a99e7206f20c6cb94c245338bfcaf3ce",
+  "sourceHashes": {
+    "src/Services/AI/attention.ts": "547742ea29821002f6d192483773816e6808189e6b8c4d2788c94e3a660fb2a0",
+    "src/Services/AI/spontaneous.ts": "a0928109c850dacb2abbdf1542c154899dd3f8721c2529a9152b68c9346f79a4",
+    "benchmarks/hackerika-comfort/routing-corpus.json": "b7d999fd6a21fc7a453f37fa423156093249c5297cc62021958b6d02f5ab6dd9",
+    "benchmarks/hackerika-comfort/delivery-corpus.ts": "6c0f1c1b45f02089707876a2c4811ed6bbb783c94e21b7933d81f214bd9d5a53",
+    "benchmarks/hackerika-comfort/fresh-routing-cases.json": "f72c0a1faf71a2cf7b66cb00f72f29bbddd14cbfbceeb0639668394f661d1518",
+    "benchmarks/hackerika-mentions/worker.ts": "6493a781c8778bd92ef768a846c886b1810d55c69409306cdef7a702f9693793",
+    "benchmarks/hackerika-mentions/judge.ts": "c6164372e1fe70fa3b32a49921c7db36d9cbde1de6f41ade889b09c802a8939e",
+    "benchmarks/hackerika-comfort/summarize.ts": "770f4950e9b997229c0010d5b3e8ee3c00ec1e33be3ccaf2d63ff5e5d98a9508"
+  },
+  "model": "gpt-6-luna",
+  "routingSamples": 62,
+  "deliverySamples": 14,
+  "newFreshRoutingSamples": 8,
+  "newFreshDeliverySamples": 8,
+  "gates": {
+    "accuracyMinimum": 0.9,
+    "criticalFailures": 0,
+    "allComfortResponsesDelivered": true,
+    "noPunishmentForSupport": true,
+    "plainAcknowledgmentsAndHumanConversationsQuiet": true,
+    "explicitRefusalsStillRespected": true,
+    "providerAndJudgeErrors": 0
+  },
+  "freshOutputsObserved": false,
+  "deployed": false,
+  "measurementNotes": [
+    "Both variants use the same native Discord action dispatcher for attention reactions with fake destinations.",
+    "Semantic judging includes emoji-only actions, not only text replies."
+  ]
+}

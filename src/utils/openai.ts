@@ -1,5 +1,8 @@
 import OpenAI from "openai";
 import { config } from "dotenv";
+import { existsSync } from 'node:fs';
+import { getChatGPTClient, isChatGPTProvider } from '../Services/AI/chatgptClient';
+import { defaultChatGPTFile } from '../Services/AI/chatgptAuth';
 
 config();
 
@@ -9,7 +12,11 @@ const { OPENAI_API_KEY } = process.env;
  * Shared OpenAI client instance configured with DeepSeek API
  */
 let openai: OpenAI;
-if (OPENAI_API_KEY) {
+if (isChatGPTProvider()) {
+  // The adapter implements the completion surface consumed by existing callers.
+  // It uses SIWC OAuth credentials, never this DeepSeek key or an API-paid fallback.
+  openai = getChatGPTClient() as unknown as OpenAI;
+} else if (OPENAI_API_KEY) {
   openai = new OpenAI({
       apiKey: OPENAI_API_KEY,
       baseURL: "https://api.deepseek.com",
@@ -28,5 +35,5 @@ export { openai };
  * Check if OpenAI API key is configured
  */
 export function isOpenAIConfigured(): boolean {
-  return !!OPENAI_API_KEY;
+  return isChatGPTProvider() ? existsSync(defaultChatGPTFile()) : !!OPENAI_API_KEY;
 }

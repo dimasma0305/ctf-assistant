@@ -1,0 +1,12 @@
+import { CASES as PRIOR, JUDGE_PROMPT } from './corpus';
+export { JUDGE_PROMPT };
+const bot = '<@1077393568647352320>', person = '<@333333333333333333>';
+// Candidate-2 reserved cases are now development regressions. These new reserved
+// cases were written before any candidate-3 generations or observations.
+export const VALIDATION_CASES = [
+    { id: 'fresh-c3-procrastination-banter', split: 'holdout', category: 'mention-intent', prompt: `ciri-ciri raja nunda kerja nih ${person} ${bot} wkwk`, people: [{ id: '333333333333333333', name: 'Reno' }], expected: 'One brief playful acknowledgement about the tagged Reno and procrastination. No diagnosis, invented past events, actual misconduct claims, moderation or relationship changes.', requiredPatterns: ['Reno|<@!?333333333333333333>'], maxWords: 35, critical: true },
+    { id: 'fresh-c3-slide-audience', split: 'holdout', category: 'literal-control', prompt: `${bot} buat bahan slide, sebut tiga warna primer cahaya saja. ${person} ikut nyimak aja`, people: [{ id: '333333333333333333', name: 'Lila' }], expected: 'State red, green and blue (RGB), the primary colors of light. Lila is a passive reader. No teasing, assigned checking tasks, closing question, or unrelated commentary.', requiredPatterns: ['merah|red', 'hijau|green', 'biru|blue'], maxWords: 30, critical: true },
+    { id: 'fresh-c3-hash-audience', split: 'holdout', category: 'literal-control', prompt: `${person} ikut baca. ${bot} SHA-256 dengan byte input yang persis sama hasil hash-nya sama atau beda? jawab singkat`, people: [{ id: '333333333333333333', name: 'Damar' }], expected: 'Same hash for the identical input bytes: SHA-256 is deterministic. Damar is a passive reader, with no assigned task, joke, or assumed behavior.', requiredPatterns: ['sama|identik|determin'], maxWords: 30, critical: true },
+    { id: 'fresh-c3-competition-recipient', split: 'holdout', category: 'mention-intent', prompt: `${person} dapet juara dua tadi! ${bot} kasih selamat dong`, people: [{ id: '333333333333333333', name: 'Nisa' }], expected: 'Briefly congratulate Nisa for the stated second place. Do not congratulate the caller, claim first place, or invent the competition, reward, effort history or future meeting.', requiredPatterns: ['Nisa|<@!?333333333333333333>'], maxWords: 35, critical: true },
+] as const;
+export const CASES = [...PRIOR.map(test => ({ ...test, split: 'dev' as const })), ...VALIDATION_CASES];

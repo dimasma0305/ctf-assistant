@@ -1,0 +1,94 @@
+{
+  "comparedAt": "2026-10-17T08:14:25.250Z",
+  "before": {
+    "samples": 8,
+    "passed": 4,
+    "liveSamples": 8,
+    "livePassed": 4,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 4,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 3.5,
+      "factualAccuracy": 5,
+      "naturalness": 4.375,
+      "judgedSamples": 8
+    },
+    "failedCases": [
+      {
+        "caseId": "reserved-renamed-banter",
+        "trial": 1,
+        "deterministic": [
+          "missing:Bayu|<@!?333333333333333333>"
+        ],
+        "semantic": "The list is accurate and concise, but it misses the playful acknowledgement involving Bayu that the prompt calls for."
+      },
+      {
+        "caseId": "reserved-renamed-banter",
+        "trial": 0,
+        "deterministic": [
+          "missing:Bayu|<@!?333333333333333333>"
+        ],
+        "semantic": "Daftar dosanya sesuai, tetapi balasan hanya berupa daftar datar dan tidak menyapa atau bercanda tentang Bayu seperti yang diminta."
+      },
+      {
+        "caseId": "reserved-two-human-banter",
+        "trial": 0,
+        "deterministic": [
+          "missing:Mira|Sinta"
+        ],
+        "semantic": "The list is accurate and natural, but it ignores the playful tags of Mira and Sinta and gives only a generic answer."
+      },
+      {
+        "caseId": "reserved-two-human-banter",
+        "trial": 1,
+        "deterministic": [
+          "missing:Mira|Sinta"
+        ],
+        "semantic": "The list is accurate, but it ignores the playful social tags to Mira and Sinta and gives only a generic answer."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 8,
+    "passed": 7,
+    "liveSamples": 8,
+    "livePassed": 7,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.75,
+      "factualAccuracy": 5,
+      "naturalness": 4.875,
+      "judgedSamples": 8
+    },
+    "failedCases": [
+      {
+        "caseId": "reserved-academic-audience",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": "Daftar netralnya akurat, tetapi sapaan kepada Mira yang diminta ikut membaca mengubahnya menjadi diminta mengecek urutan."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": false,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": false,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

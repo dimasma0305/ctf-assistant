@@ -1,0 +1,151 @@
+{
+  "ok": true,
+  "status": "supported",
+  "question": "Bagaimana mengaktifkan notifikasi first blood Discord di rsctf? Cek dokumen dan implementasi repo ini. Sebut lokasi konfigurasi yang terbukti; apakah butuh relay eksternal?",
+  "findings": [
+    {
+      "claim": "Untuk mengaktifkan pengumuman first blood, isi webhook Discord pada pengaturan game dengan URL webhook resmi HTTPS berformat `discord.com/api/webhooks/...`. Fitur ini juga mengumumkan second dan third blood untuk challenge Jeopardy.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Set the game's Discord webhook to an official HTTPS `discord.com/api/webhooks/...` URL to announce first, second, and third blood for Jeopardy challenges."
+        }
+      ]
+    },
+    {
+      "claim": "Lokasi konfigurasi yang terbukti adalah pengaturan game. Implementasi membaca URL dari field `Games.discord_webhook` untuk pengiriman.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Set the game's Discord webhook"
+        },
+        {
+          "sourceId": "S7",
+          "quote": "game.discord_webhook AS webhook_url"
+        }
+      ]
+    },
+    {
+      "claim": "Bonus poin blood terpisah dari notifikasi: mematikan bonus challenge hanya menghilangkan poin ekstra; badge dan pengumuman tetap aktif.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Turning off a challenge's blood bonus removes only the extra points; the blood badge and announcement remain active."
+        }
+      ]
+    },
+    {
+      "claim": "Tidak tampak perlu relay eksternal: dokumentasi meminta URL webhook Discord, dan implementasi RSCTF memiliki worker pengiriman webhook serta klien HTTP sendiri.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Set the game's Discord webhook to an official HTTPS `discord.com/api/webhooks/...` URL"
+        },
+        {
+          "sourceId": "S7",
+          "quote": "A bounded worker"
+        },
+        {
+          "sourceId": "S7",
+          "quote": "static HTTP_CLIENT: LazyLock<Result<reqwest::Client, String>>"
+        }
+      ]
+    },
+    {
+      "claim": "Pengumuman yang terjadi selama scoreboard dibekukan ditahan sampai game berakhir; blood yang terjadi sebelum webhook diaktifkan tidak dikirim ulang.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Announcements reached during a scoreboard freeze stay queued until the game ends so the webhook cannot leak frozen solves."
+        },
+        {
+          "sourceId": "S5",
+          "quote": "but does not replay bloods that occurred before webhook delivery was enabled."
+        }
+      ]
+    }
+  ],
+  "unresolved": [],
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://api.github.com/repos/dimasma0305/rsctf",
+      "title": "dimasma0305/rsctf repository metadata",
+      "kind": "repository-metadata",
+      "preview": "{\"full_name\":\"dimasma0305/rsctf\",\"description\":\"A high-performance Capture-the-Flag competition platform written in Rust\",\"language\":\"Rust\",\"fork\":false,\"parent\":null,\"default_branch\":\"main\",\"inspected_commit\":\"64e97da135afd7ead297f6da3bae4c4a2a3f738d\"}"
+    },
+    {
+      "id": "S2",
+      "url": "https://github.com/dimasma0305/rsctf/blob/64e97da135afd7ead297f6da3bae4c4a2a3f738d/README.md",
+      "title": "dimasma0305/rsctf: README.md",
+      "kind": "repository-file",
+      "preview": "1: # rsctf\n2: \n3: rsctf is a Rust platform for running Capture-the-Flag competitions with a React and Mantine frontend. It supports accounts, teams, Jeopardy challenges, dynamic containers, scoreboards, event administration, Attack & Defense, and King of the Hill.\n4: \n5: <p align=\"center\">\n6:   <img src=\"web/public/static/guide/games.webp\" alt=\"RSCTF event catalog with search, lifecycle groups, and event cards\" width=\"960\">\n7: </p>\n8: \n9: ## Three competition engines\n10: \n11: One installation can host ordinary Jeopardy events, infrastructure-heavy Attack & Defense matches, and King of the Hill arenas. Each engine has its own player workflow, scoring model, admin controls, and live scoreboard.\n12: \n13: ### Jeopardy\n14: \n15: Run static or dynamic challenges with categories, attachments, hints, flags, deadlines, first-blood bonuses, per-division scoring, and practice archives. Dynamic challenges can build on demand, run on a trusted worker, and expose either a direct port, an event VPN endpoint, or a Platform Proxy/WSRX connection.\n16: \n17: <p align=\"center\">\n18:   <img src=\"web/public/static/guide/challenge.webp\" alt=\"Jeopardy challenge board with category filters, solve counts, and point values\" width=\"960\">\n19: </p>\n20: \n21: ### Attack & Defense\n22: \n23: RSCTF provisions per-team services, distributes rotating flags, runs checker rounds, tracks SLA and attack/defense results, m",
+      "truncated": true
+    },
+    {
+      "id": "S3",
+      "url": "https://github.com/dimasma0305/rsctf/blob/64e97da135afd7ead297f6da3bae4c4a2a3f738d/docs/getting-started/first-login.md",
+      "title": "dimasma0305/rsctf: docs/getting-started/first-login.md",
+      "kind": "repository-file",
+      "preview": "1: # First login and setup\n2: \n3: Use this checklist before inviting players. It takes a few minutes and prevents the most common first-event problems.\n4: \n5: ## 1. Register the administrator\n6: \n7: Open `/account/register?bootstrap=1` and choose a unique password. For Docker\n8: Compose, retrieve the private setup token on the deployment host without\n9: putting it in shell history or a shared log:\n10: \n11: ```bash\n12: sed -n 's/^RSCTF_BOOTSTRAP_TOKEN=//p' deploy/.env\n13: ```\n14: \n15: For Kubernetes, use the Secret retrieval command in the Helm notes. Only a\n16: token-authorized registration can become the first **Admin**; public requests\n17: without it fail closed.\n18: \n19: ::: warning Existing database\n20: “First account” means the first account in the connected PostgreSQL database,\n21: not the first registration after a container restart or reinstall. If you\n22: deliberately wipe the database, rotate the setup token before exposing it again.\n23: :::\n24: \n25: ## 2. Review the public identity\n26: \n27: Open **Admin → Settings** and check the site name, slogan, footer, registration policy, and account activation policy. Save, refresh the public home page, and confirm the changes are visible.\n28: \n29: ## 3. Decide how people will register\n30: \n31: For a private event, disable open registration after creating or importing the required users. For a public event, leave registration e",
+      "truncated": false
+    },
+    {
+      "id": "S4",
+      "url": "https://github.com/dimasma0305/rsctf/blob/64e97da135afd7ead297f6da3bae4c4a2a3f738d/src/migrations/m0101_blood_bonus_default.rs",
+      "title": "dimasma0305/rsctf: src/migrations/m0101_blood_bonus_default.rs",
+      "kind": "repository-file",
+      "preview": "1: //! Make challenge blood rewards opt-in for newly inserted challenges.\n2: \n3: use sea_orm_migration::prelude::*;\n4: \n5: #[derive(DeriveMigrationName)]\n6: pub struct Migration;\n7: \n8: const UP_SQL: &str = r#\"\n9: ALTER TABLE \"GameChallenges\"\n10:     ALTER COLUMN disable_blood_bonus SET DEFAULT TRUE;\n11: \"#;\n12: \n13: const DOWN_SQL: &str = r#\"\n14: ALTER TABLE \"GameChallenges\"\n15:     ALTER COLUMN disable_blood_bonus SET DEFAULT FALSE;\n16: \"#;\n17: \n18: #[async_trait::async_trait]\n19: impl MigrationTrait for Migration {\n20:     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {\n21:         manager.get_connection().execute_unprepared(UP_SQL).await?;\n22:         Ok(())\n23:     }\n24: \n25:     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {\n26:         manager\n27:             .get_connection()\n28:             .execute_unprepared(DOWN_SQL)\n29:             .await?;\n30:         Ok(())\n31:     }\n32: }\n33: \n34: #[cfg(test)]\n35: mod tests {\n36:     use super::*;\n37: \n38:     #[test]\n39:     fn new_challenges_default_to_no_blood_bonus() {\n40:         assert!(UP_SQL.contains(\"disable_blood_bonus SET DEFAULT TRUE\"));\n41:         assert!(DOWN_SQL.contains(\"disable_blood_bonus SET DEFAULT FALSE\"));\n42:     }\n43: }\n44: ",
+      "truncated": false
+    },
+    {
+      "id": "S5",
+      "url": "https://github.com/dimasma0305/rsctf/blob/64e97da135afd7ead297f6da3bae4c4a2a3f738d/docs/organizers/games.md",
+      "title": "dimasma0305/rsctf: docs/organizers/games.md",
+      "kind": "repository-file",
+      "preview": "1: # Create and configure games\n2: \n3: A game is the event container for teams, divisions, notices, challenges, scoreboards, submissions, and writeups. Challenge type determines the play format, so one game can mix Jeopardy, Attack & Defense, and King of the Hill challenges.\n4: \n5: ## Core schedule and visibility\n6: \n7: Set the title, start time, end time, summary, content, and poster. A hidden game is **unlisted**: it stays out of public event discovery, but anyone with its direct `/games/{id}` link can open it and signed-in users can join under the normal invitation-code, team, division, and review rules. Hidden is not an access restriction; keep unfinished challenges disabled and use an invitation code when registration should be restricted. Verify the rendered event page with a non-admin account; administrator access can hide permission mistakes.\n8: \n[… omitted lines …]\n17: - Maximum containers or other resource limits\n18: - Whether practice access continues outside the scored period\n19: \n20: When a participation becomes accepted, rsctf can lock the team's roster. Late roster changes may therefore require an administrator action.\n21: \n22: ## Divisions\n23: \n24: Use divisions when groups need separate eligibility, rankings, review rules, or access. Create divisions before teams join, document which division each team should choose, and test one join in every permission combin",
+      "truncated": true
+    },
+    {
+      "id": "S6",
+      "url": "https://github.com/dimasma0305/rsctf/blob/64e97da135afd7ead297f6da3bae4c4a2a3f738d/docs/index.md",
+      "title": "dimasma0305/rsctf: docs/index.md",
+      "kind": "repository-file",
+      "preview": "1: ---\n2: layout: home\n3: \n4: hero:\n5:   name: \"rsctf\"\n6:   text: \"Run a CTF without fighting the platform\"\n7:   tagline: Clear guides for players, organizers, and operators—from the first login to Jeopardy, Attack & Defense, and King of the Hill events.\n8:   image:\n9:     src: /logo.svg\n10:     alt: rsctf continuous RS monogram\n11:   actions:\n12:     - theme: brand\n13:       text: Install rsctf\n14:       link: /getting-started/install-wizard\n15:     - theme: alt\n16:       text: Read the player guide\n17:       link: /players/\n18: \n19: features:\n20:   - icon: \"01\"\n21:     title: Guided installation\n22:     details: Answer a few questions and let the wizard generate secrets, validate Docker or Kubernetes, and start the platform.\n23:     link: /getting-started/install-wizard\n24:     linkText: Open installation guide\n25:   - icon: \"02\"\n26:     title: Built for real events\n27:     details: Learn the complete flow for accounts, teams, games, challenges, scoring, live operations, and recovery.\n28:     link: /organizers/\n29:     linkText: Run an event\n30:   - icon: \"03\"\n31:     title: Deploy anywhere\n32:     details: Use Docker Compose on one server or the Helm chart in Kubernetes, pulling ready-to-run multi-architecture images from Docker Hub.\n33:     link: /deploy/\n34:     linkText: Compare deployments\n35:   - icon: \"04\"\n36:     title: Searchable and accessible\n37:     details: Fast ",
+      "truncated": false
+    },
+    {
+      "id": "S7",
+      "url": "https://github.com/dimasma0305/rsctf/blob/64e97da135afd7ead297f6da3bae4c4a2a3f738d/src/services/discord_webhook.rs",
+      "title": "dimasma0305/rsctf: src/services/discord_webhook.rs",
+      "kind": "repository-file",
+      "preview": "1: //! Durable Discord delivery for Jeopardy blood announcements.\n2: //!\n3: //! A solve transaction stores only the notice id in PostgreSQL. The webhook\n4: //! credential remains on `Games`, never in the outbox or logs. A bounded worker\n5: //! claims rows with a recoverable lease and performs outbound I/O after the\n6: //! grading transaction has committed.\n7: \n8: use std::sync::LazyLock;\n9: use std::time::Duration;\n[… omitted lines …]\n32: \n33: // ASCII `DBLD`. This is intentionally distinct from submit's `(0,\n34: // challenge_id)` lock. Holding it immediately before allocating a GameNotices\n35: // id makes successful per-game blood ids visible in commit order.\n36: const BLOOD_NOTICE_LOCK_NAMESPACE: i32 = 0x4442_4c44;\n37: \n38: static HTTP_CLIENT: LazyLock<Result<reqwest::Client, String>> = LazyLock::new(|| {\n39:     reqwest::Client::builder()\n40:         .redirect(reqwest::redirect::Policy::none())\n41:         .connect_timeout(Duration::from_secs(2))\n42:         .timeout(Duration::from_secs(5))\n43:         .user_agent(\"rsctf-discord-webhook/1\")\n44:         .build()\n45:         .map_err(|error| error.to_string())\n46: });\n47: \n48: #[derive(Debug, sqlx::FromRow)]\n49: struct LeasedDelivery {\n50:     notice_id: i32,\n51:     game_id: i32,\n[… omitted lines …]\n186: \n187: fn delivery_payload(job: &LeasedDelivery) -> Result<Value, &'static str> {\n188:     let (title, color) = match job.no",
+      "truncated": true
+    },
+    {
+      "id": "S8",
+      "url": "https://github.com/dimasma0305/rsctf/blob/64e97da135afd7ead297f6da3bae4c4a2a3f738d/web/src/components/admin/BloodBonusModel.tsx",
+      "title": "dimasma0305/rsctf: web/src/components/admin/BloodBonusModel.tsx",
+      "kind": "repository-file",
+      "preview": "1: import { Button, Group, Modal, ModalProps, NumberInput, Stack, Text } from '@mantine/core'\n2: import { FC, useEffect, useRef, useState } from 'react'\n3: import { useTranslation } from 'react-i18next'\n4: import { useParams } from 'react-router'\n5: import { BloodBonus } from '@Utils/Shared'\n6: import { OnceSWRConfig } from '@Hooks/useConfig'\n7: import api, { SubmissionType } from '@Api'\n8: import {\n9:   buildGameInfoUpdatePayload,\n10:   type GameInfoSaveOperation,\n11:   prepareGameInfoSave,\n12: } from '../../pages/admin/games/[id]/gameInfoDraft'\n13: \n14: const toNumber = (value: string | number) => {\n15:   if (typeof value === 'string') {\n16:     const val = Number(value)\n17:     return isNaN(val) ? 0 : val\n18:   }\n19:   return value\n20: }\n21: \n22: export const BloodBonusModel: FC<ModalProps> = (props) => {\n23:   const { id } = useParams()\n24:   const numId = parseInt(id ?? '-1')\n25:   const { data: gameSource, mutate } = api.edit.useEditGetGame(numId, OnceSWRConfig)\n26:   const [disabled, setDisabled] = useState(false)\n27:   const [firstBloodBonus, setFirstBloodBonus] = useState(0)\n28:   const [secondBloodBonus, setSecondBloodBonus] = useState(0)\n29:   const [thirdBloodBonus, setThirdBloodBonus] = useState(0)\n30:   const saveOperation = useRef<GameInfoSaveOperation | null>(null)\n31: \n32:   const { t } = useTranslation()\n33: \n34:   useEffect(() => {\n35:     if (gameSource) {\n3",
+      "truncated": false
+    },
+    {
+      "id": "S9",
+      "url": "https://github.com/dimasma0305/rsctf/blob/64e97da135afd7ead297f6da3bae4c4a2a3f738d/web/src/pages/admin/games/%5Bid%5D/gameInfoDraft.ts",
+      "title": "dimasma0305/rsctf: web/src/pages/admin/games/[id]/gameInfoDraft.ts",
+      "kind": "repository-file",
+      "preview": "1: import { createUuid } from '@Utils/Uuid'\n2: import type { GameInfoModel } from '@Api'\n3: \n4: /** Optional fields exposed by newer settings endpoints while older RSCTF servers ignore them. */\n5: export type CompatibleGameInfoModel = GameInfoModel & {\n6:   configurationRevision?: number\n7:   operationId?: string | null\n8: }\n9: \n10: export interface GameInfoScheduleDraft {\n11:   start: number\n12:   end: number\n13:   freeze: number | null\n14:   writeupDeadline: number\n15: }\n16: \n17: export interface GameInfoSaveOperation {\n18:   digest: string\n19:   id: string\n20: }\n21: \n22: export interface PreparedGameInfoSave {\n23:   operation: GameInfoSaveOperation\n24:   payload: CompatibleGameInfoModel\n25: }\n26: \n27: export function buildGameInfoUpdatePayload(\n28:   game: CompatibleGameInfoModel,\n29:   schedule: GameInfoScheduleDraft,\n30:   vpnPolicyChanged: boolean\n31: ): CompatibleGameInfoModel {\n32:   const { operationId: _operationId, serverTime: _serverTime, ...editableGame } = game\n33:   return {\n34:     ...editableGame,\n35:     inviteCode: (game.inviteCode?.length ?? 0) > 6 ? game.inviteCode : null,\n36:     vpnPolicyChangeReason: vpnPolicyChanged ? game.vpnPolicyChangeReason : undefined,\n37:     ...schedule,\n38:   }\n39: }\n40: \n41: /** Keep one idempotency key for retries of the same draft and rotate it after any edit. */\n42: export function prepareGameInfoSave(\n43:   payload: Compati",
+      "truncated": false
+    }
+  ],
+  "stats": {
+    "model": "gpt-6-luna",
+    "modelCalls": 5,
+    "actions": 10,
+    "nativeSearches": 0,
+    "elapsedMs": 46246.294538,
+    "promptTokens": 56496,
+    "completionTokens": 1498
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "verifiedAt": "2026-10-15T15:45:43.047648+00:00",
+  "startedAt": "2026-10-15T15:45:09.423499478Z",
+  "image": "ctf-assistant:conversation-compact-12-20261015t154108z",
+  "imageId": "sha256:ae40760c5cf1d8d44bce786a62252b3585640f5f0ac442984923ae6d1f810058",
+  "runtime": {
+    "http": 200,
+    "status": "healthy",
+    "discordReady": true,
+    "databaseReady": true,
+    "promptHash": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+    "hashes": {
+      "src/Services/AI/attention.ts": "3c3ea944d6aa741dbf4561647303ac92a76ded6c41b6625b0c56bf8c6006287a",
+      "src/Services/AI/spontaneous.ts": "adbe666deea9070fd924536f082a9bf3e755e7ce49aec0d1b5785151a44558de",
+      "src/Services/AI/chat.ts": "a936b0079e45eee638c0cb5828ddb314df575f4ed5ef69de9fe622d1087633ee",
+      "src/Services/AI/vision.ts": "06f854a35c3f88ecf6e1c98d7cd1fc55934cc7410b57e67371a864c1db3beffb",
+      "src/Services/AI/memory.ts": "af14ff1c6a7fdfcc44616c22c3e60ef935d21f826e8d972696bbcee15830d28c",
+      "src/Services/AI/context.ts": "9fe40da351270bc7fa92fc7448bed684d30bd8db495fc9c688237dfa5bceb780",
+      "src/Services/AI/persona.ts": "4a2ff5c16998c6c4d81e4a23127284d1123742ff89efeca4bddbc2c71a150176",
+      "src/Services/AI/indonesianVoice.ts": "e4318eb0f8fb0a41839697cfc87e7ea1d911faaf4932d133f039099f3a368817",
+      "src/Services/AI/socialPrompt.ts": "416b86bf5f0e36e945da61acce73b844fc53fedf85862f5329c31fe7bf8f6e4a"
+    }
+  },
+  "checks": {
+    "selectedImageActive": true,
+    "runningHealthy": true,
+    "noRestarts": true,
+    "discordReady": true,
+    "databaseReady": true,
+    "healthHttp200": true,
+    "selectedPromptMatches": true,
+    "nineSourceHashesMatch": true,
+    "runtimeEnvironmentPreserved": true,
+    "serviceLabelsPreserved": true,
+    "securitySettingsPreserved": true,
+    "otherServicesUnchanged": true,
+    "affectionNotResetAgain": true
+  },
+  "passed": true,
+  "conversationPathProbe": {
+    "passed": true,
+    "answer": "engga, justru sama persis. CTR deterministik: keystream dari key+nonce sama, XOR plaintext sama \u2192 ciphertext sama. makanya nonce ga boleh reuse.",
+    "decisions": [
+      {
+        "shouldChime": true,
+        "reason": "contextual reply",
+        "promptHint": "Pertanyaan lanjutan langsung ke Hackerika tentang sifat deterministik AES-CTR; butuh klarifikasi bahwa key/nonce/plaintext sama menghasilkan ciphertext sama, bukan beda.",
+        "continuation": true
+      },
+      {
+        "shouldChime": false,
+        "reason": "chose silence",
+        "promptHint": ""
+      },
+      {
+        "shouldChime": false,
+        "reason": "follow-up burst cooldown",
+        "promptHint": ""
+      }
+    ],
+    "reactions": [],
+    "calls": 3,
+    "untaggedFollowupDelivered": true,
+    "ackAndWaitSilent": true,
+    "delivery": "fake Discord channel only"
+  },
+  "actualImageReplyProbe": {
+    "passed": true,
+    "answer": "\"Claret - Malfoid\"",
+    "downloads": 1,
+    "calls": 1,
+    "images": 1,
+    "models": [
+      "deepseek-flash"
+    ],
+    "promptHash": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+    "actualReportedUpload": true,
+    "replyTargetImage": true,
+    "currentMessageHasNoAttachments": true,
+    "transport": "real Discord CDN -> bot download -> inline bytes -> live DeepSeek -> fake Discord destination",
+    "fixtureSubstitution": false
+  },
+  "verification": {
+    "bunTests": 273,
+    "bunFailures": 0,
+    "strictBotAndBenchmarkTypesPassed": true,
+    "botBuildPassed": true,
+    "manualDiscordTestMessages": 0
+  },
+  "privacy": "All probe reply/send/react destinations are fakes. No runtime secrets, raw image bytes, signed image URLs, channel/member identifiers, or private operational configuration are included. Rollback artifacts remain in ignored protected backups."
+}

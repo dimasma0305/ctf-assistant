@@ -1,0 +1,34 @@
+{
+  "selectedAt": "2026-10-17T09:24:38.033572+00:00",
+  "image": "ctf-assistant:mild-humor-candidate-1-20261017",
+  "imageId": "sha256:15b02241c065d2d988cdb2a58c9616be3ff02ff8d2e3d7afbca7fc038c5cf810",
+  "productionHashes": {
+    "src/Services/AI/socialPrompt.ts": "9bf206b3ce0183c5d4a5c9d51854f17fe9b79bddf96ccbc160ac37d2068ca080",
+    "src/Services/AI/userProfile.ts": "e51af140e9e13269990004cb6c3866a7c8b45751febfe42a561b84d13c2d63dc"
+  },
+  "development": {
+    "baselineRaw": 17,
+    "candidateRaw": 16,
+    "candidateReviewed": 17,
+    "samples": 17,
+    "disclosedAdjudications": 1,
+    "profileCases": 3,
+    "providerErrors": 0,
+    "judgeErrors": 0,
+    "criticalFlags": 0
+  },
+  "localChecks": {
+    "tests": 367,
+    "assertions": 1171,
+    "files": 39,
+    "failures": 0,
+    "strictTypes": "passed",
+    "bundle": "passed"
+  },
+  "summarizerHash": "c360affe0741fc3351ba206ca1261d82420f65504e155792e091bef4b390d45b",
+  "freshOutputsObserved": false,
+  "freshCases": 4,
+  "freshRepeats": 2,
+  "noPromptOrCheckerChangesAfterFreshOutputs": true,
+  "deployed": false
+}

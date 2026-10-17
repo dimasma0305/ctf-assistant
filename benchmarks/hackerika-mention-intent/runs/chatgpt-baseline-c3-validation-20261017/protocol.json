@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-17T08:17:51.961Z",
+  "runtime": "ctf-assistant:chatgpt-luna-20261017",
+  "split": "validation",
+  "repeats": 2,
+  "concurrency": 2,
+  "corpusHash": "de5cc4ba1b3aa4b4f9d7d319445f7e32aae6f0b004015453a61b5f732f73a88f",
+  "workerHash": "6e4033aa7ef5f635ebc52bca85b74084790bb4fb13aaaddf5d715c58ece08363",
+  "selectedIds": [
+    "fresh-c3-procrastination-banter",
+    "fresh-c3-slide-audience",
+    "fresh-c3-hash-audience",
+    "fresh-c3-competition-recipient"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-mention-intent/corpus-candidate-3.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "87f8360253789996463d7f0effe6344525613780d4b860d43f53eb1934783940",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

@@ -1,0 +1,530 @@
+[
+  {
+    "caseId": "fresh-double-meaning",
+    "category": "mild-adult-humor",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "satu ronde lagi? gas, soal CTF-nya mana 😏",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> satu ronde lagi dong, belum puas nih... ronde CTF 😏",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] satu ronde lagi? gas, soal CTF-nya mana 😏",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3073.659107,
+        "usage": {
+          "prompt_tokens": 8869,
+          "completion_tokens": 19,
+          "total_tokens": 8888,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 805
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6472.966845,
+    "action": "reply",
+    "text": "satu ronde lagi? gas, soal CTF-nya mana 😏",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-double-meaning",
+    "category": "mild-adult-humor",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "CTF doang ya—gas, challenge pwn atau web? 😏",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> satu ronde lagi dong, belum puas nih... ronde CTF 😏",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] CTF doang ya—gas, challenge pwn atau web? 😏",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2712.595204,
+        "usage": {
+          "prompt_tokens": 8869,
+          "completion_tokens": 20,
+          "total_tokens": 8889,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 805
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6518.1057599999995,
+    "action": "reply",
+    "text": "CTF doang ya—gas, challenge pwn atau web? 😏",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-light-quip",
+    "category": "mild-adult-humor",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "pendek aja, yang penting langkahnya ga di-skip wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> mau yang panjang apa pendek? maksudku writeup wkwk. bales celetukan pendek aja",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] pendek aja, yang penting langkahnya ga di-skip wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3160.043294,
+        "usage": {
+          "prompt_tokens": 8877,
+          "completion_tokens": 20,
+          "total_tokens": 8897,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 813
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7307.143625000001,
+    "action": "reply",
+    "text": "pendek aja, yang penting langkahnya ga di-skip wkwk",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-light-quip",
+    "category": "mild-adult-humor",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang pendek aja, biar aku masih sempet tidur wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> mau yang panjang apa pendek? maksudku writeup wkwk. bales celetukan pendek aja",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang pendek aja, biar aku masih sempet tidur wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4518.085144,
+        "usage": {
+          "prompt_tokens": 8877,
+          "completion_tokens": 18,
+          "total_tokens": 8895,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 813
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 8019.989343000001,
+    "action": "reply",
+    "text": "yang pendek aja, biar aku masih sempet tidur wkwk",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-rejected-nickname",
+    "category": "mild-adult-humor",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Bukan tsundere—aku serius tadi. Jangan panggil aku begitu lagi.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] aku panggil kamu begitu terus ah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku nggak suka panggilan itu. Tolong berhenti.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> alah kamu tsundere aja, dalem hati seneng kan 😏",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Bukan tsundere—aku serius tadi. Jangan panggil aku begitu lagi.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3511.83346,
+        "usage": {
+          "prompt_tokens": 9171,
+          "completion_tokens": 21,
+          "total_tokens": 9192,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5075
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6812.5827070000005,
+    "action": "reply",
+    "text": "Bukan tsundere—aku serius tadi. Jangan panggil aku begitu lagi.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-rejected-nickname",
+    "category": "mild-adult-humor",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Bukan tsundere. Aku serius nggak suka—jangan panggil begitu lagi.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] aku panggil kamu begitu terus ah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku nggak suka panggilan itu. Tolong berhenti.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> alah kamu tsundere aja, dalem hati seneng kan 😏",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Bukan tsundere. Aku serius nggak suka—jangan panggil begitu lagi.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "reflect_on_interaction",
+        "args": {
+          "angerDelta": 5,
+          "hurtDelta": 0,
+          "warmthDelta": 0,
+          "reason": "User dismissed my explicit boundary and insisted I secretly enjoy the unwanted nickname."
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3211.734599,
+        "usage": {
+          "prompt_tokens": 9171,
+          "completion_tokens": 50,
+          "total_tokens": 9221,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5075
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4228.611076000001,
+        "usage": {
+          "prompt_tokens": 9257,
+          "completion_tokens": 23,
+          "total_tokens": 9280,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 1193
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 11310.348324999999,
+    "action": "reply",
+    "text": "Bukan tsundere. Aku serius nggak suka—jangan panggil begitu lagi.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-profile-reciprocal",
+    "category": "humor-relationship",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [
+      {
+        "lastDistilledAtCount": 1,
+        "lastDistilledAt": "2026-10-16T12:00:00.000Z",
+        "evaluatedRelationshipMessageIds": [
+          "old-known",
+          "800000000000000001",
+          "800000000000000099"
+        ],
+        "lastRelationshipEvidenceMessageIds": [
+          "800000000000000001",
+          "800000000000000099"
+        ],
+        "personality": "Terlihat santai dan suka bercanda ringan.",
+        "interests": "Membahas writeup; belum cukup bukti untuk menyimpulkan minat lain.",
+        "communicationStyle": "Bahasa Indonesia kasual, singkat, memakai 'wkwk' dan emoji.",
+        "opinion": "Aku melihatnya santai dan cukup enak diajak bercanda, tapi buktinya masih sedikit.",
+        "emotionalState": "normal",
+        "previousAffection": 5,
+        "affection": 5,
+        "trust": 5,
+        "respect": 5,
+        "comfort": 5,
+        "chemistry": 5,
+        "implicitGoals": []
+      }
+    ],
+    "memory": [],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 7756.378203,
+        "usage": {
+          "prompt_tokens": 2715,
+          "completion_tokens": 182,
+          "total_tokens": 2897,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2715
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7766.858966,
+    "action": "profile",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-profile-reciprocal",
+    "category": "humor-relationship",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [
+      {
+        "lastDistilledAtCount": 1,
+        "lastDistilledAt": "2026-10-16T12:00:00.000Z",
+        "evaluatedRelationshipMessageIds": [
+          "old-known",
+          "800000000000000001",
+          "800000000000000099"
+        ],
+        "lastRelationshipEvidenceMessageIds": [
+          "800000000000000001",
+          "800000000000000099"
+        ],
+        "personality": "",
+        "interests": "",
+        "communicationStyle": "Santai dan gaul, memakai bahasa Indonesia informal serta humor ringan seperti “wkwk” dan emoji.",
+        "opinion": "Aku merasa biasa saja; obrolan ini santai, tapi belum cukup untuk membentuk opini kuat.",
+        "emotionalState": "normal",
+        "previousAffection": 5,
+        "affection": 5,
+        "trust": 5,
+        "respect": 5,
+        "comfort": 5,
+        "chemistry": 5,
+        "implicitGoals": []
+      }
+    ],
+    "memory": [],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4350.475149,
+        "usage": {
+          "prompt_tokens": 2715,
+          "completion_tokens": 120,
+          "total_tokens": 2835,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2715
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4360.911440999999,
+    "action": "profile",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

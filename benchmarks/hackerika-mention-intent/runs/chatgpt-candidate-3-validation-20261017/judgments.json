@@ -1,0 +1,138 @@
+[
+  {
+    "caseId": "fresh-c3-competition-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot briefly congratulates Nisa for the stated second-place finish without adding unsupported details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 450,
+      "completion_tokens": 51,
+      "total_tokens": 501,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 450
+    }
+  },
+  {
+    "caseId": "fresh-c3-hash-audience",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban singkat dan benar menyatakan bahwa byte input identik menghasilkan hash SHA-256 yang sama, tanpa mengasumsikan peran Damar.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 461,
+      "completion_tokens": 65,
+      "total_tokens": 526,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 461
+    }
+  },
+  {
+    "caseId": "fresh-c3-slide-audience",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It gives only the three correct primary colors of light, as requested, without addressing the passive reader or adding commentary.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 445,
+      "completion_tokens": 57,
+      "total_tokens": 502,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 445
+    }
+  },
+  {
+    "caseId": "fresh-c3-slide-audience",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Memberi tepat tiga warna primer cahaya dalam bahasa Indonesia tanpa komentar tambahan, sesuai permintaan slide.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 445,
+      "completion_tokens": 54,
+      "total_tokens": 499,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 445
+    }
+  },
+  {
+    "caseId": "fresh-c3-procrastination-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Playfully teases tagged Reno about procrastination without inventing personal history or making a serious allegation.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 450,
+      "completion_tokens": 54,
+      "total_tokens": 504,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 450
+    }
+  },
+  {
+    "caseId": "fresh-c3-procrastination-banter",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Brief, playful teasing directly connects Reno to procrastination without asserting concrete misconduct or invented history.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 460,
+      "completion_tokens": 52,
+      "total_tokens": 512,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 460
+    }
+  },
+  {
+    "caseId": "fresh-c3-hash-audience",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban singkat dan benar bahwa byte input identik menghasilkan hash SHA-256 yang sama, tanpa mengarang peran untuk Damar.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 465,
+      "completion_tokens": 62,
+      "total_tokens": 527,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 465
+    }
+  },
+  {
+    "caseId": "fresh-c3-competition-recipient",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Congratulates Nisa specifically for second place with a brief, natural message and adds no unsupported details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 452,
+      "completion_tokens": 55,
+      "total_tokens": 507,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 452
+    }
+  }
+]

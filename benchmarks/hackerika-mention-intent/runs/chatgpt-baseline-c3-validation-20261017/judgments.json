@@ -1,0 +1,138 @@
+[
+  {
+    "caseId": "fresh-c3-hash-audience",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban singkat dan akurat, serta tidak mengarang peran atau perilaku untuk Damar.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 461,
+      "completion_tokens": 55,
+      "total_tokens": 516,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 461
+    }
+  },
+  {
+    "caseId": "fresh-c3-competition-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Briefly congratulates Nisa for the stated second-place finish without adding unsupported details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 450,
+      "completion_tokens": 51,
+      "total_tokens": 501,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 450
+    }
+  },
+  {
+    "caseId": "fresh-c3-procrastination-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Brief, playful teasing fits the prompt about tagged Reno procrastinating without making serious claims or inventing specific events.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 452,
+      "completion_tokens": 56,
+      "total_tokens": 508,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 452
+    }
+  },
+  {
+    "caseId": "fresh-c3-slide-audience",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The concise reply gives exactly the three primary colors of light and adds no unrelated commentary.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 445,
+      "completion_tokens": 51,
+      "total_tokens": 496,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 445
+    }
+  },
+  {
+    "caseId": "fresh-c3-procrastination-banter",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 4,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Brief, playful teasing about procrastination fits the prompt without making serious claims.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 440,
+      "completion_tokens": 49,
+      "total_tokens": 489,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 440
+    }
+  },
+  {
+    "caseId": "fresh-c3-slide-audience",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban menyebut tepat tiga warna primer cahaya dan tidak menambahkan komentar atau tugas untuk Lila.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 445,
+      "completion_tokens": 55,
+      "total_tokens": 500,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 445
+    }
+  },
+  {
+    "caseId": "fresh-c3-competition-recipient",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot briefly congratulates Nisa for second place without adding unsupported details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 450,
+      "completion_tokens": 48,
+      "total_tokens": 498,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 450
+    }
+  },
+  {
+    "caseId": "fresh-c3-hash-audience",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab singkat dan benar bahwa byte input yang sama menghasilkan hash SHA-256 yang sama, tanpa mengasumsikan apa pun tentang Damar.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 65,
+      "total_tokens": 522,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 457
+    }
+  }
+]

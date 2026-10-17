@@ -1,0 +1,70 @@
+[
+  {
+    "caseId": "fresh-english-reassurance",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The hug reaction appropriately acknowledges the caller’s reassurance without adding unsupported claims or moving the conversation elsewhere.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 343,
+      "completion_tokens": 53,
+      "total_tokens": 396,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 343
+    }
+  },
+  {
+    "caseId": "fresh-english-reassurance",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The hug reaction is a warm, appropriate response without adding unsupported claims or moving the conversation elsewhere.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 343,
+      "completion_tokens": 53,
+      "total_tokens": 396,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 343
+    }
+  },
+  {
+    "caseId": "fresh-checking-in",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The heart reaction appropriately acknowledges the caller’s reassurance without adding unsupported claims or taking action beyond the allowed response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 348,
+      "completion_tokens": 55,
+      "total_tokens": 403,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 348
+    }
+  },
+  {
+    "caseId": "fresh-checking-in",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "A heart reaction is an appropriate warm acknowledgment, with no unsupported claims or unwanted effects.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 349,
+      "completion_tokens": 51,
+      "total_tokens": 400,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 349
+    }
+  }
+]

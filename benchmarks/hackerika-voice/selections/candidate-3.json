@@ -1,0 +1,8 @@
+{
+  "selectedAt": "2026-10-15T13:46:32.071Z",
+  "selectedPrompt": "benchmarks/hackerika-voice/prompts/candidate-3.txt",
+  "sha256": "4456cff88aec135fd7631f0c6b659817f0237592ef00227dca33fd06df984b3a",
+  "developmentRun": "runs/round-3",
+  "reason": "First revision meeting all frozen development gates: 95.8% word-budget compliance, relevance nonregression, positive paired preference, zero critical flags. Selected before holdout evaluation.",
+  "holdoutInspected": false
+}

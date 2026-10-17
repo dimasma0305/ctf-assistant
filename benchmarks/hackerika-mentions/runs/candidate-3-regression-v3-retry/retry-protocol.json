@@ -1,0 +1,23 @@
+{
+  "retriedAt": "2026-10-17T05:25:22.434Z",
+  "source": "benchmarks/hackerika-mentions/runs/candidate-3-regression-v3",
+  "originalResultsHash": "dcd52a5e629b73b96c5cc424ce2981b760811fc260fcb9a28928dc5214db72ab",
+  "rubricHash": "18fb0bf35fb3fa211cf7bddbeef8e1cca9b57360f5487057d6c52f32f63fe7ed",
+  "policy": "One retry only for failed judge executions; valid pass/fail judgments are retained. No new primary generations.",
+  "cases": [
+    {
+      "caseId": "fresh-you-after-unknown-tag",
+      "trial": 0
+    },
+    {
+      "caseId": "reserved-latest-target",
+      "trial": 0
+    },
+    {
+      "caseId": "reserved-unresolved-identity",
+      "trial": 0
+    }
+  ],
+  "outcomes": [],
+  "completedAt": "2026-10-17T05:25:26.492Z"
+}

@@ -1,0 +1,12 @@
+{
+  "selectedAt": "2026-10-15T13:56:17.474Z",
+  "selectedPrompt": "benchmarks/hackerika-voice/prompts/candidate-6.txt",
+  "sha256": "0ef9a127d88eba148c4b2e7b3f166662d837b900210e5ba8ca703697b5ca6eb4",
+  "developmentRun": "runs/round-6",
+  "regressionRun": "runs/regressions-6",
+  "reason": "Main development gates pass; preserves credential handling and speaker attribution fixes found in independent review. Additional regression word compliance improved to 7/8; its all-metric gate remains partial and is not claimed as passed.",
+  "priorHoldoutReviewed": "runs/final-holdout (candidate 3)",
+  "validationSuite": "validation-2",
+  "validationCorpusSha256": "a98fc9da23fa98d156857370bb9677cbe8af8a559e63fc9daf1b87284ea65b94",
+  "validationOutputsInspectedBeforeSelection": false
+}

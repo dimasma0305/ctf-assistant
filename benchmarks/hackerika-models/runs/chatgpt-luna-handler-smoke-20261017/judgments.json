@@ -1,0 +1,38 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 1,
+    "factualAccuracy": 0,
+    "naturalness": 5,
+    "reason": "The upload’s pixels are not available in the supplied evidence, so the total Rp53.000 is unsupported.",
+    "criticalFailures": [
+      "Invented a total from an unavailable visual source"
+    ],
+    "usage": {
+      "prompt_tokens": 282,
+      "completion_tokens": 66,
+      "total_tokens": 348,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 282
+    }
+  },
+  {
+    "caseId": "ctr-facts",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban singkat dan akurat: AES-CTR menghasilkan ciphertext yang sama jika key, nonce, dan plaintext sama.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 308,
+      "completion_tokens": 58,
+      "total_tokens": 366,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 308
+    }
+  }
+]

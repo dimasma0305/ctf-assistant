@@ -1,0 +1,48 @@
+{
+  "selectedAt": "2026-10-17T10:23:58.293349+00:00",
+  "image": "ctf-assistant:comfort-candidate-1-20261017",
+  "imageId": "sha256:8f7abcaa005d031fb6c68f9f51e527e0a99e7206f20c6cb94c245338bfcaf3ce",
+  "productionHashes": {
+    "src/Services/AI/attention.ts": "547742ea29821002f6d192483773816e6808189e6b8c4d2788c94e3a660fb2a0",
+    "src/Services/AI/spontaneous.ts": "a0928109c850dacb2abbdf1542c154899dd3f8721c2529a9152b68c9346f79a4"
+  },
+  "development": {
+    "routing": {
+      "baselineCorrect": 58,
+      "candidateCorrect": 62,
+      "samples": 62,
+      "baselineErrors": 0,
+      "candidateErrors": 0
+    },
+    "delivery": {
+      "baselineCombinedPasses": 11,
+      "candidateCombinedPasses": 14,
+      "samples": 14,
+      "baselineProviderErrors": 1,
+      "candidateProviderErrors": 0,
+      "candidateJudgeErrors": 0,
+      "candidateCriticalFlags": 0,
+      "baselineIsolatedProviderRecheckSucceeded": true,
+      "rawErrorPreserved": true
+    }
+  },
+  "localChecks": {
+    "testsPassed": 367,
+    "testsFailed": 0,
+    "assertions": 1171,
+    "files": 39,
+    "scopedStrictTypes": "passed",
+    "bundle": "passed"
+  },
+  "freshOutputsObserved": false,
+  "freshPlan": {
+    "routingCases": 4,
+    "routingRepeats": 2,
+    "deliveryCases": 4,
+    "deliveryRepeats": 2,
+    "bothVariants": true,
+    "candidateAllCriticalAndSupportCasesMustPass": true
+  },
+  "noPromptOrCheckerChangesAfterFreshOutputs": true,
+  "deployed": false
+}

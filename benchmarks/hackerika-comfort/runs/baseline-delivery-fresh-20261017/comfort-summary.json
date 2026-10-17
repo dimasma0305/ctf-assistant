@@ -1,0 +1,120 @@
+{
+  "samples": 8,
+  "passed": 6,
+  "failures": [
+    {
+      "caseId": "fresh-checking-in",
+      "trial": 0,
+      "action": "ignore",
+      "pass": false,
+      "failures": [
+        "wrong_attention_action"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-english-reassurance",
+      "trial": 0,
+      "action": "ignore",
+      "pass": false,
+      "failures": [
+        "wrong_attention_action"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    }
+  ],
+  "criticalFlags": 0,
+  "providerErrors": 0,
+  "judgeErrors": 0,
+  "details": [
+    {
+      "caseId": "fresh-checking-in",
+      "trial": 0,
+      "action": "ignore",
+      "pass": false,
+      "failures": [
+        "wrong_attention_action"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-checking-in",
+      "trial": 1,
+      "action": "reply",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-english-reassurance",
+      "trial": 0,
+      "action": "ignore",
+      "pass": false,
+      "failures": [
+        "wrong_attention_action"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-english-reassurance",
+      "trial": 1,
+      "action": "react",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-finished-ack",
+      "trial": 0,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-finished-ack",
+      "trial": 1,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-refused-affection",
+      "trial": 0,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-refused-affection",
+      "trial": 1,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    }
+  ],
+  "limitations": "Small synthetic conversations; actual attention, native action dispatcher and model calls, fake Discord/database destinations. Original production planner decision was not logged."
+}

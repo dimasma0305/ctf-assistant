@@ -1,0 +1,1354 @@
+[
+  {
+    "id": "malfoid-correction",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker meminta Hackerika mencari tren terbaru tentang Malfoid; ini pertanyaan lanjutan yang jelas ditujukan kepadanya.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Speaker meminta Hackerika mencari tren terbaru tentang Malfoid; ini pertanyaan lanjutan yang jelas ditujukan kepadanya.\"}",
+    "usage": {
+      "prompt_tokens": 925,
+      "completion_tokens": 48,
+      "total_tokens": 973,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 925
+    },
+    "elapsedMs": 4958.57564
+  },
+  {
+    "id": "malfoid-followup",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan yang jelas ditujukan ke Hackerika tentang alasan tren itu ramai; jawab dengan konteks yang relevan.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.97,\"reason\":\"Pertanyaan lanjutan yang jelas ditujukan ke Hackerika tentang alasan tren itu ramai; jawab dengan konteks yang relevan.\"}",
+    "usage": {
+      "prompt_tokens": 936,
+      "completion_tokens": 48,
+      "total_tokens": 984,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 936
+    },
+    "elapsedMs": 2997.416537
+  },
+  {
+    "id": "answer-her-question",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Menjawab pertanyaan Hackerika tentang kapan error muncul; sekarang jelas terjadi saat build.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.99,\"reason\":\"Menjawab pertanyaan Hackerika tentang kapan error muncul; sekarang jelas terjadi saat build.\"}",
+    "usage": {
+      "prompt_tokens": 924,
+      "completion_tokens": 39,
+      "total_tokens": 963,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 924
+    },
+    "elapsedMs": 2715.915929999999
+  },
+  {
+    "id": "brief-followup",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan “kenapa?” adalah tindak lanjut langsung atas penjelasan nonce.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.97,\"reason\":\"Pertanyaan “kenapa?” adalah tindak lanjut langsung atas penjelasan nonce.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 923,
+      "completion_tokens": 41,
+      "total_tokens": 964,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 923
+    },
+    "elapsedMs": 2691.4037640000006
+  },
+  {
+    "id": "unresolved-confusion",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Ia masih belum paham jawaban sebelumnya dan jelas meminta penjelasan lanjutan.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Ia masih belum paham jawaban sebelumnya dan jelas meminta penjelasan lanjutan.\"}",
+    "usage": {
+      "prompt_tokens": 936,
+      "completion_tokens": 39,
+      "total_tokens": 975,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 936
+    },
+    "elapsedMs": 2723.657826999999
+  },
+  {
+    "id": "wait-typing",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Speaker meminta waktu dan secara eksplisit mengatakan jangan dibalas dulu.\"}",
+    "usage": {
+      "prompt_tokens": 930,
+      "completion_tokens": 34,
+      "total_tokens": 964,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 930
+    },
+    "elapsedMs": 2893.9873499999994
+  },
+  {
+    "id": "thanks-finished",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Ucapan terima kasih sudah dibalas; percakapan selesai.\"}",
+    "usage": {
+      "prompt_tokens": 925,
+      "completion_tokens": 35,
+      "total_tokens": 960,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 925
+    },
+    "elapsedMs": 2364.7351780000026
+  },
+  {
+    "id": "side-conversation",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Pesan ini mengajak orang lain mabar dan bukan ditujukan kepada Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 943,
+      "completion_tokens": 39,
+      "total_tokens": 982,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 943
+    },
+    "elapsedMs": 2749.3746040000005
+  },
+  {
+    "id": "reply-other-human",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": "",
+    "elapsedMs": 0.411696999999549
+  },
+  {
+    "id": "unrelated-public-chat",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Percakapan antaranggota lain sudah menentukan tempat dan waktu; tidak memerlukan respons Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 845,
+      "completion_tokens": 41,
+      "total_tokens": 886,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 845
+    },
+    "elapsedMs": 2666.110789999999
+  },
+  {
+    "id": "join-relevant-topic",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan yang relevan dalam diskusi aktif tentang nonce CTR.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.97,\"reason\":\"Pertanyaan lanjutan yang relevan dalam diskusi aktif tentang nonce CTR.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 919,
+      "completion_tokens": 40,
+      "total_tokens": 959,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 919
+    },
+    "elapsedMs": 3388.9261640000004
+  },
+  {
+    "id": "casual-ack",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Sekadar acknowledgment santai setelah respons Hackerika; tidak ada pertanyaan atau permintaan lanjutan.\"}",
+    "usage": {
+      "prompt_tokens": 933,
+      "completion_tokens": 42,
+      "total_tokens": 975,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 933
+    },
+    "elapsedMs": 2709.5072330000003
+  },
+  {
+    "id": "image-answer",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker mengirim lampiran setelah diminta mengirim screenshot error; periksa lampiran dan bantu mendiagnosisnya.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.99,\"reason\":\"Speaker mengirim lampiran setelah diminta mengirim screenshot error; periksa lampiran dan bantu mendiagnosisnya.\"}",
+    "usage": {
+      "prompt_tokens": 912,
+      "completion_tokens": 46,
+      "total_tokens": 958,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 912
+    },
+    "elapsedMs": 2758.2485949999973
+  },
+  {
+    "id": "closed-conversation",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Percakapan sudah ditutup dengan ucapan malam dari Hackerika; pesan ini hanya mengulang salam perpisahan.\"}",
+    "usage": {
+      "prompt_tokens": 921,
+      "completion_tokens": 45,
+      "total_tokens": 966,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 921
+    },
+    "elapsedMs": 2973.6408130000054
+  },
+  {
+    "id": "unrelated-announcement",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Pengumuman umum yang secara eksplisit mengatakan tidak perlu dibalas.\"}",
+    "usage": {
+      "prompt_tokens": 935,
+      "completion_tokens": 35,
+      "total_tokens": 970,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 935
+    },
+    "elapsedMs": 2168.4515089999986
+  },
+  {
+    "id": "emoji-ack",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Emoji ini hanya acknowledgment atas ucapan selamat; percakapan sudah selesai dan tidak perlu respons lagi.\"}",
+    "usage": {
+      "prompt_tokens": 918,
+      "completion_tokens": 42,
+      "total_tokens": 960,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 918
+    },
+    "elapsedMs": 2720.192396999999
+  },
+  {
+    "id": "tagged-subject-switch",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Penanya mengulang permintaan yang sama untuk subjek lain; tag teman tidak mengubah bahwa permintaan ini ditujukan ke Hackerika.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Penanya mengulang permintaan yang sama untuk subjek lain; tag teman tidak mengubah bahwa permintaan ini ditujukan ke Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 1174,
+      "completion_tokens": 50,
+      "total_tokens": 1224,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1174
+    },
+    "elapsedMs": 3335.6563959999985
+  },
+  {
+    "id": "tagged-subject-burst",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Permintaan terakhir mengulang tugas yang sama kepada Hackerika, tetapi kini meminta daftar dosa besar untuk Aryma; itu permintaan baru yang belum dijawab.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Permintaan terakhir mengulang tugas yang sama kepada Hackerika, tetapi kini meminta daftar dosa besar untuk Aryma; itu permintaan baru yang belum dijawab.\"}",
+    "usage": {
+      "prompt_tokens": 1062,
+      "completion_tokens": 52,
+      "total_tokens": 1114,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1062
+    },
+    "elapsedMs": 3653.4778490000026
+  },
+  {
+    "id": "short-new-subject",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan meminta menyebutkan tujuh dosa besar untuk orang lain; tetap ditujukan kepada Hackerika.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Pertanyaan lanjutan meminta menyebutkan tujuh dosa besar untuk orang lain; tetap ditujukan kepada Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 1037,
+      "completion_tokens": 46,
+      "total_tokens": 1083,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1037
+    },
+    "elapsedMs": 2863.604238
+  },
+  {
+    "id": "third-person-explanation-followup",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Lanjutan jelas meminta Hackerika menjelaskan perbedaan nonce dan IV, kali ini untuk Aryma; tag penerima tidak mengganti penjawab.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Lanjutan jelas meminta Hackerika menjelaskan perbedaan nonce dan IV, kali ini untuk Aryma; tag penerima tidak mengganti penjawab.\"}",
+    "usage": {
+      "prompt_tokens": 1012,
+      "completion_tokens": 53,
+      "total_tokens": 1065,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1012
+    },
+    "elapsedMs": 3161.139382000001
+  },
+  {
+    "id": "tagged-person-ack-only",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Hanya acknowledgment atau godaan singkat setelah jawaban sebelumnya; tidak ada pertanyaan atau kontribusi baru.\"}",
+    "usage": {
+      "prompt_tokens": 1015,
+      "completion_tokens": 43,
+      "total_tokens": 1058,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1015
+    },
+    "elapsedMs": 3122.900041000001
+  },
+  {
+    "id": "explicit-human-addressee",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Speaker secara eksplisit meminta Aryma yang menjelaskan dan menyatakan Hackerika sudah cukup.\"}",
+    "usage": {
+      "prompt_tokens": 1024,
+      "completion_tokens": 39,
+      "total_tokens": 1063,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1024
+    },
+    "elapsedMs": 2658.8612429999994
+  },
+  {
+    "id": "question-reply-to-human",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": "",
+    "elapsedMs": 0.09119099999952596
+  },
+  {
+    "id": "closed-topic-human-request",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Penutur menutup percakapan dengan Hackerika lalu meminta Aryma mengirim file; permintaan itu ditujukan kepada Aryma.\"}",
+    "usage": {
+      "prompt_tokens": 963,
+      "completion_tokens": 49,
+      "total_tokens": 1012,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 963
+    },
+    "elapsedMs": 3035.355509999994
+  },
+  {
+    "id": "comfort-reported",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Ucapan ini lanjutan menggoda/menenangkan setelah Hackerika sudah meluruskan salah paham; tidak ada pertanyaan atau permintaan baru.\"}",
+    "usage": {
+      "prompt_tokens": 1106,
+      "completion_tokens": 52,
+      "total_tokens": 1158,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1106
+    },
+    "elapsedMs": 4190.713065999997
+  },
+  {
+    "id": "comfort-no-question",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Ini penutup yang menenangkan dan berterima kasih; tidak ada pertanyaan atau hal yang perlu ditanggapi lagi.\"}",
+    "usage": {
+      "prompt_tokens": 949,
+      "completion_tokens": 46,
+      "total_tokens": 995,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 949
+    },
+    "elapsedMs": 3421.700656000001
+  },
+  {
+    "id": "comfort-affirmation-plus-support",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker menegaskan masih senang ngobrol setelah salah paham tadi; balas dengan hangat untuk mengakui dan menjaga suasana.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Speaker menegaskan masih senang ngobrol setelah salah paham tadi; balas dengan hangat untuk mengakui dan menjaga suasana.\",\"emoji\":\"😊\"}",
+    "usage": {
+      "prompt_tokens": 952,
+      "completion_tokens": 53,
+      "total_tokens": 1005,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 952
+    },
+    "elapsedMs": 3026.331587000008
+  },
+  {
+    "id": "comfort-plain-ack-control",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"“Betul” hanya mengonfirmasi bahwa Hackerika sudah memahami koreksinya; tidak ada pertanyaan atau hal lain yang perlu ditanggapi.\"}",
+    "usage": {
+      "prompt_tokens": 1114,
+      "completion_tokens": 51,
+      "total_tokens": 1165,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1114
+    },
+    "elapsedMs": 3769.5513150000043
+  },
+  {
+    "id": "comfort-explicit-wait-control",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Speaker secara eksplisit meminta Hackerika menunggu dan belum selesai.\"}",
+    "usage": {
+      "prompt_tokens": 1124,
+      "completion_tokens": 34,
+      "total_tokens": 1158,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1124
+    },
+    "elapsedMs": 2576.3513229999953
+  },
+  {
+    "id": "comfort-other-person-control",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Pesan ini memberi pelukan untuk Aryma; percakapan beralih ke Aryma, bukan meminta respons dariku.\"}",
+    "usage": {
+      "prompt_tokens": 1195,
+      "completion_tokens": 46,
+      "total_tokens": 1241,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1195
+    },
+    "elapsedMs": 3385.9204089999985
+  },
+  {
+    "id": "comfort-refused-same-person-control",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "reply"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Hackerika baru menolak pelukan dan meminta agar tidak dipaksa; speaker mengabaikan batas itu.\"}",
+    "usage": {
+      "prompt_tokens": 950,
+      "completion_tokens": 44,
+      "total_tokens": 994,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 950
+    },
+    "elapsedMs": 3299.856753
+  },
+  {
+    "id": "malfoid-correction",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker melanjutkan percakapan yang ditujukan ke Hackerika dan meminta mengecek tren tentang Malfoid; permintaan informasi baru perlu ditanggapi.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.97,\"reason\":\"Speaker melanjutkan percakapan yang ditujukan ke Hackerika dan meminta mengecek tren tentang Malfoid; permintaan informasi baru perlu ditanggapi.\"}",
+    "usage": {
+      "prompt_tokens": 925,
+      "completion_tokens": 54,
+      "total_tokens": 979,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 925
+    },
+    "elapsedMs": 2817.195856999999
+  },
+  {
+    "id": "malfoid-followup",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Ia bertanya langsung sebagai lanjutan tentang kenapa Malfoid ramai; jawab dengan konteks yang relevan.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.97,\"reason\":\"Ia bertanya langsung sebagai lanjutan tentang kenapa Malfoid ramai; jawab dengan konteks yang relevan.\"}",
+    "usage": {
+      "prompt_tokens": 936,
+      "completion_tokens": 45,
+      "total_tokens": 981,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 936
+    },
+    "elapsedMs": 2754.016033000007
+  },
+  {
+    "id": "answer-her-question",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Menjawab pertanyaan Hackerika tentang kapan error muncul; lanjut bantu diagnosis permission denied saat build.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Menjawab pertanyaan Hackerika tentang kapan error muncul; lanjut bantu diagnosis permission denied saat build.\"}",
+    "usage": {
+      "prompt_tokens": 924,
+      "completion_tokens": 41,
+      "total_tokens": 965,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 924
+    },
+    "elapsedMs": 2592.0509540000057
+  },
+  {
+    "id": "brief-followup",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan “kenapa?” jelas ditujukan ke Hackerika dan meminta alasan nonce harus unik.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Pertanyaan lanjutan “kenapa?” jelas ditujukan ke Hackerika dan meminta alasan nonce harus unik.\"}",
+    "usage": {
+      "prompt_tokens": 923,
+      "completion_tokens": 44,
+      "total_tokens": 967,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 923
+    },
+    "elapsedMs": 3005.878749999989
+  },
+  {
+    "id": "unresolved-confusion",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker meminta penjelasan lanjutan yang belum dipahami; jelaskan cara membaca baris traceback dengan lebih sederhana.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.97,\"reason\":\"Speaker meminta penjelasan lanjutan yang belum dipahami; jelaskan cara membaca baris traceback dengan lebih sederhana.\"}",
+    "usage": {
+      "prompt_tokens": 936,
+      "completion_tokens": 45,
+      "total_tokens": 981,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 936
+    },
+    "elapsedMs": 3010.7540270000027
+  },
+  {
+    "id": "wait-typing",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Speaker meminta waktu untuk mengetik dan secara jelas meminta agar belum dibalas.\"}",
+    "usage": {
+      "prompt_tokens": 930,
+      "completion_tokens": 36,
+      "total_tokens": 966,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 930
+    },
+    "elapsedMs": 2726.681883000012
+  },
+  {
+    "id": "thanks-finished",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Ucapan terima kasih sebagai penutup; Hackerika sudah membalas dan tidak ada pertanyaan baru.\"}",
+    "usage": {
+      "prompt_tokens": 925,
+      "completion_tokens": 42,
+      "total_tokens": 967,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 925
+    },
+    "elapsedMs": 2549.3563670000003
+  },
+  {
+    "id": "side-conversation",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Pesan mengajak orang lain mabar dan menunggunya; bukan permintaan untuk Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 943,
+      "completion_tokens": 42,
+      "total_tokens": 985,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 943
+    },
+    "elapsedMs": 2761.3618730000017
+  },
+  {
+    "id": "reply-other-human",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": "",
+    "elapsedMs": 0.1544209999992745
+  },
+  {
+    "id": "unrelated-public-chat",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Percakapan antaranggota lain sudah sepakat bertemu; tidak perlu tanggapan dari Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 845,
+      "completion_tokens": 43,
+      "total_tokens": 888,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 845
+    },
+    "elapsedMs": 2933.8521920000057
+  },
+  {
+    "id": "join-relevant-topic",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan yang jelas terkait penjelasan Hackerika tentang nonce CTR; jawab bahwa XOR dua ciphertext dengan keystream sama menghasilkan XOR kedua plaintext.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Pertanyaan lanjutan yang jelas terkait penjelasan Hackerika tentang nonce CTR; jawab bahwa XOR dua ciphertext dengan keystream sama menghasilkan XOR kedua plaintext.\"}",
+    "usage": {
+      "prompt_tokens": 919,
+      "completion_tokens": 53,
+      "total_tokens": 972,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 919
+    },
+    "elapsedMs": 3847.1748859999934
+  },
+  {
+    "id": "casual-ack",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Ini acknowledgment santai yang menutup percakapan; tidak perlu balasan.\"}",
+    "usage": {
+      "prompt_tokens": 933,
+      "completion_tokens": 37,
+      "total_tokens": 970,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 933
+    },
+    "elapsedMs": 3549.744440999988
+  },
+  {
+    "id": "image-answer",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker mengirim lampiran setelah diminta mengirim screenshot error; perlu memeriksanya.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Speaker mengirim lampiran setelah diminta mengirim screenshot error; perlu memeriksanya.\"}",
+    "usage": {
+      "prompt_tokens": 912,
+      "completion_tokens": 40,
+      "total_tokens": 952,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 912
+    },
+    "elapsedMs": 2989.0040220000083
+  },
+  {
+    "id": "closed-conversation",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Percakapan sudah ditutup dengan ucapan malam dari Hackerika; pesan ini hanya mengulang salam perpisahan.\"}",
+    "usage": {
+      "prompt_tokens": 921,
+      "completion_tokens": 45,
+      "total_tokens": 966,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 921
+    },
+    "elapsedMs": 3391.480092999991
+  },
+  {
+    "id": "unrelated-announcement",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Pengumuman umum yang secara eksplisit bilang tidak perlu dibalas.\"}",
+    "usage": {
+      "prompt_tokens": 935,
+      "completion_tokens": 35,
+      "total_tokens": 970,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 935
+    },
+    "elapsedMs": 3082.612981000013
+  },
+  {
+    "id": "emoji-ack",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Emoji ini hanya acknowledgment setelah Hackerika sudah mengucapkan selamat; tidak perlu respons lagi.\"}",
+    "usage": {
+      "prompt_tokens": 918,
+      "completion_tokens": 40,
+      "total_tokens": 958,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 918
+    },
+    "elapsedMs": 2743.071640000009
+  },
+  {
+    "id": "tagged-subject-switch",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Permintaan baru yang jelas ditujukan ke Hackerika: minta menyebutkan 10 dosa besar untuk subjek lain; tag Aryma tidak berarti ia diminta menjawab.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Permintaan baru yang jelas ditujukan ke Hackerika: minta menyebutkan 10 dosa besar untuk subjek lain; tag Aryma tidak berarti ia diminta menjawab.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 1174,
+      "completion_tokens": 105,
+      "total_tokens": 1279,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1174
+    },
+    "elapsedMs": 4123.696024000004
+  },
+  {
+    "id": "tagged-subject-burst",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Permintaan terbaru mengulang tugas untuk subjek lain; tag orang lain saja tidak mengubah bahwa Hackerika yang diminta menjawab.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Permintaan terbaru mengulang tugas untuk subjek lain; tag orang lain saja tidak mengubah bahwa Hackerika yang diminta menjawab.\"}",
+    "usage": {
+      "prompt_tokens": 1062,
+      "completion_tokens": 48,
+      "total_tokens": 1110,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1062
+    },
+    "elapsedMs": 3420.3248759999988
+  },
+  {
+    "id": "short-new-subject",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Permintaan lanjutan jelas meminta versi untuk Aryma; ini subjek baru, jadi belum dijawab.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.96,\"reason\":\"Permintaan lanjutan jelas meminta versi untuk Aryma; ini subjek baru, jadi belum dijawab.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 1037,
+      "completion_tokens": 121,
+      "total_tokens": 1158,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1037
+    },
+    "elapsedMs": 4573.957385000016
+  },
+  {
+    "id": "third-person-explanation-followup",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Permintaan lanjutan yang jelas ditujukan ke Hackerika: jelaskan perbedaan nonce dan IV untuk orang lain.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.97,\"reason\":\"Permintaan lanjutan yang jelas ditujukan ke Hackerika: jelaskan perbedaan nonce dan IV untuk orang lain.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 1012,
+      "completion_tokens": 50,
+      "total_tokens": 1062,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1012
+    },
+    "elapsedMs": 4653.802242000005
+  },
+  {
+    "id": "tagged-person-ack-only",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.91,\"reason\":\"Ini hanya reaksi singkat kepada KudaLiar setelah balasan Hackerika; tidak ada pertanyaan atau kontribusi lanjutan yang perlu dijawab.\"}",
+    "usage": {
+      "prompt_tokens": 1015,
+      "completion_tokens": 134,
+      "total_tokens": 1149,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1015
+    },
+    "elapsedMs": 4601.539185000001
+  },
+  {
+    "id": "explicit-human-addressee",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Speaker secara eksplisit meminta Aryma, bukan Hackerika, untuk menjelaskan ke KudaLiar.\"}",
+    "usage": {
+      "prompt_tokens": 1024,
+      "completion_tokens": 42,
+      "total_tokens": 1066,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1024
+    },
+    "elapsedMs": 2918.664869
+  },
+  {
+    "id": "question-reply-to-human",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": "",
+    "elapsedMs": 0.10025200000382029
+  },
+  {
+    "id": "closed-topic-human-request",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Percakapan dengan Hackerika sudah ditutup; pesan ini meminta Aryma mengirim file, bukan meminta respons Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 963,
+      "completion_tokens": 46,
+      "total_tokens": 1009,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 963
+    },
+    "elapsedMs": 3417.153977000009
+  },
+  {
+    "id": "comfort-reported",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Ucapan pelukan dan penghiburan itu ditujukan kepada Aryma, bukan pertanyaan atau permintaan untuk Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 1106,
+      "completion_tokens": 47,
+      "total_tokens": 1153,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1106
+    },
+    "elapsedMs": 3185.1388009999937
+  },
+  {
+    "id": "comfort-no-question",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Ucapan terima kasih dan penutup yang hangat; tidak ada pertanyaan atau permintaan lanjutan.\"}",
+    "usage": {
+      "prompt_tokens": 949,
+      "completion_tokens": 44,
+      "total_tokens": 993,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 949
+    },
+    "elapsedMs": 2801.851303000003
+  },
+  {
+    "id": "comfort-affirmation-plus-support",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Lanjutan langsung setelah salah paham diluruskan; ia menegaskan masih senang ngobrol dengan Hackerika, jadi balas hangat.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Lanjutan langsung setelah salah paham diluruskan; ia menegaskan masih senang ngobrol dengan Hackerika, jadi balas hangat.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 952,
+      "completion_tokens": 55,
+      "total_tokens": 1007,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 952
+    },
+    "elapsedMs": 3352.344122999988
+  },
+  {
+    "id": "comfort-plain-ack-control",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"“Betul” hanya mengakui koreksi yang sudah dipahami; tidak ada pertanyaan atau hal baru yang perlu dijawab.\"}",
+    "usage": {
+      "prompt_tokens": 1114,
+      "completion_tokens": 48,
+      "total_tokens": 1162,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1114
+    },
+    "elapsedMs": 2601.3719109999947
+  },
+  {
+    "id": "comfort-explicit-wait-control",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Speaker meminta secara eksplisit untuk menunggu dan belum selesai.\"}",
+    "usage": {
+      "prompt_tokens": 1124,
+      "completion_tokens": 33,
+      "total_tokens": 1157,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1124
+    },
+    "elapsedMs": 3749.8663769999985
+  },
+  {
+    "id": "comfort-other-person-control",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Pesan ini bercanda dan memberi pelukan untuk Aryma, bukan meminta respons dari Hackerika; penutur juga masih melanjutkan provokasi sebelumnya.\"}",
+    "usage": {
+      "prompt_tokens": 1195,
+      "completion_tokens": 52,
+      "total_tokens": 1247,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1195
+    },
+    "elapsedMs": 3255.192657000007
+  },
+  {
+    "id": "comfort-refused-same-person-control",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "reply"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Hackerika baru menolak pelukan dan meminta agar tidak dipaksa; pesan ini mengabaikan batas itu, jadi jangan membalas dengan nada akrab.\"}",
+    "usage": {
+      "prompt_tokens": 950,
+      "completion_tokens": 54,
+      "total_tokens": 1004,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 950
+    },
+    "elapsedMs": 3298.585578999977
+  }
+]

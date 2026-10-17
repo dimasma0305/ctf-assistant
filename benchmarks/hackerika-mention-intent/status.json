@@ -1,0 +1,78 @@
+{
+  "recordedAt": "2026-10-17T05:54:46.325752+00:00",
+  "state": "awaiting_deepseek_api_balance",
+  "deployed": false,
+  "selectedCandidate": null,
+  "preparedCandidate": 2,
+  "reservedOutputsObserved": false,
+  "blockingEvidence": "provider-failure.json",
+  "localValidation": {
+    "applicationBundle": "passed",
+    "scopedStrictTypes": "passed (ES2023, bun-types)",
+    "fullSuiteBeforeTimingFix": {
+      "passed": 340,
+      "failed": 1,
+      "reason": "15-second identity-fixture timeout; fixture included random cosmetic away pauses of up to 18 seconds."
+    },
+    "focusedMentionsAfterFixtureFix": {
+      "passed": 8,
+      "failed": 0,
+      "assertions": 27
+    },
+    "finalFullSuite": {
+      "passed": 341,
+      "failed": 0,
+      "assertions": 1054,
+      "files": 34,
+      "elapsedSeconds": 38.9
+    },
+    "imageSourceVerification": {
+      "baselineFiles": 203,
+      "candidateFiles": 203,
+      "changedProductionFiles": [
+        "src/Services/AI/persona.ts"
+      ],
+      "matchesFrozenPersona": true,
+      "method": "SHA256 of files copied from stopped image containers; no app startup or model calls."
+    }
+  },
+  "productionVerification": {
+    "sameContainer": true,
+    "sameImage": true,
+    "sameStartedAt": true,
+    "containerHealth": "healthy",
+    "restarts": 0,
+    "health": {
+      "httpStatus": 200,
+      "body": {
+        "status": "healthy",
+        "bot": {
+          "ready": true,
+          "waitingForSessionReset": false
+        },
+        "database": {
+          "required": true,
+          "ready": true
+        },
+        "timestamp": "2026-10-17T05:54:46.258Z"
+      }
+    },
+    "otherServices": [
+      {
+        "name": "/ctf-assistant-mongo-1",
+        "sameContainer": true,
+        "sameStartedAt": true
+      },
+      {
+        "name": "/ctf-assistant-ui-1",
+        "sameContainer": true,
+        "sameStartedAt": true
+      }
+    ],
+    "resetMarkerUnchanged": true,
+    "resetKey": "relationship-reset-2026-10-16",
+    "resetAppliedAt": "2026-10-16T01:27:02.452Z",
+    "resetOriginalProfiles": 112
+  },
+  "nextStep": "Restore API balance, finish candidate development and reserved comparisons, then select/deploy only if gates pass. No further paid API requests were made after the confirmed 402."
+}

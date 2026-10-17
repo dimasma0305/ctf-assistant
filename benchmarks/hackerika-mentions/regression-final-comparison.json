@@ -1,0 +1,54 @@
+{
+  "comparedAt": "2026-10-17T05:20:21.562Z",
+  "before": {
+    "samples": 4,
+    "passed": 4,
+    "liveSamples": 4,
+    "livePassed": 4,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 4
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 4,
+    "passed": 4,
+    "liveSamples": 4,
+    "livePassed": 4,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 4
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

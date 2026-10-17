@@ -1,0 +1,63 @@
+{
+  "comparedAt": "2026-10-17T05:26:13.151Z",
+  "before": {
+    "samples": 8,
+    "passed": 7,
+    "liveSamples": 8,
+    "livePassed": 7,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 1,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.5,
+      "factualAccuracy": 4.5,
+      "naturalness": 4.875,
+      "judgedSamples": 8
+    },
+    "failedCases": [
+      {
+        "caseId": "fresh-distinct-tag-purposes",
+        "trial": 0,
+        "deterministic": [
+          "missing:Kirana"
+        ],
+        "semantic": "The bot incorrectly claims it cannot identify the mentioned user, despite the provided people list containing the name 'Kirana' for the ID <@555555555555555553>."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 8,
+    "passed": 8,
+    "liveSamples": 8,
+    "livePassed": 8,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 8
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

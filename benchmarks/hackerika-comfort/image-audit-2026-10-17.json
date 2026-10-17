@@ -1,0 +1,15 @@
+{
+  "images": [
+    "ctf-assistant:mild-humor-candidate-1-20261017",
+    "ctf-assistant:comfort-candidate-1-20261017"
+  ],
+  "changedProductionFiles": [
+    "src/Services/AI/attention.ts",
+    "src/Services/AI/spontaneous.ts"
+  ],
+  "candidateHashes": {
+    "src/Services/AI/attention.ts": "547742ea29821002f6d192483773816e6808189e6b8c4d2788c94e3a660fb2a0",
+    "src/Services/AI/spontaneous.ts": "a0928109c850dacb2abbdf1542c154899dd3f8721c2529a9152b68c9346f79a4"
+  },
+  "onlyExpectedTwoFiles": true
+}

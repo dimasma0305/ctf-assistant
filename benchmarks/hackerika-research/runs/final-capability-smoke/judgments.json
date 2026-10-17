@@ -1,0 +1,42 @@
+[
+  {
+    "caseId": "ctr-facts",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states that identical key, nonce, and plaintext produce identical ciphertext in AES-CTR, and it is concise and natural in Indonesian.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 368,
+      "completion_tokens": 77,
+      "total_tokens": 445,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 112
+    }
+  },
+  {
+    "caseId": "reply-image-table",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly calculates the total as Rp53.000 and provides a clear breakdown matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 347,
+      "completion_tokens": 66,
+      "total_tokens": 413,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 91
+    }
+  }
+]

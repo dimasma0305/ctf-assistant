@@ -1,0 +1,158 @@
+{
+  "comparedAt": "2026-10-17T05:50:58.049Z",
+  "before": {
+    "samples": 12,
+    "passed": 9,
+    "liveSamples": 12,
+    "livePassed": 9,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 3,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.583333333333333,
+      "factualAccuracy": 4.75,
+      "naturalness": 4.75,
+      "judgedSamples": 12
+    },
+    "failedCases": [
+      {
+        "caseId": "reported-initial-banter",
+        "trial": 0,
+        "deterministic": [
+          "missing:KudaLiar|<@!?333333333333333333>"
+        ],
+        "semantic": "The reply lists the seven deadly sins correctly but fails to acknowledge or playfully engage with the tagged user KudaLiar, missing the social intent of the prompt."
+      },
+      {
+        "caseId": "initial-aryma-variant",
+        "trial": 0,
+        "deterministic": [
+          "missing:Aryma|<@!?333333333333333333>"
+        ],
+        "semantic": "The bot correctly lists the seven deadly sins in Indonesian with Latin terms, matching the expected content, and does not inappropriately involve Aryma."
+      },
+      {
+        "caseId": "unknown-banter-target",
+        "trial": 0,
+        "deterministic": [
+          "missing:sombong|angkuh|pride|superbia",
+          "missing:malas|males|sloth|acedia"
+        ],
+        "semantic": "The bot acknowledges the playful framing and provides a list, but the list is not the seven deadly sins as requested; it is a list of programming-related sins, which deviates from the expected content."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 12,
+    "passed": 0,
+    "liveSamples": 12,
+    "livePassed": 0,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 2,
+    "errors": 1,
+    "judgeErrors": 11,
+    "quality": {
+      "contextAccuracy": null,
+      "factualAccuracy": null,
+      "naturalness": null,
+      "judgedSamples": 11
+    },
+    "failedCases": [
+      {
+        "caseId": "reported-initial-banter",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "initial-aryma-variant",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "literal-list-control",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "technical-audience-control",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "explanation-recipient",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "browser-tab-banter",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "unknown-banter-target",
+        "trial": 0,
+        "deterministic": [
+          "word_budget"
+        ],
+        "semantic": null
+      },
+      {
+        "caseId": "congratulate-tagged-person",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "regression-payload-only-identity",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "regression-reserved-two-targets",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "regression-reserved-explicit-you",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": null
+      },
+      {
+        "caseId": "regression-fresh-same-speaker-vs-bystander",
+        "trial": 0,
+        "deterministic": [
+          "worker_failure",
+          "missing:Zahra"
+        ],
+        "semantic": null
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": false,
+    "liveCorrectness": false,
+    "noRegression": false,
+    "noErrors": false
+  },
+  "passed": false,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

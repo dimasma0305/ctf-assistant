@@ -1,0 +1,19 @@
+# Use after owner login and completed inference verification:
+# docker compose -f docker-compose.yml -f docker-compose.chatgpt.yml up -d --build
+services:
+  ctf-assistant:
+    environment:
+      AI_PROVIDER: chatgpt
+      CHATGPT_MODEL: ${CHATGPT_MODEL:-gpt-6-luna}
+      CHATGPT_REASONING_EFFORT: ${CHATGPT_REASONING_EFFORT:-low}
+      CHATGPT_AUTH_FILE: /run/hackerika-chatgpt/credentials.json
+      AI_CHAT_MODEL: ${CHATGPT_MODEL:-gpt-6-luna}
+      AI_VISION_MODEL: ${CHATGPT_MODEL:-gpt-6-luna}
+      AI_RESEARCH_MODEL: ${CHATGPT_MODEL:-gpt-6-luna}
+      AI_JUDGE_MODEL: ${CHATGPT_MODEL:-gpt-6-luna}
+    volumes:
+      - type: bind
+        source: ./runtime-secrets/chatgpt
+        target: /run/hackerika-chatgpt
+        bind:
+          create_host_path: false

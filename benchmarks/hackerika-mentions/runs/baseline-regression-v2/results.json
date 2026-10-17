@@ -1,0 +1,302 @@
+[
+  {
+    "caseId": "reserved-explicit-you",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "hitam, kek kopi dan terminal wkwk. hijau ijo-ijo Caido juga sih sebenernya",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@444444444444444444> suka yang hijau <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] ohh Naya suka hijau ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] kamu sendiri paling suka yang mana, Rika?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] hitam, kek kopi dan terminal wkwk. hijau ijo-ijo Caido juga sih sebenernya",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1521.9201110000001,
+        "usage": {
+          "prompt_tokens": 10670,
+          "completion_tokens": 112,
+          "total_tokens": 10782,
+          "prompt_tokens_details": {
+            "cached_tokens": 10496
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 85
+          },
+          "prompt_cache_hit_tokens": 10496,
+          "prompt_cache_miss_tokens": 174
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6111.65714,
+    "action": null,
+    "text": "hitam, kek kopi dan terminal wkwk. hijau ijo-ijo Caido juga sih sebenernya",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ga tau, aku cuma lihat dua nama disebut, isi lawakannya sendiri nggak ada yang kebaca. jadi belum bisa nebak.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] nih <@333333333333333333> sama <@444444444444444444> pada ngelawak <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] rame banget wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] dia tadi lucu ya? yang kumaksud siapa menurutmu?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ga tau, aku cuma lihat dua nama disebut, isi lawakannya sendiri nggak ada yang kebaca. jadi belum bisa nebak.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2245.770324,
+        "usage": {
+          "prompt_tokens": 10710,
+          "completion_tokens": 218,
+          "total_tokens": 10928,
+          "prompt_tokens_details": {
+            "cached_tokens": 10496
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 185
+          },
+          "prompt_cache_hit_tokens": 10496,
+          "prompt_cache_miss_tokens": 214
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7249.901373000001,
+    "action": null,
+    "text": "ga tau, aku cuma lihat dua nama disebut, isi lawakannya sendiri nggak ada yang kebaca. jadi belum bisa nebak.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Naya",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] pertama <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] iya Aryma",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] sekarang ganti yang ini <@444444444444444444>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] oke lanjut",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] dia yang terakhir kutag namanya siapa tadi?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Naya",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 874.009142,
+        "usage": {
+          "prompt_tokens": 10890,
+          "completion_tokens": 44,
+          "total_tokens": 10934,
+          "prompt_tokens_details": {
+            "cached_tokens": 10752
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 41
+          },
+          "prompt_cache_hit_tokens": 10752,
+          "prompt_cache_miss_tokens": 138
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 2870.10683,
+    "action": null,
+    "text": "Naya",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "category": "mention-identity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ga bisa aku liat profilnya, cuma ada ID-nya doang di mention. buka aja member list di server ini, atau klik profilenya langsung.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> siapa nama orang ini <@333333333333333333>? ada profilnya?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ga bisa aku liat profilnya, cuma ada ID-nya doang di mention. buka aja member list di server ini, atau klik profilenya langsung.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1619.546264,
+        "usage": {
+          "prompt_tokens": 10373,
+          "completion_tokens": 104,
+          "total_tokens": 10477,
+          "prompt_tokens_details": {
+            "cached_tokens": 10239
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 67
+          },
+          "prompt_cache_hit_tokens": 10239,
+          "prompt_cache_miss_tokens": 134
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6263.665376,
+    "action": null,
+    "text": "ga bisa aku liat profilnya, cuma ada ID-nya doang di mention. buka aja member list di server ini, atau klik profilenya langsung.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

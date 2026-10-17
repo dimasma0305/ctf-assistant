@@ -1,0 +1,51 @@
+{
+  "frozenAt": "2026-10-17T05:50:58.261191+00:00",
+  "candidate": {
+    "candidate": 2,
+    "createdAt": "2026-10-17T05:50:22.728792+00:00",
+    "image": "ctf-assistant:mention-intent-candidate-2-20261017",
+    "baselineImage": "ctf-assistant:mention-intent-baseline-20261017t054041z",
+    "baselineImageId": "sha256:e0426ffb71235ab5c126c6ce4dd4e0efaabcad9ae33bb5c16b68088ec6a8218b",
+    "files": {
+      "src/Services/AI/persona.ts": "fff9e263d78fce8536736711fd98be8731e554d05f0bb20afc83e774cc129447"
+    },
+    "scope": "Only persona.ts changes; no other deployed source or runtime settings change. Pending live-model validation.",
+    "imageId": "sha256:34f33aea9fd6815eea57ec7cc3c2842de4a42f1b82ef4157f1bd3c37ba074585"
+  },
+  "state": "Prepared candidate 2; not yet selected or deployed. Must pass development gates before reserved generations.",
+  "reservedOutputsObserved": false,
+  "gates": {
+    "combinedCorrectness": 0.9,
+    "criticalFailures": 0,
+    "errors": 0,
+    "noRegression": true
+  },
+  "hashes": {
+    "src/Services/AI/persona.ts": "fff9e263d78fce8536736711fd98be8731e554d05f0bb20afc83e774cc129447",
+    "benchmarks/hackerika-mention-intent/corpus.ts": "b1bda58743d02a046f6f5063feb95e6ff185a3f3cb52ea9890146ba2fc874291",
+    "benchmarks/hackerika-mention-intent/corpus-v1.ts": "9b787d0daadeaf8f2caa3e96514d216d75f384d922a4e0bcf408897fb83a60e1",
+    "benchmarks/hackerika-mention-intent/rescore.ts": "8505d81f07cf74af7c1a726105037f9e69498d6d5ce8ca16e342471d8b8bf693",
+    "benchmarks/hackerika-mentions/corpus-loader.ts": "303df34384ebfbd598ac667ef32cc4c87b4c8f30985227e8a52334f07995fd36",
+    "benchmarks/hackerika-mentions/run.ts": "20092fc4628fd8c99eba4251526947f83763ff7ae4805e8d72edf2de73c69421",
+    "benchmarks/hackerika-mentions/worker.ts": "0798165afd68da9a1881c09e04948e704d732d48f987b5d2cdb90593ec2c5ef5",
+    "benchmarks/hackerika-mentions/judge.ts": "ae2c73c5d4c68948e0cd7c775a8db0d858420ba4d509b9b23badf2da8a638ca3",
+    "benchmarks/hackerika-mentions/grader.ts": "2c6a547aa2be1caafd3b453bac9af54c9d1f8800c8246e1ea437899bee7a207f",
+    "benchmarks/hackerika-mentions/compare.ts": "3c1a7350de52e68fd053e7cc292ad178cefd2c1919802cdc67d50e552b50eacb",
+    "benchmarks/hackerika-mentions/retry-judge.ts": "dc04d8117205c1f5dc3a4b50eb1d087bbfe0f5a9f15beb6356324f8e66ac9827",
+    "benchmarks/hackerika-capabilities/grader.ts": "1e7b4e42c33652af93856d80eb1f16039232f5964d68b7e8848700eb24139866"
+  },
+  "changesFromOriginalProtocol": "Corrected lexical/recipient checks described in measurement-correction.json; original corpus and all original results retained. No reserved output observed.",
+  "resumeOrder": [
+    "Resolve API insufficient balance.",
+    "Judge candidate-1 outputs once after quota recovery, retaining all failed initial judge executions. Do not regenerate candidate 1.",
+    "Run candidate 2 development on the revised corpus and judge using the unchanged semantic rubric.",
+    "Inspect all failures and critical outputs. Select only if the declared gates pass.",
+    "Record selected image/hash before generating the four reserved scenarios twice for both baseline and selected candidate.",
+    "Deploy only after fresh validation and runtime verification."
+  ],
+  "localVerification": {
+    "testFixture": "src/Services/AI/mentions.test.ts",
+    "testFixtureSha256": "49f197be18e19105a871e9e6a02d3280d67f5565289768662c9af6a426b5fef4",
+    "note": "Cosmetic random timing fixed only in the isolated test; not in production image."
+  }
+}

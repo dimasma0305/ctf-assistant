@@ -1,0 +1,7 @@
+{
+  "selected": false,
+  "run": "runs/candidate-2-dev-v2",
+  "deterministicPasses": 17,
+  "samples": 18,
+  "reason": "Missing-source answer was grounded but too verbose; original word-budget failure retained. A third development revision was authorized by an explicit experiment-budget extension before holdout."
+}

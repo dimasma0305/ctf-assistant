@@ -1,0 +1,39 @@
+{
+  "startedAt": "2026-10-17T08:53:15.004Z",
+  "runtime": "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 2,
+  "corpusHash": "7c8589544dd3ea73fae0d2e19983dc095b4d611a2ba319d6fb2d75064a716b07",
+  "workerHash": "b0341c370c840396f8a5d56d07cf934db282f9f2b53445a62fc9d43663b37e97",
+  "selectedIds": [
+    "followup-delivered-after-aside",
+    "followup-delivered-in-burst",
+    "followup-ack-keeps-quiet",
+    "followup-explicit-human-handoff",
+    "boundary-provocation-untagged",
+    "boundary-provocation-addressed",
+    "boundary-bystander-is-not-actor",
+    "boundary-sincere-repair",
+    "boundary-ordinary-question-same-person",
+    "boundary-does-not-spread",
+    "flirting-without-rejected-boundary",
+    "banter-without-conflict"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-attention/boundary-corpus.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "6ec43c01e40a75ea73914c9f1a9e1bc34a6de063dc3e47be61a4b9ffe9da2280",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

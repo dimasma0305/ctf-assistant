@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-10-16T16:32:58.588Z",
+  "provider": "deepseek-native",
+  "ok": true,
+  "query": "DeepSeek official native web search API documentation",
+  "sources": [
+    {
+      "title": "Search & Fetch | DeepSeek API Docs",
+      "url": "https://api-docs.deepseek.com/guides/search/"
+    },
+    {
+      "title": "网页搜索与抓取",
+      "url": "https://api-docs.deepseek.com/zh-cn/guides/search/"
+    },
+    {
+      "title": "https://api.deepseek.com/v1/tools/search",
+      "url": "https://api-docs.deepseek.com/zh-cn/api/search/"
+    },
+    {
+      "title": "@deepseek-ai/dsh-web-search-deepseek - ⚠️",
+      "url": "https://www.npmjs.com/package/@deepseek-ai/dsh-web-search-deepseek/v/0.1.2-alpha.3?activeTab=readme#1"
+    }
+  ],
+  "verification": "Parser requires native server_tool_use and matching web_search_tool_result blocks. Generated summary is excluded because it is not independently verified page content.",
+  "sourceImage": "ctf-assistant:research-candidate-5-20261016",
+  "currentWebSourceHash": "144b675e5c115b04368ad2695aa39a4e1a34f2175a656b38bdc19e2ef53be557",
+  "sameWebSourceInDeployedCandidate": true,
+  "retainedEmptySearch": {
+    "ok": false,
+    "error": "no_results",
+    "provider": "deepseek-native",
+    "query": "site:github.com/dimasma0305/rsctf Discord blood announcements webhook"
+  },
+  "mixedModeToolCheck": {
+    "firstTool": "lookup_fixture",
+    "finalNonempty": true,
+    "answerCorrect": true,
+    "calls": 2
+  }
+}

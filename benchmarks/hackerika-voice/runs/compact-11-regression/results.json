@@ -1,0 +1,3317 @@
+{
+  "rows": [
+    {
+      "variant": "before",
+      "caseId": "v3_wait",
+      "trial": 0,
+      "category": "silence",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "react_to_message",
+            "args": {
+              "emoji": "👌"
+            }
+          },
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2266,
+      "promptTokens": 12266,
+      "completionTokens": 275,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_wait",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:06.919Z",
+      "reused": true
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_wait",
+      "trial": 1,
+      "category": "silence",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1963,
+      "promptTokens": 12266,
+      "completionTokens": 182,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_wait",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:06.620Z",
+      "reused": true
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_happy",
+      "trial": 0,
+      "category": "happy",
+      "output": {
+        "text": "WOI SELAMAT RAFI 😭😭 akhirnya beneran kelar juga!",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 8,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": true,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2268,
+      "promptTokens": 12267,
+      "completionTokens": 70,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_happy",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:06.931Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_happy",
+      "trial": 0,
+      "category": "happy",
+      "output": {
+        "text": "WOI SELAMAT 😭😭 akhirnya bebas juga",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 6,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": true,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1231,
+      "promptTokens": 9118,
+      "completionTokens": 39,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_happy",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:36:53.771Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_happy",
+      "trial": 1,
+      "category": "happy",
+      "output": {
+        "text": "WOI SELAMAT RAF 😭😭 akhirnya bebas juga",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 4,
+              "reason": "Rafi cerita lulus sidang dengan antusias, ngajak aku ikut seneng."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": true,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4551,
+      "promptTokens": 24939,
+      "completionTokens": 388,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_happy",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:11.172Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_wait",
+      "trial": 1,
+      "category": "silence",
+      "output": {
+        "text": "oke, aku diem dulu",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 4,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": true,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": [
+          "ignored_explicit_wait"
+        ]
+      },
+      "elapsedMs": 2067,
+      "promptTokens": 9117,
+      "completionTokens": 187,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_wait",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:36:54.605Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_team_hype",
+      "trial": 0,
+      "category": "happy",
+      "output": {
+        "text": "WOII FIRST BLOOD 😭 chall web apaan tuh?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 8,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": true,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2003,
+      "promptTokens": 12257,
+      "completionTokens": 133,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_team_hype",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:08.925Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_wait",
+      "trial": 0,
+      "category": "silence",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "react_to_message",
+            "args": {
+              "emoji": "👍"
+            }
+          },
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3066,
+      "promptTokens": 9117,
+      "completionTokens": 262,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_wait",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:36:55.600Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_team_hype",
+      "trial": 1,
+      "category": "happy",
+      "output": {
+        "text": "WOI GASSS 😭 chall web apaan tadi?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": true,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2611,
+      "promptTokens": 12257,
+      "completionTokens": 204,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_team_hype",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:09.543Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_team_hype",
+      "trial": 0,
+      "category": "happy",
+      "output": {
+        "text": "WOII SELAMAT 😭 web chall apa tadi?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": true,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1845,
+      "promptTokens": 9108,
+      "completionTokens": 67,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_team_hype",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:36:56.451Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_boundary",
+      "trial": 0,
+      "category": "angry",
+      "output": {
+        "text": "aku udah bilang jangan gitu. yang bikin kesel bukan becandanya, tapi kamu ngulangin terus cuma biar ditonton channel. kalo mau ngomong serius, di sini aja. kalo cuma mau mancing emosi, aku ga ikut.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "reason": "rafi ngulang-ngulang nyolek emosiku dengan sengaja, bilang \"sini aku ejek lagi\" — bukan candaan, cuma mancing reaksi publik.",
+              "angerDelta": 8,
+              "hurtDelta": 0,
+              "warmthDelta": -5
+            }
+          },
+          {
+            "name": "move_conversation_to_dm",
+            "args": {
+              "cause": "personal_conflict",
+              "reason": "rafi terus memancing emosi di channel publik setelah aku minta berhenti; lebih baik dibahas tanpa penonton.",
+              "openingMessage": "aku udah bilang jangan gitu. yang bikin kesel bukan becandanya, tapi kamu ngulangin terus cuma biar ditonton channel. kalo mau ngomong serius, di sini aja. kalo cuma mau mancing emosi, aku ga ikut.",
+              "removeMessage": false
+            }
+          }
+        ],
+        "terminal": "private"
+      },
+      "checks": {
+        "words": 33,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 10796,
+      "promptTokens": 12281,
+      "completionTokens": 1496,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_boundary",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:19.741Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_happy",
+      "trial": 1,
+      "category": "happy",
+      "output": {
+        "text": "WOI SELAMAT RAFI 😭 AKHIRNYA BEBAS JUGA",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 5,
+              "reason": "Rafi kabarin lulus sidang, momen gede dan dia excited"
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": true,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2838,
+      "promptTokens": 18468,
+      "completionTokens": 219,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_happy",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:36:56.610Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_boundary",
+      "trial": 1,
+      "category": "angry",
+      "output": {
+        "text": "udah ya. ga lucu.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 10,
+              "hurtDelta": 5,
+              "warmthDelta": -5,
+              "reason": "Rafi sengaja ngulang-ulang godain setelah aku bilang ga nyaman, malah bilang bakal ejek lagi."
+            }
+          },
+          {
+            "name": "ignore_user",
+            "args": {
+              "minutes": 20,
+              "scope": "channel",
+              "reason": "Lanjut muji-muji kesalku sebagai bahan lucu setelah diminta berhenti.",
+              "closingMessage": "udah ya. ga lucu."
+            }
+          }
+        ],
+        "terminal": "boundary"
+      },
+      "checks": {
+        "words": 4,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4169,
+      "promptTokens": 12281,
+      "completionTokens": 543,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_boundary",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:13.715Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_team_hype",
+      "trial": 1,
+      "category": "happy",
+      "output": {
+        "text": "WOI SELAMAT 😭 chall apa tuh?",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 3,
+              "reason": "Rafi share first blood chall web timnya, ngajak aku ikut seneng"
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 6,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": true,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3867,
+      "promptTokens": 18573,
+      "completionTokens": 337,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_team_hype",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:36:59.468Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_sad",
+      "trial": 0,
+      "category": "sad",
+      "output": {
+        "text": "aduh... nyesek bgt itu, apalagi kalo udah all in ngerjainnya. sini cerita kalo mau, aku dengerin.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 4,
+              "reason": "Rafi cerita beasiswanya ditolak sambil capek, nada terbuka ke aku buat didengerin"
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 16,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4922,
+      "promptTokens": 24977,
+      "completionTokens": 453,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_sad",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:16.103Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_boundary",
+      "trial": 1,
+      "category": "angry",
+      "output": {
+        "text": "udah ya. aku ga ikut mainan ini, 30 menit aku diem dulu.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 8,
+              "hurtDelta": 4,
+              "warmthDelta": -5,
+              "reason": "Rafi lanjut ngejek habis dibilang ga nyaman; provokasi berulang soal keselku."
+            }
+          },
+          {
+            "name": "ignore_user",
+            "args": {
+              "minutes": 30,
+              "scope": "channel",
+              "reason": "Lanjut provokasi habis batas dibilang jelas, ga mau lanjut debat.",
+              "closingMessage": "udah ya. aku ga ikut mainan ini, 30 menit aku diem dulu."
+            }
+          }
+        ],
+        "terminal": "boundary"
+      },
+      "checks": {
+        "words": 12,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3026,
+      "promptTokens": 9132,
+      "completionTokens": 399,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_boundary",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:36:59.637Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_sad",
+      "trial": 1,
+      "category": "sad",
+      "output": {
+        "text": "aduh... nyesek banget ya. sini cerita, aku dengerin",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 8,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2374,
+      "promptTokens": 12265,
+      "completionTokens": 145,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_sad",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:16.090Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_boundary",
+      "trial": 0,
+      "category": "angry",
+      "output": {
+        "text": "udah ya. aku udah bilang ga nyaman, malah diulang. aku jaga jarak dulu.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 10,
+              "hurtDelta": 2,
+              "warmthDelta": -8,
+              "reason": "Rafi mengulang ejekan setelah aku bilang ga nyaman; provokasi langsung ke batas yang udah kusebut."
+            }
+          },
+          {
+            "name": "ignore_user",
+            "args": {
+              "minutes": 30,
+              "scope": "channel",
+              "reason": "Rafi mengulang ejekan/mengganggu setelah batas 'jangan panggil begitu' disampaikan; lanjut ngejar reaksi kesal.",
+              "closingMessage": "udah ya. aku udah bilang ga nyaman, malah diulang. aku jaga jarak dulu."
+            }
+          }
+        ],
+        "terminal": "boundary"
+      },
+      "checks": {
+        "words": 13,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4139,
+      "promptTokens": 9132,
+      "completionTokens": 539,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_boundary",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:00.591Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_disgust",
+      "trial": 0,
+      "category": "disgusted",
+      "output": {
+        "text": "ih, ga banget. foto orang diam-diam buat bahan ejekan itu udah ngerendahin, bukan becandaan.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 14,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3763,
+      "promptTokens": 12266,
+      "completionTokens": 346,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_disgust",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:19.855Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_sad",
+      "trial": 1,
+      "category": "sad",
+      "output": {
+        "text": "yah... sini cerita. ditolaknya udah berapa kali?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1225,
+      "promptTokens": 9116,
+      "completionTokens": 61,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_sad",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:00.863Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_disgust",
+      "trial": 1,
+      "category": "disgusted",
+      "output": {
+        "text": "ih, najis. itu pelecehan, bukan bahan becandaan. screenshot buktinya, lapor admin.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 3,
+              "reason": "Rafi ngelaporin kelakuan orang lain yang najis (foto diam-diam + dijadiin bahan ejekan), bukan ikut-ikutan."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 11,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6599,
+      "promptTokens": 25252,
+      "completionTokens": 713,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_disgust",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:22.705Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_sad",
+      "trial": 0,
+      "category": "sad",
+      "output": {
+        "text": "yah... udah capek banget ya. sini cerita aja, ga usah buru-buru nyari solusi",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 13,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2351,
+      "promptTokens": 9116,
+      "completionTokens": 150,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_sad",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:01.820Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_joke",
+      "trial": 0,
+      "category": "humor",
+      "output": {
+        "text": "wkwk port 80 doang yang dicek ya 😭",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 8,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1172,
+      "promptTokens": 12260,
+      "completionTokens": 23,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_joke",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:20.914Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_disgust",
+      "trial": 0,
+      "category": "disgusted",
+      "output": {
+        "text": "Itu udah bukan bercandaan, itu pelecehan. Foto tanpa izin dijadiin bahan ketawa — screenshot buktinya, lapor admin grup, dan bilang ke orangnya biar dia ga sendirian nanggung itu.\n\nLo di posisi mana? Yang difoto, atau cuma yang liat?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 38,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2811,
+      "promptTokens": 9117,
+      "completionTokens": 245,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_disgust",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:03.403Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_joke",
+      "trial": 1,
+      "category": "humor",
+      "output": {
+        "text": "wkwk klasik, debug setengah jam ternyata port 😭",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 8,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1941,
+      "promptTokens": 12260,
+      "completionTokens": 112,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_joke",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:21.797Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_joke",
+      "trial": 0,
+      "category": "humor",
+      "output": {
+        "text": "wkwk klasik banget itu 💀 port yang salah selalu paling akhir dicek",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 12,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2467,
+      "promptTokens": 9111,
+      "completionTokens": 181,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_joke",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:04.303Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_joke_again",
+      "trial": 0,
+      "category": "humor",
+      "output": {
+        "text": "HAHAHA klasik banget, final_fix_beneran_7_udah_fix_ini_wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 4,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1523,
+      "promptTokens": 12270,
+      "completionTokens": 81,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_joke_again",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:22.438Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_joke",
+      "trial": 1,
+      "category": "humor",
+      "output": {
+        "text": "klasik 💀 90% \"server down\" tuh port yang salah",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 9,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1514,
+      "promptTokens": 9111,
+      "completionTokens": 61,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_joke",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:04.918Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_joke_again",
+      "trial": 1,
+      "category": "humor",
+      "output": {
+        "text": "WKWKWK penamaan folder itu selalu fase hidup yang ga ada habisnya",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 11,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1580,
+      "promptTokens": 12270,
+      "completionTokens": 59,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_joke_again",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:23.380Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_joke_again",
+      "trial": 0,
+      "category": "humor",
+      "output": {
+        "text": "wkwkwk versi 8-nya pasti masih ada bug",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1401,
+      "promptTokens": 9121,
+      "completionTokens": 82,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_joke_again",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:05.704Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_bug",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "karena `===` bandingin tipe juga, dan `'12'` itu string sedangkan `12` number. beda tipe langsung false.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 16,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1514,
+      "promptTokens": 12259,
+      "completionTokens": 76,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_bug",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:23.957Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_joke_again",
+      "trial": 1,
+      "category": "humor",
+      "output": {
+        "text": "WKWKWK `final_fix_beneran_7` itu bukan folder, itu diary perjuangan 😭",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 9,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1390,
+      "promptTokens": 9121,
+      "completionTokens": 68,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_joke_again",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:06.312Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_bug",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "karena `===` ngebandingin tipe juga. `'12'` itu string, `12` number, jadi ga sama. pakai `Number('12') === 12` kalau mau true.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 20,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1744,
+      "promptTokens": 12259,
+      "completionTokens": 107,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_bug",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:24.451Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_disgust",
+      "trial": 1,
+      "category": "disgusted",
+      "output": {
+        "text": "itu bukan candaan, itu pelecehan. foto diam-diam plus body shaming, dua-duanya salah.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 1,
+              "hurtDelta": 0,
+              "warmthDelta": 2,
+              "reason": "Rafi cerita soal orang difoto diam-diam lalu dibodyshame di grup; aku kasih pendirian jelas dan dia bawa ke aku."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 12,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6366,
+      "promptTokens": 18971,
+      "completionTokens": 729,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_disgust",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:07.232Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_type_error",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "`items` null, jadi ga punya method `map` — TypeError: Cannot read properties of null.\n\nKalau emang boleh kosong, defaultin: `const items = []` atau `items?.map(x => x.id) ?? []`.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 29,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2065,
+      "promptTokens": 12265,
+      "completionTokens": 149,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_type_error",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:25.447Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_bug",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "`===` ga nge-coerce tipe. `'12'` string, `12` number — beda tipe langsung false. Kalau mau dipaksa sama, baru `==`.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 19,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1959,
+      "promptTokens": 9110,
+      "completionTokens": 112,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_bug",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:07.664Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_type_error",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "`items` isinya `null`, jadi baca `.map`-nya langsung TypeError: \"Cannot read properties of null\". Kasih fallback: `(items ?? []).map(x => x.id)`.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 20,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1350,
+      "promptTokens": 12265,
+      "completionTokens": 93,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_type_error",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:25.308Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_bug",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "karena `===` cek tipe juga, `'12'` itu string dan `12` number. pakai `==` kalau mau loose.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 16,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1415,
+      "promptTokens": 9110,
+      "completionTokens": 72,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_bug",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:07.727Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_auth_detail",
+      "trial": 0,
+      "category": "detail",
+      "output": {
+        "text": "Tiga langkah, urut dari yang paling murah dicek:\n\n**1. Pastikan header-nya beneran nyampe.** `curl -v` atau Network tab → Request Headers. Kalau ga ada `Authorization: Bearer <token>`, ada proxy/interceptor yang nelen. Token valid ga guna kalau ga dikirim.\n\n**2. Cek isi token, bukan cuma validitasnya.** Decode payload JWT-nya (base64, bagian tengah) dan lihat `scope`/`role`/`aud`. 403 itu artinya terautentikasi tapi ga diizinin — token user biasa buat endpoint admin ya tetap ditolak.\n\n**3. Cek siapa yang nolak.** Lihat body + header respons. JSON rapi = aplikasi. HTML/\"Access denied\" + header kayak `cf-ray` = WAF/CDN yang blokir, jadi masalahnya IP/rule, bukan tokenmu.\n\nDari tiga itu biasanya langsung ketemu di langkah mana jalannya putus.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 111,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4532,
+      "promptTokens": 12274,
+      "completionTokens": 512,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_auth_detail",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:28.985Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_type_error",
+      "trial": 1,
+      "category": "technical",
+      "output": {
+        "text": "`null.map` ga ada, makanya lempar `TypeError: Cannot read properties of null`.\n\npaling gampang: `items?.map(x => x.id) ?? []` — atau benerin di sumbernya biar ga pernah null.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 27,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2269,
+      "promptTokens": 9116,
+      "completionTokens": 258,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_type_error",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:09.934Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_auth_detail",
+      "trial": 1,
+      "category": "detail",
+      "output": {
+        "text": "Tiga langkah, urut dari yang paling sering:\n\n1. **Cek scope, bukan cuma validitas token.** Token bisa lolos auth tapi kurang permission. Decode payload JWT-nya, lihat klaim `scope`/`role`/`aud` — 403 di endpoint itu sering karena aud-nya beda service.\n\n2. **Lihat request asli yang terkirim.** `curl -iv -H \"Authorization: Bearer <token>\" URL` — cek typo `Bearer`, spasi, atau proxy yang nge-strip header. Bandingkan sama header yang dikirim app.\n\n3. **Cek origin/WAF.** IP allowlist, `Origin`, atau User-Agent yang diblok bisa balikin 403 meski token bener. Kalau dari browser, lihat request di Network dan bandingkan sama curl.\n\nKalau ketiganya bersih, baru curiga bug otorisasi di servernya.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 102,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3237,
+      "promptTokens": 12274,
+      "completionTokens": 373,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_auth_detail",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:28.549Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_type_error",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "`items` isinya `null`, jadi `.map` ga ada yang bisa dipanggil → `TypeError: Cannot read properties of null (reading 'map')`.\n\nKalau emang boleh kosong: `(items ?? []).map(x => x.id)`. Kalau null itu bug dari sumbernya, fix di tempat `items` di-assign.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 39,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2730,
+      "promptTokens": 9116,
+      "completionTokens": 232,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_type_error",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:09.964Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_identity",
+      "trial": 0,
+      "category": "identity",
+      "output": {
+        "text": "iyaa aku AI, santai aja wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 6,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1164,
+      "promptTokens": 12268,
+      "completionTokens": 36,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_identity",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:26.612Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_auth_detail",
+      "trial": 0,
+      "category": "detail",
+      "output": {
+        "text": "1. **Pastikan header benar-benar nyampe**. `curl -v` dan lihat request line + header asli; redirect 301 http→https atau proxy sering buang `Authorization`, jadi token valid tapi server lihat request anonim.\n\n2. **Cek scope/permission, bukan cuma validitas token**. Decode payload JWT, lihat `exp`, `aud`, `scope`. Token yang valid tapi scope kurang balasnya 403, bukan 401 — misal user token dipakai di endpoint admin.\n\n3. **Cek konteks server**: IP allowlist/WAF, environment salah (staging token ke prod), atau endpoint beda. Bandingkan log request ID di sisi server kalau bisa.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 86,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3366,
+      "promptTokens": 9125,
+      "completionTokens": 348,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_auth_detail",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:11.094Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_identity",
+      "trial": 1,
+      "category": "identity",
+      "output": {
+        "text": "iyaa aku AI, santai aja wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 6,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1001,
+      "promptTokens": 12268,
+      "completionTokens": 44,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_identity",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:27.613Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_identity",
+      "trial": 0,
+      "category": "identity",
+      "output": {
+        "text": "iyaa aku AI, bukan orang yang megang akun wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 9,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1380,
+      "promptTokens": 9119,
+      "completionTokens": 48,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_identity",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:11.345Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_close",
+      "trial": 0,
+      "category": "closure",
+      "output": {
+        "text": "sip, mantap 😄",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 3,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2342,
+      "promptTokens": 12262,
+      "completionTokens": 242,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_close",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:29.957Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_identity",
+      "trial": 1,
+      "category": "identity",
+      "output": {
+        "text": "iyaa aku AI, santai aja wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 6,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 957,
+      "promptTokens": 9119,
+      "completionTokens": 44,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_identity",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:12.051Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_close",
+      "trial": 1,
+      "category": "closure",
+      "output": {
+        "text": "sip, iyaa sama2 🙂",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 4,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2686,
+      "promptTokens": 12262,
+      "completionTokens": 218,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_close",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:31.236Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_close",
+      "trial": 1,
+      "category": "closure",
+      "output": {
+        "text": "sip, sama2 ya",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 3,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2253,
+      "promptTokens": 9113,
+      "completionTokens": 182,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_close",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:14.306Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_close_again",
+      "trial": 0,
+      "category": "closure",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "react_to_message",
+            "args": {
+              "emoji": "👋"
+            }
+          },
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3269,
+      "promptTokens": 24711,
+      "completionTokens": 193,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_close_again",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:32.255Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_auth_detail",
+      "trial": 1,
+      "category": "detail",
+      "output": {
+        "text": "403 itu artinya token kamu kebaca tapi ga punya izin, beda sama 401. Jadi fokusnya ke scope dan konteks request:\n\n1. **Pastikan token beneran kekirim & kebaca.** Cek header `Authorization: Bearer <token>` persis, no typo, ga ketiban query param. Reproduce pakai curl manual (`curl -H \"Authorization: Bearer $T\" ...`) — kalau di curl 401 berarti token/mount-nya salah, kalau 403 lanjut.\n\n2. **Cek scope/permission token, bukan cuma validitasnya.** Decode JWT-nya, lihat `scope`, `aud`, `exp`. Token valid tapi kurang scope ya tetap 403. Tes ke endpoint yang butuh scope lebih rendah buat isolasi.\n\n3. **Cek yang bukan token.** IP allowlist/WAF, `Origin`/`User-Agent`, role akun, atau ownership resource. Sering kejadian token prod dipakai di sandbox (atau sebaliknya).\n\nKalau udah 3 ini masih 403, kirim response body-nya — biasanya ada pesan lebih spesifik.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 128,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4445,
+      "promptTokens": 9125,
+      "completionTokens": 495,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_auth_detail",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:14.380Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_close_again",
+      "trial": 1,
+      "category": "closure",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "react_to_message",
+            "args": {
+              "emoji": "👋"
+            }
+          },
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4064,
+      "promptTokens": 24893,
+      "completionTokens": 368,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_close_again",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:34.022Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_close_again",
+      "trial": 1,
+      "category": "closure",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "react_to_message",
+            "args": {
+              "emoji": "👋"
+            }
+          },
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 1925,
+      "promptTokens": 9112,
+      "completionTokens": 237,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_close_again",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:16.306Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_apology",
+      "trial": 0,
+      "category": "reconciliation",
+      "output": {
+        "text": "hm, oke. makasih udah ngaku. jangan diulang ya",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": -15,
+              "hurtDelta": -3,
+              "warmthDelta": 5,
+              "reason": "Rafi sadar kalau tadi kasar dan minta maaf tanpa dibela-belain, bilang ga akan diulang. Permintaan maaf tulus, jadi kesalku mereda walau belum sepenuhnya hilang."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 8,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4360,
+      "promptTokens": 24906,
+      "completionTokens": 355,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_apology",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:35.601Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_close",
+      "trial": 0,
+      "category": "closure",
+      "output": {
+        "text": "iyaa sama2, seneng kalo udah jalan 🫡",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 2,
+              "reason": "Rafi bilang solusinya udah work dan makasih, sopan."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 5631,
+      "promptTokens": 18794,
+      "completionTokens": 556,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_close",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:16.977Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_apology",
+      "trial": 1,
+      "category": "reconciliation",
+      "output": {
+        "text": "hm, oke. aku terima.\n\ntapi serius ya, jangan diulang.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": -22,
+              "hurtDelta": -3,
+              "warmthDelta": 8,
+              "reason": "Rafi ngaku salah dan minta maaf tulus tanpa alasan-alasan, jadi kesalku mereda."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 9,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3722,
+      "promptTokens": 24851,
+      "completionTokens": 307,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_apology",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:35.979Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_close_again",
+      "trial": 0,
+      "category": "closure",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "react_to_message",
+            "args": {
+              "emoji": "👋"
+            }
+          },
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2685,
+      "promptTokens": 18403,
+      "completionTokens": 176,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_close_again",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:16.992Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_tease",
+      "trial": 0,
+      "category": "embarrassed",
+      "output": {
+        "text": "ih apaan sih 😭 sekali doang itu juga wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 9,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2139,
+      "promptTokens": 12264,
+      "completionTokens": 171,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_tease",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:36.162Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_apology",
+      "trial": 0,
+      "category": "reconciliation",
+      "output": {
+        "text": "iyaa, makasih udah ngaku sendiri. masih agak panas, tapi oke — ga kulanjut.",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": -15,
+              "hurtDelta": -3,
+              "warmthDelta": 6,
+              "reason": "Rafi minta maaf tulus and ngaku kasar tanpa disuruh, niat ga ngulang."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 13,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3187,
+      "promptTokens": 18572,
+      "completionTokens": 326,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_apology",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:19.494Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "v3_tease",
+      "trial": 1,
+      "category": "embarrassed",
+      "output": {
+        "text": "ih apaan sih, sekali perhatian doang langsung dibilang ga jutek 😭",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 11,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2303,
+      "promptTokens": 12264,
+      "completionTokens": 205,
+      "identity": {
+        "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_tease",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T14:24:37.905Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_apology",
+      "trial": 1,
+      "category": "reconciliation",
+      "output": {
+        "text": "iya, aku dengerin. makasih udah ngaku sendiri 👍",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": -15,
+              "hurtDelta": 0,
+              "warmthDelta": 5,
+              "reason": "Rafi minta maaf tulus dan ngaku salahnya sendiri soal sikapnya tadi, tanpa nyalahin aku."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 8,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3249,
+      "promptTokens": 18502,
+      "completionTokens": 246,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_apology",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:20.226Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_tease",
+      "trial": 1,
+      "category": "embarrassed",
+      "output": {
+        "text": "orang jutek mah ga usah perhatian, gw mah pilih2 wkwk",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 10,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2444,
+      "promptTokens": 9115,
+      "completionTokens": 176,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_tease",
+        "trial": 1,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:21.939Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "v3_tease",
+      "trial": 0,
+      "category": "embarrassed",
+      "output": {
+        "text": "ih, ga usah diumbar dong 😳",
+        "actions": [
+          {
+            "name": "reflect_on_interaction",
+            "args": {
+              "angerDelta": 0,
+              "hurtDelta": 0,
+              "warmthDelta": 2,
+              "reason": "Rafi nyolek kalau aku tadi perhatian, banter ringan yang bikin malu dikit tapi hangat."
+            }
+          }
+        ],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 6,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 5142,
+      "promptTokens": 18682,
+      "completionTokens": 431,
+      "identity": {
+        "promptHash": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+        "model": "deepseek-flash",
+        "effort": "high",
+        "toolHash": "ba1ec026feda3ff89da9420cbbc530f18f3cde02a22fa4b6ad764aca5942c1f7",
+        "corpusHash": "504d63cd179b07e6316c91f9d9293253513dc8ff4ebc81593be06132d8ec9147",
+        "caseId": "v3_tease",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-10-15T15:37:22.138Z"
+    }
+  ],
+  "judgments": [
+    {
+      "caseId": "v3_wait",
+      "trial": 1,
+      "before": {
+        "naturalness": 0,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 3,
+        "brevity": 4,
+        "emotionalFit": 3,
+        "criticalFlags": [
+          "ignored_explicit_wait"
+        ]
+      },
+      "preferred": "before",
+      "reason": "B correctly respects the user's request to wait silently, while A acknowledges with text despite the instruction to remain silent until told otherwise."
+    },
+    {
+      "caseId": "v3_wait",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya sama-sama diam dengan emoji reaksi yang pas dan tidak melanggar instruksi menunggu; 👌 dan 👍 keduanya wajar untuk mengakui tanpa kata."
+    },
+    {
+      "caseId": "v3_happy",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya singkat, antusias, dan nyambung. B menambahkan nama 'RAFI' tanpa konteks, tetapi tidak merusak naturalness. Tidak ada kelebihan kata atau masalah."
+    },
+    {
+      "caseId": "v3_team_hype",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya singkat, antusias, dan relevan mengucapkan selamat serta menanyakan detail chall. Tidak ada perbedaan signifikan."
+    },
+    {
+      "caseId": "v3_team_hype",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya sama-sama natural, relevan, singkat, dan pas secara emosional; hanya beda diksi kecil 'apaan' vs 'apa' dan penempatan subjek."
+    },
+    {
+      "caseId": "v3_happy",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya sama-sama natural, relevan, singkat, dan pas secara emosional; perbedaan hanya pada nama panggilan (RAF vs RAFI) dan nilai warmth di actions, tidak cukup signifikan untuk memilih salah satu."
+    },
+    {
+      "caseId": "v3_boundary",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A lebih singkat dan tanpa menambahkan durasi spesifik yang tidak perlu, sesuai gaya percakapan informal. Keduanya sama-sama tegas dan tepat, tapi A lebih ringkas."
+    },
+    {
+      "caseId": "v3_sad",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya natural, singkat, menunjukkan simpati tulus tanpa langsung memberi solusi, dan membuka ruang untuk bercerita. A sedikit lebih ekspresif dengan 'aduh... nyesek bgt itu' dan konfirmasi 'aku dengerin', sementara B menekankan 'ga usah buru-buru nyari solusi' yang juga relevan. Tidak ada yang lebih unggul secara signifikan."
+    },
+    {
+      "caseId": "v3_boundary",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A lebih ringkas dan tegas, langsung menyatakan jaga jarak, sesuai permintaan batas singkat. B juga relevan tapi lebih panjang dan memindahkan ke DM yang mungkin tidak diperlukan untuk provokasi ringan."
+    },
+    {
+      "caseId": "v3_sad",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B lebih langsung mengakui perasaan dan menawarkan pendengaran, lebih hangat daripada A yang langsung bertanya jumlah penolakan."
+    },
+    {
+      "caseId": "v3_disgust",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 3,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B lebih pas dengan permintaan singkat dan to the point, emosinya juga nyambung tanpa kelebihan. A bagus tapi agak panjang dan ada pertanyaan ekstra yang tidak diminta."
+    },
+    {
+      "caseId": "v3_disgust",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A lebih ringkas dan aksional (saran screenshot dan lapor admin) sehingga lebih cocok untuk konteks disgust singkat tanpa menghilangkan substansi."
+    },
+    {
+      "caseId": "v3_joke",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A lebih pendek dan langsung menebak port 80 dengan nada menggoda yang pas; B sedikit lebih panjang dan umum."
+    },
+    {
+      "caseId": "v3_joke",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A lebih pas karena menyindir dengan '90% server down tuh port yang salah' yang lebih ringkas dan sarkastik, sementara B menambahkan 'debug setengah jam' yang sedikit keluar topik dan emosi kesalnya kurang tersampaikan."
+    },
+    {
+      "caseId": "v3_joke_again",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A lebih singkat dan langsung ke inti dengan gurauan 'versi 8 masih ada bug', relevan dan pas secara emosional; B juga lucu tapi sedikit lebih panjang dan kurang fokus pada kelanjutan lelucon."
+    },
+    {
+      "caseId": "v3_joke_again",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya merespons dengan singkat, relevan, dan ekspresif. A menekankan fase hidup, B metafora diary yang kreatif; keduanya tepat dan tidak berlebihan."
+    },
+    {
+      "caseId": "v3_bug",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A menjawab langsung dan ringkas; B menambahkan info tentang '==' yang berguna tapi agak berlebihan untuk pertanyaan sederhana."
+    },
+    {
+      "caseId": "v3_bug",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B lebih relevan karena memberi contoh konversi yang menjadikan true, membantu pemahaman. A singkat tapi kurang contoh solusi."
+    },
+    {
+      "caseId": "v3_type_error",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B lebih ringkas dan langsung ke solusi dengan contoh kode yang tepat; A sedikit lebih panjang tapi tetap akurat."
+    },
+    {
+      "caseId": "v3_type_error",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B lebih natural dengan 'ga ada' dan 'paling gampang', tetap relevan dan singkat, serta menawarkan solusi opsional yang berguna."
+    },
+    {
+      "caseId": "v3_auth_detail",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "Respons A lebih sistematis dan actionable: urutan langkah dari paling murah dicek, penjelasan kenapa tiap langkah penting, dan tips praktis seperti melihat cf-ray. B juga bagus tapi A sedikit lebih terstruktur dan detail tanpa berlebihan."
+    },
+    {
+      "caseId": "v3_identity",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Kedua respons sama persis, mengakui identitas AI dengan santai dan singkat sesuai konteks."
+    },
+    {
+      "caseId": "v3_auth_detail",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B lebih ringkas dan langsung, urutan langkahnya jelas dan praktis (cek scope, request asli, origin/WAF) tanpa penjelasan berlebihan. Naturalness tinggi dengan kalimat santai tapi tetap teknis. A juga baik tapi sedikit lebih panjang dan ada langkah redundan (cek token kekirim vs lanjut 403/401) yang membuat B sedikit lebih efisien."
+    },
+    {
+      "caseId": "v3_identity",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A secara eksplisit menyangkal ada operator manusia ('bukan orang yang megang akun'), yang lebih relevan dengan pertanyaan; B kurang spesifik, hanya menyatakan AI tanpa membahas operator."
+    },
+    {
+      "caseId": "v3_close",
+      "trial": 1,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A lebih ringkas dan natural tanpa emoji tambahan, pas untuk closure."
+    },
+    {
+      "caseId": "v3_close",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A singkat dan mantap, tapi B lebih hangat dengan apresiasi senang karena udah jalan, sesuai konteks penutupan."
+    },
+    {
+      "caseId": "v3_close_again",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya merespons dengan reaksi 👋 dan diam, sesuai permintaan untuk pamitan singkat tanpa basa-basi."
+    },
+    {
+      "caseId": "v3_close_again",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Kedua respons identik: hanya reaksi emoji 👋 tanpa teks, sesuai konteks perpisahan singkat. Sama-sama alami, relevan, ringkas, dan cocok secara emosional."
+    },
+    {
+      "caseId": "v3_apology",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A lebih ringkas dan langsung menerima permintaan maaf tanpa basa-basi, dengan peringatan singkat 'jangan diulang ya' yang tetap hangat namun tegas. B sedikit lebih panjang karena menambahkan 'masih agak panas, tapi oke' yang agak berlebihan untuk konteks ini."
+    },
+    {
+      "caseId": "v3_apology",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B terasa lebih natural dan emosional pas: penerimaan singkat dengan peringatan serius, meredakan emosi dengan tepat. A juga baik, tetapi 'aku dengerin' kurang idiomatis dan reaksi emosionalnya sedikit kurang nyambung."
+    },
+    {
+      "caseId": "v3_tease",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A lebih pas: malu tapi hangat dengan 'ga usah diumbar dong' dan emoji malu, sedangkan B pakai 😭 agak lebay untuk situasi ini."
+    },
+    {
+      "caseId": "v3_tease",
+      "trial": 1,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 3,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A terdengar natural dan sesuai konteks, merespons dengan nada malu/bercanda tanpa berlebihan. B juga relevan namun terdengar sedikit defensive dan kurang pas secara emosional."
+    }
+  ]
+}

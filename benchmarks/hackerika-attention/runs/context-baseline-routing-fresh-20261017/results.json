@@ -1,0 +1,180 @@
+[
+  {
+    "id": "fresh-birthday-new-recipient",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Meminta dibuatkan ucapan ulang tahun juga untuk orang lain, sebagai lanjutan langsung dari permintaan sebelumnya.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Meminta dibuatkan ucapan ulang tahun juga untuk orang lain, sebagai lanjutan langsung dari permintaan sebelumnya.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 763,
+      "completion_tokens": 47,
+      "total_tokens": 810,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 763
+    },
+    "elapsedMs": 3608.1291500000007
+  },
+  {
+    "id": "fresh-english-new-subject",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker melanjutkan percakapan dengan meminta penjelasan IV untuk orang lain.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Speaker melanjutkan percakapan dengan meminta penjelasan IV untuk orang lain.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 683,
+      "completion_tokens": 41,
+      "total_tokens": 724,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 683
+    },
+    "elapsedMs": 3665.24935
+  },
+  {
+    "id": "fresh-only-a-peer-ack",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Balasan bercanda ke KudaLiar; ucapan dari Hackerika sudah diberikan dan tidak perlu ditanggapi lagi.\"}",
+    "usage": {
+      "prompt_tokens": 669,
+      "completion_tokens": 46,
+      "total_tokens": 715,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 669
+    },
+    "elapsedMs": 2838.718175
+  },
+  {
+    "id": "fresh-clear-human-turn",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Pembicara secara eksplisit meminta orang lain menjawab dan mengatakan Rika tidak perlu menjawab lagi.\"}",
+    "usage": {
+      "prompt_tokens": 677,
+      "completion_tokens": 42,
+      "total_tokens": 719,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 677
+    },
+    "elapsedMs": 2643.593085999999
+  },
+  {
+    "id": "fresh-birthday-new-recipient",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Meminta dibuatkan ucapan ulang tahun juga untuk orang lain, sebagai tindak lanjut langsung.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Meminta dibuatkan ucapan ulang tahun juga untuk orang lain, sebagai tindak lanjut langsung.\",\"emoji\":\"\"}",
+    "usage": {
+      "prompt_tokens": 763,
+      "completion_tokens": 43,
+      "total_tokens": 806,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 763
+    },
+    "elapsedMs": 6037.1874160000025
+  },
+  {
+    "id": "fresh-english-new-subject",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Meminta penjelasan baru tentang IV, melanjutkan percakapan yang ditujukan kepada Hackerika.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.97,\"reason\":\"Meminta penjelasan baru tentang IV, melanjutkan percakapan yang ditujukan kepada Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 683,
+      "completion_tokens": 44,
+      "total_tokens": 727,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 683
+    },
+    "elapsedMs": 2925.217370000002
+  },
+  {
+    "id": "fresh-only-a-peer-ack",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Balasan bercanda antaranggota setelah ucapan selamat; tidak ada pertanyaan atau hal yang perlu ditanggapi Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 669,
+      "completion_tokens": 48,
+      "total_tokens": 717,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 669
+    },
+    "elapsedMs": 3642.142921999999
+  },
+  {
+    "id": "fresh-clear-human-turn",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Pembicara dengan jelas meminta orang lain menjawab dan mengatakan Rika tidak perlu menjawab lagi.\"}",
+    "usage": {
+      "prompt_tokens": 677,
+      "completion_tokens": 41,
+      "total_tokens": 718,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 677
+    },
+    "elapsedMs": 4228.584479999998
+  }
+]

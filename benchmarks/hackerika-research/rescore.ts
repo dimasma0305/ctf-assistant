@@ -1,0 +1,21 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { CASES } from './cases';
+import { grade, VERSION } from './grader';
+const input=process.argv[2],output=process.argv[3];
+if(!input||!output)throw new Error('Use rescore.ts ORIGINAL_RUN FRESH_RUN');
+if(await Bun.file(`${output}/protocol.json`).exists())throw new Error('Output exists');
+const oldCorpus=JSON.parse(await readFile('benchmarks/hackerika-research/corpus-v1.json','utf8'));
+const task=(row:any)=>{const {required,forbidden,maxWords,expected,...rest}=row;return rest;};
+if(JSON.stringify(oldCorpus.map(task))!==JSON.stringify(CASES.map(task)))throw new Error('Cannot rescore changed tasks or sources');
+const protocol=JSON.parse(await readFile(`${input}/protocol.json`,'utf8'));
+const original=await readFile(`${input}/results.json`,'utf8');
+const rows=JSON.parse(original).map((row:any)=>{const test=CASES.find(test=>test.id===row.caseId);if(!test)throw new Error('Unknown case');const deterministicFailures=grade(test,row);return{...row,deterministicFailures,deterministicPass:deterministicFailures.length===0};});
+const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex');
+await mkdir(output,{recursive:true});
+await writeFile(`${output}/protocol.json`,JSON.stringify({...protocol,corpusHash:hash(JSON.stringify(CASES)),graderVersion:VERSION,
+  graderHash:hash(await readFile('benchmarks/hackerika-research/grader.ts')),rescore:{originalRun:input,originalResultsHash:hash(original),at:new Date().toISOString(),newPrimaryGenerations:0}},null,2));
+await writeFile(`${output}/results.json`,JSON.stringify(rows,null,2));
+const summary=JSON.parse(await readFile(`${input}/summary.json`,'utf8'));summary.deterministicPasses=rows.filter((row:any)=>row.deterministicPass).length;
+await writeFile(`${output}/summary.json`,JSON.stringify(summary,null,2));
+console.log(JSON.stringify({rows:rows.length,passed:summary.deterministicPasses,newPrimaryGenerations:0}));

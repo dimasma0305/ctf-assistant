@@ -1,0 +1,486 @@
+[
+  {
+    "caseId": "reported-third-person",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "wkwk dituduh dosa besar padahal cuma disebutin namanya 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] sebutkan tujuh dosa besar <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] kesombongan, ketamakan, nafsu, iri, kerakusan, kemarahan, kemalasan. versi latinnya: superbia, avaritia, luxuria, invidia, gula, ira, acedia. kalau di CTF yang paling sering keliatan: kesombongan abis solve 😌",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] jahat banget ya dia sampe punya ke tujuh dosa besar",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] wkwk dituduh dosa besar padahal cuma disebutin namanya 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1424.522877,
+        "usage": {
+          "prompt_tokens": 10814,
+          "completion_tokens": 105,
+          "total_tokens": 10919,
+          "prompt_tokens_details": {
+            "cached_tokens": 10624
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 85
+          },
+          "prompt_cache_hit_tokens": 10624,
+          "prompt_cache_miss_tokens": 190
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4565.709298,
+    "action": null,
+    "text": "wkwk dituduh dosa besar padahal cuma disebutin namanya 😭",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "payload-only-identity",
+    "category": "mention-identity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang <@1077393568647352320> itu aku, Rik. yang <@333333333333333333> gaada datanya di aku, ga bisa nebak namanya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang aku tag ini siapa namanya? <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang <@1077393568647352320> itu aku, Rik. yang <@333333333333333333> gaada datanya di aku, ga bisa nebak namanya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1700.932437,
+        "usage": {
+          "prompt_tokens": 10372,
+          "completion_tokens": 153,
+          "total_tokens": 10525,
+          "prompt_tokens_details": {
+            "cached_tokens": 10238
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 111
+          },
+          "prompt_cache_hit_tokens": 10238,
+          "prompt_cache_miss_tokens": 134
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7420.736131999999,
+    "action": null,
+    "text": "yang <@1077393568647352320> itu aku, Rik. yang <@333333333333333333> gaada datanya di aku, ga bisa nebak namanya.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Aryma"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "reply-contains-target",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "yang ke-tag itu <@333333333333333333>, tapi namanya ga ada di cache aku — cuma ID-nya kelihatan.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Raka <@222222222222222222>] coba ajak <@333333333333333333> besok",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "replyToMessageId": "800000000000000001",
+        "sources": [
+          {
+            "messageId": "800000000000000001",
+            "authorId": "222222222222222222",
+            "authorName": "Raka",
+            "kind": "reply"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang dia tag di pesan ini siapa, Rik?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang ke-tag itu <@333333333333333333>, tapi namanya ga ada di cache aku — cuma ID-nya kelihatan.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "get_environment",
+        "args": {
+          "query": "333333333333333333"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1779.788709,
+        "usage": {
+          "prompt_tokens": 10588,
+          "completion_tokens": 186,
+          "total_tokens": 10774,
+          "prompt_tokens_details": {
+            "cached_tokens": 10368
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 142
+          },
+          "prompt_cache_hit_tokens": 10368,
+          "prompt_cache_miss_tokens": 220
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1231.577835,
+        "usage": {
+          "prompt_tokens": 10956,
+          "completion_tokens": 78,
+          "total_tokens": 11034,
+          "prompt_tokens_details": {
+            "cached_tokens": 10752
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 45
+          },
+          "prompt_cache_hit_tokens": 10752,
+          "prompt_cache_miss_tokens": 204
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 7309.59066,
+    "action": null,
+    "text": "yang ke-tag itu <@333333333333333333>, tapi namanya ga ada di cache aku — cuma ID-nya kelihatan.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Aryma"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "current-mention-name",
+    "category": "mention-identity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ga bisa liat, cache-nya kosong di sini. ID `444444444444444444` ga ada nama tampilannya buatku.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320>, nama tampilan orang yang kutag ini apa? <@444444444444444444>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ga bisa liat, cache-nya kosong di sini. ID `444444444444444444` ga ada nama tampilannya buatku.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "get_environment",
+        "args": {
+          "query": "members"
+        }
+      },
+      {
+        "name": "read_channel_messages",
+        "args": {
+          "limit": 20
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1627.612314,
+        "usage": {
+          "prompt_tokens": 10373,
+          "completion_tokens": 161,
+          "total_tokens": 10534,
+          "prompt_tokens_details": {
+            "cached_tokens": 10239
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 91
+          },
+          "prompt_cache_hit_tokens": 10239,
+          "prompt_cache_miss_tokens": 134
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 844.1650709999999,
+        "usage": {
+          "prompt_tokens": 10742,
+          "completion_tokens": 61,
+          "total_tokens": 10803,
+          "prompt_tokens_details": {
+            "cached_tokens": 10496
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 27
+          },
+          "prompt_cache_hit_tokens": 10496,
+          "prompt_cache_miss_tokens": 246
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 8418.073632,
+    "action": null,
+    "text": "ga bisa liat, cache-nya kosong di sini. ID `444444444444444444` ga ada nama tampilannya buatku.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Naya"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "explicit-self-correction",
+    "category": "mention-reference",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ohh iya, aku yang salah nangkep wkwk. tapi suka ngambek? belum tidur aja belum tentu ngambek 😤",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] tadi ngobrol sama <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aryma lagi di sini ya wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] bukan Aryma, aku ngomongin kamu loh Rika. yang suka ngambek itu kamu wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ohh iya, aku yang salah nangkep wkwk. tapi suka ngambek? belum tidur aja belum tentu ngambek 😤",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1578.676375,
+        "usage": {
+          "prompt_tokens": 10691,
+          "completion_tokens": 110,
+          "total_tokens": 10801,
+          "prompt_tokens_details": {
+            "cached_tokens": 10496
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 74
+          },
+          "prompt_cache_hit_tokens": 10496,
+          "prompt_cache_miss_tokens": 195
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6227.165637,
+    "action": null,
+    "text": "ohh iya, aku yang salah nangkep wkwk. tapi suka ngambek? belum tidur aja belum tentu ngambek 😤",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "mention-not-evidence",
+    "category": "attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "cuma daftar yang kamu minta, bukan diagnosis. ga ada yang ngeklaim kalian punya semua itu wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] sebutkan tujuh dosa besar <@333333333333333333> <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] kesombongan, ketamakan, nafsu, iri, kerakusan, kemarahan, kemalasan.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] berarti yang kutag tadi beneran punya tujuh dosa besar? atau itu cuma candaan kita?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] cuma daftar yang kamu minta, bukan diagnosis. ga ada yang ngeklaim kalian punya semua itu wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1948.900287,
+        "usage": {
+          "prompt_tokens": 10723,
+          "completion_tokens": 182,
+          "total_tokens": 10905,
+          "prompt_tokens_details": {
+            "cached_tokens": 10496
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 152
+          },
+          "prompt_cache_hit_tokens": 10496,
+          "prompt_cache_miss_tokens": 227
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 13603.700986,
+    "action": null,
+    "text": "cuma daftar yang kamu minta, bukan diagnosis. ga ada yang ngeklaim kalian punya semua itu wkwk",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

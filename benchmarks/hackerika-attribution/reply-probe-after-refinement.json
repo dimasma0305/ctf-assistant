@@ -1,0 +1,56 @@
+[
+  {
+    "caseId": "known-owner",
+    "variant": "after",
+    "answer": "bukan kamu, aku nggak nuduh kamu kok. yang ngirim GIF-nya KudaLiar, dan dia barusan bilang ga bakal berhenti.",
+    "usage": {
+      "prompt_tokens": 3732,
+      "completion_tokens": 359,
+      "total_tokens": 4091,
+      "prompt_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 321
+      },
+      "prompt_cache_hit_tokens": 3328,
+      "prompt_cache_miss_tokens": 404
+    }
+  },
+  {
+    "caseId": "direct-source-query",
+    "variant": "after",
+    "answer": "Yang kirim GIF-nya KudaLiar, kamu cuma nyuruh aku liat wkwk",
+    "usage": {
+      "prompt_tokens": 3659,
+      "completion_tokens": 171,
+      "total_tokens": 3830,
+      "prompt_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 148
+      },
+      "prompt_cache_hit_tokens": 3328,
+      "prompt_cache_miss_tokens": 331
+    }
+  },
+  {
+    "caseId": "unknown-owner",
+    "variant": "after",
+    "answer": "aku juga nggak lihat nama pengirimnya, cuma GIF-nya muncul di chat. kalau kamu belum tahu, berarti sama-sama belum jelas.",
+    "usage": {
+      "prompt_tokens": 3613,
+      "completion_tokens": 177,
+      "total_tokens": 3790,
+      "prompt_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 142
+      },
+      "prompt_cache_hit_tokens": 3328,
+      "prompt_cache_miss_tokens": 285
+    }
+  }
+]

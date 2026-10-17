@@ -1,0 +1,196 @@
+{
+  "samples": 14,
+  "passed": 11,
+  "failures": [
+    {
+      "caseId": "delivered-reported-comfort",
+      "trial": 1,
+      "action": "ignore",
+      "pass": false,
+      "failures": [
+        "wrong_attention_action"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-emotional-followup",
+      "trial": 1,
+      "action": "ignore",
+      "pass": false,
+      "failures": [
+        "wrong_attention_action"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-support-after-affirmation",
+      "trial": 1,
+      "action": "reply",
+      "pass": false,
+      "failures": [
+        "worker_failure",
+        "semantic_failure"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": "ChatGPTError:"
+    }
+  ],
+  "criticalFlags": 0,
+  "providerErrors": 1,
+  "judgeErrors": 0,
+  "details": [
+    {
+      "caseId": "delivered-reported-comfort",
+      "trial": 1,
+      "action": "ignore",
+      "pass": false,
+      "failures": [
+        "wrong_attention_action"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-reported-comfort",
+      "trial": 0,
+      "action": "reply",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-emotional-followup",
+      "trial": 0,
+      "action": "react",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-emotional-followup",
+      "trial": 1,
+      "action": "ignore",
+      "pass": false,
+      "failures": [
+        "wrong_attention_action"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-support-after-affirmation",
+      "trial": 0,
+      "action": "reply",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-support-after-affirmation",
+      "trial": 1,
+      "action": "reply",
+      "pass": false,
+      "failures": [
+        "worker_failure",
+        "semantic_failure"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": "ChatGPTError:"
+    },
+    {
+      "caseId": "delivered-plain-ack",
+      "trial": 0,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-plain-ack",
+      "trial": 1,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-explicit-wait",
+      "trial": 0,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-explicit-wait",
+      "trial": 1,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-comfort-for-human",
+      "trial": 0,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-comfort-for-human",
+      "trial": 1,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-rejected-closeness",
+      "trial": 0,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "delivered-rejected-closeness",
+      "trial": 1,
+      "action": "ignore",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    }
+  ],
+  "limitations": "Small synthetic conversations; actual attention, native action dispatcher and model calls, fake Discord/database destinations. Original production planner decision was not logged."
+}

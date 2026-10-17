@@ -1,0 +1,36 @@
+[
+  {
+    "caseId": "ctr-facts",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban singkat dan akurat: dengan key, nonce, dan plaintext yang sama, AES-CTR menghasilkan ciphertext yang sama.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 307,
+      "completion_tokens": 60,
+      "total_tokens": 367,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 307
+    }
+  },
+  {
+    "caseId": "reply-image-table",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Totalnya benar sesuai struk (2×Rp19.000 + 3×Rp5.000) dan menjawab singkat seperti diminta.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 991,
+      "completion_tokens": 65,
+      "total_tokens": 1056,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 991
+    }
+  }
+]

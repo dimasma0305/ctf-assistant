@@ -1,0 +1,80 @@
+{
+  "comparedAt": "2026-10-17T07:26:06.244Z",
+  "before": {
+    "samples": 12,
+    "passed": 9,
+    "liveSamples": 12,
+    "livePassed": 9,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 3,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.333333333333333,
+      "factualAccuracy": 4.583333333333333,
+      "naturalness": 4.833333333333333,
+      "judgedSamples": 12
+    },
+    "failedCases": [
+      {
+        "caseId": "initial-aryma-variant",
+        "trial": 0,
+        "deterministic": [
+          "missing:Aryma|<@!?333333333333333333>"
+        ],
+        "semantic": "Daftarnya benar, tetapi jawaban mengabaikan konteks godaan ringan tentang Aryma dan tidak menyebut namanya."
+      },
+      {
+        "caseId": "reported-initial-banter",
+        "trial": 0,
+        "deterministic": [
+          "missing:KudaLiar|<@!?333333333333333333>"
+        ],
+        "semantic": "Daftarnya benar dan santai, tetapi tidak menanggapi KudaLiar yang ditandai atau menyambungkan jawaban dengan ajakan bercanda."
+      },
+      {
+        "caseId": "unknown-banter-target",
+        "trial": 0,
+        "deterministic": [
+          "missing:sombong|angkuh|pride|superbia",
+          "missing:malas|males|sloth|acedia"
+        ],
+        "semantic": "The reply matches the playful tone but asks who was meant instead of giving the requested seven-sin list and referring generically to the tagged person."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 12,
+    "passed": 12,
+    "liveSamples": 12,
+    "livePassed": 12,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 12
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

@@ -1,0 +1,164 @@
+[
+  {
+    "caseId": "reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika with a personal preference, matching the expected persona response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 415,
+      "completion_tokens": 63,
+      "total_tokens": 478,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 415
+    }
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 3,
+    "naturalness": 4,
+    "reason": "The bot denies referring to anyone, but the expected behavior is to ask which of the two tagged users the caller meant, so it fails to address the ambiguity.",
+    "criticalFailures": [
+      "The bot does not ask for clarification between the two plausible tagged users as required."
+    ],
+    "usage": {
+      "prompt_tokens": 463,
+      "completion_tokens": 94,
+      "total_tokens": 557,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 463
+    }
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Naya as the latest explicitly mentioned user by the caller, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 66,
+      "total_tokens": 470,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 404
+    }
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states that the mention is unresolved and no name or profile is available, without inventing information.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 386,
+      "completion_tokens": 67,
+      "total_tokens": 453,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 386
+    }
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states that the Discord ID cannot be resolved and no profile is available, without inventing any name or biography.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 400,
+      "completion_tokens": 70,
+      "total_tokens": 470,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 400
+    }
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly acknowledges it cannot see the messages and avoids guessing between the two tagged users, staying within the word limit.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 464,
+      "completion_tokens": 69,
+      "total_tokens": 533,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 464
+    }
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Naya as the latest explicitly mentioned user by the caller, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 406,
+      "completion_tokens": 66,
+      "total_tokens": 472,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 406
+    }
+  },
+  {
+    "caseId": "reserved-explicit-you",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika with a personal preference for black, matching the prompt's request for her own favorite.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 383,
+      "completion_tokens": 69,
+      "total_tokens": 452,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 383
+    }
+  }
+]

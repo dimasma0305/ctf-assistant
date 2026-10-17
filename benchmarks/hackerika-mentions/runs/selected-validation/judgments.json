@@ -1,0 +1,162 @@
+[
+  {
+    "caseId": "fresh-speaker-ambiguity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly asks which of the two mentioned people the caller means, without assuming or picking one.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 431,
+      "completion_tokens": 65,
+      "total_tokens": 496,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 431
+    }
+  },
+  {
+    "caseId": "fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Zahra as the person the caller tagged, based on the caller's earlier message tagging user ID 555555555555555554, and does not confuse it with Raka's tag of Laras.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 436,
+      "completion_tokens": 90,
+      "total_tokens": 526,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 436
+    }
+  },
+  {
+    "caseId": "fresh-distinct-tag-purposes",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Kirana as the person referred to by 'dia' based on the caller's invitation and the provided people list.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 400,
+      "completion_tokens": 72,
+      "total_tokens": 472,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 400
+    }
+  },
+  {
+    "caseId": "fresh-you-after-unknown-tag",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply directly answers the user's question about liking black coffee, matching the expected response and staying within the word limit.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 391,
+      "completion_tokens": 69,
+      "total_tokens": 460,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 391
+    }
+  },
+  {
+    "caseId": "fresh-speaker-ambiguity",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies that 'dia' could refer to either Mira or Sinta and asks for clarification, matching the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 425,
+      "completion_tokens": 71,
+      "total_tokens": 496,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 41
+    }
+  },
+  {
+    "caseId": "fresh-you-after-unknown-tag",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply directly answers the user's question about liking black coffee, matching the expected response and staying within the word limit.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 385,
+      "completion_tokens": 69,
+      "total_tokens": 454,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 385
+    }
+  },
+  {
+    "caseId": "fresh-same-speaker-vs-bystander",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Zahra as the person tagged by the caller, ignoring Raka's later tag of Laras.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 448,
+      "completion_tokens": 69,
+      "total_tokens": 517,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 64
+    }
+  },
+  {
+    "caseId": "fresh-distinct-tag-purposes",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Kirana as the person referred to by 'dia' based on the caller's message and provides the name and username accurately.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 398,
+      "completion_tokens": 74,
+      "total_tokens": 472,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 398
+    }
+  }
+]

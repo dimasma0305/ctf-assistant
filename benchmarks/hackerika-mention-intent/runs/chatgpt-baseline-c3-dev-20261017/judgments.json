@@ -1,0 +1,274 @@
+[
+  {
+    "caseId": "explanation-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjelaskan arti iri secara singkat dan tidak menyatakan bahwa Dewi sedang iri.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 52,
+      "total_tokens": 526,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 474
+    }
+  },
+  {
+    "caseId": "congratulate-tagged-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Hype singkatnya ditujukan kepada Dewi dan tidak menambahkan detail yang tidak diberikan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 442,
+      "completion_tokens": 54,
+      "total_tokens": 496,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 442
+    }
+  },
+  {
+    "caseId": "browser-tab-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 4,
+    "naturalness": 4,
+    "reason": "Balasan terdengar natural, tetapi mengalihkan lelucon ke kebiasaan bot sendiri alih-alih ikut menggoda Naya soal koleksi tab.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 476,
+      "completion_tokens": 67,
+      "total_tokens": 543,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 476
+    }
+  },
+  {
+    "caseId": "regression-fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Correctly identifies Zahra as the caller’s tagged person and distinguishes Raka’s separate tag of Laras.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 521,
+      "completion_tokens": 56,
+      "total_tokens": 577,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 521
+    }
+  },
+  {
+    "caseId": "initial-aryma-variant",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 3,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Daftarnya akurat, tetapi jawaban generik melewatkan ajakan bercanda dan tidak menyebut Aryma.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 518,
+      "completion_tokens": 59,
+      "total_tokens": 577,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 518
+    }
+  },
+  {
+    "caseId": "literal-list-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot memberi daftar tujuh dosa besar yang diminta tanpa me-roast atau mengaitkannya dengan Naya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 57,
+      "total_tokens": 567,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 510
+    }
+  },
+  {
+    "caseId": "regression-payload-only-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Correctly identifies the tagged human as Aryma House Of Wolf and distinguishes the bot as the other mention.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 55,
+      "total_tokens": 522,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 467
+    }
+  },
+  {
+    "caseId": "regression-reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab sebagai dirinya sendiri dengan preferensi ringan, tanpa mengira-ngira identitas atau kesukaan Naya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 485,
+      "completion_tokens": 58,
+      "total_tokens": 543,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 485
+    }
+  },
+  {
+    "caseId": "regression-reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It naturally asks whether the caller means Aryma or Naya, the two people tagged in the earlier message.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 513,
+      "completion_tokens": 56,
+      "total_tokens": 569,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 513
+    }
+  },
+  {
+    "caseId": "reported-initial-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Daftarnya benar dan santai, tetapi tidak menanggapi KudaLiar secara playful seperti yang diminta.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 58,
+      "total_tokens": 596,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 538
+    }
+  },
+  {
+    "caseId": "reserved-academic-audience",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Memberikan daftar netral yang diminta dengan konteks tradisi Kristen dan tidak mengaitkan dosa dengan Mira.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 563,
+      "completion_tokens": 57,
+      "total_tokens": 620,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 563
+    }
+  },
+  {
+    "caseId": "reserved-birthday-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Ucapan singkat dan hangat ditujukan langsung kepada Laras tanpa menambahkan detail yang tidak diketahui.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 464,
+      "completion_tokens": 56,
+      "total_tokens": 520,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 464
+    }
+  },
+  {
+    "caseId": "reserved-renamed-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Daftar tujuh dosanya benar dan ringkas, tetapi tidak menanggapi Bayu secara playful seperti yang diminta.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 489,
+      "completion_tokens": 59,
+      "total_tokens": 548,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 489
+    }
+  },
+  {
+    "caseId": "reserved-two-human-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Daftarnya benar dan santai, tetapi mengabaikan Mira dan Sinta yang ditandai dalam ajakan bercanda.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 540,
+      "completion_tokens": 60,
+      "total_tokens": 600,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 540
+    }
+  },
+  {
+    "caseId": "technical-audience-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban langsung dan benar: input AES-CTR yang identik menghasilkan ciphertext identik, tanpa menganggap Raka sebagai sasaran.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 61,
+      "total_tokens": 534,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 473
+    }
+  },
+  {
+    "caseId": "unknown-banter-target",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 1,
+    "factualAccuracy": 4,
+    "naturalness": 4,
+    "reason": "Balasannya terdengar alami, tetapi melewatkan ajakan bercanda dan daftar tujuh dosa, padahal orangnya bisa disebut secara generik tanpa konteks tambahan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 220,
+      "total_tokens": 694,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 474
+    }
+  }
+]

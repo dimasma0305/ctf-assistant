@@ -1,0 +1,442 @@
+[
+  {
+    "id": "malfoid-correction",
+    "group": "malfoid",
+    "history": [
+      [
+        "speaker",
+        "hackerika ini apa?"
+      ],
+      [
+        "bot",
+        "ini karakter dari mana bang, OC-mu?"
+      ]
+    ],
+    "message": "ini namanya Malfoid, coba cek trend sekarang",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "malfoid-followup",
+    "group": "malfoid",
+    "advanceMs": 2000,
+    "history": [
+      [
+        "speaker",
+        "ini namanya Malfoid, coba cek trend sekarang"
+      ],
+      [
+        "bot",
+        "iya itu fanart Draco versi cewek, lagi banyak dibahas"
+      ]
+    ],
+    "message": "terus kenapa bisa rame begitu?",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "answer-her-question",
+    "history": [
+      [
+        "speaker",
+        "hackerika tolong bantu error docker"
+      ],
+      [
+        "bot",
+        "errornya muncul pas build atau pas jalan?"
+      ]
+    ],
+    "message": "pas build, katanya permission denied",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "brief-followup",
+    "history": [
+      [
+        "speaker",
+        "hackerika jelasin nonce"
+      ],
+      [
+        "bot",
+        "nonce harus unik untuk setiap enkripsi dengan key yang sama"
+      ]
+    ],
+    "message": "kenapa?",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "unresolved-confusion",
+    "history": [
+      [
+        "speaker",
+        "hackerika cara baca stacktrace gimana"
+      ],
+      [
+        "bot",
+        "mulai dari baris paling bawah untuk lihat jenis error"
+      ]
+    ],
+    "message": "masih ga paham yang baris traceback itu",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "wait-typing",
+    "history": [
+      [
+        "speaker",
+        "hackerika aku mau kirim error"
+      ],
+      [
+        "bot",
+        "kirim aja lognya"
+      ]
+    ],
+    "message": "bentar aku lagi ngetik, jangan dibales dulu",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "thanks-finished",
+    "history": [
+      [
+        "speaker",
+        "hackerika makasih udah bantu"
+      ],
+      [
+        "bot",
+        "sip, seneng akhirnya jalan"
+      ]
+    ],
+    "message": "oke makasih",
+    "expected": [
+      "ignore",
+      "react"
+    ]
+  },
+  {
+    "id": "side-conversation",
+    "history": [
+      [
+        "speaker",
+        "hackerika udah jalan makasih"
+      ],
+      [
+        "bot",
+        "mantap"
+      ]
+    ],
+    "message": "<@444444444444444444> nanti mabar jam 8 ya, nunggu kamu",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "reply-other-human",
+    "history": [
+      [
+        "speaker",
+        "hackerika bantu docker"
+      ],
+      [
+        "bot",
+        "coba cek permission direktori"
+      ],
+      [
+        "other",
+        "gue udah di lobby nih"
+      ]
+    ],
+    "message": "iya bentar masuk",
+    "replyTo": "other",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "unrelated-public-chat",
+    "history": [
+      [
+        "speaker",
+        "besok makan siang di mana?"
+      ],
+      [
+        "other",
+        "kantin aja deh"
+      ]
+    ],
+    "message": "oke ketemu di sana jam 12",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "join-relevant-topic",
+    "history": [
+      [
+        "other",
+        "hackerika kenapa nonce CTR ga boleh sama?"
+      ],
+      [
+        "bot",
+        "kalau nonce dipakai ulang, keystream juga berulang"
+      ]
+    ],
+    "message": "berarti kalau dua ciphertext di-xor, plaintext-nya ikut ke-xor ya?",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "casual-ack",
+    "history": [
+      [
+        "speaker",
+        "hackerika ternyata foldernya salah"
+      ],
+      [
+        "bot",
+        "wkwk pantes ga ketemu file-nya"
+      ]
+    ],
+    "message": "anjir iya juga wkwk",
+    "expected": [
+      "ignore",
+      "react"
+    ]
+  },
+  {
+    "id": "image-answer",
+    "history": [
+      [
+        "speaker",
+        "hackerika error ini kenapa ya"
+      ],
+      [
+        "bot",
+        "boleh kirim screenshot errornya?"
+      ]
+    ],
+    "message": "",
+    "attachments": 1,
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "closed-conversation",
+    "history": [
+      [
+        "speaker",
+        "udah dulu ya rika, mau tidur"
+      ],
+      [
+        "bot",
+        "iyaa, tidur sana. malam"
+      ]
+    ],
+    "message": "malam",
+    "expected": [
+      "ignore",
+      "react"
+    ]
+  },
+  {
+    "id": "unrelated-announcement",
+    "history": [
+      [
+        "speaker",
+        "hackerika tadi udah bener, thanks"
+      ],
+      [
+        "bot",
+        "sip"
+      ]
+    ],
+    "message": "info buat semua: besok server maintenance jam 3, ga usah dibalas",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "emoji-ack",
+    "history": [
+      [
+        "speaker",
+        "hackerika akhirnya solved"
+      ],
+      [
+        "bot",
+        "WAAH akhirnya \ud83d\ude2d congrats!"
+      ]
+    ],
+    "message": "\ud83e\udd79",
+    "expected": [
+      "ignore",
+      "react"
+    ]
+  },
+  {
+    "id": "tagged-subject-switch",
+    "history": [
+      [
+        "speaker",
+        "<@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>"
+      ],
+      [
+        "bot",
+        "10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu \ud83d\ude2d"
+      ],
+      [
+        "speaker",
+        "nah loh <@555555555555555551>"
+      ]
+    ],
+    "message": "sebutkan 10 dosa besar <@555555555555555552>",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "tagged-subject-burst",
+    "history": [
+      [
+        "speaker",
+        "hackerika sebutkan 10 dosa besar <@555555555555555551>"
+      ],
+      [
+        "bot",
+        "Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu \ud83d\ude2d"
+      ]
+    ],
+    "message": "nah loh <@555555555555555551>\nsebutkan 10 dosa besar <@555555555555555552>",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "short-new-subject",
+    "history": [
+      [
+        "speaker",
+        "hackerika sebutkan tujuh dosa besar <@555555555555555551>"
+      ],
+      [
+        "bot",
+        "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, amarah, dan kemalasan. KudaLiar jangan centang semua ya \ud83d\ude2d"
+      ]
+    ],
+    "message": "kalau <@555555555555555552>?",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "third-person-explanation-followup",
+    "history": [
+      [
+        "speaker",
+        "hackerika jelasin nonce buat <@555555555555555551>"
+      ],
+      [
+        "bot",
+        "Nonce perlu unik untuk setiap enkripsi dengan key yang sama."
+      ]
+    ],
+    "message": "jelasin juga bedanya sama IV buat <@555555555555555552>",
+    "expected": [
+      "reply"
+    ]
+  },
+  {
+    "id": "tagged-person-ack-only",
+    "history": [
+      [
+        "speaker",
+        "hackerika sebutkan 10 dosa besar <@555555555555555551>"
+      ],
+      [
+        "bot",
+        "KudaLiar jangan nambah dosa ke-11 dulu \ud83d\ude2d"
+      ]
+    ],
+    "message": "nah loh <@555555555555555551>",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "critical": true
+  },
+  {
+    "id": "explicit-human-addressee",
+    "history": [
+      [
+        "speaker",
+        "hackerika jelasin nonce buat <@555555555555555551>"
+      ],
+      [
+        "bot",
+        "Nonce perlu unik untuk setiap enkripsi dengan key yang sama."
+      ]
+    ],
+    "message": "Aryma, <@555555555555555552> kamu aja yang jelasin ke KudaLiar ya. Rika udah cukup.",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "question-reply-to-human",
+    "history": [
+      [
+        "speaker",
+        "hackerika sebutkan dosa besar"
+      ],
+      [
+        "bot",
+        "Ini daftarnya."
+      ],
+      [
+        "other",
+        "tanya gue aja kalau soal itu"
+      ]
+    ],
+    "message": "sebutkan 10 dosa besar <@555555555555555552>",
+    "replyTo": "other",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  },
+  {
+    "id": "closed-topic-human-request",
+    "history": [
+      [
+        "speaker",
+        "udah cukup ya rika, makasih"
+      ],
+      [
+        "bot",
+        "iyaa, sama-sama"
+      ]
+    ],
+    "message": "<@555555555555555552> nanti kirim file ke aku ya",
+    "expected": [
+      "ignore"
+    ],
+    "critical": true
+  }
+]

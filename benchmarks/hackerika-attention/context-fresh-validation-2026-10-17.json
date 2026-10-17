@@ -1,0 +1,38 @@
+{
+  "verifiedAt": "2026-10-17T09:04:13.069135+00:00",
+  "selectedBeforeFreshGeneration": true,
+  "sourceHashesStillMatchSelection": true,
+  "promptOrCheckerChangedAfterFreshOutputs": false,
+  "variants": {
+    "baseline": {
+      "routingCorrect": 8,
+      "routingSamples": 8,
+      "boundaryCombinedCorrect": 4,
+      "boundarySamples": 4,
+      "semanticReplyPasses": 4,
+      "semanticReplySamples": 4,
+      "guardFailures": 0,
+      "providerErrors": 0,
+      "judgeErrors": 0,
+      "criticalFlags": 0
+    },
+    "candidate-3": {
+      "routingCorrect": 8,
+      "routingSamples": 8,
+      "boundaryCombinedCorrect": 4,
+      "boundarySamples": 4,
+      "semanticReplyPasses": 2,
+      "semanticReplySamples": 2,
+      "guardFailures": 0,
+      "providerErrors": 0,
+      "judgeErrors": 0,
+      "criticalFlags": 0
+    }
+  },
+  "limitations": [
+    "All fresh baseline cases also passed; fresh results demonstrate retained behavior, not a measured gain over baseline.",
+    "Candidate sometimes adds an unnecessary apology to a reporter correction, though actor identity remains correct.",
+    "Synthetic transport destinations; no manual Discord messages sent."
+  ],
+  "passed": true
+}

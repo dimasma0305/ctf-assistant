@@ -1,0 +1,68 @@
+[
+  {
+    "caseId": "explanation-recipient",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "congratulate-tagged-person",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "browser-tab-banter",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "initial-aryma-variant",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "literal-list-control",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "regression-payload-only-identity",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "regression-reserved-explicit-you",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "regression-reserved-two-targets",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "reported-initial-banter",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "technical-audience-control",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  },
+  {
+    "caseId": "unknown-banter-target",
+    "trial": 0,
+    "pass": false,
+    "judgeError": "Error"
+  }
+]

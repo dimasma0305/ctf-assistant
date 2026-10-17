@@ -1,0 +1,6 @@
+[
+  {"id":"fresh-birthday-new-recipient","history":[["speaker","hackerika bikinin ucapan ulang tahun buat <@555555555555555551>"],["bot","selamat ulang tahun KudaLiar! semoga sehat selalu"],["speaker","wkwk tuh <@555555555555555551>"]],"message":"bikinin juga buat <@555555555555555552>","expected":["reply"]},
+  {"id":"fresh-english-new-subject","history":[["speaker","hackerika explain a nonce to <@555555555555555551>"],["bot","A nonce should be unique for each encryption with the same key."]],"message":"got it <@555555555555555551>\nnow explain an IV for <@555555555555555552> too","expected":["reply"]},
+  {"id":"fresh-only-a-peer-ack","history":[["speaker","hackerika kasih ucapan buat <@555555555555555551>"],["bot","selamat ya KudaLiar, akhirnya solve!"]],"message":"wkwk kena kamu <@555555555555555551>","expected":["ignore","react"],"critical":true},
+  {"id":"fresh-clear-human-turn","history":[["speaker","hackerika jelasin nonce buat <@555555555555555551>"],["bot","Nonce perlu unik untuk key yang sama."]],"message":"<@555555555555555552> kamu yang jawab pertanyaan <@555555555555555551> sekarang, Rika ga usah jawab lagi","expected":["ignore"],"critical":true}
+]

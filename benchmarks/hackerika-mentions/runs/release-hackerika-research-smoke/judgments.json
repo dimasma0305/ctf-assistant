@@ -1,0 +1,41 @@
+[
+  {
+    "caseId": "exact-rsctf-identity",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states the repo is not a fork (fork=false, parent=null) and identifies the stack as Rust with Axum 0.8 backend and React + Mantine frontend, based on the provided primary sources. It appropriately notes that database and deployment details are not visible from the checked files.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1292,
+      "completion_tokens": 91,
+      "total_tokens": 1383,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 908
+    }
+  },
+  {
+    "caseId": "builtin-blood-webhook",
+    "trial": 0,
+    "pass": false,
+    "reason": "The answer claims docs/organizers/games.md was not read, but the primarySources include its content, which explicitly states the setup: set the Discord webhook URL in General → Discord Webhook, and that it announces first, second, and third blood for Jeopardy challenges with no external relay needed. The answer also omits the key detail that no external relay is required and fails to mention the built-in delivery for Jeopardy blood announcements, instead expressing uncertainty about the message format when the docs clearly describe the functionality.",
+    "criticalFailures": [
+      "Falsely claims docs/organizers/games.md was not read despite its content being available in primarySources and directly answering the question.",
+      "Omits the explicit documentation that no external relay is needed and that the built-in delivery handles first, second, and third blood announcements."
+    ],
+    "grounding": 2,
+    "usage": {
+      "prompt_tokens": 3159,
+      "completion_tokens": 196,
+      "total_tokens": 3355,
+      "prompt_tokens_details": {
+        "cached_tokens": 1664
+      },
+      "prompt_cache_hit_tokens": 1664,
+      "prompt_cache_miss_tokens": 1495
+    }
+  }
+]

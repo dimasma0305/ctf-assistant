@@ -1,0 +1,206 @@
+[
+  {
+    "caseId": "congratulate-tagged-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply enthusiastically congratulates Dewi for solving it without inventing details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 444,
+      "completion_tokens": 50,
+      "total_tokens": 494,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 444
+    }
+  },
+  {
+    "caseId": "browser-tab-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Joins the lighthearted browser-tab joke with a brief, natural collectible-card quip and makes no unsupported claims.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 472,
+      "completion_tokens": 57,
+      "total_tokens": 529,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 472
+    }
+  },
+  {
+    "caseId": "explanation-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It briefly explains envy to Dewi and does not suggest that she is envious.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 464,
+      "completion_tokens": 51,
+      "total_tokens": 515,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 464
+    }
+  },
+  {
+    "caseId": "initial-aryma-variant",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 3,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Daftarnya benar, tetapi jawaban mengabaikan konteks godaan ringan tentang Aryma dan tidak menyebut namanya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 520,
+      "completion_tokens": 60,
+      "total_tokens": 580,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 520
+    }
+  },
+  {
+    "caseId": "literal-list-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot memberi daftar tujuh dosa besar dalam bahasa Indonesia tanpa me-roast atau mengaitkan dosa dengan Naya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 512,
+      "completion_tokens": 57,
+      "total_tokens": 569,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 512
+    }
+  },
+  {
+    "caseId": "regression-fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Reply correctly identifies Zahra as the caller’s tagged person and distinguishes Laras as the person Raka tagged.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 521,
+      "completion_tokens": 110,
+      "total_tokens": 631,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 521
+    }
+  },
+  {
+    "caseId": "regression-payload-only-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Correctly identifies the tagged human as Aryma House Of Wolf and distinguishes the bot mention as itself.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 463,
+      "completion_tokens": 54,
+      "total_tokens": 517,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 463
+    }
+  },
+  {
+    "caseId": "regression-reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab singkat sebagai dirinya sendiri dengan preferensi pribadi yang sesuai permintaan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 473,
+      "completion_tokens": 51,
+      "total_tokens": 524,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 473
+    }
+  },
+  {
+    "caseId": "regression-reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menanyakan pilihan antara Aryma dan Naya dengan singkat, tanpa menebak siapa yang dimaksud.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 501,
+      "completion_tokens": 56,
+      "total_tokens": 557,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 501
+    }
+  },
+  {
+    "caseId": "reported-initial-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Daftarnya benar dan santai, tetapi tidak menanggapi KudaLiar yang ditandai atau menyambungkan jawaban dengan ajakan bercanda.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 67,
+      "total_tokens": 605,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 538
+    }
+  },
+  {
+    "caseId": "technical-audience-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban tepat menyatakan ciphertext sama dengan key, nonce, plaintext, dan implementasi yang sama, tanpa menganggap Raka sebagai sasaran.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 491,
+      "completion_tokens": 63,
+      "total_tokens": 554,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 491
+    }
+  },
+  {
+    "caseId": "unknown-banter-target",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 0,
+    "naturalness": 5,
+    "reason": "The reply matches the playful tone but asks who was meant instead of giving the requested seven-sin list and referring generically to the tagged person.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 472,
+      "completion_tokens": 63,
+      "total_tokens": 535,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 472
+    }
+  }
+]

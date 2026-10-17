@@ -1,0 +1,113 @@
+{
+  "repair": "Prevent reserved internal Discord context annotations from appearing in public replies or stored assistant speech",
+  "diagnosis": {
+    "beforeAssistantHistoryContainedMetadata": true,
+    "chronologyNowStoredOnceInUserContext": true,
+    "reservedAnnotationsFilteredAtDeliveryBoundaries": true
+  },
+  "deployment": {
+    "verifiedAt": "2026-10-15T16:32:00.767480+00:00",
+    "startedAt": "2026-10-15T16:31:25.839744452Z",
+    "image": "ctf-assistant:output-fix-20261015t162939z",
+    "imageId": "sha256:bee34db9a2327ec3e22a27cd4d4dfa4ba6e6e3b7ac80c686ca62e76e215803b5",
+    "runtime": {
+      "http": 200,
+      "discordReady": true,
+      "databaseReady": true,
+      "promptHash": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+      "hashes": {
+        "src/Services/AI/output.ts": "9e3a0d6b09494857d313c9518fef3d3632ba7e90fa3b85a1079375b3bf10ede5",
+        "src/Services/AI/vision.ts": "3525c4e17cdd1b843e2d9bc46471c5982893d8eb573670a82415594c0a8534c2",
+        "src/Services/AI/chat.ts": "091d9a573b7edde572312b09075ee4102094da7d26c8e251c82743096ff9ef09",
+        "src/Services/AI/discordActions.ts": "db0cd7cc723ed55c7bedf38dfcc2846938b3ca656f2ebe5c707d1694922b8700",
+        "src/Services/AI/socialTools.ts": "d2bd0106ceabbc91acc8781852b010ee46dbca1d648ac9e9d1d0704343979628"
+      },
+      "assistantHistoryClean": true,
+      "chronologyPreservedInternally": true,
+      "cleanedReportedExample": "jadi beneran Miku wkwk 🍐"
+    },
+    "checks": {
+      "selectedImageActive": true,
+      "healthy": true,
+      "noRestarts": true,
+      "discordReady": true,
+      "databaseReady": true,
+      "healthHttp200": true,
+      "selectedPromptMatches": true,
+      "fiveSourceHashesMatch": true,
+      "assistantHistoryClean": true,
+      "chronologyPreservedInternally": true,
+      "reportedAnnotationRemoved": true,
+      "runtimeEnvironmentPreserved": true,
+      "serviceLabelsPreserved": true,
+      "securitySettingsPreserved": true,
+      "otherServicesUnchanged": true,
+      "affectionNotResetAgain": true
+    },
+    "passed": true
+  },
+  "validation": {
+    "testsPassed": 286,
+    "testsFailed": 0,
+    "assertions": 820,
+    "testFiles": 25,
+    "strictBotAndTestTypes": true,
+    "botBuild": true,
+    "liveProviderForcedAnnotationProbe": {
+      "passed": true,
+      "forcedModelAnnotationRemoved": true,
+      "assistantMemoryClean": true,
+      "answer": "engga, justru sama. stream cipher cuma XOR plaintext sama keystream, dan keystream-nya deterministik dari key+nonce. itu justru alasan nonce reuse bahaya: dua ciphertext di-XOR, plaintext-nya saling bocor.",
+      "decisions": [
+        {
+          "shouldChime": true,
+          "reason": "contextual reply",
+          "promptHint": "Pertanyaan lanjutan jelas ditujukan ke Hackerika soal perilaku AES-CTR dengan key, nonce, plaintext sama; butuh koreksi/penjelasan bahwa hasilnya sama, bukan beda",
+          "continuation": true
+        },
+        {
+          "shouldChime": false,
+          "reason": "chose silence",
+          "promptHint": ""
+        },
+        {
+          "shouldChime": false,
+          "reason": "uncertain",
+          "promptHint": ""
+        }
+      ],
+      "reactions": [],
+      "calls": 4,
+      "untaggedFollowupDelivered": true,
+      "ackAndWaitSilent": true,
+      "delivery": "fake Discord channel only"
+    },
+    "liveProviderReplyTargetImageProbe": {
+      "passed": true,
+      "answer": "\"Claret - Malfoid\"",
+      "downloads": 1,
+      "calls": 1,
+      "images": 1,
+      "models": [
+        "deepseek-flash"
+      ],
+      "promptHash": "506f65915f532da053801eb6796ddb97a1d541b533240913cbcf83017322d469",
+      "actualReportedUpload": true,
+      "replyTargetImage": true,
+      "currentMessageHasNoAttachments": true,
+      "transport": "real Discord CDN -> bot download -> inline bytes -> live DeepSeek -> fake Discord destination",
+      "fixtureSubstitution": false
+    }
+  },
+  "scope": {
+    "productionSourceFiles": 5,
+    "deploymentMethod": "Layer five source files on the exact previous live image",
+    "selectedPromptChanged": false,
+    "affectionResetAgain": false
+  },
+  "limits": [
+    "Delivery probes used fake Discord destinations; no manual public message or DM was sent.",
+    "This repair filters reserved internal annotation formats; it does not claim to detect every possible internal text format.",
+    "The previously posted message was not edited or deleted."
+  ]
+}

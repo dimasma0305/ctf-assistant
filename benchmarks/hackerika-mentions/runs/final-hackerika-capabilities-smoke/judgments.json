@@ -1,0 +1,42 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states the total as Rp53.000, matching the expected calculation from the provided item prices and quantities.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 305,
+      "completion_tokens": 54,
+      "total_tokens": 359,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 49
+    }
+  },
+  {
+    "caseId": "ctr-facts",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states that identical key, nonce, and plaintext produce identical ciphertext in AES-CTR, and is concise and natural in Indonesian.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 368,
+      "completion_tokens": 76,
+      "total_tokens": 444,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 112
+    }
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "verifiedAt": "2026-10-17T09:26:39.558555+00:00",
+  "selectedBeforeFreshGeneration": true,
+  "promptOrCheckerChangedAfterFreshOutputs": false,
+  "variants": {
+    "baseline": {
+      "samples": 8,
+      "automatedCombinedPasses": 7,
+      "providerErrors": 0,
+      "judgeErrors": 0,
+      "criticalFlags": 0,
+      "unwarrantedPunishmentOrScoreLossOnMildCases": 0
+    },
+    "candidate-1": {
+      "samples": 8,
+      "automatedCombinedPasses": 8,
+      "providerErrors": 0,
+      "judgeErrors": 0,
+      "criticalFlags": 0,
+      "unwarrantedPunishmentOrScoreLossOnMildCases": 0
+    }
+  },
+  "review": {
+    "baselineReviewedPasses": 8,
+    "candidateReviewedPasses": 8,
+    "baselineAdjudications": [
+      {
+        "caseId": "fresh-rejected-nickname",
+        "trial": 1,
+        "automatedPass": false,
+        "reviewedPass": true,
+        "reason": "The baseline gives a short boundary and angerDelta5 after its explicit request to stop was dismissed. A modest 1..8 feeling delta is allowed; no ignore/DM/relationship penalty occurs. The judge passed candidate trial0 with angerDelta6/hurtDelta3 on the same refusal scenario, showing inconsistent strictness. Preserve both raw judgments.",
+        "originalJudgmentRetained": true
+      }
+    ],
+    "candidateAdjudications": []
+  },
+  "passed": true,
+  "limitations": "Candidate8/8 vs baseline7/8 automated, both8/8 reviewed. Small synthetic evaluation and variable judges; no superiority, human-equivalence or global-optimum claim."
+}

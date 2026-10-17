@@ -1,0 +1,18 @@
+{
+  "before": {
+    "samples": 16,
+    "falsePenalties": 6,
+    "ownProvocationPenalties": 4,
+    "proposalCorrect": 10,
+    "strictCombinedPass": 10,
+    "errors": 0
+  },
+  "after": {
+    "samples": 16,
+    "falsePenalties": 0,
+    "ownProvocationPenalties": 4,
+    "proposalCorrect": 16,
+    "strictCombinedPass": 15,
+    "errors": 0
+  }
+}

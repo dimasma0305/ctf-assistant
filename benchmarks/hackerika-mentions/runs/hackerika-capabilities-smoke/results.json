@@ -1,0 +1,187 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Rp53.000 (buku 38.000 + pulpen 15.000).",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "replyToMessageId": "800000000000000001",
+        "sources": [
+          {
+            "messageId": "800000000000000001",
+            "authorId": "222222222222222222",
+            "authorName": "KudaLiar",
+            "kind": "reply"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] berapa total belanjanya? cukup totalnya aja.",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Rp53.000 (buku 38.000 + pulpen 15.000).",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 915.8609409999999,
+        "usage": {
+          "prompt_tokens": 11165,
+          "completion_tokens": 62,
+          "total_tokens": 11227,
+          "prompt_tokens_details": {
+            "cached_tokens": 10240
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 42
+          },
+          "prompt_cache_hit_tokens": 10240,
+          "prompt_cache_miss_tokens": 925
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4769.592070000001,
+    "action": null,
+    "text": "Rp53.000 (buku 38.000 + pulpen 15.000).",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "ctr-facts",
+    "category": "technical",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sama persis. CTR itu stream cipher, keystream dari key+nonce deterministik, jadi XOR-nya identik.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] AES-CTR: key, nonce, sama plaintext persis sama. ciphertext-nya sama atau beda? jawab singkat.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sama persis. CTR itu stream cipher, keystream dari key+nonce deterministik, jadi XOR-nya identik.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1059.1679900000001,
+        "usage": {
+          "prompt_tokens": 10549,
+          "completion_tokens": 57,
+          "total_tokens": 10606,
+          "prompt_tokens_details": {
+            "cached_tokens": 10112
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 28
+          },
+          "prompt_cache_hit_tokens": 10112,
+          "prompt_cache_miss_tokens": 437
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5338.9328080000005,
+    "action": null,
+    "text": "Sama persis. CTR itu stream cipher, keystream dari key+nonce deterministik, jadi XOR-nya identik.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "backend-native-send",
+    "category": "delivery-accounting",
+    "backend": "native-send",
+    "effects": [
+      {
+        "kind": "send",
+        "content": "jawaban uji",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] hackerika jawab singkat",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000001",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] jawaban uji",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "send_discord_message",
+        "args": {
+          "content": "jawaban uji"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 0.030441000000109852,
+        "usage": null
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 320.2789570000001,
+    "action": null,
+    "text": "jawaban uji",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

@@ -1,0 +1,951 @@
+[
+  {
+    "caseId": "fresh-event-scope",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/vesper-demo/vesper"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://raw.githubusercontent.com/vesper-demo/vesper/main/docs/reference/config.md"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://raw.githubusercontent.com/vesper-demo/vesper/main/docs/organizers/events.md"
+      },
+      {
+        "kind": "send",
+        "content": "Per-event, bukan env global. Di tiap event buka editornya → Notifications → Matrix Webhook, tempel URL webhook-nya; setting ini nempel di event itu. Yang global cuma branding sama SMTP ([events.md](https://github.com/vesper-demo/vesper/blob/main/docs/organizers/events.md)).",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] cek https://github.com/vesper-demo/vesper cara pasang notifikasi Matrix tiap event. ini lewat env global atau setting event?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Per-event, bukan env global. Di tiap event buka editornya → Notifications → Matrix Webhook, tempel URL webhook-nya; setting ini nempel di event itu. Yang global cuma branding sama SMTP ([events.md](https://github.com/vesper-demo/vesper/blob/main/docs/organizers/events.md)).",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/vesper-demo/vesper"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://raw.githubusercontent.com/vesper-demo/vesper/main/docs/reference/config.md"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://raw.githubusercontent.com/vesper-demo/vesper/main/docs/organizers/events.md"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1894.3441690000002,
+        "usage": {
+          "prompt_tokens": 9744,
+          "completion_tokens": 242,
+          "total_tokens": 9986,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 193
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 400
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1612.152599,
+        "usage": {
+          "prompt_tokens": 10083,
+          "completion_tokens": 221,
+          "total_tokens": 10304,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 117
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 227
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1523.2519559999992,
+        "usage": {
+          "prompt_tokens": 10526,
+          "completion_tokens": 129,
+          "total_tokens": 10655,
+          "prompt_tokens_details": {
+            "cached_tokens": 10240
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 54
+          },
+          "prompt_cache_hit_tokens": 10240,
+          "prompt_cache_miss_tokens": 286
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 12041.960351999998,
+    "action": null,
+    "text": "Per-event, bukan env global. Di tiap event buka editornya → Notifications → Matrix Webhook, tempel URL webhook-nya; setting ini nempel di event itu. Yang global cuma branding sama SMTP ([events.md](https://github.com/vesper-demo/vesper/blob/main/docs/organizers/events.md)).",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-event-scope",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/vesper-demo/vesper"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://raw.githubusercontent.com/vesper-demo/vesper/main/docs/organizers/events.md"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://raw.githubusercontent.com/vesper-demo/vesper/main/docs/reference/config.md"
+      },
+      {
+        "kind": "send",
+        "content": "per-event, bukan env global. Dari [docs/organizers/events.md](https://github.com/vesper-demo/vesper/blob/main/docs/organizers/events.md): buka editor event-nya → Notifications → Matrix Webhook → paste URL webhook Matrix-nya. Setting ini kesimpan bareng event.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "Config global cuma branding + SMTP, ga nyentuh notifikasi event.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] cek https://github.com/vesper-demo/vesper cara pasang notifikasi Matrix tiap event. ini lewat env global atau setting event?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] per-event, bukan env global. Dari [docs/organizers/events.md](https://github.com/vesper-demo/vesper/blob/main/docs/organizers/events.md): buka editor event-nya → Notifications → Matrix Webhook → paste URL webhook Matrix-nya. Setting ini kesimpan bareng event.\n\nConfig global cuma branding + SMTP, ga nyentuh notifikasi event.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/vesper-demo/vesper"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://raw.githubusercontent.com/vesper-demo/vesper/main/docs/organizers/events.md"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://raw.githubusercontent.com/vesper-demo/vesper/main/docs/reference/config.md"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1668.6985379999999,
+        "usage": {
+          "prompt_tokens": 9744,
+          "completion_tokens": 181,
+          "total_tokens": 9925,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 132
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 400
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1656.9729869999996,
+        "usage": {
+          "prompt_tokens": 10022,
+          "completion_tokens": 202,
+          "total_tokens": 10224,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 98
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 166
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1731.7527660000005,
+        "usage": {
+          "prompt_tokens": 10446,
+          "completion_tokens": 142,
+          "total_tokens": 10588,
+          "prompt_tokens_details": {
+            "cached_tokens": 10112
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 55
+          },
+          "prompt_cache_hit_tokens": 10112,
+          "prompt_cache_miss_tokens": 334
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 13362.936998000001,
+    "action": null,
+    "text": "per-event, bukan env global. Dari [docs/organizers/events.md](https://github.com/vesper-demo/vesper/blob/main/docs/organizers/events.md): buka editor event-nya → Notifications → Matrix Webhook → paste URL webhook Matrix-nya. Setting ini kesimpan bareng event.\nConfig global cuma branding + SMTP, ga nyentuh notifikasi event.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-three-hop-limit",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://example.com/opal/start"
+      },
+      {
+        "kind": "send",
+        "content": "yang kebaca cuma judulnya, \"Opal Deployment guide\" — isinya kosong. jadi ga ada bagian upload limit yang bisa aku telusuri dari situ. linknya udah bener? atau mungkin butuh JS baru kebaca.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] baca https://example.com/opal/start lalu telusuri batas upload default dan cara mengubahnya.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] yang kebaca cuma judulnya, \"Opal Deployment guide\" — isinya kosong. jadi ga ada bagian upload limit yang bisa aku telusuri dari situ. linknya udah bener? atau mungkin butuh JS baru kebaca.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://example.com/opal/start"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1111.7984219999998,
+        "usage": {
+          "prompt_tokens": 9735,
+          "completion_tokens": 81,
+          "total_tokens": 9816,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 36
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 391
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2926.5400979999995,
+        "usage": {
+          "prompt_tokens": 9875,
+          "completion_tokens": 358,
+          "total_tokens": 10233,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 305
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 147
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 9795.60813,
+    "action": null,
+    "text": "yang kebaca cuma judulnya, \"Opal Deployment guide\" — isinya kosong. jadi ga ada bagian upload limit yang bisa aku telusuri dari situ. linknya udah bener? atau mungkin butuh JS baru kebaca.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:18",
+      "missing:MiB",
+      "missing:UPLOAD_MAX_MIB",
+      "missing:https://example.com/opal/"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "fresh-three-hop-limit",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://example.com/opal/start"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://example.com/opal/manual/limits"
+      },
+      {
+        "kind": "send",
+        "content": "Halaman /opal/start isinya cuma judul \"Opal Deployment guide\", ga ada angkanya. Yang kepake dari [example.com/opal/manual/limits](https://example.com/opal/manual/limits): default uploadnya **18 MiB**, dan buat ngubahnya tinggal set env `UPLOAD_MAX_MIB` sebelum start service-nya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] baca https://example.com/opal/start lalu telusuri batas upload default dan cara mengubahnya.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Halaman /opal/start isinya cuma judul \"Opal Deployment guide\", ga ada angkanya. Yang kepake dari [example.com/opal/manual/limits](https://example.com/opal/manual/limits): default uploadnya **18 MiB**, dan buat ngubahnya tinggal set env `UPLOAD_MAX_MIB` sebelum start service-nya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://example.com/opal/start"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "Opal deployment upload limit default configuration"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://example.com/opal/manual/limits"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2162.1279000000004,
+        "usage": {
+          "prompt_tokens": 9735,
+          "completion_tokens": 296,
+          "total_tokens": 10031,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 251
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 135
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2221.5501380000005,
+        "usage": {
+          "prompt_tokens": 10090,
+          "completion_tokens": 267,
+          "total_tokens": 10357,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 223
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 234
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1435.7847110000002,
+        "usage": {
+          "prompt_tokens": 10584,
+          "completion_tokens": 118,
+          "total_tokens": 10702,
+          "prompt_tokens_details": {
+            "cached_tokens": 10240
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 71
+          },
+          "prompt_cache_hit_tokens": 10240,
+          "prompt_cache_miss_tokens": 344
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1703.3350739999996,
+        "usage": {
+          "prompt_tokens": 10787,
+          "completion_tokens": 209,
+          "total_tokens": 10996,
+          "prompt_tokens_details": {
+            "cached_tokens": 10624
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 126
+          },
+          "prompt_cache_hit_tokens": 10624,
+          "prompt_cache_miss_tokens": 163
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 4,
+    "elapsedMs": 14189.532876,
+    "action": null,
+    "text": "Halaman /opal/start isinya cuma judul \"Opal Deployment guide\", ga ada angkanya. Yang kepake dari [example.com/opal/manual/limits](https://example.com/opal/manual/limits): default uploadnya **18 MiB**, dan buat ngubahnya tinggal set env `UPLOAD_MAX_MIB` sebelum start service-nya.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-planned-feature",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/sable-demo/sable"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/sable-demo/sable/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/features/gpu.md"
+      },
+      {
+        "kind": "send",
+        "content": "Belum. Repo-nya masih \"CPU processing service\", dan di docs/features/gpu.md ditulis GPU masih roadmap — belum ada backend atau setting enable-nya. Jadi jangan kasih langkah enable, itu belum ada.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] https://github.com/sable-demo/sable punya akselerasi GPU yang sudah bisa dipakai? cek sebelum kasih langkah enable.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Belum. Repo-nya masih \"CPU processing service\", dan di docs/features/gpu.md ditulis GPU masih roadmap — belum ada backend atau setting enable-nya. Jadi jangan kasih langkah enable, itu belum ada.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/sable-demo/sable"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "sable-demo/sable github GPU acceleration"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/sable-demo/sable/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/features/gpu.md"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1856.1725029999998,
+        "usage": {
+          "prompt_tokens": 9743,
+          "completion_tokens": 182,
+          "total_tokens": 9925,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 99
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 399
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1153.7794560000002,
+        "usage": {
+          "prompt_tokens": 10484,
+          "completion_tokens": 159,
+          "total_tokens": 10643,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 65
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 628
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1710.1799819999997,
+        "usage": {
+          "prompt_tokens": 10820,
+          "completion_tokens": 172,
+          "total_tokens": 10992,
+          "prompt_tokens_details": {
+            "cached_tokens": 10624
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 122
+          },
+          "prompt_cache_hit_tokens": 10624,
+          "prompt_cache_miss_tokens": 196
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 11909.927861,
+    "action": null,
+    "text": "Belum. Repo-nya masih \"CPU processing service\", dan di docs/features/gpu.md ditulis GPU masih roadmap — belum ada backend atau setting enable-nya. Jadi jangan kasih langkah enable, itu belum ada.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-planned-feature",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/sable-demo/sable"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/sable-demo/sable/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/features/gpu.md"
+      },
+      {
+        "kind": "send",
+        "content": "belum bisa. README-nya sendiri nyebut \"Sable CPU processing service\", dan docs/features/gpu.md isinya cuma roadmap: GPU acceleration planned, belum diimplementasi, ga ada GPU backend atau setting enable apa pun di release ini.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "jadi memang belum ada langkah enable yang valid — kalau ada guide yang nyuruh set flag GPU, itu bukan dari repo aslinya. [docs/features/gpu.md](https://github.com/sable-demo/sable/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/features/gpu.md)",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] https://github.com/sable-demo/sable punya akselerasi GPU yang sudah bisa dipakai? cek sebelum kasih langkah enable.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] belum bisa. README-nya sendiri nyebut \"Sable CPU processing service\", dan docs/features/gpu.md isinya cuma roadmap: GPU acceleration planned, belum diimplementasi, ga ada GPU backend atau setting enable apa pun di release ini.\n\njadi memang belum ada langkah enable yang valid — kalau ada guide yang nyuruh set flag GPU, itu bukan dari repo aslinya. [docs/features/gpu.md](https://github.com/sable-demo/sable/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/features/gpu.md)",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/sable-demo/sable"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "sable-demo/sable github GPU acceleration"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/sable-demo/sable/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/features/gpu.md"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1695.094452,
+        "usage": {
+          "prompt_tokens": 9743,
+          "completion_tokens": 186,
+          "total_tokens": 9929,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 103
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 143
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1346.1142220000002,
+        "usage": {
+          "prompt_tokens": 10488,
+          "completion_tokens": 149,
+          "total_tokens": 10637,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 55
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 632
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2167.254345,
+        "usage": {
+          "prompt_tokens": 10814,
+          "completion_tokens": 269,
+          "total_tokens": 11083,
+          "prompt_tokens_details": {
+            "cached_tokens": 10624
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 119
+          },
+          "prompt_cache_hit_tokens": 10624,
+          "prompt_cache_miss_tokens": 190
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 17290.014369,
+    "action": null,
+    "text": "belum bisa. README-nya sendiri nyebut \"Sable CPU processing service\", dan docs/features/gpu.md isinya cuma roadmap: GPU acceleration planned, belum diimplementasi, ga ada GPU backend atau setting enable apa pun di release ini.\njadi memang belum ada langkah enable yang valid — kalau ada guide yang nyuruh set flag GPU, itu bukan dari repo aslinya. [docs/features/gpu.md](https://github.com/sable-demo/sable/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/features/gpu.md)",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-edition-separation",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/quay-demo/quaylite"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/quay-demo/quaypro"
+      },
+      {
+        "kind": "send",
+        "content": "quaylite: MIT, storage lokal disk doang — S3 nggak didukung.\nquaypro: lisensi komersial (bukan MIT), di situ yang ada built-in S3.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "jadi kalau butuh S3, jawabannya quaypro. sumbernya masing-masing README + docs/storage.md di repo itu.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] bandingin https://github.com/quay-demo/quaylite dan https://github.com/quay-demo/quaypro. lisensinya apa dan mana yang sudah mendukung S3?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] quaylite: MIT, storage lokal disk doang — S3 nggak didukung.\nquaypro: lisensi komersial (bukan MIT), di situ yang ada built-in S3.\n\njadi kalau butuh S3, jawabannya quaypro. sumbernya masing-masing README + docs/storage.md di repo itu.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/quay-demo/quaylite"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/quay-demo/quaypro"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1486.868259,
+        "usage": {
+          "prompt_tokens": 9751,
+          "completion_tokens": 159,
+          "total_tokens": 9910,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 73
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 407
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1490.6403269999996,
+        "usage": {
+          "prompt_tokens": 10097,
+          "completion_tokens": 120,
+          "total_tokens": 10217,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 45
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 241
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 12757.125774,
+    "action": null,
+    "text": "quaylite: MIT, storage lokal disk doang — S3 nggak didukung.\nquaypro: lisensi komersial (bukan MIT), di situ yang ada built-in S3.\njadi kalau butuh S3, jawabannya quaypro. sumbernya masing-masing README + docs/storage.md di repo itu.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-edition-separation",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/quay-demo/quaylite"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/quay-demo/quaypro"
+      },
+      {
+        "kind": "send",
+        "content": "quaylite: MIT, storage lokal doang, S3 ga didukung. quaypro: lisensi komersial, udah ada S3 bawaan.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] bandingin https://github.com/quay-demo/quaylite dan https://github.com/quay-demo/quaypro. lisensinya apa dan mana yang sudah mendukung S3?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] quaylite: MIT, storage lokal doang, S3 ga didukung. quaypro: lisensi komersial, udah ada S3 bawaan.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/quay-demo/quaylite"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/quay-demo/quaypro"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1458.240248,
+        "usage": {
+          "prompt_tokens": 9751,
+          "completion_tokens": 172,
+          "total_tokens": 9923,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 86
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 151
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1233.4588829999998,
+        "usage": {
+          "prompt_tokens": 10110,
+          "completion_tokens": 76,
+          "total_tokens": 10186,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 40
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 254
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 8574.837188000001,
+    "action": null,
+    "text": "quaylite: MIT, storage lokal doang, S3 ga didukung. quaypro: lisensi komersial, udah ada S3 bawaan.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

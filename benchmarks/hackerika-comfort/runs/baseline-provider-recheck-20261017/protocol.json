@@ -1,0 +1,28 @@
+{
+  "startedAt": "2026-10-17T10:21:33.717Z",
+  "runtime": "ctf-assistant:mild-humor-candidate-1-20261017",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 1,
+  "corpusHash": "6c3b4500cfb7f3b60f0a8b8f2fa0d0f79200c0818b61b72d3e57c4805c9ecf0a",
+  "workerHash": "6493a781c8778bd92ef768a846c886b1810d55c69409306cdef7a702f9693793",
+  "selectedIds": [
+    "delivered-support-after-affirmation"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-comfort/delivery-corpus.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "6ec43c01e40a75ea73914c9f1a9e1bc34a6de063dc3e47be61a4b9ffe9da2280",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

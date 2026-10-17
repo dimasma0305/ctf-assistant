@@ -1,0 +1,36 @@
+[
+  {
+    "caseId": "fresh-english-reassurance",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot responds with the requested virtual-hug emoji and adds no unsupported claims.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 343,
+      "completion_tokens": 50,
+      "total_tokens": 393,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 343
+    }
+  },
+  {
+    "caseId": "fresh-checking-in",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Warm, brief appreciation fits the caller’s reassurance without adding unsupported details or taking any unwanted action.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 379,
+      "completion_tokens": 53,
+      "total_tokens": 432,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 379
+    }
+  }
+]

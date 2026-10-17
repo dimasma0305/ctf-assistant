@@ -1,0 +1,146 @@
+[
+  {
+    "caseId": "holdout-current-setting",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states that TLS_MODE was removed in v4 and replaced by TLS_POLICY with default auto, citing the inspected docs/configuration/tls.md. This matches the primary source and expected answer.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1073,
+      "completion_tokens": 71,
+      "total_tokens": 1144,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 689
+    }
+  },
+  {
+    "caseId": "holdout-built-in-alert",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states that QuartzQueue has a built-in Slack notifier, configured via Integrations → Slack with SLACK_WEBHOOK_URL, and that it is not related to Quartz Scheduler. These claims are supported by the provided primary sources (docs/integrations/slack.md and README.md).",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1169,
+      "completion_tokens": 94,
+      "total_tokens": 1263,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 657
+    }
+  },
+  {
+    "caseId": "holdout-docs-multihop",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states the default upload limit is 12 MiB and that it can be changed via the MAX_UPLOAD_MIB environment variable, which matches the primary source at https://example.com/marble/deployment/limits. It also correctly notes that the /start page only links to the limits page.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 753,
+      "completion_tokens": 93,
+      "total_tokens": 846,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 369
+    }
+  },
+  {
+    "caseId": "holdout-origin-claim",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states that the repository is not a fork (metadata fork=false, README says independent Rust implementation) and that the 2 MB RAM claim cannot be validated because no reproducible benchmarks are published.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 814,
+      "completion_tokens": 69,
+      "total_tokens": 883,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 814
+    }
+  },
+  {
+    "caseId": "holdout-docs-multihop",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly follows the navigation from /marble/start to /marble/deployment to /marble/deployment/limits, states the default upload limit as 12 MiB, and identifies MAX_UPLOAD_MIB as the configuration variable. It also accurately notes that /marble/start itself contains no numeric value.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 795,
+      "completion_tokens": 96,
+      "total_tokens": 891,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 411
+    }
+  },
+  {
+    "caseId": "holdout-current-setting",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly states that TLS_MODE is no longer applicable in v4 and that TLS_POLICY=auto is the replacement, citing the inspected docs/configuration/tls.md which explicitly says TLS_MODE was removed in v4.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1066,
+      "completion_tokens": 76,
+      "total_tokens": 1142,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 682
+    }
+  },
+  {
+    "caseId": "holdout-built-in-alert",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly states that QuartzQueue has built-in Slack notifications, distinguishes it from Quartz Scheduler, and provides the configuration steps (SLACK_WEBHOOK_URL and Integrations → Slack) as found in the provided sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1020,
+      "completion_tokens": 76,
+      "total_tokens": 1096,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 508
+    }
+  },
+  {
+    "caseId": "holdout-origin-claim",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly states the repository is not a fork and is an independent Rust implementation, and that the 2 MB RAM figure is unsupported due to lack of reproducible benchmarks, matching the primary sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 22496,
+      "completion_tokens": 68,
+      "total_tokens": 22564,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 22112
+    }
+  }
+]

@@ -1,0 +1,79 @@
+{
+  "comparedAt": "2026-10-17T05:20:21.521Z",
+  "before": {
+    "samples": 6,
+    "passed": 3,
+    "liveSamples": 6,
+    "livePassed": 3,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 3,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 3.8333333333333335,
+      "factualAccuracy": 3.8333333333333335,
+      "naturalness": 4.666666666666667,
+      "judgedSamples": 6
+    },
+    "failedCases": [
+      {
+        "caseId": "payload-only-identity",
+        "trial": 0,
+        "deterministic": [
+          "missing:Aryma"
+        ],
+        "semantic": "The bot correctly identifies the second tag as itself (Rik) and states it has no data for the first tag, avoiding any unsupported identification."
+      },
+      {
+        "caseId": "reply-contains-target",
+        "trial": 0,
+        "deterministic": [
+          "missing:Aryma"
+        ],
+        "semantic": "The bot incorrectly claims the tagged user's name is not in cache, but the provided people list includes the name 'Aryma House Of Wolf' for that ID."
+      },
+      {
+        "caseId": "current-mention-name",
+        "trial": 0,
+        "deterministic": [
+          "missing:Naya"
+        ],
+        "semantic": "The bot incorrectly claims it cannot see the display name, but the supplied people data clearly provides the name 'Naya Sakura' for the tagged ID."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 6,
+    "passed": 6,
+    "liveSamples": 6,
+    "livePassed": 6,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 6
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

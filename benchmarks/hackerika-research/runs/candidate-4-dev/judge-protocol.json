@@ -1,0 +1,10 @@
+{
+  "startedAt": "2026-10-16T16:29:41.921Z",
+  "model": "deepseek-v4-pro",
+  "rubricVersion": "research-v1",
+  "rubricHash": "88c105d6abcc06e684f6dd37905592dd3589c71a3ba60a41445d3aaab8e3a47a",
+  "samples": 8,
+  "maxCalls": 8,
+  "maxSecondsPerCall": 60,
+  "blindVariantLabels": true
+}

@@ -1,0 +1,128 @@
+{
+  "verifiedAt": "2026-10-17T07:17:51.433874+00:00",
+  "status": "support_installed_owner_login_pending",
+  "image": "ctf-assistant:chatgpt-plan-ready-20261017",
+  "imageId": "sha256:380e2e0b7a2912dca649299a65c3be372cd636a7f08192c50d0e7a9f8dc8b57d",
+  "providerEnabled": "deepseek",
+  "modelRoles": {
+    "AI_CHAT_MODEL": "deepseek-flash",
+    "AI_VISION_MODEL": "deepseek-flash",
+    "AI_RESEARCH_MODEL": "deepseek-flash",
+    "AI_JUDGE_MODEL": "deepseek-flash"
+  },
+  "chatgptSelectionTarget": {
+    "model": "gpt-6-luna",
+    "reasoningEffort": "low",
+    "policy": "Lowest known Standard-credit model visible in actual account catalog; requires completed inference."
+  },
+  "health": {
+    "status": "healthy",
+    "bot": {
+      "ready": true,
+      "waitingForSessionReset": false
+    },
+    "database": {
+      "required": true,
+      "ready": true
+    },
+    "timestamp": "2026-10-17T07:17:51.420Z"
+  },
+  "containerHealth": "healthy",
+  "runtimePreservationChecks": {
+    "Cmd": true,
+    "Entrypoint": true,
+    "User": true,
+    "WorkingDir": true,
+    "Healthcheck": true,
+    "HostConfig.CapDrop": true,
+    "HostConfig.SecurityOpt": true,
+    "HostConfig.Tmpfs": true,
+    "HostConfig.RestartPolicy": true,
+    "HostConfig.Memory": true,
+    "HostConfig.NanoCpus": true,
+    "HostConfig.ReadonlyRootfs": true,
+    "HostConfig.PortBindings": true,
+    "HostConfig.Binds": true,
+    "networks": true,
+    "operationalLabels": true
+  },
+  "changedEnvironmentKeys": [],
+  "productionSourceChanges": [
+    "src/Services/AI/chatgptAuth.ts",
+    "src/Services/AI/chatgptClient.ts",
+    "src/Services/AI/models.ts",
+    "src/Services/AI/web.ts",
+    "src/utils/openai.ts"
+  ],
+  "personaChanged": false,
+  "publicHelper": {
+    "path": "https://api.assistant.1pc.tf/hackerika-chatgpt-login.mjs",
+    "sha256": "b73e6513c5a28071bc9e35e69427a2e8dc0e11b8416c987cf9bbaa2e177f011e"
+  },
+  "temporaryPortal": {
+    "origin": "https://app.assistant.1pc.tf",
+    "path": "/hackerika-connect",
+    "httpsStatus": 200,
+    "publicSecretIncluded": false,
+    "lifetimeMinutes": 30,
+    "bootstrapSingleUse": true,
+    "callbackDelivery": "Owner submits the original loopback redirect URL over authenticated HTTPS; exact official loopback redirect URI is unchanged.",
+    "productionContainerUnchanged": true
+  },
+  "fullTests": {
+    "passed": 361,
+    "failed": 0,
+    "assertions": 1135,
+    "files": 37
+  },
+  "focusedTestsIncludingPortal": {
+    "passed": 22,
+    "failed": 0,
+    "assertions": 104,
+    "files": 4
+  },
+  "strictTypes": "passed",
+  "bundle": "passed",
+  "benchmarkTransportFixtures": [
+    {
+      "suite": "hackerika-mentions",
+      "passed": true,
+      "simulatedCompletions": 2,
+      "controlledNativeSearches": 1,
+      "realProviderCalls": 0
+    },
+    {
+      "suite": "hackerika-capabilities",
+      "passed": true,
+      "simulatedCompletions": 2,
+      "controlledNativeSearches": 1,
+      "realProviderCalls": 0
+    },
+    {
+      "suite": "hackerika-research",
+      "passed": true,
+      "simulatedCompletions": 2,
+      "controlledNativeSearches": 1,
+      "realProviderCalls": 0
+    }
+  ],
+  "realOpenAIInferenceCalls": 0,
+  "actualAccountAccess": "pending owner sign-in and completed inference",
+  "semanticQualityBenchmark": "pending; historical DeepSeek results are not relabeled ChatGPT results",
+  "sourceHashes": {
+    "src/Services/AI/chatgptAuth.ts": "6f4f358c763b2dca3dae13ff0e8a1e67650a530473589ae5df8be7e202264b5d",
+    "src/Services/AI/chatgptClient.ts": "c3f6322a58409c06dd01ea3687d31016cd98865815098347c179a48904e869bf",
+    "src/Services/AI/chatgptLoginPortal.ts": "4bbb65be8747d3a205ad667a4e67e7c5fa0a4c97848de35bdc76a2f2570707a5",
+    "scripts/chatgpt-auth.ts": "4dcd83d650432567ac6bb1fb67051cf074eb880241e3343ff350bd7b44a066c7",
+    "scripts/chatgpt-login-portal.ts": "865fd626cf6529244e026e0eaddda494bf8316fc60462961dcce11303440e002",
+    "benchmarks/chatgpt-runtime.ts": "e1d1fa5a342be3cbc215bdb77d0858a567ca1c52688ecfad4c605f56aaed5684",
+    "public/hackerika-chatgpt-login.mjs": "b73e6513c5a28071bc9e35e69427a2e8dc0e11b8416c987cf9bbaa2e177f011e"
+  },
+  "retainedFailure": "Initial image returned HTTP500 because public directory mode was 0644. Rolled back to healthy Flash image, changed directory to0755, passed isolated HTTP preflight, then deployed corrected image.",
+  "expectedRecreationMetadataChanges": [
+    "com.docker.compose.project.working_dir",
+    "com.docker.compose.config-hash",
+    "com.docker.compose.project.config_files",
+    "com.docker.compose.image"
+  ]
+}

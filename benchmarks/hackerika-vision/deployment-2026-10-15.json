@@ -1,0 +1,57 @@
+{
+  "deployedAt": "2026-10-15T14:57:19.016143992Z",
+  "verifiedAt": "2026-10-15T14:58:07.675632+00:00",
+  "image": "ctf-assistant:human-vision-20261015t145347z",
+  "imageId": "sha256:49d33f499a34407e74a93e5ef073ceb38bd5b7667a3af5b7ec7cee98d4df54ed",
+  "previousImageId": "sha256:9d06bca27bdea82497dd14196609dd5b70601fdf55ab333824156f956c263708",
+  "diagnosis": {
+    "previousContainerAge": "five weeks",
+    "previousVisionModulePresent": false,
+    "previousAttachmentsMetadataOnly": true
+  },
+  "checks": {
+    "newImageActive": true,
+    "containerHealthy": true,
+    "noRestarts": true,
+    "discordReadyLogged": true,
+    "apiHealthy": true,
+    "runtimePromptMatches": true,
+    "visionEnabled": true,
+    "visionModel": true,
+    "oldMetadataOnlyMarkerRemoved": true,
+    "runtimeEnvironmentPreserved": true,
+    "otherServicesUnchanged": true,
+    "affectionNotResetAgain": true,
+    "runtimeConfigurationPreserved": true,
+    "allScopedRuntimeSourceHashesMatch": true
+  },
+  "sourceFilesVerified": 31,
+  "runtime": {
+    "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+    "visionEnabled": true,
+    "visionModel": "deepseek-flash",
+    "oldMetadataOnlyMarker": false,
+    "healthHttp": 200,
+    "healthStatus": "healthy",
+    "databaseReady": true
+  },
+  "discordReady": true,
+  "syntheticImagePreflight": {
+    "passed": true,
+    "calls": 1,
+    "imageParts": 1,
+    "usedModels": [
+      "deepseek-flash"
+    ],
+    "promptHash": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+    "answer": "4 buah. tiga di baris atas, satu di bawah kiri.",
+    "delivery": "fake channel only",
+    "fixtureTransport": "synthetic Discord URL replaced with known fixture data URI at provider boundary"
+  },
+  "limitations": [
+    "Synthetic fixture bytes were substituted for the synthetic Discord CDN URL at the provider boundary. Actual member upload/CDN download was not exercised.",
+    "All response destinations in the test were fakes. No manual test message was sent to Discord."
+  ],
+  "deploymentScope": "Only the bot container was replaced using the exact prior image plus the 31 authorized AI/client/database source files. Existing dependencies and runtime configuration were preserved. MongoDB and UI container IDs and start times were unchanged.",
+  "rollback": "The exact previous image and protected runtime configuration are retained in ignored backups; secret-bearing runtime files are excluded from source and image context."
+}

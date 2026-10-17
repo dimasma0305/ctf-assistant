@@ -1,0 +1,9 @@
+{
+  "comparison": "Matched direct-addressed first completions, same14 development samples, excludes routing calls and extra tool rounds",
+  "baselineMeanPromptTokens": 9311.42857142857,
+  "candidateMeanPromptTokens": 9529.42857142857,
+  "addedTokens": 218.0,
+  "increasePercent": 2.341208959803631,
+  "model": "gpt-6-luna",
+  "caveat": "This revision improves semantic context at a small prompt cost; no token-savings or latency-improvement claim. Different tools/history/cache use change production usage."
+}

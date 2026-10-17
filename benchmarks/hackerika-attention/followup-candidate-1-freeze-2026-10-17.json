@@ -1,0 +1,11 @@
+{
+  "frozenAt": "2026-10-17T08:36:11.356338+00:00",
+  "image": "ctf-assistant:attention-followup-candidate-1-20261017",
+  "imageId": "sha256:1e5b4ba1aae9e5b9757d95e8e2bfece44f8df7a15c3523efd0cc1880ee42622f",
+  "sourceHashes": {
+    "src/Services/AI/attention.ts": "66d4dc5db3e487a8406e438a457737990bb6e4ee1da1148abfc71e4f89c11c3e",
+    "src/Services/AI/spontaneous.ts": "122b745a67db45a706edfc457f234c1342e1d09c9cf9b2c240cc88a02efac8c8"
+  },
+  "scope": "Only attention snapshot mention identities and planner subject/addressee distinction. Chat persona, model, cooldowns, budgets and ignore boundaries unchanged.",
+  "deployed": false
+}

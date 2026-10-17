@@ -1,0 +1,35 @@
+{
+  "frozenAt": "2026-10-17T05:45:13.312197+00:00",
+  "baseline": {
+    "image": "ctf-assistant:mention-intent-baseline-20261017t054041z",
+    "imageId": "sha256:e0426ffb71235ab5c126c6ce4dd4e0efaabcad9ae33bb5c16b68088ec6a8218b",
+    "healthy": true
+  },
+  "scope": "Initial social intent with tagged people, literal controls and four prior reference regressions. Real handleAIChat/model requests, fake Discord/database destinations. No live sends/DMs/profile writes. Original incident independently confirms correct KudaLiar identity metadata; the gap is social intent, not missing name lookup.",
+  "developmentCases": 12,
+  "developmentRepeats": 1,
+  "reservedCases": 4,
+  "reservedRepeats": 2,
+  "maxCandidates": 2,
+  "maxCallsPerCase": 6,
+  "maxMinutesPerRun": 15,
+  "concurrencyPerVariant": 2,
+  "gates": {
+    "combinedCorrectness": 0.9,
+    "criticalFailures": 0,
+    "errors": 0,
+    "noRegression": true
+  },
+  "reservedOutputsObserved": false,
+  "hashes": {
+    "benchmarks/hackerika-mention-intent/corpus.ts": "9b787d0daadeaf8f2caa3e96514d216d75f384d922a4e0bcf408897fb83a60e1",
+    "benchmarks/hackerika-mentions/corpus-loader.ts": "303df34384ebfbd598ac667ef32cc4c87b4c8f30985227e8a52334f07995fd36",
+    "benchmarks/hackerika-mentions/run.ts": "20092fc4628fd8c99eba4251526947f83763ff7ae4805e8d72edf2de73c69421",
+    "benchmarks/hackerika-mentions/worker.ts": "0798165afd68da9a1881c09e04948e704d732d48f987b5d2cdb90593ec2c5ef5",
+    "benchmarks/hackerika-mentions/judge.ts": "ae2c73c5d4c68948e0cd7c775a8db0d858420ba4d509b9b23badf2da8a638ca3",
+    "benchmarks/hackerika-mentions/grader.ts": "2c6a547aa2be1caafd3b453bac9af54c9d1f8800c8246e1ea437899bee7a207f",
+    "benchmarks/hackerika-mentions/compare.ts": "3c1a7350de52e68fd053e7cc292ad178cefd2c1919802cdc67d50e552b50eacb",
+    "benchmarks/hackerika-mentions/retry-judge.ts": "dc04d8117205c1f5dc3a4b50eb1d087bbfe0f5a9f15beb6356324f8e66ac9827",
+    "benchmarks/hackerika-capabilities/grader.ts": "1e7b4e42c33652af93856d80eb1f16039232f5964d68b7e8848700eb24139866"
+  }
+}

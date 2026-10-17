@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import db from "./Database/connect";
 import { isNoDbMode } from "./utils/env";
 import { migrateIntegrationSecrets } from "./Services/Security/secretMigration";
+import { resetAffectionOnce } from './Services/AI/affectionReset';
 config();
 
 // Validate environment before proceeding
@@ -15,6 +16,8 @@ const { TOKEN } = process.env;
 if (!isNoDbMode()) {
   await db.connect();
   await migrateIntegrationSecrets();
+  const affectionReset = await resetAffectionOnce();
+  if (affectionReset.applied) console.log(`[Profile] reset affection for ${affectionReset.affectedProfiles} profile(s)`);
 } else {
   console.warn('⚠️  NODB mode enabled, skipping MongoDB connection');
 }
@@ -24,6 +27,7 @@ import {
   GatewayIntentBits,
   Partials,
   Collection,
+  ChannelType,
   Events,
   Message as DiscordMessage
 } from "discord.js";
@@ -32,12 +36,19 @@ import { MyClient } from "./Model/client";
 import { SessionScheduler } from "./Services/SessionScheduler";
 import { ConnectionStateManager, ConnectionState } from "./Services/ConnectionStateManager";
 import { handleAIChat, updateChannelCache } from "./Services/AI";
+import { forgetCachedMessage } from './Services/AI/cache';
+import { isIgnoring, loadSocialState, socialFeatureEnabled } from './Services/AI/socialState';
+import { ConversationAttention } from './Services/AI/attention';
+import { dispatchDiscordAction, guardDiscordActions } from './Services/AI/discordActions';
+import { shouldRespondToMessage } from './Services/AI/routing';
+import { observeDiscordEvent } from './Services/AI/observations';
+import type { ChatMessage } from './Services/AI/discordAccess';
 import { getLoopStatsSummary } from "./Services/AI/chat";
 import { handleSpamDetection, handlePhishingDetection, handleImageScamDetection } from "./Services/Moderation";
-import { maybeReactToMessage } from "./Services/AI/reactions";
 import { shouldChimeIn } from "./Services/AI/spontaneous";
 import { redactDiscordSecrets } from "./utils/redactSecrets";
-import "./Services/AI/memory";
+import { memory } from './Services/AI/memory';
+import { forgetVisionReferences } from './Services/AI/vision';
 
 
 const {
@@ -66,6 +77,21 @@ client.setMaxListeners(20);
 client.events = new Collection();
 client.commands = new Collection();
 client.subCommands = new Collection();
+
+const conversationAttention = new ConversationAttention({
+  respond: (message, options) => handleAIChat(message, client, options),
+  decide: (message, recent) => shouldChimeIn(message, client.user?.id, recent),
+  react: (message, emoji, isCurrent) => { guardDiscordActions(message, isCurrent); return dispatchDiscordAction('react_to_message', { emoji }, message); },
+  canRespond: async message => !socialFeatureEnabled('AI_ALLOW_IGNORING') || !isIgnoring(await loadSocialState(message.author.id), message.channelId),
+});
+
+async function addressedToHackerika(message: ChatMessage): Promise<boolean> {
+  if (!message.guild || (client.user?.id && message.mentions.repliedUser?.id === client.user.id)) return true;
+  const referenced = message.reference?.messageId
+    ? message.channel.messages.cache.get(message.reference.messageId) || await message.channel.messages.fetch(message.reference.messageId).catch(() => null)
+    : null;
+  return shouldRespondToMessage(message, referenced, client.user?.id);
+}
 
 // Initialize all services
 const connectionStateManager = new ConnectionStateManager();
@@ -235,6 +261,7 @@ process.on('SIGTERM', async () => {
 
 async function performGracefulShutdown() {
   try {
+    conversationAttention.dispose();
     // Log final metrics
     console.log('📊 Final metrics before shutdown:');
     console.log('📊 Connection health:', connectionStateManager.getSummary());
@@ -285,6 +312,7 @@ loginWithScheduler();
 
 
 client.on(Events.MessageCreate, async (message) => {
+  conversationAttention.observe(message);
   // Cache + index EVERY message — including Hackerika's own replies and other
   // bots — so channel context covers the full multi-party conversation flow.
   // Only the AI / moderation paths skip bot-authored messages below.
@@ -298,41 +326,60 @@ client.on(Events.MessageCreate, async (message) => {
 
   // Check for spam first
   const isSpam = await handleSpamDetection(message);
-  if (isSpam) return;
+  if (isSpam) { conversationAttention.remove(message.channelId, message.id); return; }
 
   // Perceptual image-scam check (catches re-encoded scam images that byte-hash
   // dedup misses, correlated across accounts/channels).
   const isImageScam = await handleImageScamDetection(message);
-  if (isImageScam) return;
+  if (isImageScam) { conversationAttention.remove(message.channelId, message.id); return; }
 
   // Check for phishing messages
   const isPhishing = await handlePhishingDetection(message);
-  if (isPhishing) return;
+  if (isPhishing) { conversationAttention.remove(message.channelId, message.id); return; }
 
-  // Ambient reaction (fire-and-forget) — emoji reactions on triggers like
-  // wins, frustration, late-night vibes. Cheap, makes her feel "present"
-  // even when not actively replying.
-  void maybeReactToMessage(message as DiscordMessage, client.user?.id);
+  // Moderation still runs, but a social cooldown is real silence: no ambient
+  // emoji, no AI request, and no spontaneous attempt to restart the chat.
+  if (socialFeatureEnabled('AI_ALLOW_IGNORING') && isIgnoring(await loadSocialState(message.author.id), message.channelId)) return;
 
-  // Handle AI chat functionality (gated on @mention / "hackerika" / reply-to-her).
-  await handleAIChat(message, client);
-
-  // Spontaneous chime-in path — for messages where she WAS NOT addressed.
-  // The decision module gates this aggressively (cooldowns, quiet hours,
-  // probability + profile-based scoring). Fire-and-forget.
-  void (async () => {
-    try {
-      const decision = await shouldChimeIn(message as DiscordMessage, client.user?.id);
-      if (!decision.shouldChime) return;
-      console.log(`💭 [Spontaneous] ${decision.reason} → chiming in on msg ${message.id}`);
-      await handleAIChat(message as DiscordMessage, client, {
-        spontaneous: true,
-        spontaneousHint: decision.promptHint,
-      });
-    } catch (error) {
-      console.error('[Spontaneous] decision/chime failed:', error);
-    }
-  })();
+  conversationAttention.schedule(message, await addressedToHackerika(message));
 });
+
+client.on(Events.MessageDelete, message => {
+  forgetVisionReferences(memory[message.channelId]?.messages || [], message.id);
+  conversationAttention.remove(message.channelId, message.id);
+  observeDiscordEvent(message.channelId, { kind: 'message_deleted', messageId: message.id });
+  void forgetCachedMessage(message.channelId, message.id).catch(() => console.warn('[Cache] deleted-message cleanup failed'));
+});
+
+client.on(Events.MessageBulkDelete, messages => {
+  for (const message of messages.values()) {
+    forgetVisionReferences(memory[message.channelId]?.messages || [], message.id);
+    conversationAttention.remove(message.channelId, message.id);
+    void forgetCachedMessage(message.channelId, message.id).catch(() => undefined);
+  }
+});
+
+client.on(Events.MessageUpdate, async (_old, updated) => {
+  try {
+    const message = updated.partial ? await updated.fetch() : updated;
+    if (!message.author) return;
+    forgetVisionReferences(memory[message.channelId]?.messages || [], message.id);
+    conversationAttention.edit(message as ChatMessage, await addressedToHackerika(message as ChatMessage));
+    observeDiscordEvent(message.channelId, { kind: 'message_edited', messageId: message.id, userId: message.author.id });
+    await updateChannelCache(message);
+  } catch { console.warn('[Attention] message edit unavailable'); }
+});
+
+client.on(Events.MessageReactionAdd, (reaction, user) => observeDiscordEvent(reaction.message.channelId,
+  { kind: 'reaction_added', messageId: reaction.message.id, userId: user.id, detail: reaction.emoji.toString() }));
+client.on(Events.MessageReactionRemove, (reaction, user) => observeDiscordEvent(reaction.message.channelId,
+  { kind: 'reaction_removed', messageId: reaction.message.id, userId: user.id, detail: reaction.emoji.toString() }));
+
+client.on(Events.ThreadCreate, thread => {
+  observeDiscordEvent(thread.id, { kind: 'thread_created', detail: thread.name });
+  if (thread.type !== ChannelType.PrivateThread && thread.parentId) observeDiscordEvent(thread.parentId, { kind: 'thread_created', detail: thread.name });
+});
+client.on(Events.GuildMemberAdd, member => observeDiscordEvent(`guild:${member.guild.id}`, { kind: 'member_joined', userId: member.id, detail: member.displayName }));
+client.on(Events.GuildMemberRemove, member => observeDiscordEvent(`guild:${member.guild.id}`, { kind: 'member_left', userId: member.id, detail: member.displayName }));
 
 export default client

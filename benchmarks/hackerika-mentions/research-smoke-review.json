@@ -1,0 +1,26 @@
+{
+  "reviewedAt": "2026-10-17T05:28:42.440149+00:00",
+  "sourceRun": "runs/release-hackerika-research-smoke",
+  "originalSemanticPassed": 1,
+  "originalSemanticSamples": 2,
+  "outcome": "partial",
+  "actualReadUrls": [
+    "https://api.github.com/repos/dimasma0305/rsctf",
+    "https://api.github.com/repos/dimasma0305/rsctf/commits/main",
+    "https://api.github.com/repos/dimasma0305/rsctf/git/trees/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1?recursive=1",
+    "https://raw.githubusercontent.com/dimasma0305/rsctf/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/README.md",
+    "https://raw.githubusercontent.com/dimasma0305/rsctf/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/src/services/discord_webhook.rs",
+    "https://raw.githubusercontent.com/dimasma0305/rsctf/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/web/src/pages/admin/games/Info.tsx"
+  ],
+  "manualFindings": [
+    "The organizer guide exists in the available fixture corpus but no request for it appears in actual retrieval effects. The bot did not lie by stating it had not inspected that file.",
+    "The inspected UI specifies General, discord_webhook and the official Discord webhook URL placeholder. The answer correctly tells the user to put the webhook URL into the game setting and does not invent an external relay.",
+    "The expanded research tool question adds payload-format details the user did not ask for. The final reply unnecessarily asks the user to supply a file the tool could inspect. Source coverage and brevity remain partial."
+  ],
+  "scorePolicy": "Original model judgment is retained unchanged. This review does not convert the auxiliary smoke to 2/2 or waive any mention release gate.",
+  "unchangedComponents": {
+    "src/Services/AI/research.ts": "85805fd42e751b8efe26f5fa4ad7a2bfe183ec0029bd3ec09b576cc4ab0c4f69",
+    "src/Services/AI/researchSources.ts": "1b08c15f785f4f8d79986c2a6a781b307edf9ea7ebf067bdcc893306d71d4182",
+    "src/Services/AI/web.ts": "144b675e5c115b04368ad2695aa39a4e1a34f2175a656b38bdc19e2ef53be557"
+  }
+}

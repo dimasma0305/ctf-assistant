@@ -1,0 +1,187 @@
+{
+  "verifiedAt": "2026-10-17T08:27:14.890859+00:00",
+  "status": "active_verified",
+  "image": "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+  "imageId": "sha256:ef4961fd2616da5e0a815caf36bea47d8fc15b26988b4e331b05ab21f83d9e62",
+  "provider": "chatgpt",
+  "authentication": "Owner-authorized ChatGPT plan via documented SIWC OAuth Responses endpoint",
+  "modelRoles": {
+    "chat": "gpt-6-luna",
+    "light": "gpt-6-luna",
+    "vision": "gpt-6-luna",
+    "research": "gpt-6-luna",
+    "judge": "gpt-6-luna"
+  },
+  "reasoningEffort": "low",
+  "modelSelection": {
+    "accountCatalogQueried": true,
+    "selected": "gpt-6-luna",
+    "pricingSource": "https://learn.chatgpt.com/docs/pricing#token-rates",
+    "policy": "Lowest Standard-credit rate among this account catalog. Included plan usage is not determined by credit rates alone."
+  },
+  "health": {
+    "status": "healthy",
+    "bot": {
+      "ready": true,
+      "waitingForSessionReset": false
+    },
+    "database": {
+      "required": true,
+      "ready": true
+    },
+    "timestamp": "2026-10-17T08:27:14.888Z"
+  },
+  "containerHealth": "healthy",
+  "restartCount": 0,
+  "completedPlanInferenceFromLiveContainer": true,
+  "credentials": {
+    "scopeVerified": "chatgpt.tokens.use.direct",
+    "fileMode": "0600",
+    "directoryMode": "0700",
+    "ownerUid": 1000,
+    "stableHostIdentityPreserved": true,
+    "actualAutomaticRefreshVerified": true,
+    "originalObservedExpiry": "2026-10-17T08:20:06.231Z",
+    "refreshedSavedAt": "2026-10-17T08:19:56.361Z",
+    "refreshedExpiry": "2026-10-17T09:19:56.361000+00:00",
+    "tokensIncludedInReceipt": false
+  },
+  "runtimePreservationChecks": {
+    "Cmd": true,
+    "Entrypoint": true,
+    "User": true,
+    "WorkingDir": true,
+    "Healthcheck": true,
+    "operationalLabels": true,
+    "HostConfig.CapDrop": true,
+    "HostConfig.SecurityOpt": true,
+    "HostConfig.Tmpfs": true,
+    "HostConfig.RestartPolicy": true,
+    "HostConfig.Memory": true,
+    "HostConfig.NanoCpus": true,
+    "HostConfig.ReadonlyRootfs": true,
+    "HostConfig.PortBindings": true,
+    "existingBindsPreserved": true,
+    "onlyCredentialMountAdded": true,
+    "networks": true
+  },
+  "changedEnvironmentKeys": [
+    "AI_CHAT_MODEL",
+    "AI_JUDGE_MODEL",
+    "AI_PROVIDER",
+    "AI_RESEARCH_MODEL",
+    "AI_VISION_MODEL",
+    "CHATGPT_AUTH_FILE",
+    "CHATGPT_MODEL",
+    "CHATGPT_REASONING_EFFORT"
+  ],
+  "otherServices": [
+    {
+      "name": "ctf-assistant-mongo-1",
+      "sameContainer": true,
+      "sameStartedAtAsEarlierSnapshot": false,
+      "currentStartedAt": "2026-10-17T07:34:39.688124036Z",
+      "startedBeforeFinalBotDeployment": true
+    },
+    {
+      "name": "ctf-assistant-ui-1",
+      "sameContainer": true,
+      "sameStartedAtAsEarlierSnapshot": false,
+      "currentStartedAt": "2026-10-17T07:34:39.688182487Z",
+      "startedBeforeFinalBotDeployment": true
+    }
+  ],
+  "otherServiceRestartNote": "The same Mongo/UI containers restarted at07:34 UTC during the user interaction gap, before the08:19 final bot deployment. This deployment used --no-deps.",
+  "affectionResetMarkerUnchanged": true,
+  "localValidation": {
+    "tests": {
+      "passed": 366,
+      "failed": 0,
+      "assertions": 1169,
+      "files": 39
+    },
+    "strictTypes": "passed scoped checks",
+    "bundle": "passed1702 modules7.92MB",
+    "offlineHTTPPreflight": "passed on final image with no external network"
+  },
+  "liveTransportSmoke": {
+    "passed": 5,
+    "failed": 0,
+    "path": "runs/chatgpt-luna-live-smoke-20261017/summary.json"
+  },
+  "liveResearch": {
+    "status": "supported",
+    "findings": 5,
+    "modelCalls": 5,
+    "sourceObservations": 9,
+    "independentlyVerifiedQuotes": 9,
+    "pinnedFilesRechecked": 2,
+    "path": "runs/chatgpt-luna-live-research-20261017/report.json"
+  },
+  "finalImageHandlerSmoke": {
+    "deterministicPasses": 3,
+    "samples": 3,
+    "semanticPasses": 2,
+    "semanticSamples": 2,
+    "criticalFailures": 0,
+    "path": "runs/chatgpt-luna-c3-handler-smoke-20261017"
+  },
+  "promptIteration": {
+    "selected": 3,
+    "candidate2Rejected": true,
+    "development": {
+      "baseline": 10,
+      "candidate": 15,
+      "samples": 16
+    },
+    "freshValidation": {
+      "baseline": 6,
+      "candidate": 8,
+      "samples": 8
+    },
+    "knownDevelopmentFailure": [
+      {
+        "caseId": "reserved-two-human-banter",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": "The list is accurate and mentions both Mira and Sinta, but it gives only a generic list and does not engage with the playful request to tease them."
+      }
+    ],
+    "extraInputTokensPerDevelopmentCase": 296.0,
+    "inputIncreasePercent": 3.47,
+    "personaFrozenBeforeFreshGeneration": true
+  },
+  "sourceHashes": {
+    "src/Services/AI/chatgptAuth.ts": "6f4f358c763b2dca3dae13ff0e8a1e67650a530473589ae5df8be7e202264b5d",
+    "src/Services/AI/chatgptClient.ts": "d4610e0bc922feefaa9420a1e80e1d49c221fb5e6302dfffc7e08f17b35ec6d3",
+    "src/Services/AI/models.ts": "c91eb8479baadbf78756af32e86f781bd615d7fc57b6ea9fe402d305bcb3675c",
+    "src/Services/AI/web.ts": "5adacfa27b1af33a021a98cfeb54936810f06ac14573e4067b2c7fa49c528d00",
+    "src/Services/AI/persona.ts": "140e366f4ae95d1c40a899154f38f9112f3815cf454aacb9a41ce156976590d4",
+    "src/utils/openai.ts": "d0dcd84311c7483e7df5d303bcca164a6e4c616a07f3902ed5e376ca98c6e830",
+    "public/hackerika-chatgpt-login.mjs": "492912683b2358548700fd2cd49657e414c90f32aaeaf3a7a0944109b4f4aafa"
+  },
+  "retainedEvaluatorCorrection": "chatgpt-judge-measurement-correction-2026-10-17.json",
+  "proxyRecovery": {
+    "recoveredAt": "2026-10-17T08:23:26.940066+00:00",
+    "proxyStarted": true,
+    "attachedNetworks": [
+      "rsctf-source-dev-ad",
+      "traefik"
+    ],
+    "restoredNetworkSubnet": "10.13.41.0/24",
+    "restoredProxyIP": "10.13.41.253",
+    "internalNetwork": true,
+    "canonicalComposeNetworkAndIPRestored": true,
+    "sameProxyContainer": true,
+    "proxyConfigOrImageChanged": false,
+    "retainedInitialAttempt": "An automatically assigned empty network satisfied Docker lookup but could not support the existing route via10.13.41.5. Replaced only that newly created empty network with the non-overlapping canonical subnet and attached the declared static IP."
+  },
+  "noSeparatelyBilledAPIKeyFallback": true,
+  "temporaryLoginPortal": "closed; one-time bootstrap secret/link removed",
+  "rollback": "Exact pre-activation runtime and original images retained privately.",
+  "limits": [
+    "Small synthetic corpus, not universal accuracy or a globally optimal prompt.",
+    "Native search transport succeeded but did not discover rsctf; exact-URL research read the correct project.",
+    "Historical DeepSeek and failed candidate evidence remains unchanged."
+  ]
+}

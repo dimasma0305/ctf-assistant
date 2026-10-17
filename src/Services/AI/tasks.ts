@@ -50,10 +50,11 @@ function relativeAge(d: Date | string | undefined): string {
  * Load active tasks for a user. Used by chat.ts to inject a compact list
  * into the per-turn ctx block, and by the follow-up cron to pick candidates.
  */
-export async function loadActiveTasksForUser(userId: string, limit = 5): Promise<any[]> {
+export async function loadActiveTasksForUser(userId: string, limit = 5, channelId?: string): Promise<any[]> {
     try {
         return await TaskModel.find({
             userId,
+            ...(channelId ? { channelId } : {}),
             status: { $in: ['pending', 'in_progress'] },
         })
             .sort({ lastWorkedOn: -1 })
@@ -189,7 +190,7 @@ export async function listTasksForTool(
 ): Promise<ListTasksResult> {
     const userId = message.author.id;
     const limit = Math.max(1, Math.min(20, Number(args?.limit) || 10));
-    const filter: any = { userId };
+    const filter: any = { userId, channelId: message.channelId };
     if (args?.status && VALID_STATUSES.has(args.status as TaskStatus)) {
         filter.status = args.status;
     } else {
@@ -247,6 +248,7 @@ export async function updateTaskForTool(
     }
     if (!doc) return { ok: false, error: 'not_found' };
     if (doc.userId !== message.author.id) return { ok: false, error: 'not_yours' };
+    if (doc.channelId !== message.channelId) return { ok: false, error: 'not_found' };
 
     const update: any = {};
 
@@ -307,6 +309,7 @@ export async function completeTaskForTool(
     }
     if (!doc) return { ok: false, error: 'not_found' };
     if (doc.userId !== message.author.id) return { ok: false, error: 'not_yours' };
+    if (doc.channelId !== message.channelId) return { ok: false, error: 'not_found' };
     if (doc.status === 'done') return { ok: false, error: 'already_done' };
 
     try {

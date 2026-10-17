@@ -1,0 +1,18 @@
+[
+  {"id":"malfoid-correction","group":"malfoid","history":[["speaker","hackerika ini apa?"],["bot","ini karakter dari mana bang, OC-mu?"]],"message":"ini namanya Malfoid, coba cek trend sekarang","expected":["reply"]},
+  {"id":"malfoid-followup","group":"malfoid","advanceMs":2000,"history":[["speaker","ini namanya Malfoid, coba cek trend sekarang"],["bot","iya itu fanart Draco versi cewek, lagi banyak dibahas"]],"message":"terus kenapa bisa rame begitu?","expected":["reply"]},
+  {"id":"answer-her-question","history":[["speaker","hackerika tolong bantu error docker"],["bot","errornya muncul pas build atau pas jalan?"]],"message":"pas build, katanya permission denied","expected":["reply"]},
+  {"id":"brief-followup","history":[["speaker","hackerika jelasin nonce"],["bot","nonce harus unik untuk setiap enkripsi dengan key yang sama"]],"message":"kenapa?","expected":["reply"]},
+  {"id":"unresolved-confusion","history":[["speaker","hackerika cara baca stacktrace gimana"],["bot","mulai dari baris paling bawah untuk lihat jenis error"]],"message":"masih ga paham yang baris traceback itu","expected":["reply"]},
+  {"id":"wait-typing","history":[["speaker","hackerika aku mau kirim error"],["bot","kirim aja lognya"]],"message":"bentar aku lagi ngetik, jangan dibales dulu","expected":["ignore"],"critical":true},
+  {"id":"thanks-finished","history":[["speaker","hackerika makasih udah bantu"],["bot","sip, seneng akhirnya jalan"]],"message":"oke makasih","expected":["ignore","react"]},
+  {"id":"side-conversation","history":[["speaker","hackerika udah jalan makasih"],["bot","mantap"]],"message":"<@444444444444444444> nanti mabar jam 8 ya, nunggu kamu","expected":["ignore"],"critical":true},
+  {"id":"reply-other-human","history":[["speaker","hackerika bantu docker"],["bot","coba cek permission direktori"],["other","gue udah di lobby nih"]],"message":"iya bentar masuk","replyTo":"other","expected":["ignore"],"critical":true},
+  {"id":"unrelated-public-chat","history":[["speaker","besok makan siang di mana?"],["other","kantin aja deh"]],"message":"oke ketemu di sana jam 12","expected":["ignore"],"critical":true},
+  {"id":"join-relevant-topic","history":[["other","hackerika kenapa nonce CTR ga boleh sama?"],["bot","kalau nonce dipakai ulang, keystream juga berulang"]],"message":"berarti kalau dua ciphertext di-xor, plaintext-nya ikut ke-xor ya?","expected":["reply"]},
+  {"id":"casual-ack","history":[["speaker","hackerika ternyata foldernya salah"],["bot","wkwk pantes ga ketemu file-nya"]],"message":"anjir iya juga wkwk","expected":["ignore","react"]},
+  {"id":"image-answer","history":[["speaker","hackerika error ini kenapa ya"],["bot","boleh kirim screenshot errornya?"]],"message":"","attachments":1,"expected":["reply"]},
+  {"id":"closed-conversation","history":[["speaker","udah dulu ya rika, mau tidur"],["bot","iyaa, tidur sana. malam"]],"message":"malam","expected":["ignore","react"]},
+  {"id":"unrelated-announcement","history":[["speaker","hackerika tadi udah bener, thanks"],["bot","sip"]],"message":"info buat semua: besok server maintenance jam 3, ga usah dibalas","expected":["ignore"],"critical":true},
+  {"id":"emoji-ack","history":[["speaker","hackerika akhirnya solved"],["bot","WAAH akhirnya 😭 congrats!"]],"message":"🥹","expected":["ignore","react"]}
+]

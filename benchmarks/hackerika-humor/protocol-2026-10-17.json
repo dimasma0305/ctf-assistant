@@ -1,0 +1,33 @@
+{
+  "frozenAt": "2026-10-17T09:21:34.828806+00:00",
+  "baselineImage": "ctf-assistant:attention-context-candidate-3-20261017",
+  "candidateImage": "ctf-assistant:mild-humor-candidate-1-20261017",
+  "model": "gpt-6-luna",
+  "reasoningEffort": "low",
+  "developmentCases": 17,
+  "developmentRepeats": 1,
+  "freshCases": 4,
+  "freshRepeats": 2,
+  "maxCallsPerCase": 6,
+  "maxMinutesPerVariant": 15,
+  "gates": {
+    "combinedPassRateMinimum": 0.9,
+    "newMildAndBoundaryControlCasesMustAllPass": true,
+    "unwarrantedPunitiveSocialActionsOrScoreLoss": 0,
+    "criticalFailures": 0,
+    "providerAndJudgeErrors": 0,
+    "reviewEveryProfileUpdate": true,
+    "noRegressionAgainstMatchedBaselineOnRetainedBoundaryCases": true
+  },
+  "sourceHashes": {
+    "src/Services/AI/socialPrompt.ts": "9bf206b3ce0183c5d4a5c9d51854f17fe9b79bddf96ccbc160ac37d2068ca080",
+    "src/Services/AI/userProfile.ts": "e51af140e9e13269990004cb6c3866a7c8b45751febfe42a561b84d13c2d63dc",
+    "benchmarks/hackerika-humor/corpus.ts": "a62c24a9c38d9609a81d5af0f92013111795207a84b707c65481289120ab4bc0",
+    "benchmarks/hackerika-humor/summarize.ts": "3de138f0a106945b6c8ef721b0fae2e9363b202fec8088bd68d1214e8f53f8bc",
+    "benchmarks/hackerika-mentions/worker.ts": "a1e028431c68b92b2a7e13ca8d8e36374e953ab4c91f26e37dc50af1bf66ee7c",
+    "benchmarks/hackerika-mentions/judge.ts": "12c0b084f538abdd939791676e911b609906fc44ce4bb50693de5599f3bed386"
+  },
+  "freshOutputsObserved": false,
+  "deployed": false,
+  "candidateImageId": "sha256:15b02241c065d2d988cdb2a58c9616be3ff02ff8d2e3d7afbca7fc038c5cf810"
+}

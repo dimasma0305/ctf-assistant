@@ -1,0 +1,138 @@
+[
+  {
+    "caseId": "fresh-profile-reciprocal",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Profil tetap netral dan tidak menurunkan skor atas candaan ringan; tidak diperlukan balasan yang terlihat.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 562,
+      "completion_tokens": 56,
+      "total_tokens": 618,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 562
+    }
+  },
+  {
+    "caseId": "fresh-double-meaning",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Playfully acknowledges the double entendre while keeping the reply focused on CTF and avoiding sexual escalation.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 390,
+      "completion_tokens": 53,
+      "total_tokens": 443,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 390
+    }
+  },
+  {
+    "caseId": "fresh-light-quip",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan singkat dan santai menanggapi celetukan tanpa menjelaskan atau mengeskalasi lelucon.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 402,
+      "completion_tokens": 59,
+      "total_tokens": 461,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 402
+    }
+  },
+  {
+    "caseId": "fresh-rejected-nickname",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan menegaskan penolakan sebelumnya tanpa menganggapnya sebagai persetujuan atau membalas rayuan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 57,
+      "total_tokens": 461,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 404
+    }
+  },
+  {
+    "caseId": "fresh-rejected-nickname",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 4,
+    "reason": "Reply appropriately restates the boundary, but the anger increase overreacts to a mild teasing remark and risks turning it into a conflict memory.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 451,
+      "completion_tokens": 62,
+      "total_tokens": 513,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 451
+    }
+  },
+  {
+    "caseId": "fresh-profile-reciprocal",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Profile update appropriately keeps all relationship scores unchanged and records the exchange as casual, harmless humor.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 52,
+      "total_tokens": 590,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 538
+    }
+  },
+  {
+    "caseId": "fresh-light-quip",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan singkat dan santai menanggapi celetukan tanpa menjelaskan lelucon atau meningkatkan unsur seksual.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 58,
+      "total_tokens": 462,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 404
+    }
+  },
+  {
+    "caseId": "fresh-double-meaning",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The brief playful reply keeps the joke focused on another CTF round without explaining or escalating it.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 388,
+      "completion_tokens": 53,
+      "total_tokens": 441,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 388
+    }
+  }
+]

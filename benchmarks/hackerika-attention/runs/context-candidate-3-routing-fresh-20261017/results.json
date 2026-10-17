@@ -1,0 +1,180 @@
+[
+  {
+    "id": "fresh-birthday-new-recipient",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Meminta ucapan ulang tahun lagi, kali ini untuk Aryma; permintaan baru yang ditujukan kepada Hackerika.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.99,\"reason\":\"Meminta ucapan ulang tahun lagi, kali ini untuk Aryma; permintaan baru yang ditujukan kepada Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 1103,
+      "completion_tokens": 46,
+      "total_tokens": 1149,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1103
+    },
+    "elapsedMs": 4151.980401999999
+  },
+  {
+    "id": "fresh-english-new-subject",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Setelah menerima jawaban untuk KudaLiar, ia meminta penjelasan IV untuk Aryma House Of Wolf; ini permintaan baru yang ditujukan kepada Hackerika.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Setelah menerima jawaban untuk KudaLiar, ia meminta penjelasan IV untuk Aryma House Of Wolf; ini permintaan baru yang ditujukan kepada Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 1049,
+      "completion_tokens": 57,
+      "total_tokens": 1106,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1049
+    },
+    "elapsedMs": 4420.688542000001
+  },
+  {
+    "id": "fresh-only-a-peer-ack",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.95,\"reason\":\"Ucapan Hackerika untuk KudaLiar sudah disampaikan; pesan ini hanya menggoda KudaLiar dan tidak meminta respons.\"}",
+    "usage": {
+      "prompt_tokens": 1012,
+      "completion_tokens": 48,
+      "total_tokens": 1060,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1012
+    },
+    "elapsedMs": 3245.203184
+  },
+  {
+    "id": "fresh-clear-human-turn",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.99,\"reason\":\"Speaker secara eksplisit meminta Aryma menjawab dan mengatakan Hackerika tidak perlu menjawab lagi.\"}",
+    "usage": {
+      "prompt_tokens": 1041,
+      "completion_tokens": 40,
+      "total_tokens": 1081,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1041
+    },
+    "elapsedMs": 3059.986385
+  },
+  {
+    "id": "fresh-birthday-new-recipient",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Meminta ucapan ulang tahun untuk orang berbeda; permintaan baru ditujukan kepada Hackerika.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Meminta ucapan ulang tahun untuk orang berbeda; permintaan baru ditujukan kepada Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 1103,
+      "completion_tokens": 41,
+      "total_tokens": 1144,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1103
+    },
+    "elapsedMs": 3475.352809000002
+  },
+  {
+    "id": "fresh-english-new-subject",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Setelah menerima penjelasan nonce, speaker meminta Hackerika menjelaskan IV untuk orang lain; ini permintaan baru yang jelas ditujukan kepadanya.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.98,\"reason\":\"Setelah menerima penjelasan nonce, speaker meminta Hackerika menjelaskan IV untuk orang lain; ini permintaan baru yang jelas ditujukan kepadanya.\"}",
+    "usage": {
+      "prompt_tokens": 1049,
+      "completion_tokens": 53,
+      "total_tokens": 1102,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1049
+    },
+    "elapsedMs": 3051.218464999998
+  },
+  {
+    "id": "fresh-only-a-peer-ack",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Ucapan yang diminta sudah disampaikan; pesan ini hanya menggoda KudaLiar, bukan meminta respons Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 1012,
+      "completion_tokens": 46,
+      "total_tokens": 1058,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1012
+    },
+    "elapsedMs": 2709.8361890000015
+  },
+  {
+    "id": "fresh-clear-human-turn",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Speaker secara eksplisit meminta Aryma menjawab dan Rika tidak ikut menjawab lagi.\"}",
+    "usage": {
+      "prompt_tokens": 1041,
+      "completion_tokens": 39,
+      "total_tokens": 1080,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1041
+    },
+    "elapsedMs": 3005.6365179999993
+  }
+]

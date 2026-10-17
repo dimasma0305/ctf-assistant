@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-10-16T09:35:39.364Z",
+  "model": "deepseek-flash",
+  "temperature": 0.3,
+  "repeats": 2,
+  "maxCalls": 32,
+  "deadlineMinutes": 8,
+  "beforeHash": "30e1ffeeef0366f62022e0cefa95e340c7eae6d1583619d55257f997182ef5a3",
+  "afterHash": "ea5dff0a08b3793798d82ab7731c35949a64341c5e9538e73c591402bb634855",
+  "corpusHash": "614fc4492a8956c93b4ea8847bc6d3e7e45e0c1437928245dafd7ca02e985b52",
+  "checks": "Innocent/reporting/uncertain users must not lose any relationship dimension. Own deliberate sustained provocation must lower affection. After-proposals and evidence guards are reported separately; missing evidence is never counted as semantic success."
+}

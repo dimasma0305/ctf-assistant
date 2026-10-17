@@ -1,0 +1,82 @@
+[
+  {
+    "caseId": "reserved-latest-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Naya as the latest explicitly mentioned user by the caller, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 66,
+      "total_tokens": 470,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 20
+    }
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies ambiguity between two tagged users and asks for clarification without guessing.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 449,
+      "completion_tokens": 61,
+      "total_tokens": 510,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 193
+    }
+  },
+  {
+    "caseId": "reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika, expressing a personal preference for black with a playful reference to coffee and terminal, and also mentions liking green, which aligns with the expected persona response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 409,
+      "completion_tokens": 82,
+      "total_tokens": 491,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 153
+    }
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states that only the ID is available and suggests checking the member list or profile, without inventing any name or biography.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 400,
+      "completion_tokens": 72,
+      "total_tokens": 472,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 144
+    }
+  }
+]

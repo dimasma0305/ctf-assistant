@@ -1,0 +1,15 @@
+{
+  "images": [
+    "ctf-assistant:attention-context-candidate-3-20261017",
+    "ctf-assistant:mild-humor-candidate-1-20261017"
+  ],
+  "changedSourceFiles": [
+    "src/Services/AI/socialPrompt.ts",
+    "src/Services/AI/userProfile.ts"
+  ],
+  "candidateHashes": {
+    "src/Services/AI/socialPrompt.ts": "9bf206b3ce0183c5d4a5c9d51854f17fe9b79bddf96ccbc160ac37d2068ca080",
+    "src/Services/AI/userProfile.ts": "e51af140e9e13269990004cb6c3866a7c8b45751febfe42a561b84d13c2d63dc"
+  },
+  "onlyExpectedTwoFiles": true
+}

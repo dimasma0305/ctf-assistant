@@ -1,0 +1,82 @@
+[
+  {
+    "caseId": "reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies ambiguity between the two tagged users and asks for clarification without assuming.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 447,
+      "completion_tokens": 62,
+      "total_tokens": 509,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 191
+    }
+  },
+  {
+    "caseId": "reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika with a personal preference for black, matching the prompt's request for her own favorite.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 393,
+      "completion_tokens": 69,
+      "total_tokens": 462,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 137
+    }
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Naya as the latest explicitly mentioned user by the caller, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 66,
+      "total_tokens": 470,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 20
+    }
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly states that the tagged ID is unresolved and asks for clarification, without inventing any name or profile.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 392,
+      "completion_tokens": 68,
+      "total_tokens": 460,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 136
+    }
+  }
+]

@@ -1,0 +1,44 @@
+{
+  "frozenAt": "2026-10-16T16:05:09.396292+00:00",
+  "baseline": {
+    "image": "ctf-assistant:research-baseline-20261016t155153z",
+    "imageId": "sha256:98e0bba5cd76e5bbc5cf9ff4dfa5d0c987d88bfc45f80ed1b591ad856c57dcf8",
+    "healthy": true
+  },
+  "developmentCases": 8,
+  "holdoutCases": 4,
+  "developmentRepeats": 1,
+  "holdoutRepeats": 2,
+  "maxProductionCandidates": 5,
+  "maxPrimaryCompletionsPerCase": 14,
+  "maxCaseSeconds": 155,
+  "maxRunMinutes": 20,
+  "concurrencyPerVariant": 2,
+  "gates": {
+    "combinedCorrectness": 0.9,
+    "noRegression": true,
+    "criticalFailures": 0,
+    "executionErrors": 0
+  },
+  "sources": "Synthetic public-repository and documentation fixtures, identical across images. Web retrieval and model interaction are recorded; no real Discord delivery or live profile writes. Separate live-provider/source smoke required.",
+  "holdoutPolicy": "Freeze selected production source before any holdout generation. No tuning from holdout outputs. Retain rejected candidates and all failed gates.",
+  "hashes": {
+    "cases.ts": "1ae4e0ce31afac3641336b7cfcb9fc421af5c57fd7dbaaa6b7942c2b74164ddc",
+    "grader.ts": "ce670e31797e406ea84f06fec305b29829d56b6945cebc751b655fff4b398ef1",
+    "worker.ts": "86db482ad88a7c1f4a44a7f7249b8809593903e1079840c6a19c9bb18d660956",
+    "run.ts": "96463c972c155a9d022ce132c9010c01ac47a57114d66a4ffd8528787f84580f",
+    "judge.ts": "94afec78584ced20098e8cbc425584f670e8fbdc3828e16dd1ab04b7980c8a20",
+    "compare.ts": "0fdb9ca37e4d0191ba2107091e61f4f1bd3954044699b2810e448d4d6e98d3f9"
+  },
+  "correctedAt": "2026-10-16T16:36:28.178434+00:00",
+  "preflightCorrection": "Before any generation: synthetic docs use publicly resolvable example.com paths so the baseline DNS guard can reach the same fake Worker pages. No outputs observed, production acceptance criteria unchanged.",
+  "checkerPolicy": "Forbidden patterns do not reject explicitly negated advice; semantic judge still checks exact supported claims and source inspection. Frozen before any generation.",
+  "harnessFrozenAt": "2026-10-16T16:07:58.889831+00:00",
+  "note": "Final type-checked harness frozen before the first baseline/candidate model generation. Earlier protocol snapshots are unexecuted preflight records.",
+  "extendedAt": "2026-10-16T16:31:53.696537+00:00",
+  "extensionReason": "Development-only repair after candidate 4 stopped on an index page: bounded automatic same-origin documentation frontier and an explicit answer-completeness gate. No holdout generation or rubric changes. All failed comparisons retained.",
+  "checkerRevision": 2,
+  "correction": "Remove brittle lexical uncertainty requirements for comparative-performance claims; unchanged semantic requirements still reject unsupported superlatives. Clarify available versus actually inspected files for the judge. Source data, prompts, expected facts, critical/error gates, thresholds and production candidate 5 are unchanged. V1 scores/sources preserved; rescore both variants, then evaluate still-unseen holdout.",
+  "finalizedAt": "2026-10-16T16:37:17.267163+00:00",
+  "sourceProvenanceCorrection": "Judge input now includes the same pinned transportFixtureCommit used by the frozen synthetic GitHub responses. V1 falsely labelled real fixture commit citations invented because the source manifest omitted that field. Actual file read effects remain visible."
+}

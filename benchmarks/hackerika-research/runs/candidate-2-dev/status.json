@@ -1,0 +1,4 @@
+{
+  "status": "exploratory-image-tag-not-pinned",
+  "reason": "Candidate image rebuild and run launch overlapped. Excluded from selected comparison regardless of outputs; repeat against an immutable image tag."
+}

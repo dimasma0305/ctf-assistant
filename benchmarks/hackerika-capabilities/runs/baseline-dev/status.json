@@ -1,0 +1,4 @@
+{
+  "classification": "exploratory; superseded by matched dev-v2 runs due to synthetic REST collection order correction",
+  "corpusAndGraderChanged": false
+}

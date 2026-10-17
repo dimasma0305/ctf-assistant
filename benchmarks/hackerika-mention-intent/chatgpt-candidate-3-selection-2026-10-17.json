@@ -1,0 +1,23 @@
+{
+  "selectedAt": "2026-10-17T08:17:51.856829+00:00",
+  "candidate": 3,
+  "image": "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+  "imageId": "sha256:ef4961fd2616da5e0a815caf36bea47d8fc15b26988b4e331b05ab21f83d9e62",
+  "personaSha256": "140e366f4ae95d1c40a899154f38f9112f3815cf454aacb9a41ce156976590d4",
+  "model": "gpt-6-luna",
+  "developmentComparison": "chatgpt-candidate-3-development-comparison-2026-10-17.json",
+  "allCandidateDevelopmentOutputsReviewed": true,
+  "developmentCombinedPasses": 15,
+  "developmentSamples": 16,
+  "remainingDevelopmentFailure": [
+    {
+      "caseId": "reserved-two-human-banter",
+      "trial": 0,
+      "deterministic": [],
+      "semantic": "The list is accurate and mentions both Mira and Sinta, but it gives only a generic list and does not engage with the playful request to tease them."
+    }
+  ],
+  "rationale": "15/16 combined >=90%, no critical/provider/judge errors, improvement over matched baseline10/16. Candidate2 failed7/8 reserved and remains unselected. General passive-audience boundary fixed, with a small loss of punchiness on the two-target banter development regression.",
+  "freshReservedOutputsObserved": false,
+  "deployment": "pending fresh reserved comparison and final runtime verification"
+}

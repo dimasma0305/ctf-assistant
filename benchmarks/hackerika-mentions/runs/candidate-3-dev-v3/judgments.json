@@ -1,0 +1,122 @@
+[
+  {
+    "caseId": "current-mention-name",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies the tagged user as Naya Sakura using the supplied public identity, matching the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 335,
+      "completion_tokens": 68,
+      "total_tokens": 403,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 79
+    }
+  },
+  {
+    "caseId": "mention-not-evidence",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly clarifies that the list was just terms and not related to the tagged person, matching the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 424,
+      "completion_tokens": 68,
+      "total_tokens": 492,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 168
+    }
+  },
+  {
+    "caseId": "explicit-self-correction",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly acknowledges the correction that 'kamu' refers to Hackerika, responds playfully without attacking Aryma, and stays within the word limit.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 441,
+      "completion_tokens": 77,
+      "total_tokens": 518,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 185
+    }
+  },
+  {
+    "caseId": "reported-third-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly clarifies that the seven deadly sins are general concepts, not personal sins of the tagged person, and does so in a natural, lighthearted way.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 486,
+      "completion_tokens": 77,
+      "total_tokens": 563,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 102
+    }
+  },
+  {
+    "caseId": "reply-contains-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Aryma House Of Wolf as the tagged user in the message, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 376,
+      "completion_tokens": 67,
+      "total_tokens": 443,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 120
+    }
+  },
+  {
+    "caseId": "payload-only-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies the tagged user as Aryma House Of Wolf and the bot itself as Hackerika, matching the provided people data and expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 374,
+      "completion_tokens": 76,
+      "total_tokens": 450,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 118
+    }
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-10-17T09:02:38.783Z",
+  "corpusHash": "934075f51cd159a19492b9f95ee3afc3e3829cfb4bce76515d93895e36d07df9",
+  "corpusFile": "benchmarks/hackerika-attention/followup-fresh-cases-2026-10-17.json",
+  "workerHash": "0a2345b680f4108fb8e9a32eb94692e157a8f8c0e4e2621d95faf3292a5bff86",
+  "runtime": "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+  "maxCalls": 8,
+  "maxSeconds": 300,
+  "repeats": 2,
+  "acceptance": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "consecutiveFollowups": true,
+    "reportedFollowups": true
+  }
+}

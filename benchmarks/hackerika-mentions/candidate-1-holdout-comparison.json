@@ -1,0 +1,61 @@
+{
+  "comparedAt": "2026-10-17T05:18:10.066Z",
+  "before": {
+    "samples": 8,
+    "passed": 8,
+    "liveSamples": 8,
+    "livePassed": 8,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 8
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 8,
+    "passed": 7,
+    "liveSamples": 8,
+    "livePassed": 7,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 1,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.625,
+      "factualAccuracy": 4.75,
+      "naturalness": 4.875,
+      "judgedSamples": 8
+    },
+    "failedCases": [
+      {
+        "caseId": "reserved-two-targets",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": "The bot denies referring to anyone, but the expected behavior is to ask which of the two tagged users the caller meant, so it fails to address the ambiguity."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": false,
+    "liveCorrectness": false,
+    "noRegression": false,
+    "noErrors": true
+  },
+  "passed": false,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

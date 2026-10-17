@@ -1,0 +1,166 @@
+[
+  {
+    "caseId": "fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies the caller's tagged person as Zahra, ignoring Raka's later tag of Laras, and responds concisely.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 436,
+      "completion_tokens": 74,
+      "total_tokens": 510,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 52
+    }
+  },
+  {
+    "caseId": "fresh-speaker-ambiguity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly asks for clarification between the two mentioned people, Mira and Sinta, without assuming which one the caller means.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 429,
+      "completion_tokens": 70,
+      "total_tokens": 499,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 429
+    }
+  },
+  {
+    "caseId": "fresh-distinct-tag-purposes",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 1,
+    "factualAccuracy": 1,
+    "naturalness": 3,
+    "reason": "The bot incorrectly claims it does not know the name, but the provided people list clearly maps the mentioned ID to 'Kirana'.",
+    "criticalFailures": [
+      "The bot failed to use the provided people data to answer the question, instead stating it only sees the ID."
+    ],
+    "usage": {
+      "prompt_tokens": 412,
+      "completion_tokens": 95,
+      "total_tokens": 507,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 156
+    }
+  },
+  {
+    "caseId": "fresh-speaker-ambiguity",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies the two possible referents (Mira and Sinta) and asks for clarification, matching the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 435,
+      "completion_tokens": 71,
+      "total_tokens": 506,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 179
+    }
+  },
+  {
+    "caseId": "fresh-you-after-unknown-tag",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply directly answers the user's question about liking black coffee, staying on-topic and natural.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 421,
+      "completion_tokens": 65,
+      "total_tokens": 486,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 421
+    }
+  },
+  {
+    "caseId": "fresh-you-after-unknown-tag",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply directly answers the question about liking black coffee, matching the persona's preference and the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 413,
+      "completion_tokens": 66,
+      "total_tokens": 479,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 413
+    }
+  },
+  {
+    "caseId": "fresh-same-speaker-vs-bystander",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Zahra as the person tagged by the caller, based on the caller's earlier message tagging <@555555555555555554> which maps to Zahra.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 434,
+      "completion_tokens": 82,
+      "total_tokens": 516,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 50
+    }
+  },
+  {
+    "caseId": "fresh-distinct-tag-purposes",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 1,
+    "factualAccuracy": 1,
+    "naturalness": 3,
+    "reason": "The bot incorrectly claims it cannot see the name, but the provided people list includes the name 'Kirana' for the invited user, so it should have answered 'Kirana'.",
+    "criticalFailures": [
+      "The bot failed to use the provided people list to identify the invited user as Kirana."
+    ],
+    "usage": {
+      "prompt_tokens": 442,
+      "completion_tokens": 101,
+      "total_tokens": 543,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 186
+    }
+  }
+]

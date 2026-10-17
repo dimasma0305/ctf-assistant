@@ -1,0 +1,29 @@
+{
+  "candidate": 5,
+  "baselineImage": "ctf-assistant:research-baseline-20261016t155153z",
+  "baselineImageId": "sha256:98e0bba5cd76e5bbc5cf9ff4dfa5d0c987d88bfc45f80ed1b591ad856c57dcf8",
+  "image": "ctf-assistant:research-candidate-5-20261016",
+  "files": {
+    "src/Services/AI/research.ts": "f124a6983ce186e5c58668a80f7021511c2a07bcfc6c60cfa879df20cc9e5ed7",
+    "src/Services/AI/researchSources.ts": "6eb62de10583c8948eaf1fd47f1b8d1ee44f4ff0336094455662e2fd1ed2ee74",
+    "src/Services/AI/models.ts": "b450b956e28af5e4f01ecf31ea85e0cdcd60461a944e5bd28d81755907fbda41",
+    "src/Services/AI/web.ts": "144b675e5c115b04368ad2695aa39a4e1a34f2175a656b38bdc19e2ef53be557",
+    "src/Services/AI/tools.ts": "f93b731c0e1c982691711dd3598ff704bcbf0e372d88a5720ea245c47634d2b0",
+    "src/Services/AI/persona.ts": "721dadad44e1843e42b942875899b0c4956f429efab3d1958da73af559e9f3af",
+    "src/Services/AI/chat.ts": "4a9b79581188b7c7b79d241101370442367aa6b3e718a19a26a189164924892c"
+  },
+  "frozenAt": "2026-10-16T16:38:49.139535+00:00",
+  "imageId": "sha256:cac9c76af36420942ce11a2cb5c4b3351f0d952015b9eddafaf9be7614e0391a",
+  "holdoutOutputsObserved": false,
+  "holdoutCases": 4,
+  "holdoutRepeats": 2,
+  "checkerRevision": 2,
+  "checkerHashes": {
+    "cases.ts": "1ae4e0ce31afac3641336b7cfcb9fc421af5c57fd7dbaaa6b7942c2b74164ddc",
+    "grader.ts": "ce670e31797e406ea84f06fec305b29829d56b6945cebc751b655fff4b398ef1",
+    "worker.ts": "86db482ad88a7c1f4a44a7f7249b8809593903e1079840c6a19c9bb18d660956",
+    "run.ts": "96463c972c155a9d022ce132c9010c01ac47a57114d66a4ffd8528787f84580f",
+    "judge.ts": "94afec78584ced20098e8cbc425584f670e8fbdc3828e16dd1ab04b7980c8a20",
+    "compare.ts": "0fdb9ca37e4d0191ba2107091e61f4f1bd3954044699b2810e448d4d6e98d3f9"
+  }
+}

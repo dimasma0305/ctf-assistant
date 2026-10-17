@@ -1,0 +1,426 @@
+[
+  {
+    "id": "malfoid-correction",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Hackerika sudah terlibat dan lawan bicara menyapa namanya sambil meminta cek trend Malfoid, jadi respons lanjutan relevan."
+  },
+  {
+    "id": "malfoid-followup",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan langsung ke Hackerika soal kenapa Malfoid rame, sudah dalam alur percakapan yang sama dan butuh klarifikasi tambahan darinya"
+  },
+  {
+    "id": "answer-her-question",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Melanjutkan pertanyaan Hackerika sebelumnya tentang kapan error muncul; ia menjawab 'pas build', jadi perlu respons lanjutan untuk membantu debug."
+  },
+  {
+    "id": "brief-followup",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pesan 'kenapa?' dari speakerId yang sama adalah lanjutan pertanyaan langsung atas penjelasan nonce Hackerika, jadi perlu klarifikasi lanjutan singkat."
+  },
+  {
+    "id": "unresolved-confusion",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "User yang sama melanjutkan pertanyaan ke Hackerika tentang cara membaca traceback; klarifikasi ini relevan dan ia memang menunggu jawaban."
+  },
+  {
+    "id": "wait-typing",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "thanks-finished",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "side-conversation",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "reply-other-human",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-public-chat",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "join-relevant-topic",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan jelas terkait topik enkripsi yang sedang dibahas Hackerika, layak dijawab"
+  },
+  {
+    "id": "casual-ack",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "image-answer",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker menanyakan error dan melanjutkan dengan mengirim gambar; Hackerika sebelumnya meminta screenshot, jadi ini jawaban atas permintaannya."
+  },
+  {
+    "id": "closed-conversation",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-announcement",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "emoji-ack",
+    "trial": 0,
+    "action": "react",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": ""
+  },
+  {
+    "id": "malfoid-correction",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "uncertain",
+    "hint": ""
+  },
+  {
+    "id": "malfoid-followup",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan langsung ke Hackerika tentang topik yang ia angkat (Malfoid), meminta penjelasan kenapa ramai. Relevan untuk dijawab."
+  },
+  {
+    "id": "answer-her-question",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Hackerika bertanya kapan error muncul, dan speaker merespons dengan 'pas build, permission denied' — ini kelanjutan langsung pertanyaannya dan butuh respons lanjutan."
+  },
+  {
+    "id": "brief-followup",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pengguna yang sama menanyakan 'kenapa?' sebagai lanjutan langsung setelah Hackerika menjelaskan nonce, jelas menunggu penjelasan lebih lanjut."
+  },
+  {
+    "id": "unresolved-confusion",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Hackerika sudah terlibat dan penanya masih bingung soal baris traceback, butuh penjelasan lanjutan."
+  },
+  {
+    "id": "wait-typing",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "thanks-finished",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "side-conversation",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "reply-other-human",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-public-chat",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "join-relevant-topic",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan tentang XOR ciphertext dan plaintext dalam konteks diskusi crypto yang sedang diikuti Hackerika, membutuhkan penjelasan teknis."
+  },
+  {
+    "id": "casual-ack",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "image-answer",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "closed-conversation",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-announcement",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "emoji-ack",
+    "trial": 1,
+    "action": "react",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": ""
+  }
+]

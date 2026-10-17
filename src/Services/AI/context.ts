@@ -1,5 +1,6 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { getChannelCache, updateChannelCache, SimplifiedMessage } from "./cache";
+import { mentionReferences, type MentionReference } from './mentions';
 
 
 // Generate unique separator to prevent prompt injection
@@ -43,21 +44,24 @@ export function neutralizeControlTokens(text: string): string {
 // conversations (where Hackerika needs to track what User A asked, what she
 // answered, and what User B is now adding) have enough scroll-back.
 const CHANNEL_CONTEXT_LIMIT = 12;
-const PER_MESSAGE_CHAR_LIMIT = 200;
+const PER_MESSAGE_CHAR_LIMIT = 450;
 
 function truncate(s: string, n: number): string {
   return s.length <= n ? s : s.slice(0, n - 1) + '…';
 }
+const mentionContext = (mentions: MentionReference[]) => mentions.length
+  ? ` mentions=${JSON.stringify(mentions.slice(0, 3).map(({ id, displayName, isBot }) => ({ id, displayName, isBot })))}` : '';
 
 // Compact channel context — last N messages, each truncated to a fixed budget.
-export async function getChannelContext(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, startSep: string, endSep: string): Promise<string> {
+export async function getChannelContext(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, startSep: string, endSep: string,
+  onMentions?: (mentions: MentionReference[]) => void): Promise<string> {
   try {
     const channelId = message.channel.id;
     let contextMessages: string[];
 
     const cachedMessages = await getChannelCache(channelId);
     const sliceCount = CHANNEL_CONTEXT_LIMIT + 1; // +1 because the current msg may be at the tail
-    const relevantCachedMessages = cachedMessages.slice(Math.max(0, cachedMessages.length - sliceCount), -1);
+    const relevantCachedMessages = cachedMessages.filter(msg => msg.id !== message.id).slice(-sliceCount);
 
     // Format lines as `[DisplayName <@ID>] content` — matches the speaker-tag
     // format used everywhere else (user messages, assistant messages in memory,
@@ -76,7 +80,9 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
           else if (msg.embeds) content = '[embed]';
           else content = '[empty]';
         }
-        return `[${authorName} <@${authorId}>] ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}`;
+        onMentions?.(msg.mentions || []);
+        const targets = mentionContext(msg.mentions || []);
+        return `[${neutralizeControlTokens(authorName)} <@${authorId}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${targets}`;
       });
     } else {
       const fetchedMessages = await message.channel.messages.fetch({ limit: CHANNEL_CONTEXT_LIMIT, before: message.id });
@@ -98,7 +104,10 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
           else if (msg.embeds.length > 0) content = '[embed]';
           else content = '[empty]';
         }
-        return `[${authorName} <@${authorId}>] ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}`;
+        const mentions = mentionReferences(msg);
+        onMentions?.(mentions);
+        const targets = mentionContext(mentions);
+        return `[${neutralizeControlTokens(authorName)} <@${authorId}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${targets}`;
       });
     }
 
@@ -148,7 +157,9 @@ export async function getReplyContext(
 
     // Same `[Name <@ID>] content` format as the speaker-tag / channel block —
     // disambiguates when two users share a display name.
-    return `\n${startSep}\n[${referencedAuthor} <@${referencedAuthorId}>] ${referencedContent}\n${endSep}`;
+    const mentions = mentionReferences(referencedMessage);
+    const targets = mentionContext(mentions);
+    return `\n${startSep}\n[${neutralizeControlTokens(referencedAuthor)} <@${referencedAuthorId}>] ${referencedContent}${targets}\n${endSep}`;
   } catch (error) {
     console.error('Error getting reply context:', error);
     return '';
@@ -167,10 +178,10 @@ export function getEnvironmentContext(
   userTimezone: string = 'Asia/Jakarta',
   timezoneIsDefault: boolean = true,
 ): string {
-  const guildName = message.guild?.name || 'DM';
+  const guildName = neutralizeControlTokens(message.guild?.name || 'DM');
   const channel = message.channel as any;
-  const channelName = channel?.name ? `#${channel.name}` : 'DM';
-  const channelTopic = channel?.topic ? truncate(channel.topic, 120) : '';
+  const channelName = channel?.name ? `#${neutralizeControlTokens(channel.name)}` : 'DM';
+  const channelTopic = channel?.topic ? truncate(neutralizeControlTokens(channel.topic), 120) : '';
   const isNSFW = channel?.nsfw ? ' nsfw' : '';
 
   let purpose = 'general';
@@ -201,6 +212,6 @@ export function getEnvironmentContext(
   }
 
   const tzMarker = timezoneIsDefault ? `${userTimezone} (default-unset)` : userTimezone;
-  const topicPart = channelTopic ? ` topic="${channelTopic}"` : '';
-  return `guild=${guildName} channel=${channelName} purpose=${purpose}${isNSFW}${topicPart} server-time=${serverIso} user-tz=${tzMarker} user-local-time="${userLocal}"`;
+  const topicPart = channelTopic ? ` topic=${JSON.stringify(channelTopic)}` : '';
+  return `guild=${JSON.stringify(guildName)} channel=${JSON.stringify(channelName)} purpose=${purpose}${isNSFW}${topicPart} server-time=${serverIso} user-tz=${tzMarker} user-local-time="${userLocal}"`;
 }

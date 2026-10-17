@@ -1,0 +1,20 @@
+{
+  "corpusHash": "9986b92a5bd23d340bc302d59a4ed6172760a0d6627bbfaf0fa9e6de76178247",
+  "sourceHash": "109e8eaad4f920366563e1aba6b845853886bba57f888521a9f31d386ae2f5c3",
+  "model": "configured light model",
+  "repeats": 2,
+  "samples": 32,
+  "correct": 30,
+  "accuracy": 0.9375,
+  "criticalFailures": 0,
+  "consecutiveFollowups": false,
+  "calls": 30,
+  "elapsedMs": 30429.029992,
+  "acceptance": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "consecutiveFollowups": true
+  },
+  "passed": false,
+  "limitations": "Small synthetic routing evaluation with expected action sets. No human-native baseline, Discord delivery, real tool actions, or global-optimum claim."
+}

@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-10-17T07:25:18.085Z",
+  "model": "gpt-6-luna",
+  "args": {
+    "question": "Bagaimana mengaktifkan notifikasi first blood Discord di rsctf? Cek dokumen dan implementasi repo ini. Sebut lokasi konfigurasi yang terbukti; apakah butuh relay eksternal?",
+    "urls": [
+      "https://github.com/dimasma0305/rsctf"
+    ]
+  },
+  "scope": "Regression of the historical exact-repository question using real primary-source reads and plan inference; no Discord sends or DB writes.",
+  "expected": "Per-game official Discord webhook; native blood announcements; no invented external relay."
+}

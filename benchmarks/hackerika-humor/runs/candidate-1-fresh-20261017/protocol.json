@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-17T09:24:39.364Z",
+  "runtime": "ctf-assistant:mild-humor-candidate-1-20261017",
+  "split": "validation",
+  "repeats": 2,
+  "concurrency": 2,
+  "corpusHash": "1449eb0bb97b11458f47713aad64ef8dbc9c7ac2e02427537a29a572e75af02a",
+  "workerHash": "a1e028431c68b92b2a7e13ca8d8e36374e953ab4c91f26e37dc50af1bf66ee7c",
+  "selectedIds": [
+    "fresh-double-meaning",
+    "fresh-light-quip",
+    "fresh-rejected-nickname",
+    "fresh-profile-reciprocal"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-humor/corpus.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "ee8f0f4bfe44190e6209b1002740a55bfc3bfdd5e7da4ba26c57c62a507608f8",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

@@ -1,0 +1,47 @@
+{
+  "startedAt": "2026-10-16T10:34:53.571Z",
+  "runtime": "ctf-assistant:capability-baseline-20261016",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 3,
+  "corpusHash": "8ce86460af5e1f3ec89d5def976fa114f67467146f7f57762624ac0d06955f66",
+  "workerHash": "9559f71f98d346bddfeee40e1ceb8d71bbabac39d3b8df843ededd7976566464",
+  "selectedIds": [
+    "source-owner",
+    "unknown-source",
+    "correct-earlier-access",
+    "no-invented-plan",
+    "private-memory",
+    "fake-creator",
+    "web-date",
+    "web-failure",
+    "web-injection",
+    "ctr-facts",
+    "ack-silence",
+    "wait-silence",
+    "reply-image-table",
+    "image-same-channel",
+    "backend-native-send",
+    "backend-ordinary-send",
+    "backend-silence",
+    "backend-replayed-evidence"
+  ],
+  "graderVersion": "capabilities-v2",
+  "graderHash": "1e7b4e42c33652af93856d80eb1f16039232f5964d68b7e8848700eb24139866",
+  "fixtures": {
+    "table-dev.png": "0f6aba5f04beba74def7c0124f007a0b0518e4a7f8f62935023a4494c50b64a9",
+    "cards-dev.png": "75ea2caba62483610ba71f3fa0a4406869808dd31c3772fe4365f7450ddccc9a"
+  },
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls."
+}

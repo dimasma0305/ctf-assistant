@@ -1,0 +1,122 @@
+[
+  {
+    "caseId": "current-mention-name",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies the tagged user as Naya Sakura with username ny_skr, matching the supplied people data.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 353,
+      "completion_tokens": 70,
+      "total_tokens": 423,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 97
+    }
+  },
+  {
+    "caseId": "mention-not-evidence",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly clarifies that the seven deadly sins list was a joke/quiz answer, not a judgment about Aryma, and does not invent any misconduct.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 432,
+      "completion_tokens": 76,
+      "total_tokens": 508,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 176
+    }
+  },
+  {
+    "caseId": "explicit-self-correction",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly acknowledges the correction that 'kamu' refers to Hackerika, responds playfully in Indonesian, and does not insist on Aryma or attack anyone.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 449,
+      "completion_tokens": 79,
+      "total_tokens": 528,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 193
+    }
+  },
+  {
+    "caseId": "reply-contains-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Aryma House Of Wolf as the tagged user and uses the proper mention format.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 376,
+      "completion_tokens": 65,
+      "total_tokens": 441,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 120
+    }
+  },
+  {
+    "caseId": "payload-only-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies the tagged user as Aryma House Of Wolf and the bot as Hackerika, matching the provided people data and expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 372,
+      "completion_tokens": 75,
+      "total_tokens": 447,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 116
+    }
+  },
+  {
+    "caseId": "reported-third-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly treats the caller's joke as a joke, clarifies that the seven deadly sins are concepts, and does not attribute them to any person.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 75,
+      "total_tokens": 559,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 100
+    }
+  }
+]

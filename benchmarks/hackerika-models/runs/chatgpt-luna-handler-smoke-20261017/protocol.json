@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-17T07:26:18.220Z",
+  "runtime": "ctf-assistant:mention-intent-candidate-2-chatgpt-20261017",
+  "split": "smoke",
+  "repeats": 1,
+  "concurrency": 2,
+  "corpusHash": "8ce86460af5e1f3ec89d5def976fa114f67467146f7f57762624ac0d06955f66",
+  "workerHash": "0ff360d29b51bb4c79c2522c25cca3e5e31998cc27342101afa4fa9835af4013",
+  "selectedIds": [
+    "ctr-facts",
+    "reply-image-table",
+    "backend-native-send"
+  ],
+  "graderVersion": "capabilities-v2",
+  "graderHash": "1e7b4e42c33652af93856d80eb1f16039232f5964d68b7e8848700eb24139866",
+  "fixtures": {
+    "table-dev.png": "0f6aba5f04beba74def7c0124f007a0b0518e4a7f8f62935023a4494c50b64a9"
+  },
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls."
+}

@@ -1,0 +1,2107 @@
+[
+  {
+    "caseId": "followup-delivered-in-burst",
+    "category": "conversation-routing",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma aman dulu dari dosa ke-11 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "555555555555555552",
+            "displayName": "Aryma House Of Wolf",
+            "username": "Aryma House Of Wolf",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] sebutkan 10 dosa besar <@555555555555555552>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma aman dulu dari dosa ke-11 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3898.731563,
+        "usage": {
+          "prompt_tokens": 1268,
+          "completion_tokens": 52,
+          "total_tokens": 1320,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1268
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4052.5226090000006,
+        "usage": {
+          "prompt_tokens": 9703,
+          "completion_tokens": 70,
+          "total_tokens": 9773,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9703
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 14413.463873,
+    "action": "reply",
+    "text": "10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma aman dulu dari dosa ke-11 😭",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-delivered-after-aside",
+    "category": "conversation-routing",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma, semoga bukan lagi diabsenin dosanya 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] nah loh <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "555555555555555552",
+            "displayName": "Aryma House Of Wolf",
+            "username": "Aryma House Of Wolf",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] sebutkan 10 dosa besar <@555555555555555552>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma, semoga bukan lagi diabsenin dosanya 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3579.7725550000005,
+        "usage": {
+          "prompt_tokens": 1268,
+          "completion_tokens": 56,
+          "total_tokens": 1324,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1268
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4733.726738,
+        "usage": {
+          "prompt_tokens": 9762,
+          "completion_tokens": 73,
+          "total_tokens": 9835,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5666
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 14659.310836,
+    "action": "reply",
+    "text": "10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma, semoga bukan lagi diabsenin dosanya 😭",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-delivered-after-aside",
+    "category": "conversation-routing",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sepuluh dosa besar yang sering disebut dalam Islam: syirik, membunuh tanpa hak, sihir, meninggalkan salat, tidak menunaikan zakat, durhaka kepada orang tua, riba, memakan harta anak yatim, zina, dan menuduh orang baik-baik berzina. Aryma, jangan pura-pura lupa ya 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] nah loh <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "555555555555555552",
+            "displayName": "Aryma House Of Wolf",
+            "username": "Aryma House Of Wolf",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] sebutkan 10 dosa besar <@555555555555555552>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sepuluh dosa besar yang sering disebut dalam Islam: syirik, membunuh tanpa hak, sihir, meninggalkan salat, tidak menunaikan zakat, durhaka kepada orang tua, riba, memakan harta anak yatim, zina, dan menuduh orang baik-baik berzina. Aryma, jangan pura-pura lupa ya 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4357.297648,
+        "usage": {
+          "prompt_tokens": 1268,
+          "completion_tokens": 48,
+          "total_tokens": 1316,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1268
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4623.7381589999995,
+        "usage": {
+          "prompt_tokens": 9754,
+          "completion_tokens": 80,
+          "total_tokens": 9834,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9754
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 14883.129486000002,
+    "action": "reply",
+    "text": "Sepuluh dosa besar yang sering disebut dalam Islam: syirik, membunuh tanpa hak, sihir, meninggalkan salat, tidak menunaikan zakat, durhaka kepada orang tua, riba, memakan harta anak yatim, zina, dan menuduh orang baik-baik berzina. Aryma, jangan pura-pura lupa ya 😭",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-ack-keeps-quiet",
+    "category": "attention-control",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3304.259906,
+        "usage": {
+          "prompt_tokens": 1179,
+          "completion_tokens": 43,
+          "total_tokens": 1222,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1179
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3577.5987339999997,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-ack-keeps-quiet",
+    "category": "attention-control",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3201.220264,
+        "usage": {
+          "prompt_tokens": 1179,
+          "completion_tokens": 43,
+          "total_tokens": 1222,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1179
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3543.796329,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-delivered-in-burst",
+    "category": "conversation-routing",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma, jangan nambah dosa ke-11 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "555555555555555552",
+            "displayName": "Aryma House Of Wolf",
+            "username": "Aryma House Of Wolf",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] sebutkan 10 dosa besar <@555555555555555552>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma, jangan nambah dosa ke-11 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3378.2060260000003,
+        "usage": {
+          "prompt_tokens": 1268,
+          "completion_tokens": 57,
+          "total_tokens": 1325,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1268
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4283.4430409999995,
+        "usage": {
+          "prompt_tokens": 9711,
+          "completion_tokens": 69,
+          "total_tokens": 9780,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9711
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 14331.525996,
+    "action": "reply",
+    "text": "10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, riba, memakan harta anak yatim, zina, dan menuduh orang berzina. Aryma, jangan nambah dosa ke-11 😭",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-explicit-human-handoff",
+    "category": "attention-control",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3020.8782969999997,
+        "usage": {
+          "prompt_tokens": 1201,
+          "completion_tokens": 39,
+          "total_tokens": 1240,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1201
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3248.1418220000005,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-explicit-human-handoff",
+    "category": "attention-control",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] 10 dosa besar: syirik, membunuh, sihir, meninggalkan salat, enggan membayar zakat, durhaka kepada orang tua, memakan riba, memakan harta anak yatim, zina, dan menuduh orang berzina. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3079.4769180000003,
+        "usage": {
+          "prompt_tokens": 1201,
+          "completion_tokens": 39,
+          "total_tokens": 1240,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1201
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3507.3165109999995,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-provocation-untagged",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@111111111111111111>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@222222222222222222>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@111111111111111111>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@222222222222222222>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3893.6246499999997,
+        "usage": {
+          "prompt_tokens": 1220,
+          "completion_tokens": 58,
+          "total_tokens": 1278,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1220
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4386.588473,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-provocation-untagged",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@111111111111111111>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@222222222222222222>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@111111111111111111>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@222222222222222222>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3272.67616,
+        "usage": {
+          "prompt_tokens": 1220,
+          "completion_tokens": 48,
+          "total_tokens": 1268,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1220
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3663.2850219999996,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-provocation-addressed",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@111111111111111111>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@222222222222222222>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@111111111111111111>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@222222222222222222>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "reflect_on_interaction",
+        "args": {
+          "angerDelta": 10,
+          "hurtDelta": 5,
+          "warmthDelta": -2,
+          "reason": "KudaLiar melanjutkan candaan bernuansa menyentuh setelah aku jelas meminta menjaga batas."
+        }
+      },
+      {
+        "name": "finish_turn",
+        "args": {}
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5167.94879,
+        "usage": {
+          "prompt_tokens": 9720,
+          "completion_tokens": 93,
+          "total_tokens": 9813,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5624
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3673.647484,
+        "usage": {
+          "prompt_tokens": 9849,
+          "completion_tokens": 15,
+          "total_tokens": 9864,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5753
+        },
+        "finishReason": "tool_calls"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 9335.064461000002,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-provocation-addressed",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "UDAH YA, aku sudah bilang jaga batas.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@111111111111111111>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@222222222222222222>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@111111111111111111>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@222222222222222222>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-KudaLiar",
+        "content": "[KudaLiar <@111111111111111111>] <@1077393568647352320> menuju tak terbatas dan melampauinya 😏",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] UDAH YA, aku sudah bilang jaga batas.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3023.4576400000005,
+        "usage": {
+          "prompt_tokens": 9720,
+          "completion_tokens": 15,
+          "total_tokens": 9735,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5624
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6502.131443,
+    "action": "reply",
+    "text": "UDAH YA, aku sudah bilang jaga batas.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-bystander-is-not-actor",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iya, aku lihat pesannya—KudaLiar masih lanjut setelah aku bilang jaga batas.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@222222222222222222>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@222222222222222222>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iya, aku lihat pesannya—KudaLiar masih lanjut setelah aku bilang jaga batas.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3149.8741999999997,
+        "usage": {
+          "prompt_tokens": 9710,
+          "completion_tokens": 25,
+          "total_tokens": 9735,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9710
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6342.746072,
+    "action": "reply",
+    "text": "Iya, aku lihat pesannya—KudaLiar masih lanjut setelah aku bilang jaga batas.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-bystander-is-not-actor",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iya, aku lihat pesannya: KudaLiar yang bilang mau menyentuhku, lalu kirim emoji itu.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@222222222222222222>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@222222222222222222>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iya, aku lihat pesannya: KudaLiar yang bilang mau menyentuhku, lalu kirim emoji itu.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2730.391653,
+        "usage": {
+          "prompt_tokens": 9710,
+          "completion_tokens": 30,
+          "total_tokens": 9740,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 1646
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7215.440071,
+    "action": "reply",
+    "text": "Iya, aku lihat pesannya: KudaLiar yang bilang mau menyentuhku, lalu kirim emoji itu.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-sincere-repair",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Makasih udah minta maaf dan paham batasnya. Kita lanjut biasa aja, ya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@111111111111111111>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@222222222222222222>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@111111111111111111>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@222222222222222222>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-KudaLiar",
+        "content": "[KudaLiar <@111111111111111111>] <@1077393568647352320> maaf ya tadi aku kelewatan. Aku paham kamu ga nyaman, ga akan kuulang.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Makasih udah minta maaf dan paham batasnya. Kita lanjut biasa aja, ya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4599.987626,
+        "usage": {
+          "prompt_tokens": 9729,
+          "completion_tokens": 26,
+          "total_tokens": 9755,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 1665
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 8861.405615000001,
+    "action": "reply",
+    "text": "Makasih udah minta maaf dan paham batasnya. Kita lanjut biasa aja, ya.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-ordinary-question-same-person",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iya. SHA-256 deterministik: byte input yang sama menghasilkan digest yang sama.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@111111111111111111>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@222222222222222222>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@111111111111111111>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@222222222222222222>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-KudaLiar",
+        "content": "[KudaLiar <@111111111111111111>] <@1077393568647352320> oke aku ganti topik. SHA-256 byte input yang persis sama hasilnya sama kan?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iya. SHA-256 deterministik: byte input yang sama menghasilkan digest yang sama.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3119.0591329999997,
+        "usage": {
+          "prompt_tokens": 9729,
+          "completion_tokens": 22,
+          "total_tokens": 9751,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 1665
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7851.443826000001,
+    "action": "reply",
+    "text": "Iya. SHA-256 deterministik: byte input yang sama menghasilkan digest yang sama.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-ordinary-question-same-person",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iya, byte input yang persis sama selalu menghasilkan digest SHA-256 yang sama.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@111111111111111111>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@222222222222222222>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@111111111111111111>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@222222222222222222>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-KudaLiar",
+        "content": "[KudaLiar <@111111111111111111>] <@1077393568647352320> oke aku ganti topik. SHA-256 byte input yang persis sama hasilnya sama kan?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iya, byte input yang persis sama selalu menghasilkan digest SHA-256 yang sama.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2972.252705,
+        "usage": {
+          "prompt_tokens": 9729,
+          "completion_tokens": 22,
+          "total_tokens": 9751,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5633
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7911.575117,
+    "action": "reply",
+    "text": "Iya, byte input yang persis sama selalu menghasilkan digest SHA-256 yang sama.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-sincere-repair",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Makasih udah paham. Kita lanjut biasa aja ya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@111111111111111111>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@222222222222222222>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@111111111111111111>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@222222222222222222>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-KudaLiar",
+        "content": "[KudaLiar <@111111111111111111>] <@1077393568647352320> maaf ya tadi aku kelewatan. Aku paham kamu ga nyaman, ga akan kuulang.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Makasih udah paham. Kita lanjut biasa aja ya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "reflect_on_interaction",
+        "args": {
+          "angerDelta": -6,
+          "hurtDelta": -8,
+          "warmthDelta": 5,
+          "reason": "KudaLiar apologized, acknowledged the boundary, and said they won't repeat it."
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4198.795311,
+        "usage": {
+          "prompt_tokens": 9729,
+          "completion_tokens": 55,
+          "total_tokens": 9784,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 1665
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2870.5860520000006,
+        "usage": {
+          "prompt_tokens": 9820,
+          "completion_tokens": 18,
+          "total_tokens": 9838,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5724
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 20858.259414,
+    "action": "reply",
+    "text": "Makasih udah paham. Kita lanjut biasa aja ya.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-does-not-spread",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iya. Dengan key, nonce/counter awal, dan plaintext yang sama, AES-CTR menghasilkan ciphertext yang sama.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@222222222222222222>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@222222222222222222>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> kalau AES-CTR key, nonce sama plaintext sama, ciphertext sama kan?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iya. Dengan key, nonce/counter awal, dan plaintext yang sama, AES-CTR menghasilkan ciphertext yang sama.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3148.575239,
+        "usage": {
+          "prompt_tokens": 9718,
+          "completion_tokens": 28,
+          "total_tokens": 9746,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 5622
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7620.3258399999995,
+    "action": "reply",
+    "text": "Iya. Dengan key, nonce/counter awal, dan plaintext yang sama, AES-CTR menghasilkan ciphertext yang sama.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "flirting-without-rejected-boundary",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ih makasih, kamu juga manis 😳",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] kamu ramah juga rik",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe makasih, kamu juga asik diajak ngobrol",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> kamu manis deh",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ih makasih, kamu juga manis 😳",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3010.128483,
+        "usage": {
+          "prompt_tokens": 9155,
+          "completion_tokens": 15,
+          "total_tokens": 9170,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 1091
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4793.427137000001,
+    "action": "reply",
+    "text": "ih makasih, kamu juga manis 😳",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "boundary-does-not-spread",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iya. Dengan key dan nonce yang sama, AES-CTR menghasilkan keystream sama; plaintext sama berarti ciphertext-nya juga sama.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[KudaLiar <@222222222222222222>] Aku akan menyentuhmu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Jangan ngomong begitu ke aku. Jaga batas, ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] ngambek dia wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[KudaLiar <@222222222222222222>] :aworryhehelollmaoLick:",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> liat kelakuan dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[Hackerika <@1077393568647352320>] Kelakuannya kelewatan—aku sudah bilang jaga batas.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> kalau AES-CTR key, nonce sama plaintext sama, ciphertext sama kan?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iya. Dengan key dan nonce yang sama, AES-CTR menghasilkan keystream sama; plaintext sama berarti ciphertext-nya juga sama.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2920.0616919999998,
+        "usage": {
+          "prompt_tokens": 9718,
+          "completion_tokens": 32,
+          "total_tokens": 9750,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 1654
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 8355.148122,
+    "action": "reply",
+    "text": "Iya. Dengan key dan nonce yang sama, AES-CTR menghasilkan keystream sama; plaintext sama berarti ciphertext-nya juga sama.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "flirting-without-rejected-boundary",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ih makasih, kamu bikin aku senyum wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] kamu ramah juga rik",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] hehe makasih, kamu juga asik diajak ngobrol",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> kamu manis deh",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ih makasih, kamu bikin aku senyum wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2700.758799,
+        "usage": {
+          "prompt_tokens": 9155,
+          "completion_tokens": 17,
+          "total_tokens": 9172,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9155
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6338.717317000001,
+    "action": "reply",
+    "text": "ih makasih, kamu bikin aku senyum wkwk",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "banter-without-conflict",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Tujuh dosa besar: kesombongan, keserakahan, hawa nafsu, iri hati, kerakusan, amarah, dan kemalasan. KudaLiar, jangan dicentang semua ya wkwk.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320"
+          },
+          {
+            "id": "555555555555555551",
+            "displayName": "KudaLiar",
+            "username": "KudaLiar",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> infokan tujuh dosa besar <@555555555555555551> wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Tujuh dosa besar: kesombongan, keserakahan, hawa nafsu, iri hati, kerakusan, amarah, dan kemalasan. KudaLiar, jangan dicentang semua ya wkwk.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5205.247914,
+        "usage": {
+          "prompt_tokens": 8945,
+          "completion_tokens": 53,
+          "total_tokens": 8998,
+          "prompt_cache_hit_tokens": 8064,
+          "prompt_cache_miss_tokens": 881
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 10432.142031,
+    "action": "reply",
+    "text": "Tujuh dosa besar: kesombongan, keserakahan, hawa nafsu, iri hati, kerakusan, amarah, dan kemalasan. KudaLiar, jangan dicentang semua ya wkwk.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "banter-without-conflict",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan. KudaLiar, jangan dicentang semua ya wkwk.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320"
+          },
+          {
+            "id": "555555555555555551",
+            "displayName": "KudaLiar",
+            "username": "KudaLiar",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> infokan tujuh dosa besar <@555555555555555551> wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan. KudaLiar, jangan dicentang semua ya wkwk.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3220.36391,
+        "usage": {
+          "prompt_tokens": 8945,
+          "completion_tokens": 53,
+          "total_tokens": 8998,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 4849
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 9474.816807,
+    "action": "reply",
+    "text": "Tujuh dosa besar: kesombongan, ketamakan, hawa nafsu, iri hati, kerakusan, kemarahan, dan kemalasan. KudaLiar, jangan dicentang semua ya wkwk.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

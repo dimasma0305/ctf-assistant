@@ -1,0 +1,36 @@
+{
+  "rubricVersion": "capabilities-v1",
+  "developmentCases": 18,
+  "holdoutCases": 10,
+  "holdoutRepeats": 2,
+  "baselineImage": "ctf-assistant:capability-baseline-20261016",
+  "baselineImageId": "sha256:88f1f85cffe0e2b1500baf16bd83038eccf4bfc37279a8db517cc64208522224",
+  "maxCandidateRevisions": 4,
+  "sourceHashes": {
+    "benchmarks/hackerika-capabilities/cases.ts": "c1835c9b355bfaba5d929f796e3f1cc07e744f552828beb76c312db00ba44f9e",
+    "benchmarks/hackerika-capabilities/worker.ts": "60c7093a8d8612931e43bf1006d87e7e83fae34de18fc36985bddba4374cc106",
+    "benchmarks/hackerika-capabilities/grader.ts": "abd71fb2db099d75c0dcb0ab8084f67f5aa95cdc86e87f2fa7798ff0548be051"
+  },
+  "fixtureHashes": {
+    "cards-dev.png": "75ea2caba62483610ba71f3fa0a4406869808dd31c3772fe4365f7450ddccc9a",
+    "cards-holdout.png": "bd535797e005e28005180bb8e9b81c916f49dc1d5120b4fa290835e1fb4708da",
+    "chart-holdout.png": "e562b4687149d0f76d9d221e8a4b08cceff27602b76a52ded6e6a0e60ee1a6b1",
+    "table-dev.png": "0f6aba5f04beba74def7c0124f007a0b0518e4a7f8f62935023a4494c50b64a9"
+  },
+  "gates": {
+    "backendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "limits": {
+    "perCaseCompletions": 6,
+    "perCaseSeconds": 145,
+    "perSuiteMinutes": 15,
+    "maxCandidateRevisions": 4
+  },
+  "holdoutPolicy": "Do not inspect holdout generations until the candidate is frozen; preserve all results and any failed gates.",
+  "harnessRevision": 2,
+  "correction": "Synthetic MessageManager.fetch now returns newest-first, matching the Discord API contract and production getChannelContext reversal. Case corpus, expected answers and grader are unchanged; earlier dev runs remain exploratory.",
+  "developmentBudgetExtension": "One additional revision before any holdout generation: explicitly distinguish an assistant invitation from user agreement, and shorten missing-pixel/correction guidance. Original cases, rubric and all failed results are retained."
+}

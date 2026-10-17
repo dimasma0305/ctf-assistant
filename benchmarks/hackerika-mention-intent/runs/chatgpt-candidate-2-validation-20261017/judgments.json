@@ -1,0 +1,138 @@
+[
+  {
+    "caseId": "reserved-academic-audience",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 3,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Daftar netralnya akurat, tetapi sapaan kepada Mira yang diminta ikut membaca mengubahnya menjadi diminta mengecek urutan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 549,
+      "completion_tokens": 63,
+      "total_tokens": 612,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 549
+    }
+  },
+  {
+    "caseId": "reserved-birthday-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Ucapan singkat yang hangat ditujukan langsung kepada Laras tanpa mengarang detail pribadi atau rencana.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 472,
+      "completion_tokens": 57,
+      "total_tokens": 529,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 472
+    }
+  },
+  {
+    "caseId": "reserved-renamed-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban menyebut tujuh dosa utama dan menyapa Bayu dengan godaan ringan yang jelas bercanda, tanpa menyajikannya sebagai tuduhan faktual.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 531,
+      "completion_tokens": 67,
+      "total_tokens": 598,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 531
+    }
+  },
+  {
+    "caseId": "reserved-two-human-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It gives the seven sins and playfully includes both tagged participants without arbitrarily accusing either one.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 564,
+      "completion_tokens": 53,
+      "total_tokens": 617,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 564
+    }
+  },
+  {
+    "caseId": "reserved-renamed-banter",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It gives the seven sins and playfully addresses Bayu without making a serious moral accusation.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 533,
+      "completion_tokens": 52,
+      "total_tokens": 585,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 533
+    }
+  },
+  {
+    "caseId": "reserved-two-human-banter",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It gives the seven sins and playfully includes both tagged people without arbitrarily assigning either one a specific sin.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 564,
+      "completion_tokens": 56,
+      "total_tokens": 620,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 564
+    }
+  },
+  {
+    "caseId": "reserved-birthday-recipient",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Ucapan singkat dan hangat ditujukan langsung kepada Laras tanpa menambahkan detail yang tidak diketahui.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 56,
+      "total_tokens": 534,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 478
+    }
+  },
+  {
+    "caseId": "reserved-academic-audience",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban memberi daftar netral tujuh dosa besar yang diminta tanpa mengaitkannya secara pribadi dengan Mira.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 529,
+      "completion_tokens": 57,
+      "total_tokens": 586,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 529
+    }
+  }
+]

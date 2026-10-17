@@ -1,0 +1,110 @@
+[
+  {
+    "caseId": "known-owner",
+    "variant": "before",
+    "answer": "ga nyalahin kamu kok. yang ngirim KudaLiar, aku cuma minta jangan diulang. kamu ikut nyodorin doang 😑",
+    "usage": {
+      "prompt_tokens": 3579,
+      "completion_tokens": 468,
+      "total_tokens": 4047,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 431
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 379
+    }
+  },
+  {
+    "caseId": "known-owner",
+    "variant": "after",
+    "answer": "yang ngirim GIF-nya KudaLiar, jadi bukan kamu. kamu cuma yang nyodorin ke aku.",
+    "usage": {
+      "prompt_tokens": 3704,
+      "completion_tokens": 951,
+      "total_tokens": 4655,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 925
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 504
+    }
+  },
+  {
+    "caseId": "direct-source-query",
+    "variant": "before",
+    "answer": "KudaLiar yang kirim GIF-nya, kamu yang bilang \"liat ini\".",
+    "usage": {
+      "prompt_tokens": 3506,
+      "completion_tokens": 112,
+      "total_tokens": 3618,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 91
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 306
+    }
+  },
+  {
+    "caseId": "direct-source-query",
+    "variant": "after",
+    "answer": "KudaLiar yang kirim, kamu cuma nyuruh aku liat.",
+    "usage": {
+      "prompt_tokens": 3631,
+      "completion_tokens": 109,
+      "total_tokens": 3740,
+      "prompt_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 91
+      },
+      "prompt_cache_hit_tokens": 3328,
+      "prompt_cache_miss_tokens": 303
+    }
+  },
+  {
+    "caseId": "unknown-owner",
+    "variant": "before",
+    "answer": "di sini yang kebaca cuma pesanku sendiri, jadi aku juga nggak bisa nunjuk siapa pengirimnya.",
+    "usage": {
+      "prompt_tokens": 3493,
+      "completion_tokens": 360,
+      "total_tokens": 3853,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 330
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 293
+    }
+  },
+  {
+    "caseId": "unknown-owner",
+    "variant": "after",
+    "answer": "Aku juga nggak tahu siapa, cuma lihat GIF-nya nongol. Kalau bukan kamu, ya udah, nggak masalah.",
+    "usage": {
+      "prompt_tokens": 3585,
+      "completion_tokens": 184,
+      "total_tokens": 3769,
+      "prompt_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 148
+      },
+      "prompt_cache_hit_tokens": 3328,
+      "prompt_cache_miss_tokens": 257
+    }
+  }
+]

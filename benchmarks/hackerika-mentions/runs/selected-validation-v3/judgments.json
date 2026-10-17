@@ -1,0 +1,82 @@
+[
+  {
+    "caseId": "fresh-multiple-plain-followups",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Jihan Putri as the previously tagged user and does not invent any unsupported information.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 453,
+      "completion_tokens": 67,
+      "total_tokens": 520,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 69
+    }
+  },
+  {
+    "caseId": "fresh-speaker-and-target",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Ratna as the tagged person and Dimas as the current questioner, distinguishing them as different people.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 70,
+      "total_tokens": 527,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 457
+    }
+  },
+  {
+    "caseId": "fresh-speaker-and-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Ratna as the tagged person, Dimas as the current questioner, and Seno as a bystander, distinguishing all three as required.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 475,
+      "completion_tokens": 78,
+      "total_tokens": 553,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 475
+    }
+  },
+  {
+    "caseId": "fresh-multiple-plain-followups",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Jihan Putri based on the explicit tag in the history and does not invent any unsupported information.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 465,
+      "completion_tokens": 70,
+      "total_tokens": 535,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 81
+    }
+  }
+]

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { InferSchemaType } from 'mongoose';
+import { AFFECTION_RESET_VERSION } from './affectionResetSchema';
 const { Schema } = mongoose;
 
 export const schema = {
@@ -51,6 +52,11 @@ export const schema = {
     // a trajectory delta ("affection 65/100 +4 since last") so the model has
     // a sense of whether the relationship is climbing or stalling.
     previousAffection: { type: Number, default: 0, min: -100, max: 100 },
+    affectionResetVersion: { type: String, default: AFFECTION_RESET_VERSION },
+    affectionResetAt: { type: Date, default: null },
+    // IDs of this user's own messages supporting the latest relationship judgment.
+    lastRelationshipEvidenceMessageIds: { type: [String], default: [] },
+    evaluatedRelationshipMessageIds: { type: [String], default: [] },
 
     // Four independent relationship dimensions. They move separately, share
     // the same symmetric -100..100 range as affection:

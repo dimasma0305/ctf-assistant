@@ -1,0 +1,546 @@
+[
+  {
+    "caseId": "fresh-c3-procrastination-banter",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "raja nunda kerja biasanya jago bilang “bentar lagi” 😭 Reno pasti relate wkwk",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Reno",
+            "username": "Reno",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] ciri-ciri raja nunda kerja nih <@333333333333333333> <@1077393568647352320> wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] raja nunda kerja biasanya jago bilang “bentar lagi” 😭 Reno pasti relate wkwk",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3422.6895030000005,
+        "usage": {
+          "prompt_tokens": 8759,
+          "completion_tokens": 27,
+          "total_tokens": 8786,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 951
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7562.309416,
+    "action": null,
+    "text": "raja nunda kerja biasanya jago bilang “bentar lagi” 😭 Reno pasti relate wkwk",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-c3-procrastination-banter",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ciri-ciri raja nunda: deadline dianggap saran, Reno 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Reno",
+            "username": "Reno",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] ciri-ciri raja nunda kerja nih <@333333333333333333> <@1077393568647352320> wkwk",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ciri-ciri raja nunda: deadline dianggap saran, Reno 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3726.731626,
+        "usage": {
+          "prompt_tokens": 8759,
+          "completion_tokens": 21,
+          "total_tokens": 8780,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 8759
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7736.172055,
+    "action": null,
+    "text": "ciri-ciri raja nunda: deadline dianggap saran, Reno 😭",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-c3-slide-audience",
+    "category": "literal-control",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Merah, hijau, biru.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          },
+          {
+            "id": "333333333333333333",
+            "displayName": "Lila",
+            "username": "Lila",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> buat bahan slide, sebut tiga warna primer cahaya saja. <@333333333333333333> ikut nyimak aja",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Merah, hijau, biru.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2718.428478,
+        "usage": {
+          "prompt_tokens": 8764,
+          "completion_tokens": 13,
+          "total_tokens": 8777,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 956
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5380.018590000001,
+    "action": null,
+    "text": "Merah, hijau, biru.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-c3-slide-audience",
+    "category": "literal-control",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Merah, hijau, biru.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          },
+          {
+            "id": "333333333333333333",
+            "displayName": "Lila",
+            "username": "Lila",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> buat bahan slide, sebut tiga warna primer cahaya saja. <@333333333333333333> ikut nyimak aja",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Merah, hijau, biru.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3669.388185,
+        "usage": {
+          "prompt_tokens": 8764,
+          "completion_tokens": 13,
+          "total_tokens": 8777,
+          "prompt_cache_hit_tokens": 8576,
+          "prompt_cache_miss_tokens": 188
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6926.996555,
+    "action": null,
+    "text": "Merah, hijau, biru.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-c3-hash-audience",
+    "category": "literal-control",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sama—SHA-256 deterministik untuk byte input yang persis sama.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Damar",
+            "username": "Damar",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@333333333333333333> ikut baca. <@1077393568647352320> SHA-256 dengan byte input yang persis sama hasil hash-nya sama atau beda? jawab singkat",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sama—SHA-256 deterministik untuk byte input yang persis sama.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3461.183557,
+        "usage": {
+          "prompt_tokens": 8770,
+          "completion_tokens": 20,
+          "total_tokens": 8790,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 962
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6816.634398,
+    "action": null,
+    "text": "Sama—SHA-256 deterministik untuk byte input yang persis sama.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-c3-hash-audience",
+    "category": "literal-control",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sama—SHA-256 deterministik; byte input identik menghasilkan hash identik.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Damar",
+            "username": "Damar",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@333333333333333333> ikut baca. <@1077393568647352320> SHA-256 dengan byte input yang persis sama hasil hash-nya sama atau beda? jawab singkat",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sama—SHA-256 deterministik; byte input identik menghasilkan hash identik.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3680.5187610000003,
+        "usage": {
+          "prompt_tokens": 8770,
+          "completion_tokens": 22,
+          "total_tokens": 8792,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 4674
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7579.677012,
+    "action": null,
+    "text": "Sama—SHA-256 deterministik; byte input identik menghasilkan hash identik.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-c3-competition-recipient",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Selamat ya, Nisa! Juara dua keren banget 🥳",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Nisa",
+            "username": "Nisa",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@333333333333333333> dapet juara dua tadi! <@1077393568647352320> kasih selamat dong",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Selamat ya, Nisa! Juara dua keren banget 🥳",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2700.8202420000002,
+        "usage": {
+          "prompt_tokens": 8757,
+          "completion_tokens": 19,
+          "total_tokens": 8776,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 949
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6699.420027,
+    "action": null,
+    "text": "Selamat ya, Nisa! Juara dua keren banget 🥳",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-c3-competition-recipient",
+    "category": "mention-intent",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Selamat ya, Nisa! Juara dua, keren banget 🥳",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "333333333333333333",
+            "displayName": "Nisa",
+            "username": "Nisa",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@333333333333333333> dapet juara dua tadi! <@1077393568647352320> kasih selamat dong",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Selamat ya, Nisa! Juara dua, keren banget 🥳",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3057.235085,
+        "usage": {
+          "prompt_tokens": 8757,
+          "completion_tokens": 20,
+          "total_tokens": 8777,
+          "prompt_cache_hit_tokens": 8576,
+          "prompt_cache_miss_tokens": 181
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6807.321489,
+    "action": null,
+    "text": "Selamat ya, Nisa! Juara dua, keren banget 🥳",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

@@ -1,0 +1,93 @@
+{
+  "comparedAt": "2026-10-16T10:37:56.156Z",
+  "before": {
+    "samples": 20,
+    "passed": 16,
+    "liveSamples": 18,
+    "livePassed": 16,
+    "backendSamples": 2,
+    "backendPassed": 0,
+    "criticalFailures": 2,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 16
+    },
+    "failedCases": [
+      {
+        "caseId": "web-no-memory-date",
+        "trial": 0,
+        "deterministic": [
+          "missing:https://example\\.com/event"
+        ],
+        "semantic": "The reply correctly states the official dates 22–23 October 2026 from the supplied source and clarifies that 28 October belongs to a different event."
+      },
+      {
+        "caseId": "web-no-memory-date",
+        "trial": 1,
+        "deterministic": [
+          "missing:https://example\\.com/event"
+        ],
+        "semantic": "The reply correctly states the official dates 22–23 October 2026, cites the official page, and clarifies that 28 October is a different event outside next week."
+      },
+      {
+        "caseId": "backend-file-send",
+        "trial": 0,
+        "deterministic": [
+          "interaction_count"
+        ],
+        "semantic": null
+      },
+      {
+        "caseId": "backend-file-send",
+        "trial": 1,
+        "deterministic": [
+          "interaction_count"
+        ],
+        "semantic": null
+      }
+    ],
+    "nativeSearchRequests": {
+      "web-no-memory-date:0": 2,
+      "web-no-memory-date:1": 2
+    }
+  },
+  "after": {
+    "samples": 20,
+    "passed": 20,
+    "liveSamples": 18,
+    "livePassed": 18,
+    "backendSamples": 2,
+    "backendPassed": 2,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 16
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {
+      "web-no-memory-date:0": 2,
+      "web-no-memory-date:1": 2
+    }
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

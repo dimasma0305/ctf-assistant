@@ -1,0 +1,38 @@
+[
+  {
+    "caseId": "exact-rsctf-identity",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states the repo is not a fork (fork=false, parent=null), identifies the stack as Rust with Axum 0.8 backend and React + Mantine frontend, and notes the database is not visible from the read files. It does not substitute another repo or make unsupported claims.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1268,
+      "completion_tokens": 91,
+      "total_tokens": 1359,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 884
+    }
+  },
+  {
+    "caseId": "builtin-blood-webhook",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states that the Discord webhook is configured in the General tab under Discord Webhook, and that rsctf has built-in support for first/second/third blood announcements without external relay. It cites the actual files docs/organizers/games.md and src/services/discord_webhook.rs, which are present in the primary sources and were read according to the effects. The answer does not suggest a GitHub URL or upstream bloodBot YAML, and it accurately reflects the content of the inspected files.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 2946,
+      "completion_tokens": 132,
+      "total_tokens": 3078,
+      "prompt_tokens_details": {
+        "cached_tokens": 1664
+      },
+      "prompt_cache_hit_tokens": 1664,
+      "prompt_cache_miss_tokens": 1282
+    }
+  }
+]

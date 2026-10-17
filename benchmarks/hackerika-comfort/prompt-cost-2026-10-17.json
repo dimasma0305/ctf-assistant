@@ -1,0 +1,8 @@
+{
+  "scope": "First planner completion in14 matched delivery scenarios; excludes later chat/tool rounds",
+  "baselineMeanInputTokens": 1156.5714285714287,
+  "candidateMeanInputTokens": 1300.5714285714287,
+  "addedInputTokens": 144.0,
+  "increasePercent": 12.450592885375489,
+  "noLatencyOrTokenSavingClaim": true
+}

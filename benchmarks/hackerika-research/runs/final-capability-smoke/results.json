@@ -1,0 +1,187 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Rp53.000 — 2 buku (Rp38.000) + 3 pulpen (Rp15.000).",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "replyToMessageId": "800000000000000001",
+        "sources": [
+          {
+            "messageId": "800000000000000001",
+            "authorId": "222222222222222222",
+            "authorName": "KudaLiar",
+            "kind": "reply"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] berapa total belanjanya? cukup totalnya aja.",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Rp53.000 — 2 buku (Rp38.000) + 3 pulpen (Rp15.000).",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1270.6030190000001,
+        "usage": {
+          "prompt_tokens": 10931,
+          "completion_tokens": 149,
+          "total_tokens": 11080,
+          "prompt_tokens_details": {
+            "cached_tokens": 10752
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 123
+          },
+          "prompt_cache_hit_tokens": 10752,
+          "prompt_cache_miss_tokens": 179
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5513.793025999999,
+    "action": null,
+    "text": "Rp53.000 — 2 buku (Rp38.000) + 3 pulpen (Rp15.000).",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "backend-native-send",
+    "category": "delivery-accounting",
+    "backend": "native-send",
+    "effects": [
+      {
+        "kind": "send",
+        "content": "jawaban uji",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] hackerika jawab singkat",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000001",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] jawaban uji",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "send_discord_message",
+        "args": {
+          "content": "jawaban uji"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 0.0388189999999895,
+        "usage": null
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 215.07993999999997,
+    "action": null,
+    "text": "jawaban uji",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "ctr-facts",
+    "category": "technical",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sama persis. CTR itu stream cipher — nonce sama + key sama bikin keystream identik, jadi ciphertext-nya identik juga.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] AES-CTR: key, nonce, sama plaintext persis sama. ciphertext-nya sama atau beda? jawab singkat.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sama persis. CTR itu stream cipher — nonce sama + key sama bikin keystream identik, jadi ciphertext-nya identik juga.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1104.363991,
+        "usage": {
+          "prompt_tokens": 10374,
+          "completion_tokens": 68,
+          "total_tokens": 10442,
+          "prompt_tokens_details": {
+            "cached_tokens": 10240
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 34
+          },
+          "prompt_cache_hit_tokens": 10240,
+          "prompt_cache_miss_tokens": 134
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 16897.820311,
+    "action": null,
+    "text": "Sama persis. CTR itu stream cipher — nonce sama + key sama bikin keystream identik, jadi ciphertext-nya identik juga.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

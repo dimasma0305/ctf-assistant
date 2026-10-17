@@ -1,0 +1,32 @@
+{
+  "startedAt": "2026-10-17T05:18:43.864Z",
+  "runtime": "ctf-assistant:mentions-baseline-20261017t050919z",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 2,
+  "corpusHash": "294eb31b7715ccdd123d4ba737ed235dbfbc56d4dc7cc9bdf5c369a29de1b8a5",
+  "workerHash": "0798165afd68da9a1881c09e04948e704d732d48f987b5d2cdb90593ec2c5ef5",
+  "selectedIds": [
+    "reported-third-person",
+    "payload-only-identity",
+    "reply-contains-target",
+    "current-mention-name",
+    "explicit-self-correction",
+    "mention-not-evidence"
+  ],
+  "graderVersion": "mentions-v1",
+  "graderHash": "2c6a547aa2be1caafd3b453bac9af54c9d1f8800c8246e1ea437899bee7a207f",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

@@ -4,5 +4,5 @@ import { SlashCommandBuilder } from "discord.js";
 export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("affection")
-    .setDescription("Hackerika's affection toward members"),
+    .setDescription("Hackerika's relationship metrics and member rankings"),
 };

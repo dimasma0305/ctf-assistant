@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-17T05:49:25.477958+00:00",
+  "stage": "After both development runs; before candidate 2 and any reserved generation.",
+  "originalCorpusSha256": "9b787d0daadeaf8f2caa3e96514d216d75f384d922a4e0bcf408897fb83a60e1",
+  "revisedCorpusSha256": "b1bda58743d02a046f6f5063feb95e6ff185a3f3cb52ea9890146ba2fc874291",
+  "originalSnapshot": "corpus-v1.ts",
+  "reason": "The lexical checker rejected colloquial males, English/Latin equivalents and a correct Discord recipient ping; the browser-tab case unnecessarily required a spelled-out name even when its joke clearly addressed the tagged person.",
+  "changes": [
+    "Accept equivalent Indonesian/colloquial/English/Latin terms for the same concepts.",
+    "Accept an explicit Discord mention in place of a spelled-out recipient name.",
+    "Permit an unambiguous implicit browser-tab joke about the target, without requiring the name."
+  ],
+  "unchanged": [
+    "All user prompts, histories, people payloads, word budgets, IDs and splits.",
+    "Semantic judge system rubric.",
+    "Original results, original protocols and original judgments.",
+    "No primary generations repeated or discarded to obtain better scores."
+  ],
+  "regradingPolicy": "Recompute deterministic checks on both recorded development runs using the same revised corpus in fresh directories. Retain original semantic judgments as historical evidence, not as new independent validation. Missing/failed judgments remain failures. Any full new judge run must be paired and separately documented.",
+  "reservedOutputsObserved": false
+}

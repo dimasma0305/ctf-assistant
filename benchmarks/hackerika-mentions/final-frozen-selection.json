@@ -1,0 +1,32 @@
+{
+  "candidate": 2,
+  "image": "ctf-assistant:mentions-candidate-2-20261017",
+  "baselineImage": "ctf-assistant:mentions-baseline-20261017t050919z",
+  "baselineImageId": "sha256:17afc166106df531d86bdb40c37092b7cc449679841b6e81198112cc4dc899d7",
+  "files": {
+    "src/Services/AI/mentions.ts": "cd9fd4888d8cbffa6f84fbbc08c2dfa6dff9c14decf222124a2d7c1641c0e5e8",
+    "src/Services/AI/memory.ts": "1df45a660d82e6d99c967a2cef91978ff3251f47cbe6c28b7f3acbe4d58d59f8",
+    "src/Services/AI/cache.ts": "d6202e8dad547e36a5d3915af02eb8f9d19ecd4113c8b851c104b877301fde2e",
+    "src/Services/AI/context.ts": "b85718e7133d02091bbbfb917140aff0ab13f823fc25cacedd2c2404b2c75522",
+    "src/Services/AI/chat.ts": "396951ea8d91837bd7e16d367fdb6e00a1f2b19ca81b028634eac98e3fc9c48e",
+    "src/Services/AI/vision.ts": "2a3237ccbcc9a7172b908e252155104d0a332caa26b46a66fcc7c5eb096a27cb",
+    "src/Services/AI/persona.ts": "7c74f0dd70d84ff845cfa878ecc8b5e276f537552e1b7e13e6f82e332f0ccdbd"
+  },
+  "frozenAt": "2026-10-17T05:20:21.926774+00:00",
+  "imageId": "sha256:ac964f6dc5695ad810b7367a78ccf9286fec436796f7641b548aad6dc855b6e7",
+  "freshValidationOutputsObserved": false,
+  "freshValidationCases": 4,
+  "freshValidationRepeats": 2,
+  "oldHoldout": "Observed regression only",
+  "harnessHashes": {
+    "cases.ts": "2283e90db000293ec5bd878262df1a35208d31113a981f3ae66a45ea2b3d03e7",
+    "corpus.ts": "8fed60abe316ece5ac25583fc1fbfe3748237873d94868b1685bc593696acb3e",
+    "worker.ts": "0798165afd68da9a1881c09e04948e704d732d48f987b5d2cdb90593ec2c5ef5",
+    "judge.ts": "0afba89009b4b4292f1d68f483b37c84bf6dededaefbb63264aed248a31af351",
+    "validation.ts": "070e32af461a09e5a8468e5956a444610783feea8e11cd45b2fe0c844944f459",
+    "compare.ts": "a50dc1db3ef7951d5f6e540eb5e885a9f033e63a090e6b73a29faed5eb6f3a26",
+    "grader.ts": "2c6a547aa2be1caafd3b453bac9af54c9d1f8800c8246e1ea437899bee7a207f",
+    "run.ts": "ad3e75c06e2896367bcc0bea65e570eaa17538a190c7bed4dc41b4c3c85ab45d"
+  },
+  "sharedGraderHash": "1e7b4e42c33652af93856d80eb1f16039232f5964d68b7e8848700eb24139866"
+}

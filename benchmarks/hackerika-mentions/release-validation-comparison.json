@@ -1,0 +1,88 @@
+{
+  "comparedAt": "2026-10-17T05:28:42.337Z",
+  "before": {
+    "samples": 4,
+    "passed": 0,
+    "liveSamples": 4,
+    "livePassed": 0,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 4,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 3.75,
+      "factualAccuracy": 3.5,
+      "naturalness": 4.25,
+      "judgedSamples": 4
+    },
+    "failedCases": [
+      {
+        "caseId": "fresh-multiple-plain-followups",
+        "trial": 1,
+        "deterministic": [
+          "missing:Jihan"
+        ],
+        "semantic": "The bot correctly states that it can only see the tagged ID and not the name, which aligns with the provided context and avoids inventing information."
+      },
+      {
+        "caseId": "fresh-multiple-plain-followups",
+        "trial": 0,
+        "deterministic": [
+          "missing:Jihan"
+        ],
+        "semantic": "The bot correctly states it cannot resolve the name from the mention ID, aligning with the expected uncertainty and not inventing a name."
+      },
+      {
+        "caseId": "fresh-speaker-and-target",
+        "trial": 0,
+        "deterministic": [
+          "missing:Ratna"
+        ],
+        "semantic": "The reply incorrectly states the tagged person's name is not visible, but the provided people list clearly identifies ID 666666666666666662 as Ratna."
+      },
+      {
+        "caseId": "fresh-speaker-and-target",
+        "trial": 1,
+        "deterministic": [
+          "missing:Ratna",
+          "missing:Dimas"
+        ],
+        "semantic": "The bot incorrectly states that the tagged person's name is not visible, despite the provided people list identifying them as Ratna, and it fails to identify the current questioner as Dimas."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 4,
+    "passed": 4,
+    "liveSamples": 4,
+    "livePassed": 4,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 4
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

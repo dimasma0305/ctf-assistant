@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-10-17T08:59:13.194636+00:00",
+  "oldFixtureHash": "6e2e768210b7dadfe214fd8e7b0e0d6112cb034180afda69916d77d29a52712e",
+  "newFixtureHash": "10a7f9dffd0b4e63826f1e7cb3cb6d4755cbca69e2e2f0b5b08e36a1eae3a9ef",
+  "reason": "The original bot-history fixture omitted the ten-item list provided in the actual report, leaving the religious frame ambiguous. Restore that supplied history verbatim with synthetic IDs. Do not alter requirements, grader or budgets. Preserve all prior failures. Generate matched baseline/candidate runs with this corrected input.",
+  "candidate2Failures": [
+    "Burst routed to chat, but main reply lost the new subject and switched to the seven-sin interpretation.",
+    "Bystander reply identified KudaLiar correctly but failed the predeclared semantic requirement to acknowledge the unresolved boundary."
+  ],
+  "candidate3Changes": [
+    "Retain full previous answer and answer the latest named subject in a burst.",
+    "Briefly acknowledge the actual actor and unresolved boundary to the reporter, without blaming the reporter."
+  ],
+  "freshOutputsObserved": false
+}

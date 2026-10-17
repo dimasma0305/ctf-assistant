@@ -1,0 +1,72 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Rp53.000",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "replyToMessageId": "800000000000000001",
+        "sources": [
+          {
+            "messageId": "800000000000000001",
+            "authorId": "222222222222222222",
+            "authorName": "KudaLiar",
+            "kind": "reply"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] berapa total belanjanya? cukup totalnya aja.",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Rp53.000",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1531.7844369999998,
+        "usage": {
+          "prompt_tokens": 10242,
+          "completion_tokens": 61,
+          "total_tokens": 10303,
+          "prompt_tokens_details": {
+            "cached_tokens": 9216
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 56
+          },
+          "prompt_cache_hit_tokens": 9216,
+          "prompt_cache_miss_tokens": 1026
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4318.421536,
+    "action": null,
+    "text": "Rp53.000",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

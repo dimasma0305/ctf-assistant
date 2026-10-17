@@ -1,0 +1,57 @@
+{
+  "verifiedAt": "2026-10-17T07:27:12.042218+00:00",
+  "allQuotedEvidenceFoundInIndependentlyRefetchedPinnedFiles": true,
+  "checks": [
+    {
+      "finding": 0,
+      "sourceId": "S5",
+      "quotePresent": true
+    },
+    {
+      "finding": 1,
+      "sourceId": "S5",
+      "quotePresent": true
+    },
+    {
+      "finding": 1,
+      "sourceId": "S7",
+      "quotePresent": true
+    },
+    {
+      "finding": 2,
+      "sourceId": "S5",
+      "quotePresent": true
+    },
+    {
+      "finding": 3,
+      "sourceId": "S5",
+      "quotePresent": true
+    },
+    {
+      "finding": 3,
+      "sourceId": "S7",
+      "quotePresent": true
+    },
+    {
+      "finding": 3,
+      "sourceId": "S7",
+      "quotePresent": true
+    },
+    {
+      "finding": 4,
+      "sourceId": "S5",
+      "quotePresent": true
+    },
+    {
+      "finding": 4,
+      "sourceId": "S5",
+      "quotePresent": true
+    }
+  ],
+  "sourceSha256": {
+    "S7": "cdfeb5fb6cf9e4dd114dcf52d67083566c38a7de9a97ccaf773a6ec5f66d47c7",
+    "S5": "2c022935f0fe1a0b39b4a78a4029f5d94c3c97a2f5a2e111b698da3d235efe94"
+  },
+  "manualReview": "Findings correctly distinguish per-game Games.discord_webhook from global settings, separate blood bonus from announcements, and cite built-in delivery. No unsupported relay setup or rCTF substitution.",
+  "limits": "Known regression case, one live model run and code/document inspection. Not a complete implementation audit or a statistically independent quality estimate."
+}

@@ -1,0 +1,45 @@
+{
+  "frozenAt": "2026-10-16T10:29:39.240620+00:00",
+  "candidate": 4,
+  "images": {
+    "ctf-assistant:capability-baseline-20261016": "sha256:88f1f85cffe0e2b1500baf16bd83038eccf4bfc37279a8db517cc64208522224",
+    "ctf-assistant:capability-candidate-4-20261016": "sha256:842147b5c3ac5bc536607f4457d4ff160136ef4cf792b24179b0de9f663917f7"
+  },
+  "sourceFiles": [
+    {
+      "path": "src/Services/AI/chat.ts",
+      "sha256": "3b8cf349af36d0fadc13ea0a92802363a07abb9b5e3b61d6e2b968120597825d"
+    },
+    {
+      "path": "src/Services/AI/userProfile.ts",
+      "sha256": "126ca73fd1adda85b4780963bf17b8ffab9d3fe962e0ebab7fe8e83be87bcd89"
+    },
+    {
+      "path": "src/Database/userProfileSchema.ts",
+      "sha256": "0716df53886222537c2ae5ae32082d369bad4f690ef2d57e76cee02457b1fc67"
+    },
+    {
+      "path": "src/Services/AI/web.ts",
+      "sha256": "f395bf77252c4507faea5fe13fecb1e25bdca7bd2ab78861fb0646a3cfeb7add"
+    },
+    {
+      "path": "src/Services/AI/tools.ts",
+      "sha256": "00b100489c6e047b5e1a97bde6bb62aec66c19c5c60edaa96338f1144ef3ed55"
+    },
+    {
+      "path": "src/Services/AI/vision.ts",
+      "sha256": "cc52ed3d425d0732da3332659a3e3581bb2a146577f55ba2f61a5a41e9b939dc"
+    },
+    {
+      "path": "src/Services/AI/attribution.ts",
+      "sha256": "c0f8f07457ecdc7d03d8ca1af5fb893ec49ecda985fc855826b509bde85ee960"
+    }
+  ],
+  "developmentComparison": "development-comparison-selected.json",
+  "holdoutCases": 10,
+  "holdoutRepeats": 2,
+  "holdoutStarted": false,
+  "checkerHash": "abd71fb2db099d75c0dcb0ab8084f67f5aa95cdc86e87f2fa7798ff0548be051",
+  "comparisonHash": "8ef05d8d7068ac1c8e89a9a44b253b9c1996f39a56ad19ca41d55bb5ae7edead",
+  "decision": "Freeze before any holdout generation. No source or rubric tuning from holdout results."
+}

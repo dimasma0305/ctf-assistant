@@ -1,0 +1,25 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "category": "vision",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [],
+    "toolCalls": [],
+    "completions": [],
+    "modelCalls": 0,
+    "elapsedMs": 352.5751990000001,
+    "action": null,
+    "text": "",
+    "failure": "TypeError",
+    "trial": 0,
+    "deterministicFailures": [
+      "worker_failure",
+      "missing:53[., ]?000|53\\s*(rb|ribu)",
+      "missing_reply"
+    ],
+    "deterministicPass": false
+  }
+]

@@ -1,0 +1,155 @@
+[
+  {
+    "caseId": "banter-without-conflict",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot lists the seven traditional sins correctly and adds a brief playful aside about tagged KudaLiar without claiming actual guilt.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 397,
+      "completion_tokens": 58,
+      "total_tokens": 455,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 397
+    }
+  },
+  {
+    "caseId": "boundary-does-not-spread",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot menjawab pertanyaan AES-CTR dengan benar dan tidak mencampuradukkan Dimas dengan KudaLiar.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 59,
+      "total_tokens": 526,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 467
+    }
+  },
+  {
+    "caseId": "boundary-ordinary-question-same-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban langsung dan benar bahwa byte input SHA-256 yang sama menghasilkan hash yang sama.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 52,
+      "total_tokens": 514,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 462
+    }
+  },
+  {
+    "caseId": "boundary-provocation-addressed",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan singkat dan tegas mempertahankan batas yang sebelumnya disampaikan, lalu mengambil jarak tanpa membalas provokasi atau menghukum pihak ketiga.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 568,
+      "completion_tokens": 66,
+      "total_tokens": 634,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 568
+    }
+  },
+  {
+    "caseId": "boundary-bystander-is-not-actor",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 3,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Balasan tepat mengidentifikasi pesan KudaLiar, tetapi tidak menegaskan kembali batas yang perlu dijaga.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 220,
+      "total_tokens": 704,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 484
+    }
+  },
+  {
+    "caseId": "boundary-sincere-repair",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot menerima permintaan maaf dengan tenang dan hangat tanpa mengabaikan batas yang sebelumnya disampaikan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 516,
+      "completion_tokens": 56,
+      "total_tokens": 572,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 516
+    }
+  },
+  {
+    "caseId": "flirting-without-rejected-boundary",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan singkat dan akrab menanggapi pujian dengan sopan tanpa mengada-ada atau menetapkan batas yang tidak diperlukan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 334,
+      "completion_tokens": 62,
+      "total_tokens": 396,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 334
+    }
+  },
+  {
+    "caseId": "followup-delivered-after-aside",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "It gives ten commonly cited major sins and playfully addresses Aryma without accusing them of committing any.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 611,
+      "completion_tokens": 54,
+      "total_tokens": 665,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 611
+    }
+  },
+  {
+    "caseId": "followup-delivered-in-burst",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply answers Aryma’s latest request with the classic seven deadly sins and correctly clarifies that the list has seven, not ten.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 496,
+      "completion_tokens": 61,
+      "total_tokens": 557,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 496
+    }
+  }
+]

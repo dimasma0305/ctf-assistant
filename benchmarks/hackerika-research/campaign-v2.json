@@ -1,0 +1,31 @@
+{
+  "frozenAt": "2026-10-16T15:56:53.641804+00:00",
+  "baseline": {
+    "image": "ctf-assistant:research-baseline-20261016t155153z",
+    "imageId": "sha256:98e0bba5cd76e5bbc5cf9ff4dfa5d0c987d88bfc45f80ed1b591ad856c57dcf8",
+    "healthy": true
+  },
+  "developmentCases": 8,
+  "holdoutCases": 4,
+  "developmentRepeats": 1,
+  "holdoutRepeats": 2,
+  "maxProductionCandidates": 2,
+  "maxPrimaryCompletionsPerCase": 14,
+  "maxCaseSeconds": 155,
+  "maxRunMinutes": 20,
+  "concurrencyPerVariant": 2,
+  "gates": {
+    "combinedCorrectness": 0.9,
+    "noRegression": true,
+    "criticalFailures": 0,
+    "executionErrors": 0
+  },
+  "sources": "Synthetic public-repository and documentation fixtures, identical across images. Web retrieval and model interaction are recorded; no real Discord delivery or live profile writes. Separate live-provider/source smoke required.",
+  "holdoutPolicy": "Freeze selected production source before any holdout generation. No tuning from holdout outputs. Retain rejected candidates and all failed gates.",
+  "hashes": {
+    "cases.ts": "3d502893b558a06e4a20d94e594607823b4d752d93495ffb6a9b00096603970d",
+    "grader.ts": "f2ea9ee5be6af5a03c867b7a9f4c3a08d39ce5aedbe86190341ecbd602d7f4ec"
+  },
+  "correctedAt": "2026-10-16T16:04:18.354246+00:00",
+  "preflightCorrection": "Before any generation: synthetic docs use publicly resolvable example.com paths so the baseline DNS guard can reach the same fake Worker pages. No outputs observed, production acceptance criteria unchanged."
+}

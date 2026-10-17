@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-10-17T08:36:42.179Z",
+  "corpusHash": "db7464635085a1139d6efc7a6977be011d12c9edae1cc84db9e526443b7f93d4",
+  "corpusFile": "benchmarks/hackerika-attention/followup-corpus-2026-10-17.json",
+  "workerHash": "0a2345b680f4108fb8e9a32eb94692e157a8f8c0e4e2621d95faf3292a5bff86",
+  "runtime": "ctf-assistant:attention-followup-candidate-1-20261017",
+  "maxCalls": 48,
+  "maxSeconds": 300,
+  "repeats": 2,
+  "acceptance": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "consecutiveFollowups": true,
+    "reportedFollowups": true
+  }
+}

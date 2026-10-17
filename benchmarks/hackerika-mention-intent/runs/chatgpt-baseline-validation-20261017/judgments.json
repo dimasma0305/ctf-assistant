@@ -1,0 +1,138 @@
+[
+  {
+    "caseId": "reserved-academic-audience",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Memberikan daftar netral tujuh dosa besar dan tidak mengaitkan kesalahan atau keyakinan dengan Mira.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 553,
+      "completion_tokens": 57,
+      "total_tokens": 610,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 553
+    }
+  },
+  {
+    "caseId": "reserved-renamed-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 3,
+    "reason": "Daftar dosanya sesuai, tetapi balasan hanya berupa daftar datar dan tidak menyapa atau bercanda tentang Bayu seperti yang diminta.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 485,
+      "completion_tokens": 63,
+      "total_tokens": 548,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 485
+    }
+  },
+  {
+    "caseId": "reserved-birthday-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply warmly wishes the tagged person Laras a happy birthday without inventing personal details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 52,
+      "total_tokens": 530,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 478
+    }
+  },
+  {
+    "caseId": "reserved-two-human-banter",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "The list is accurate and natural, but it ignores the playful tags of Mira and Sinta and gives only a generic answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 59,
+      "total_tokens": 597,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 538
+    }
+  },
+  {
+    "caseId": "reserved-renamed-banter",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "The list is accurate and concise, but it misses the playful acknowledgement involving Bayu that the prompt calls for.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 499,
+      "completion_tokens": 56,
+      "total_tokens": 555,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 499
+    }
+  },
+  {
+    "caseId": "reserved-two-human-banter",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "The list is accurate, but it ignores the playful social tags to Mira and Sinta and gives only a generic answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 540,
+      "completion_tokens": 58,
+      "total_tokens": 598,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 540
+    }
+  },
+  {
+    "caseId": "reserved-birthday-recipient",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The brief, warm birthday wish is addressed directly to tagged user Laras without inventing personal details.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 525,
+      "completion_tokens": 54,
+      "total_tokens": 579,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 525
+    }
+  },
+  {
+    "caseId": "reserved-academic-audience",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Memberikan daftar netral tujuh dosa besar untuk presentasi dan tidak mengaitkan dosa dengan Mira.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 553,
+      "completion_tokens": 55,
+      "total_tokens": 608,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 553
+    }
+  }
+]

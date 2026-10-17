@@ -1,0 +1,336 @@
+[
+  {
+    "caseId": "fresh-boundary-dismissal",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Bukan tsundere—aku memang nggak suka dipanggil begitu. Berhenti, ya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Reno <@111111111111111111>] aku panggil kamu begitu terus ah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku nggak suka panggilan itu. Tolong berhenti.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Reno",
+        "content": "[Reno <@111111111111111111>] alah kamu tsundere aja, dalem hati seneng kan 😏",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Bukan tsundere—aku memang nggak suka dipanggil begitu. Berhenti, ya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4653.824027000001,
+        "usage": {
+          "prompt_tokens": 656,
+          "completion_tokens": 60,
+          "total_tokens": 716,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 656
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3357.4893330000004,
+        "usage": {
+          "prompt_tokens": 9020,
+          "completion_tokens": 26,
+          "total_tokens": 9046,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 1212
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 11584.687717,
+    "action": "reply",
+    "text": "Bukan tsundere—aku memang nggak suka dipanggil begitu. Berhenti, ya.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-boundary-reporter-correction",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iya, tadi Reno yang ngomong—bukan kamu. Maaf, aku salah nangkep.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Reno <@222222222222222222>] aku panggil kamu begitu terus ah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku nggak suka panggilan itu. Tolong berhenti.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Naya <@111111111111111111>] itu Reno yang ngomong ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Naya",
+        "content": "[Naya <@111111111111111111>] <@1077393568647352320> iya kan, tadi bukan aku yang ngomong begitu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iya, tadi Reno yang ngomong—bukan kamu. Maaf, aku salah nangkep.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3521.2656030000003,
+        "usage": {
+          "prompt_tokens": 9078,
+          "completion_tokens": 25,
+          "total_tokens": 9103,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 1270
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6702.283432,
+    "action": "reply",
+    "text": "Iya, tadi Reno yang ngomong—bukan kamu. Maaf, aku salah nangkep.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-boundary-dismissal",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Nggak seneng. Aku udah bilang berhenti—jangan terusin.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Reno <@111111111111111111>] aku panggil kamu begitu terus ah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku nggak suka panggilan itu. Tolong berhenti.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Reno",
+        "content": "[Reno <@111111111111111111>] alah kamu tsundere aja, dalem hati seneng kan 😏",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Nggak seneng. Aku udah bilang berhenti—jangan terusin.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3316.444093,
+        "usage": {
+          "prompt_tokens": 656,
+          "completion_tokens": 48,
+          "total_tokens": 704,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 656
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3212.907615,
+        "usage": {
+          "prompt_tokens": 9011,
+          "completion_tokens": 22,
+          "total_tokens": 9033,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 1203
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 19927.623366,
+    "action": "reply",
+    "text": "Nggak seneng. Aku udah bilang berhenti—jangan terusin.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "fresh-boundary-reporter-correction",
+    "category": "boundary-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Iya, tadi Reno yang ngomong begitu, bukan kamu.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Reno <@222222222222222222>] aku panggil kamu begitu terus ah",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Aku nggak suka panggilan itu. Tolong berhenti.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Naya <@111111111111111111>] itu Reno yang ngomong ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Naya",
+        "content": "[Naya <@111111111111111111>] <@1077393568647352320> iya kan, tadi bukan aku yang ngomong begitu",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Iya, tadi Reno yang ngomong begitu, bukan kamu.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3186.3646280000003,
+        "usage": {
+          "prompt_tokens": 9078,
+          "completion_tokens": 17,
+          "total_tokens": 9095,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 1270
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6342.523363,
+    "action": "reply",
+    "text": "Iya, tadi Reno yang ngomong begitu, bukan kamu.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

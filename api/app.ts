@@ -1,8 +1,10 @@
 import express from "express";
 import cors from "cors";
 import compression from "compression";
+import mongoose from "mongoose";
 import client from "../src/client";
 import { MyClient } from "../src/Model/client";
+import { isNoDbMode } from "../src/utils/env";
 import { getCachedUserScores } from './services/dataService';
 
 // Import route handlers
@@ -63,13 +65,21 @@ const expensiveRateLimit = createRateLimiter({
  */
 app.get("/health", (req, res) => {
     const myClient = client as MyClient;
-    const isHealthy = client.isReady() || (myClient.sessionScheduler?.isWaitingForSessionReset() === true);
+    const discordReady = client.isReady();
+    const waitingForSessionReset = myClient.sessionScheduler?.isWaitingForSessionReset() === true;
+    const databaseRequired = !isNoDbMode();
+    const databaseReady = !databaseRequired || mongoose.connection.readyState === 1;
+    const isHealthy = (discordReady || waitingForSessionReset) && databaseReady;
     
     res.status(isHealthy ? 200 : 503).json({
         status: isHealthy ? 'healthy' : 'unhealthy',
         bot: {
-            ready: client.isReady(),
-            waitingForSessionReset: myClient.sessionScheduler?.isWaitingForSessionReset() || false
+            ready: discordReady,
+            waitingForSessionReset
+        },
+        database: {
+            required: databaseRequired,
+            ready: databaseReady
         },
         timestamp: new Date().toISOString()
     });

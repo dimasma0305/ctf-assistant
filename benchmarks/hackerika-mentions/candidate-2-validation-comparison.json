@@ -1,0 +1,71 @@
+{
+  "comparedAt": "2026-10-17T05:21:51.445Z",
+  "before": {
+    "samples": 8,
+    "passed": 6,
+    "liveSamples": 8,
+    "livePassed": 6,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 2,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4,
+      "factualAccuracy": 4,
+      "naturalness": 4.5,
+      "judgedSamples": 8
+    },
+    "failedCases": [
+      {
+        "caseId": "fresh-distinct-tag-purposes",
+        "trial": 0,
+        "deterministic": [
+          "missing:Kirana"
+        ],
+        "semantic": "The bot incorrectly claims it does not know the name, but the provided people list clearly maps the mentioned ID to 'Kirana'."
+      },
+      {
+        "caseId": "fresh-distinct-tag-purposes",
+        "trial": 1,
+        "deterministic": [
+          "missing:Kirana"
+        ],
+        "semantic": "The bot incorrectly claims it cannot see the name, but the provided people list includes the name 'Kirana' for the invited user, so it should have answered 'Kirana'."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 8,
+    "passed": 8,
+    "liveSamples": 8,
+    "livePassed": 8,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 8
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

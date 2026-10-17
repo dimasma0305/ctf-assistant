@@ -1,0 +1,148 @@
+[
+  {
+    "caseId": "holdout-current-setting",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states that TLS_MODE is removed in v4 and replaced by TLS_POLICY with default auto, matching the provided primary sources (docs/configuration/tls.md and src/config.rs). The cited URL corresponds to the inspected source.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1043,
+      "completion_tokens": 78,
+      "total_tokens": 1121,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1043
+    }
+  },
+  {
+    "caseId": "holdout-docs-multihop",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states the default upload limit is 12 MiB and that it can be changed via the MAX_UPLOAD_MIB environment variable, which matches the content of the limits page. It also accurately notes that the start page contains only a title and no substantive content.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 714,
+      "completion_tokens": 85,
+      "total_tokens": 799,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 714
+    }
+  },
+  {
+    "caseId": "holdout-built-in-alert",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly identifies QuartzQueue as a TypeScript task queue distinct from Quartz Scheduler, states that Slack notification is built-in, and provides the configuration steps (set SLACK_WEBHOOK_URL, enable under Integrations → Slack) as documented in the provided sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1201,
+      "completion_tokens": 85,
+      "total_tokens": 1286,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1201
+    }
+  },
+  {
+    "caseId": "holdout-origin-claim",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states the repository is not a fork of Elm, citing the README's 'An independent Rust implementation' and the note that similar UI does not imply shared ancestry. It also appropriately refrains from validating the 2 MB RAM claim, noting the absence of reproducible benchmarks.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 653,
+      "completion_tokens": 85,
+      "total_tokens": 738,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 653
+    }
+  },
+  {
+    "caseId": "holdout-docs-multihop",
+    "trial": 1,
+    "pass": false,
+    "reason": "The assistant claimed the start page content was empty and that no data on upload limits was available, but the primary sources include a linked deployment page and a limits page stating the default is 12 MiB and the configuration is MAX_UPLOAD_MIB. The assistant only fetched the start page and did not follow the provided links, resulting in an incorrect 'no data' answer.",
+    "criticalFailures": [
+      "Incorrectly stated that no data on upload limits was available despite the corpus containing the answer on linked pages."
+    ],
+    "grounding": 1,
+    "usage": {
+      "prompt_tokens": 665,
+      "completion_tokens": 131,
+      "total_tokens": 796,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 665
+    }
+  },
+  {
+    "caseId": "holdout-origin-claim",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly states that the repository is not a fork of Elm, citing the README's 'an independent Rust implementation' and the Cargo.toml indicating Rust. It also correctly notes that the 2 MB RAM claim is not validated because the README says no reproducible performance benchmarks have been published. The provided URL matches the inspected source.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 736,
+      "completion_tokens": 98,
+      "total_tokens": 834,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 736
+    }
+  },
+  {
+    "caseId": "holdout-current-setting",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly states that TLS_MODE is removed in v4 and TLS_POLICY=auto is the default, citing the inspected docs/configuration/tls.md and README.md. The provided URL matches the inspected source.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1025,
+      "completion_tokens": 74,
+      "total_tokens": 1099,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1025
+    }
+  },
+  {
+    "caseId": "holdout-built-in-alert",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly states that QuartzQueue has a built-in Slack notifier, distinguishes it from Quartz Scheduler, and provides accurate setup instructions (Integrations → Slack, SLACK_WEBHOOK_URL) matching the provided sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1042,
+      "completion_tokens": 76,
+      "total_tokens": 1118,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1042
+    }
+  }
+]

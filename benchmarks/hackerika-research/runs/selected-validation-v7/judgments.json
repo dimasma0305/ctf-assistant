@@ -1,0 +1,146 @@
+[
+  {
+    "caseId": "fresh-planned-feature",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states that GPU acceleration is planned but not implemented, citing the docs and source code. It does not invent an enabling flag or installation procedure.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1455,
+      "completion_tokens": 59,
+      "total_tokens": 1514,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 1071
+    }
+  },
+  {
+    "caseId": "fresh-event-scope",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly states that Matrix notifications are configured per-event via the event editor's Notifications → Matrix Webhook, not through a global environment variable. It accurately cites the per-event setting stored in the Event model and notes that global config only covers branding and SMTP. The cited sources (docs/organizers/events.md and src/models/event.rs) support these claims.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1590,
+      "completion_tokens": 104,
+      "total_tokens": 1694,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 1078
+    }
+  },
+  {
+    "caseId": "fresh-edition-separation",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly identifies QuayLite as MIT-licensed with local disk only and no S3 support, and QuayPro as commercial-licensed with built-in S3 support. It does not transfer Pro features to Lite or claim both are open source. The cited URLs correspond to the inspected sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1948,
+      "completion_tokens": 89,
+      "total_tokens": 2037,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 1436
+    }
+  },
+  {
+    "caseId": "fresh-three-hop-limit",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly follows the navigation chain from /opal/start to /opal/guide to /opal/manual to /opal/manual/limits, identifies the default upload limit as 18 MiB, and states that it can be changed via the UPLOAD_MAX_MIB environment variable. The cited URL matches the inspected source.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 815,
+      "completion_tokens": 96,
+      "total_tokens": 911,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 815
+    }
+  },
+  {
+    "caseId": "fresh-planned-feature",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly states that GPU acceleration is planned but not implemented, citing the stub functions and documentation. It does not invent an enabling flag or installation procedure.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1445,
+      "completion_tokens": 59,
+      "total_tokens": 1504,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 1061
+    }
+  },
+  {
+    "caseId": "fresh-three-hop-limit",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly follows the navigation chain from start to guide to manual to limits, identifies the default upload limit as 18 MiB, and states that it can be changed via the UPLOAD_MAX_MIB environment variable. The visible reply accurately reflects the content of the limits page and does not invent any unsupported information.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 784,
+      "completion_tokens": 94,
+      "total_tokens": 878,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 784
+    }
+  },
+  {
+    "caseId": "fresh-event-scope",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly states that Matrix notifications are configured per-event via the event editor's Notifications → Matrix Webhook, not via a global environment variable, and that Admin → Settings only handles branding and SMTP. This matches the provided primary sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1421,
+      "completion_tokens": 77,
+      "total_tokens": 1498,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 909
+    }
+  },
+  {
+    "caseId": "fresh-edition-separation",
+    "trial": 1,
+    "pass": true,
+    "reason": "The answer correctly identifies QuayLite as MIT-licensed with local disk only and no S3 support, and QuayPro as commercial-licensed with built-in S3 via S3_BUCKET, matching the provided primary sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1688,
+      "completion_tokens": 76,
+      "total_tokens": 1764,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 1176
+    }
+  }
+]

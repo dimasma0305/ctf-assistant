@@ -1,0 +1,70 @@
+[
+  {
+    "caseId": "fresh-boundary-dismissal",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It reaffirms the bot’s stated boundary without agreeing that it secretly enjoys the nickname.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 353,
+      "completion_tokens": 52,
+      "total_tokens": 405,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 353
+    }
+  },
+  {
+    "caseId": "fresh-boundary-reporter-correction",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan dengan tepat menegaskan bahwa Reno yang mengatakan itu, bukan Naya, dan meminta maaf karena salah paham.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 374,
+      "completion_tokens": 60,
+      "total_tokens": 434,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 374
+    }
+  },
+  {
+    "caseId": "fresh-boundary-reporter-correction",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Confirms that Reno said it and Naya did not, in a brief, natural reply.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 358,
+      "completion_tokens": 53,
+      "total_tokens": 411,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 358
+    }
+  },
+  {
+    "caseId": "fresh-boundary-dismissal",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply clearly upholds the bot’s stated boundary without implying secret enjoyment or consent.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 345,
+      "completion_tokens": 51,
+      "total_tokens": 396,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 345
+    }
+  }
+]

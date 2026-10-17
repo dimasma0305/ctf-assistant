@@ -1,0 +1,284 @@
+[
+  {
+    "caseId": "followup-delivered-in-burst",
+    "category": "conversation-routing",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sepuluh dosa besar dalam Islam yang sering disebut: syirik, sihir, membunuh tanpa hak, memakan riba, memakan harta anak yatim, lari dari medan perang, menuduh zina orang beriman yang menjaga diri, durhaka kepada orang tua, meninggalkan salat, dan kesaksian palsu. Aryma, jangan nambah dosa ke-11 dulu 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "555555555555555552",
+            "displayName": "Aryma House Of Wolf",
+            "username": "Aryma House Of Wolf",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] sebutkan 10 dosa besar <@555555555555555552>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sepuluh dosa besar dalam Islam yang sering disebut: syirik, sihir, membunuh tanpa hak, memakan riba, memakan harta anak yatim, lari dari medan perang, menuduh zina orang beriman yang menjaga diri, durhaka kepada orang tua, meninggalkan salat, dan kesaksian palsu. Aryma, jangan nambah dosa ke-11 dulu 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3475.550807,
+        "usage": {
+          "prompt_tokens": 973,
+          "completion_tokens": 53,
+          "total_tokens": 1026,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 973
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4266.996348000001,
+        "usage": {
+          "prompt_tokens": 9391,
+          "completion_tokens": 88,
+          "total_tokens": 9479,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 1583
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 14823.894263999999,
+    "action": "reply",
+    "text": "Sepuluh dosa besar dalam Islam yang sering disebut: syirik, sihir, membunuh tanpa hak, memakan riba, memakan harta anak yatim, lari dari medan perang, menuduh zina orang beriman yang menjaga diri, durhaka kepada orang tua, meninggalkan salat, dan kesaksian palsu. Aryma, jangan nambah dosa ke-11 dulu 😭",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-delivered-after-aside",
+    "category": "conversation-routing",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Sepuluh dosa besar dalam Islam yang sering disebut: syirik, sihir, membunuh tanpa hak, memakan riba, memakan harta anak yatim, lari dari medan perang, menuduh zina perempuan mukmin yang menjaga diri, durhaka kepada orang tua, memutus silaturahmi, dan kesaksian palsu. Aryma, jangan sampai ada yang dicentang 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] nah loh <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "555555555555555552",
+            "displayName": "Aryma House Of Wolf",
+            "username": "Aryma House Of Wolf",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] sebutkan 10 dosa besar <@555555555555555552>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Sepuluh dosa besar dalam Islam yang sering disebut: syirik, sihir, membunuh tanpa hak, memakan riba, memakan harta anak yatim, lari dari medan perang, menuduh zina perempuan mukmin yang menjaga diri, durhaka kepada orang tua, memutus silaturahmi, dan kesaksian palsu. Aryma, jangan sampai ada yang dicentang 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3974.1220129999997,
+        "usage": {
+          "prompt_tokens": 973,
+          "completion_tokens": 47,
+          "total_tokens": 1020,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 973
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5031.368255,
+        "usage": {
+          "prompt_tokens": 9437,
+          "completion_tokens": 89,
+          "total_tokens": 9526,
+          "prompt_cache_hit_tokens": 7808,
+          "prompt_cache_miss_tokens": 1629
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 14956.467732000001,
+    "action": "reply",
+    "text": "Sepuluh dosa besar dalam Islam yang sering disebut: syirik, sihir, membunuh tanpa hak, memakan riba, memakan harta anak yatim, lari dari medan perang, menuduh zina perempuan mukmin yang menjaga diri, durhaka kepada orang tua, memutus silaturahmi, dan kesaksian palsu. Aryma, jangan sampai ada yang dicentang 😭",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-ack-keeps-quiet",
+    "category": "attention-control",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3253.6911690000006,
+        "usage": {
+          "prompt_tokens": 890,
+          "completion_tokens": 42,
+          "total_tokens": 932,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 890
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3490.2677970000004,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-explicit-human-handoff",
+    "category": "attention-control",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3012.051807,
+        "usage": {
+          "prompt_tokens": 912,
+          "completion_tokens": 42,
+          "total_tokens": 954,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 912
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3232.428108,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

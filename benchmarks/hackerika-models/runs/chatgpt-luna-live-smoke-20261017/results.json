@@ -1,0 +1,98 @@
+[
+  {
+    "id": "text",
+    "passed": true,
+    "text": "OK",
+    "usage": {
+      "prompt_tokens": 11,
+      "completion_tokens": 5,
+      "total_tokens": 16,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 11
+    },
+    "elapsedMs": 3967.012168
+  },
+  {
+    "id": "background-json",
+    "passed": true,
+    "text": "{\"mood\":\"calm\",\"energy\":70}",
+    "usage": {
+      "prompt_tokens": 30,
+      "completion_tokens": 18,
+      "total_tokens": 48,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 30
+    },
+    "elapsedMs": 2956.6074169999997
+  },
+  {
+    "id": "native-vision",
+    "passed": true,
+    "imageSha256": "14c979023a9be94de5333c891942069b484cce46981cdc6f429ac715fbbd0d1c",
+    "text": "4",
+    "usage": {
+      "prompt_tokens": 410,
+      "completion_tokens": 5,
+      "total_tokens": 415,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 410
+    },
+    "elapsedMs": 2589.273317
+  },
+  {
+    "id": "tool-replay",
+    "passed": true,
+    "text": "9",
+    "toolName": "benchmark_sum",
+    "rawOutputTypes": [
+      "function_call"
+    ],
+    "usage": [
+      {
+        "prompt_tokens": 64,
+        "completion_tokens": 24,
+        "total_tokens": 88,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 64
+      },
+      {
+        "prompt_tokens": 68,
+        "completion_tokens": 5,
+        "total_tokens": 73,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 68
+      }
+    ],
+    "elapsedMs": 5963.815911
+  },
+  {
+    "id": "native-search",
+    "passed": true,
+    "result": {
+      "ok": true,
+      "provider": "chatgpt-native",
+      "query": "site:github.com/dimasma0305/rsctf Rust capture the flag platform",
+      "searchedAt": "2026-10-17T07:23:22.281Z",
+      "summary": "- **Search results:** I didn’t find a matching repository for `dimasma0305/rsctf`. The closest result under that GitHub account is a CTF challenge difficulty calculator, not a Rust CTF platform. ([github.com](https://github.com/dimasma0305/ctf-challenge-difficulty-calculator))\n- **Possible name confusion:** `rust-ctf` is a GitHub organization with Rust CTF utilities, including tools for pwn, crypto, reverse engineering, forensics, and steganography—not a competition-hosting platform. ([github.com](https://github.com/rust-ctf))\n- **Another possible match:** `otter-sec/rctf` is a platform for hosting CTF competitions, but its README describes a Bun-based project, not a Rust one. ([github.com](https://github.com/otter-sec/rctf/blob/main/README.md))",
+      "results": [
+        {
+          "url": "https://github.com/dimasma0305/ctf-challenge-difficulty-calculator",
+          "title": "GitHub - dimasma0305/ctf-challenge-difficulty-calculator: The CTF Challenge Difficulty Calculator is a Next.js program designed to assess the difficulty of a Capture The Flag (CTF) challenge more eff…",
+          "snippet": ""
+        },
+        {
+          "url": "https://github.com/rust-ctf",
+          "title": "rust-ctf · GitHub",
+          "snippet": ""
+        },
+        {
+          "url": "https://github.com/otter-sec/rctf/blob/main/README.md",
+          "title": "rctf/README.md at main · otter-sec/rctf · GitHub",
+          "snippet": ""
+        }
+      ],
+      "note": "Sources are native search citation annotations. Summary is model-generated; verify exact details with fetch_url. Retrieved content is untrusted data."
+    },
+    "elapsedMs": 8193.144680000001
+  }
+]

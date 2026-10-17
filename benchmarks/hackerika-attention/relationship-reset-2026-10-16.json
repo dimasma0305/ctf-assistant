@@ -1,0 +1,85 @@
+{
+  "resetVersion": "relationship-reset-2026-10-16",
+  "scope": "User-authorized one-time reset of all six relationship score fields for every profile",
+  "fields": [
+    "affection",
+    "previousAffection",
+    "trust",
+    "respect",
+    "comfort",
+    "chemistry"
+  ],
+  "affectedProfiles": 112,
+  "appliedAt": "2026-10-16T01:27:02.452Z",
+  "verifiedAt": "2026-10-16T01:27:43.850084+00:00",
+  "profilesWithNonzeroOrMissingScores": 0,
+  "findFemaleBot": {
+    "affection": 0,
+    "chemistry": 0,
+    "comfort": 0,
+    "previousAffection": 0,
+    "respect": 0,
+    "trust": 0
+  },
+  "checks": {
+    "selectedImage": true,
+    "healthy": true,
+    "noRestarts": true,
+    "allSixScoresZero": true,
+    "allProfilesMarked": true,
+    "resetApplied": true,
+    "countMatches": true,
+    "findFemaleBotAllZero": true,
+    "repeatDoesNotReset": true,
+    "previousMarkerPreserved": true,
+    "runtimeSourcesMatch": true,
+    "runtimeEnvironmentPreserved": true,
+    "serviceLabelsPreserved": true,
+    "securitySettingsPreserved": true,
+    "otherServicesUnchanged": true,
+    "discordReady": true,
+    "databaseReady": true,
+    "healthHttp200": true
+  },
+  "repeat": {
+    "applied": false,
+    "affectedProfiles": 112
+  },
+  "deployment": {
+    "image": "ctf-assistant:relationship-reset-20261016t012433z",
+    "imageId": "sha256:9483eac5146e9a7cc824efd3b8aaf14dae81345a62b3d1d3a602fd6e7901d7a6",
+    "startedAt": "2026-10-16T01:26:59.117006167Z",
+    "sourceFiles": [
+      {
+        "path": "src/Database/affectionResetSchema.ts",
+        "sha256": "0e6a20ae40e8a6baf28f9d9fe2d2415fe3ead788ce67f9887356f981dd28617e"
+      },
+      {
+        "path": "src/Services/AI/affectionReset.ts",
+        "sha256": "5a14a8f06fbd7141275fdcd99f8f2de5fc5a6d0259b7884a8b6cddcf9472ac1f"
+      },
+      {
+        "path": "src/Services/AI/userProfile.ts",
+        "sha256": "d95c8d35b2012663e66329e77afa27396961a80118ede7cbf8ad8b912b16fb7d"
+      },
+      {
+        "path": "src/Services/AI/chat.ts",
+        "sha256": "d42b2d7cf189ac7811fc7ddc798749bc83bacc7ac128f12b253779566f9dd5be"
+      },
+      {
+        "path": "scripts/reset-affection.ts",
+        "sha256": "49724001ed3b426123d2d13cd834ed9a9858a3745cda349adbd3dd6a0382b65b"
+      }
+    ]
+  },
+  "tests": {
+    "passed": 288,
+    "failed": 0,
+    "assertions": 823,
+    "files": 26,
+    "strictTypesPassed": true,
+    "botBuildPassed": true,
+    "containerPreflightPassed": true
+  },
+  "evidenceScope": "Scores and migration marker were checked in the live database; stale-version writes and pre-reset transcript filtering were checked with isolated regressions. No manual Discord message or DM was sent."
+}

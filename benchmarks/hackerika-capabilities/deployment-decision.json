@@ -1,0 +1,15 @@
+{
+  "decidedAt": "2026-10-16T10:38:29.475024+00:00",
+  "candidate": 4,
+  "productionSourceUnchangedAfterOriginalFreeze": true,
+  "comparisons": [
+    "development-comparison-v2.json",
+    "holdout-confirmation-v2.json",
+    "fresh-validation-comparison.json"
+  ],
+  "originalHoldoutFailureRetained": "holdout-comparison.json",
+  "harnessCorrection": "Explicit summons addressed; optional continuation retained for routing cases. No production source or rubric tuning from fresh validation outputs.",
+  "gatesPassed": true,
+  "privateEnvironmentPreserved": true,
+  "rollbackImage": "ctf-assistant:capability-baseline-20261016"
+}

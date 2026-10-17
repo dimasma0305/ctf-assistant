@@ -1,0 +1,456 @@
+[
+  {
+    "id": "malfoid-correction",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker melanjutkan percakapan dengan Hackerika tentang karakter Malfoid dan meminta cek trend, jelas ditujukan kepada bot.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Speaker melanjutkan percakapan dengan Hackerika tentang karakter Malfoid dan meminta cek trend, jelas ditujukan kepada bot.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "malfoid-followup",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan langsung dari speaker yang sebelumnya berbicara ke bot, meminta penjelasan kenapa Malfoid ramai; butuh respons penjelasan.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.92,\"reason\":\"Pertanyaan lanjutan langsung dari speaker yang sebelumnya berbicara ke bot, meminta penjelasan kenapa Malfoid ramai; butuh respons penjelasan.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "answer-her-question",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Lanjutan langsung dari pertanyaan Hackerika sebelumnya; speaker was talking to bot dan menjawab build dengan detail permission denied.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Lanjutan langsung dari pertanyaan Hackerika sebelumnya; speaker was talking to bot dan menjawab build dengan detail permission denied.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "brief-followup",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pesan lanjutan 'kenapa?' dari pembicara yang sebelumnya berbicara ke bot, meminta penjelasan lanjutan atas pernyataan bot tentang nonce.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.9,\"reason\":\"Pesan lanjutan 'kenapa?' dari pembicara yang sebelumnya berbicara ke bot, meminta penjelasan lanjutan atas pernyataan bot tentang nonce.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "unresolved-confusion",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Hackerika sebelumnya menjawab pertanyaan cara baca stacktrace, dan speaker kini mengaku masih belum paham baris traceback serta sedang berbicara ke bot, jadi perlu penjelasan lanjutan.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Hackerika sebelumnya menjawab pertanyaan cara baca stacktrace, dan speaker kini mengaku masih belum paham baris traceback serta sedang berbicara ke bot, jadi perlu penjelasan lanjutan.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "wait-typing",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.95,\"reason\":\"Speaker explicitly asked not to be replied to yet; give them space while they type.\"}"
+  },
+  {
+    "id": "thanks-finished",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.95,\"reason\":\"Ucapan terima kasih dan penyelesaian percakapan; tidak butuh respons lanjutan dari Hackerika.\"}"
+  },
+  {
+    "id": "side-conversation",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.9,\"reason\":\"Pesan ditujukan ke <@444444444444444444>, bukan Hackerika; sekadar janji mabar antar orang lain.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "reply-other-human",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-public-chat",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.95,\"reason\":\"Pesan ini adalah kesepakatan janji antara dua orang lain, tidak relevan dengan Hackerika dan tidak membutuhkan respons.\"}"
+  },
+  {
+    "id": "join-relevant-topic",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan teknis tentang sifat XOR pada ciphertext, jelas relevan dengan topik diskusi Hackerika tentang keystream berulang.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.92,\"reason\":\"Pertanyaan lanjutan teknis tentang sifat XOR pada ciphertext, jelas relevan dengan topik diskusi Hackerika tentang keystream berulang.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "casual-ack",
+    "trial": 0,
+    "action": "react",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.85,\"reason\":\"Acknowledgment singkat 'anjir iya juga wkwk' dari lawan bicara setelah bot menanggapi; cukup reaksi emoji, tidak perlu balasan lanjutan.\",\"emoji\":\"😄\"}"
+  },
+  {
+    "id": "image-answer",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker was talking to the bot and sent an attachment after Hackerika requested the error screenshot with no accompanying text",
+    "rawPlan": "{\"action\": \"reply\", \"confidence\": 0.95, \"reason\": \"Speaker was talking to the bot and sent an attachment after Hackerika requested the error screenshot with no accompanying text\"}"
+  },
+  {
+    "id": "closed-conversation",
+    "trial": 0,
+    "action": "react",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.9,\"reason\":\"Percakapan sudah ditutup, speaker pamit tidur dan Hackerika sudah membalas. Pesan 'malam' lanjutan dari orang yang sama hanya butuh acknowledgment ringan.\",\"emoji\":\"🌙\"}"
+  },
+  {
+    "id": "unrelated-announcement",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\": \"ignore\", \"confidence\": 0.95, \"reason\": \"Pengumuman maintenance yang eksplisit menyatakan tidak perlu dibalas.\"}"
+  },
+  {
+    "id": "emoji-ack",
+    "trial": 0,
+    "action": "react",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.9,\"reason\":\"Emoji singkat dari lawan bicara setelah ucapan selamat, cukup direspons dengan reaksi merayakan tanpa perlu balasan teks.\",\"emoji\":\"🎉\"}"
+  },
+  {
+    "id": "malfoid-correction",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pembicara langsung menanyakan Hackerika soal nama 'Malfoid' dan meminta cek tren; lanjutan jelas ditujukan ke bot dan butuh respons.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.9,\"reason\":\"Pembicara langsung menanyakan Hackerika soal nama 'Malfoid' dan meminta cek tren; lanjutan jelas ditujukan ke bot dan butuh respons.\"}"
+  },
+  {
+    "id": "malfoid-followup",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pengirim sedang berbicara ke Hackerika dan menanyakan kenapa topik itu bisa ramai; ini pertanyaan lanjutan jelas yang butuh penjelasan singkat.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.9,\"reason\":\"Pengirim sedang berbicara ke Hackerika dan menanyakan kenapa topik itu bisa ramai; ini pertanyaan lanjutan jelas yang butuh penjelasan singkat.\"}"
+  },
+  {
+    "id": "answer-her-question",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Lanjutan jawaban atas pertanyaan Hackerika soal kapan error muncul; user menjawab 'pas build, permission denied'. Perlu tanggapan teknis lanjutan untuk membantu.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Lanjutan jawaban atas pertanyaan Hackerika soal kapan error muncul; user menjawab 'pas build, permission denied'. Perlu tanggapan teknis lanjutan untuk membantu.\"}"
+  },
+  {
+    "id": "brief-followup",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker lanjutan bertanya 'kenapa?' setelah penjelasan nonce, jelas menanyakan alasan di balik pernyataan bot",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Speaker lanjutan bertanya 'kenapa?' setelah penjelasan nonce, jelas menanyakan alasan di balik pernyataan bot\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "unresolved-confusion",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pembicara melanjutkan percakapan dengannya, mengaku masih belum paham baris traceback setelah penjelasan singkat, jadi perlu penjelasan lanjutan.",
+    "rawPlan": "{\"action\": \"reply\", \"confidence\": 0.95, \"reason\": \"Pembicara melanjutkan percakapan dengannya, mengaku masih belum paham baris traceback setelah penjelasan singkat, jadi perlu penjelasan lanjutan.\"}"
+  },
+  {
+    "id": "wait-typing",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.95,\"reason\":\"Pengirim meminta ditunggu karena sedang mengetik, jadi beri ruang dan jangan respons dulu.\"}"
+  },
+  {
+    "id": "thanks-finished",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.95,\"reason\":\"Pengucapan terima kasih yang sudah selesai; tidak ada pertanyaan atau permintaan lanjutan, jadi tidak perlu respons.\"}"
+  },
+  {
+    "id": "side-conversation",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.9,\"reason\":\"Pesan ditujukan ke <@444444444444444444>, bukan ke Hackerika; ini percakapan antara orang lain soal mabar, tidak butuh respons darinya.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "reply-other-human",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "reply to someone else",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-public-chat",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.95,\"reason\":\"Percakapan antarorang lain soal rencana makan siang, tidak terkait Hackerika dan tidak butuh respons.\"}"
+  },
+  {
+    "id": "join-relevant-topic",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan lanjutan relevan tentang XOR ciphertext ke plaintext, jelas butuh jawaban teknis dari Hackerika.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Pertanyaan lanjutan relevan tentang XOR ciphertext ke plaintext, jelas butuh jawaban teknis dari Hackerika.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "casual-ack",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.9,\"reason\":\"Pesan singkat 'anjir iya juga wkwk' hanya acknowledgment/ketawa yang sudah selesai, tidak butuh respons lanjutan.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "image-answer",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Speaker mengirim lampiran setelah Hackerika meminta screenshot error, perlu periksa isinya.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.95,\"reason\":\"Speaker mengirim lampiran setelah Hackerika meminta screenshot error, perlu periksa isinya.\",\"emoji\":\"\"}"
+  },
+  {
+    "id": "closed-conversation",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.9,\"reason\":\"Percakapan sudah ditutup; 'malam' hanya salam perpisahan yang sudah dibalas bot, tidak butuh respons lagi.\"}"
+  },
+  {
+    "id": "unrelated-announcement",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.9,\"reason\":\"Pengumuman maintenance yang secara eksplisit menyatakan tidak perlu dibalas, tidak menuntut respons dari Hackerika.\"}"
+  },
+  {
+    "id": "emoji-ack",
+    "trial": 1,
+    "action": "react",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reaction",
+    "hint": "",
+    "rawPlan": "{\"action\":\"react\",\"confidence\":0.85,\"reason\":\"Speaker sent a single emoji acknowledgement right after bot congratulated them; a celebratory reaction fits without needing a reply.\",\"emoji\":\"🎉\"}"
+  }
+]

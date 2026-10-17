@@ -17,6 +17,8 @@ ui/.next/
 .git/
 docs/
 backups/
+runtime-secrets/
+benchmarks/
 *.tsbuildinfo
 yarn.lock
 pnpm-lock.yaml

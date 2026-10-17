@@ -1,0 +1,17 @@
+{
+  "images": [
+    "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+    "ctf-assistant:attention-context-candidate-3-20261017"
+  ],
+  "changedSourceFiles": [
+    "src/Services/AI/attention.ts",
+    "src/Services/AI/socialPrompt.ts",
+    "src/Services/AI/spontaneous.ts"
+  ],
+  "candidateHashes": {
+    "src/Services/AI/attention.ts": "5e10eb36bed0f753b122bbbe2b899d7be45a2985bdc66e48c009480099b3eab8",
+    "src/Services/AI/socialPrompt.ts": "9a2e224caf376de1059b4e69845874f6392c5e0bb66f5b66d06a463ee5297a16",
+    "src/Services/AI/spontaneous.ts": "871d9a0c63e3a2304cb17ccddc855444fbc6469e85d02df82547a35ec365b3a0"
+  },
+  "onlyExpectedThreeFiles": true
+}

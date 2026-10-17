@@ -1,0 +1,8 @@
+{
+  "scope": "First chat completion in six matched mild-humor cases, same provider/model and context, excludes later tool rounds",
+  "baselineMeanInputTokens": 8994,
+  "candidateMeanInputTokens": 9127,
+  "addedInputTokens": 133,
+  "increasePercent": 1.4787636201912369,
+  "limitation": "No latency or token-saving claim; actual usage varies with history and tool calls."
+}

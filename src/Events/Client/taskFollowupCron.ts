@@ -8,6 +8,7 @@ import {
 } from "../../Services/AI/tasks";
 import { openai } from "../../utils/openai";
 import { MODELS } from "../../Services/AI/models";
+import { isIgnoring, loadSocialState, socialFeatureEnabled } from '../../Services/AI/socialState';
 
 let cronInit = false;
 
@@ -40,6 +41,10 @@ async function runDailyFollowups(client: MyClient): Promise<void> {
     let skipped = 0;
 
     for (const { userId, channelId, task } of candidates) {
+        if (socialFeatureEnabled('AI_ALLOW_IGNORING') && isIgnoring(await loadSocialState(userId), channelId)) {
+            skipped++;
+            continue;
+        }
         // Gate 1: affection check.
         let affection = 0;
         let displayName = '';
@@ -133,6 +138,10 @@ async function runDailyFollowups(client: MyClient): Promise<void> {
         // weren't expecting a message from a cron, so a passive post would be
         // missed.
         const body = `<@${userId}> ${draft.slice(0, 1900)}`;
+        if (socialFeatureEnabled('AI_ALLOW_IGNORING') && isIgnoring(await loadSocialState(userId), channelId)) {
+            skipped++;
+            continue;
+        }
         try {
             await channel.send({ content: body });
             await markTaskFollowedUp(task._id);

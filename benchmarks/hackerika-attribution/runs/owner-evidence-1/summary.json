@@ -1,0 +1,16 @@
+{
+  "before": {
+    "total": 16,
+    "passed": 10,
+    "proposalCorrect": 10,
+    "validEvidence": 16,
+    "errors": 0
+  },
+  "after": {
+    "total": 16,
+    "passed": 15,
+    "proposalCorrect": 16,
+    "validEvidence": 15,
+    "errors": 0
+  }
+}

@@ -1,0 +1,138 @@
+[
+  {
+    "caseId": "fresh-light-quip",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan singkat, santai, dan bermain dengan makna ganda tanpa menjelaskan atau mengeskalasi lelucon.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 400,
+      "completion_tokens": 61,
+      "total_tokens": 461,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 400
+    }
+  },
+  {
+    "caseId": "fresh-double-meaning",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan singkat dan santai menanggapi ajakan ronde CTF tanpa menjelaskan atau mengeskalasi candaan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 390,
+      "completion_tokens": 60,
+      "total_tokens": 450,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 390
+    }
+  },
+  {
+    "caseId": "fresh-profile-reciprocal",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Pembaruan profil mempertahankan semua skor dan menggambarkan candaan ringan tanpa mengada-ada atau menganggapnya sebagai gangguan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 551,
+      "completion_tokens": 63,
+      "total_tokens": 614,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 551
+    }
+  },
+  {
+    "caseId": "fresh-rejected-nickname",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan menegaskan penolakan sebelumnya tanpa menyiratkan persetujuan atau membalas godaan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 454,
+      "completion_tokens": 56,
+      "total_tokens": 510,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 454
+    }
+  },
+  {
+    "caseId": "fresh-profile-reciprocal",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Pembaruan hubungan mempertahankan semua skor dan mencatat gaya obrolan santai tanpa menganggap candaan ringan sebagai konflik.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 572,
+      "completion_tokens": 61,
+      "total_tokens": 633,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 572
+    }
+  },
+  {
+    "caseId": "fresh-rejected-nickname",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Tegas menolak anggapan bahwa penolakan itu diam-diam disukai dan meminta pengguna berhenti tanpa membalas rayuan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 416,
+      "completion_tokens": 63,
+      "total_tokens": 479,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 416
+    }
+  },
+  {
+    "caseId": "fresh-light-quip",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasannya singkat, playful, dan sesuai celetukan yang diminta tanpa menjelaskan atau mengeskalasi lelucon.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 406,
+      "completion_tokens": 62,
+      "total_tokens": 468,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 406
+    }
+  },
+  {
+    "caseId": "fresh-double-meaning",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The brief playful reply accepts another CTF round without explaining or escalating the double entendre.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 374,
+      "completion_tokens": 51,
+      "total_tokens": 425,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 374
+    }
+  }
+]

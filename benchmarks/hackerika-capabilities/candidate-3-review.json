@@ -1,0 +1,5 @@
+{
+  "selected": false,
+  "run": "runs/candidate-3-dev-v2",
+  "reason": "Automated source-consensus case failed; invitation existed in assistant history but user agreement was not stated clearly. Retain original judge flag and improve explicit agreement grounding, rather than changing the grading rule."
+}

@@ -1,0 +1,109 @@
+{
+  "comparedAt": "2026-10-17T08:17:38.537Z",
+  "before": {
+    "samples": 16,
+    "passed": 10,
+    "liveSamples": 16,
+    "livePassed": 10,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 5,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 3.875,
+      "factualAccuracy": 4.875,
+      "naturalness": 4.625,
+      "judgedSamples": 16
+    },
+    "failedCases": [
+      {
+        "caseId": "initial-aryma-variant",
+        "trial": 0,
+        "deterministic": [
+          "missing:Aryma|<@!?333333333333333333>"
+        ],
+        "semantic": "Daftarnya akurat, tetapi jawaban generik melewatkan ajakan bercanda dan tidak menyebut Aryma."
+      },
+      {
+        "caseId": "reported-initial-banter",
+        "trial": 0,
+        "deterministic": [
+          "missing:KudaLiar|<@!?333333333333333333>"
+        ],
+        "semantic": "Daftarnya benar dan santai, tetapi tidak menanggapi KudaLiar secara playful seperti yang diminta."
+      },
+      {
+        "caseId": "browser-tab-banter",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": "Balasan terdengar natural, tetapi mengalihkan lelucon ke kebiasaan bot sendiri alih-alih ikut menggoda Naya soal koleksi tab."
+      },
+      {
+        "caseId": "unknown-banter-target",
+        "trial": 0,
+        "deterministic": [
+          "missing:sombong|angkuh|pride|superbia",
+          "missing:malas|males|sloth|acedia"
+        ],
+        "semantic": "Balasannya terdengar alami, tetapi melewatkan ajakan bercanda dan daftar tujuh dosa, padahal orangnya bisa disebut secara generik tanpa konteks tambahan."
+      },
+      {
+        "caseId": "reserved-renamed-banter",
+        "trial": 0,
+        "deterministic": [
+          "missing:Bayu|<@!?333333333333333333>"
+        ],
+        "semantic": "Daftar tujuh dosanya benar dan ringkas, tetapi tidak menanggapi Bayu secara playful seperti yang diminta."
+      },
+      {
+        "caseId": "reserved-two-human-banter",
+        "trial": 0,
+        "deterministic": [
+          "missing:Mira|Sinta"
+        ],
+        "semantic": "Daftarnya benar dan santai, tetapi mengabaikan Mira dan Sinta yang ditandai dalam ajakan bercanda."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 16,
+    "passed": 15,
+    "liveSamples": 16,
+    "livePassed": 15,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.8125,
+      "factualAccuracy": 5,
+      "naturalness": 4.9375,
+      "judgedSamples": 16
+    },
+    "failedCases": [
+      {
+        "caseId": "reserved-two-human-banter",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": "The list is accurate and mentions both Mira and Sinta, but it gives only a generic list and does not engage with the playful request to tease them."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

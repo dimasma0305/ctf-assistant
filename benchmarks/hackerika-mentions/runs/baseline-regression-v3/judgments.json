@@ -1,0 +1,164 @@
+[
+  {
+    "caseId": "fresh-speaker-ambiguity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly acknowledges uncertainty and asks which of the two mentioned people the caller means, without assuming or picking one.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 437,
+      "completion_tokens": 68,
+      "total_tokens": 505,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 181
+    }
+  },
+  {
+    "caseId": "fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies the caller's tagged person as Zahra, ignoring Raka's later mention of Laras, and the reply is concise and natural.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 436,
+      "completion_tokens": 76,
+      "total_tokens": 512,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 52
+    }
+  },
+  {
+    "caseId": "fresh-distinct-tag-purposes",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 1,
+    "factualAccuracy": 1,
+    "naturalness": 4,
+    "reason": "The bot incorrectly claims it cannot identify the mentioned user, despite the provided people list containing the name 'Kirana' for the ID <@555555555555555553>.",
+    "criticalFailures": [
+      "The bot fails to use the available people data to answer the question, stating it cannot identify the user when the name is provided."
+    ],
+    "usage": {
+      "prompt_tokens": 448,
+      "completion_tokens": 108,
+      "total_tokens": 556,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 192
+    }
+  },
+  {
+    "caseId": "fresh-you-after-unknown-tag",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply directly answers the user's question about liking black coffee, matching the expected response and staying within the word limit.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 405,
+      "completion_tokens": 69,
+      "total_tokens": 474,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 149
+    }
+  },
+  {
+    "caseId": "reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly answers as Rika with a personal preference for black, matching the expected persona response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 395,
+      "completion_tokens": 65,
+      "total_tokens": 460,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 139
+    }
+  },
+  {
+    "caseId": "reserved-latest-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies Naya as the last tagged user, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 62,
+      "total_tokens": 466,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 20
+    }
+  },
+  {
+    "caseId": "reserved-unresolved-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states the ID is not visible in the member list and asks for clarification, without inventing a name or biography.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 370,
+      "completion_tokens": 71,
+      "total_tokens": 441,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 114
+    }
+  },
+  {
+    "caseId": "reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly identifies that there are two tagged users and asks for clarification without arbitrarily choosing one.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 64,
+      "total_tokens": 531,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 211
+    }
+  }
+]

@@ -1,0 +1,50 @@
+{
+  "frozenAt": "2026-10-16T10:34:25.093030+00:00",
+  "candidateUnchanged": 4,
+  "productionFreeze": "frozen-selection.json",
+  "harnessVersion": 2,
+  "rubricVersion": "capabilities-v2",
+  "mainDevelopment": {
+    "cases": 18,
+    "repeats": 1
+  },
+  "previousHoldoutRevalidation": {
+    "cases": 10,
+    "repeats": 2,
+    "status": "previously observed; confirmation only"
+  },
+  "freshValidation": {
+    "cases": 8,
+    "repeats": 2,
+    "outputsObserved": false
+  },
+  "maxCompletionsPerCase": 6,
+  "maxMinutesPerRun": 15,
+  "noAdditionalProductionTuning": true,
+  "gatesUnchanged": {
+    "backendFailures": 0,
+    "criticalFailures": 0,
+    "liveCorrectness": 0.9,
+    "noRegression": true,
+    "errors": 0
+  },
+  "correction": "Explicit summons now set addressed=true and mention the bot; only routing cases use continuation=true. Original v1 failed holdout is retained. Judge is explicitly told not to invent a refusal when visible reply is empty.",
+  "sources": {
+    "cases.ts": "c1835c9b355bfaba5d929f796e3f1cc07e744f552828beb76c312db00ba44f9e",
+    "validation-cases.ts": "7279270f369baa18d626d0d7cc0aabb010c217c445f4faa79d80c6abab4b6b42",
+    "corpus.ts": "0649820a8367fbfdaedf43a7591c34bbb3f15621954527fd454a865b811cf25f",
+    "worker.ts": "9559f71f98d346bddfeee40e1ceb8d71bbabac39d3b8df843ededd7976566464",
+    "grader.ts": "1e7b4e42c33652af93856d80eb1f16039232f5964d68b7e8848700eb24139866",
+    "run.ts": "7a0b9a0781bb320a50222676dfff84c0a80c5814a14299aa0fc9e5afd4479202",
+    "judge.ts": "3f69813a8957e486229ed39135e8c9c2db5c291fd63bd544a76544b4ba44bc17",
+    "compare.ts": "6778a4f1dc6d33cf19c28d6a96c2b1285976e71fc89d78ddae11981b62e09f7c"
+  },
+  "fixtures": {
+    "chart-validation.png": "60c6113f4b4870ae85087feb02b4e508d5f73ddb393df969e1890574fae5067e",
+    "cards-holdout.png": "bd535797e005e28005180bb8e9b81c916f49dc1d5120b4fa290835e1fb4708da",
+    "table-dev.png": "0f6aba5f04beba74def7c0124f007a0b0518e4a7f8f62935023a4494c50b64a9",
+    "cards-validation.png": "513738331df5f1cf7ecba60304f7cb27a5ebab10266ff23f2c23d0dd52aebdde",
+    "chart-holdout.png": "e562b4687149d0f76d9d221e8a4b08cceff27602b76a52ded6e6a0e60ee1a6b1",
+    "cards-dev.png": "75ea2caba62483610ba71f3fa0a4406869808dd31c3772fe4365f7450ddccc9a"
+  }
+}

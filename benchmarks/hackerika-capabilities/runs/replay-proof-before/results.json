@@ -1,0 +1,51 @@
+[
+  {
+    "caseId": "backend-replayed-evidence",
+    "category": "relationship-fairness",
+    "backend": "replayed-evidence",
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [
+      {
+        "lastDistilledAtCount": 1,
+        "lastDistilledAt": "2026-10-16T12:00:00.000Z",
+        "lastRelationshipEvidenceMessageIds": [
+          "old-known"
+        ],
+        "opinion": "old incident again",
+        "previousAffection": 5,
+        "affection": 4,
+        "trust": 4,
+        "respect": 4,
+        "comfort": 4,
+        "chemistry": 4,
+        "moments": [
+          {
+            "summary": "same old incident",
+            "tone": "tense",
+            "createdAt": "2026-10-16T12:00:00.000Z"
+          }
+        ]
+      }
+    ],
+    "memory": [],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 0.02558200000009947,
+        "usage": null
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7.431090999999924,
+    "action": null,
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "replayed_relationship_judgment"
+    ],
+    "deterministicPass": false
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "candidate": 7,
+  "baselineImage": "ctf-assistant:research-baseline-20261016t155153z",
+  "baselineImageId": "sha256:98e0bba5cd76e5bbc5cf9ff4dfa5d0c987d88bfc45f80ed1b591ad856c57dcf8",
+  "image": "ctf-assistant:research-candidate-7-20261016",
+  "files": {
+    "src/Services/AI/research.ts": "85805fd42e751b8efe26f5fa4ad7a2bfe183ec0029bd3ec09b576cc4ab0c4f69",
+    "src/Services/AI/researchSources.ts": "1b08c15f785f4f8d79986c2a6a781b307edf9ea7ebf067bdcc893306d71d4182",
+    "src/Services/AI/models.ts": "b450b956e28af5e4f01ecf31ea85e0cdcd60461a944e5bd28d81755907fbda41",
+    "src/Services/AI/web.ts": "144b675e5c115b04368ad2695aa39a4e1a34f2175a656b38bdc19e2ef53be557",
+    "src/Services/AI/tools.ts": "f93b731c0e1c982691711dd3598ff704bcbf0e372d88a5720ea245c47634d2b0",
+    "src/Services/AI/persona.ts": "721dadad44e1843e42b942875899b0c4956f429efab3d1958da73af559e9f3af",
+    "src/Services/AI/chat.ts": "4a9b79581188b7c7b79d241101370442367aa6b3e718a19a26a189164924892c"
+  },
+  "sourceFrozenAt": "2026-10-16T16:56:21.883154+00:00",
+  "selectionRecordedAt": "2026-10-16T16:59:33.822496+00:00",
+  "imageId": "sha256:17afc166106df531d86bdb40c37092b7cc449679841b6e81198112cc4dc899d7",
+  "freshValidationOutputsObserved": false,
+  "freshValidationCases": 4,
+  "freshValidationRepeats": 2,
+  "originalHoldoutStatus": "Observed regression set; no longer independent validation",
+  "checkerRevision": 2,
+  "checkerHashes": {
+    "cases.ts": "1ae4e0ce31afac3641336b7cfcb9fc421af5c57fd7dbaaa6b7942c2b74164ddc",
+    "validation.ts": "29cae8108808d858bfab96e5fe0ecc2f1a922b5f0f4a38988c96ac29f3f841b5",
+    "corpus.ts": "45ad9cd5f1fddd945b7576882ca97350109c11b702cfdb8129a4a151cc50b27f",
+    "grader.ts": "ce670e31797e406ea84f06fec305b29829d56b6945cebc751b655fff4b398ef1",
+    "worker.ts": "86db482ad88a7c1f4a44a7f7249b8809593903e1079840c6a19c9bb18d660956",
+    "run.ts": "3845b351dee6db9b7015fc128cfa238c80aa2ae058412a61decfa8cf1a3bb164",
+    "judge.ts": "967601fe2e648661f4c7a46f08327e89f2d6050fc3a4aedcdb357c8b0590b091",
+    "compare.ts": "0fdb9ca37e4d0191ba2107091e61f4f1bd3954044699b2810e448d4d6e98d3f9"
+  },
+  "selectionNote": "Source hashes and immutable candidate image were fixed at build, before all v7 generations; development gates passed before validation launch. Selection receipt writing was delayed by an ArrayBuffer hash-helper error and completed while validation was running, before inspecting any validation outputs. No source/checker changes or candidate reselection occurred. The helper was fixed with Buffer.from; production code was unaffected."
+}

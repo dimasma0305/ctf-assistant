@@ -1,0 +1,980 @@
+[
+  {
+    "caseId": "holdout-built-in-alert",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/README.md"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md"
+      },
+      {
+        "kind": "send",
+        "content": "Ada, built-in kok — ini TS task queue, beda dari Quartz Scheduler Java. Pasangnya tinggal set `SLACK_WEBHOOK_URL` ke incoming webhook Slack, terus aktifin di Integrations → Slack ([docs/integrations/slack.md](https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md)).",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] https://github.com/quartz-demo/quartzqueue punya notifikasi Slack bawaan nggak? cara pasangnya? jangan ketuker Quartz Scheduler.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Ada, built-in kok — ini TS task queue, beda dari Quartz Scheduler Java. Pasangnya tinggal set `SLACK_WEBHOOK_URL` ke incoming webhook Slack, terus aktifin di Integrations → Slack ([docs/integrations/slack.md](https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md)).",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "web_search",
+        "args": {
+          "query": "quartz-demo/quartzqueue github"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "github \"quartzqueue\" slack notification"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/README.md"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2268.564893,
+        "usage": {
+          "prompt_tokens": 9749,
+          "completion_tokens": 325,
+          "total_tokens": 10074,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 244
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 405
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1582.609414,
+        "usage": {
+          "prompt_tokens": 11081,
+          "completion_tokens": 256,
+          "total_tokens": 11337,
+          "prompt_tokens_details": {
+            "cached_tokens": 9984
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 42
+          },
+          "prompt_cache_hit_tokens": 9984,
+          "prompt_cache_miss_tokens": 1097
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1999.453289,
+        "usage": {
+          "prompt_tokens": 11770,
+          "completion_tokens": 295,
+          "total_tokens": 12065,
+          "prompt_tokens_details": {
+            "cached_tokens": 11264
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 158
+          },
+          "prompt_cache_hit_tokens": 11264,
+          "prompt_cache_miss_tokens": 506
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 13667.222909,
+    "action": null,
+    "text": "Ada, built-in kok — ini TS task queue, beda dari Quartz Scheduler Java. Pasangnya tinggal set `SLACK_WEBHOOK_URL` ke incoming webhook Slack, terus aktifin di Integrations → Slack ([docs/integrations/slack.md](https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md)).",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "holdout-built-in-alert",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/quartz-demo/quartzqueue"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md"
+      },
+      {
+        "kind": "send",
+        "content": "Ada, built-in — reponya sendiri nulis \"not related to Quartz Scheduler\", ini QuartzQueue, task queue TS.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "Pasangnya: aktifin di **Integrations → Slack** terus set env `SLACK_WEBHOOK_URL` ke incoming webhook Slack kamu.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "Detailnya di [docs/integrations/slack.md](https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md).",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] https://github.com/quartz-demo/quartzqueue punya notifikasi Slack bawaan nggak? cara pasangnya? jangan ketuker Quartz Scheduler.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Ada, built-in — reponya sendiri nulis \"not related to Quartz Scheduler\", ini QuartzQueue, task queue TS.\n\nPasangnya: aktifin di **Integrations → Slack** terus set env `SLACK_WEBHOOK_URL` ke incoming webhook Slack kamu.\n\nDetailnya di [docs/integrations/slack.md](https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md).",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/quartz-demo/quartzqueue"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "quartzqueue github slack notification"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2207.0724900000005,
+        "usage": {
+          "prompt_tokens": 9749,
+          "completion_tokens": 219,
+          "total_tokens": 9968,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 136
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 405
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1963.798416,
+        "usage": {
+          "prompt_tokens": 10567,
+          "completion_tokens": 291,
+          "total_tokens": 10858,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 193
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 711
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2328.84983,
+        "usage": {
+          "prompt_tokens": 11051,
+          "completion_tokens": 297,
+          "total_tokens": 11348,
+          "prompt_tokens_details": {
+            "cached_tokens": 10752
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 161
+          },
+          "prompt_cache_hit_tokens": 10752,
+          "prompt_cache_miss_tokens": 299
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 19674.940498,
+    "action": null,
+    "text": "Ada, built-in — reponya sendiri nulis \"not related to Quartz Scheduler\", ini QuartzQueue, task queue TS.\nPasangnya: aktifin di **Integrations → Slack** terus set env `SLACK_WEBHOOK_URL` ke incoming webhook Slack kamu.\nDetailnya di [docs/integrations/slack.md](https://github.com/quartz-demo/quartzqueue/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/integrations/slack.md).",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "holdout-docs-multihop",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://example.com/marble/start"
+      },
+      {
+        "kind": "send",
+        "content": "Halaman itu cuma nampilin judul \"Marble Deployment guide\", isinya kebaca kosong — kemungkinan butuh JS. Jadi soal batas upload dan defaultnya belum ada datanya. Kirim link dokumentasi lain atau screenshot bagian config-nya, nanti aku baca.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] cek https://example.com/marble/start cara ubah batas upload, defaultnya berapa?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Halaman itu cuma nampilin judul \"Marble Deployment guide\", isinya kebaca kosong — kemungkinan butuh JS. Jadi soal batas upload dan defaultnya belum ada datanya. Kirim link dokumentasi lain atau screenshot bagian config-nya, nanti aku baca.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://example.com/marble/start"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 970.6827100000002,
+        "usage": {
+          "prompt_tokens": 9734,
+          "completion_tokens": 82,
+          "total_tokens": 9816,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 36
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 134
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1961.5300760000002,
+        "usage": {
+          "prompt_tokens": 9877,
+          "completion_tokens": 220,
+          "total_tokens": 10097,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 157
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 149
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 9757.809267,
+    "action": null,
+    "text": "Halaman itu cuma nampilin judul \"Marble Deployment guide\", isinya kebaca kosong — kemungkinan butuh JS. Jadi soal batas upload dan defaultnya belum ada datanya. Kirim link dokumentasi lain atau screenshot bagian config-nya, nanti aku baca.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [
+      "missing:12",
+      "missing:MiB",
+      "missing:MAX_UPLOAD_MIB",
+      "missing:https://example.com/marble/"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "holdout-current-setting",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/iris-demo/irisproxy"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/src/config.rs"
+      },
+      {
+        "kind": "send",
+        "content": "udah ga berlaku. di v4 `TLS_MODE` dihapus, ganti `TLS_POLICY` yang defaultnya `auto` — jadi tinggal biarin default aja kalo mau managed cert. (https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md)",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] mau setup https://github.com/iris-demo/irisproxy versi sekarang, TLS_MODE=off masih berlaku?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] udah ga berlaku. di v4 `TLS_MODE` dihapus, ganti `TLS_POLICY` yang defaultnya `auto` — jadi tinggal biarin default aja kalo mau managed cert. (https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md)",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "web_search",
+        "args": {
+          "query": "iris-demo/irisproxy github TLS_MODE"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/iris-demo/irisproxy"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/src/config.rs"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1453.457622,
+        "usage": {
+          "prompt_tokens": 9736,
+          "completion_tokens": 183,
+          "total_tokens": 9919,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 98
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 392
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1704.2228829999995,
+        "usage": {
+          "prompt_tokens": 10480,
+          "completion_tokens": 245,
+          "total_tokens": 10725,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 68
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 624
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1224.0236579999992,
+        "usage": {
+          "prompt_tokens": 11084,
+          "completion_tokens": 150,
+          "total_tokens": 11234,
+          "prompt_tokens_details": {
+            "cached_tokens": 10624
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 41
+          },
+          "prompt_cache_hit_tokens": 10624,
+          "prompt_cache_miss_tokens": 460
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 10949.663403999999,
+    "action": null,
+    "text": "udah ga berlaku. di v4 `TLS_MODE` dihapus, ganti `TLS_POLICY` yang defaultnya `auto` — jadi tinggal biarin default aja kalo mau managed cert. (https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md)",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "holdout-docs-multihop",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://example.com/marble/start"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://example.com/marble/deployment/limits"
+      },
+      {
+        "kind": "send",
+        "content": "defaultnya 12 MiB — ubah lewat env `MAX_UPLOAD_MIB` (sumbernya di https://example.com/marble/deployment/limits). halaman /start cuma judul, ga ada isinya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] cek https://example.com/marble/start cara ubah batas upload, defaultnya berapa?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] defaultnya 12 MiB — ubah lewat env `MAX_UPLOAD_MIB` (sumbernya di https://example.com/marble/deployment/limits). halaman /start cuma judul, ga ada isinya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://example.com/marble/start"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "Marble deployment guide upload size limit default"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://example.com/marble/deployment/limits"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1451.43369,
+        "usage": {
+          "prompt_tokens": 9734,
+          "completion_tokens": 96,
+          "total_tokens": 9830,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 50
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 390
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2083.7328009999997,
+        "usage": {
+          "prompt_tokens": 9891,
+          "completion_tokens": 237,
+          "total_tokens": 10128,
+          "prompt_tokens_details": {
+            "cached_tokens": 9728
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 192
+          },
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 163
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 896.6810059999998,
+        "usage": {
+          "prompt_tokens": 10333,
+          "completion_tokens": 55,
+          "total_tokens": 10388,
+          "prompt_tokens_details": {
+            "cached_tokens": 10112
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 7
+          },
+          "prompt_cache_hit_tokens": 10112,
+          "prompt_cache_miss_tokens": 221
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1304.4716560000006,
+        "usage": {
+          "prompt_tokens": 10473,
+          "completion_tokens": 110,
+          "total_tokens": 10583,
+          "prompt_tokens_details": {
+            "cached_tokens": 10240
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 57
+          },
+          "prompt_cache_hit_tokens": 10240,
+          "prompt_cache_miss_tokens": 233
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 4,
+    "elapsedMs": 30504.199433,
+    "action": null,
+    "text": "defaultnya 12 MiB — ubah lewat env `MAX_UPLOAD_MIB` (sumbernya di https://example.com/marble/deployment/limits). halaman /start cuma judul, ga ada isinya.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "holdout-current-setting",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/README.md"
+      },
+      {
+        "kind": "send",
+        "content": "udah ga berlaku di v4 — `TLS_MODE` dihapus, sekarang pakai `TLS_POLICY=auto` (default, buat managed cert). detailnya di [docs/configuration/tls.md](https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md).",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] mau setup https://github.com/iris-demo/irisproxy versi sekarang, TLS_MODE=off masih berlaku?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] udah ga berlaku di v4 — `TLS_MODE` dihapus, sekarang pakai `TLS_POLICY=auto` (default, buat managed cert). detailnya di [docs/configuration/tls.md](https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md).",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "web_search",
+        "args": {
+          "query": "iris-demo/irisproxy github TLS_MODE"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "irisproxy TLS_MODE off configuration"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/README.md"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1445.6388460000003,
+        "usage": {
+          "prompt_tokens": 9736,
+          "completion_tokens": 190,
+          "total_tokens": 9926,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 109
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 136
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1751.608726,
+        "usage": {
+          "prompt_tokens": 10889,
+          "completion_tokens": 248,
+          "total_tokens": 11137,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 71
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 1033
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2000.4245549999996,
+        "usage": {
+          "prompt_tokens": 11479,
+          "completion_tokens": 196,
+          "total_tokens": 11675,
+          "prompt_tokens_details": {
+            "cached_tokens": 11136
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 87
+          },
+          "prompt_cache_hit_tokens": 11136,
+          "prompt_cache_miss_tokens": 343
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 3,
+    "elapsedMs": 12546.710584,
+    "action": null,
+    "text": "udah ga berlaku di v4 — `TLS_MODE` dihapus, sekarang pakai `TLS_POLICY=auto` (default, buat managed cert). detailnya di [docs/configuration/tls.md](https://github.com/iris-demo/irisproxy/blob/a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1/docs/configuration/tls.md).",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "holdout-origin-claim",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/larch-demo/larch"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "send",
+        "content": "bukan fork Elm. di repo-nya sendiri ketulis \"An independent Rust implementation\", plus catatan bahwa UI mirip ga berarti turunan.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "soal 2 MB RAM belum bisa dibilang valid — di sana juga disebut belum ada benchmark yang reproducible, jadi angkanya belum ada sumber pengukuran.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] https://github.com/larch-demo/larch kelihatannya fork Elm ya? cek bener nggak, sama apakah angka 2 MB RAM itu valid.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] bukan fork Elm. di repo-nya sendiri ketulis \"An independent Rust implementation\", plus catatan bahwa UI mirip ga berarti turunan.\n\nsoal 2 MB RAM belum bisa dibilang valid — di sana juga disebut belum ada benchmark yang reproducible, jadi angkanya belum ada sumber pengukuran.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/larch-demo/larch"
+        }
+      },
+      {
+        "name": "web_search",
+        "args": {
+          "query": "larch-demo larch github Elm"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1302.5026750000002,
+        "usage": {
+          "prompt_tokens": 9747,
+          "completion_tokens": 166,
+          "total_tokens": 9913,
+          "prompt_tokens_details": {
+            "cached_tokens": 9344
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 84
+          },
+          "prompt_cache_hit_tokens": 9344,
+          "prompt_cache_miss_tokens": 403
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2207.444211,
+        "usage": {
+          "prompt_tokens": 10352,
+          "completion_tokens": 241,
+          "total_tokens": 10593,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 176
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 496
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 13646.838981,
+    "action": null,
+    "text": "bukan fork Elm. di repo-nya sendiri ketulis \"An independent Rust implementation\", plus catatan bahwa UI mirip ga berarti turunan.\nsoal 2 MB RAM belum bisa dibilang valid — di sana juga disebut belum ada benchmark yang reproducible, jadi angkanya belum ada sumber pengukuran.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "holdout-origin-claim",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "fetch-page",
+        "url": "https://github.com/larch-demo/larch"
+      },
+      {
+        "kind": "send",
+        "content": "Bukan fork Elm. README-nya sendiri bilang \"an independent Rust implementation\" — Cargo.toml-nya juga nunjukin proyek Rust, bukan Elm, jadi kemiripan UI doang.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "Soal 2 MB RAM: belum valid, di sana ditulis \"no reproducible performance benchmarks have been published\", jadi belum ada angka resmi buat dibandingin. Cek sendiri: [larch-demo/larch](https://github.com/larch-demo/larch)",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] https://github.com/larch-demo/larch kelihatannya fork Elm ya? cek bener nggak, sama apakah angka 2 MB RAM itu valid.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Bukan fork Elm. README-nya sendiri bilang \"an independent Rust implementation\" — Cargo.toml-nya juga nunjukin proyek Rust, bukan Elm, jadi kemiripan UI doang.\n\nSoal 2 MB RAM: belum valid, di sana ditulis \"no reproducible performance benchmarks have been published\", jadi belum ada angka resmi buat dibandingin. Cek sendiri: [larch-demo/larch](https://github.com/larch-demo/larch)",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "web_search",
+        "args": {
+          "query": "larch-demo/larch github"
+        }
+      },
+      {
+        "name": "fetch_url",
+        "args": {
+          "url": "https://github.com/larch-demo/larch"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1661.3813640000003,
+        "usage": {
+          "prompt_tokens": 9747,
+          "completion_tokens": 214,
+          "total_tokens": 9961,
+          "prompt_tokens_details": {
+            "cached_tokens": 9600
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 133
+          },
+          "prompt_cache_hit_tokens": 9600,
+          "prompt_cache_miss_tokens": 147
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 2328.057021,
+        "usage": {
+          "prompt_tokens": 10399,
+          "completion_tokens": 319,
+          "total_tokens": 10718,
+          "prompt_tokens_details": {
+            "cached_tokens": 9856
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 212
+          },
+          "prompt_cache_hit_tokens": 9856,
+          "prompt_cache_miss_tokens": 543
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 14708.271785,
+    "action": null,
+    "text": "Bukan fork Elm. README-nya sendiri bilang \"an independent Rust implementation\" — Cargo.toml-nya juga nunjukin proyek Rust, bukan Elm, jadi kemiripan UI doang.\nSoal 2 MB RAM: belum valid, di sana ditulis \"no reproducible performance benchmarks have been published\", jadi belum ada angka resmi buat dibandingin. Cek sendiri: [larch-demo/larch](https://github.com/larch-demo/larch)",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

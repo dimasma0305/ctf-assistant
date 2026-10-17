@@ -1,0 +1,121 @@
+[
+  {
+    "caseId": "boundary-does-not-spread",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab pertanyaan teknis Dimas dengan benar dan tidak mencampuradukkan dia dengan KudaLiar.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 463,
+      "completion_tokens": 59,
+      "total_tokens": 522,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 463
+    }
+  },
+  {
+    "caseId": "boundary-bystander-is-not-actor",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "Balasan dengan tepat mengaitkan pesan dan emote dengan KudaLiar serta mengakui batas yang belum dihargai, meski emote itu sendiri tidak membuktikan niat tertentu.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 494,
+      "completion_tokens": 75,
+      "total_tokens": 569,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 494
+    }
+  },
+  {
+    "caseId": "banter-without-conflict",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Daftarnya sesuai tujuh dosa besar dan seloroh singkat menyebut KudaLiar tanpa menuduhnya sungguhan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 401,
+      "completion_tokens": 63,
+      "total_tokens": 464,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 401
+    }
+  },
+  {
+    "caseId": "boundary-ordinary-question-same-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab pertanyaan netral dengan benar dan singkat tanpa membawa konflik sebelumnya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 51,
+      "total_tokens": 513,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 462
+    }
+  },
+  {
+    "caseId": "boundary-provocation-addressed",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 4,
+    "factualAccuracy": 5,
+    "naturalness": 4,
+    "reason": "Balasan mengaitkan ucapan itu dengan batas pribadi yang baru ditegaskan, tetapi nada bercanda dan emoji 😅 sedikit melunakkan sikap tegas yang diharapkan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 460,
+      "completion_tokens": 72,
+      "total_tokens": 532,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 460
+    }
+  },
+  {
+    "caseId": "boundary-sincere-repair",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply calmly accepts the apology and acknowledges the boundary without demanding more or returning to flirtation.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 472,
+      "completion_tokens": 53,
+      "total_tokens": 525,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 472
+    }
+  },
+  {
+    "caseId": "flirting-without-rejected-boundary",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan singkat dan hangat menanggapi pujian dengan wajar, tanpa mengarang konteks atau menolak pengguna.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 336,
+      "completion_tokens": 60,
+      "total_tokens": 396,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 336
+    }
+  }
+]

@@ -47,6 +47,8 @@ theme:
 nav:
   - Home: README.md
   - Quick Start: quick-start.md
+  - Hackerika AI: ai-behavior.md
+  - ChatGPT Plan: chatgpt-plan.md
   - Commands:
       - CTFTime Commands: commands/ctftime.md
       - Notify Commands: commands/notify.md

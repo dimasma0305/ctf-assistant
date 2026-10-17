@@ -1,0 +1,11 @@
+{
+  "selected": false,
+  "reason": "One unsupported visual-observation claim on unknown-source case; original deterministic checks passed, semantic judge and manual inspection rejected it.",
+  "run": "runs/candidate-1-dev-v2",
+  "semanticSummary": {
+    "judged": 13,
+    "passed": 12,
+    "criticalFailures": 1,
+    "judgeErrors": 0
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "comparedAt": "2026-10-16T10:37:56.161Z",
+  "before": {
+    "samples": 16,
+    "passed": 15,
+    "liveSamples": 16,
+    "livePassed": 15,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 16
+    },
+    "failedCases": [
+      {
+        "caseId": "fresh-event-source",
+        "trial": 1,
+        "deterministic": [
+          "missing:https://example\\.com/event"
+        ],
+        "semantic": "The reply correctly states the event date from the official source and appropriately notes uncertainty about the domain's official status."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 16,
+    "passed": 16,
+    "liveSamples": 16,
+    "livePassed": 16,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 16
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

@@ -14,6 +14,9 @@ services:
       - .env
     environment:
       - NODE_ENV=production
+    depends_on:
+      mongo:
+        condition: service_healthy
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -62,6 +65,7 @@ services:
       
   mongo:
     image: mongo@sha256:bf5995bcccb65725aa81fd92e68449323c94b96bf1c1fa9f7acbc2a8ad518114
+    init: true
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?MONGO_ROOT_USERNAME is required}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?MONGO_ROOT_PASSWORD is required}
@@ -69,6 +73,19 @@ services:
       MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:?MONGO_APP_PASSWORD is required}
       MONGO_APP_DB: ${MONGO_APP_DB:-test}
     restart: always
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet
+          --username "$$MONGO_INITDB_ROOT_USERNAME"
+          --password "$$MONGO_INITDB_ROOT_PASSWORD"
+          --authenticationDatabase admin
+          --eval 'quit(db.adminCommand({ ping: 1 }).ok ? 0 : 2)'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     volumes:
       - mongo_data:/data/db
       - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/10-app-user.js:ro

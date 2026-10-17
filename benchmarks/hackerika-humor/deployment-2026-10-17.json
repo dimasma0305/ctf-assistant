@@ -1,0 +1,120 @@
+{
+  "verifiedAt": "2026-10-17T09:27:38.701075+00:00",
+  "status": "active_verified",
+  "image": "ctf-assistant:mild-humor-candidate-1-20261017",
+  "imageId": "sha256:15b02241c065d2d988cdb2a58c9616be3ff02ff8d2e3d7afbca7fc038c5cf810",
+  "startedAt": "2026-10-17T09:26:50.096336193Z",
+  "provider": "chatgpt",
+  "modelRoles": {
+    "chat": "gpt-6-luna",
+    "light": "gpt-6-luna",
+    "vision": "gpt-6-luna",
+    "research": "gpt-6-luna",
+    "judge": "gpt-6-luna"
+  },
+  "productionHashes": {
+    "src/Services/AI/socialPrompt.ts": "9bf206b3ce0183c5d4a5c9d51854f17fe9b79bddf96ccbc160ac37d2068ca080",
+    "src/Services/AI/userProfile.ts": "e51af140e9e13269990004cb6c3866a7c8b45751febfe42a561b84d13c2d63dc"
+  },
+  "preservationChecks": {
+    "Config.Cmd": true,
+    "Config.Entrypoint": true,
+    "Config.User": true,
+    "Config.WorkingDir": true,
+    "Config.Healthcheck": true,
+    "Config.Env": true,
+    "HostConfig.CapDrop": true,
+    "HostConfig.SecurityOpt": true,
+    "HostConfig.Tmpfs": true,
+    "HostConfig.RestartPolicy": true,
+    "HostConfig.Memory": true,
+    "HostConfig.NanoCpus": true,
+    "HostConfig.ReadonlyRootfs": true,
+    "HostConfig.PortBindings": true,
+    "bindMounts": true,
+    "operationalLabels": true,
+    "networks": true,
+    "selectedImage": true,
+    "healthy": true,
+    "noRestarts": true,
+    "otherServicesUnchanged": true,
+    "runtimeHashesMatch": true,
+    "providerPreserved": true,
+    "modelsPreserved": true,
+    "resetMarkerUnchanged": true
+  },
+  "otherServices": [
+    {
+      "name": "ctf-assistant-mongo-1",
+      "sameContainerAndStartedAt": true
+    },
+    {
+      "name": "ctf-assistant-ui-1",
+      "sameContainerAndStartedAt": true
+    },
+    {
+      "name": "traefik",
+      "sameContainerAndStartedAt": true
+    },
+    {
+      "name": "rsctf-rsctf-proxy-firewall-1",
+      "sameContainerAndStartedAt": true
+    }
+  ],
+  "health": {
+    "status": "healthy",
+    "bot": {
+      "ready": true,
+      "waitingForSessionReset": false
+    },
+    "database": {
+      "required": true,
+      "ready": true
+    },
+    "timestamp": "2026-10-17T09:27:38.698Z"
+  },
+  "resetMarkerUnchanged": true,
+  "resetExecutedByThisChange": false,
+  "development": {
+    "baselineRaw": 17,
+    "candidateRaw": 16,
+    "candidateReviewed": 17,
+    "samples": 17,
+    "disclosedAdjudications": 1,
+    "profileCases": 3,
+    "providerErrors": 0,
+    "judgeErrors": 0,
+    "criticalFlags": 0
+  },
+  "localChecks": {
+    "tests": 367,
+    "assertions": 1171,
+    "files": 39,
+    "failures": 0,
+    "strictTypes": "passed",
+    "bundle": "passed"
+  },
+  "freshValidation": "fresh-validation-2026-10-17.json",
+  "freshAutomatedPasses": 8,
+  "freshSamples": 8,
+  "imageAudit": "image-audit-2026-10-17.json",
+  "manualDiscordMessagesSent": 0,
+  "manualDMsSent": 0,
+  "benchmarkDatabaseWrites": "Synthetic only",
+  "limitations": [
+    "Baseline already tolerated these tested mild jokes. This clarifies a preference; no measured universal accuracy gain.",
+    "Development candidate16/17 automated,17/17 after disclosed review; fresh8/8 automated.",
+    "Small synthetic model evaluations, no human equivalence or global optimum claim."
+  ],
+  "liveInferenceAfterDeployment": {
+    "model": "gpt-6-luna",
+    "passed": true,
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 10
+    }
+  }
+}

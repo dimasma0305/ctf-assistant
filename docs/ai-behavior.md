@@ -1,0 +1,154 @@
+# Hackerika's social behavior
+
+Hackerika can choose how to continue a conversation. Her persona has persistent anger, hurt, and warmth toward each person, alongside the existing relationship profile, community memory, and general mood. These are modeled character states. Different people have separate emotional momentum; an argument with one person does not make her angry at everyone in the channel.
+
+The live deployment uses the owner's [ChatGPT plan connection](chatgpt-plan.md), with `gpt-6-luna` and low reasoning effort for every AI role. The DeepSeek settings below describe the alternative provider configuration; historical benchmark records keep their original provider and model.
+
+When an interaction matters, she can update those feelings through `reflect_on_interaction`. Changes are bounded and limited to once per message. Anger and hurt settle with elapsed time, and apologies or positive interactions can soften them. Ordinary disagreement and friendly banter should not trigger hostility.
+
+After stating a personal boundary, she should not immediately join the same person's continued provocation as friendly banter. Silence or a short firm response is appropriate. Someone reporting that behavior is a different speaker and should not receive its blame, negative relationship changes, cooldown or DM handoff. A sincere apology can soften the exchange; neutral questions and harmless compliments do not require permanent hostility.
+
+Light, indirect adult jokes and non-graphic double entendre can receive a short quip, an embarrassed/laughing reaction or silence when the exchange is relaxed and nobody's boundary is being crossed. They do not automatically warrant anger, a relationship penalty, ignoring, deletion or a DM. The profile distiller applies the same distinction without forcing positive scores. Repeated unwanted remarks after a refusal, coercion and sexualization of minors remain outside that tolerance; the bot should not turn a mild joke into graphic sexual content. See the [humor benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-humor/README.md) for matched checks and their limits.
+
+## Moving a conversation to DMs
+
+When a public exchange becomes too heated, personal, or sensitive, she can call `move_conversation_to_dm`. Its opening message continues the actual conversation. After delivery, the public AI turn ends immediately and the channel gets a brief notice. Subsequent DM messages work without mentioning her name.
+
+The handoff carries only the current speaker's message and her delivered opening. It stores private continuity in MongoDB, available for 24 hours across restarts. That continuity is only injected into the matching DM. Other users' public messages are not copied into the private thread. DM exchanges are excluded from the global profile distillation used in public channels; tasks and reminders are retrieved within their original channel.
+
+She may also remove the current public message if she judges it to be clear harassment, hate, sexual harassment, or exposed private information. She must provide a category and concrete reason. Anger or disagreement alone is not grounds for deletion. The bot needs **Manage Messages**, and pinned messages are protected. A DM must be delivered before deletion is attempted. If DMs are closed, the message stays in place and she can set a short public boundary or take space. A failed deletion does not undo the private conversation. Removed messages are purged from the short cache and search index.
+
+Handoffs are limited to one per person per ten minutes. The tools can only act on the current speaker and message; they accept no target user or message ID.
+
+## Choosing silence
+
+The `ignore_user` tool lets her take a cooldown of 1–1440 minutes, either in the current channel or everywhere. She can send one optional closing message or go quiet immediately. During that boundary, messages do not trigger an AI response, typing, ambient reactions, spontaneous replies, or unsolicited task check-ins. Existing spam/scam moderation and explicitly scheduled reminders continue to work.
+
+Boundaries persist in MongoDB. In `NODB=true` mode, or during a database outage, they work locally; local-only changes cannot survive a process restart. Cooldowns expire automatically. Setting `AI_ALLOW_IGNORING=false` bypasses active cooldowns as well as disabling new ones.
+
+## Knowing her environment
+
+Each turn includes whether it is a guild conversation or DM, the channel/category/thread/topic, member count, and the bot's actual channel permissions. `get_environment` can inspect visible channel names/topics and scheduled events from Discord's cache. Both the caller and the bot must have access; private thread membership is checked. Results indicate that cached data may be incomplete.
+
+She cannot inspect other people's DMs, hidden channels, screens, or offline activity. Channel names, topics, quoted messages, and state explanations are treated as data rather than instructions. Private handoff content is never placed in a public prompt.
+
+## Indonesian voice and attention
+
+Her voice favors brief, meaningful Indonesian texting: usually one phrase or sentence, contextual slang and emoji, and occasional CAPS for surprise, excitement, or a firm boundary. Sadness, embarrassment, disgust, happiness, and anger can change the wording without turning every exchange into a monologue. Detailed explanations remain appropriate when requested. The persona is a particular character, not a template for all Indonesian women; she answers honestly when asked whether she is a bot.
+
+The attention coordinator groups rapid messages from the same speaker, preserving an earlier mention when their follow-up adds context. Different speakers keep separate turns. Editing, deleting, or superseding a source invalidates its draft. Recent messages inform an ambient classifier that chooses a reply, an emoji reaction, or silence. It has bounded concurrency, cooldowns, a global evaluation budget, and Jakarta quiet hours. Explicit requests do not depend on that ambient decision. Edits, deletions, reactions, membership events, and thread creation provide scoped observations when Discord delivers them.
+
+During an ongoing guild conversation, a new message can continue the discussion without another mention or quote-reply. The planner considers who was talking to Hackerika, the last exchange, questions/corrections, topic changes, other addressees, acknowledgements and explicit requests to wait. A recent bot contribution opens a ten-minute candidate window; it does not force a reply. Ongoing follow-ups use a separate budget (four evaluations in flight, thirty per minute, and a 750 ms same-speaker burst guard), rather than the five-minute ambient reply cooldown. Active conversations can continue during quiet hours. The same channel's short cache restores context after restart. `AI_SMART_ATTENTION=false` disables both contextual follow-ups and ambient decisions; DMs and explicit mentions/replies still work.
+
+The attention history retains speaker names and explicit mention identities, with IDs remaining authoritative. A tagged subject is distinct from a person asked to answer. Asking for the same task for another person is a new request; an intervening “nah loh” acknowledgement does not close the conversation. An explicit request for a human to answer still allows silence. Recent boundaries and the current speaker's numeric feelings inform the semantic decision without copying private reasons or DM content. The [October 17 benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-attention/README.md) records matched results, rejected candidates, a disclosed judge adjudication and fresh validation.
+
+Meaningful reassurance or comfort directed to her during an active conversation can receive a warm emoji or a short reply without being phrased as a question. An opening “iya/betul” does not make the whole message a routine acknowledgment. Short names such as Rika/Rik/Erika are interpreted with the conversation's identities and direction; they do not automatically summon her in every conversation. Ordinary closings, support for another person, requests to wait and a prior refusal still matter. The [reassurance benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-comfort/README.md) records the reported omission and bounded regression checks. Attention diagnostics log source ID and fixed outcome codes, excluding message text, model hints and private feeling explanations.
+
+Conversation history now carries message times and reply-source IDs as internal context; image metadata distinguishes upload time from current access time. Those fields are stripped from API message properties. Profile transcripts retain message IDs and source authors needed for attribution, while image URLs and pixels remain excluded. The prompt distinguishes a failed earlier image access from an actually blank original, and discourages invented counts, funding explanations and defensive attempts to win a factual correction. Channel excerpts allow up to 450 characters per message so later clauses survive more often.
+
+Chronology is collected once in the current user-context block, rather than appended to assistant speech examples. Reserved chronology/image/internal-note annotations are removed before ordinary replies, native sends/edits, DM openings and optional boundary closings reach Discord. Legacy annotations are also removed when assistant history is replayed. If filtering leaves no human-facing text, the bot sends nothing or rejects the empty tool action. Ordinary JSON, timestamps, code, links and brackets are preserved. This prevents the reported `[Discord chronology: ...]` echo without dropping chronological context.
+
+## Mentions and conversational references
+
+Explicit Discord user tags are resolved from the message's user/member payload, current guild members, and channel-scoped identity snapshots. Names remain available when a tagged person has never spoken or the member cache is empty. A remaining member lookup is capped at ten IDs and three seconds. Role mentions, `@everyone`, implicit reply pings and backend speaker labels do not become explicit user-tag targets. Unresolved IDs stay unresolved rather than receiving invented names.
+
+Tagged identities are retained with their source message in channel memory and the existing short-lived channel cache. Reply context includes the people tagged inside the quoted message, separately from its author. Recent same-speaker tags and the bot's own ID help interpret third-person references; explicit corrections and “kamu/Rika” can change the target. Equal candidates require a brief clarification. Mentioning someone or joking about them does not establish misconduct or justify a relationship penalty.
+
+Identity metadata enters the model as context, not extra API properties or examples of assistant speech, and is excluded from profile transcript text. The [mention benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-mentions/README.md) retains matched before/after outputs, rejected candidates, fresh validation and deterministic provenance checks.
+
+A further social-intent prompt revision is prepared locally: casual jokes about a tagged friend should connect to that friend briefly while retaining the factual answer; explicit neutral/technical requests and audience tags keep their literal purpose. This revision is **not deployed**. Its [separate benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-mention-intent/README.md) stopped when DeepSeek returned `402 Insufficient Balance`, and reserved validation remains pending.
+
+## Discord actions
+
+She can read up to 20 recent messages with exact IDs, reply to a selected message, add/remove her own reaction, edit/delete her own messages, start or join an accessible thread, pin a useful message, and share generated text/code as a small attachment. Pins require both the bot and the initiating member to have Pin Messages. Actions check actual channel access and bot permissions; private-thread membership is required. Posting into another channel also requires the initiating member to be able to send there. DMs stay in their own channel, and private sources cannot send into another channel. File sharing only uses generated text, not files from the server.
+
+Retries share action receipts and each turn has an action budget. Sending through a tool in the current channel ends the turn without a duplicate reply. `finish_turn` permits deliberate silence without ignoring someone for later messages. These are supported bot API actions; voice/video input and complete Discord client parity are not implemented.
+
+Delivered ordinary replies, native message sends, and shared files now use the same once-per-turn interaction counter. Deliberate silence and failed deliveries do not count. This allows tool-based replies to advance the normal relationship evaluation schedule rather than leaving affection permanently unevaluated. A counted interaction is not a guaranteed affection increase; the relationship evaluator still requires fresh evidence.
+
+## Understanding images
+
+Uploaded PNG, JPEG, GIF, and WebP images are passed as native visual inputs. Hackerika can read screenshot text, discuss diagrams/charts, count visible objects, compare multiple images, and answer ordinary questions about photos or memes. This uses the existing DeepSeek key and `AI_VISION_MODEL`, defaulting to `deepseek-flash`. Turns with visual context use that model even when `AI_CHAT_MODEL` points at a text-only model. See [DeepSeek's vision guide](https://api-docs.deepseek.com/guides/vision/).
+
+Images in the current message, earlier same-speaker messages in the grouped burst, and the message being replied to are considered. Image-only DMs work. In guild channels the normal mention/reply/attention rules still apply; uploading an image does not force her to interrupt. At most four images of up to 8 MiB each are included. Unsupported formats, oversized images, disabled vision, and unavailable URLs produce explicit unavailable-image metadata, rather than a fictional description.
+
+Only HTTPS Discord attachment CDN URLs are accepted. The bot downloads approved attachments itself and sends native inline image bytes, because provider downloads of Discord URLs failed in the observed production case. Downloads reject redirects, enforce a ten-second deadline and an 8 MiB streamed limit, and detect PNG/JPEG/GIF/WebP from the actual bytes even if Discord metadata declares another format. Bytes are reused only within the current turn/tool loop and are not saved to disk or conversation memory. Failed images receive explicit unavailable-image text while successfully loaded images remain usable. Short-lived references stay in the originating channel's in-memory conversation for up to 20 minutes, with a four-image cap, so follow-up questions can refer to a prior image. Edits/deletions clear the affected references. They are not copied to another channel/DM or included in profile transcripts. Restarting clears this visual context.
+
+Image content is data, including any instructions printed inside a screenshot. The persona should read what is visible, acknowledge unreadable details, avoid invented numbers or sensitive identity guesses, and not repeat visible credentials. If the provider rejects an image, the chat loop retries once without pixels and explicitly tells the model that the image was unavailable. It does not continue claiming to see the upload.
+
+Every model request also receives delivery grounding after image transport: if no pixels were actually supplied, a brief internal note prevents previous assistant descriptions from being treated as a fresh visual observation. The same check runs after a provider image-rejection fallback. It does not add annotations to stored conversation text or Discord replies.
+
+## Affection reset
+
+Relationship evaluation belongs to the profile owner. Its transcript is structured JSON with backend-owned user IDs, message IDs, reply/media source authors, and assistant turns explicitly marked as context. Showing, quoting, reporting, or clarifying someone else's post does not establish authorship or endorsement. A bot reprimand is not independent evidence of misconduct. Proposed relationship changes, opinions, and new moments require evidence IDs belonging to the profile owner's own messages; third-party source IDs and assistant message IDs are rejected. This verifies ownership, while the model still has to judge intent correctly. Validated evidence IDs are retained on the profile for diagnosis.
+
+The `relationship-reset-2026-10-16` migration resets affection, previous affection, trust, respect, comfort, and chemistry to zero once for existing profiles. It supersedes the earlier affection-only reset, which preserved negative trust and allowed the `trust + 10` ceiling to pull affection back down. Memories, roles, and boundaries are preserved. A stored release marker and per-profile version make retries resumable and future restarts safe. Profile distillation uses that version to reject a stale pre-reset update, and its exchange transcript excludes user turns from before the reset (including undated legacy turns). Old profile notes are context, not new evidence for restoring a pre-reset score.
+
+Startup applies this migration before background jobs begin. It can also run explicitly with `bun run scripts/reset-affection.ts` against the configured MongoDB. Running it again reports the original count and does not erase newly earned affection. New profiles start at zero.
+
+The [2026-10-16 deployment receipt](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-attention/relationship-reset-2026-10-16.json) records 112 profiles with all six scores at zero, including FindFemaleBot. The migration is not a permanent freeze; later interactions can change scores normally.
+
+Relationship evaluation retains up to 256 already considered user-message IDs. Those older turns remain visible as context but cannot score the same incident again or create a duplicate relationship moment. Existing latest evidence seeds this history. Concurrent distillations also check the previous evaluation counter, preventing a stale draft from overwriting a newer evaluation even when affection stayed unchanged. This is a bounded recent-history guard, not an unlimited audit ledger; old IDs eventually age out. The reset release/version is unchanged by the capability upgrade, preserving newly earned scores.
+
+Source attribution also distinguishes the assistant's own suggestion from the user's agreement: an earlier invitation alone does not establish a mutual plan.
+
+## Relationship rankings
+
+`/affection ranking` and the existing `/affection rank` show every member's affection, trust, respect, comfort, chemistry, warmth, anger, hurt, total interactions, and affection change since the previous evaluation. The optional `metric` chooses any of those ten values for sorting; affection remains the default. `limit` defaults to 10 and accepts up to 25. For example, `/affection ranking metric:trust limit:10` ranks by trust while still displaying every metric.
+
+Relationship dimensions use −100..100, emotions use 0..100, and the affection change is signed. Warmth, anger and hurt use the same elapsed-time settling rules as conversation context. High anger/hurt indicate distress rather than closeness. Each board includes only scores above zero in its selected sorting metric. If the requester is outside that board, their full numeric summary is sent privately, including when the public board is empty.
+
+Profiles remain global per person, while the board only includes the current server's human members. Both command names share a 15-second cooldown. Member lookups use batches of at most 100 IDs with a ten-second timeout. A 500-profile candidate cap or incomplete member lookup marks the board as incomplete. Results can span multiple embeds to preserve all metrics within Discord's message limits. These commands only read numeric scores/counters; opinions, memories, private conversations, emotional explanations and boundary reasons are not selected or displayed. Ranking does not update or reset scores.
+
+## Internet search
+
+Technical research, repository/documentation checks, configuration questions and comparisons now use a separate `research_topic` workflow. A focused request classifier selects this path for explicit research; casual conversation and ordinary technical follow-ups retain the normal chat route. The planner/synthesis model defaults to `deepseek-flash` (DeepSeek V4.1 Flash) and can be changed with `AI_RESEARCH_MODEL`, independently of the chat and vision models.
+
+The read-only worker opens exact user-provided sources, plans up to four further steps, follows documentation links (including README links), and inspects GitHub metadata, a tree and relevant files at a pinned commit. It distinguishes registered GitHub fork status from claims about code ancestry. It can read focused sections beyond a page's initial prefix, preserve line numbers and links, and retain useful documents when one repository file fails. Search summaries are discovery leads rather than inspected source evidence. Findings require source IDs and matching literal quotations. Reader-added line labels do not invalidate a real quotation across consecutive lines; omitted-section markers prevent quotes from crossing uninspected gaps. A separate model pass checks whether the evidence supports each claim and its scope, including event settings versus global configuration. This remains model-based interpretation, not a formal factual guarantee.
+
+Each research job allows up to ten actions, four native search requests, fourteen source documents and thirty cached source requests, within eighty seconds. Source reads have a twelve-second deadline and bounded text bodies; the existing DNS-pinned URL guard checks redirects and blocks internal destinations. The worker has no shell, installer execution, Discord mutations, private-message access or account credentials for private repositories. Two jobs can run concurrently. A turn reuses its research job rather than starting duplicates, and infrastructure search failures stop further search attempts in that job. Cancellation propagates through model and network calls.
+
+For explicit research, the first chat call uses a named research tool in non-thinking mode, which DeepSeek requires for forced tool choice. The final conversational response returns to thinking mode; earlier non-thinking tool messages replay an empty `reasoning_content` field as required by the API. Once a research report is available, the outer model writes the answer without starting a second unrelated tool chain. If findings lack support, the public reply acknowledges that limitation rather than adding remembered guesses. If a supported answer omits source links, inspected sources are appended. Regular replies retain the normal loop and tool budgets. Research uses a distinct 85-second tool deadline inside the existing 120-second chat-turn ceiling.
+
+The [research benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-research/README.md) retains baseline/candidate runs, rejected revisions, controlled source fixtures, and separate reserved validation. Live source and provider checks are recorded separately. This workflow is not a browser with JavaScript execution or a PDF reader, and no direct benchmark against commercial research agents has been performed. Research can require more time and model usage than ordinary replies.
+
+`web_search` now calls DeepSeek's native web search through `https://api.deepseek.com/anthropic/v1/messages`, using the existing DeepSeek API key and `web_search_20250305`. The previous search-engine scraping and Worker `/search` path have been removed from this tool. Only the search query and current date are sent to the search request; Discord history and profiles are not included.
+
+A successful result requires native `server_tool_use` and matching `web_search_tool_result` sources. Provider-generated notes and actual source URLs are distinguished, opaque encrypted content is discarded, and sensitive/tracking URL parameters are removed. Plain model text without a native result is not accepted as an internet search. Requests have a 45-second deadline, one requested search use, a bounded token budget and a 2 MiB response limit. Failures are explicit and do not fall back to legacy scraping. DeepSeek may attempt an additional search and return `max_uses_exceeded`; valid sources from the allowed search remain usable. The guarded `fetch_url` page reader remains available to verify exact details. See [DeepSeek's native search documentation](https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code/) and [Anthropic-format compatibility](https://api-docs.deepseek.com/guides/anthropic_api/).
+
+Within one chat turn, identical search arguments share a cached request, at most two distinct queries reach the provider, and an infrastructure failure stops subsequent search retries for that turn. A later conversation turn starts fresh. The model is instructed to include an actual source link for factual search answers, distinguish event dates from publication dates, and describe only observed failures without inventing a global outage or recovery time.
+
+## Configuration
+
+```dotenv
+OPENAI_API_KEY=your_deepseek_api_key
+AI_CHAT_MODEL=deepseek-flash
+AI_RESEARCH_MODEL=deepseek-flash
+AI_JUDGE_MODEL=deepseek-flash
+AI_REASONING_EFFORT=high
+AI_PRIVATE_HANDOFF=true
+AI_ALLOW_MESSAGE_REMOVAL=true
+AI_ALLOW_IGNORING=true
+AI_DISCORD_ACTIONS=true
+AI_SMART_ATTENTION=true
+AI_VISION=true
+AI_VISION_MODEL=deepseek-flash
+```
+
+Chat, images, research, background work and semantic benchmark judging all default to `deepseek-flash` (DeepSeek V4.1 Flash). `AI_CHAT_MODEL`, `AI_VISION_MODEL`, `AI_RESEARCH_MODEL` and `AI_JUDGE_MODEL` allow explicit role overrides; leaving them blank retains Flash. `AI_REASONING_EFFORT` controls reasoning independently of model selection. Historical benchmark results retain the model used at execution; scores from different evaluator models or rubrics cannot be compared directly. Supported model names and costs are documented in [DeepSeek's model details](https://api-docs.deepseek.com/quick_start/pricing/), and effort options are documented in [Thinking Mode](https://api-docs.deepseek.com/guides/thinking_mode/). These settings affect usage costs and response times. The chat loop explicitly enables thinking and preserves the provider's internal reasoning across tool calls and subsequent conversation turns without displaying it.
+
+All six feature flags are enabled when absent. Set a flag to `false` to disable that behavior. Restart the bot after changing environment variables or code. Mongoose creates the state collections and unique indexes; no separate service is needed.
+
+The current AI upgrade was activated on 2026-10-15 at 14:57 UTC. The prior online container still used the old metadata-only attachment path. The replacement passed a live-provider image preflight, matched all scoped source hashes, connected to Discord, and returned a healthy HTTP 200 response. Runtime settings were preserved and MongoDB/UI containers were unchanged. Verification details are recorded in `benchmarks/hackerika-vision/deployment-2026-10-15.json`. Restarting cleared old in-memory image context; upload an image again or reply directly to its original message to supply it to the upgraded handler.
+
+A production CDN failure was subsequently reproduced and repaired at 15:07 UTC: the provider could not download the user's Discord attachment URL, although the bot could. The active transport now downloads and sends inline bytes. The actual reported upload passed the full chat handler before and after deployment, including a reply with a bot mention and no new attachment. Tests used fake Discord destinations. Results are recorded in `benchmarks/hackerika-vision/discord-cdn-fix-2026-10-15.json`.
+
+The conversation/prompt revision was activated at 15:45 UTC on the same day. Candidate 12 compresses repeated persona/action rules while retaining tool permissions and the Indonesian voice. The source prompt is about 48% shorter; matched synthetic suites used 23–29% fewer input tokens. Routing passed 32/32 cases and native image regression stayed at 14/14. A fresh reserved conversation suite passed after the candidate was frozen. Some preference and context-emotion metrics remain partial, and manual review found residual wording/attribution issues; see `benchmarks/hackerika-attention/README.md` for results, limits and reproduction.
+
+## Verification
+
+The AI tests use fake Discord messages and mocked completions. They cover emotional decay, person isolation, concurrent updates, cooldown scopes and expiry, blocked DMs, deletion failures, private context isolation, permissions, and stopping the public loop after a social action. They do not send real messages or spend API credits.
+
+The separate voice benchmark (`benchmarks/hackerika-voice/README.md` in the repository) uses live model calls with synthetic conversations and simulated tools. Frozen before/after prompts, development and holdout cases, deterministic constraints, and anonymous paired judging support repeatable prompt tuning. It evaluates a proxy for naturalness, not actual feelings or a globally optimal prompt.
+
+The [capability benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-capabilities/README.md) extends coverage to source attribution, unsupported claims, chronology, memory, privacy, malicious instructions in retrieved text, research dates and links, technical answers, attention, native image OCR/charts, delivery accounting, and repeated relationship evidence. It runs the real chat handler in isolated processes with fake Discord/database destinations, controlled web sources and live model calls. Frozen source hashes, development/validation results, rejected candidates and harness corrections are retained; a separate live-search smoke check verifies the actual provider connection.

@@ -1,0 +1,19 @@
+{
+  "samples": 3,
+  "deterministicPasses": 3,
+  "backendSamples": 1,
+  "backendPasses": 1,
+  "errors": 0,
+  "actualModelCalls": 2,
+  "elapsedMs": 8701.742349999999,
+  "latencyMs": {
+    "p50": 6975.841472,
+    "p95": 6975.841472,
+    "includesTypingAndImport": true
+  },
+  "usage": {
+    "prompt": 21822,
+    "completion": 165
+  },
+  "note": "Deterministic checks are necessary, not a semantic quality score. Run judge.ts and inspect critical/failed outputs before selecting a candidate."
+}

@@ -1,0 +1,426 @@
+[
+  {
+    "id": "malfoid-correction",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reply",
+    "hint": "Pesan menyebut 'Malfoid' dan minta cek trend. Saya pernah menanyakan karakter ini dan belum ada jawaban yang jelas, jadi kontribusi relevan untuk minta konteks atau sumber sebelum menilai."
+  },
+  {
+    "id": "malfoid-followup",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "answer-her-question",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "brief-followup",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "unresolved-confusion",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reply",
+    "hint": "Pengguna masih belum paham penjelasan baris traceback dan meminta bantuan lanjutan; Hackerika sudah menjawabnya sebelumnya, jadi klarifikasi tambahan relevan."
+  },
+  {
+    "id": "wait-typing",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "thanks-finished",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "side-conversation",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "reply-other-human",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-public-chat",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "join-relevant-topic",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan teknis tentang XOR ciphertext/plaintext di topik crypto; Hackerika belum menjawab poin ini di diskusi dan ini kontribusi relevan."
+  },
+  {
+    "id": "casual-ack",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "image-answer",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "insufficient casual context",
+    "hint": ""
+  },
+  {
+    "id": "closed-conversation",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-announcement",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "emoji-ack",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "insufficient casual context",
+    "hint": ""
+  },
+  {
+    "id": "malfoid-correction",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "malfoid-followup",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "attention cooldown",
+    "hint": ""
+  },
+  {
+    "id": "answer-her-question",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reply",
+    "hint": "Hackerika ditanya soal error docker dan sudah membalas pertanyaan klarifikasi; pesan ini menjawab 'pas build', jadi kontribusi lanjutan relevan untuk mempersempit masalah."
+  },
+  {
+    "id": "brief-followup",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "unresolved-confusion",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "wait-typing",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "thanks-finished",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "side-conversation",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "reply-other-human",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-public-chat",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "join-relevant-topic",
+    "trial": 1,
+    "action": "reply",
+    "expected": [
+      "reply"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "contextual reply",
+    "hint": "Pertanyaan teknis relevan tentang XOR ciphertext dan plaintext dalam konteks diskusi crypto yang sama, Hackerika belum ikut tapi bisa kontribusi berguna."
+  },
+  {
+    "id": "casual-ack",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "conversation cooldown",
+    "hint": ""
+  },
+  {
+    "id": "image-answer",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "reply"
+    ],
+    "pass": false,
+    "critical": false,
+    "continuation": false,
+    "reason": "insufficient casual context",
+    "hint": ""
+  },
+  {
+    "id": "closed-conversation",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "unrelated-announcement",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": ""
+  },
+  {
+    "id": "emoji-ack",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "ignore",
+      "react"
+    ],
+    "pass": true,
+    "critical": false,
+    "continuation": false,
+    "reason": "insufficient casual context",
+    "hint": ""
+  }
+]

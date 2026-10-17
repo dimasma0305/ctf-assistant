@@ -1,0 +1,81 @@
+{
+  "verifiedAt": "2026-10-16T11:51:55.257272+00:00",
+  "image": "ctf-assistant:ranking-metrics-20261016t114728z",
+  "imageId": "sha256:98e0bba5cd76e5bbc5cf9ff4dfa5d0c987d88bfc45f80ed1b591ad856c57dcf8",
+  "baselineImage": "ctf-assistant:ranking-baseline-20261016t114728z",
+  "baselineImageId": "sha256:842147b5c3ac5bc536607f4457d4ff160136ef4cf792b24179b0de9f663917f7",
+  "startedAt": "2026-10-16T11:50:28.661107337Z",
+  "checks": {
+    "environmentPreserved": true,
+    "serviceLabelsPreserved": true,
+    "runtimeCommandPreserved": true,
+    "securitySettingsPreserved": true,
+    "networkNamesPreserved": true,
+    "otherServicesUnchanged": true,
+    "selectedImage": true,
+    "healthy": true,
+    "noRestarts": true,
+    "healthHttp200": true,
+    "discordReady": true,
+    "databaseReady": true,
+    "commandSourceHashesMatch": true,
+    "aiEvaluatorAndSearchUnchanged": true,
+    "registeredAliasesAndAllMetricChoices": true,
+    "globalResetNotRepeated": true
+  },
+  "sourceHashes": {
+    "src/Commands/Public/Affection/affection.ts": "317f6dcd3197bd2abc9194128ae78ef3b75e54f2105a8b714de018c5a5e81e0b",
+    "src/Commands/Public/Affection/rank.ts": "c4af94a28b4024926295c8abcfa01693939fbb65fee946098ca5c85df0fac4f0",
+    "src/Commands/Public/Affection/ranking.ts": "3be78023ae3ba2ac84154bc5bf50db520b14e0910a579890a6bb2ec3e21dd232",
+    "src/Commands/Public/Affection/utils/ranking.ts": "87988a2256b3c6dafc130c36e864f5dc0dce9f3b5d38a74d15e1ce1621036de4"
+  },
+  "commands": {
+    "aliases": [
+      "/affection rank",
+      "/affection ranking"
+    ],
+    "metrics": [
+      "affection",
+      "trust",
+      "respect",
+      "comfort",
+      "chemistry",
+      "warmth",
+      "anger",
+      "hurt",
+      "interactions",
+      "change"
+    ],
+    "defaultMetric": "affection",
+    "defaultLimit": 10,
+    "maximumLimit": 25,
+    "cooldownSeconds": 15,
+    "eligibility": "Selected sorting metric above zero; requester metrics outside the public board are ephemeral.",
+    "candidateCap": 500,
+    "partialResultsMarked": true,
+    "emotionValues": "Same elapsed-time settling as conversation context; round only after decay.",
+    "privateFieldsExcluded": true
+  },
+  "tests": {
+    "passed": 314,
+    "failed": 0,
+    "assertions": 970,
+    "files": 30,
+    "rankingTests": 8,
+    "scopedStrictTypesPassed": true,
+    "botBuildPassed": true,
+    "isolatedImagePreflightPassed": true,
+    "realDiscordRegistrationReadBack": true,
+    "testDiscordMessagesSent": 0,
+    "liveModelCallsRequired": 0
+  },
+  "relationshipState": {
+    "newResetPerformed": false,
+    "resetKey": "relationship-reset-2026-10-16",
+    "originalResetAppliedAt": "2026-10-16T01:27:02.452Z"
+  },
+  "rollback": {
+    "baselineImageRetained": true,
+    "privateConfigurationRetained": true
+  }
+}

@@ -1,0 +1,53 @@
+[
+  {
+    "caseId": "delivered-emotional-followup",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The hug reaction is a warm, appropriate response to the caller’s reassurance and makes no unsupported claims.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 378,
+      "completion_tokens": 54,
+      "total_tokens": 432,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 378
+    }
+  },
+  {
+    "caseId": "delivered-reported-comfort",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan hangat dan singkat yang menerima pelukan tanpa menyalahkan siapa pun atau mengarang konteks.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 436,
+      "completion_tokens": 57,
+      "total_tokens": 493,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 436
+    }
+  },
+  {
+    "caseId": "delivered-support-after-affirmation",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Balasan hangat dan singkat yang menerima reassurance tanpa menyalahkan caller atau mengarang konteks.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 454,
+      "completion_tokens": 55,
+      "total_tokens": 509,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 454
+    }
+  }
+]

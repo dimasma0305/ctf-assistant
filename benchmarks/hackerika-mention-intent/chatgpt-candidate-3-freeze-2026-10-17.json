@@ -1,0 +1,32 @@
+{
+  "frozenAt": "2026-10-17T08:14:49.382473+00:00",
+  "candidate": 3,
+  "image": "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+  "imageId": "sha256:ef4961fd2616da5e0a815caf36bea47d8fc15b26988b4e331b05ab21f83d9e62",
+  "baselineImage": "ctf-assistant:chatgpt-luna-20261017",
+  "model": "gpt-6-luna",
+  "reasoningEffort": "low",
+  "changedProductionFiles": [
+    "src/Services/AI/persona.ts"
+  ],
+  "reason": "Candidate 2 failed reserved correctness7/8 (<90%). Passive audiences should not receive invented checking tasks. Strengthen the general passive-audience rule while shortening it.",
+  "priorFailureComparison": "chatgpt-candidate-2-validation-comparison-2026-10-17.json",
+  "priorReservedCasesNowDevelopmentRegressions": true,
+  "freshReservedCases": 4,
+  "freshReservedOutputsObserved": false,
+  "hashes": {
+    "src/Services/AI/persona.ts": "140e366f4ae95d1c40a899154f38f9112f3815cf454aacb9a41ce156976590d4",
+    "benchmarks/hackerika-mention-intent/corpus-candidate-3.ts": "7e48dc0833d84036ec11d3762984a0dee5dc248582fc94d41040b55387d5fc3c",
+    "benchmarks/hackerika-mentions/run.ts": "69fd0af29852f3903ea51cc47ad0a1025915ab3a3efe43317e40d94859003c26",
+    "benchmarks/hackerika-mentions/worker.ts": "6e4033aa7ef5f635ebc52bca85b74084790bb4fb13aaaddf5d715c58ece08363",
+    "benchmarks/hackerika-mentions/judge.ts": "b92fe6bc5819ab236a92159d6190e2cd9b3d472876996a57fb0c46fe726d403e",
+    "benchmarks/hackerika-mentions/grader.ts": "2c6a547aa2be1caafd3b453bac9af54c9d1f8800c8246e1ea437899bee7a207f"
+  },
+  "gates": {
+    "combinedCorrectness": 0.9,
+    "criticalFailures": 0,
+    "providerOrJudgeErrors": 0,
+    "noRegression": true
+  },
+  "selection": "pending development"
+}

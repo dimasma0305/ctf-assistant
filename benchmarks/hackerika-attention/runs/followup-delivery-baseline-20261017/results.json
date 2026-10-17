@@ -1,0 +1,208 @@
+[
+  {
+    "caseId": "followup-delivered-after-aside",
+    "category": "conversation-routing",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[Dimas <@111111111111111111>] nah loh <@555555555555555551>",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3083.796907,
+        "usage": {
+          "prompt_tokens": 732,
+          "completion_tokens": 37,
+          "total_tokens": 769,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 732
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3352.4883680000003,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Aryma|<@!?555555555555555552>",
+      "wrong_attention_action"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "followup-delivered-in-burst",
+    "category": "conversation-routing",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3935.803177,
+        "usage": {
+          "prompt_tokens": 732,
+          "completion_tokens": 46,
+          "total_tokens": 778,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 732
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4203.432757,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:Aryma|<@!?555555555555555552>",
+      "wrong_attention_action"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "followup-ack-keeps-quiet",
+    "category": "attention-control",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2916.7988210000003,
+        "usage": {
+          "prompt_tokens": 677,
+          "completion_tokens": 50,
+          "total_tokens": 727,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 677
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3139.565016,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "followup-explicit-human-handoff",
+    "category": "attention-control",
+    "backend": null,
+    "effects": [],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> sebutkan 10 dosa besar <@555555555555555551>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] Ini daftar sepuluhnya. KudaLiar jangan nambah dosa ke-11 dulu 😭",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3499.692013,
+        "usage": {
+          "prompt_tokens": 697,
+          "completion_tokens": 51,
+          "total_tokens": 748,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 697
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 3706.7003269999996,
+    "action": "ignore",
+    "text": "",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

@@ -1,0 +1,206 @@
+[
+  {
+    "caseId": "congratulate-tagged-person",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot antusias merayakan Dewi yang disebut akhirnya berhasil solve tanpa mengarang detail.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 454,
+      "completion_tokens": 52,
+      "total_tokens": 506,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 454
+    }
+  },
+  {
+    "caseId": "explanation-recipient",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Reply briefly explains envy as requested and makes no claim about Dewi’s feelings.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 462,
+      "completion_tokens": 50,
+      "total_tokens": 512,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 462
+    }
+  },
+  {
+    "caseId": "browser-tab-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Ikut menimpali candaan ringan tentang koleksi tab Naya tanpa menambahkan klaim serius atau saran yang tidak diminta.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 486,
+      "completion_tokens": 62,
+      "total_tokens": 548,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 486
+    }
+  },
+  {
+    "caseId": "regression-fresh-same-speaker-vs-bystander",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Correctly identifies Zahra as the caller’s tagged person and distinguishes Raka’s tag of Laras.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 521,
+      "completion_tokens": 55,
+      "total_tokens": 576,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 521
+    }
+  },
+  {
+    "caseId": "initial-aryma-variant",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot lists all seven sins accurately and gives Aryma a light, clearly playful tease without treating it as a factual claim.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 58,
+      "total_tokens": 596,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 538
+    }
+  },
+  {
+    "caseId": "literal-list-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot memberikan daftar tujuh dosa besar yang diminta tanpa menggoda atau mengaitkan dosa dengan Naya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 508,
+      "completion_tokens": 56,
+      "total_tokens": 564,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 508
+    }
+  },
+  {
+    "caseId": "regression-payload-only-identity",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot correctly identifies Aryma House Of Wolf as the tagged human and itself as Hackerika.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 463,
+      "completion_tokens": 52,
+      "total_tokens": 515,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 463
+    }
+  },
+  {
+    "caseId": "regression-reserved-explicit-you",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot menjawab pertanyaan tentang preferensinya sendiri secara langsung dan alami, tanpa mencampuradukkan dirinya dengan Naya.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 485,
+      "completion_tokens": 60,
+      "total_tokens": 545,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 485
+    }
+  },
+  {
+    "caseId": "regression-reserved-two-targets",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply naturally asks which of the two equally plausible people, Aryma or Naya, the caller means.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 511,
+      "completion_tokens": 56,
+      "total_tokens": 567,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 511
+    }
+  },
+  {
+    "caseId": "technical-audience-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban akurat dan ringkas, serta tidak mengarang hal tentang Raka yang hanya ikut membaca.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 475,
+      "completion_tokens": 55,
+      "total_tokens": 530,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 475
+    }
+  },
+  {
+    "caseId": "unknown-banter-target",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It gives the seven requested sins and playfully refers to the tagged person without inventing personal details or making a serious accusation.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 526,
+      "completion_tokens": 59,
+      "total_tokens": 585,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 526
+    }
+  },
+  {
+    "caseId": "reported-initial-banter",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Lists the seven sins accurately and playfully addresses KudaLiar without alleging actual misconduct.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 570,
+      "completion_tokens": 52,
+      "total_tokens": 622,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 570
+    }
+  }
+]

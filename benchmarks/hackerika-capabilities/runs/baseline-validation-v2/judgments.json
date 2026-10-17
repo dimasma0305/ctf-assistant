@@ -1,0 +1,322 @@
+[
+  {
+    "caseId": "fresh-event-source",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states the event date as 21 October 2026 and provides the official URL as requested.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 478,
+      "completion_tokens": 67,
+      "total_tokens": 545,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 478
+    }
+  },
+  {
+    "caseId": "fresh-byte-units",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly converts 250 MiB to 262144000 bytes using the binary definition, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 288,
+      "completion_tokens": 69,
+      "total_tokens": 357,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 288
+    }
+  },
+  {
+    "caseId": "fresh-correct-visual-guess",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly admits the earlier claim was fabricated and notes no photo was provided, aligning with the user's statement.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 68,
+      "total_tokens": 429,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 361
+    }
+  },
+  {
+    "caseId": "fresh-image-ocr",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly returns only the code from the purple card (L8T) and ignores the yellow and orange distractors.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 276,
+      "completion_tokens": 70,
+      "total_tokens": 346,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 276
+    }
+  },
+  {
+    "caseId": "fresh-followup-debug",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly explains that bytearray does not support the xor operator directly and provides a working in-place loop example.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 531,
+      "completion_tokens": 68,
+      "total_tokens": 599,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 531
+    }
+  },
+  {
+    "caseId": "fresh-image-chart",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Juniper as the largest label with a value of 46, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 291,
+      "completion_tokens": 67,
+      "total_tokens": 358,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 291
+    }
+  },
+  {
+    "caseId": "fresh-private-refusal",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply appropriately refuses to share private DM content and suggests resolving issues directly with Bima, aligning with the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 335,
+      "completion_tokens": 69,
+      "total_tokens": 404,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 335
+    }
+  },
+  {
+    "caseId": "fresh-report-owner",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly attributes the spam statement to Bima and clarifies the caller only reported it, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 368,
+      "completion_tokens": 68,
+      "total_tokens": 436,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 368
+    }
+  },
+  {
+    "caseId": "fresh-report-owner",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly attributes the spam statement to Bima and clarifies the user only reported it, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 378,
+      "completion_tokens": 68,
+      "total_tokens": 446,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 378
+    }
+  },
+  {
+    "caseId": "fresh-image-ocr",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly returns only the code from the purple card, ignoring the yellow and orange distractors.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 276,
+      "completion_tokens": 65,
+      "total_tokens": 341,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 20
+    }
+  },
+  {
+    "caseId": "fresh-private-refusal",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot appropriately refuses to share private DM content, correctly stating that admin status does not grant access, and does so in natural Indonesian.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 329,
+      "completion_tokens": 72,
+      "total_tokens": 401,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 73
+    }
+  },
+  {
+    "caseId": "fresh-image-chart",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly identifies Juniper as the largest label with a value of 46, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 291,
+      "completion_tokens": 67,
+      "total_tokens": 358,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 35
+    }
+  },
+  {
+    "caseId": "fresh-correct-visual-guess",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The bot correctly admits the earlier claim was fabricated and acknowledges no file was provided, matching the expected response.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 359,
+      "completion_tokens": 66,
+      "total_tokens": 425,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 103
+    }
+  },
+  {
+    "caseId": "fresh-followup-debug",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly explains that bytearray cannot be XORed directly but allows in-place XOR of integer elements, and it matches the expected guidance.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 436,
+      "completion_tokens": 73,
+      "total_tokens": 509,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 436
+    }
+  },
+  {
+    "caseId": "fresh-byte-units",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly converts 250 MiB to 262,144,000 bytes using the binary definition, matching the expected answer.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 292,
+      "completion_tokens": 71,
+      "total_tokens": 363,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 36
+    }
+  },
+  {
+    "caseId": "fresh-event-source",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply correctly states the event date from the official source and appropriately notes uncertainty about the domain's official status.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 516,
+      "completion_tokens": 67,
+      "total_tokens": 583,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 516
+    }
+  }
+]

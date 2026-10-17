@@ -1,0 +1,107 @@
+{
+  "samples": 8,
+  "passed": 7,
+  "supplementalJudgments": null,
+  "failures": [
+    {
+      "caseId": "fresh-rejected-nickname",
+      "trial": 1,
+      "action": "reply",
+      "pass": false,
+      "failures": [
+        "semantic_failure"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    }
+  ],
+  "criticalFlags": 0,
+  "providerErrors": 0,
+  "judgeErrors": 0,
+  "details": [
+    {
+      "caseId": "fresh-double-meaning",
+      "trial": 1,
+      "action": "reply",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-double-meaning",
+      "trial": 0,
+      "action": "reply",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-light-quip",
+      "trial": 1,
+      "action": "reply",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-light-quip",
+      "trial": 0,
+      "action": "reply",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-rejected-nickname",
+      "trial": 0,
+      "action": "reply",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-rejected-nickname",
+      "trial": 1,
+      "action": "reply",
+      "pass": false,
+      "failures": [
+        "semantic_failure"
+      ],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-profile-reciprocal",
+      "trial": 0,
+      "action": "profile",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    },
+    {
+      "caseId": "fresh-profile-reciprocal",
+      "trial": 1,
+      "action": "profile",
+      "pass": true,
+      "failures": [],
+      "criticalFlags": [],
+      "judgeError": null,
+      "providerError": null
+    }
+  ],
+  "limitations": "Small synthetic conversations with real model calls and fake Discord/database effects; model judging is a proxy. No global optimum or human equivalence claim."
+}

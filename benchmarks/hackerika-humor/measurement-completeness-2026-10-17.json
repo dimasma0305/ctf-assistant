@@ -1,0 +1,8 @@
+{
+  "recordedAt": "2026-10-17T09:23:41.962974+00:00",
+  "reason": "Development candidate judging started before the last sample finished, so its protocol scheduled15 of16 eligible replies/profile updates. Add a one-sample supplement instead of rerunning completed judgments. Preserve original outputs.",
+  "rubricChanged": false,
+  "productionSourceChanged": false,
+  "corpusChanged": false,
+  "supplementCheckerHash": "c360affe0741fc3351ba206ca1261d82420f65504e155792e091bef4b390d45b"
+}

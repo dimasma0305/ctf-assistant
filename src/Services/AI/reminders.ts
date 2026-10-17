@@ -221,7 +221,7 @@ export async function listRemindersForTool(
     const userId = message.author.id;
     let docs: any[];
     try {
-        docs = await ReminderModel.find({ userId, delivered: false })
+        docs = await ReminderModel.find({ userId, channelId: message.channelId, delivered: false })
             .sort({ dueAt: 1 })
             .limit(50)
             .lean();
@@ -273,6 +273,7 @@ export async function cancelReminderForTool(
     }
     if (!doc) return { ok: false, error: 'not_found' };
     if (doc.userId !== userId) return { ok: false, error: 'not_yours' };
+    if (doc.channelId !== message.channelId) return { ok: false, error: 'not_found' };
     if (doc.delivered) return { ok: false, error: 'already_delivered' };
 
     try {

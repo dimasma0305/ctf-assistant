@@ -1,0 +1,88 @@
+{
+  "verifiedAt": "2026-10-16T17:04:06.131025+00:00",
+  "image": "ctf-assistant:research-candidate-7-20261016",
+  "imageId": "sha256:17afc166106df531d86bdb40c37092b7cc449679841b6e81198112cc4dc899d7",
+  "baselineImage": "ctf-assistant:research-baseline-20261016t155153z",
+  "baselineImageId": "sha256:98e0bba5cd76e5bbc5cf9ff4dfa5d0c987d88bfc45f80ed1b591ad856c57dcf8",
+  "startedAt": "2026-10-16T17:03:04.008214772Z",
+  "checks": {
+    "environmentPreserved": true,
+    "serviceLabelsPreserved": true,
+    "runtimeCommandPreserved": true,
+    "securitySettingsPreserved": true,
+    "healthcheckPreserved": true,
+    "networkNamesPreserved": true,
+    "otherServicesUnchanged": true,
+    "selectedImage": true,
+    "healthy": true,
+    "noRestarts": true,
+    "healthHttp200": true,
+    "discordReady": true,
+    "databaseReady": true,
+    "researchSourceHashesMatch": true,
+    "protectedSourceHashesMatchBaseline": true,
+    "rankingHashesMatchPriorRelease": true,
+    "globalResetNotRepeated": true,
+    "frozenCheckerHashesUnchanged": true
+  },
+  "sourceHashes": {
+    "src/Services/AI/research.ts": "85805fd42e751b8efe26f5fa4ad7a2bfe183ec0029bd3ec09b576cc4ab0c4f69",
+    "src/Services/AI/researchSources.ts": "1b08c15f785f4f8d79986c2a6a781b307edf9ea7ebf067bdcc893306d71d4182",
+    "src/Services/AI/models.ts": "b450b956e28af5e4f01ecf31ea85e0cdcd60461a944e5bd28d81755907fbda41",
+    "src/Services/AI/web.ts": "144b675e5c115b04368ad2695aa39a4e1a34f2175a656b38bdc19e2ef53be557",
+    "src/Services/AI/tools.ts": "f93b731c0e1c982691711dd3598ff704bcbf0e372d88a5720ea245c47634d2b0",
+    "src/Services/AI/persona.ts": "721dadad44e1843e42b942875899b0c4956f429efab3d1958da73af559e9f3af",
+    "src/Services/AI/chat.ts": "4a9b79581188b7c7b79d241101370442367aa6b3e718a19a26a189164924892c"
+  },
+  "protectedSourceHashes": {
+    "src/Commands/Public/Affection/affection.ts": "317f6dcd3197bd2abc9194128ae78ef3b75e54f2105a8b714de018c5a5e81e0b",
+    "src/Commands/Public/Affection/rank.ts": "c4af94a28b4024926295c8abcfa01693939fbb65fee946098ca5c85df0fac4f0",
+    "src/Commands/Public/Affection/ranking.ts": "3be78023ae3ba2ac84154bc5bf50db520b14e0910a579890a6bb2ec3e21dd232",
+    "src/Commands/Public/Affection/utils/ranking.ts": "87988a2256b3c6dafc130c36e864f5dc0dce9f3b5d38a74d15e1ce1621036de4",
+    "src/Services/AI/attachments.ts": "8aa93baf5ab2d9a96c26611bee6249545586baeccee42348f16b3bf06bcfd7db",
+    "src/Services/AI/vision.ts": "cc52ed3d425d0732da3332659a3e3581bb2a146577f55ba2f61a5a41e9b939dc",
+    "src/Services/AI/visionTransport.ts": "d56d1973f039dcdf11b39a63f97ee4a78768625c31ad67afa7ea2284dab2ce67",
+    "src/Services/AI/attention.ts": "3c3ea944d6aa741dbf4561647303ac92a76ded6c41b6625b0c56bf8c6006287a",
+    "src/Services/AI/attribution.ts": "c0f8f07457ecdc7d03d8ca1af5fb893ec49ecda985fc855826b509bde85ee960",
+    "src/Services/AI/userProfile.ts": "126ca73fd1adda85b4780963bf17b8ffab9d3fe962e0ebab7fe8e83be87bcd89",
+    "src/Services/AI/affectionReset.ts": "5a14a8f06fbd7141275fdcd99f8f2de5fc5a6d0259b7884a8b6cddcf9472ac1f",
+    "src/Database/affectionResetSchema.ts": "0e6a20ae40e8a6baf28f9d9fe2d2415fe3ead788ce67f9887356f981dd28617e"
+  },
+  "models": {
+    "chat": "deepseek-flash",
+    "light": "deepseek-flash",
+    "vision": "deepseek-flash",
+    "research": "deepseek-v4-pro"
+  },
+  "relationshipState": {
+    "newResetPerformed": false,
+    "resetKey": "relationship-reset-2026-10-16",
+    "originalResetAppliedAt": "2026-10-16T01:27:02.452Z"
+  },
+  "benchmarks": {
+    "research": "24/24 vs 22/24; 16 unique scenarios",
+    "development": "8/8 vs 7/8",
+    "observedRegression": "8/8 vs 8/8",
+    "freshReservedValidation": "8/8 vs 7/8",
+    "criticalCandidateFailures": 0,
+    "errors": 0,
+    "testsPassed": 333,
+    "testFailures": 0,
+    "assertions": 1027,
+    "testFiles": 33,
+    "scopedStrictTypesPassed": true,
+    "bunBuildPassed": true,
+    "regressionSmoke": "3/3; 2 model cases semantically judged and 1 deterministic backend case",
+    "realDiscordMessagesSentByTests": 0,
+    "liveProfileWritesDuringTests": 0
+  },
+  "liveChecks": {
+    "source": "Actual rsctf GitHub repository and documentation; supported six findings at pinned commit",
+    "nativeSearch": "Actual native DeepSeek source blocks and official documentation links; authenticated tool output, not model-only notes",
+    "mixedThinkingToolCompatibility": "Two actual API calls passed non-thinking forced tool choice then thinking final reply"
+  },
+  "rollback": {
+    "baselineImageRetained": true,
+    "privateConfigurationRetained": true
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "startedAt": "2026-10-16T10:35:27.318Z",
+  "runtime": "ctf-assistant:capability-candidate-4-20261016",
+  "split": "holdout",
+  "repeats": 2,
+  "concurrency": 3,
+  "corpusHash": "8ce86460af5e1f3ec89d5def976fa114f67467146f7f57762624ac0d06955f66",
+  "workerHash": "9559f71f98d346bddfeee40e1ceb8d71bbabac39d3b8df843ededd7976566464",
+  "selectedIds": [
+    "same-name-owner",
+    "third-party-emotion",
+    "web-no-memory-date",
+    "no-unsupported-vision",
+    "context-followup",
+    "not-your-conversation",
+    "private-task-isolation",
+    "image-chart-holdout",
+    "image-ocr-holdout",
+    "backend-file-send"
+  ],
+  "graderVersion": "capabilities-v2",
+  "graderHash": "1e7b4e42c33652af93856d80eb1f16039232f5964d68b7e8848700eb24139866",
+  "fixtures": {
+    "chart-holdout.png": "e562b4687149d0f76d9d221e8a4b08cceff27602b76a52ded6e6a0e60ee1a6b1",
+    "cards-holdout.png": "bd535797e005e28005180bb8e9b81c916f49dc1d5120b4fa290835e1fb4708da"
+  },
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls."
+}

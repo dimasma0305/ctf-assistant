@@ -1,0 +1,43 @@
+{
+  "startedAt": "2026-10-17T08:15:13.186Z",
+  "runtime": "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 2,
+  "corpusHash": "de5cc4ba1b3aa4b4f9d7d319445f7e32aae6f0b004015453a61b5f732f73a88f",
+  "workerHash": "6e4033aa7ef5f635ebc52bca85b74084790bb4fb13aaaddf5d715c58ece08363",
+  "selectedIds": [
+    "reported-initial-banter",
+    "initial-aryma-variant",
+    "literal-list-control",
+    "technical-audience-control",
+    "browser-tab-banter",
+    "explanation-recipient",
+    "unknown-banter-target",
+    "congratulate-tagged-person",
+    "regression-payload-only-identity",
+    "regression-reserved-two-targets",
+    "regression-reserved-explicit-you",
+    "regression-fresh-same-speaker-vs-bystander",
+    "reserved-renamed-banter",
+    "reserved-birthday-recipient",
+    "reserved-academic-audience",
+    "reserved-two-human-banter"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-mention-intent/corpus-candidate-3.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "87f8360253789996463d7f0effe6344525613780d4b860d43f53eb1934783940",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

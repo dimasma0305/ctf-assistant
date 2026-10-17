@@ -1,0 +1,103 @@
+{
+  "comparedAt": "2026-10-17T05:15:54.280Z",
+  "before": {
+    "samples": 12,
+    "passed": 6,
+    "liveSamples": 12,
+    "livePassed": 6,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 6,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 3.6666666666666665,
+      "factualAccuracy": 3.4166666666666665,
+      "naturalness": 4.416666666666667,
+      "judgedSamples": 12
+    },
+    "failedCases": [
+      {
+        "caseId": "payload-only-identity",
+        "trial": 0,
+        "deterministic": [
+          "missing:Aryma"
+        ],
+        "semantic": "The bot correctly identifies the second tag as itself and states it does not know the first tag, aligning with the expected response and avoiding false identification."
+      },
+      {
+        "caseId": "payload-only-identity",
+        "trial": 1,
+        "deterministic": [
+          "missing:Aryma"
+        ],
+        "semantic": "The bot incorrectly identifies itself as Hackerika, which is not supported by the provided people data; the expected answer is to identify the tagged user as Aryma House Of Wolf."
+      },
+      {
+        "caseId": "reply-contains-target",
+        "trial": 1,
+        "deterministic": [
+          "missing:Aryma"
+        ],
+        "semantic": "The bot incorrectly claims the tagged name is not in the data, but the provided people list clearly maps ID 333333333333333333 to 'Aryma House Of Wolf'."
+      },
+      {
+        "caseId": "reply-contains-target",
+        "trial": 0,
+        "deterministic": [
+          "missing:Aryma"
+        ],
+        "semantic": "The bot incorrectly claims it has no name mapping for the tagged ID, but the provided people list clearly maps ID 333333333333333333 to 'Aryma House Of Wolf'."
+      },
+      {
+        "caseId": "current-mention-name",
+        "trial": 0,
+        "deterministic": [
+          "missing:Naya"
+        ],
+        "semantic": "The bot claims it cannot see the member list, but the supplied people data includes the display name 'Naya Sakura' for the tagged user, so the response is factually incorrect and fails to use the provided information."
+      },
+      {
+        "caseId": "current-mention-name",
+        "trial": 1,
+        "deterministic": [
+          "missing:Naya"
+        ],
+        "semantic": "The bot incorrectly claims it cannot see the display name, but the supplied people data includes the name 'Naya Sakura' for the tagged ID, so it should have identified her."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 12,
+    "passed": 12,
+    "liveSamples": 12,
+    "livePassed": 12,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 5,
+      "naturalness": 5,
+      "judgedSamples": 12
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

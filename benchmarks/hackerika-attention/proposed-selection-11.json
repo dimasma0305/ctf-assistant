@@ -1,0 +1,14 @@
+{
+  "prompt": "../hackerika-voice/prompts/candidate-11.txt",
+  "sha256": "93b67cc8615a477b589acb301c472bc3e72b98b1581511b4e335daa300f7a312",
+  "status": "frozen before final regression review",
+  "contextRun": "../hackerika-voice/runs/compact-11-context",
+  "additionalRequiredChecks": [
+    "main voice non-regression and savings",
+    "reviewed validation-3 regression",
+    "image native-input non-regression",
+    "live routing corpus",
+    "full chat pipeline with fake Discord destinations",
+    "tests/types/build/runtime health"
+  ]
+}

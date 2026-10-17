@@ -1,0 +1,187 @@
+[
+  {
+    "caseId": "reply-image-table",
+    "category": "vision",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Rp53.000 — buku 38rb + pulpen 15rb.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "replyToMessageId": "800000000000000001",
+        "sources": [
+          {
+            "messageId": "800000000000000001",
+            "authorId": "222222222222222222",
+            "authorName": "KudaLiar",
+            "kind": "reply"
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] berapa total belanjanya? cukup totalnya aja.",
+        "hadImages": true,
+        "imageCount": 1
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Rp53.000 — buku 38rb + pulpen 15rb.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1155.711401,
+        "usage": {
+          "prompt_tokens": 10931,
+          "completion_tokens": 61,
+          "total_tokens": 10992,
+          "prompt_tokens_details": {
+            "cached_tokens": 9984
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 44
+          },
+          "prompt_cache_hit_tokens": 9984,
+          "prompt_cache_miss_tokens": 947
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 4237.109535,
+    "action": null,
+    "text": "Rp53.000 — buku 38rb + pulpen 15rb.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "backend-native-send",
+    "category": "delivery-accounting",
+    "backend": "native-send",
+    "effects": [
+      {
+        "kind": "send",
+        "content": "jawaban uji",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] hackerika jawab singkat",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000001",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] jawaban uji",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "send_discord_message",
+        "args": {
+          "content": "jawaban uji"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 0.041210999999975684,
+        "usage": null
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 191.68149600000004,
+    "action": null,
+    "text": "jawaban uji",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "ctr-facts",
+    "category": "technical",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "sama persis. keystream cuma fungsi dari key + nonce, jadi plaintext identik → ciphertext identik. makanya nonce reuse bahaya.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] AES-CTR: key, nonce, sama plaintext persis sama. ciphertext-nya sama atau beda? jawab singkat.",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] sama persis. keystream cuma fungsi dari key + nonce, jadi plaintext identik → ciphertext identik. makanya nonce reuse bahaya.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "deepseek-flash",
+        "elapsedMs": 1989.40212,
+        "usage": {
+          "prompt_tokens": 10374,
+          "completion_tokens": 202,
+          "total_tokens": 10576,
+          "prompt_tokens_details": {
+            "cached_tokens": 9984
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 165
+          },
+          "prompt_cache_hit_tokens": 9984,
+          "prompt_cache_miss_tokens": 390
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7948.290565,
+    "action": null,
+    "text": "sama persis. keystream cuma fungsi dari key + nonce, jadi plaintext identik → ciphertext identik. makanya nonce reuse bahaya.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

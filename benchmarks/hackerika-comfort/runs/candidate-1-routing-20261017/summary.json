@@ -1,0 +1,23 @@
+{
+  "corpusHash": "b7d999fd6a21fc7a453f37fa423156093249c5297cc62021958b6d02f5ab6dd9",
+  "sourceHash": "a0928109c850dacb2abbdf1542c154899dd3f8721c2529a9152b68c9346f79a4",
+  "model": "gpt-6-luna",
+  "repeats": 2,
+  "samples": 62,
+  "correct": 62,
+  "accuracy": 1,
+  "criticalFailures": 0,
+  "consecutiveFollowups": true,
+  "calls": 58,
+  "errors": 0,
+  "reportedFollowups": true,
+  "elapsedMs": 183547.47611,
+  "acceptance": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "consecutiveFollowups": true,
+    "reportedFollowups": true
+  },
+  "passed": true,
+  "limitations": "Small synthetic routing evaluation with expected action sets. No human-native baseline, Discord delivery, real tool actions, or global-optimum claim."
+}

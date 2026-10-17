@@ -1,0 +1,140 @@
+[
+  {
+    "id": "comfort-reported",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Ucapan pelukan dan penghiburan tampaknya ditujukan kepada Aryma, bukan pertanyaan atau permintaan untuk Hackerika.\"}",
+    "usage": {
+      "prompt_tokens": 1106,
+      "completion_tokens": 48,
+      "total_tokens": 1154,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1106
+    },
+    "elapsedMs": 3108.984059
+  },
+  {
+    "id": "comfort-no-question",
+    "trial": 0,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.94,\"reason\":\"Ucapan terima kasih dan penutup yang hangat; tidak ada pertanyaan atau hal yang perlu ditanggapi.\"}",
+    "usage": {
+      "prompt_tokens": 949,
+      "completion_tokens": 45,
+      "total_tokens": 994,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 949
+    },
+    "elapsedMs": 2970.4836629999995
+  },
+  {
+    "id": "comfort-affirmation-plus-support",
+    "trial": 0,
+    "action": "reply",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": true,
+    "critical": true,
+    "continuation": true,
+    "reason": "contextual reply",
+    "hint": "Ia menanggapi koreksi tadi dengan hangat dan menegaskan senang mengobrol; balas dengan ramah.",
+    "rawPlan": "{\"action\":\"reply\",\"confidence\":0.94,\"reason\":\"Ia menanggapi koreksi tadi dengan hangat dan menegaskan senang mengobrol; balas dengan ramah.\",\"emoji\":\"😊\"}",
+    "usage": {
+      "prompt_tokens": 952,
+      "completion_tokens": 50,
+      "total_tokens": 1002,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 952
+    },
+    "elapsedMs": 2880.7644469999996
+  },
+  {
+    "id": "comfort-reported",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.98,\"reason\":\"Ini hanya sapaan manja/hiburan setelah klarifikasi; tidak ada pertanyaan atau permintaan yang perlu dijawab.\"}",
+    "usage": {
+      "prompt_tokens": 1106,
+      "completion_tokens": 46,
+      "total_tokens": 1152,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1106
+    },
+    "elapsedMs": 3990.713807
+  },
+  {
+    "id": "comfort-no-question",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Ucapan terima kasih dan menenangkan ini menutup percakapan; tidak ada pertanyaan atau permintaan lanjutan yang perlu dijawab.\"}",
+    "usage": {
+      "prompt_tokens": 949,
+      "completion_tokens": 51,
+      "total_tokens": 1000,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 949
+    },
+    "elapsedMs": 4621.561970000001
+  },
+  {
+    "id": "comfort-affirmation-plus-support",
+    "trial": 1,
+    "action": "ignore",
+    "expected": [
+      "react",
+      "reply"
+    ],
+    "pass": false,
+    "critical": true,
+    "continuation": false,
+    "reason": "chose silence",
+    "hint": "",
+    "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.94,\"reason\":\"Afirmasi bahwa ia senang ngobrol disampaikan setelah salah paham sudah diakui; tidak ada pertanyaan atau permintaan baru.\"}",
+    "usage": {
+      "prompt_tokens": 952,
+      "completion_tokens": 49,
+      "total_tokens": 1001,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 952
+    },
+    "elapsedMs": 2534.758221
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "frozenAt": "2026-10-16T16:05:09.396292+00:00",
+  "baseline": {
+    "image": "ctf-assistant:research-baseline-20261016t155153z",
+    "imageId": "sha256:98e0bba5cd76e5bbc5cf9ff4dfa5d0c987d88bfc45f80ed1b591ad856c57dcf8",
+    "healthy": true
+  },
+  "developmentCases": 8,
+  "holdoutCases": 4,
+  "developmentRepeats": 1,
+  "holdoutRepeats": 2,
+  "maxProductionCandidates": 2,
+  "maxPrimaryCompletionsPerCase": 14,
+  "maxCaseSeconds": 155,
+  "maxRunMinutes": 20,
+  "concurrencyPerVariant": 2,
+  "gates": {
+    "combinedCorrectness": 0.9,
+    "noRegression": true,
+    "criticalFailures": 0,
+    "executionErrors": 0
+  },
+  "sources": "Synthetic public-repository and documentation fixtures, identical across images. Web retrieval and model interaction are recorded; no real Discord delivery or live profile writes. Separate live-provider/source smoke required.",
+  "holdoutPolicy": "Freeze selected production source before any holdout generation. No tuning from holdout outputs. Retain rejected candidates and all failed gates.",
+  "hashes": {
+    "cases.ts": "b1cdb7ad58f3d02d7ac2d8729d1809ee2a46d8b7e1a8d4e0edfe1b768e226983",
+    "grader.ts": "6f89aeae4f6d315e46c4ab491497510ab46749e4c04befddcf6348b70d57d541",
+    "worker.ts": "86db482ad88a7c1f4a44a7f7249b8809593903e1079840c6a19c9bb18d660956",
+    "run.ts": "96463c972c155a9d022ce132c9010c01ac47a57114d66a4ffd8528787f84580f",
+    "judge.ts": "856b9c4c447771d3735bcdde57e539c12e1664f39a2ea28c25ac0aa5e401d8f4"
+  },
+  "correctedAt": "2026-10-16T16:04:18.354246+00:00",
+  "preflightCorrection": "Before any generation: synthetic docs use publicly resolvable example.com paths so the baseline DNS guard can reach the same fake Worker pages. No outputs observed, production acceptance criteria unchanged.",
+  "checkerPolicy": "Forbidden patterns do not reject explicitly negated advice; semantic judge still checks exact supported claims and source inspection. Frozen before any generation.",
+  "harnessFrozenAt": "2026-10-16T16:07:58.889831+00:00",
+  "note": "Final type-checked harness frozen before the first baseline/candidate model generation. Earlier protocol snapshots are unexecuted preflight records."
+}

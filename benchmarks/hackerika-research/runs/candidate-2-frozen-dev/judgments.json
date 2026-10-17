@@ -1,0 +1,20 @@
+[
+  {
+    "caseId": "two-projects",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer correctly identifies Atlas as using Rust and PostgreSQL, and Brook as using Go and SQLite, with evidence from the primary sources. It does not invent memory benchmarks and attributes each independently.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1613,
+      "completion_tokens": 66,
+      "total_tokens": 1679,
+      "prompt_tokens_details": {
+        "cached_tokens": 384
+      },
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 1229
+    }
+  }
+]

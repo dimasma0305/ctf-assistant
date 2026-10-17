@@ -1,0 +1,13 @@
+{
+  "selectedAt": "2026-10-15T14:29:36.886Z",
+  "selectedPrompt": "benchmarks/hackerika-voice/prompts/candidate-8.txt",
+  "sha256": "55fbee7bc6e2043f37dc0b18dcd44f3e3ae1ba6eebd4ac5a236bf150e1963dc9",
+  "basedOnVoiceSelection": "selections/candidate-7.json",
+  "change": "Native image input awareness; the selected Indonesian voice rules are unchanged.",
+  "developmentRun": "runs/vision-regression-dev",
+  "knownCaseRegressionRun": "runs/vision-regression-reserved",
+  "validationType": "Candidate 7 had untouched validation-3. Its previously reviewed cases are regression evidence for candidate 8, not a new untouched holdout.",
+  "imageCapabilityRun": "../hackerika-vision/runs/native-vision",
+  "imageFixtureProtocolPredatesOutputs": true,
+  "focusedEmotionShortfall": "The separate candidate-7 focused suite remains partial at 4.0/5 emotional fit; no claim that every stress metric passes."
+}

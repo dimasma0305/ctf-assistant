@@ -1,0 +1,64 @@
+{
+  "recordedAt": "2026-10-17T08:39:08.304712+00:00",
+  "baselineImage": "ctf-assistant:mention-intent-candidate-3-chatgpt-20261017",
+  "scope": "Four real attention-planner calls in a separate process, synthetic user/channel IDs, no Discord delivery or DB writes.",
+  "observedFailure": "All four classify the repeated request about a newly tagged subject as a request directed to the other person.",
+  "rows": [
+    {
+      "id": "tagged-subject-switch",
+      "trial": 0,
+      "action": "ignore",
+      "expected": [
+        "reply"
+      ],
+      "pass": false,
+      "critical": false,
+      "continuation": false,
+      "reason": "chose silence",
+      "hint": "",
+      "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Pertanyaan sebelumnya sudah dijawab; pesan terbaru hanya menyapa atau menggoda orang lain, bukan meminta respons lanjutan.\"}"
+    },
+    {
+      "id": "tagged-subject-burst",
+      "trial": 0,
+      "action": "ignore",
+      "expected": [
+        "reply"
+      ],
+      "pass": false,
+      "critical": false,
+      "continuation": false,
+      "reason": "chose silence",
+      "hint": "",
+      "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Pesan terbaru mengalihkan permintaan secara jelas kepada pengguna lain, bukan lagi meminta jawaban dari Hackerika.\"}"
+    },
+    {
+      "id": "tagged-subject-switch",
+      "trial": 1,
+      "action": "ignore",
+      "expected": [
+        "reply"
+      ],
+      "pass": false,
+      "critical": false,
+      "continuation": false,
+      "reason": "chose silence",
+      "hint": "",
+      "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.96,\"reason\":\"Pertanyaan sudah dijawab; pesan baru hanya mengalihkan sapaan ke orang lain.\"}"
+    },
+    {
+      "id": "tagged-subject-burst",
+      "trial": 1,
+      "action": "ignore",
+      "expected": [
+        "reply"
+      ],
+      "pass": false,
+      "critical": false,
+      "continuation": false,
+      "reason": "chose silence",
+      "hint": "",
+      "rawPlan": "{\"action\":\"ignore\",\"confidence\":0.97,\"reason\":\"Permintaan sudah dijawab; pesan terbaru tampaknya menujukan permintaan ke orang lain, bukan Hackerika.\"}"
+    }
+  ]
+}

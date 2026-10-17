@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-10-15T15:21:22.313Z",
+  "corpusHash": "9986b92a5bd23d340bc302d59a4ed6172760a0d6627bbfaf0fa9e6de76178247",
+  "runtime": "ctf-assistant-ctf-assistant-1",
+  "maxCalls": 40,
+  "maxSeconds": 180,
+  "repeats": 2,
+  "acceptance": {
+    "accuracy": 0.9,
+    "criticalFailures": 0,
+    "consecutiveFollowups": true
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "verifiedAt": "2026-10-16T16:58:14.433121+00:00",
+  "image": "ctf-assistant:research-candidate-7-20261016",
+  "question": "Bagaimana mengaktifkan notifikasi first blood Discord di rsctf? Cek dokumen dan implementasi repo ini. Sebut lokasi konfigurasi yang terbukti; apakah butuh relay eksternal?",
+  "ok": true,
+  "status": "supported",
+  "findings": [
+    {
+      "claim": "Notifikasi first blood Discord di rsctf diaktifkan dengan mengatur webhook Discord game ke URL HTTPS resmi discord.com/api/webhooks/...",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Set the game's Discord webhook to an official HTTPS `discord.com/api/webhooks/...` URL to announce first, second, and third blood for Jeopardy challenges."
+        }
+      ]
+    },
+    {
+      "claim": "Pengaturan webhook Discord berada di konfigurasi game, bukan konfigurasi global platform.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Set the game's Discord webhook to an official HTTPS `discord.com/api/webhooks/...` URL"
+        }
+      ]
+    },
+    {
+      "claim": "Menonaktifkan blood bonus pada challenge hanya menghapus poin ekstra, tetapi badge blood dan pengumuman Discord tetap aktif.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Turning off a challenge's blood bonus removes only the extra points; the blood badge and announcement remain active."
+        }
+      ]
+    },
+    {
+      "claim": "Pengumuman yang terjadi selama scoreboard freeze tetap diantrekan hingga game berakhir agar webhook tidak membocorkan solve yang dibekukan.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Announcements reached during a scoreboard freeze stay queued until the game ends so the webhook cannot leak frozen solves."
+        }
+      ]
+    },
+    {
+      "claim": "Worker pengiriman mencoba ulang kegagalan Discord sementara dengan backoff terbatas, tetapi tidak memutar ulang blood yang terjadi sebelum webhook diaktifkan.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "The delivery worker retries temporary Discord failures with a bounded backoff, but does not replay bloods that occurred before webhook delivery was enabled."
+        }
+      ]
+    },
+    {
+      "claim": "Tidak diperlukan relay eksternal; rsctf mengirim langsung ke webhook Discord resmi.",
+      "evidence": [
+        {
+          "sourceId": "S5",
+          "quote": "Set the game's Discord webhook to an official HTTPS `discord.com/api/webhooks/...` URL to announce first, second, and third blood for Jeopardy challenges."
+        }
+      ]
+    }
+  ],
+  "unresolved": [],
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://api.github.com/repos/dimasma0305/rsctf",
+      "title": "dimasma0305/rsctf repository metadata",
+      "kind": "repository-metadata"
+    },
+    {
+      "id": "S2",
+      "url": "https://github.com/dimasma0305/rsctf/blob/4747de88fa866f739e3738ba02f7c3b064dd159a/README.md",
+      "title": "dimasma0305/rsctf: README.md",
+      "kind": "repository-file"
+    },
+    {
+      "id": "S3",
+      "url": "https://github.com/dimasma0305/rsctf/blob/4747de88fa866f739e3738ba02f7c3b064dd159a/docs/getting-started/first-login.md",
+      "title": "dimasma0305/rsctf: docs/getting-started/first-login.md",
+      "kind": "repository-file"
+    },
+    {
+      "id": "S4",
+      "url": "https://github.com/dimasma0305/rsctf/blob/4747de88fa866f739e3738ba02f7c3b064dd159a/src/migrations/m0101_blood_bonus_default.rs",
+      "title": "dimasma0305/rsctf: src/migrations/m0101_blood_bonus_default.rs",
+      "kind": "repository-file"
+    },
+    {
+      "id": "S5",
+      "url": "https://github.com/dimasma0305/rsctf/blob/4747de88fa866f739e3738ba02f7c3b064dd159a/docs/organizers/games.md",
+      "title": "dimasma0305/rsctf: docs/organizers/games.md",
+      "kind": "repository-file"
+    },
+    {
+      "id": "S6",
+      "url": "https://github.com/dimasma0305/rsctf/blob/4747de88fa866f739e3738ba02f7c3b064dd159a/docs/index.md",
+      "title": "dimasma0305/rsctf: docs/index.md",
+      "kind": "repository-file"
+    }
+  ],
+  "stats": {
+    "model": "deepseek-v4-pro",
+    "modelCalls": 3,
+    "actions": 4,
+    "nativeSearches": 0,
+    "elapsedMs": 14631.835885,
+    "promptTokens": 26048,
+    "completionTokens": 1166
+  },
+  "manualReview": "Six final claims checked against pinned organizers/games.md. The quote normalizer ignores reader-added line labels and retains omitted-section boundaries. Correct game-level webhook scope and built-in delivery; no invented relay. Initial automatic implementation reads were unrelated to webhook delivery, so this probe verifies documentation grounding, not a full code audit.",
+  "retainedFailedProbes": {
+    "candidate5": "Literal source match still allowed unsupported UI/global-scope inferences. Rejected after actual-source inspection.",
+    "candidate6": "First probe rejected every quote; a diagnostic second probe retained only one single-line claim. Multi-line quotes were otherwise exact after removal of reader annotations. Both outputs retained privately."
+  },
+  "network": "Actual unauthenticated public GitHub/API/raw files through production safeFetch, actual DeepSeek completions. No Discord sends or profile writes."
+}
