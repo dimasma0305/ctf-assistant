@@ -124,11 +124,39 @@ An explicit request such as “bantuin OSINT” or “bantu solve punya W yang t
 
 Investigations keep inspected evidence, candidate derivations, attempted actions and specific unresolved clues in a channel-scoped checkpoint for 24 hours. Any teammate in that channel can continue it; another channel or DM cannot read it. A clearly new challenge can start a new case. MongoDB preserves checkpoints across restarts; during an outage or `NODB=true`, the bounded local cache cannot survive a restart. Expired entries are rejected immediately, even before MongoDB's TTL cleanup runs.
 
-During a requested investigation, up to 30 recent messages in that channel can supply teammates' actual image and text/code attachments, with source message and author IDs. Images still use the existing four-image vision limit and actual downloaded pixels; an “Image” placeholder supplies no visual evidence. Text/code files are bounded to three files, 64 KiB each and 96 KiB total, using approved Discord CDN URLs without redirects. Binary archives and executables are identified as unread rather than falsely described as analyzed. Missing original story text, uncertain characters or absent checker rules remain explicit gaps.
+In an accessible thread, the chat handler reads up to six pages of 100 messages and the exact original thread starter. It refreshes the latest page, including teammates' updates posted after the summon, and selects older discoveries, corrections and decisions within a bounded context budget. It never reads surrounding parent-channel or sibling-thread history. Both the caller and bot need access and history permissions; a hidden parent starter is excluded. Coverage metadata distinguishes complete, capped and unavailable reads. Edits/deletions invalidate the short-lived snapshot. Ordinary conversations also use this thread context.
+
+CTF checkpoints additionally retain a structured team ledger: reported values, remaining question, original message IDs, author IDs and literal supporting quotes. Reports remain working inputs rather than independently verified findings. Unsupported or altered quotes are rejected, short values must match whole tokens, and the worker receives validation feedback to repair rejected entries. Latest supported corrections replace older values. Current originals revalidate the ledger before reuse. This is bounded history, not unlimited or permanent memory.
+
+Outside threads, a requested investigation still uses up to 30 recent messages in the current channel. Accessible selected thread sources and the exact starter can also supply teammates' actual image and text/code attachments, with source message and author IDs. Parent-starter images keep their true origin while being scoped only to the authorized thread. Images still use the existing four-image vision limit and actual downloaded pixels; an “Image” placeholder supplies no visual evidence. Text/code files are bounded to three files, 64 KiB each and 96 KiB total, using approved Discord CDN URLs without redirects. Binary archives and executables are identified as unread rather than falsely described as analyzed. Missing original story text, uncertain characters or absent checker rules remain explicit gaps.
 
 The calculator uses [QuickJS compiled to WebAssembly](https://github.com/justjake/quickjs-emscripten) in a separate worker with a fresh guest per calculation, no host bindings/module loader, 32 MiB guest memory, a 1.5-second interrupt budget, a four-second worker deadline and bounded output. It has no shell, host filesystem, credentials or network. The investigation has an 80-second budget, at most 12 actions, three searches and two concurrent cases. It checkpoints partial progress for a later turn; it is not an unbounded background solve. Arbitrary binary execution, network exploitation, scoreboard brute force and flag submission are not implemented.
 
 Incomplete ordinary research now retains its verified findings, inspected citations and concrete gaps instead of replacing the answer with the same fixed unavailable sentence. The [CTF benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-ctf/README.md) records development failures, matched baseline comparisons and reserved validation. Passing those synthetic cases is not a claim to solve every CTF category or the supplied Securinets challenge without its original clues.
+
+
+## Proposed isolated Codex solver
+
+Status: design only; the deployed CTF worker above still uses read-only source inspection and the isolated JavaScript calculator. It does not launch Codex jobs, execute binaries or exploit challenge services.
+
+A separate trusted controller can launch a fresh Codex CLI/app-server job for a challenge. Hackerika would hand it the accessible thread starter, selected original messages, downloaded artifacts, supported team ledger, unresolved target and explicit CTF target scope. Each job would have a separate workspace, session, deadline and resource budget. Results would return to the originating thread as findings, reproducible tests, artifact references and unverified flag candidates. A successful local test must remain distinct from checker acceptance.
+
+Use the existing ChatGPT plan path through [Codex authentication](https://learn.chatgpt.com/docs/auth) or the [SIWC app-server integration](https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server). A model catalog is not an entitlement check: only a successfully completed inference turn establishes access for that request. A separate billing route such as the [Agents API](https://developers.openai.com/api/docs/guides/agents-api/overview) must not be selected as a silent fallback from subscription usage.
+
+Proposed routing, subject to paired evaluation and actual account access:
+
+| Work | Initial model | Escalation condition |
+| --- | --- | --- |
+| Small decodes, parsing and straightforward clues | GPT-6 Luna | A reproducible failed test or missing capability |
+| Substantial code, reversing or multi-step solving | GPT-6.1 Sol | A documented unresolved hypothesis after bounded tests |
+| Difficult or ambiguous challenge reasoning | GPT-6 Astra | Explicit per-job ceiling; no repeated automatic upgrades |
+| Approved cybersecurity workflows | Approved Daybreak model/surface | Verified provisioning and approved use scope, not the word “exploitation” alone |
+
+[Daybreak Blue and Red](https://learn.chatgpt.com/docs/cyber-safety) have distinct approval requirements. Blue targets authorized defensive work; specialist Red access is separately provisioned. Approval must cover the identity, workspace/project, model, product surface and intended integration. A cached `gpt-daybreak-blue-latest` name does not prove access or authorize exposing that access through a Discord bot. The [Responses API program selector](https://developers.openai.com/api/docs/guides/daybreak) also requires an approved project and its API credentials.
+
+The controller must stay outside the worker and bot containers. In particular, the Discord bot receives no Docker socket. Exploit jobs should use a fresh dedicated VM or comparably strong isolation, with only the job workspace and approved challenge endpoints reachable. Keep Discord/Mongo/OAuth credentials outside the guest. An inference gateway can exchange a short-lived per-job capability for bounded model calls without exposing reusable login credentials to model-executed commands. This gateway and its limits still need implementation and boundary tests; configuring a sandbox flag alone does not provide them. See OpenAI's [cybersecurity environment guidance](https://learn.chatgpt.com/docs/cyber-safety/recommended-configuration).
+
+Before activation, benchmark the same frozen challenges under Luna-only and routed workers. Score exact recovery, reproducible evidence, unsupported claims, calls/tokens, elapsed time and isolation. Test cancellation, deadlines, restart recovery, cross-job access, network restrictions and credential exposure independently. Route upgrades only when they improve the measured result within budget.
 
 ## Configuration
 

@@ -1,4 +1,6 @@
-import { requiresCTFSolve, setCTFTurnContext, getCTFReport, groundCTFReply } from './ctf';
+import { formatTeamProgress, mergeTeamProgress } from './ctfProgress';
+import { loadThreadContext, formatThreadContext } from './threadContext';
+import { requiresCTFSolve, ctfToolAvailable, setCTFTurnContext, getCTFReport, groundCTFReply } from './ctf';
 import { ctfScope, loadCTFCase } from './ctfCases';
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { openai } from "../../utils/openai";
@@ -428,6 +430,7 @@ function buildContextBlock(
     lorebookBlock: string,
     activeTasksBlock: string,
     isDeveloper: boolean,
+    threadBlock = '',
 ): string {
     const lines: string[] = [`${CTX_OPEN}`, `user=${userInfo}`, `env=${envContext}`];
     lines.push(ACTOR_ATTRIBUTION_CONTEXT);
@@ -447,6 +450,7 @@ function buildContextBlock(
     // can update_task, complete_task, or naturally reference them in replies.
     // Sits next to user-notes since it's user-specific.
     if (activeTasksBlock) lines.push(`their-active-tasks:\n${activeTasksBlock}`);
+    if (threadBlock) lines.push(threadBlock);
     if (channelContext) lines.push(`recent:${channelContext}`);
     if (replyContext) lines.push(`replying-to:${replyContext}`);
     if (attachmentBlock) lines.push(attachmentBlock.trimStart());
@@ -592,13 +596,14 @@ async function runChatTurn(
     const displayName = message.member?.displayName || author;
 
     const contextMentionSeeds: MentionReference[] = [];
-    const [channelContext, userInfo, replyContext, userProfile, botState, socialState] = await Promise.all([
+    const [channelContext, userInfo, replyContext, userProfile, botState, socialState, threadSnapshot] = await Promise.all([
         getChannelContext(message, CHAN_OPEN, CHAN_CLOSE, mentions => contextMentionSeeds.push(...mentions)),
         getUserInfo(message),
         getReplyContext(message, REPLY_OPEN, REPLY_CLOSE, messageReference as DiscordMessage | null),
         loadProfile(userId),
         loadBotState(),
         loadSocialState(userId),
+        !spontaneous ? loadThreadContext(message) : Promise.resolve(null),
     ]);
     // Resolve caller's timezone: explicit-set on profile, else community default.
     // The TZ marker in the env block tells the model whether it's the user's
@@ -700,7 +705,8 @@ async function runChatTurn(
 
     // Static system prompt lives at module level; build per-turn context for
     // injection into only the final user message below.
-    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend, userProfileBlock, botStateBlockWithVibe, lorebookBlock, activeTasksBlock, isDeveloper);
+    const threadBlock = neutralizeControlTokens(formatThreadContext(threadSnapshot));
+    const contextBlock = buildContextBlock(userInfo, envContext, channelContext, replyContext, attachmentBlock.promptBlock, mentionLegend, userProfileBlock, botStateBlockWithVibe, lorebookBlock, activeTasksBlock, isDeveloper, threadBlock);
 
     // If this is a spontaneous chime (she's nimbrung without being addressed),
     // tell the model so it shifts tone: shorter, lower-key, "joining the
@@ -719,16 +725,24 @@ async function runChatTurn(
     const recentOwnText = history.filter(entry => entry.role === 'user' && entry.name?.startsWith(`${userId}-`)
         && (!entry.at || Date.now() - entry.at < 10 * 60_000)).slice(-5).map(entry => entry.content).join('\n')
         + (messageReference?.content || '');
-    const ctfContext = [channelContext, replyContext, attachmentBlock.promptBlock, recentOwnText].join('\n');
+    const ctfContext = [channelContext, replyContext, attachmentBlock.promptBlock, recentOwnText, threadBlock].join('\n');
+    let lastTeamProgress = '';
     const ctfHelp = /\b(?:bantu(?:in)?|tolong|solve|lanjut(?:kan)?|decode|decrypt|recover|pecahkan)\b/i.test(content);
-    const ctfCheckpoint = !spontaneous && ctfHelp ? await loadCTFCase(ctfScope(message)) : null;
+    const ctfCheckpoint = !spontaneous && (ctfHelp || threadSnapshot) ? await loadCTFCase(ctfScope(message)) : null;
+    if (ctfCheckpoint?.teamProgress) {
+        const progress = threadSnapshot ? mergeTeamProgress(ctfCheckpoint.teamProgress, undefined,
+            [...threadSnapshot.messages, ...(threadSnapshot.starter ? [threadSnapshot.starter] : [])]) : ctfCheckpoint.teamProgress;
+        lastTeamProgress = formatTeamProgress(progress);
+    }
     const ctfRequired = !spontaneous && requiresCTFSolve(content, ctfContext, !!ctfCheckpoint);
-    setCTFTurnContext(message, { text: ctfContext, images: [...attachmentBlock.images,
+    const ctfAvailable = !spontaneous && ctfToolAvailable(content, ctfContext, !!ctfCheckpoint);
+    const turnTools = ctfAvailable ? TOOL_DEFINITIONS : TOOL_DEFINITIONS.filter(tool => tool.function.name !== 'solve_ctf');
+    setCTFTurnContext(message, { text: ctfContext, thread: threadSnapshot, images: [...attachmentBlock.images,
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
     const researchRequired = !ctfRequired && !spontaneous && requiresResearch(content, recentOwnText);
     const lastUserMessage: ChatMessage = {
         ...userMessageEntry,
-        content: `${contextBlock}\n\n${userMessageEntry.content}${spontaneousNote}`,
+        content: `${contextBlock}${lastTeamProgress ? `\n${neutralizeControlTokens(lastTeamProgress)}` : ''}\n\n${userMessageEntry.content}${spontaneousNote}`,
     };
     const messages = prepareVisionMessages([
         { role: 'system', content: STATIC_SYSTEM_PROMPT },
@@ -922,7 +936,7 @@ async function runChatTurn(
                 {
                     model: MODELS.chat,
                     messages: conversation,
-                    tools: TOOL_DEFINITIONS as any,
+                    tools: turnTools as any,
                     tool_choice: getResearchReport(message) || getCTFReport(message) ? 'none' : iter === 0 && (researchRequired || ctfRequired)
                         ? { type: 'function', function: { name: ctfRequired ? 'solve_ctf' : 'research_topic' } } : 'auto',
                     parallel_tool_calls: false,
@@ -967,6 +981,12 @@ async function runChatTurn(
                         continue;
                     }
                     const fnName = tc.function?.name || '';
+                    if (fnName === 'solve_ctf' && !ctfAvailable) {
+                        conversation.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify({ error: 'unrelated_current_request',
+                            detail: 'Use the supplied conversation evidence to answer the current request; this turn does not request a CTF investigation.' }) });
+                        totalToolCalls++;
+                        continue;
+                    }
                     const rawArgs = tc.function?.arguments ?? '';
                     let parsedArgs: any;
                     try {

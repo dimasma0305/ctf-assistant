@@ -1,0 +1,30 @@
+{
+  "startedAt": "2026-10-17T14:39:15.332Z",
+  "runtime": "ctf-assistant:thread-context-3-20261017",
+  "split": "validation",
+  "repeats": 1,
+  "concurrency": 2,
+  "corpusHash": "19c549da2cc3fd156f3194157c51a3b0f75fea3bb2829c4d1919bc4e327846ee",
+  "workerHash": "ca0c10f963a82afd455bb117674922b603dde609702ca550348099d6ab02fea4",
+  "selectedIds": [
+    "reserved-parent-image",
+    "reserved-new-names-and-focus"
+  ],
+  "graderVersion": "thread-context-v1-frozen",
+  "graderHash": "357a5ba886e595270036ba650a346ddba85709092efe18af7f5aaef0ac5fde2d",
+  "fixtures": {
+    "vision-clue.png": "1ea3bd9cad4c1209b5468b396e3494ae1252c3cef9b06850500a2b719996290b"
+  },
+  "limits": {
+    "maxCompletionsPerCase": 14,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 20
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "CTF capability: real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls. Public-source HTTP transport is replaced by identical synthetic responses; repository parsing, commit pinning, evidence validation and nested research model calls are real."
+}

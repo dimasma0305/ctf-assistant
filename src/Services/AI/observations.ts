@@ -1,3 +1,4 @@
+import { invalidateThreadContext } from './threadContext';
 import { neutralizeControlTokens } from './context';
 
 export type ObservationKind = 'message_edited' | 'message_deleted' | 'reaction_added' | 'reaction_removed' | 'thread_created' | 'member_joined' | 'member_left';
@@ -7,6 +8,7 @@ const MAX_SCOPES = 500;
 const TTL_MS = 30 * 60_000;
 
 export function observeDiscordEvent(scope: string, event: Omit<Observation, 'at'>): void {
+    if (event.kind === 'message_edited' || event.kind === 'message_deleted') invalidateThreadContext(scope);
     const now = Date.now();
     const recent = (observations.get(scope) || []).filter(item => now - item.at < TTL_MS);
     recent.push({ ...event, detail: event.detail ? neutralizeControlTokens(event.detail).slice(0, 160) : undefined, at: now });

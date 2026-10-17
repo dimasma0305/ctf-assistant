@@ -1,0 +1,19 @@
+{
+  "samples": 1,
+  "deterministicPasses": 1,
+  "backendSamples": 0,
+  "backendPasses": 0,
+  "errors": 0,
+  "actualModelCalls": 1,
+  "elapsedMs": 6671.518006,
+  "latencyMs": {
+    "p50": 5912.585828,
+    "p95": 5912.585828,
+    "includesTypingAndImport": true
+  },
+  "usage": {
+    "prompt": 10844,
+    "completion": 20
+  },
+  "note": "Deterministic checks are necessary, not a semantic quality score. Inspect outputs against original fixture evidence and record semantic/critical findings before selection."
+}

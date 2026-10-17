@@ -1,0 +1,71 @@
+[
+  {
+    "ctfReport": null,
+    "caseId": "ordinary-thread-decision",
+    "category": "generic-thread",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "history-page",
+        "before": null,
+        "limit": 100
+      },
+      {
+        "kind": "history-page",
+        "before": "800000000000005000",
+        "limit": 12
+      },
+      {
+        "kind": "thread-starter-read"
+      },
+      {
+        "kind": "send",
+        "content": "Jam 14:00 di ruang C—itu keputusan final yang tercatat.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000005000",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] Rika rapatnya jadi jam berapa dan di ruang mana?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Jam 14:00 di ruang C—itu keputusan final yang tercatat.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000005000",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2644.534733,
+        "usage": {
+          "prompt_tokens": 10844,
+          "completion_tokens": 20,
+          "total_tokens": 10864,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10844
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 5912.585828,
+    "action": null,
+    "text": "Jam 14:00 di ruang C—itu keputusan final yang tercatat.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

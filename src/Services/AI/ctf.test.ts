@@ -1,10 +1,12 @@
 import { expect, test } from 'bun:test';
-import { requiresCTFSolve, publicCTFQuery } from './ctf';
+import { requiresCTFSolve, ctfToolAvailable, publicCTFQuery } from './ctf';
 import { ctfScope, loadCTFCase, saveCTFCase, type CTFCaseNotes } from './ctfCases';
 import { collectCTFInputs } from './ctfInputs';
 test('CTF intent routes team help but leaves research recommendations and banter alone', () => {
   for(const text of ['bantuin osint','bantu solve CTF crypto','decode ciphertext ini','lanjut flag yang tadi']) expect(requiresCTFSolve(text)).toBe(true);
   expect(requiresCTFSolve('hackerika bantuin','[W] CTF crypto cipher hex 3132')).toBe(true);
+  expect(requiresCTFSolve('bantu ini <@1077393568647352320>','thread starter: OSINT CTF; tinggal nomor 9')).toBe(true);
+  expect(requiresCTFSolve('rekap progres tim','CTF OSINT thread')).toBe(true);
   expect(requiresCTFSolve('lanjut yang tadi','',true)).toBe(true);
   for(const text of ['saran platform CTF yang bisa deploy','CTF tadi seru wkwk','istirahat dulu, nanti lanjut CTF','jangan jawab dulu, aku mau kirim CTF','sayang rika']) expect(requiresCTFSolve(text)).toBe(false);
 });
@@ -53,8 +55,14 @@ test("provided index follows two real source links before a missing-evidence dec
 });
 
 test('an active CTF cannot hijack unrelated social, Discord or platform-research requests',()=>{
- for(const text of ['tolong nyanyi dong','bantu hapus pesanku','tolong buat reminder besok','bantu rekomendasi platform CTF yang bisa deploy'])
+ for(const text of ['tolong nyanyi dong','bantu hapus pesanku','bantu hapus pesan ini','tolong buat reminder besok','bantu rekomendasi platform CTF yang bisa deploy'])
    expect(requiresCTFSolve(text,'W: earlier CTF flag clue',true)).toBe(false);
  expect(requiresCTFSolve('hackerika bantuin','W: CTF clue')).toBe(true);
  expect(requiresCTFSolve('bantu punya W yang tadi','W: CTF clue')).toBe(true);
+});
+test('CTF tool eligibility follows the current question rather than the channel title',()=>{
+ expect(ctfToolAvailable('rapatnya jadi jam berapa dan di mana?', 'channel=CTF OSINT; old solved flag', true)).toBe(false);
+ expect(ctfToolAvailable('Apa flag yang didapat dari ciphertext ini?')).toBe(true);
+ expect(ctfToolAvailable('bantu ini <@1077393568647352320>', 'thread starter: CTF misc')).toBe(true);
+ expect(ctfToolAvailable('Rika rekap progres tim', 'thread starter: OSINT')).toBe(true);
 });

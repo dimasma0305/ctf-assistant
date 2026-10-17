@@ -1,0 +1,18 @@
+{
+  "image": "ctf-assistant:thread-context-3-20261017",
+  "comparedFiles": 215,
+  "changedFiles": [
+    "src/Services/AI/chat.ts",
+    "src/Services/AI/ctf.ts",
+    "src/Services/AI/ctfCases.ts",
+    "src/Services/AI/ctfInputs.ts",
+    "src/Services/AI/ctfProgress.ts",
+    "src/Services/AI/observations.ts",
+    "src/Services/AI/persona.ts",
+    "src/Services/AI/threadContext.ts",
+    "src/Services/AI/vision.ts"
+  ],
+  "exactExpectedChanges": true,
+  "workspaceSourcesMatch": true,
+  "unrelatedEditsExcluded": true
+}

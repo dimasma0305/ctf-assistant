@@ -1,0 +1,102 @@
+{
+  "selectedImage": "ctf-assistant:thread-context-3-20261017",
+  "grader": "thread-context-v1-frozen",
+  "before": {
+    "samples": 8,
+    "strictPasses": 1,
+    "modelCalls": 29,
+    "promptTokens": 176912,
+    "completionTokens": 2987,
+    "providerErrors": 0,
+    "medianTurnMs": 23192.0474435
+  },
+  "after": {
+    "samples": 8,
+    "strictPasses": 8,
+    "modelCalls": 32,
+    "promptTokens": 190498,
+    "completionTokens": 12472,
+    "providerErrors": 0,
+    "medianTurnMs": 51150.997853
+  },
+  "developmentHistory": [
+    {
+      "candidate": 1,
+      "strictPasses": 3,
+      "samples": 6,
+      "issues": "Incomplete correction ledger, missing numbered focus in structured question; ordinary thread decision ignored."
+    },
+    {
+      "candidate": 2,
+      "strictPasses": 5,
+      "samples": 6,
+      "issues": "Ordinary decision answered correctly but invoked an unnecessary CTF investigation. Two untouched reserved cases passed after candidate freeze."
+    },
+    {
+      "candidate": 3,
+      "strictPasses": 6,
+      "samples": 6,
+      "changes": "Current-request tool eligibility only, selected from the development control failure. CTF worker prompt/input transport unchanged from candidate 2."
+    }
+  ],
+  "reservedValidation": {
+    "candidate2": {
+      "pass": 2,
+      "samples": 2,
+      "unseenBeforeFreeze": true
+    },
+    "candidate3Replay": {
+      "pass": 2,
+      "samples": 2,
+      "unseen": false
+    },
+    "notUsedToReviseSolver": true
+  },
+  "manualEvidenceReview": {
+    "criticalFalseFlags": 0,
+    "unsupportedCheckerAcceptance": 0,
+    "hiddenParentLeaks": 0,
+    "independentEvidence": "Literal synthetic source entries, original quote/author checks, actual ROT13 compute receipt; dates differ from upload/edit dates.",
+    "minorIssue": "One reply asks for clue 9 together with its missing primary entry even though the starter already supplies the broad question. The ledger preserves the target and prior team values.",
+    "noUniversalAccuracyScore": true
+  },
+  "verification": {
+    "isolatedCheckoutTests": 376,
+    "testFailures": 0,
+    "strictTypecheck": true,
+    "bunBundle": true,
+    "strictDocs": true,
+    "sourceImageAudit": true,
+    "mongoLedgerAcrossProcesses": true,
+    "ctfRegression": {
+      "pass": 2,
+      "samples": 2
+    },
+    "deployedReadiness": {
+      "pass": 2,
+      "samples": 2,
+      "paths": [
+        "live-vision",
+        "live-conversation"
+      ],
+      "realModelCalls": 7,
+      "fakeDiscordOnly": true
+    }
+  },
+  "limits": {
+    "maxThreadMessages": 600,
+    "pages": 6,
+    "snapshotCacheMinutes": 5,
+    "checkpointHours": 24,
+    "workerSeconds": 80,
+    "workerActions": 12,
+    "visionImages": 4
+  },
+  "costQualification": "Same economical model. Input tokens and latency increase because source history and literal team-ledger evidence are retained. This is a correctness/context improvement, not a measured cost reduction.",
+  "codexRunner": {
+    "status": "design only",
+    "documentation": "docs/ai-behavior.md#proposed-isolated-codex-solver",
+    "billingRouteUnchanged": true
+  },
+  "harnessPostRunChanges": "Runner help/scope/note clarified; trailing worker whitespace removed. Model-input semantics, corpus and grader unchanged."
+}

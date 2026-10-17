@@ -6,6 +6,7 @@ export interface CTFCaseNotes {
   sources: { id: string; url: string; title: string; kind: string; content: string }[];
   attempts: { type: string; target: string; outcome: string }[];
   candidates: { flag: string; basis: string }[];
+  teamProgress?: import('./ctfProgress').TeamProgress;
   calculations?: { id: string; purpose: string; result: import('./ctfCompute').ComputeResult }[];
   updatedAt: number;
 }

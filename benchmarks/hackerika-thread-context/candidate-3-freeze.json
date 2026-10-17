@@ -1,0 +1,19 @@
+{
+  "frozenAt": "2026-10-17T14:39:15.172178+00:00",
+  "image": "ctf-assistant:thread-context-3-20261017",
+  "imageId": "sha256:c459123bc1806fc1b18f73b5ab9d543bcd7ad98091241e6886774276c3670c9c",
+  "sources": {
+    "src/Services/AI/threadContext.ts": "7d0abcee6629e206e0abb2d13693dd17b44889f68981948363f8aac30bc3930b",
+    "src/Services/AI/ctfProgress.ts": "33aa31635b21cd534867a212aeb48ef2c62279d995bbbdb6bbf9f3d0925bcd6e",
+    "src/Services/AI/ctfInputs.ts": "ffd0f6ab815af86ac3a330ef25b6eeea25bd714a3a9a8ffe674f0d99f143c1de",
+    "src/Services/AI/ctfCases.ts": "4b60b02d70465fa3a8b54341fe92e960a338f6b88547d3725ccc5a38e6efbb21",
+    "src/Services/AI/ctf.ts": "13f0dde0872b8434874d1b7febc3caaf8f4c7f2c1eb0154068f290d03b1898d2",
+    "src/Services/AI/chat.ts": "6d4edbe210d87e5ab74e7b8e6043cc49e321805fdea2904d7f455f6254610d9b",
+    "src/Services/AI/observations.ts": "20fadf8a51ff53887af95a991cdf402d57ae69446b1815cda47a0d07e8b74715",
+    "src/Services/AI/vision.ts": "c63713d47a23bc0bde55b31adb8c0085c528e045c45c7c11ec584a43de5cf55f",
+    "src/Services/AI/persona.ts": "d71df971b564e6d4c1fd507d8c1f327439a6fa0cd06026ee7942f31359e3a36c"
+  },
+  "corpusHash": "1c9db3ebd7be9bff717e5e3a15cc14e5a0001e80414ce0a4b86d2820240a8ae3",
+  "graderHash": "357a5ba886e595270036ba650a346ddba85709092efe18af7f5aaef0ac5fde2d",
+  "changeFromCandidate2": "Current-turn tool eligibility only. Decided from ordinary-thread development failure before examining reserved candidate-2 results. Solver prompt/inputs unchanged for eligible CTF requests. Final validation is a replay; first untouched reserved run was candidate 2."
+}
