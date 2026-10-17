@@ -1,0 +1,36 @@
+{
+  "frozenAt": "2026-10-17T13:26:41.226912+00:00",
+  "image": "ctf-assistant:ctf-candidate-9-20261017",
+  "imageId": "sha256:b0de512b531a92408e131bdb977f729a0d98bd6c46804401be4a2b05b3e46429",
+  "files": {
+    "package.json": "2cbf6ae796336e5ac02e2d7bfd37c4fe632edfd3b0c451c6d448d14a51e3e359",
+    "bun.lock": "cb71afc0ba9772347dc750f35b3c83cf8081a09bf7a094badea0eade6526be7c",
+    "src/Database/connect.ts": "0ec9eb17d4cf9a48f550f2bf04e652d8c59ca2612d7fbf52af367d2c12140d06",
+    "src/Database/ctfCaseSchema.ts": "e5d60c4fde4644b0c998173d8dea9881cf549b61bd642b362c4f35e49d65e5ea",
+    "src/Services/AI/ctf.ts": "c1c95bb77c345b6e1e36c4d2df9134ab0f79d30b7241d5aefd384f65a24aced9",
+    "src/Services/AI/ctfCases.ts": "5d33b544e8b68d22e50a5d6dd143513c0d636c19d6b09d1526241c6f7fe5590a",
+    "src/Services/AI/ctfCompute.ts": "18253dd7bbbab64b62b035c4c2ca1b9c03b76627968e3e64361e39b600866c33",
+    "src/Services/AI/ctfComputeWorker.ts": "e4ccf15870154b51428a7c4c59a0a240755acbebb4ff0ce90784bcf09cc07ab4",
+    "src/Services/AI/ctfInputs.ts": "603c6866b913b03f7c8c43098079213d4d274fa96bfc7b6ffdcf510113bc81c3",
+    "src/Services/AI/chat.ts": "63812d97d0712a07f1fe9dbd873ea1cc605fb28fb225c10d689a92caee8254a0",
+    "src/Services/AI/tools.ts": "50cf7966a994af05f382c410e6bf068e75a44170d7661961a5c66d8e41d3ddc7",
+    "src/Services/AI/research.ts": "015ccf630fd06ba3352c5dc9ac66eb84f124af317a7c257d775f4e836f9e2a17",
+    "src/Services/AI/persona.ts": "8348042047bcca5cd7dffb6407132b5901a317f1bed7c6678d6f96d464af68b9"
+  },
+  "caseHash": "37be16b38e0fd4353b75a510ab59fa32a02bbf7fcd17dd7cdcd65b96f6401036",
+  "graderHash": "1cba07ae59a6f254988c74cc68b7d6a1b874c53709089c1e0db305bdc7e9bbf2",
+  "limits": {
+    "developmentCandidates": 9,
+    "maxInvestigateSeconds": 80,
+    "maxActions": 12,
+    "maxSearches": 3,
+    "maxModelCallsPerCase": 14,
+    "holdoutUsedForCandidateSelection": false,
+    "validationUsedForCandidateSelection": false
+  },
+  "qualification": "Synthetic bounded evaluation; flags remain unverified by external checker. Earlier failed candidates and measurement amendments are retained.",
+  "imageCreatedAt": "2026-10-17T13:25:43.508432579Z",
+  "holdoutDisclosure": "Candidate 7 holdout execution had already begun when its suite wrapper was terminated. Its summary arrived after candidate 8 source/image freeze; candidate 8 was not revised from those outcomes. Only candidate 8 reserved-validation results are used for final gates.",
+  "changeFromBenchmarkImage": "Only requiresCTFSolve routing guards changed to keep unrelated social/Discord/recommendation requests out of a prior CTF case. Worker prompt, source traversal, calculator, tool schema, chat prompt and all other execution paths are byte-identical. Frozen corpus route equivalence is checked independently.",
+  "workerBenchmarkFreeze": "candidate-8-freeze.json"
+}

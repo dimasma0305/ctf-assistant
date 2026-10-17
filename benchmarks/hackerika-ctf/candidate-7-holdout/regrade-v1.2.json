@@ -1,0 +1,26 @@
+{
+  "version": "ctf-v1.2-control-amendment",
+  "passes": 3,
+  "total": 4,
+  "results": [
+    {
+      "caseId": "fresh-double-encoding",
+      "failures": [
+        "wrong_or_missing_answer",
+        "no_computation_receipt"
+      ]
+    },
+    {
+      "caseId": "fresh-rsa",
+      "failures": []
+    },
+    {
+      "caseId": "fresh-no-checker",
+      "failures": []
+    },
+    {
+      "caseId": "fresh-source-conflict",
+      "failures": []
+    }
+  ]
+}

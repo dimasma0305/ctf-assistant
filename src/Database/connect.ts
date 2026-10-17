@@ -24,6 +24,7 @@ import {instagramWatchStateSchema, type InstagramWatchStateSchemaType} from './i
 import {memberWelcomeStateSchema, type MemberWelcomeStateSchemaType} from './memberWelcomeStateSchema';
 import { socialStateSchema } from './socialStateSchema';
 import { affectionResetSchema } from './affectionResetSchema';
+import { ctfCaseSchema } from './ctfCaseSchema';
 import { getMongoUri } from '../utils/env';
 
 const DEFAULT_RETRY_DELAY_MS = Number(process.env.MONGO_CONNECT_RETRY_DELAY_MS || 2000);
@@ -120,6 +121,7 @@ export const EventReminderStateModel = mongoose.model("EventReminderState", even
 export const InstagramWatchStateModel = mongoose.model("InstagramWatchState", instagramWatchStateSchema)
 export const MemberWelcomeStateModel = mongoose.model("MemberWelcomeState", memberWelcomeStateSchema)
 export const SocialStateModel = mongoose.model("SocialState", socialStateSchema)
+export const CTFCaseModel = mongoose.model('CTFCase', ctfCaseSchema)
 export const AffectionResetModel = mongoose.model('AffectionReset', affectionResetSchema)
 
 export {

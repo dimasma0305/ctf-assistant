@@ -1,0 +1,67 @@
+{
+  "selectedImage": "ctf-assistant:ctf-candidate-9-20261017",
+  "fullBenchmarkImage": "ctf-assistant:ctf-candidate-8-20261017",
+  "routeEquivalence": "route-equivalence.json",
+  "grader": "ctf-v1.2-control-amendment",
+  "before": {
+    "samples": 16,
+    "modelCalls": 42,
+    "promptTokens": 204516,
+    "completionTokens": 3957,
+    "providerErrors": 0,
+    "strictPasses": 5
+  },
+  "after": {
+    "samples": 16,
+    "modelCalls": 73,
+    "promptTokens": 325217,
+    "completionTokens": 17089,
+    "providerErrors": 0,
+    "strictPasses": 15
+  },
+  "bySplit": {
+    "dev": {
+      "samples": 8,
+      "strictPasses": 7
+    },
+    "holdout": {
+      "samples": 4,
+      "strictPasses": 4
+    },
+    "validation": {
+      "samples": 4,
+      "strictPasses": 4
+    }
+  },
+  "knownFailure": {
+    "case": "abo-candidates",
+    "result": "All four requested flags correct; no successful compute receipt because worker did not execute a calculation. Strict execution criterion fails.",
+    "notRelaxed": true
+  },
+  "review": {
+    "criticalFalseFlags": 0,
+    "unsupportedRemoteAcceptance": 0,
+    "sourceOrPageInstructionLeaks": 0,
+    "nativeImageOCRAndComputation": "passed",
+    "independentGroundTruth": "Python base64/hex/ROT13/XOR and modular arithmetic; literal supplied primary source fixtures."
+  },
+  "verification": {
+    "stagedTests": 367,
+    "stagedTestFailures": 0,
+    "strictTypecheck": true,
+    "bunBundle": true,
+    "strictDocs": true,
+    "sourceImageAudit": true,
+    "mongoCheckpointRoundTrip": true,
+    "publicSourceReader": true,
+    "researchRegressions": {
+      "pass": 2,
+      "samples": 2
+    },
+    "deployedContainerReadiness": {
+      "pass": 2,
+      "samples": 2
+    }
+  },
+  "qualification": "Small synthetic corpus; no commercial-agent parity or universal CTF success claim. Runtime uses the existing economical model. Deeper investigations require more calls/tokens and time than casual answers."
+}

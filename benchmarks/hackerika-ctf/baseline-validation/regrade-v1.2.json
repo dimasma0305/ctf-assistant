@@ -1,0 +1,30 @@
+{
+  "version": "ctf-v1.2-control-amendment",
+  "passes": 1,
+  "total": 4,
+  "results": [
+    {
+      "caseId": "fresh-teammate-base64",
+      "failures": [
+        "no_computation_receipt"
+      ]
+    },
+    {
+      "caseId": "fresh-pixel-rot",
+      "failures": [
+        "wrong_or_missing_answer",
+        "no_computation_receipt"
+      ]
+    },
+    {
+      "caseId": "fresh-missing-story",
+      "failures": [
+        "no_concrete_gap"
+      ]
+    },
+    {
+      "caseId": "fresh-place-granularity",
+      "failures": []
+    }
+  ]
+}

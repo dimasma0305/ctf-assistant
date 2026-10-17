@@ -69,3 +69,10 @@ for (const mode of ['multihop', 'multiple-targets', 'bad-citation', 'false-answe
     expect(stdout).toContain('RESEARCH_SCENARIO_OK');
   }, 10_000);
 }
+
+test('incomplete research preserves verified progress and concrete gaps but rejects unsupported draft', () => {
+  const report:any={ok:false,question:'configuration',findings:[{claim:'Audit logging is configurable.',evidence:[{sourceId:'S1',quote:'Set AUDIT_LOG=on'}]}],
+    sources:[{id:'S1',kind:'page',url:'https://example.com/config',title:'Configuration',preview:'Set AUDIT_LOG=on'}],unresolved:['Per-event scope still needs its settings source.']};
+  const text=groundResearchReply('Definitely supports Kubernetes and per-event settings.',report);
+  expect(text).toContain('Audit logging is configurable.');expect(text).toContain('Per-event scope still needs');expect(text).toContain('https://example.com/config');expect(text).not.toContain('Kubernetes');
+});

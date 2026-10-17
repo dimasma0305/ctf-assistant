@@ -1,3 +1,4 @@
+import { solveCTFForTurn } from './ctf';
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { searchMessagesForTool, recallMemoryForTool } from "./search";
 import { grantFanRoleForTool } from "./fanRole";
@@ -36,6 +37,17 @@ import {
  */
 export const TOOL_DEFINITIONS = [
     ...DISCORD_TOOL_DEFINITIONS,
+    {
+        type: 'function' as const,
+        function: {
+            name: 'solve_ctf',
+            description: 'Kerjakan challenge CTF/OSINT/crypto/misc yang diminta: investigasi multi-langkah, baca sumber primer dan gambar asli, perhitungan JavaScript terisolasi, catatan progres per channel untuk diteruskan tim. Pakai sebelum mengklaim hasil decode/flag; bukan sekadar saran generik. Tidak submit flag atau menjalankan shell. Pertahankan hipotesis vs bukti dan minta clue asli yang benar-benar hilang. Perkiraan sampai 80 detik per langkah investigasi.',
+            parameters: { type: 'object', properties: {
+                question: { type: 'string', maxLength: 4000, description: 'Challenge dan bagian yang perlu diselesaikan; konteks tim/gambar dilampirkan sistem. Jangan mengarang isi clue.' },
+                newCase: { type: 'boolean', description: 'true HANYA jika user jelas mulai challenge berbeda; false untuk melanjutkan checkpoint channel ini.' },
+            }, required: ['question'], additionalProperties: false },
+        },
+    },
     {
         type: 'function' as const,
         function: {
@@ -443,6 +455,7 @@ export async function dispatchTool(
     options: { signal?: AbortSignal } = {},
 ): Promise<string> {
     try {
+        if (name === 'solve_ctf') return JSON.stringify(await solveCTFForTurn(args || {}, message, options));
         if (name === 'research_topic') {
             const suppliedUrls = [...(message.content || '').matchAll(/https?:\/\/[^\s<>]+/g)]
                 .map(match => match[0].replace(/[),.!?;]+$/, ''));

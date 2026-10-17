@@ -118,6 +118,18 @@ A successful result requires native `server_tool_use` and matching `web_search_t
 
 Within one chat turn, identical search arguments share a cached request, at most two distinct queries reach the provider, and an infrastructure failure stops subsequent search retries for that turn. A later conversation turn starts fresh. The model is instructed to include an actual source link for factual search answers, distinguish event dates from publication dates, and describe only observed failures without inventing a global outage or recovery time.
 
+## Solving CTF challenges
+
+An explicit request such as “bantuin OSINT” or “bantu solve punya W yang tadi” uses `solve_ctf`. The worker reads the current channel's team clues, follows primary sources and repository paths, and runs bounded JavaScript calculations for tasks such as encodings, XOR, small RSA and local flag candidate enumeration. Calculations receive the original message/source data directly to reduce transcription mistakes. A successful calculation is a local result, never evidence that a remote checker accepted a flag.
+
+Investigations keep inspected evidence, candidate derivations, attempted actions and specific unresolved clues in a channel-scoped checkpoint for 24 hours. Any teammate in that channel can continue it; another channel or DM cannot read it. A clearly new challenge can start a new case. MongoDB preserves checkpoints across restarts; during an outage or `NODB=true`, the bounded local cache cannot survive a restart. Expired entries are rejected immediately, even before MongoDB's TTL cleanup runs.
+
+During a requested investigation, up to 30 recent messages in that channel can supply teammates' actual image and text/code attachments, with source message and author IDs. Images still use the existing four-image vision limit and actual downloaded pixels; an “Image” placeholder supplies no visual evidence. Text/code files are bounded to three files, 64 KiB each and 96 KiB total, using approved Discord CDN URLs without redirects. Binary archives and executables are identified as unread rather than falsely described as analyzed. Missing original story text, uncertain characters or absent checker rules remain explicit gaps.
+
+The calculator uses [QuickJS compiled to WebAssembly](https://github.com/justjake/quickjs-emscripten) in a separate worker with a fresh guest per calculation, no host bindings/module loader, 32 MiB guest memory, a 1.5-second interrupt budget, a four-second worker deadline and bounded output. It has no shell, host filesystem, credentials or network. The investigation has an 80-second budget, at most 12 actions, three searches and two concurrent cases. It checkpoints partial progress for a later turn; it is not an unbounded background solve. Arbitrary binary execution, network exploitation, scoreboard brute force and flag submission are not implemented.
+
+Incomplete ordinary research now retains its verified findings, inspected citations and concrete gaps instead of replacing the answer with the same fixed unavailable sentence. The [CTF benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-ctf/README.md) records development failures, matched baseline comparisons and reserved validation. Passing those synthetic cases is not a claim to solve every CTF category or the supplied Securinets challenge without its original clues.
+
 ## Configuration
 
 ```dotenv

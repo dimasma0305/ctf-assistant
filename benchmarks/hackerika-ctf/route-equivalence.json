@@ -1,0 +1,87 @@
+{
+  "benchmarkImage": 8,
+  "deployedCandidate": 9,
+  "cases": [
+    {
+      "id": "xor-local",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "team-continuation",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "multi-hop-osint",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "partial-flag-no-original",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "abo-candidates",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "source-outage",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "page-injection",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "banter-control",
+      "old": false,
+      "current": false
+    },
+    {
+      "id": "fresh-double-encoding",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "fresh-rsa",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "fresh-source-conflict",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "fresh-no-checker",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "fresh-pixel-rot",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "fresh-teammate-base64",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "fresh-place-granularity",
+      "old": true,
+      "current": true
+    },
+    {
+      "id": "fresh-missing-story",
+      "old": true,
+      "current": true
+    }
+  ],
+  "unchangedOutsideRouteFunction": true
+}

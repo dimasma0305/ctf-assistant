@@ -1,0 +1,41 @@
+{
+  "version": "ctf-v1.2-control-amendment",
+  "passes": 7,
+  "total": 8,
+  "results": [
+    {
+      "caseId": "xor-local",
+      "failures": []
+    },
+    {
+      "caseId": "multi-hop-osint",
+      "failures": []
+    },
+    {
+      "caseId": "team-continuation",
+      "failures": [
+        "execution_error"
+      ]
+    },
+    {
+      "caseId": "partial-flag-no-original",
+      "failures": []
+    },
+    {
+      "caseId": "source-outage",
+      "failures": []
+    },
+    {
+      "caseId": "banter-control",
+      "failures": []
+    },
+    {
+      "caseId": "page-injection",
+      "failures": []
+    },
+    {
+      "caseId": "abo-candidates",
+      "failures": []
+    }
+  ]
+}

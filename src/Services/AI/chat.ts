@@ -1,3 +1,5 @@
+import { requiresCTFSolve, setCTFTurnContext, getCTFReport, groundCTFReply } from './ctf';
+import { ctfScope, loadCTFCase } from './ctfCases';
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { openai } from "../../utils/openai";
 import { MyClient } from "../../Model/client";
@@ -114,7 +116,7 @@ async function dispatchToolBounded(name: string, args: any, message: any, turnId
             dispatch,
             new Promise<string>((_, reject) => { timer = setTimeout(() => {
                 cancellation.abort(); reject(new Error('tool_timeout'));
-            }, name === 'research_topic' ? 85_000 : TOOL_EXEC_TIMEOUT_MS); }),
+            }, ['research_topic', 'solve_ctf'].includes(name) ? 85_000 : TOOL_EXEC_TIMEOUT_MS); }),
         ]);
         try { const p = JSON.parse(resultStr); if (p && REAL_TOOL_FAILURES.has(p.error)) loopStats.toolErrors++; } catch { /* non-JSON result */ }
         console.log(`   [${turnId}] tool ${name} ok ${Date.now() - t0}ms`);
@@ -717,7 +719,13 @@ async function runChatTurn(
     const recentOwnText = history.filter(entry => entry.role === 'user' && entry.name?.startsWith(`${userId}-`)
         && (!entry.at || Date.now() - entry.at < 10 * 60_000)).slice(-5).map(entry => entry.content).join('\n')
         + (messageReference?.content || '');
-    const researchRequired = !spontaneous && requiresResearch(content, recentOwnText);
+    const ctfContext = [channelContext, replyContext, attachmentBlock.promptBlock, recentOwnText].join('\n');
+    const ctfHelp = /\b(?:bantu(?:in)?|tolong|solve|lanjut(?:kan)?|decode|decrypt|recover|pecahkan)\b/i.test(content);
+    const ctfCheckpoint = !spontaneous && ctfHelp ? await loadCTFCase(ctfScope(message)) : null;
+    const ctfRequired = !spontaneous && requiresCTFSolve(content, ctfContext, !!ctfCheckpoint);
+    setCTFTurnContext(message, { text: ctfContext, images: [...attachmentBlock.images,
+        ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
+    const researchRequired = !ctfRequired && !spontaneous && requiresResearch(content, recentOwnText);
     const lastUserMessage: ChatMessage = {
         ...userMessageEntry,
         content: `${contextBlock}\n\n${userMessageEntry.content}${spontaneousNote}`,
@@ -915,8 +923,8 @@ async function runChatTurn(
                     model: MODELS.chat,
                     messages: conversation,
                     tools: TOOL_DEFINITIONS as any,
-                    tool_choice: getResearchReport(message) ? 'none' : iter === 0 && researchRequired
-                        ? { type: 'function', function: { name: 'research_topic' } } : 'auto',
+                    tool_choice: getResearchReport(message) || getCTFReport(message) ? 'none' : iter === 0 && (researchRequired || ctfRequired)
+                        ? { type: 'function', function: { name: ctfRequired ? 'solve_ctf' : 'research_topic' } } : 'auto',
                     parallel_tool_calls: false,
                     n: 1,
                 } as any,
@@ -1134,6 +1142,7 @@ async function runChatTurn(
         }
 
         finalContent = groundResearchReply(finalContent, getResearchReport(message), content);
+        finalContent = groundCTFReply(finalContent, getCTFReport(message));
 
         // Output anti-spoof: if the model accidentally copied the speaker-tag
         // pattern at the start of its reply (because it sees it everywhere

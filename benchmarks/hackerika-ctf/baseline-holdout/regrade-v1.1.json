@@ -1,0 +1,28 @@
+{
+  "version": "ctf-v1.1-measurement-amendment",
+  "passes": 2,
+  "total": 4,
+  "results": [
+    {
+      "caseId": "fresh-double-encoding",
+      "failures": [
+        "no_computation_receipt"
+      ]
+    },
+    {
+      "caseId": "fresh-rsa",
+      "failures": [
+        "wrong_or_missing_answer",
+        "no_computation_receipt"
+      ]
+    },
+    {
+      "caseId": "fresh-no-checker",
+      "failures": []
+    },
+    {
+      "caseId": "fresh-source-conflict",
+      "failures": []
+    }
+  ]
+}

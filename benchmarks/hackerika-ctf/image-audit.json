@@ -1,0 +1,21 @@
+{
+  "image": "ctf-assistant:ctf-candidate-9-20261017",
+  "imageId": "sha256:b0de512b531a92408e131bdb977f729a0d98bd6c46804401be4a2b05b3e46429",
+  "changedSourcePaths": [
+    "src/Database/connect.ts",
+    "src/Database/ctfCaseSchema.ts",
+    "src/Services/AI/chat.ts",
+    "src/Services/AI/ctf.ts",
+    "src/Services/AI/ctfCases.ts",
+    "src/Services/AI/ctfCompute.ts",
+    "src/Services/AI/ctfComputeWorker.ts",
+    "src/Services/AI/ctfInputs.ts",
+    "src/Services/AI/persona.ts",
+    "src/Services/AI/research.ts",
+    "src/Services/AI/tools.ts"
+  ],
+  "frozenSourceMatchesImage": true,
+  "envBaked": false,
+  "authBaked": false,
+  "unrelatedCTFtimeChangesIncluded": false
+}

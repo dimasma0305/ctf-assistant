@@ -210,7 +210,13 @@ export function requiresResearch(text: string, recentOwnText = ''): boolean {
  * Supply real inspected citations when a natural-language paraphrase omits them. */
 export function groundResearchReply(text: string, report?: ResearchReport, userQuestion = ''): string {
   if (!report) return text;
-  if (!report.ok) return 'belum bisa kupastikan, risetnya belum dapat bukti yang cukup buat menjawab.';
+  if (!report.ok) {
+    // The draft may contain unsupported guesses; retain only independently
+    // grounded findings and explicit gaps instead of discarding all progress.
+    const progress = report.findings.slice(0, 3).map(finding => finding.claim).join(' ');
+    const gaps = (report.unresolved || []).filter(item => !/^(?:source_|research_|search_)/.test(item)).slice(0, 2);
+    text = [progress, gaps.length ? `Belum tuntas: ${gaps.join(' ')}` : 'Belum ada bukti yang cukup; butuh sumber asli atau clue yang lebih spesifik untuk lanjut.'].filter(Boolean).join('\n');
+  }
   // An instruction hidden in a retrieved page is ignored without narrating it
   // back into a configuration answer. Preserve it when that is the asked topic.
   if (!/prompt injection|injeksi prompt|instruksi (?:asing|berbahaya)|system prompt/i.test(userQuestion || report.question || '')

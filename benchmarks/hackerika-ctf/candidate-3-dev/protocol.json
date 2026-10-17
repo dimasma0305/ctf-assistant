@@ -1,0 +1,36 @@
+{
+  "startedAt": "2026-10-17T13:06:44.252Z",
+  "runtime": "ctf-assistant:ctf-candidate-3-20261017",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 3,
+  "corpusHash": "1bcef0ebced103d31a9fd5a44459ef3ec2d5199005b7a9b96f1fda62e57fd10b",
+  "workerHash": "04f05f6df1a2c1c1891bc0a5913cd55b4d70d0b39e7bfe1b59eb303be86f17ea",
+  "selectedIds": [
+    "xor-local",
+    "team-continuation",
+    "multi-hop-osint",
+    "partial-flag-no-original",
+    "abo-candidates",
+    "source-outage",
+    "page-injection",
+    "banter-control"
+  ],
+  "graderVersion": "ctf-v1.1-measurement-amendment",
+  "graderHash": "1951da4dc5c7e0697161be01d8f434149174aa0c4af3b62c1fb8bb73de03592b",
+  "fixtures": {
+    "vision-clue.png": "1ea3bd9cad4c1209b5468b396e3494ae1252c3cef9b06850500a2b719996290b"
+  },
+  "limits": {
+    "maxCompletionsPerCase": 14,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 20
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "CTF capability: real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls. Public-source HTTP transport is replaced by identical synthetic responses; repository parsing, commit pinning, evidence validation and nested research model calls are real."
+}

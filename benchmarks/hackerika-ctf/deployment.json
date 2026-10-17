@@ -1,0 +1,51 @@
+{
+  "deployedAt": "2026-10-17T13:29:46.448480623Z",
+  "image": "ctf-assistant:ctf-candidate-9-20261017",
+  "imageId": "sha256:b0de512b531a92408e131bdb977f729a0d98bd6c46804401be4a2b05b3e46429",
+  "previousImage": "ctf-assistant:comfort-candidate-1-20261017",
+  "containerHealthy": true,
+  "restarts": 0,
+  "publicHealth": {
+    "status": "healthy",
+    "bot": {
+      "ready": true,
+      "waitingForSessionReset": false
+    },
+    "database": {
+      "required": true,
+      "ready": true
+    },
+    "timestamp": "2026-10-17T13:30:04.249Z"
+  },
+  "runtimePreservationChecks": {
+    "Config.Cmd": true,
+    "Config.Entrypoint": true,
+    "Config.User": true,
+    "Config.WorkingDir": true,
+    "Config.Healthcheck": true,
+    "Config.Env": true,
+    "Config.Labels.custom": true,
+    "HostConfig.CapDrop": true,
+    "HostConfig.SecurityOpt": true,
+    "HostConfig.Tmpfs": true,
+    "HostConfig.RestartPolicy": true,
+    "HostConfig.Memory": true,
+    "HostConfig.NanoCpus": true,
+    "HostConfig.ReadonlyRootfs": true,
+    "HostConfig.PortBindings": true,
+    "HostConfig.Binds": true,
+    "Networks": true,
+    "OtherServices": true
+  },
+  "relationshipResetMarkerUnchanged": true,
+  "sourceImageAudit": "image-audit.json",
+  "benchmarkSelection": "selection.json",
+  "noManualDiscordMessagesOrDMs": true,
+  "liveReadiness": {
+    "pass": 2,
+    "samples": 2,
+    "path": "live-readiness",
+    "realModelCalls": 9,
+    "fakeDiscordOnly": true
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "tool": "Python standard library and built-in modular arithmetic",
+  "results": {
+    "xor": "LabCTF{xor_receipt_27}",
+    "rot13": "LabCTF{team_clr_81}",
+    "twoLayer": "LabCTF{hwd_sane_a27}",
+    "rsa": "RSA",
+    "rsaReencoded": [
+      1859,
+      2680,
+      2790
+    ],
+    "pixel": "LabCTF{pixel_compute_42}",
+    "teammate": "LastCTF{binding_542}"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "version": "ctf-v1.1-measurement-amendment",
+  "passes": 2,
+  "total": 8,
+  "results": [
+    {
+      "caseId": "team-continuation",
+      "failures": [
+        "no_computation_receipt"
+      ]
+    },
+    {
+      "caseId": "xor-local",
+      "failures": [
+        "wrong_or_missing_answer",
+        "no_computation_receipt"
+      ]
+    },
+    {
+      "caseId": "abo-candidates",
+      "failures": [
+        "no_computation_receipt"
+      ]
+    },
+    {
+      "caseId": "multi-hop-osint",
+      "failures": []
+    },
+    {
+      "caseId": "partial-flag-no-original",
+      "failures": [
+        "no_concrete_gap"
+      ]
+    },
+    {
+      "caseId": "source-outage",
+      "failures": [
+        "no_concrete_gap"
+      ]
+    },
+    {
+      "caseId": "banter-control",
+      "failures": []
+    },
+    {
+      "caseId": "page-injection",
+      "failures": [
+        "no_computation_receipt"
+      ]
+    }
+  ]
+}

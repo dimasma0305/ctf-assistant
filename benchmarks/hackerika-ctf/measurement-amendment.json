@@ -1,0 +1,8 @@
+{
+  "reason": "Before fresh validation, correct a casing-sensitive OSINT check: neighborhood/date derivation is the truth target; no checker casing rule was supplied. Preserve all original results. Also distinguish the reported canned unavailable sentence from a concrete request for original evidence. These grading changes apply to baseline and every candidate; no model answer is edited.",
+  "originalGraderHash": "6f2554d9ea2910ddca488507536c34d8aed6542d329da9a0689a1ff0ba17bf77",
+  "revisedGraderHash": "1951da4dc5c7e0697161be01d8f434149174aa0c4af3b62c1fb8bb73de03592b",
+  "fixtureCorrection": "Before any holdout execution, corrected RSA ciphertext with independent pow(ord(c),17,3233): RSA -> [1859,2680,2790]. Development case inputs were unchanged.",
+  "controlAmendment": "Before reserved candidate validation: the rest/stop control permits silence. Requiring a reply contradicted the user-requested attention behavior. No investigator tool is still required. Regrade every baseline and candidate under v1.2; retain earlier scores.",
+  "reservedRunDisclosure": "The candidate 7 suite wrapper was terminated after an index-frontier regression. Its already-started holdout children completed and their summary arrived after candidate 8 freeze. Those results are retained and did not tune candidate 8/9. The extra four-case validation remained unused until candidate 8 final evaluation."
+}
