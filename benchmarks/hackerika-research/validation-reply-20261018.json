@@ -1,0 +1,16 @@
+{
+  "issue": "Partial legal/technical research timed out and leaked internal English gap notes instead of answering the Discord user.",
+  "matchedSmoke": {
+    "cases": ["exact-rsctf-identity", "builtin-blood-webhook"],
+    "baseline": { "run": "runs/reply-live-baseline-smoke-20261018", "deterministicPasses": 2, "judgePasses": 2, "criticalFailures": 0 },
+    "candidateV2": { "run": "runs/reply-v2-smoke-20261018", "deterministicPasses": 2, "judgePasses": 1, "criticalFailures": 2,
+      "finding": "The webhook reply contained a hand-typed citation with a truncated commit hash; this prompted the exact-URL citation guard." }
+  },
+  "focusedCandidateChecks": [
+    { "case": "builtin-blood-webhook", "run": "runs/reply-v3-webhook-20261018", "deterministicPass": true, "judgePass": true, "criticalFailures": 0 },
+    { "case": "research-outage", "run": "runs/reply-v2-outage-20261018", "deterministicPass": true, "judgePass": true, "criticalFailures": 0 },
+    { "case": "holdout-docs-multihop", "run": "runs/reply-v2-multihop-20261018", "deterministicPass": true, "judgePass": true, "criticalFailures": 0 }
+  ],
+  "codeTests": "28 passed in research, source, ChatGPT client and integration tests; focused TypeScript check passed.",
+  "scope": "Synthetic source fixtures and real model calls; no real Discord messages sent. The legal example is covered by a deterministic partial-report regression, not a live legal-source replay. Model latency and token use varied across single-sample trials, so no speed or cost improvement is claimed."
+}

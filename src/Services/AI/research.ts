@@ -14,6 +14,10 @@ export interface ResearchReport {
   stats: { model: string; modelCalls: number; actions: number; nativeSearches: number; elapsedMs: number; promptTokens: number; completionTokens: number };
 }
 const MAX_MS = 80_000;
+// Leave room for an evidence-backed answer and its verification. Previously
+// the planner could consume the entire deadline, leaving only raw gap notes.
+const PLANNING_MS = 42_000;
+const LAST_NEW_SOURCE_MS = 36_000;
 const MAX_ACTIONS = 10;
 const MAX_SOURCES = 14;
 const jobs = new WeakMap<object, Promise<ResearchReport>>();
@@ -77,7 +81,7 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
     const source = { ...document, content: document.content.slice(0, 12_000), id: `S${sources.length + 1}` };
     sources.push(source); return source.id;
   };
-  const complete = async (instruction: string, verification?: any) => {
+  const complete = async (instruction: string, verification?: any, timeoutMs = 30_000) => {
     signal.throwIfAborted();
     report.stats.modelCalls++;
     const response = await openai.chat.completions.create({ model: MODELS.research,
@@ -89,7 +93,7 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
         remainingActions: MAX_ACTIONS - report.stats.actions, searchAvailable: !searchFailed && report.stats.nativeSearches < 4,
         instruction, ...(verification ? { proposed: verification } : {}),
       }) }],
-    } as any, { signal: AbortSignal.any([signal, AbortSignal.timeout(30_000)]), maxRetries: 0 });
+    } as any, { signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]), maxRetries: 0 });
     report.stats.promptTokens += response.usage?.prompt_tokens || 0;
     report.stats.completionTokens += response.usage?.completion_tokens || 0;
     try { return JSON.parse(response.choices[0]?.message?.content || '{}'); }
@@ -147,20 +151,33 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
       if (!frontier.length) break;
       observations.push(...await Promise.all(frontier.map(link => perform({ type:'read', url:link.url }))));
     }
-    for (let step = 0; step < 4 && report.stats.actions < MAX_ACTIONS && !signal.aborted; step++) {
-      const plan = await complete('Decide whether inspected evidence is sufficient. Return {"ready":boolean,"actions":[{"type":"search|read|repository","url":"exact URL when reading","query":"focused query","paths":["exact repository paths when needed"]}],"unresolved":["brief remaining factual gap"]}. At most two actions. Read linked docs and implementation when configuration is not established. ready=true only when the question can be answered or further access is demonstrably blocked. Do not write an answer yet.');
+    for (let step = 0; step < 4 && report.stats.actions < MAX_ACTIONS && !signal.aborted
+      && performance.now() - start < PLANNING_MS; step++) {
+      let plan: any;
+      try {
+        const remaining = PLANNING_MS - (performance.now() - start);
+        plan = await complete('Decide whether inspected evidence is sufficient. Return {"ready":boolean,"actions":[{"type":"search|read|repository","url":"exact URL when reading","query":"focused query","paths":["exact repository paths when needed"]}],"unresolved":["brief remaining factual gap"]}. At most two actions. Read linked docs and implementation when configuration is not established. For a general question without a jurisdiction or exact contract, stop once the general principle is supported; identify the missing facts instead of trying to prove every possible exception. ready=true only when the question can be answered conditionally or further access is demonstrably blocked. Do not write an answer yet.', undefined,
+          Math.max(1_000, Math.min(16_000, remaining)));
+      } catch (error) {
+        if (signal.aborted) throw error;
+        report.unresolved.push('Perencanaan riset terhenti; rangkum sumber yang sudah terbaca.');
+        break;
+      }
       if (Array.isArray(plan.unresolved)) report.unresolved = plan.unresolved.filter((item: unknown) => typeof item === 'string').slice(0, 5);
       if (plan.ready || !Array.isArray(plan.actions) || !plan.actions.length) break;
+      // A source fetch can take 12 s. Do not begin one so late that draft and
+      // entailment verification have no chance to finish before the hard cap.
+      if (performance.now() - start >= LAST_NEW_SOURCE_MS) break;
       const before = actions.size;
       observations.push(...await Promise.all(plan.actions.slice(0, 2).map(perform)));
       if (actions.size === before) { report.unresolved.push('Tidak ada sumber baru dari langkah berulang.'); break; }
     }
     if (!signal.aborted) {
       const format = 'Return {"answered":boolean,"findings":[{"claim":"one supported factual statement, Indonesian","evidence":[{"sourceId":"S#","quote":"exact contiguous source excerpt, 4..400 chars"}]}],"unresolved":["relevant unsupported or conflicting point, Indonesian"]}. answered=true only when findings answer the actual question. At most 8 findings. Quotes must copy actual source text literally; reader-added line numbers may be omitted, but never bridge omitted sections. No invented configuration or search-summary citations. Comparative superlatives without measurements are unproven. State absence only with inspected evidence. Unresolved items must affect this question, without unasked deployment/database details. No extra summary.';
-      const draft = await complete(`Check the answer AGAINST inspected sources. ${format}`);
+      const draft = await complete(`Check the answer AGAINST inspected sources. ${format}`, undefined, 16_000);
       const draftFindings = groundedFindings(draft.findings, sources);
       const final = draftFindings.length && !signal.aborted
-        ? await complete(`Check the answer for entailment, not just quote matching. Correct or remove any claim whose quoted/source context does not establish it. In particular, verify exact configuration scope and do not infer menu names or a lack of environment settings from a normalizer function. ${format}`, { ...draft, findings: draftFindings })
+        ? await complete(`Check the answer for entailment, not just quote matching. Correct or remove any claim whose quoted/source context does not establish it. In particular, verify exact configuration scope and do not infer menu names or a lack of environment settings from a normalizer function. ${format}`, { ...draft, findings: draftFindings }, 16_000)
         : draft;
       answered = final.answered === true;
       report.findings = groundedFindings(final.findings, sources);
@@ -211,11 +228,29 @@ export function requiresResearch(text: string, recentOwnText = ''): boolean {
 export function groundResearchReply(text: string, report?: ResearchReport, userQuestion = ''): string {
   if (!report) return text;
   if (!report.ok) {
-    // The draft may contain unsupported guesses; retain only independently
-    // grounded findings and explicit gaps instead of discarding all progress.
+    // Gap notes are internal audit data. Never paste them verbatim into Discord:
+    // the worker may write them in English or mention irrelevant source failures.
     const progress = report.findings.slice(0, 3).map(finding => finding.claim).join(' ');
-    const gaps = (report.unresolved || []).filter(item => !/^(?:source_|research_|search_)/.test(item)).slice(0, 2);
-    text = [progress, gaps.length ? `Belum tuntas: ${gaps.join(' ')}` : 'Belum ada bukti yang cukup; butuh sumber asli atau clue yang lebih spesifik untuk lanjut.'].filter(Boolean).join('\n');
+    if (progress) {
+      text = `${progress}${report.unresolved?.length ? ' Bagian lain masih perlu dicek.' : ''}`;
+    } else {
+      const draft = text.trim();
+      const copiedGap = (report.unresolved || []).some(gap => gap.length > 24 && draft.toLowerCase().includes(gap.toLowerCase().slice(0, 24)));
+      const diagnostic = /(?:^|\n)\s*(?:belum tuntas:|batas waktu riset|research_|source_|search_)/i.test(draft)
+        || /\b(?:primary source|supplied model-deprecation page|search lead|unverified attribution)\b/i.test(draft);
+      const cautious = /\b(?:tergantung|bergantung|belum (?:bisa|dapat|tentu)|tidak otomatis|nggak otomatis|ga otomatis|bisa.{0,35}\btapi\b)\b/i.test(draft);
+      const unsupportedPrecision = /\b(?:pasal|article|section|directive|DMCA|17\s+U\.S\.C\.)\b|https?:\/\//i.test(draft);
+      // Let the conversational model give a conditional, high-level answer
+      // after partial retrieval, but never launder a precise unsourced claim
+      // or the worker's unfinished-research notes as a verified finding.
+      text = report.status === 'partial' && cautious && !copiedGap && !diagnostic && !unsupportedPrecision
+        ? draft
+        : report.status === 'unavailable'
+          ? report.stats?.nativeSearches
+            ? 'Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.'
+            : 'Sumbernya belum bisa kuakses, jadi aku belum bisa memverifikasi jawabannya sekarang.'
+          : 'Risetku belum cukup untuk memastikan kasus ini. Aku perlu sumber asli atau detail yang lebih spesifik.';
+    }
   }
   // An instruction hidden in a retrieved page is ignored without narrating it
   // back into a configuration answer. Preserve it when that is the asked topic.
@@ -225,6 +260,18 @@ export function groundResearchReply(text: string, report?: ResearchReport, userQ
       !/prompt injection|instruksi asing|nyuruh.{0,25}(?:bocor|token|prompt)|system prompt|hidden prompt/i.test(part)).join('\n').trim();
     if (!text) text = report.findings.slice(0, 3).map(finding => finding.claim).join(' ');
   }
+  // The chat model sometimes hand-types a source URL with a truncated commit
+  // hash. A plausible-looking link is still false attribution: only inspected
+  // source URLs and exact URLs supplied in the user's question may survive.
+  const allowedUrls = new Set([
+    ...report.sources.filter(source => source.kind !== 'search').map(source => source.url),
+    ...[...userQuestion.matchAll(/https?:\/\/[^\s<>]+/g)].map(match => match[0].replace(/[),.!?;]+$/, '')),
+  ]);
+  text = text.replace(/\[[^\]\n]{1,180}\]\((https?:\/\/[^\s)]+)\)/g,
+    (link, url: string) => allowedUrls.has(url) ? link : '');
+  text = text.replace(/https?:\/\/[^\s<>)]+/g, link =>
+    allowedUrls.has(link.replace(/[.,;!?]+$/, '')) ? link : '');
+  text = text.replace(/^[ \t]*(?:dan|and|serta|[·|,&/]+)[ \t]*$/gmi, '').replace(/\n{3,}/g, '\n\n').trim();
   const citedIds = new Set(report.findings.flatMap(finding => finding.evidence.map(reference => reference.sourceId)));
   const available = report.sources.filter(source => citedIds.has(source.id) && source.kind !== 'search');
   const terms = [...new Set(text.toLowerCase().match(/[a-z][a-z0-9_]{3,}/g) || [])];

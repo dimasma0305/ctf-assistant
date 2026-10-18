@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "holdout-docs-multihop",
+    "trial": 0,
+    "pass": true,
+    "reason": "Jawaban mengikuti sumber yang ditautkan dari halaman awal: batas unggah default 12 MiB dan dapat diubah melalui MAX_UPLOAD_MIB. Tautan mengarah ke sumber yang telah dibaca; tidak ada workaround yang ditebak.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 680,
+      "completion_tokens": 72,
+      "total_tokens": 752,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 680
+    }
+  }
+]

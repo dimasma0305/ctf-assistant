@@ -1,0 +1,32 @@
+[
+  {
+    "caseId": "builtin-blood-webhook",
+    "trial": 0,
+    "pass": true,
+    "reason": "Jawaban memberi langkah pengaturan yang didukung docs, menyebut pengumuman Jeopardy untuk first/second/third blood dan pengiriman webhook yang tampak di cuplikan implementasi. Ia juga secara tepat membatasi klaim tentang pemicu, antrean, format, dan cakupan konfigurasi yang tidak terverifikasi, serta menautkan dua sumber yang memang dibaca.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 2988,
+      "completion_tokens": 102,
+      "total_tokens": 3090,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2988
+    }
+  },
+  {
+    "caseId": "exact-rsctf-identity",
+    "trial": 0,
+    "pass": true,
+    "reason": "Jawaban mengidentifikasi repo yang tepat, menyebut metadata fork=false, dan merangkum stack sesuai README serta Cargo.toml: Rust/Axum 0.8 dan React/Mantine. Tautan mengarah ke sumber yang tercatat telah dibaca. Klaim “tanpa parent” tidak didukung oleh corpus yang tersedia, tetapi tidak mengubah kesimpulan utamanya.",
+    "criticalFailures": [],
+    "grounding": 4,
+    "usage": {
+      "prompt_tokens": 1552,
+      "completion_tokens": 395,
+      "total_tokens": 1947,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1552
+    }
+  }
+]

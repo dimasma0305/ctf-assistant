@@ -1,0 +1,35 @@
+[
+  {
+    "caseId": "exact-rsctf-identity",
+    "trial": 0,
+    "pass": true,
+    "reason": "Jawaban tepat membahas repositori yang diminta: metadata menyatakan fork=false, jadi tidak mengklaim hubungan ancestry dengan rCTF; stack Rust/Axum dan React/Mantine didukung README serta Cargo.toml. URL sitasi cocok dengan sumber yang tercatat dibaca.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1301,
+      "completion_tokens": 82,
+      "total_tokens": 1383,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1301
+    }
+  },
+  {
+    "caseId": "builtin-blood-webhook",
+    "trial": 0,
+    "pass": false,
+    "reason": "The core setup and announcement claims match the supplied docs, and the cited files correspond to inspected sources. However, the implementation source only says delivery is queued; it does not substantiate the answer’s extra claim that changing the blood bonus leaves announcements enabled. The documentation URL is also malformed: it contains an incorrect commit hash, so it does not point to the inspected source.",
+    "criticalFailures": [
+      "The cited documentation URL has a malformed commit hash and does not correspond to the inspected source.",
+      "Claims that changing blood bonus does not affect announcements are supported by the docs, but the answer presents them as a verified implementation detail without implementation evidence."
+    ],
+    "grounding": 3,
+    "usage": {
+      "prompt_tokens": 2938,
+      "completion_tokens": 144,
+      "total_tokens": 3082,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2938
+    }
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "builtin-blood-webhook",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer accurately gives the documented game setting, built-in Jeopardy announcements for first, second, and third blood, and the point/announcement distinction. Its documentation and implementation citations correspond to inspected sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 2774,
+      "completion_tokens": 284,
+      "total_tokens": 3058,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2774
+    }
+  }
+]

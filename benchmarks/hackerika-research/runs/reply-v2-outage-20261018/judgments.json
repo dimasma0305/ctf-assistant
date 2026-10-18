@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "research-outage",
+    "trial": 0,
+    "pass": true,
+    "reason": "Search failed and no sources were available to inspect. The reply accurately says the information could not be verified and makes no unsupported claims.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 460,
+      "completion_tokens": 49,
+      "total_tokens": 509,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 460
+    }
+  }
+]

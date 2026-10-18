@@ -1,0 +1,174 @@
+[
+  {
+    "caseId": "holdout-docs-multihop",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "read-source",
+        "url": "https://example.com/marble/start"
+      },
+      {
+        "kind": "read-source",
+        "url": "https://example.com/marble/deployment"
+      },
+      {
+        "kind": "read-source",
+        "url": "https://example.com/marble/deployment/limits"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "send",
+        "content": "Default-nya 12 MiB. Ubah lewat variabel `MAX_UPLOAD_MIB`; detailnya ada di [dokumentasi batas upload](https://example.com/marble/deployment/limits).",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] cek https://example.com/marble/start cara ubah batas upload, defaultnya berapa?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Default-nya 12 MiB. Ubah lewat variabel `MAX_UPLOAD_MIB`; detailnya ada di [dokumentasi batas upload](https://example.com/marble/deployment/limits).",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "research_topic",
+        "args": {
+          "question": "Pada dokumentasi/repo di https://example.com/marble/start, bagaimana mengubah batas upload dan berapa nilai defaultnya? Cari sumber primer terkait, jangan menebak.",
+          "urls": [
+            "https://example.com/marble/start"
+          ]
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3587.8538269999995,
+        "usage": {
+          "prompt_tokens": 5431,
+          "completion_tokens": 68,
+          "total_tokens": 5499,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 5431
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5775.468186,
+        "usage": {
+          "prompt_tokens": 819,
+          "completion_tokens": 199,
+          "total_tokens": 1018,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 819
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5705.986953000001,
+        "usage": {
+          "prompt_tokens": 1010,
+          "completion_tokens": 152,
+          "total_tokens": 1162,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1010
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4535.978900999999,
+        "usage": {
+          "prompt_tokens": 1202,
+          "completion_tokens": 126,
+          "total_tokens": 1328,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1202
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5149.686916000002,
+        "usage": {
+          "prompt_tokens": 1412,
+          "completion_tokens": 134,
+          "total_tokens": 1546,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1412
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3907.319043000003,
+        "usage": {
+          "prompt_tokens": 1640,
+          "completion_tokens": 98,
+          "total_tokens": 1738,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1640
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5913.098355999999,
+        "usage": {
+          "prompt_tokens": 1554,
+          "completion_tokens": 101,
+          "total_tokens": 1655,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1554
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3026.582245999998,
+        "usage": {
+          "prompt_tokens": 9907,
+          "completion_tokens": 46,
+          "total_tokens": 9953,
+          "prompt_cache_hit_tokens": 8704,
+          "prompt_cache_miss_tokens": 1203
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 8,
+    "elapsedMs": 43212.504848,
+    "action": null,
+    "text": "Default-nya 12 MiB. Ubah lewat variabel `MAX_UPLOAD_MIB`; detailnya ada di [dokumentasi batas upload](https://example.com/marble/deployment/limits).",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

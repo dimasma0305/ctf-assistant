@@ -1,0 +1,27 @@
+{
+  "startedAt": "2026-10-18T14:58:50.291Z",
+  "runtime": "ctf-assistant:research-reply-v2",
+  "split": "holdout",
+  "repeats": 1,
+  "concurrency": 1,
+  "corpusHash": "8352058a4c42a4ed2035aa6482c239d2df0e5ccf14523bee5f3d740c35f9b2ce",
+  "workerHash": "df830b91d174c38077c7410cf7dd468bf4df6ddadde0d4f139731ae2298d84eb",
+  "selectedIds": [
+    "holdout-docs-multihop"
+  ],
+  "graderVersion": "research-v2",
+  "graderHash": "ce670e31797e406ea84f06fec305b29829d56b6945cebc751b655fff4b398ef1",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 14,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 20
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls. Public-source HTTP transport is replaced by identical synthetic responses; repository parsing, commit pinning, evidence validation and nested research model calls are real."
+}

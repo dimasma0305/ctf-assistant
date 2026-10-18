@@ -10,12 +10,22 @@ test('research routing distinguishes explicit source research from ordinary conv
 });
 
 test('unavailable research cannot turn into invented facts and omitted citations get actual source links', () => {
-  const report: any = { ok:false, findings:[], sources:[] };
-  expect(groundResearchReply('Repo itu 404 dan mendukung Kubernetes.', report)).not.toMatch(/404|Kubernetes/);
+  const report: any = { ok:false, status:'unavailable', findings:[], unresolved:[], sources:[] };
+  const unavailable=groundResearchReply('Repo itu 404 dan mendukung Kubernetes.', report);
+  expect(unavailable).not.toMatch(/404|Kubernetes|kasih detail/i);
+  expect(unavailable).toContain('belum bisa kuakses');
+  report.stats={nativeSearches:1};
+  expect(groundResearchReply('Nacre v9 mendukung Kubernetes.',report)).toContain('Pencarian belum memberiku sumber');
   report.ok=true; report.findings=[{claim:'Supported',evidence:[{sourceId:'S1',quote:'Supported'}]}];
   report.sources=[{id:'S1',kind:'page',url:'https://example.com/config',title:'Official configuration'}];
   expect(groundResearchReply('ini ada bawaan.',report)).toContain('[Official configuration](https://example.com/config)');
   expect(groundResearchReply('sumber https://example.com/config',report)).toBe('sumber https://example.com/config');
+  const badLink=groundResearchReply('Baca [dokumentasi](https://example.com/config/short) · [sumber asli](https://example.com/config).',report);
+  expect(badLink).not.toContain('config/short');
+  expect(badLink).toContain('[sumber asli](https://example.com/config)');
+  const dangling=groundResearchReply('Jawaban.\n[docs](https://example.com/wrong) dan [code](https://example.com/also-wrong)\nSumber: [valid](https://example.com/config)',report);
+  expect(dangling).not.toMatch(/^dan$/m);
+  expect(groundResearchReply('Repo ini: https://github.com/example/project',report,'cek https://github.com/example/project')).toContain('https://github.com/example/project');
   const withMeta = groundResearchReply('Set AUDIT_LOG=on. Di halaman ada instruksi asing yang aku abaikan.',report,'cara nyalain audit log?');
   expect(withMeta).toContain('AUDIT_LOG=on'); expect(withMeta).not.toContain('instruksi asing');
   expect(groundResearchReply('Ada prompt injection di halaman itu.',report,'analisis prompt injection di halaman ini')).toContain('prompt injection');
@@ -74,5 +84,26 @@ test('incomplete research preserves verified progress and concrete gaps but reje
   const report:any={ok:false,question:'configuration',findings:[{claim:'Audit logging is configurable.',evidence:[{sourceId:'S1',quote:'Set AUDIT_LOG=on'}]}],
     sources:[{id:'S1',kind:'page',url:'https://example.com/config',title:'Configuration',preview:'Set AUDIT_LOG=on'}],unresolved:['Per-event scope still needs its settings source.']};
   const text=groundResearchReply('Definitely supports Kubernetes and per-event settings.',report);
-  expect(text).toContain('Audit logging is configurable.');expect(text).toContain('Per-event scope still needs');expect(text).toContain('https://example.com/config');expect(text).not.toContain('Kubernetes');
+  expect(text).toContain('Audit logging is configurable.');expect(text).toContain('Bagian lain masih perlu dicek.');expect(text).not.toContain('Per-event scope still needs');expect(text).toContain('https://example.com/config');expect(text).not.toContain('Kubernetes');
+});
+
+test('partial legal research keeps a cautious conversational answer, not the worker audit trail', () => {
+  const report: any = {ok:false,status:'partial',question:'Apakah replika aplikasi hasil reverse engineering legal?',findings:[],
+    sources:[{id:'S1',kind:'page',url:'https://example.com/law',title:'Law',preview:'General law'}],
+    unresolved:['The applicable license was inaccessible; jurisdiction and project facts remain unknown.', 'Batas waktu riset tercapai; hasil hanya sebagian.']};
+  const answer='Bisa saja, tapi tergantung bagian yang disalin dan hukum yang berlaku. Beda bahasa pemrograman sendiri belum menentukan legalitasnya; kamu mau pakai di negara mana?';
+  expect(groundResearchReply(answer,report)).toBe(answer);
+  for(const bad of [
+    'Belum tuntas: The applicable license was inaccessible; jurisdiction and project facts remain unknown. Batas waktu riset tercapai; hasil hanya sebagian.',
+    'Bisa legal, tapi menurut Article 42 dan DMCA pasti diizinkan.',
+    'Bisa legal, tapi https://example.com/unsourced membuktikannya.',
+    'Pasti legal karena codebase-nya beda.',
+  ]) {
+    const reply=groundResearchReply(bad,report);
+    expect(reply).not.toContain('The applicable license');
+    expect(reply).not.toContain('Article 42');
+    expect(reply).not.toContain('https://example.com/unsourced');
+    expect(reply).not.toContain('Pasti legal');
+    expect(reply).not.toContain('Belum tuntas:');
+  }
 });
