@@ -1,5 +1,11 @@
 # Hackerika research upgrade — 2026-10-16
 
+## Discord profile OSINT regression — 2026-10-18
+
+An explicit member mention in a profile/identity question now triggers a read-only Discord user and current-guild member lookup. The bot can ground a reply in username, display name, account creation timestamp inferred from the Discord ID, server join date, roles, public flags, and available avatar/banner URLs. A same-handle web page is reported only as an unverified lead unless there is independent evidence tying it to the Discord account. The worker searches by handle instead of sending the Discord ID and full private question to web search, and opens source pages before using them.
+
+The matched synthetic [before/after comparison](profile-osint-final-comparison-20261018.json) moved from **0/1 to 1/1** judged pass. The old bot searched four times and gave no profile facts; the candidate read the correct Discord profile and one same-handle page, stated the verified account facts, and kept the website attribution uncertain. Two existing technical research cases passed their [regression smoke](runs/profile-regression-smoke-20261018/judge-summary.json) (2/2, no critical failures). These are small fixtures, not a production accuracy estimate. The first image trial failed because the benchmark mounted a host credential path inaccessible to the container user; the harness now mounts it at the runtime path. Failed runs are retained under `runs/profile-candidate-20261018/` and `runs/profile-candidate-retry-20261018/`.
+
 The deployed bot now runs a bounded research workflow: discover sources, open the exact project, follow documentation, inspect relevant repository files, synthesize supported findings, and review whether the evidence supports each claim. This addresses confusing similarly named projects, treating a README omission as feature absence, inventing configuration/relay instructions, and stopping at a documentation index.
 
 Research uses `deepseek-v4-pro`; normal conversation and native image input retain `deepseek-flash`. Implementation lives in [research.ts](../../src/Services/AI/research.ts), [researchSources.ts](../../src/Services/AI/researchSources.ts), and the existing chat/tool dispatchers. No project names or benchmark answers are hardcoded into production rules.

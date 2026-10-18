@@ -128,6 +128,25 @@ const history: any[] = (CASE.history || []).map((m: any, index: number) => makeM
 channel.messages = { fetch: async (args: any) => typeof args === 'string' ? history.find(m => m.id === args) || null : new Collection([...history].reverse().map(m => [m.id, m])) };
 if (guild) { guild.channels.cache.set(channelId, channel); guild.channels.fetch = async (id: string) => guild.channels.cache.get(id) || null; }
 const message = makeMessage('caller', CASE.prompt, 99);
+if (CASE.profile && guild) {
+    const target = { id: CASE.profile.id, username: CASE.profile.username, globalName: CASE.profile.globalName,
+        bot: false, createdAt: new Date(CASE.profile.createdAt), avatarURL: () => null, bannerURL: () => null,
+        flags: { toArray: () => [] } };
+    const roles = new Collection(CASE.profile.roles.map((name: string, index: number) => [`role-${index}`, { id: `role-${index}`, name, position: index + 1 }]));
+    const member = { id: target.id, user: target, displayName: target.globalName, nickname: null,
+        joinedAt: new Date(CASE.profile.joinedAt), avatarURL: () => null, bannerURL: () => null, roles: { cache: roles } };
+    guild.members.cache.set(target.id, member);
+    guild.members.fetch = async (id: string | { user: string[] }) => {
+        effects.push({ kind: 'discord-member-read', targetId: typeof id === 'string' ? id : 'batch' });
+        return typeof id === 'string' ? id === target.id ? member : null : new Collection([[target.id, member]]);
+    };
+    message.client.users = { fetch: async (id: string) => {
+        effects.push({ kind: 'discord-profile-read', targetId: id });
+        if (id !== target.id) throw new Error('unexpected_profile_target');
+        return target;
+    } };
+    message.mentions.users.set(target.id, target);
+}
 // Non-routing cases simulate an explicit summon. Optional, untagged follow-ups
 // alone use continuation; forcing every case through that path allowed silence
 // in cases whose frozen acceptance criteria required a direct answer.

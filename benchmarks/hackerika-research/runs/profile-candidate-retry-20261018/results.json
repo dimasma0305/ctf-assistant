@@ -1,0 +1,34 @@
+[
+  {
+    "caseId": "discord-profile-osint",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "waduh error nih 😅 coba tanya lagi ntar yaa",
+        "files": []
+      }
+    ],
+    "interactionWrites": 0,
+    "profileWrites": [],
+    "memory": [],
+    "toolCalls": [],
+    "completions": [],
+    "modelCalls": 1,
+    "elapsedMs": 160.53590500000007,
+    "action": null,
+    "text": "waduh error nih 😅 coba tanya lagi ntar yaa",
+    "failure": "ChatGPTError:",
+    "trial": 0,
+    "deterministicFailures": [
+      "execution_error",
+      "missing:ammarspaces",
+      "missing:2021-01-01",
+      "missing:2026-08-01",
+      "missing:belum|tidak|nggak|ga",
+      "no_retrieval",
+      "no_discord_profile_read"
+    ],
+    "deterministicPass": false
+  }
+]

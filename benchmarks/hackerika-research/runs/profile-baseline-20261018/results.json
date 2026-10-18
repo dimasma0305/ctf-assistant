@@ -1,0 +1,153 @@
+[
+  {
+    "caseId": "discord-profile-osint",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "send",
+        "content": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          },
+          {
+            "id": "795513549812006981",
+            "displayName": "FindFemaleBot",
+            "username": "ammarspaces",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> deep search dan osint tentang siapa itu <@795513549812006981>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "research_topic",
+        "args": {
+          "question": "Do a privacy-respecting OSINT check on the public identity of Discord user FindFemaleBot (username ammarspaces), ID 795513549812006981. Only use clearly public, attributable information; distinguish verified matches from guesses, avoid doxxing or sensitive personal data, and report whether reliable public identity/profiles can be established. Do not attempt account access or contact."
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5277.515948,
+        "usage": {
+          "prompt_tokens": 9890,
+          "completion_tokens": 95,
+          "total_tokens": 9985,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9890
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5725.022868,
+        "usage": {
+          "prompt_tokens": 750,
+          "completion_tokens": 112,
+          "total_tokens": 862,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 750
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5234.187982000001,
+        "usage": {
+          "prompt_tokens": 998,
+          "completion_tokens": 147,
+          "total_tokens": 1145,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 998
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 6863.882286,
+        "usage": {
+          "prompt_tokens": 1128,
+          "completion_tokens": 263,
+          "total_tokens": 1391,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1128
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4759.512022000003,
+        "usage": {
+          "prompt_tokens": 1147,
+          "completion_tokens": 167,
+          "total_tokens": 1314,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1147
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3081.761819000003,
+        "usage": {
+          "prompt_tokens": 10215,
+          "completion_tokens": 31,
+          "total_tokens": 10246,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10215
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 6,
+    "elapsedMs": 35595.292548,
+    "action": null,
+    "text": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:ammarspaces",
+      "missing:2021-01-01",
+      "missing:2026-08-01",
+      "no_discord_profile_read"
+    ],
+    "deterministicPass": false
+  }
+]

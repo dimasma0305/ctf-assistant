@@ -23,7 +23,7 @@ await Promise.all(Array.from({ length: 3 }, async () => {
         try {
             const response = await openai.chat.completions.create({ model: MODELS.judge, temperature: 0,
                 response_format: { type: 'json_object' }, thinking: { type: 'disabled' },
-                messages: [{ role: 'system', content: JUDGE_PROMPT }, { role: 'user', content: JSON.stringify({ prompt: test.prompt, primarySources: {repos:test.repos || [], pages:test.pages || {}, transportFixtureCommit: SHA}, searchFailed: test.searchFailed || false, expected: test.expected, maxWords: test.maxWords, visibleReply: row.text, effects: row.effects, tools: row.toolCalls }) }],
+                messages: [{ role: 'system', content: JUDGE_PROMPT }, { role: 'user', content: JSON.stringify({ prompt: test.prompt, primarySources: {repos:test.repos || [], pages:test.pages || {}, transportFixtureCommit: SHA}, discordProfileFixture: test.profile || null, searchFailed: test.searchFailed || false, expected: test.expected, maxWords: test.maxWords, visibleReply: row.text, effects: row.effects, tools: row.toolCalls }) }],
             } as any, { signal: AbortSignal.timeout(60_000), maxRetries: 0 });
             judgments.push({ caseId: row.caseId, trial: row.trial, ...JSON.parse(response.choices[0]?.message?.content || '{}'), usage: response.usage });
         } catch (error: any) { judgments.push({ caseId: row.caseId, trial: row.trial, pass: false, judgeError: error?.name || 'judge_failed' }); }

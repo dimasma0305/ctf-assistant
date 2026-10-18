@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "discord-profile-osint",
+    "trial": 0,
+    "pass": true,
+    "reason": "Jawaban melaporkan rincian profil Discord yang cocok dengan fixture, menyebut halaman dengan handle sama sebagai belum terverifikasi, dan tidak mengklaim identitas di luar bukti. URL yang dikutip adalah sumber yang tercatat telah dibaca.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 837,
+      "completion_tokens": 74,
+      "total_tokens": 911,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 837
+    }
+  }
+]

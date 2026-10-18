@@ -1,0 +1,19 @@
+[
+  {
+    "caseId": "discord-profile-osint",
+    "trial": 0,
+    "pass": false,
+    "reason": "The supplied Discord profile fixture provides the username, display name, account creation date, server join date, and role, but the reply says it could not verify anything. It also fails to mention the HackerDNA page as an unverified lead.",
+    "criticalFailures": [
+      "Claims no verifiable source was available despite the supplied profile fixture and page."
+    ],
+    "grounding": 1,
+    "usage": {
+      "prompt_tokens": 633,
+      "completion_tokens": 363,
+      "total_tokens": 996,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 633
+    }
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "discord-profile-osint",
+    "trial": 0,
+    "pass": true,
+    "reason": "Jawaban cocok dengan data profil Discord: menyebut username ammarspaces, nama tampilan FindFemaleBot, tanggal pembuatan akun yang diturunkan dari ID, tanggal bergabung, dan role. Jawaban juga tepat memperlakukan halaman HackerDNA bernama sama sebagai petunjuk yang belum terverifikasi, bukan bukti kepemilikan akun.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 852,
+      "completion_tokens": 96,
+      "total_tokens": 948,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 852
+    }
+  }
+]

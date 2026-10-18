@@ -1,0 +1,32 @@
+[
+  {
+    "caseId": "builtin-blood-webhook",
+    "trial": 0,
+    "pass": true,
+    "reason": "Accurately explains the documented General → Discord Webhook setup, Jeopardy blood announcements, no external relay, and the UI field; cited URLs match inspected files. Saying other parts still need checking is appropriately cautious, since implementation details beyond the inspected service file are not described.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 2853,
+      "completion_tokens": 79,
+      "total_tokens": 2932,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2853
+    }
+  },
+  {
+    "caseId": "exact-rsctf-identity",
+    "trial": 0,
+    "pass": true,
+    "reason": "Jawaban mengidentifikasi repo yang tepat, menyatakan metadata fork=false tanpa menganggap itu membuktikan ketiadaan pengaruh kode rCTF, dan merangkum stack yang didukung README serta Cargo.toml: Rust, React, Mantine, dan Axum 0.8. Sumber yang dikutip sesuai dengan sumber yang dibaca.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1268,
+      "completion_tokens": 95,
+      "total_tokens": 1363,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1268
+    }
+  }
+]

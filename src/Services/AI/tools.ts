@@ -4,6 +4,7 @@ import { searchMessagesForTool, recallMemoryForTool } from "./search";
 import { grantFanRoleForTool } from "./fanRole";
 import { reflectOnInteraction, ignoreUserForTool, moveConversationToDM } from './socialTools';
 import { getEnvironmentForTool } from './environment';
+import { getDiscordProfileForTool, discordProfileSubject } from './discordProfile';
 import { DISCORD_TOOL_DEFINITIONS, DISCORD_TOOL_NAMES, dispatchDiscordAction } from './discordActions';
 import {
     setReminderForTool,
@@ -108,6 +109,16 @@ export const TOOL_DEFINITIONS = [
             description: 'Cek lingkungan Discord sekarang: DM vs guild, channel/topic/thread, izin nyata, channel yang user DAN bot bisa lihat, event dari cache. Tidak mengakses channel tersembunyi atau guild lain dari DM. Cache bisa belum lengkap.',
             parameters: { type: 'object', properties: {
                 query: { type: 'string', maxLength: 100, description: 'Opsional, cari nama/topic channel atau nama event.' },
+            }, additionalProperties: false },
+        },
+    },
+    {
+        type: 'function' as const,
+        function: {
+            name: 'get_discord_profile',
+            description: 'Baca profil Discord user yang secara eksplisit ditag dalam pesan SEKARANG di server ini, atau profil speaker sendiri. Hasil API: username/nama, umur akun dari ID, tanggal bergabung server, peran, avatar/banner, badge publik. Tidak menyediakan bio, koneksi akun, DM, guild lain atau identitas asli. Nama akun web yang sama bukan bukti pemilik yang sama. Gunakan untuk pertanyaan profil/OSINT sebelum menyimpulkan identitas.',
+            parameters: { type: 'object', properties: {
+                userId: { type: 'string', description: 'ID user yang ditag dalam pesan sekarang; kosongkan bila hanya satu orang lain ditag.' },
             }, additionalProperties: false },
         },
     },
@@ -480,8 +491,13 @@ export async function dispatchTool(
         if (name === 'research_topic') {
             const suppliedUrls = [...(message.content || '').matchAll(/https?:\/\/[^\s<>]+/g)]
                 .map(match => match[0].replace(/[),.!?;]+$/, ''));
+            const profileInquiry = /\b(?:siapa\s+(?:itu|dia)|profil(?:e)?\s+discord|identitas\s+akun|osint\s+(?:tentang|soal)\s+siapa)\b/i.test(message.content || '');
+            const targetId = profileInquiry ? discordProfileSubject(message) : null;
+            const profileResult = targetId ? await getDiscordProfileForTool(message, { userId: targetId }) : null;
+            const discordProfile = profileResult?.ok ? profileResult.profile : undefined;
             const result = await researchForTurn({ question: args?.question,
-                urls: [...new Set([...suppliedUrls, ...(Array.isArray(args?.urls) ? args.urls : [])])].slice(0, 4) }, message, options);
+                urls: [...new Set([...suppliedUrls, ...(Array.isArray(args?.urls) ? args.urls : [])])].slice(0, 4),
+                discordProfile }, message, options);
             return JSON.stringify(result);
         }
         if (DISCORD_TOOL_NAMES.has(name)) return JSON.stringify(await dispatchDiscordAction(name, args, message));
@@ -489,6 +505,7 @@ export async function dispatchTool(
         if (name === 'move_conversation_to_dm') return JSON.stringify(await moveConversationToDM(message, args));
         if (name === 'ignore_user') return JSON.stringify(await ignoreUserForTool(message, args));
         if (name === 'get_environment') return JSON.stringify(await getEnvironmentForTool(message, args));
+        if (name === 'get_discord_profile') return JSON.stringify(await getDiscordProfileForTool(message, args || {}));
         if (name === 'search_messages') {
             const query = typeof args?.query === 'string' ? args.query : '';
             const authorId = typeof args?.authorId === 'string' && args.authorId.trim().length > 0

@@ -12,5 +12,8 @@ export async function chatGPTMountArgs(image: string, envFile: string): Promise<
     if (!info.isDirectory() || (info.mode & 0o077) || directory.includes(',')) throw Error('Use an owner-only private credential directory');
     const file = environment.match(/^CHATGPT_AUTH_FILE=(.+)$/m)?.[1]?.trim();
     if (!file || !isAbsolute(file) || !file.endsWith('/credentials.json') || file.includes(',')) throw Error('Set an absolute CHATGPT_AUTH_FILE ending in /credentials.json');
-    return ['--mount', `type=bind,src=${directory},dst=${file.slice(0, -'/credentials.json'.length)}`];
+    // Host env files may point under /root, which the unprivileged image user
+    // cannot traverse even when the credential file itself is readable.
+    const mount = '/run/hackerika-chatgpt';
+    return ['--mount', `type=bind,src=${directory},dst=${mount}`, '--env', `CHATGPT_AUTH_FILE=${mount}/credentials.json`];
 }
