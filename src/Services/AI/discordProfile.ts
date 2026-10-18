@@ -15,6 +15,15 @@ export function discordProfileSubject(message: Pick<ChatMessage, 'content' | 'au
     return mentions.length === 1 ? mentions[0] : null;
 }
 
+/** A person/profile question about exactly one tagged member. Keep CTF team
+ * mentions and ordinary name references out of this research path. */
+export function discordPersonResearchSubject(message: Pick<ChatMessage, 'content' | 'author' | 'client'>): string | null {
+    const id = discordProfileSubject(message);
+    if (!id || id === message.author.id) return null;
+    const direct = /\b(?:siapa(?:\s+(?:itu|dia))?|who\s+is|profil(?:e)?(?:\s+discord)?|identitas(?:\s+akun)?)\s*<@!?(\d{17,20})>/i.exec(message.content);
+    return direct?.[1] === id ? id : null;
+}
+
 export interface DiscordProfile {
     id: string; username: string; globalName: string | null; bot: boolean;
     accountCreatedAt: string; accountCreatedAtBasis: 'discord_snowflake';

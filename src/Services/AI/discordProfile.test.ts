@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { Collection } from 'discord.js';
-import { discordProfileSubject, getDiscordProfileForTool, type DiscordProfile } from './discordProfile';
-import { formatDiscordProfileReply, groundResearchReply, requiresResearch } from './research';
+import { discordPersonResearchSubject, discordProfileSubject, getDiscordProfileForTool, type DiscordProfile } from './discordProfile';
+import { discordProfileSearchQueries, formatDiscordProfileReply, groundResearchReply, requiresResearch } from './research';
 
 const speaker = '663394727688798231';
 const bot = '1077393568647352320';
@@ -48,6 +48,17 @@ test('profile lookup does not inspect an unmentioned third party or ambiguous mu
   expect(discordProfileSubject(self.message as unknown as Parameters<typeof discordProfileSubject>[0])).toBe(speaker);
 });
 
+test('natural siapa @member deep search request selects one profile, not generic CTF mentions', () => {
+  const direct = fixture(`<@${bot}> siapa <@${target}> aku mau kamu deep search dia`);
+  const prior = fixture(`<@${bot}> deep search dan osint siapa itu <@${target}>`);
+  const ctf = fixture(`<@${bot}> sebutkan 10 dosa besar <@${target}>`);
+  const ambiguous = fixture(`<@${bot}> siapa <@${target}> dan <@${other}>`);
+  for (const value of [direct, prior])
+    expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(target);
+  for (const value of [ctf, ambiguous])
+    expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(null);
+});
+
 test('a failed global-user refresh still uses the freshly fetched guild member user', async () => {
   const { message, member, user } = fixture(`cek profil <@${target}>`);
   const fallback = { ...member, user };
@@ -74,7 +85,27 @@ test('deep Discord OSINT is routed to research and never attributes a same-name 
   expect(answer).toContain('Yang bisa kupastikan dari Discord');
   expect(answer).toContain('@ammarspaces');
   expect(answer).not.toContain('HackerDNA');
-  expect(answer).toContain('belum ada bukti');
-  expect(answer).toContain('[example.com](https://example.com/ammarspaces)');
-  expect(formatDiscordProfileReply(profile)).toContain('belum punya tautan');
+  expect(answer).toContain('belum membuktikan');
+  expect(answer).toContain('[example.com/ammarspaces](https://example.com/ammarspaces)');
+  expect(formatDiscordProfileReply(profile)).toContain('belum menemukan halaman publik');
+  expect(discordProfileSearchQueries(profile)).toEqual(['"ammarspaces"', '"FindFemaleBot"']);
+});
+
+test('profile grounding shows multiple inspected leads without attributing them to the member', () => {
+  const profile: DiscordProfile = { id: target, username: 'worldsavior', globalName: 'Aryma House Of Wolf', bot: false,
+    accountCreatedAt: '2021-01-01T00:00:00.000Z', accountCreatedAtBasis: 'discord_snowflake', avatarUrl: null,
+    bannerUrl: null, publicFlags: [], guild: { id: '555555555555555555', displayName: 'Aryma House Of Wolf', nickname: null,
+      joinedAt: '2026-08-01T00:00:00.000Z', roles: [], avatarUrl: null, bannerUrl: null } };
+  const report: NonNullable<Parameters<typeof groundResearchReply>[1]> = { ok: false, status: 'partial', question: 'Who?',
+    discordProfile: profile, findings: [], unresolved: [], sources: [
+      { id: 'S1', kind: 'page', url: 'https://example.com/worldsavior', title: 'worldsavior', preview: 'worldsavior' },
+      { id: 'S2', kind: 'page', url: 'https://example.com/aryma', title: 'Aryma', preview: 'Aryma' },
+      { id: 'S3', kind: 'search', url: 'https://example.com/not-read', title: 'Aryma', preview: 'Aryma' }],
+    stats: { model: 'fixture', modelCalls: 1, actions: 1, nativeSearches: 1, elapsedMs: 1, promptTokens: 1, completionTokens: 1 } };
+  const answer = groundResearchReply('', report);
+  expect(answer).toContain('https://example.com/worldsavior');
+  expect(answer).toContain('https://example.com/aryma');
+  expect(answer).not.toContain('https://example.com/not-read');
+  expect(answer).toContain('belum membuktikan');
+  expect(discordProfileSearchQueries(profile)).toEqual(['"worldsavior"', '"Aryma House Of Wolf"']);
 });

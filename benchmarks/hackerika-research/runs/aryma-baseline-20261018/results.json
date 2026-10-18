@@ -1,0 +1,158 @@
+[
+  {
+    "caseId": "discord-profile-osint-natural",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "send",
+        "content": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          },
+          {
+            "id": "795513549812006981",
+            "displayName": "Aryma House Of Wolf",
+            "username": "worldsavior",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> siapa <@795513549812006981> aku mau kamu deep search dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "research_topic",
+        "args": {
+          "question": "Deep search profil publik Discord orang ini berdasarkan ID Discord 795513549812006981 dan data yang tersedia; tentukan hanya informasi publik yang dapat diatribusikan dengan yakin, jangan menebak identitas asli atau menggabungkan akun yang sekadar mirip. User menyebut tampilan Aryma House Of Wolf, username worldsavior, anggota role CTF Player."
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4368.803228,
+        "usage": {
+          "prompt_tokens": 5759,
+          "completion_tokens": 94,
+          "total_tokens": 5853,
+          "prompt_cache_hit_tokens": 4608,
+          "prompt_cache_miss_tokens": 1151
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4871.9883310000005,
+        "usage": {
+          "prompt_tokens": 860,
+          "completion_tokens": 136,
+          "total_tokens": 996,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 860
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5085.521724,
+        "usage": {
+          "prompt_tokens": 1156,
+          "completion_tokens": 144,
+          "total_tokens": 1300,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1156
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 6411.039533000001,
+        "usage": {
+          "prompt_tokens": 1459,
+          "completion_tokens": 260,
+          "total_tokens": 1719,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1459
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4302.082393000001,
+        "usage": {
+          "prompt_tokens": 1478,
+          "completion_tokens": 109,
+          "total_tokens": 1587,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1478
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3750.418038,
+        "usage": {
+          "prompt_tokens": 10294,
+          "completion_tokens": 55,
+          "total_tokens": 10349,
+          "prompt_cache_hit_tokens": 8960,
+          "prompt_cache_miss_tokens": 1334
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 6,
+    "elapsedMs": 33462.039410000005,
+    "action": null,
+    "text": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:worldsavior",
+      "missing:Aryma House Of Wolf",
+      "missing:2021-01-01",
+      "missing:2026-08-01",
+      "missing:https://example.com/worldsavior",
+      "missing:https://example.com/aryma",
+      "no_discord_profile_read",
+      "unread_lead:https://example.com/worldsavior",
+      "unread_lead:https://example.com/aryma"
+    ],
+    "deterministicPass": false
+  }
+]

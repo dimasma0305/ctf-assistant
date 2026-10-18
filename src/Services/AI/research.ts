@@ -29,6 +29,13 @@ const normalize = (text: string) => text.replace(/\s+/g, ' ').trim();
 // Line labels are reader annotations, not source text. Keep omitted-section
 // markers intact so a quote cannot bridge a gap in the inspected excerpt.
 const normalizeEvidence = (text: string) => normalize(text.replace(/^\d+: ?/gm, ''));
+export function discordProfileSearchQueries(profile: DiscordProfile): string[] {
+  const term = (value: string) => value.replace(/["\\\r\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90);
+  const handle = term(profile.username);
+  const display = term(profile.guild.displayName || profile.globalName || '');
+  return [...new Set([handle ? `"${handle}"` : '', display && display.toLowerCase() !== handle.toLowerCase() ? `"${display}"` : ''])]
+    .filter(Boolean);
+}
 const failureNote = (error: unknown) => {
   const message = error instanceof Error ? error.message : '';
   return /^(?:source_|repository_|invalid_|research_|search_)[a-z0-9_]+$/i.test(message) ? message : 'source_unavailable';
@@ -140,22 +147,30 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
     // Open the exact supplied sources before allowing query/name substitution.
     observations.push(...await Promise.all(urls.slice(0, 2).map(url => perform({ type: githubRepository(url) ? 'repository' : 'read', url }))));
     if (!urls.length) {
-      // Search by the actual Discord handle, not the model's long question or
-      // account snowflake. Read results: provider snippets are discovery only.
-      const query = args.discordProfile?.username ? `"${args.discordProfile.username}"` : question.slice(0, 500);
-      const found = await perform({ type: 'search', query });
-      observations.push(found);
+      // Search two independently observed Discord names; never send the
+      // snowflake or model's long question to the public search provider.
+      const queries = args.discordProfile ? discordProfileSearchQueries(args.discordProfile) : [question.slice(0, 500)];
+      const searches = await Promise.all(queries.map(query => perform({ type: 'search', query })));
+      observations.push(...searches);
       if (args.discordProfile) {
-        const more = (!found.ok && found.error === 'no_results') || found.ok && Array.isArray(found.results) && found.results.length < 2
-          ? await perform({ type: 'search', query: `${args.discordProfile.username} CTF` }) : null;
-        if (more) observations.push(more);
-        const leads = [...(Array.isArray(found.results) ? found.results : []),
-          ...(Array.isArray(more?.results) ? more.results : [])].map((item: { url?: unknown }) =>
-          typeof item?.url === 'string' ? publicResearchUrl(item.url) : null)
-          .filter((url: string | null): url is string => !!url)
-          .filter((url: string, index: number, all: string[]) => all.findIndex(other => new URL(other).hostname === new URL(url).hostname) === index)
-          .slice(0, 3);
-        observations.push(...await Promise.all(leads.map((url: string) => perform({ type: githubRepository(url) ? 'repository' : 'read', url }))));
+        const raw = searches.flatMap(result => Array.isArray(result.results) ? result.results : []);
+        const handle = args.discordProfile.username.toLowerCase();
+        const firstName = (args.discordProfile.guild.displayName || args.discordProfile.globalName || '')
+          .toLowerCase().match(/[a-z][a-z0-9_-]{4,}/)?.[0] || '';
+        const ranked = raw.map((item: { url?: unknown; title?: unknown }) => {
+          const url = typeof item.url === 'string' ? publicResearchUrl(item.url) : null;
+          const label = `${url || ''} ${typeof item.title === 'string' ? item.title : ''}`.toLowerCase();
+          return { url, score: (handle && label.includes(handle) ? 3 : 0) + (firstName && label.includes(firstName) ? 2 : 0) };
+        }).filter((item: { url: string | null; score: number }): item is { url: string; score: number } => !!item.url)
+          .sort((a: { score: number }, b: { score: number }) => b.score - a.score);
+        const seenUrls = new Set<string>(), perHost = new Map<string, number>(), leads: string[] = [];
+        for (const { url } of ranked) {
+          const host = new URL(url).hostname;
+          if (seenUrls.has(url) || (perHost.get(host) || 0) >= 2) continue;
+          seenUrls.add(url); perHost.set(host, (perHost.get(host) || 0) + 1); leads.push(url);
+          if (leads.length >= 4) break;
+        }
+        observations.push(...await Promise.all(leads.map(url => perform({ type: githubRepository(url) ? 'repository' : 'read', url }))));
       }
     }
     // Follow an obvious documentation frontier before a planner can mistake an
@@ -163,7 +178,9 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
     // deployment → configuration. Foreign page instructions cannot disable it.
     for (let depth = 0; depth < 2 && report.stats.actions < MAX_ACTIONS && !signal.aborted; depth++) {
       const seen = new Set(sources.map(source => source.url));
-      const terms: string[] = Array.from(question.toLowerCase().match(/[a-z][a-z0-9_-]{2,}/g) || []);
+      const relevanceText = args.discordProfile
+        ? `${args.discordProfile.username} ${args.discordProfile.guild.displayName}` : question;
+      const terms: string[] = Array.from(relevanceText.toLowerCase().match(/[a-z][a-z0-9_-]{2,}/g) || []);
       const frontier = sources.filter(source => source.kind === 'page' || source.kind === 'repository-file' && /\.mdx?$/i.test(new URL(source.url).pathname)).flatMap(source => source.links
         .filter(link => !seen.has(link.url) && new URL(link.url).origin === new URL(source.url).origin)
         .map(link => ({ ...link, score: terms.reduce((n, term) => n + (`${link.title} ${new URL(link.url).pathname.split('/').slice(5).join('/')}`.toLowerCase().includes(term) ? 1 : 0), 0)
@@ -173,6 +190,10 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
       if (!frontier.length) break;
       observations.push(...await Promise.all(frontier.map(link => perform({ type:'read', url:link.url }))));
     }
+    // Discord facts and inspected candidate URLs are grounded deterministically
+    // below. Planner, draft and verifier output cannot add a verified account
+    // connection, and would spend tokens searching repeatedly for the same name.
+    if (!args.discordProfile) {
     for (let step = 0; step < 4 && report.stats.actions < MAX_ACTIONS && !signal.aborted
       && performance.now() - start < PLANNING_MS; step++) {
       let plan: any;
@@ -206,6 +227,7 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
       report.unresolved = Array.isArray(final.unresolved) ? final.unresolved.filter((item: unknown) => typeof item === 'string').slice(0, 6) : report.unresolved;
       if (Array.isArray(final.findings) && final.findings.length > report.findings.length) report.unresolved.push('Sebagian klaim tidak lolos pencocokan kutipan sumber.');
     }
+    }
   } catch (error) {
     report.unresolved.push(signal.aborted ? 'Batas waktu riset tercapai; hasil hanya sebagian.' : `Riset belum selesai (${failureNote(error)}).`);
   } finally {
@@ -233,7 +255,7 @@ export function researchForTurn(args: ResearchArgs, turn: object, options: { sig
 
 export const getResearchReport = (turn: object) => completed.get(turn);
 
-export function formatDiscordProfileReply(profile: DiscordProfile, candidateUrl?: string): string {
+export function formatDiscordProfileReply(profile: DiscordProfile, candidateUrls: string[] = []): string {
   const label = profile.globalName && profile.globalName !== profile.username
     ? `${profile.globalName} (@${profile.username})` : `@${profile.username}`;
   const accountDate = profile.accountCreatedAt.slice(0, 10);
@@ -242,8 +264,10 @@ export function formatDiscordProfileReply(profile: DiscordProfile, candidateUrl?
     ? `, nick server ${profile.guild.nickname}` : '';
   const roles = profile.guild.roles.length ? ` Role: ${profile.guild.roles.slice(0, 6).join(', ')}.` : '';
   const badges = profile.publicFlags.length ? ` Badge publik: ${profile.publicFlags.slice(0, 4).join(', ')}.` : '';
-  const web = candidateUrl ? `Aku juga baca halaman [${new URL(candidateUrl).hostname}](${candidateUrl}) dengan handle sama, tapi belum ada bukti itu milik akun Discord ini.`
-    : 'Profil web dengan nama mirip belum otomatis milik akun ini; aku belum punya tautan yang membuktikan keterkaitannya.';
+  const leads = candidateUrls.slice(0, 3).map(url => `[${new URL(url).hostname}${new URL(url).pathname}](${url})`);
+  const web = leads.length
+    ? `Aku cek jejak web ${leads.join(', ')}; nama/handle yang mirip belum membuktikan halaman itu milik akun Discord ini.`
+    : 'Aku belum menemukan halaman publik yang bisa kutautkan dengan yakin ke akun Discord ini.';
   return `Yang bisa kupastikan dari Discord: ${label}${nickname}, ${profile.bot ? 'akun bot' : 'akun pengguna'} (ID ${profile.id}). Akun dibuat sekitar ${accountDate} (dari ID Discord)${joined ? `; bergabung ke server ini ${joined}` : ''}.${roles}${badges} ${web}`;
 }
 
@@ -266,9 +290,16 @@ export function groundResearchReply(text: string, report?: ResearchReport, userQ
   if (!report) return text;
   if (report.discordProfile) {
     const handle = report.discordProfile.username.toLowerCase();
-    const candidate = report.sources.find(source => source.kind === 'page'
-      && source.preview.toLowerCase().includes(handle) && !!publicResearchUrl(source.url));
-    return formatDiscordProfileReply(report.discordProfile, candidate ? publicResearchUrl(candidate.url) || undefined : undefined);
+    const display = (report.discordProfile.guild.displayName || report.discordProfile.globalName || '').toLowerCase();
+    const distinctive = display.match(/[a-z][a-z0-9_-]{4,}/)?.[0] || '';
+    const candidates = report.sources.filter(source => source.kind === 'page'
+      && !!publicResearchUrl(source.url)
+      && (source.url.toLowerCase().includes(handle) || source.title.toLowerCase().includes(handle)
+        || source.preview.toLowerCase().includes(handle)
+        || !!distinctive && `${source.url} ${source.title} ${source.preview}`.toLowerCase().includes(distinctive)))
+      .map(source => publicResearchUrl(source.url)!)
+      .filter((url, index, all) => all.indexOf(url) === index).slice(0, 3);
+    return formatDiscordProfileReply(report.discordProfile, candidates);
   }
   if (!report.ok) {
     // Gap notes are internal audit data. Never paste them verbatim into Discord:

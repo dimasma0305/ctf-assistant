@@ -1,0 +1,20 @@
+[
+  {
+    "caseId": "discord-profile-osint-natural",
+    "trial": 0,
+    "pass": false,
+    "reason": "The answer says no sources could be checked, but the supplied Discord profile fixture provides verified account details, and two distinct same-name web pages were inspected as unverified leads. It should report the profile fields while clarifying that the web pages do not establish account ownership.",
+    "criticalFailures": [
+      "Misses all available Discord profile facts: username worldsavior, display name Aryma House Of Wolf, account creation date, server join date, and CTF Player role.",
+      "Incorrectly claims no sources were available to inspect, despite the profile fixture and two inspected pages."
+    ],
+    "grounding": 0,
+    "usage": {
+      "prompt_tokens": 667,
+      "completion_tokens": 129,
+      "total_tokens": 796,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 667
+    }
+  }
+]

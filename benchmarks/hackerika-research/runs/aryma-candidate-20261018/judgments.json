@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "discord-profile-osint-natural",
+    "trial": 0,
+    "pass": true,
+    "reason": "Accurately reports the Discord username, display name, ID, account date, server join date, and role. It cites both inspected web pages and correctly says their similar names do not verify ownership of the Discord account.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 901,
+      "completion_tokens": 228,
+      "total_tokens": 1129,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 901
+    }
+  }
+]

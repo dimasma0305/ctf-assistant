@@ -1,0 +1,51 @@
+{
+  "comparedAt": "2026-10-18T15:55:43.668Z",
+  "baseline": {
+    "samples": 1,
+    "passed": 1,
+    "deterministicPassed": 1,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "modelCalls": 7,
+    "usage": {
+      "prompt": 24069,
+      "completion": 968
+    },
+    "latencyMs": {
+      "p50": 41170.237130999994,
+      "p95": 41170.237130999994
+    },
+    "failures": []
+  },
+  "candidate": {
+    "samples": 1,
+    "passed": 1,
+    "deterministicPassed": 1,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "modelCalls": 2,
+    "usage": {
+      "prompt": 16225,
+      "completion": 165
+    },
+    "latencyMs": {
+      "p50": 25234.162585000002,
+      "p95": 25234.162585000002
+    },
+    "failures": []
+  },
+  "gates": {
+    "correctness": true,
+    "noRegression": true,
+    "critical": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "limits": [
+    "Small synthetic primary-source fixtures; not a general production accuracy estimate.",
+    "Live sources/provider behavior require separate smoke evidence.",
+    "No human-agent parity baseline was measured."
+  ]
+}

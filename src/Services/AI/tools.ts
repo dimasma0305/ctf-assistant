@@ -4,7 +4,7 @@ import { searchMessagesForTool, recallMemoryForTool } from "./search";
 import { grantFanRoleForTool } from "./fanRole";
 import { reflectOnInteraction, ignoreUserForTool, moveConversationToDM } from './socialTools';
 import { getEnvironmentForTool } from './environment';
-import { getDiscordProfileForTool, discordProfileSubject } from './discordProfile';
+import { getDiscordProfileForTool, discordPersonResearchSubject } from './discordProfile';
 import { DISCORD_TOOL_DEFINITIONS, DISCORD_TOOL_NAMES, dispatchDiscordAction } from './discordActions';
 import {
     setReminderForTool,
@@ -491,8 +491,7 @@ export async function dispatchTool(
         if (name === 'research_topic') {
             const suppliedUrls = [...(message.content || '').matchAll(/https?:\/\/[^\s<>]+/g)]
                 .map(match => match[0].replace(/[),.!?;]+$/, ''));
-            const profileInquiry = /\b(?:siapa\s+(?:itu|dia)|profil(?:e)?\s+discord|identitas\s+akun|osint\s+(?:tentang|soal)\s+siapa)\b/i.test(message.content || '');
-            const targetId = profileInquiry ? discordProfileSubject(message) : null;
+            const targetId = discordPersonResearchSubject(message);
             const profileResult = targetId ? await getDiscordProfileForTool(message, { userId: targetId }) : null;
             const discordProfile = profileResult?.ok ? profileResult.profile : undefined;
             const result = await researchForTurn({ question: args?.question,

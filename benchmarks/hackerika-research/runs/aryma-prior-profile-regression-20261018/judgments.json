@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "discord-profile-osint",
+    "trial": 0,
+    "pass": true,
+    "reason": "Accurately reports the Discord profile, account creation date, server join date, and role. It treats the same-name HackerDNA page as an unverified lead and links to the page that was actually read.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 808,
+      "completion_tokens": 249,
+      "total_tokens": 1057,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 808
+    }
+  }
+]

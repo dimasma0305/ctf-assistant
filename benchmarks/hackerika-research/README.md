@@ -1,5 +1,11 @@
 # Hackerika research upgrade — 2026-10-16
 
+## Natural member OSINT request — 2026-10-18
+
+The production example “siapa @Aryma House Of Wolf aku mau kamu deep search dia” exposed a routing gap: `siapa @member` skipped the verified Discord profile and sent a long generic question to web search. The bot now recognizes that syntax for exactly one tagged person, reads the current guild/user profile, searches the observed username and display name separately, and opens up to four relevant web leads plus bounded same-site links. Its reply separates verified Discord fields from inspected but unlinked web pages. Routine CTF questions with a member mention stay on the normal route.
+
+The matched synthetic [before/after run](aryma-final-comparison-20261018.json) improved from **0/1 to 1/1** judged pass. Baseline made six model calls and read neither the Discord profile nor the two available pages; the final version made two model calls, read all three sources, and used fewer measured prompt/completion tokens (21,006/798 → 16,225/165). An [intermediate comparison](aryma-efficiency-comparison-20261018.json) confirms the same 1/1 result with seven → two calls after removing redundant profile drafting and verification. The [prior profile regression](runs/aryma-prior-profile-regression-20261018/judge-summary.json) also passed 1/1. These are small, controlled fixtures; real web availability and account attribution still depend on inspectable links and source quality.
+
 ## Discord profile OSINT regression — 2026-10-18
 
 An explicit member mention in a profile/identity question now triggers a read-only Discord user and current-guild member lookup. The bot can ground a reply in username, display name, account creation timestamp inferred from the Discord ID, server join date, roles, public flags, and available avatar/banner URLs. A same-handle web page is reported only as an unverified lead unless there is independent evidence tying it to the Discord account. The worker searches by handle instead of sending the Discord ID and full private question to web search, and opens source pages before using them.
