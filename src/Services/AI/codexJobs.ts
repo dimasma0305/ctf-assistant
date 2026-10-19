@@ -44,15 +44,20 @@ export const pendingCodexDiscordReads=()=>codexRequest<{ok:true;requests:CodexDi
 export const respondCodexDiscordRead=(id:string,jobId:string,result:unknown)=>codexRequest<{ok:true}>('/jobs/context/respond',{id,jobId,result});
 
 export function formatCodexResult(job:CodexPublicJob):string{
-  const short=job.id.slice(0,8),model=job.model==='gpt-daybreak-blue-latest'?'Daybreak Blue':job.model==='gpt-6-luna'?'Luna':job.model==='gpt-6.1-sol'?'Sol':job.model||'Codex';
   const label=job.kind==='investigation'?'riset':'CTF';
-  if(job.state==='failed')return `job ${label} \`${short}\` gagal di sandbox (${job.error||'worker_failed'}). kirim ulang kalau mau dicoba lagi.`;
-  if(job.state==='cancelled')return `job ${label} \`${short}\` dibatalin.`;
-  const result=job.result;if(!result)return `job ${label} \`${short}\` selesai tanpa hasil yang bisa dipakai.`;
-  const parts=[`${job.kind==='investigation'?'🔎':'🧩'} **hasil ${model}** · job \`${short}\``,result.summary.trim()];
+  if(job.state==='failed')return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum berhasil. Coba lagi sebentar ya.`;
+  if(job.state==='cancelled')return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi dibatalkan.`;
+  const result=job.result;if(!result)return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum menghasilkan jawaban yang bisa kupastikan.`;
+  // The worker's findings and unresolved fields are internal evidence notes.
+  // Only its explicitly user-facing answer belongs in the channel.
+  const parts=[result.summary.trim()];
   if(result.flags.length)parts.push(`kandidat flag (belum dicek remote):\n${result.flags.map(flag=>`\`${flag.replace(/`/g,'')}\``).join('\n')}`);
-  if(result.findings.length)parts.push(result.findings.slice(0,5).map(item=>`• ${item}`).join('\n'));
-  if(job.sources?.length)parts.push(`sumber: ${job.sources.slice(0,2).map(source=>source.url).join(' · ')}`);
-  if(result.unresolved.length)parts.push(`yang masih kebuka: ${result.unresolved.slice(0,3).join('; ')}`);
+  const sources=(job.sources||[]).map(source=>source.url).filter(url=>!result.summary.includes(url)).slice(0,2);
+  if(sources.length)parts.push(`Sumber: ${sources.join(' · ')}`);
   return parts.join('\n\n').slice(0,1950);
+}
+
+export function isDeliveredCodexReply(message:{author?:{id?:string};reference?:{messageId?:string|null}|null;content?:string},
+  botId:string|undefined,originalMessageId:string,content:string):boolean {
+  return !!botId&&message.author?.id===botId&&message.reference?.messageId===originalMessageId&&message.content===content;
 }

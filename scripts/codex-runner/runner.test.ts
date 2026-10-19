@@ -7,7 +7,7 @@ import { workerArgs } from './executor';
 import { startGateway } from './gateway';
 import { DiscordContextBroker } from './discordBroker';
 import { ensureWorkerImage } from './workerImage';
-import { codexRequest, formatCodexResult } from '../../src/Services/AI/codexJobs';
+import { codexRequest, formatCodexResult, isDeliveredCodexReply } from '../../src/Services/AI/codexJobs';
 
 const packet=()=>({scope:'555555555555555555:700000000000000001',guildId:'555555555555555555',channelId:'700000000000000001',
   messageId:'800000000000000001',userId:'663394727688798231',question:'solve pwn exploit ini',context:'thread evidence',route:'auto' as const,artifacts:[]});
@@ -59,7 +59,21 @@ test('investigation jobs keep their kind and render sourced findings without CTF
   const exposed=publicJob(job);
   expect(exposed.kind).toBe('investigation');
   const rendered=formatCodexResult(exposed);
-  expect(rendered).toContain('🔎');expect(rendered).toContain('https://example.org/docs');expect(rendered).not.toContain('kandidat flag');
+  expect(rendered).toContain('Perbedaannya ada pada webhook.');expect(rendered).toContain('https://example.org/docs');expect(rendered).not.toContain('kandidat flag');
+});
+
+test('delivery posts only the final answer and deduplicates by exact reply',()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));
+  job.state='completed';job.model='gpt-6-luna';job.result=resultFromText(JSON.stringify({summary:'Keii menulis tentang forensik. https://example.org/about',
+    flags:[],findings:['INTERNAL: searched unrelated game chat'],unresolved:['INTERNAL: ask what topic'],needsStrongerModel:false}));
+  job.sources=[{url:'https://example.org/about',title:'About'}];
+  const rendered=formatCodexResult(publicJob(job));
+  expect(rendered).toBe('Keii menulis tentang forensik. https://example.org/about');
+  expect(rendered).not.toContain('INTERNAL');expect(rendered).not.toContain('job');expect(rendered).not.toContain('Luna');
+  const reply={author:{id:'bot'},reference:{messageId:job.packet.messageId},content:rendered};
+  expect(isDeliveredCodexReply(reply,'bot',job.packet.messageId,rendered)).toBe(true);
+  expect(isDeliveredCodexReply({...reply,reference:{messageId:'other'}},'bot',job.packet.messageId,rendered)).toBe(false);
+  expect(isDeliveredCodexReply({...reply,content:'queued'},'bot',job.packet.messageId,rendered)).toBe(false);
 });
 
 test('omitted flag is recovered only from explanatory prose and a successful proof command',()=>{

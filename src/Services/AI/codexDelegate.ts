@@ -2,7 +2,7 @@ import type { Message, OmitPartialGroupDMChannel } from 'discord.js';
 import { collectCTFInputs, collectCodexArtifacts } from './ctfInputs';
 import { solveCTFForTurn } from './ctf';
 import { codexSolverEnabled, submitCodexJob, type CodexRoute, type CodexPublicJob } from './codexJobs';
-import { getDiscordProfileForTool } from './discordProfile';
+import { discordPersonResearchSubject, getDiscordProfileForTool } from './discordProfile';
 
 type Turn = OmitPartialGroupDMChannel<Message<boolean>>;
 const delegated = new WeakSet<object>();
@@ -30,17 +30,26 @@ export async function delegateCodexForTurn(args: {
     const signal = AbortSignal.any([AbortSignal.timeout(70_000), ...(options.signal ? [options.signal] : [])]);
     const gathered = await collectCTFInputs(message, { text: message.content || '' }, signal);
     let context = gathered.text;
-    if (args.targetUserId !== undefined) {
-        const profile = await getDiscordProfileForTool(message, { userId: args.targetUserId });
+    // Ground an explicit one-person research request even when the manager
+    // omits targetUserId. This identifies the subject; it does not choose a
+    // research route or infer a public account from a matching username.
+    const explicitProfileSubject = discordPersonResearchSubject(message);
+    const targetUserId = explicitProfileSubject || args.targetUserId;
+    let question = args.question.trim();
+    if (targetUserId !== undefined) {
+        const profile = await getDiscordProfileForTool(message, { userId: targetUserId });
         if (!profile.ok) return profile;
         context += `\n[verified Discord API profile for explicitly mentioned member] ${JSON.stringify(profile)}`;
+        if (explicitProfileSubject) {
+            question = `Permintaan user: ${JSON.stringify(message.content)}. Objek riset adalah satu member Discord yang ditag eksplisit; profil terverifikasi ada di context. Telusuri jejak publik/profesional yang relevan, periksa sumber, dan bedakan akun yang hanya bernama mirip. Jangan minta klarifikasi tentang objek yang sudah jelas. Tujuan tambahan: ${question}`;
+        }
     }
     const artifacts = await collectCodexArtifacts(gathered.originals, signal, message.id);
     const route: CodexRoute = ['auto', 'luna', 'sol', 'daybreak'].includes(args.solver || '') ? args.solver! : 'auto';
     try {
         const queued = await submitCodexJob({ kind: 'investigation', scope: `${message.guildId}:${message.channelId}`,
             guildId: message.guildId, channelId: message.channelId, messageId: message.id, userId: message.author.id,
-            question: args.question.trim().slice(0, 8000), context: context.slice(0, 50_000), route, artifacts }, signal);
+            question: question.slice(0, 8000), context: context.slice(0, 50_000), route, artifacts }, signal);
         delegated.add(message);
         return { ok: true, status: 'queued', job: queued.job,
             note: 'Hasil riset akan dikirim otomatis di channel/thread ini. Jangan klaim pekerjaan selesai sebelum hasil tiba.' };

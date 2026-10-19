@@ -2,7 +2,7 @@ import { PermissionFlagsBits as P } from 'discord.js';
 import { Event } from '../../Handlers/eventHandler';
 import { MyClient } from '../../Model/client';
 import { canShareChannel } from '../../Services/AI/discordAccess';
-import { completedCodexJobs, codexSolverEnabled, formatCodexResult, markCodexJobDelivered, pendingCodexDiscordReads, respondCodexDiscordRead } from '../../Services/AI/codexJobs';
+import { completedCodexJobs, codexSolverEnabled, formatCodexResult, isDeliveredCodexReply, markCodexJobDelivered, pendingCodexDiscordReads, respondCodexDiscordRead } from '../../Services/AI/codexJobs';
 import { readCodexDiscordContext } from '../../Services/AI/codexDiscordContext';
 import { sanitizeMentions } from '../../Services/Moderation';
 
@@ -34,14 +34,13 @@ export async function deliverCodexJobs(client:MyClient):Promise<void>{
         const sendPermission=channel.isThread?.()?P.SendMessagesInThreads:P.SendMessages;
         if(!original||original.author?.id!==job.userId||!canShareChannel(original,channel)
           ||!channel.permissionsFor?.(original.guild?.members?.me)?.has(sendPermission)){await markCodexJobDelivered(job.id);continue;}
-        // A send can succeed while the controller's delivered ACK fails. The
-        // stable job marker lets the next poll acknowledge without reposting.
+        // A send can succeed while the controller's delivered ACK fails.
+        // Match the exact reply instead of exposing a job marker in chat.
+        const content=sanitizeMentions(formatCodexResult(job),original.guild);
         const recent=await channel.messages.fetch({limit:50}).catch(()=>null);
-        const marker=`job \`${job.id.slice(0,8)}\``;
-        if(recent?.some((message:any)=>message.author?.id===client.user?.id&&message.content?.includes(marker))){
+        if(recent?.some((message:any)=>isDeliveredCodexReply(message,client.user?.id,original.id,content))){
           await markCodexJobDelivered(job.id);failures.delete(job.id);continue;
         }
-        const content=sanitizeMentions(formatCodexResult(job),original.guild);
         await original.reply({content,allowedMentions:{parse:[],repliedUser:false}});
         await markCodexJobDelivered(job.id);failures.delete(job.id);
       }catch(error){
