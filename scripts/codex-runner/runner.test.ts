@@ -36,9 +36,9 @@ test('Docker worker arguments expose only disposable tmpfs and one inference soc
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
   const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-1',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-2',dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-1',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-2',dependencies);
   expect(builds).toBe(1);
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');

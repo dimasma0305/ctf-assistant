@@ -9,7 +9,7 @@ import { ensureWorkerImage } from './workerImage';
 const socket = process.env.CODEX_CONTROL_SOCKET || '/run/hackerika-codex/control.sock';
 const stateRoot = process.env.CODEX_JOB_STATE_ROOT || '/var/lib/hackerika-codex/jobs';
 const runtimeRoot = process.env.CODEX_JOB_RUNTIME_ROOT || '/run/hackerika-codex-jobs';
-const image = process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-1';
+const image = process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-2';
 const maxQueued = Math.max(1, Math.min(16, Number(process.env.CODEX_MAX_QUEUED) || 8));
 const ttlMs = 24 * 60 * 60_000;
 const daybreakUsers = new Set((process.env.CODEX_DAYBREAK_USER_IDS || '').split(',').map(s=>s.trim()).filter(Boolean));

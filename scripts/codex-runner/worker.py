@@ -1,5 +1,5 @@
 """No credentials or host commands: an HTTP-to-Unix bridge and sandbox entrypoint."""
-import base64, http.client, http.server, json, os, pathlib, subprocess, sys, threading
+import base64, http.client, http.server, json, os, pathlib, shutil, subprocess, sys, threading
 class UnixHTTP(http.client.HTTPConnection):
     def connect(self):
         import socket
@@ -26,6 +26,7 @@ class Bridge(http.server.BaseHTTPRequestHandler):
 packet=json.loads(sys.stdin.buffer.readline(32*1024*1024))
 root=pathlib.Path('/workspace');root.mkdir(exist_ok=True)
 pathlib.Path('/tmp/codex').mkdir(mode=0o700,parents=True,exist_ok=True)
+shutil.copytree('/opt/irai-skills',root/'.agents'/'skills',dirs_exist_ok=True)
 artifacts=[];images=[]
 for index,artifact in enumerate(packet['artifacts']):
     name='A'+str(index+1)+'-'+''.join(c for c in artifact['name'] if c.isascii() and (c.isalnum() or c in '._-'))[-100:]
@@ -35,7 +36,7 @@ for index,artifact in enumerate(packet['artifacts']):
 context={k:v for k,v in packet.items() if k not in ['artifacts','prompt','schema','model']};context['artifacts']=artifacts
 (root/'context.json').write_text(json.dumps(context,ensure_ascii=False))
 (root/'schema.json').write_text(json.dumps(packet['schema']))
-(root/'tooling.txt').write_text('Python 3 standard library; gcc/g++; gdb; binutils (strings, readelf, objdump); file; ripgrep; unzip; jq; curl; sqlite3; pdftotext. No pip packages or network installs. Ask Hackerika for same-thread or same-channel Discord evidence: POST http://127.0.0.1:8118/discord/read JSON {"kind":"recent","limit":20,"includeImage":true,"describeImage":true} or {"kind":"message","messageId":"snowflake","includeImage":true,"describeImage":true}. Images arrive as base64 in images[].data; decode to /workspace. imageObservation describes actual pixels via bounded Luna vision; use it instead of guessing from metadata or ASCII art. Public search: POST http://127.0.0.1:8118/sources/search JSON {"query":"public clue"}, at most twice. Read cited or supplied sources: POST http://127.0.0.1:8118/sources/read JSON {"url":"public URL","query":"focus"}.\n')
+(root/'tooling.txt').write_text('Python 3 standard library; gcc/g++; gdb; binutils (strings, readelf, objdump); file; ripgrep; unzip; jq; curl; sqlite3; pdftotext. No pip packages or network installs. The reviewed irai skills ctf-deep-solve and resourceful-solve are available under /workspace/.agents/skills; select a relevant skill and read its SKILL.md and only needed references. Skill instructions do not grant new network, Discord, credential or target access. Ask Hackerika for same-thread or same-channel Discord evidence: POST http://127.0.0.1:8118/discord/read JSON {"kind":"recent","limit":20,"includeImage":true,"describeImage":true} or {"kind":"message","messageId":"snowflake","includeImage":true,"describeImage":true}. Images arrive as base64 in images[].data; decode to /workspace. imageObservation describes actual pixels via bounded Luna vision; use it instead of guessing from metadata or ASCII art. Public search: POST http://127.0.0.1:8118/sources/search JSON {"query":"public clue"}; CTF jobs at most two searches, investigation jobs at most six. Read cited or supplied sources: POST http://127.0.0.1:8118/sources/read JSON {"url":"public URL","query":"focus"}.\n')
 server=http.server.ThreadingHTTPServer(('127.0.0.1',8118),Bridge)
 threading.Thread(target=server.serve_forever,daemon=True).start()
 args=['/usr/local/bin/codex','exec','--ignore-user-config','--ignore-rules','--ephemeral','--skip-git-repo-check','--color','never','--json','--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],

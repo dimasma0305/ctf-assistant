@@ -1,4 +1,4 @@
-import { chmod, copyFile, mkdtemp, realpath, rm } from 'node:fs/promises';
+import { chmod, copyFile, cp, mkdtemp, realpath, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -8,12 +8,13 @@ const source=await realpath(binDir),codex=join(source,'codex'),host=join(source,
 const versionProcess=Bun.spawn([codex,'--version'],{stdout:'pipe',stderr:'pipe'});
 const version=(await new Response(versionProcess.stdout).text()).trim();
 if(await versionProcess.exited!==0||!/^codex-cli 0\.163\.0\b/.test(version))throw Error(`unsupported_codex_version:${version}`);
-const tag=process.argv[3]||'hackerika-codex-worker:0.163.0-1';
+const tag=process.argv[3]||'hackerika-codex-worker:0.163.0-2';
 const directory=await mkdtemp(join(tmpdir(),'hackerika-codex-build-'));
 try{
   await Promise.all([
     copyFile(join(import.meta.dir,'Dockerfile'),join(directory,'Dockerfile')),
     copyFile(join(import.meta.dir,'worker.py'),join(directory,'worker.py')),
+    cp(join(import.meta.dir,'skills','irai'),join(directory,'skills'),{recursive:true}),
     copyFile(codex,join(directory,'codex')),
     copyFile(host,join(directory,'codex-code-mode-host')),
   ]);

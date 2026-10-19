@@ -1,0 +1,4 @@
+interface:
+  display_name: "Resourceful Solve"
+  short_description: "Diagnose and fix problems with Assuming, Searching, Proofing"
+  default_prompt: "Use $resourceful-solve on this problem: locate likely causes, search my Notion and the web, inspect or download relevant third-party tools, and prove the solution with before/after checks."

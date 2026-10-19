@@ -16,7 +16,7 @@ try{
   if(await compile.exited!==0)throw Error('fixture_compile_failed:'+await new Response(compile.stderr).text());
   const image=await readFile('benchmarks/hackerika-ctf/vision-clue.png');
   const allCases=[
-    {id:'luna-hex-execution',model:'gpt-6-luna',route:'luna' as const,expected:'LabCTF{isolated_python_731}',question:'Decode the authorized toy CTF hex with Python and verify by re-encoding.',context:'Original hex: '+Buffer.from('LabCTF{isolated_python_731}').toString('hex'),artifacts:[]},
+    {id:'luna-hex-execution',model:'gpt-6-luna',route:'luna' as const,expected:'LabCTF{isolated_python_731}',requireSkill:'ctf-deep-solve/SKILL.md',question:'Use the installed ctf-deep-solve skill. Decode the authorized toy CTF hex with Python and verify by re-encoding.',context:'Original hex: '+Buffer.from('LabCTF{isolated_python_731}').toString('hex'),artifacts:[]},
     {id:'luna-image-compute',model:'gpt-6-luna',route:'luna' as const,expected:'LabCTF{pixel_compute_42}',question:'Read the exact ciphertext from the supplied authorized CTF image, compute its decode with Python, verify it, and report the flag.',context:'The image is the original challenge clue.',artifacts:[{name:'vision-clue.png',data:image.toString('base64'),image:true}]},
     {id:'luna-public-source',model:'gpt-6-luna',route:'luna' as const,expected:'LabCTF{rot-13}',requireSource:'docs.python.org',question:'Use the local public search gateway to find official Python documentation for the ROT13 codec and read the cited source. Then use Python codecs.lookup to obtain the canonical runtime codec name and print the complete toy flag LabCTF{<canonical runtime codec name>} in a successful command. Preserve any hyphen in the canonical name; do not rely on memory alone.',context:'Authorized public documentation puzzle. No private material.',artifacts:[]},
     {id:'luna-discord-followup',model:'gpt-6-luna',route:'luna' as const,expected:'LabCTF{fresh_thread_clue_29}',requireDiscord:true,
@@ -28,7 +28,7 @@ try{
     {id:'daybreak-ret2win',model:'gpt-daybreak-blue-latest',route:'daybreak' as const,expected:'BlueCTF{ret2win_local_0x41}',question:'Solve this authorized local pwn ELF. Derive and execute a ret2win payload, then report the printed flag.',context:'Deliberately vulnerable local CTF binary. No remote target or checker.',artifacts:[{name:'ret2win',data:(await readFile(binary)).toString('base64'),image:false}]},
   ];
   const cases=filter?allCases.filter(test=>test.id===filter):allCases;if(!cases.length)throw Error('unknown_benchmark_case');
-  const protocol={startedAt:new Date().toISOString(),workerImage:process.env.CODEX_WORKER_IMAGE||'hackerika-codex-worker:0.163.0-1',codexVersion:'0.163.0',
+  const protocol={startedAt:new Date().toISOString(),workerImage:process.env.CODEX_WORKER_IMAGE||'hackerika-codex-worker:0.163.0-2',codexVersion:'0.163.0',
     promptHash:hash(SOLVER_PROMPT),caseIds:cases.map(test=>test.id),fixtureHashes:{image:hash(image),ret2win:hash(await readFile(binary))},
     limits:{sequential:true,maxSecondsPerCase:180,maxModelCalls:10,maxInputChars:1_200_000},
     acceptance:'Exact expected flag must appear in final structured output and in stdout of a successful local command receipt. The public-source case additionally requires a primary source read through the gateway.',
@@ -53,8 +53,9 @@ try{
       if(!solved)throw Error('solver_result_missing');
       const matching=job.receipts.some(receipt=>receipt.exitCode===0&&receipt.output.includes(test.expected));
       const sourceRead=!('requireSource' in test)||job.sources.some(source=>{try{return new URL(source.url).hostname===test.requireSource;}catch{return false;}});
-      row={id:test.id,model:test.model,pass:solved.result.flags.includes(test.expected)&&matching&&sourceRead&&(!('requireDiscord' in test)||discordReads>0),expected:test.expected,result:solved.result,
-        stats:job.stats,elapsedMs:performance.now()-started,receiptCount:job.receipts.length,matchingReceipt:matching,sourceRead,discordReads};}
+      const skillRead=!('requireSkill' in test)||job.receipts.some(receipt=>receipt.exitCode===0&&receipt.command.includes(test.requireSkill));
+      row={id:test.id,model:test.model,pass:solved.result.flags.includes(test.expected)&&matching&&sourceRead&&skillRead&&(!('requireDiscord' in test)||discordReads>0),expected:test.expected,result:solved.result,
+        stats:job.stats,elapsedMs:performance.now()-started,receiptCount:job.receipts.length,matchingReceipt:matching,sourceRead,skillRead,discordReads};}
     catch(error:any){row={id:test.id,model:test.model,pass:false,expected:test.expected,error:String(error?.message||error),diagnostics:diagnostics.slice(-2000),receipts:job.receipts,stats:job.stats,elapsedMs:performance.now()-started,receiptCount:job.receipts.length};}
     results.push(row);await writeFile(join(out,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({id:row.id,pass:row.pass,model:row.model,elapsedMs:Math.round(row.elapsedMs)}));
   }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CTF Deep Solve"
+  short_description: "Solve hard authorized CTFs with evidence and persistence"
+  default_prompt: "Use $ctf-deep-solve and its composite security-researcher operating style to solve this authorized CTF through Assuming, Searching, and Proofing, then verify the flag from a clean run."
