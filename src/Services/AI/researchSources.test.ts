@@ -18,6 +18,14 @@ test('HTML reader keeps useful main-content links and ignores navigation noise',
   expect(result.links).toEqual([{ url: 'https://example.com/config/mail', title: 'Mail guide' }]);
 });
 
+test('HTML reader follows portfolio routes kept only in the header without treating nav text as evidence', async () => {
+  restores.push(spyOn(researchTransport, 'fetch').mockResolvedValue(new Response('<header><nav><a href="/about">About</a><a href="/ctf">CTF</a></nav></header><main><h1>Profile</h1><p>Public security notes.</p></main>', { headers: { 'content-type': 'text/html' } })));
+  const result = await new ResearchSourceReader(AbortSignal.timeout(1000)).read('https://example.com/profile', 'security');
+  expect(result.links).toEqual([{ url: 'https://example.com/about', title: 'About' }, { url: 'https://example.com/ctf', title: 'CTF' }]);
+  expect(result.content).toContain('Public security notes');
+  expect(result.content).not.toContain('About CTF');
+});
+
 test('repository reads pin files to the resolved commit and preserve metadata without assuming ancestry', async () => {
   const sha = 'c3'.repeat(20), requests: string[] = [];
   restores.push(spyOn(researchTransport, 'fetch').mockImplementation((async (url: any) => {

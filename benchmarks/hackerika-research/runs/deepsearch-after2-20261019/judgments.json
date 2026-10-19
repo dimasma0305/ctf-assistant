@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "deepsearch-member-multihop",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer accurately reports the Discord profile details and the inspected pages’ DFIR, CTF, and log-analysis claims, while correctly warning that a matching handle does not establish account ownership. It omits a citation to the inspected mossbyte homepage and attributes the creation date to the Discord ID rather than the profile data; these are minor grounding shortcomings.",
+    "criticalFailures": [],
+    "grounding": 4,
+    "usage": {
+      "prompt_tokens": 1366,
+      "completion_tokens": 448,
+      "total_tokens": 1814,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1366
+    }
+  }
+]

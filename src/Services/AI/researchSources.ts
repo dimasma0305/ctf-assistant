@@ -80,6 +80,9 @@ function parsePage(raw: string, url: string, html: boolean): { title: string; te
   }
   const $ = cheerio.load(raw);
   const title = $('title').first().text().trim() || $('h1').first().text().trim() || new URL(url).hostname;
+  // Portfolio and documentation sites often put their only About/Projects
+  // routes in the header. Keep a small link frontier before dropping nav text.
+  $('nav a[href], header a[href]').slice(0, 12).each((_i, element) => addLink($(element).attr('href'), $(element).text().trim()));
   $('script,style,noscript,svg,nav,header,footer,form,button').remove();
   const main = $('main').first().length ? $('main').first() : $('article').first().length ? $('article').first() : $('body');
   main.find('a[href]').each((_i, element) => addLink($(element).attr('href'), $(element).text().trim()));
