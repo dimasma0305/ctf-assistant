@@ -1,0 +1,146 @@
+{
+  "at": "2026-10-19T09:36:12.298Z",
+  "baselineImage": "ctf-assistant:1646ef2",
+  "candidateImage": "ctf-assistant:topic-route-candidate",
+  "cases": [
+    {
+      "id": "live_wordpress_request",
+      "prompt": "<@1077393568647352320> solve challenge ku yang tentang wordpress, yang mana aja",
+      "shouldForceSolver": true
+    },
+    {
+      "id": "indonesian_verb",
+      "prompt": "tolong pecahkan challenge WordPress punyaku",
+      "shouldForceSolver": true
+    },
+    {
+      "id": "reverse_order",
+      "prompt": "challenge WordPress ini, tolong solve",
+      "shouldForceSolver": true
+    },
+    {
+      "id": "different_topic",
+      "prompt": "solve challenge web yang dibuat timku",
+      "shouldForceSolver": true
+    },
+    {
+      "id": "wordpress_support",
+      "prompt": "tolong cek plugin WordPress ku",
+      "shouldForceSolver": false
+    },
+    {
+      "id": "ctf_recommendation",
+      "prompt": "saran platform CTF yang bisa deploy",
+      "shouldForceSolver": false
+    },
+    {
+      "id": "challenge_banter",
+      "prompt": "challenge menulis harian ini seru",
+      "shouldForceSolver": false
+    },
+    {
+      "id": "math_homework",
+      "prompt": "bantu solve soal matematika ini",
+      "shouldForceSolver": false
+    }
+  ],
+  "baseline": [
+    {
+      "id": "live_wordpress_request",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "indonesian_verb",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "reverse_order",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "different_topic",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "wordpress_support",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "ctf_recommendation",
+      "required": false,
+      "available": true
+    },
+    {
+      "id": "challenge_banter",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "math_homework",
+      "required": false,
+      "available": false
+    }
+  ],
+  "candidate": [
+    {
+      "id": "live_wordpress_request",
+      "required": true,
+      "available": true
+    },
+    {
+      "id": "indonesian_verb",
+      "required": true,
+      "available": true
+    },
+    {
+      "id": "reverse_order",
+      "required": true,
+      "available": true
+    },
+    {
+      "id": "different_topic",
+      "required": true,
+      "available": true
+    },
+    {
+      "id": "wordpress_support",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "ctf_recommendation",
+      "required": false,
+      "available": true
+    },
+    {
+      "id": "challenge_banter",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "math_homework",
+      "required": false,
+      "available": false
+    }
+  ],
+  "correct": {
+    "baseline": 4,
+    "candidate": 8,
+    "total": 8
+  },
+  "chatToolChoice": {
+    "baseline": "auto",
+    "candidate": {
+      "type": "function",
+      "function": {
+        "name": "solve_ctf"
+      }
+    }
+  },
+  "method": "Production TypeScript in isolated images, real chat handler with stubbed completion. No network, Discord send, Codex job or checker call."
+}

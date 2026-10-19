@@ -21,6 +21,25 @@ test('request to solve another TCP1P challenge forces the CTF solver', () => {
     expect(ctfToolAvailable(unrelated)).toBe(false);
   }
 });
+test('explicit challenge solve by topic forces the CTF solver without a contest keyword', () => {
+  for (const message of [
+    '<@1077393568647352320> solve challenge ku yang tentang wordpress, yang mana aja',
+    'tolong pecahkan challenge WordPress punyaku',
+    'challenge WordPress ini, tolong solve',
+  ]) {
+    expect(requiresCTFSolve(message)).toBe(true);
+    expect(ctfToolAvailable(message)).toBe(true);
+  }
+  for (const unrelated of [
+    'tolong cek plugin WordPress ku',
+    'challenge menulis harian ini seru',
+    'bantu solve soal matematika ini',
+  ]) {
+    expect(requiresCTFSolve(unrelated)).toBe(false);
+    expect(ctfToolAvailable(unrelated)).toBe(false);
+  }
+  expect(requiresCTFSolve('saran platform CTF yang bisa deploy')).toBe(false);
+});
 test('coba lagi resumes a recent failed CTF request from another member, not unrelated research', async () => {
   const now = Date.parse('2026-10-19T08:59:00Z');
   const bot = '1077393568647352320', teammate = '734732163332964456';

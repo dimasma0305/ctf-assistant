@@ -1,5 +1,9 @@
 # Hackerika CTF capability benchmark
 
+## WordPress challenge routing — 2026-10-19
+
+The live request `@Hackerika solve challenge ku yang tentang wordpress, yang mana aja` called `research_topic` and returned a generic search failure. The router now treats an explicit request to solve a challenge as a CTF solve request even without a contest keyword. The [matched image comparison](topic-challenge-route-comparison-20261019.json) improved from **4/8 to 8/8** cases across the incident, three paraphrases and four unrelated controls. In the real chat handler under a stubbed completion, the first tool choice changed from `auto` to forced `solve_ctf`. This checks dispatch only; it does not claim Codex solved a WordPress challenge or verified a flag.
+
 ## TCP1P “solve another challenge” routing — 2026-10-19
 
 The live request `@Hackerika solve 1 soal lagi yg ada di tcp1p` called `research_topic` and ended with a generic search failure. Its wording had the solve verb but no keyword recognized as a CTF task, so `solve_ctf` was omitted from that turn's tool list. The router now treats a challenge/soal/tantangan tied to TCP1P as a CTF request. The [matched image comparison](tcp1p-route-comparison-20261019.json) moved from **4/6 to 6/6** routing cases: the incident and an equivalent challenge request now require and expose `solve_ctf`; reminder, platform-research and banter controls remain outside that route. This checks routing only, not whether an unspecified challenge can ultimately be solved or its flag accepted.
