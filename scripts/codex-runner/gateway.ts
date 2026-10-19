@@ -11,7 +11,9 @@ export async function startGateway(socket: string, job: Job, model: string, sign
   discordRead?: (query: DiscordReadQuery) => Promise<unknown>;
 }={}) {
   const auth=new ChatGPTAuth(), credentials=dependencies.credentials||(()=>auth.credentials(signal));
-  const fetcher=dependencies.fetcher||fetch;let active=false;const sources:any[]=[];
+  const fetcher=dependencies.fetcher||fetch;let active=false;let failureReason='';const sources:any[]=[];
+  const maxCalls=dependencies.maxCalls??(job.packet.kind==='investigation'?18:14);
+  const maxInputChars=dependencies.maxInputChars??(job.packet.kind==='investigation'?3_000_000:2_000_000);
   const visionCache=new Map<string,string>();
   job.stats.searches ||= 0;job.stats.sourceReads ||= 0;job.stats.visionReads ||= 0;
   const allowedSources=new Set<string>();
@@ -65,7 +67,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           const x=await request.json() as any;const query=String(x?.query||'').trim();
           if(!query||query.length>350||/[\w-]+\{[^}]*\}|%7[bBdD]|\b(?:sk-[\w-]+|Bearer\s+\S+)|<@!?\d+>|(?:password|api.?key|token)\s*[:=]/i.test(query))
             return Response.json({error:'invalid_or_private_query'},{status:400});
-          const result=await webSearchForTool({query,maxResults:5},{signal});
+          const result=await webSearchForTool({query,maxResults:job.packet.kind==='investigation'?8:5},{signal});
           if(result.ok)for(const row of result.results||[]){const url=publicResearchUrl(row.url);if(url&&allowedSources.size<60)allowedSources.add(url);}
           return Response.json(result);
         }
@@ -74,14 +76,17 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           const x=await request.json() as any;const url=publicResearchUrl(x?.url);
           if(!url||!allowedSources.has(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))return Response.json({error:'invalid_or_private_source'},{status:400});
           const doc=await new ResearchSourceReader(signal).read(url,String(x.query||'').slice(0,350));
-          for(const link of doc.links||[]){const next=publicResearchUrl(link.url);if(next&&new URL(next).origin===new URL(url).origin&&allowedSources.size<60)allowedSources.add(next);}
+          // A cited public page can point to a relevant primary source on a
+          // different domain. The guarded reader still checks each requested
+          // destination and redirect before making a network request.
+          for(const link of doc.links||[]){const next=publicResearchUrl(link.url);if(next&&allowedSources.size<60)allowedSources.add(next);}
           sources.push({url:doc.url,title:doc.title,content:doc.content.slice(0,12000)});return Response.json(doc);
         }
         if(path!=='/v1/responses')return Response.json({error:'route_not_found'},{status:404});
         const waitStarted=Date.now();while(active&&Date.now()-waitStarted<15_000)await new Promise(resolve=>setTimeout(resolve,25));
-        if(active||job.stats.calls>=(dependencies.maxCalls||10))return Response.json({error:'model_call_budget'},{status:429});
+        if(active||job.stats.calls>=maxCalls){failureReason=active?'model_busy':'model_call_budget';return Response.json({error:failureReason},{status:429});}
         const text=await request.text();const body=JSON.parse(text);job.stats.inputChars+=JSON.stringify(body,(_key,value)=>typeof value==='string'&&value.startsWith('data:image/')?'[inline image]':value).length;
-        if(job.stats.inputChars>(dependencies.maxInputChars||1_200_000))return Response.json({error:'input_budget'},{status:429});
+        if(job.stats.inputChars>maxInputChars){failureReason='input_budget';return Response.json({error:failureReason},{status:429});}
         if(body.model!==model)return Response.json({error:'model_not_allowed'},{status:403});
         const allowed=(tools:any[]):boolean=>Array.isArray(tools)&&tools.every(t=>t?.type==='function'||t?.type==='custom'||t?.type==='namespace'&&allowed(t.tools));
         if(body.tools&&!allowed(body.tools))return Response.json({error:'server_tools_not_allowed'},{status:403});
@@ -102,5 +107,5 @@ export async function startGateway(socket: string, job: Job, model: string, sign
     }});
   await chmod(socket,0o666); // Parent is owner-only; only this job receives this socket.
   const stop=()=>{server.stop(true);};signal.addEventListener('abort',stop,{once:true});
-  return {sources,close(){signal.removeEventListener('abort',stop);stop();}};
+  return {sources,failureReason:()=>failureReason,close(){signal.removeEventListener('abort',stop);stop();}};
 }

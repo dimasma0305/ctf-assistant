@@ -45,7 +45,9 @@ export const respondCodexDiscordRead=(id:string,jobId:string,result:unknown)=>co
 
 export function formatCodexResult(job:CodexPublicJob):string{
   const label=job.kind==='investigation'?'riset':'CTF';
-  if(job.state==='failed')return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum berhasil. Coba lagi sebentar ya.`;
+  if(job.state==='failed')return ['model_call_budget','input_budget'].includes(job.error||'')
+    ? `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi kepotong sebelum kesimpulannya siap. Minta aku lanjutkan nanti ya; aku belum mau nebak dari bukti yang belum tuntas.`
+    : `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum berhasil. Coba lagi sebentar ya.`;
   if(job.state==='cancelled')return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi dibatalkan.`;
   const result=job.result;if(!result)return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum menghasilkan jawaban yang bisa kupastikan.`;
   // The worker's findings and unresolved fields are internal evidence notes.

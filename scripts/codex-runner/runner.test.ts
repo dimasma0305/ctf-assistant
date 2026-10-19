@@ -8,6 +8,7 @@ import { startGateway } from './gateway';
 import { DiscordContextBroker } from './discordBroker';
 import { ensureWorkerImage } from './workerImage';
 import { codexRequest, formatCodexResult, isDeliveredCodexReply } from '../../src/Services/AI/codexJobs';
+import { researchTransport } from '../../src/Services/AI/researchSources';
 
 const packet=()=>({scope:'555555555555555555:700000000000000001',guildId:'555555555555555555',channelId:'700000000000000001',
   messageId:'800000000000000001',userId:'663394727688798231',question:'solve pwn exploit ini',context:'thread evidence',route:'auto' as const,artifacts:[]});
@@ -76,6 +77,14 @@ test('delivery posts only the final answer and deduplicates by exact reply',()=>
   expect(isDeliveredCodexReply({...reply,content:'queued'},'bot',job.packet.messageId,rendered)).toBe(false);
 });
 
+test('budget failure is explained in ordinary language without exposing an internal error code',()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));
+  job.state='failed';job.error='model_call_budget';
+  const rendered=formatCodexResult(publicJob(job));
+  expect(rendered).toContain('kepotong');
+  expect(rendered).not.toContain('model_call_budget');
+});
+
 test('omitted flag is recovered only from explanatory prose and a successful proof command',()=>{
   const result=resultFromText(JSON.stringify({summary:'hasil LabCTF{pixel_compute_42}',flags:[],findings:[],unresolved:[],needsStrongerModel:false}));
   expect(promoteReceiptCandidates(result,[{command:'python',exitCode:1,output:'LabCTF{pixel_compute_42}'}]).flags).toEqual([]);
@@ -98,6 +107,44 @@ test('isolated source gateway rejects flags and bounds public searches before ne
     await expect(codexRequest('/sources/search',{query:'Bearer secret'},{socketPath:socket})).rejects.toThrow('invalid_or_private_query');
     await expect(codexRequest('/sources/search',{query:'public third query'},{socketPath:socket})).rejects.toThrow('search_budget');
   }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
+});
+
+test('investigation gateway has enough calls for deep research and reports an exact budget failure',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-research-budget-test-')),socket=join(directory,'source.sock');
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));
+  const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal,{
+    credentials:async()=>({access_token:'fixture'}),
+    fetcher:(async()=>new Response('data: {"type":"response.completed"}\n\n',
+      {headers:{'Content-Type':'text/event-stream'}})) as typeof fetch,
+  });
+  const request=()=>fetch('http://localhost/v1/responses',{unix:socket,method:'POST',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gpt-6-luna'})} as RequestInit & {unix:string});
+  try{
+    for(let i=0;i<18;i++){const response=await request();expect(response.status).toBe(200);await response.text();}
+    expect(job.stats.calls).toBe(18);
+    const rejected=await request();expect(rejected.status).toBe(429);
+    expect(await rejected.json()).toEqual({error:'model_call_budget'});
+    expect(gateway.failureReason()).toBe('model_call_budget');
+  }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
+});
+
+test('source gateway follows a public cross-domain link found on an inspected page',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-source-link-test-')),socket=join(directory,'source.sock');
+  const originalFetch=researchTransport.fetch;
+  researchTransport.fetch=async url=>new Response(String(url)==='https://fixture-a.example/start'
+    ?'<main><a href="https://fixture-b.example/original">Original record</a></main>'
+    :'<main>Original record confirms the project credit.</main>',
+    {headers:{'Content-Type':'text/html'}});
+  const job=newJob(validatePacket({...packet(),kind:'investigation',question:'Read https://fixture-a.example/start'}));
+  const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal);
+  try{
+    const first=await codexRequest<{url:string;links:{url:string}[]}>('/sources/read',
+      {url:'https://fixture-a.example/start'},{socketPath:socket});
+    expect(first.links.some(link=>link.url==='https://fixture-b.example/original')).toBe(true);
+    const second=await codexRequest<{url:string;content:string}>('/sources/read',
+      {url:'https://fixture-b.example/original'},{socketPath:socket});
+    expect(second.content).toContain('Original record confirms');
+  }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
 });
 
 test('worker can repeatedly request only scoped Discord reads through the bot broker',async()=>{

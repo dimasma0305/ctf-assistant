@@ -34,7 +34,7 @@ export async function executeJob(job:Job,model:string,root:string,signal:AbortSi
     for await(const chunk of proc.stdout as any){eventBytes+=chunk.byteLength;if(eventBytes>4*1024*1024){kill();throw Error('worker_event_budget');}
       buffer+=decoder.decode(chunk,{stream:true});let end;while((end=buffer.indexOf('\n'))>=0){consume(buffer.slice(0,end));buffer=buffer.slice(end+1);}}
     if(buffer)consume(buffer);const exit=await proc.exited;await errors;signal.throwIfAborted();
-    if(exit!==0)throw Error(/sandbox|Operation not permitted|bwrap/i.test(stderr)?'worker_sandbox_unavailable':'worker_failed');
+    if(exit!==0)throw Error(gateway.failureReason()||(/sandbox|Operation not permitted|bwrap/i.test(stderr)?'worker_sandbox_unavailable':'worker_failed'));
     if(!final)throw Error('solver_result_missing');const parsed=resultFromText(final);
     const result=job.packet.kind==='investigation'?{...parsed,flags:[]}:promoteReceiptCandidates(parsed,job.receipts);
     if(result.flags.some(flag=>!job.receipts.some(receipt=>receipt.exitCode===0&&receipt.output.includes(flag))))throw Error('flag_without_matching_execution_receipt');
