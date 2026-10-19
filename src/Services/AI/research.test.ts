@@ -5,6 +5,7 @@ test('research routing distinguishes explicit source research from ordinary conv
   expect(requiresResearch('cek https://github.com/example/project fitur webhook-nya')).toBe(true);
   expect(requiresResearch('ya makanya coba cek', 'tadi https://github.com/example/project')).toBe(true);
   expect(requiresResearch('saran platform CTF apa yang bisa di-deploy?')).toBe(true);
+  expect(requiresResearch('cari writeup untuk challenge ini')).toBe(true);
   expect(requiresResearch('https://github.com/example/service punya integrasi chat bawaan nggak?')).toBe(true);
   for (const text of ['wkwk iya', 'sayang rika', 'kalau nonce-nya beda gimana?', 'bentar jangan jawab dulu', 'jangan jawab dulu, aku mau kirim repo buat riset']) expect(requiresResearch(text)).toBe(false);
 });

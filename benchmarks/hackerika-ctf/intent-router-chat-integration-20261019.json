@@ -1,0 +1,62 @@
+{
+  "at": "2026-10-19T09:50:35.181Z",
+  "method": "Real chat handler in isolated images; classifier and response model stubbed, no Discord sends or Codex jobs.",
+  "rows": [
+    {
+      "id": "ambiguous_challenge",
+      "want": "solve_ctf",
+      "baseline": {
+        "classifier": false,
+        "toolChoice": "auto"
+      },
+      "candidate": {
+        "classifier": true,
+        "toolChoice": {
+          "type": "function",
+          "function": {
+            "name": "solve_ctf"
+          }
+        }
+      }
+    },
+    {
+      "id": "person_osint",
+      "want": "research_topic",
+      "baseline": {
+        "classifier": false,
+        "toolChoice": {
+          "type": "function",
+          "function": {
+            "name": "solve_ctf"
+          }
+        }
+      },
+      "candidate": {
+        "classifier": true,
+        "toolChoice": {
+          "type": "function",
+          "function": {
+            "name": "research_topic"
+          }
+        }
+      }
+    },
+    {
+      "id": "classifier_unavailable",
+      "want": "auto",
+      "baseline": {
+        "classifier": false,
+        "toolChoice": "auto"
+      },
+      "candidate": {
+        "classifier": false,
+        "toolChoice": "auto"
+      }
+    }
+  ],
+  "correct": {
+    "baseline": 1,
+    "candidate": 3,
+    "total": 3
+  }
+}

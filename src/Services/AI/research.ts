@@ -275,6 +275,7 @@ export function formatDiscordProfileReply(profile: DiscordProfile, candidateUrls
  * evergreen technical follow-ups keep the normal conversational route. */
 export function requiresResearch(text: string, recentOwnText = ''): boolean {
   if (/\b(?:jangan|ga usah|nggak usah|tidak perlu)\s+(?:jawab|balas|reply)|\b(?:wait|do not reply|don't reply)\b/i.test(text)) return false;
+  if (/\b(?:cari|carikan|cek|search|find)\b/i.test(text) && /\b(?:write[ -]?up|walkthrough)\b/i.test(text)) return true;
   if (/https:\/\/github\.com\//i.test(text) && /\?|\b(?:apa|apakah|cara|gimana|bagaimana|punya|support|dukungan|bahasa|stack|how|what|which)\b/i.test(text)) return true;
   if (/\b(?:riset|research|telusuri|investigasi|bandingkan|compare|osint)\b|\bdeep\s+search\b/i.test(text)) return true;
   const source = /https?:\/\/[^\s]+|\b(?:repo|github|docs|dokumentasi|platform|framework|versi|terbaru|jadwal|konferensi|internet)\b/i.test(text);

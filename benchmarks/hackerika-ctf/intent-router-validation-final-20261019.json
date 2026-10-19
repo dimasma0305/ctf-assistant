@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-19T09:56:47.202Z",
+  "model": "gpt-6-luna",
+  "split": "validation",
+  "method": "Live classifier calls only for ambiguous cases; deterministic baseline and candidate use the same frozen inputs.",
+  "rows": [
+    {
+      "id": "colloquial_continuation",
+      "expected": "ctf_solve",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "ctf_solve",
+      "candidate": "ctf_solve",
+      "elapsedMs": 2991,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "writeup_search",
+      "expected": "research",
+      "baseline": "research",
+      "consulted": false,
+      "classified": null,
+      "candidate": "research",
+      "elapsedMs": 0,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "exam_question",
+      "expected": "chat",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "chat",
+      "candidate": "chat",
+      "elapsedMs": 3311,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "explain_challenge",
+      "expected": "chat",
+      "baseline": "chat",
+      "consulted": false,
+      "classified": null,
+      "candidate": "chat",
+      "elapsedMs": 0,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "repository_check",
+      "expected": "research",
+      "baseline": "research",
+      "consulted": true,
+      "classified": "research",
+      "candidate": "research",
+      "elapsedMs": 2858,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "person_profile",
+      "expected": "research",
+      "baseline": "research",
+      "consulted": false,
+      "classified": null,
+      "candidate": "research",
+      "elapsedMs": 0,
+      "ctfToolAvailable": false
+    }
+  ],
+  "correct": {
+    "baseline": 5,
+    "candidate": 6,
+    "total": 6
+  },
+  "classifierCalls": 3
+}

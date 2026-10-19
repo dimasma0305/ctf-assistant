@@ -1,0 +1,93 @@
+{
+  "at": "2026-10-19T09:53:48.932Z",
+  "model": "gpt-6-luna",
+  "method": "Live classifier calls only for ambiguous cases; deterministic baseline and candidate use the same frozen inputs.",
+  "rows": [
+    {
+      "id": "web_thread_followup",
+      "expected": "ctf_solve",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "ctf_solve",
+      "candidate": "ctf_solve",
+      "elapsedMs": 2408,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "wordpress_owner",
+      "expected": "ctf_solve",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "ctf_solve",
+      "candidate": "ctf_solve",
+      "elapsedMs": 3732,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "thread_short_help",
+      "expected": "ctf_solve",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "ctf_solve",
+      "candidate": "ctf_solve",
+      "elapsedMs": 2562,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "person_osint",
+      "expected": "research",
+      "baseline": "ctf_solve",
+      "consulted": true,
+      "classified": "research",
+      "candidate": "research",
+      "elapsedMs": 2974,
+      "ctfToolAvailable": true
+    },
+    {
+      "id": "math_homework",
+      "expected": "chat",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "chat",
+      "candidate": "chat",
+      "elapsedMs": 2602,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "platform_recommendation",
+      "expected": "research",
+      "baseline": "research",
+      "consulted": false,
+      "classified": null,
+      "candidate": "research",
+      "elapsedMs": 0,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "wordpress_support",
+      "expected": "chat",
+      "baseline": "chat",
+      "consulted": false,
+      "classified": null,
+      "candidate": "chat",
+      "elapsedMs": 0,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "explicit_ctf",
+      "expected": "ctf_solve",
+      "baseline": "ctf_solve",
+      "consulted": false,
+      "classified": null,
+      "candidate": "ctf_solve",
+      "elapsedMs": 0,
+      "ctfToolAvailable": true
+    }
+  ],
+  "correct": {
+    "baseline": 4,
+    "candidate": 8,
+    "total": 8
+  },
+  "classifierCalls": 5
+}

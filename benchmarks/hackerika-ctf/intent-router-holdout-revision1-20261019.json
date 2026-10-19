@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-19T09:55:30.423Z",
+  "model": "gpt-6-luna",
+  "split": "holdout",
+  "method": "Live classifier calls only for ambiguous cases; deterministic baseline and candidate use the same frozen inputs.",
+  "rows": [
+    {
+      "id": "crypto_teammate",
+      "expected": "ctf_solve",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "ctf_solve",
+      "candidate": "ctf_solve",
+      "elapsedMs": 3568,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "writeup_lookup",
+      "expected": "research",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "research",
+      "candidate": "research",
+      "elapsedMs": 2577,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "school_question",
+      "expected": "chat",
+      "baseline": "chat",
+      "consulted": true,
+      "classified": "chat",
+      "candidate": "chat",
+      "elapsedMs": 2353,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "discord_channel_lookup",
+      "expected": "chat",
+      "baseline": "chat",
+      "consulted": false,
+      "classified": null,
+      "candidate": "chat",
+      "elapsedMs": 0,
+      "ctfToolAvailable": false
+    },
+    {
+      "id": "person_osint_plain",
+      "expected": "research",
+      "baseline": "ctf_solve",
+      "consulted": true,
+      "classified": "research",
+      "candidate": "research",
+      "elapsedMs": 3849,
+      "ctfToolAvailable": true
+    },
+    {
+      "id": "explicit_flag",
+      "expected": "ctf_solve",
+      "baseline": "ctf_solve",
+      "consulted": false,
+      "classified": null,
+      "candidate": "ctf_solve",
+      "elapsedMs": 0,
+      "ctfToolAvailable": true
+    }
+  ],
+  "correct": {
+    "baseline": 3,
+    "candidate": 6,
+    "total": 6
+  },
+  "classifierCalls": 4
+}

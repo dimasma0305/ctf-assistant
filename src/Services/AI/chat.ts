@@ -36,6 +36,7 @@ import { inlineDiscordImages, type VisionDownloadCache } from './visionTransport
 import { stripInternalAnnotations } from './output';
 import { ACTOR_ATTRIBUTION_CONTEXT, messageSources } from './attribution';
 import { requiresResearch, getResearchReport, groundResearchReply } from './research';
+import { classifyTurnIntent, needsSemanticRouting } from './intentRouter';
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -735,12 +736,22 @@ async function runChatTurn(
             [...threadSnapshot.messages, ...(threadSnapshot.starter ? [threadSnapshot.starter] : [])]) : ctfCheckpoint.teamProgress;
         lastTeamProgress = formatTeamProgress(progress);
     }
-    const ctfRequired = !spontaneous && (requiresCTFSolve(content, ctfContext, !!ctfCheckpoint) || ctfRetry);
-    const ctfAvailable = !spontaneous && (ctfToolAvailable(content, ctfContext, !!ctfCheckpoint) || ctfRetry);
+    let ctfRequired = !spontaneous && (requiresCTFSolve(content, ctfContext, !!ctfCheckpoint) || ctfRetry);
+    let ctfAvailable = !spontaneous && (ctfToolAvailable(content, ctfContext, !!ctfCheckpoint) || ctfRetry);
+    let researchRequired = !ctfRequired && !spontaneous && requiresResearch(content, recentOwnText);
+    if (!spontaneous && !ctfRetry && needsSemanticRouting(content, { ctf: ctfRequired, research: requiresResearch(content, recentOwnText) })) {
+        const intent = await classifyTurnIntent({ text: content, threadName: threadSnapshot?.name,
+            threadStarter: threadSnapshot?.starter?.content,
+            recent: history.slice(-4).map(entry => typeof entry.content === 'string' ? entry.content : '') });
+        if (intent) {
+            ctfRequired = intent === 'ctf_solve';
+            researchRequired = intent === 'research';
+            ctfAvailable = ctfRequired;
+        }
+    }
     const turnTools = ctfAvailable ? TOOL_DEFINITIONS : TOOL_DEFINITIONS.filter(tool => tool.function.name !== 'solve_ctf');
     setCTFTurnContext(message, { text: ctfContext, thread: threadSnapshot, images: [...attachmentBlock.images,
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
-    const researchRequired = !ctfRequired && !spontaneous && requiresResearch(content, recentOwnText);
     const lastUserMessage: ChatMessage = {
         ...userMessageEntry,
         content: `${contextBlock}${lastTeamProgress ? `\n${neutralizeControlTokens(lastTeamProgress)}` : ''}\n\n${userMessageEntry.content}${spontaneousNote}`,

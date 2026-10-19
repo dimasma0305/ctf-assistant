@@ -55,6 +55,7 @@ export function requiresCTFSolve(text: string, context = '', activeCase = false)
  * for an unrelated current request. Explicit puzzle questions remain eligible
  * even when they do not use a verb that forces the tool. */
 export function ctfToolAvailable(text: string, context = '', activeCase = false): boolean {
+  if (/\b(?:saran|rekomendasi|recommend)\b/i.test(text) && /\b(?:platform|framework)\b/i.test(text)) return false;
   return requiresCTFSolve(text, context, activeCase)
     || /\b(?:ctf|osint|cipher|ciphertext|flag|forensics|steganografi|reverse engineering)\b|[\w-]+\{[^\n}]{3,}\}/i.test(text)
     || /\b(?:soal|challenge|tantangan)\b/i.test(text) && /\b(?:tcp1p|1pc\.tf)\b/i.test(text);

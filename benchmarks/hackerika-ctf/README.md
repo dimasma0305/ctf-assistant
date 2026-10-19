@@ -1,5 +1,13 @@
 # Hackerika CTF capability benchmark
 
+## Bounded semantic intent router — 2026-10-19
+
+The bot now consults the configured light model for ambiguous CTF-vs-research requests, using the current message and a bounded same-thread/recent excerpt. Clear solve requests still route directly. The classifier has a 6.5-second deadline, two concurrent-call and 20-per-minute caps, and falls back to the existing deterministic route if it fails or reports low confidence. It only selects a route; it cannot grant Discord permissions or submit a flag.
+
+The [live Luna development comparison](intent-router-development-release-20261019.json) scored **4/8 baseline → 8/8 candidate** on frozen examples: three ambiguous challenge requests, person OSINT, homework, support, a platform recommendation and an explicit solve request. Five examples invoked the model; three skipped it. An earlier [repeat](intent-router-live-final-20261019.json) fell to **7/8** when Luna misread a short reference to a prior challenge; the prompt was revised and two later [repeats](intent-router-live-revision1-20261019.json) [passed](intent-router-live-revision2-20261019.json). A second [holdout](intent-router-holdout-20261019.json) initially scored **4/6**, exposing local Discord channel lookup and person OSINT; the [retest](intent-router-holdout-revision1-20261019.json) scored **6/6** after routing guards. A later [validation](intent-router-validation-20261019.json) initially scored **5/6**, exposing writeup lookup; the [final retest](intent-router-validation-final-20261019.json) scored **6/6**. Earlier failures remain visible; these tuned-set results do not establish unseen accuracy.
+
+The [chat-handler integration comparison](intent-router-chat-integration-20261019.json) scored **1/3 → 3/3**: ambiguous challenge now forces `solve_ctf`, person OSINT forces `research_topic`, and classifier failure preserves the old route. The [live runner](intent-router-benchmark.ts) records exact inputs, decisions and latency without sensitive credentials.
+
 ## WordPress challenge routing — 2026-10-19
 
 The live request `@Hackerika solve challenge ku yang tentang wordpress, yang mana aja` called `research_topic` and returned a generic search failure. The router now treats an explicit request to solve a challenge as a CTF solve request even without a contest keyword. The [matched image comparison](topic-challenge-route-comparison-20261019.json) improved from **4/8 to 8/8** cases across the incident, three paraphrases and four unrelated controls. In the real chat handler under a stubbed completion, the first tool choice changed from `auto` to forced `solve_ctf`. This checks dispatch only; it does not claim Codex solved a WordPress challenge or verified a flag.

@@ -39,6 +39,7 @@ test('explicit challenge solve by topic forces the CTF solver without a contest 
     expect(ctfToolAvailable(unrelated)).toBe(false);
   }
   expect(requiresCTFSolve('saran platform CTF yang bisa deploy')).toBe(false);
+  expect(ctfToolAvailable('saran platform CTF yang bisa deploy')).toBe(false);
 });
 test('coba lagi resumes a recent failed CTF request from another member, not unrelated research', async () => {
   const now = Date.parse('2026-10-19T08:59:00Z');
