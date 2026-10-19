@@ -1,0 +1,157 @@
+{
+  "at": "2026-10-19T09:16:07.796Z",
+  "method": "Frozen same-channel Discord messages, production TypeScript from isolated images; no model or network calls.",
+  "baselineImage": "ctf-assistant:7f4e813",
+  "candidateImage": "ctf-assistant:retry-candidate-final-20261019",
+  "cases": [
+    {
+      "id": "incident_cross_speaker",
+      "prior": "<@1077393568647352320> solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 84,
+      "want": true
+    },
+    {
+      "id": "banter_between",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 84,
+      "after": "banter",
+      "want": true
+    },
+    {
+      "id": "non_ctf_research",
+      "prior": "tolong riset platform TCP1P",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 84,
+      "want": false
+    },
+    {
+      "id": "new_request_before_failure",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "between": "tolong riset platform TCP1P",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 84,
+      "want": false
+    },
+    {
+      "id": "new_request_after_failure",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 84,
+      "after": "other_request",
+      "want": false
+    },
+    {
+      "id": "later_bot_answer",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 84,
+      "after": "later_bot",
+      "want": false
+    },
+    {
+      "id": "stale_ctf",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 180,
+      "want": false
+    },
+    {
+      "id": "no_failure",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Oke, nanti kucoba.",
+      "ageMinutes": 84,
+      "want": false
+    }
+  ],
+  "baseline": [
+    {
+      "id": "incident_cross_speaker",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "banter_between",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "non_ctf_research",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "new_request_before_failure",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "new_request_after_failure",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "later_bot_answer",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "stale_ctf",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "no_failure",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    }
+  ],
+  "candidate": [
+    {
+      "id": "incident_cross_speaker",
+      "ctfRequired": true,
+      "ctfAvailable": true
+    },
+    {
+      "id": "banter_between",
+      "ctfRequired": true,
+      "ctfAvailable": true
+    },
+    {
+      "id": "non_ctf_research",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "new_request_before_failure",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "new_request_after_failure",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "later_bot_answer",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "stale_ctf",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "no_failure",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    }
+  ],
+  "correct": {
+    "baseline": 6,
+    "candidate": 8,
+    "total": 8
+  }
+}

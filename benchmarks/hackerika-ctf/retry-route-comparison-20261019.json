@@ -1,0 +1,103 @@
+{
+  "at": "2026-10-19T09:13:24.499Z",
+  "method": "Frozen same-channel Discord message fixtures, production TypeScript from isolated images, no model or network calls.",
+  "baselineImage": "ctf-assistant:7f4e813",
+  "candidateImage": "ctf-assistant:retry-candidate-20261019",
+  "cases": [
+    {
+      "id": "incident_cross_speaker",
+      "prior": "<@1077393568647352320> solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 84,
+      "want": true
+    },
+    {
+      "id": "non_ctf_research",
+      "prior": "tolong riset platform TCP1P",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 84,
+      "want": false
+    },
+    {
+      "id": "later_bot_answer",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "laterBot": "Oke, reminder sudah dibuat.",
+      "ageMinutes": 84,
+      "want": false
+    },
+    {
+      "id": "stale_ctf",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.",
+      "ageMinutes": 180,
+      "want": false
+    },
+    {
+      "id": "no_failure",
+      "prior": "solve 1 soal lagi yg ada di tcp1p",
+      "reply": "Oke, nanti kucoba.",
+      "ageMinutes": 84,
+      "want": false
+    }
+  ],
+  "baseline": [
+    {
+      "id": "incident_cross_speaker",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "non_ctf_research",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "later_bot_answer",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "stale_ctf",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "no_failure",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    }
+  ],
+  "candidate": [
+    {
+      "id": "incident_cross_speaker",
+      "ctfRequired": true,
+      "ctfAvailable": true
+    },
+    {
+      "id": "non_ctf_research",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "later_bot_answer",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "stale_ctf",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    },
+    {
+      "id": "no_failure",
+      "ctfRequired": false,
+      "ctfAvailable": false
+    }
+  ],
+  "correct": {
+    "baseline": 4,
+    "candidate": 5,
+    "total": 5
+  }
+}

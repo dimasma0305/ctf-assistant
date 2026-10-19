@@ -1,5 +1,6 @@
 import { expect, test } from 'bun:test';
-import { requiresCTFSolve, ctfToolAvailable, publicCTFQuery } from './ctf';
+import { requiresCTFSolve, ctfToolAvailable, isCTFRetryRequest, publicCTFQuery } from './ctf';
+import { Collection } from 'discord.js';
 import { ctfScope, loadCTFCase, saveCTFCase, type CTFCaseNotes } from './ctfCases';
 import { collectCTFInputs, collectCodexArtifacts } from './ctfInputs';
 test('CTF intent routes team help but leaves research recommendations and banter alone', () => {
@@ -19,6 +20,29 @@ test('request to solve another TCP1P challenge forces the CTF solver', () => {
     expect(requiresCTFSolve(unrelated, 'W: earlier CTF flag clue', true)).toBe(false);
     expect(ctfToolAvailable(unrelated)).toBe(false);
   }
+});
+test('coba lagi resumes a recent failed CTF request from another member, not unrelated research', async () => {
+  const now = Date.parse('2026-10-19T08:59:00Z');
+  const bot = '1077393568647352320', teammate = '734732163332964456';
+  const prior = { id: '111111111111111111', content: `<@${bot}> solve 1 soal lagi yg ada di tcp1p`,
+    author: { id: teammate, bot: false }, createdTimestamp: now - 86 * 60_000 };
+  const failure = { id: '222222222222222222', content: 'Pencarian belum memberiku sumber yang bisa kuperiksa, jadi aku belum bisa memverifikasi jawabannya sekarang.',
+    author: { id: bot, bot: true }, createdTimestamp: now - 84 * 60_000 };
+  const request = (content: string, messages: typeof prior[]) => ({ id: '333333333333333333', content, createdTimestamp: now,
+    client: { user: { id: bot } }, channel: { messages: { fetch: async () => new Collection(messages.map(item => [item.id, item])) } } });
+  const check = (content: string, messages: typeof prior[]) => isCTFRetryRequest(request(content, messages) as unknown as Parameters<typeof isCTFRetryRequest>[0]);
+  expect(await check(`<@${bot}> coba lagi`, [prior, failure])).toBe(true);
+  expect(await check('coba lagi', [prior, failure, { ...prior, id: '444444444444444444', content: 'wkwk', createdTimestamp: now - 20 * 60_000 }])).toBe(true);
+  expect(await check('coba lagi', [prior, failure, ...Array.from({ length: 6 }, (_, index) => ({ ...prior,
+    id: String(700000000000000000n + BigInt(index)), content: 'wkwk', createdTimestamp: now - (20 - index) * 60_000 }))])).toBe(true);
+  expect(await check('coba lagi', [{ ...prior, content: 'tolong riset platform TCP1P' }, failure])).toBe(false);
+  expect(await check('coba lagi', [prior, { ...prior, id: '777777777777777777', content: 'tolong riset platform TCP1P',
+    createdTimestamp: now - 85 * 60_000 }, failure])).toBe(false);
+  expect(await check('coba lagi', [prior, { ...failure, author: { id: teammate, bot: false } }])).toBe(false);
+  expect(await check('coba lagi', [prior, failure, { ...failure, id: '555555555555555555', content: 'Oke, reminder sudah dibuat.', createdTimestamp: now - 5 * 60_000 }])).toBe(false);
+  expect(await check('coba lagi', [prior, failure, { ...prior, id: '666666666666666666', content: 'tolong buat reminder besok', createdTimestamp: now - 5 * 60_000 }])).toBe(false);
+  expect(await check('coba lagi', [{ ...prior, createdTimestamp: now - 4 * 60 * 60_000 }, { ...failure, createdTimestamp: now - 4 * 60 * 60_000 + 60_000 }])).toBe(false);
+  expect(await check('coba lagi', [prior])).toBe(false);
 });
 test('public discovery rejects complete flags and credentials including URL-encoded flags', () => {
   expect(publicCTFQuery('Andrew Prahlow official composer')).toBe('Andrew Prahlow official composer');

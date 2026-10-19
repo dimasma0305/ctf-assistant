@@ -1,6 +1,6 @@
 import { formatTeamProgress, mergeTeamProgress } from './ctfProgress';
 import { loadThreadContext, formatThreadContext } from './threadContext';
-import { requiresCTFSolve, ctfToolAvailable, setCTFTurnContext, getCTFReport, groundCTFReply } from './ctf';
+import { requiresCTFSolve, ctfToolAvailable, isCTFRetryRequest, setCTFTurnContext, getCTFReport, groundCTFReply } from './ctf';
 import { ctfScope, loadCTFCase } from './ctfCases';
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { openai } from "../../utils/openai";
@@ -726,16 +726,17 @@ async function runChatTurn(
         && (!entry.at || Date.now() - entry.at < 10 * 60_000)).slice(-5).map(entry => entry.content).join('\n')
         + (messageReference?.content || '');
     const ctfContext = [channelContext, replyContext, attachmentBlock.promptBlock, recentOwnText, threadBlock].join('\n');
+    const ctfRetry = !spontaneous && await isCTFRetryRequest(message);
     let lastTeamProgress = '';
     const ctfHelp = /\b(?:bantu(?:in)?|tolong|solve|lanjut(?:kan)?|decode|decrypt|recover|pecahkan)\b/i.test(content);
-    const ctfCheckpoint = !spontaneous && (ctfHelp || threadSnapshot) ? await loadCTFCase(ctfScope(message)) : null;
+    const ctfCheckpoint = !spontaneous && (ctfHelp || ctfRetry || threadSnapshot) ? await loadCTFCase(ctfScope(message)) : null;
     if (ctfCheckpoint?.teamProgress) {
         const progress = threadSnapshot ? mergeTeamProgress(ctfCheckpoint.teamProgress, undefined,
             [...threadSnapshot.messages, ...(threadSnapshot.starter ? [threadSnapshot.starter] : [])]) : ctfCheckpoint.teamProgress;
         lastTeamProgress = formatTeamProgress(progress);
     }
-    const ctfRequired = !spontaneous && requiresCTFSolve(content, ctfContext, !!ctfCheckpoint);
-    const ctfAvailable = !spontaneous && ctfToolAvailable(content, ctfContext, !!ctfCheckpoint);
+    const ctfRequired = !spontaneous && (requiresCTFSolve(content, ctfContext, !!ctfCheckpoint) || ctfRetry);
+    const ctfAvailable = !spontaneous && (ctfToolAvailable(content, ctfContext, !!ctfCheckpoint) || ctfRetry);
     const turnTools = ctfAvailable ? TOOL_DEFINITIONS : TOOL_DEFINITIONS.filter(tool => tool.function.name !== 'solve_ctf');
     setCTFTurnContext(message, { text: ctfContext, thread: threadSnapshot, images: [...attachmentBlock.images,
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });

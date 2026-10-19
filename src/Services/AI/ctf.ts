@@ -12,6 +12,7 @@ import { groundedFindings } from './research';
 import { webSearchForTool } from './web';
 import { prepareVisionMessages, groundVisionDelivery, hasVisionContent, type ImageReference } from './vision';
 import { inlineDiscordImages } from './visionTransport';
+import type { Message as DiscordMessage, OmitPartialGroupDMChannel } from 'discord.js';
 interface Turn { id?:string;content?: string; guildId?: string | null; channelId?: string;author?:{id?:string} }
 interface Context { text: string; images?: ImageReference[]; thread?: ThreadSnapshot | null }
 export interface CTFReport {
@@ -54,6 +55,30 @@ export function ctfToolAvailable(text: string, context = '', activeCase = false)
   return requiresCTFSolve(text, context, activeCase)
     || /\b(?:ctf|osint|cipher|ciphertext|flag|forensics|steganografi|reverse engineering)\b|[\w-]+\{[^\n}]{3,}\}/i.test(text)
     || /\b(?:soal|challenge|tantangan)\b/i.test(text) && /\b(?:tcp1p|1pc\.tf)\b/i.test(text);
+}
+
+/** A short retry can refer to a failed CTF request from another member. Read
+ * actual same-channel Discord messages, not model prose or copied chat text. */
+export async function isCTFRetryRequest(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>): Promise<boolean> {
+  const short = message.content.replace(/<@!?\d{17,20}>/g, ' ').replace(/\b(?:hackerika|rika)\b/gi, ' ').trim();
+  if (!/^(?:coba(?:in)?|ulang(?:i)?|retry|lanjut(?:kan)?)(?:\s+(?:lagi|dong|ya|deh|tadi|itu)){0,3}[!?.]*$/i.test(short)) return false;
+  const botId = message.client.user?.id;
+  if (!botId || !message.channel?.messages?.fetch) return false;
+  try {
+    const fetched = await message.channel.messages.fetch({ limit: 30, before: message.id });
+    const now = message.createdTimestamp || Date.now();
+    const recent = [...fetched.values()].filter(item => item.createdTimestamp <= now && now - item.createdTimestamp < 2 * 60 * 60_000)
+      .sort((a, b) => b.createdTimestamp - a.createdTimestamp);
+    const lastBot = recent.find(item => item.author.id === botId);
+    if (!lastBot || !/^(?:Pencarian belum memberiku sumber yang bisa kuperiksa|Sumbernya belum bisa kuakses|Risetku belum cukup untuk memastikan kasus ini)/i.test(lastBot.content.trim())) return false;
+    const afterFailure = recent.filter(item => item.createdTimestamp > lastBot.createdTimestamp);
+    const requestWords = /\b(?:tolong|bantu|solve|cari|cek|riset|research|apa|gimana|siapa|buat|hapus|ingatkan)\b|\?/i;
+    if (afterFailure.some(item => requestWords.test(item.content))) return false;
+    const previousRequest = recent.find(item => !item.author.bot && item.createdTimestamp < lastBot.createdTimestamp
+      && lastBot.createdTimestamp - item.createdTimestamp <= 5 * 60_000
+      && (requiresCTFSolve(item.content) || requestWords.test(item.content)));
+    return !!previousRequest && requiresCTFSolve(previousRequest.content);
+  } catch { return false; }
 }
 export function publicCTFQuery(value: unknown): string | null {
   if (typeof value !== 'string') return null;
