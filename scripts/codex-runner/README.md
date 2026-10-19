@@ -2,7 +2,7 @@
 
 The Discord bot submits bounded jobs over `/run/hackerika-codex/control.sock`. A trusted host controller owns Docker and the ChatGPT sign-in session. Every challenge runs in a fresh container with no network, no credentials, no Docker socket, a read-only root, dropped capabilities, and disposable `/workspace` and `/tmp` filesystems. Only a per-job inference/source Unix socket enters the worker. Containers share the host kernel; this is container isolation, not a VM boundary.
 
-Build the pinned worker from the matching standalone Codex release:
+Build the pinned worker from the matching standalone Codex release. The controller also checks this image before each job and rebuilds the pinned release if Docker has pruned it:
 
 ```sh
 bun scripts/codex-runner/build.ts /root/.codex/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/bin

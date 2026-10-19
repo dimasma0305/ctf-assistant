@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path';
 import { chooseModel, newJob, publicJob, validatePacket, type Job } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
+import { ensureWorkerImage } from './workerImage';
 
 const socket = process.env.CODEX_CONTROL_SOCKET || '/run/hackerika-codex/control.sock';
 const stateRoot = process.env.CODEX_JOB_STATE_ROOT || '/var/lib/hackerika-codex/jobs';
@@ -63,6 +64,7 @@ async function runNext(){
   try{
     await persist(job);
     const model=chooseModel(job.packet,daybreakUsers,verified);
+    await ensureWorkerImage(image);
     const deadline=AbortSignal.any([controller.signal,AbortSignal.timeout(300_000)]);
     let result:Awaited<ReturnType<typeof executeJob>>|undefined;
     for(let attempt=0;attempt<2;attempt++){

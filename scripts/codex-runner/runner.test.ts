@@ -6,6 +6,7 @@ import { chooseModel, newJob, promoteReceiptCandidates, publicJob, resultFromTex
 import { workerArgs } from './executor';
 import { startGateway } from './gateway';
 import { DiscordContextBroker } from './discordBroker';
+import { ensureWorkerImage } from './workerImage';
 import { codexRequest, formatCodexResult } from '../../src/Services/AI/codexJobs';
 
 const packet=()=>({scope:'555555555555555555:700000000000000001',guildId:'555555555555555555',channelId:'700000000000000001',
@@ -26,6 +27,18 @@ test('Docker worker arguments expose only disposable tmpfs and one inference soc
   for(const required of ['--network none','--read-only','--cap-drop ALL','no-new-privileges:true','--user 1000:1000','--pids-limit 128','/run/inference.sock'])expect(joined).toContain(required);
   expect(joined).not.toContain('/var/run/docker.sock');expect(joined).not.toContain('/root/app');expect(joined).not.toContain('credentials.json');
   expect(joined).toContain('/workspace:rw,exec,nosuid,nodev');
+});
+
+test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
+  let present=false,builds=0;
+  const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-1',dependencies);
+  expect(present).toBe(true);expect(builds).toBe(1);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-1',dependencies);
+  expect(builds).toBe(1);
+  present=false;
+  await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');
+  expect(builds).toBe(1);
 });
 
 test('public job output hides challenge bytes and formats only validated solver fields',()=>{
