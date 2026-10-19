@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "discord-profile-osint",
+    "trial": 0,
+    "pass": true,
+    "reason": "The reply accurately reports the supplied Discord profile details and account/join dates, cites the inspected HackerDNA page, and explicitly treats the matching name as an unverified lead rather than proof of identity. It makes no unsupported attribution or ancestry/performance claims.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 939,
+      "completion_tokens": 73,
+      "total_tokens": 1012,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 939
+    }
+  }
+]

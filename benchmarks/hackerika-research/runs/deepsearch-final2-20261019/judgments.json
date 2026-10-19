@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "deepsearch-member-multihop",
+    "trial": 0,
+    "pass": true,
+    "reason": "The answer accurately reports the Discord profile, creation and join dates, and role; cites all four inspected pages; summarizes the DFIR focus, CTF challenge, and log-analysis writeup; and explicitly cautions that a matching handle does not prove account ownership.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 1458,
+      "completion_tokens": 258,
+      "total_tokens": 1716,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1458
+    }
+  }
+]

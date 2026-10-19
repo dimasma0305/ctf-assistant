@@ -1,0 +1,70 @@
+{
+  "comparedAt": "2026-10-19T11:13:38.525Z",
+  "baseline": {
+    "samples": 1,
+    "passed": 0,
+    "deterministicPassed": 0,
+    "criticalFailures": 1,
+    "errors": 0,
+    "judgeErrors": 0,
+    "modelCalls": 8,
+    "usage": {
+      "prompt": 28747,
+      "completion": 1098
+    },
+    "latencyMs": {
+      "p50": 48696.619704,
+      "p95": 48696.619704
+    },
+    "failures": [
+      {
+        "caseId": "deepsearch-member-multihop",
+        "trial": 0,
+        "deterministic": [
+          "missing:2021-01-01",
+          "missing:2026-08-01",
+          "missing:Forensic|forensik",
+          "missing:log",
+          "missing:https://example.com/mossbyte/ctf",
+          "missing:https://example.com/mossbyte/writeups",
+          "no_discord_profile_read"
+        ],
+        "semantic": "The reply gives only a partial profile and leaves the CTF evidence unchecked: it omits the Forensic challenge and the writeup’s proxy/authentication-log analysis. It also fails to report the Discord profile’s identity and dates or clarify that a matching handle does not establish that the website belongs to the account. The inspected pages do not explain what “deepsearch” means, so that uncertainty is reasonable.",
+        "critical": [
+          "Omitted the available CTF challenge and writeup evidence.",
+          "Omitted Discord profile details and the caveat that matching handles do not prove account ownership of the site."
+        ]
+      }
+    ]
+  },
+  "candidate": {
+    "samples": 1,
+    "passed": 1,
+    "deterministicPassed": 1,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "modelCalls": 7,
+    "usage": {
+      "prompt": 27344,
+      "completion": 1514
+    },
+    "latencyMs": {
+      "p50": 63650.614741,
+      "p95": 63650.614741
+    },
+    "failures": []
+  },
+  "gates": {
+    "correctness": true,
+    "noRegression": true,
+    "critical": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "limits": [
+    "Small synthetic primary-source fixtures; not a general production accuracy estimate.",
+    "Live sources/provider behavior require separate smoke evidence.",
+    "No human-agent parity baseline was measured."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "startedAt": "2026-10-19T11:13:23.791Z",
+  "model": "gpt-6-luna",
+  "rubricVersion": "research-v2",
+  "rubricHash": "27bb81f0e13d896751e1499d9d7270f769983a6556ed51a5d90accbb3002ac2e",
+  "samples": 1,
+  "maxCalls": 1,
+  "maxSecondsPerCall": 60,
+  "blindVariantLabels": true
+}

@@ -1,0 +1,158 @@
+[
+  {
+    "caseId": "discord-profile-osint-natural",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "discord-member-read",
+        "targetId": "795513549812006981"
+      },
+      {
+        "kind": "discord-profile-read",
+        "targetId": "795513549812006981"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "read-source",
+        "url": "https://example.com/worldsavior"
+      },
+      {
+        "kind": "read-source",
+        "url": "https://example.com/aryma"
+      },
+      {
+        "kind": "send",
+        "content": "Yang bisa kupastikan dari Discord: Aryma House Of Wolf (@worldsavior), akun pengguna (ID 795513549812006981). Akun dibuat sekitar 2021-01-01 (dari ID Discord); bergabung ke server ini 2026-08-01. Role: CTF Player.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "Yang kutemukan di sumber publik:\n• [Aryma-f4](https://example.com/aryma): Halaman `Aryma-f4` berisi catatan proyek dengan nama serupa dan tidak mengidentifikasi anggota Discord.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "content": "Nama/handle yang cocok saja belum membuktikan situs itu milik akun Discord yang ditag.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          },
+          {
+            "id": "795513549812006981",
+            "displayName": "Aryma House Of Wolf",
+            "username": "worldsavior",
+            "isBot": false
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] <@1077393568647352320> siapa <@795513549812006981> aku mau kamu deep search dia",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Yang bisa kupastikan dari Discord: Aryma House Of Wolf (@worldsavior), akun pengguna (ID 795513549812006981). Akun dibuat sekitar 2021-01-01 (dari ID Discord); bergabung ke server ini 2026-08-01. Role: CTF Player.\n\nYang kutemukan di sumber publik:\n• [Aryma-f4](https://example.com/aryma): Halaman `Aryma-f4` berisi catatan proyek dengan nama serupa dan tidak mengidentifikasi anggota Discord.\n\nNama/handle yang cocok saja belum membuktikan situs itu milik akun Discord yang ditag.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "research_topic",
+        "args": {
+          "question": "Deep search profil publik untuk akun Discord Aryma House Of Wolf, username worldsavior, ID 795513549812006981: cari temuan profesional/CTF dari sumber publik yang dapat diatribusikan dengan hati-hati. Jangan samakan akun hanya karena nama mirip; bedakan bukti dan ketidakpastian."
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4758.476491,
+        "usage": {
+          "prompt_tokens": 5799,
+          "completion_tokens": 86,
+          "total_tokens": 5885,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 5799
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 7982.067408,
+        "usage": {
+          "prompt_tokens": 1236,
+          "completion_tokens": 155,
+          "total_tokens": 1391,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1236
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 7390.398047999999,
+        "usage": {
+          "prompt_tokens": 1341,
+          "completion_tokens": 234,
+          "total_tokens": 1575,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1341
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 7146.862379000002,
+        "usage": {
+          "prompt_tokens": 1273,
+          "completion_tokens": 189,
+          "total_tokens": 1462,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1273
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3692.0417830000006,
+        "usage": {
+          "prompt_tokens": 10650,
+          "completion_tokens": 65,
+          "total_tokens": 10715,
+          "prompt_cache_hit_tokens": 9088,
+          "prompt_cache_miss_tokens": 1562
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 5,
+    "elapsedMs": 44019.117092,
+    "action": null,
+    "text": "Yang bisa kupastikan dari Discord: Aryma House Of Wolf (@worldsavior), akun pengguna (ID 795513549812006981). Akun dibuat sekitar 2021-01-01 (dari ID Discord); bergabung ke server ini 2026-08-01. Role: CTF Player.\nYang kutemukan di sumber publik:\n• [Aryma-f4](https://example.com/aryma): Halaman `Aryma-f4` berisi catatan proyek dengan nama serupa dan tidak mengidentifikasi anggota Discord.\nNama/handle yang cocok saja belum membuktikan situs itu milik akun Discord yang ditag.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:https://example.com/worldsavior"
+    ],
+    "deterministicPass": false
+  }
+]
