@@ -496,7 +496,8 @@ export async function dispatchTool(
             const discordProfile = profileResult?.ok ? profileResult.profile : undefined;
             const result = await researchForTurn({ question: args?.question,
                 urls: [...new Set([...suppliedUrls, ...(Array.isArray(args?.urls) ? args.urls : [])])].slice(0, 4),
-                discordProfile }, message, options);
+                discordProfile,
+                deep: !!discordProfile && /\b(?:deep\s*search|osint|riset\s+mendalam|telusuri\s+mendalam)\b/i.test(message.content) }, message, options);
             return JSON.stringify(result);
         }
         if (DISCORD_TOOL_NAMES.has(name)) return JSON.stringify(await dispatchDiscordAction(name, args, message));

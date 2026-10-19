@@ -4,7 +4,7 @@ import { webSearchForTool } from './web';
 import { ResearchSourceReader, githubRepository, publicResearchUrl, type ResearchDocument } from './researchSources';
 import type { DiscordProfile } from './discordProfile';
 
-export interface ResearchArgs { question?: string; urls?: string[]; discordProfile?: DiscordProfile }
+export interface ResearchArgs { question?: string; urls?: string[]; discordProfile?: DiscordProfile; deep?: boolean }
 interface Evidence { sourceId: string; quote: string }
 interface Finding { claim: string; evidence: Evidence[] }
 interface Source extends ResearchDocument { id: string }
@@ -12,6 +12,7 @@ export interface ResearchReport {
   ok: boolean; status: 'supported' | 'partial' | 'unavailable'; question: string;
   findings: Finding[]; unresolved: string[];
   discordProfile?: DiscordProfile;
+  deep?: boolean;
   sources: { id: string; url: string; title: string; kind: string; preview: string; truncated?: boolean }[];
   stats: { model: string; modelCalls: number; actions: number; nativeSearches: number; elapsedMs: number; promptTokens: number; completionTokens: number };
 }
@@ -65,7 +66,7 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
   const start = performance.now();
   const question = typeof args.question === 'string' ? args.question.trim().slice(0, 2400) : '';
   const report: ResearchReport = { ok: false, status: 'unavailable', question, findings: [], unresolved: [], sources: [],
-    ...(args.discordProfile ? { discordProfile: args.discordProfile } : {}),
+    ...(args.discordProfile ? { discordProfile: args.discordProfile, deep: !!args.deep } : {}),
     stats: { model: MODELS.research, modelCalls: 0, actions: 0, nativeSearches: 0, elapsedMs: 0, promptTokens: 0, completionTokens: 0 } };
   if (!question || !openai) { report.unresolved.push(!question ? 'Pertanyaan riset kosong.' : 'Model riset belum dikonfigurasi.'); return report; }
   if (active >= 2) { report.unresolved.push('Dua riset sedang berjalan; belum bisa memulai riset tambahan.'); return report; }
@@ -168,7 +169,7 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
           const host = new URL(url).hostname;
           if (seenUrls.has(url) || (perHost.get(host) || 0) >= 2) continue;
           seenUrls.add(url); perHost.set(host, (perHost.get(host) || 0) + 1); leads.push(url);
-          if (leads.length >= 4) break;
+          if (leads.length >= (args.deep ? 3 : 4)) break;
         }
         observations.push(...await Promise.all(leads.map(url => perform({ type: githubRepository(url) ? 'repository' : 'read', url }))));
       }
@@ -182,24 +183,27 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
         ? `${args.discordProfile.username} ${args.discordProfile.guild.displayName}` : question;
       const terms: string[] = Array.from(relevanceText.toLowerCase().match(/[a-z][a-z0-9_-]{2,}/g) || []);
       const frontier = sources.filter(source => source.kind === 'page' || source.kind === 'repository-file' && /\.mdx?$/i.test(new URL(source.url).pathname)).flatMap(source => source.links
-        .filter(link => !seen.has(link.url) && new URL(link.url).origin === new URL(source.url).origin)
+        .filter(link => !seen.has(link.url) && (new URL(link.url).origin === new URL(source.url).origin
+          || !!args.discordProfile && terms.some(term => term.length >= 4 && `${link.title} ${link.url}`.toLowerCase().includes(term))))
         .map(link => ({ ...link, score: terms.reduce((n, term) => n + (`${link.title} ${new URL(link.url).pathname.split('/').slice(5).join('/')}`.toLowerCase().includes(term) ? 1 : 0), 0)
-          + (/config|setup|deploy|guide|docs|limit|panduan|konfigurasi/i.test(link.title + link.url) ? 1 : 0), only: source.links.length === 1 })))
+          + (args.discordProfile
+            ? /about|portfolio|ctf|write.?up|achievement|project|blog|contact|github|team|author|profil/i.test(link.title + link.url) ? 2 : 0
+            : /config|setup|deploy|guide|docs|limit|panduan|konfigurasi/i.test(link.title + link.url) ? 1 : 0), only: source.links.length === 1 })))
         .filter(link => link.score > 0 || link.only).sort((a,b) => b.score-a.score)
         .filter((link,index,array) => array.findIndex(other => other.url === link.url) === index).slice(0,2);
       if (!frontier.length) break;
       observations.push(...await Promise.all(frontier.map(link => perform({ type:'read', url:link.url }))));
     }
-    // Discord facts and inspected candidate URLs are grounded deterministically
-    // below. Planner, draft and verifier output cannot add a verified account
-    // connection, and would spend tokens searching repeatedly for the same name.
-    if (!args.discordProfile) {
+    // Ordinary profile lookups stay cheap. Explicit deep research gets the
+    // planner and evidence checks; the final renderer still separates Discord
+    // facts from claims on candidate websites.
+    if (!args.discordProfile || args.deep) {
     for (let step = 0; step < 4 && report.stats.actions < MAX_ACTIONS && !signal.aborted
       && performance.now() - start < PLANNING_MS; step++) {
       let plan: any;
       try {
         const remaining = PLANNING_MS - (performance.now() - start);
-        plan = await complete('Decide whether inspected evidence is sufficient. Return {"ready":boolean,"actions":[{"type":"search|read|repository","url":"exact URL when reading","query":"focused query","paths":["exact repository paths when needed"]}],"unresolved":["brief remaining factual gap"]}. At most two actions. Read linked docs and implementation when configuration is not established. For a general question without a jurisdiction or exact contract, stop once the general principle is supported; identify the missing facts instead of trying to prove every possible exception. ready=true only when the question can be answered conditionally or further access is demonstrably blocked. Do not write an answer yet.', undefined,
+        plan = await complete(`Decide whether inspected evidence is sufficient. Return {"ready":boolean,"actions":[{"type":"search|read|repository","url":"exact URL when reading","query":"focused query","paths":["exact repository paths when needed"]}],"unresolved":["brief remaining factual gap"]}. At most two actions. ${args.discordProfile ? 'For profile research, follow relevant about/CTF/project/author links and search distinct professional leads; do not repeat the same handle query. Never infer an account connection from a matching name. Stop when public professional information is sufficiently covered or attribution is impossible.' : 'Read linked docs and implementation when configuration is not established. For a general question without a jurisdiction or exact contract, stop once the general principle is supported; identify the missing facts instead of trying to prove every possible exception.'} ready=true only when the question can be answered conditionally or further access is demonstrably blocked. Do not write an answer yet.`, undefined,
           Math.max(1_000, Math.min(16_000, remaining)));
       } catch (error) {
         if (signal.aborted) throw error;
@@ -216,11 +220,11 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
       if (actions.size === before) { report.unresolved.push('Tidak ada sumber baru dari langkah berulang.'); break; }
     }
     if (!signal.aborted) {
-      const format = 'Return {"answered":boolean,"findings":[{"claim":"one supported factual statement, Indonesian","evidence":[{"sourceId":"S#","quote":"exact contiguous source excerpt, 4..400 chars"}]}],"unresolved":["relevant unsupported or conflicting point, Indonesian"]}. answered=true only when findings answer the actual question. At most 8 findings. Quotes must copy actual source text literally; reader-added line numbers may be omitted, but never bridge omitted sections. No invented configuration or search-summary citations. Comparative superlatives without measurements are unproven. State absence only with inspected evidence. Unresolved items must affect this question, without unasked deployment/database details. No extra summary.';
+      const format = `Return {"answered":boolean,"findings":[{"claim":"one supported factual statement, Indonesian","evidence":[{"sourceId":"S#","quote":"exact contiguous source excerpt, 4..400 chars"}]}],"unresolved":["relevant unsupported or conflicting point, Indonesian"]}. answered=true only when findings answer the actual question. At most 8 findings. Quotes must copy actual source text literally; reader-added line numbers may be omitted, but never bridge omitted sections. No invented configuration or search-summary citations. Comparative superlatives without measurements are unproven. State absence only with inspected evidence. Unresolved items must affect this question, without unasked deployment/database details. ${args.discordProfile ? 'Describe each public website as that website or author making the claim. Do not say a same-name website is owned by the Discord member unless the source explicitly publishes the exact Discord username or ID. Cover distinct professional facts across the inspected pages: if three or more relevant pages were read, cite at least three different source IDs. Include concrete technical details from read writeups or project pages, not just the homepage and about page. Never seek private contact details or real-world identity.' : ''} No extra summary.`;
       const draft = await complete(`Check the answer AGAINST inspected sources. ${format}`, undefined, 16_000);
       const draftFindings = groundedFindings(draft.findings, sources);
       const final = draftFindings.length && !signal.aborted
-        ? await complete(`Check the answer for entailment, not just quote matching. Correct or remove any claim whose quoted/source context does not establish it. In particular, verify exact configuration scope and do not infer menu names or a lack of environment settings from a normalizer function. ${format}`, { ...draft, findings: draftFindings }, 16_000)
+        ? await complete(`Check the answer for entailment, not just quote matching. Correct or remove any claim whose quoted/source context does not establish it. Preserve source-backed findings from distinct pages, including technical writeups, when they pass this check. In particular, verify exact configuration scope and do not infer menu names or a lack of environment settings from a normalizer function. ${format}`, { ...draft, findings: draftFindings }, 16_000)
         : draft;
       answered = final.answered === true;
       report.findings = groundedFindings(final.findings, sources);
@@ -271,13 +275,47 @@ export function formatDiscordProfileReply(profile: DiscordProfile, candidateUrls
   return `Yang bisa kupastikan dari Discord: ${label}${nickname}, ${profile.bot ? 'akun bot' : 'akun pengguna'} (ID ${profile.id}). Akun dibuat sekitar ${accountDate} (dari ID Discord)${joined ? `; bergabung ke server ini ${joined}` : ''}.${roles}${badges} ${web}`;
 }
 
+function formatDeepDiscordProfileReply(report: ResearchReport, candidates: string[]): string {
+  const profile = report.discordProfile!;
+  const facts = formatDiscordProfileReply(profile).replace(/ Aku belum menemukan halaman publik.*$/u, '');
+  const byId = new Map(report.sources.filter(source => source.kind !== 'search').map(source => [source.id, source]));
+  const claims = report.findings.flatMap(finding => {
+    const source = byId.get(finding.evidence[0]?.sourceId);
+    if (!source || !publicResearchUrl(source.url)) return [];
+    // Even a quote-backed claim can overstate identity. Keep the Discord facts
+    // separate and reject a direct attribution from a same-name web page.
+    if (/\b(?:akun|member|pengguna)\s+discord\b/i.test(finding.claim)
+      || /\b(?:adalah|merupakan|milik|punya|belongs to|owned by)\b/i.test(finding.claim)
+      && [profile.username, profile.globalName, profile.guild.displayName]
+        .some(name => !!name && finding.claim.toLowerCase().includes(name.toLowerCase()))) return [];
+    const title = source.title.replace(/[\[\]()\\`]/g, '').replace(/@/g, '＠').slice(0, 60) || new URL(source.url).hostname;
+    const claim = finding.claim.replace(/https?:\/\/\S+/gi, '').replace(/<@!?\d{17,20}>/g, '')
+      .replace(/@/g, '＠').replace(/\s+/g, ' ').trim().slice(0, 270);
+    return claim ? [`• [${title}](${source.url}): ${claim}`] : [];
+  }).filter((claim, index, all) => all.indexOf(claim) === index).slice(0, 5);
+  if (!claims.length) return formatDiscordProfileReply(profile, candidates);
+  const exactHandle = profile.username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const selfDisclosed = new RegExp(`discord.{0,35}@?${exactHandle}\\b`, 'i');
+  const linked = report.sources.some(source => source.kind !== 'search' && selfDisclosed.test(source.preview));
+  const caveat = linked
+    ? `Ada situs yang mencantumkan handle Discord yang sama. Itu pengaitan yang dinyatakan situs, belum verifikasi identitas asli.`
+    : `Nama/handle yang cocok saja belum membuktikan situs itu milik akun Discord yang ditag.`;
+  const head = `${facts}\n\nYang kutemukan di sumber publik:\n`;
+  const kept: string[] = [];
+  for (const claim of claims) {
+    if ((head + [...kept, claim].join('\n') + `\n\n${caveat}`).length > 1900) break;
+    kept.push(claim);
+  }
+  return `${head}${kept.join('\n')}\n\n${caveat}`;
+}
+
 /** Explicit research intent with a current source/topic; ordinary banter and
  * evergreen technical follow-ups keep the normal conversational route. */
 export function requiresResearch(text: string, recentOwnText = ''): boolean {
   if (/\b(?:jangan|ga usah|nggak usah|tidak perlu)\s+(?:jawab|balas|reply)|\b(?:wait|do not reply|don't reply)\b/i.test(text)) return false;
   if (/\b(?:cari|carikan|cek|search|find)\b/i.test(text) && /\b(?:write[ -]?up|walkthrough)\b/i.test(text)) return true;
   if (/https:\/\/github\.com\//i.test(text) && /\?|\b(?:apa|apakah|cara|gimana|bagaimana|punya|support|dukungan|bahasa|stack|how|what|which)\b/i.test(text)) return true;
-  if (/\b(?:riset|research|telusuri|investigasi|bandingkan|compare|osint)\b|\bdeep\s+search\b/i.test(text)) return true;
+  if (/\b(?:riset|research|telusuri|investigasi|bandingkan|compare|osint)\b|\bdeep\s*search\b/i.test(text)) return true;
   const source = /https?:\/\/[^\s]+|\b(?:repo|github|docs|dokumentasi|platform|framework|versi|terbaru|jadwal|konferensi|internet)\b/i.test(text);
   if (/\b(?:cek|check|baca|cari|carikan|verifikasi|verify)\b/i.test(text)
     && (source || /https?:\/\//i.test(recentOwnText))) return true;
@@ -300,7 +338,8 @@ export function groundResearchReply(text: string, report?: ResearchReport, userQ
         || !!distinctive && `${source.url} ${source.title} ${source.preview}`.toLowerCase().includes(distinctive)))
       .map(source => publicResearchUrl(source.url)!)
       .filter((url, index, all) => all.indexOf(url) === index).slice(0, 3);
-    return formatDiscordProfileReply(report.discordProfile, candidates);
+    return report.deep ? formatDeepDiscordProfileReply(report, candidates)
+      : formatDiscordProfileReply(report.discordProfile, candidates);
   }
   if (!report.ok) {
     // Gap notes are internal audit data. Never paste them verbatim into Discord:

@@ -21,7 +21,11 @@ export function discordPersonResearchSubject(message: Pick<ChatMessage, 'content
     const id = discordProfileSubject(message);
     if (!id || id === message.author.id) return null;
     const direct = /\b(?:siapa(?:\s+(?:itu|dia))?|who\s+is|profil(?:e)?(?:\s+discord)?|identitas(?:\s+akun)?)\s*<@!?(\d{17,20})>/i.exec(message.content);
-    return direct?.[1] === id ? id : null;
+    if (direct?.[1] === id) return id;
+    // A bare "deepsearch @member" is still a request about that member. The
+    // single-mention guard above excludes ambiguous multi-person lookups.
+    return /\b(?:deep\s*search|osint|riset(?:\s+mendalam)?|telusuri(?:\s+mendalam)?)\b/i.test(message.content)
+        && new RegExp(`<@!?${id}>`).test(message.content) ? id : null;
 }
 
 export interface DiscordProfile {

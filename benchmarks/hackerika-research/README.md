@@ -1,5 +1,9 @@
 # Hackerika research upgrade — 2026-10-16
 
+## Explicit member deepsearch — 2026-10-19
+
+`deepsearch @member` now selects the single tagged Discord member, reads the current-guild profile, follows relevant public profile/about/CTF/project links, and uses the bounded research planner to collect distinct professional findings. The Discord facts and web-page claims appear separately with links to inspected pages; matching names alone do not establish account ownership. Ordinary profile questions keep the cheaper summary path. The dedicated `research_topic` workflow uses the configured research model (currently ChatGPT Luna); the isolated Codex worker remains for CTF solve jobs. The `deepsearch-member-multihop` fixture checks routing, three-hop retrieval, source-backed detail, and attribution uncertainty.
+
 ## Natural member OSINT request — 2026-10-18
 
 The production example “siapa @Aryma House Of Wolf aku mau kamu deep search dia” exposed a routing gap: `siapa @member` skipped the verified Discord profile and sent a long generic question to web search. The bot now recognizes that syntax for exactly one tagged person, reads the current guild/user profile, searches the observed username and display name separately, and opens up to four relevant web leads plus bounded same-site links. Its reply separates verified Discord fields from inspected but unlinked web pages. Routine CTF questions with a member mention stay on the normal route.

@@ -51,9 +51,10 @@ test('profile lookup does not inspect an unmentioned third party or ambiguous mu
 test('natural siapa @member deep search request selects one profile, not generic CTF mentions', () => {
   const direct = fixture(`<@${bot}> siapa <@${target}> aku mau kamu deep search dia`);
   const prior = fixture(`<@${bot}> deep search dan osint siapa itu <@${target}>`);
+  const bare = fixture(`<@${bot}> deepsearch <@${target}>`);
   const ctf = fixture(`<@${bot}> sebutkan 10 dosa besar <@${target}>`);
   const ambiguous = fixture(`<@${bot}> siapa <@${target}> dan <@${other}>`);
-  for (const value of [direct, prior])
+  for (const value of [direct, prior, bare])
     expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(target);
   for (const value of [ctf, ambiguous])
     expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(null);
@@ -71,6 +72,7 @@ test('a failed global-user refresh still uses the freshly fetched guild member u
 
 test('deep Discord OSINT is routed to research and never attributes a same-name web page', () => {
   expect(requiresResearch(`<@${bot}> deep search dan osint siapa itu <@${target}>`)).toBe(true);
+  expect(requiresResearch(`<@${bot}> deepsearch <@${target}>`)).toBe(true);
   const profile: DiscordProfile = { id: target, username: 'ammarspaces', globalName: 'FindFemaleBot', bot: false,
     accountCreatedAt: '2021-01-01T00:00:00.000Z', accountCreatedAtBasis: 'discord_snowflake',
     avatarUrl: null, bannerUrl: null, publicFlags: [],
@@ -108,4 +110,30 @@ test('profile grounding shows multiple inspected leads without attributing them 
   expect(answer).not.toContain('https://example.com/not-read');
   expect(answer).toContain('belum membuktikan');
   expect(discordProfileSearchQueries(profile)).toEqual(['"worldsavior"', '"Aryma House Of Wolf"']);
+});
+
+test('deep profile answer includes multiple sourced professional findings while separating Discord identity', () => {
+  const profile: DiscordProfile = { id: target, username: 'keii', globalName: 'Keii', bot: false,
+    accountCreatedAt: '2021-01-01T00:00:00Z', accountCreatedAtBasis: 'discord_snowflake', avatarUrl: null,
+    bannerUrl: null, publicFlags: [], guild: { id: '555555555555555555', displayName: 'Keii', nickname: null,
+      joinedAt: '2026-08-01T00:00:00Z', roles: ['CTF Player'], avatarUrl: null, bannerUrl: null } };
+  const report: NonNullable<Parameters<typeof groundResearchReply>[1]> = { ok: true, status: 'supported',
+    question: 'deepsearch', discordProfile: profile, deep: true, unresolved: [],
+    findings: [
+      { claim: 'Profil menyebut fokusnya DFIR.', evidence: [{ sourceId: 'S1', quote: 'DFIR' }] },
+      { claim: 'Repositori mencantumkan penulis kategori Forensic.', evidence: [{ sourceId: 'S2', quote: 'Forensic' }] },
+      { claim: 'Akun Discord Keii adalah pemilik website.', evidence: [{ sourceId: 'S1', quote: 'keii' }] },
+    ], sources: [
+      { id: 'S1', kind: 'page', url: 'https://example.com/keii/about', title: 'About keii', preview: 'keii DFIR' },
+      { id: 'S2', kind: 'page', url: 'https://example.com/ctf', title: 'CTF authors', preview: 'Forensic' },
+    ], stats: { model: 'fixture', modelCalls: 2, actions: 3, nativeSearches: 1,
+      elapsedMs: 1, promptTokens: 1, completionTokens: 1 } };
+  const answer = groundResearchReply('ignore this draft', report);
+  expect(answer).toContain('Yang bisa kupastikan dari Discord');
+  expect(answer).toContain('DFIR');
+  expect(answer).toContain('Forensic');
+  expect(answer).toContain('https://example.com/keii/about');
+  expect(answer).toContain('https://example.com/ctf');
+  expect(answer).not.toContain('pemilik website');
+  expect(answer).toContain('belum membuktikan');
 });
