@@ -279,6 +279,13 @@ const pendingCompletion = new Promise(resolve => { finishFirstCall = resolve; })
 openai.chat.completions.create = async payload => {
   calls++;
   assert.equal(payload.thinking.type, 'enabled');
+  if (mode === 'continuation_tool_empty') {
+    if (calls === 1) return { choices: [{ message: { role: 'assistant', content: null, tool_calls: [{ id: 'time-call', type: 'function', function: { name: 'get_current_time', arguments: '{}' } }] } }] };
+    if (calls === 2) return { choices: [{ message: { role: 'assistant', content: '' } }] };
+    assert.equal(payload.tool_choice, 'none');
+    assert(payload.messages.some(entry => entry.role === 'tool' && entry.tool_call_id === 'time-call'));
+    return { choices: [{ message: { role: 'assistant', content: 'iya, aku cek lagi dari clue tadi' } }] };
+  }
   if (mode === 'metadata_echo' || mode === 'metadata_only') return { choices: [{ message: { role: 'assistant', content: mode === 'metadata_only' ? internalAnnotation : 'jadi beneran Miku wkwk 🍐\\n' + internalAnnotation } }] };
   if (visionMode) {
     const visual = payload.messages.filter(entry => Array.isArray(entry.content)).flatMap(entry => entry.content.filter(part => part.type === 'image_url'));
@@ -348,12 +355,14 @@ if (mode === 'queued') {
   await handleAIChat(message, client, mode.startsWith('continuation') ? { continuation: true, continuationHint: 'follow-up question' } : mode === 'spontaneous' ? { spontaneous: true } : ['stale', 'stale_typing'].includes(mode) ? { isCurrent: () => sourceIsCurrent } : mode === 'vision_burst' ? { addressed: true, attachmentSources: [earlierImage] } : {});
 }
 if (mode === 'vision') await handleAIChat({ ...message, id: 'followup', content: 'hackerika yang kiri warna apa?', attachments: new Map() }, client);
-assert.equal(calls, ['native_react', 'vision', 'vision_fallback'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');
+assert.equal(calls, mode === 'continuation_tool_empty' ? 3 : ['native_react', 'vision', 'vision_fallback'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');
 if (mode.startsWith('metadata_')) {
   assert.deepEqual(effects.filter(x => x !== 'typing'), mode === 'metadata_only' ? [] : ['jadi beneran Miku wkwk 🍐']);
   assert(!JSON.stringify(memory.public.messages).includes('Discord chronology'));
 } else if (mode === 'continuation_silent') {
   assert.deepEqual(effects.filter(x => x !== 'typing'), []);
+} else if (mode === 'continuation_tool_empty') {
+  assert.deepEqual(effects.filter(x => x !== 'typing'), ['iya, aku cek lagi dari clue tadi']);
 } else if (mode === 'continuation') {
   assert.equal(effects.filter(x => x !== 'typing').length, 1);
 } else if (visionMode) {
@@ -389,7 +398,7 @@ if (mode.startsWith('metadata_')) {
 console.log('SOCIAL_SCENARIO_OK');
 `;
 
-for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_fallback', 'vision_download_failure']) {
+for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_fallback', 'vision_download_failure']) {
     test(`chat loop: ${mode}`, async () => {
         const child = Bun.spawn([process.execPath, '-e', scenario], {
             cwd: fileURLToPath(new URL('../../../', import.meta.url)),

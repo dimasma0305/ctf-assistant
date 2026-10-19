@@ -5,13 +5,17 @@ export interface CodexArtifact { name:string;data:string;image:boolean;sourceMes
 export interface CodexPublicJob {
   id:string;state:'pending'|'running'|'completed'|'failed'|'cancelled';createdAt:number;updatedAt:number;deliveredAt?:number;model?:string;
   result?:{summary:string;flags:string[];findings:string[];unresolved:string[];needsStrongerModel:boolean};error?:string;
-  stats:{calls:number;searches:number;sourceReads:number;inputChars:number;outputBytes:number;elapsedMs:number;attempts:number};receiptCount:number;
+  stats:{calls:number;searches:number;sourceReads:number;visionReads:number;inputChars:number;outputBytes:number;elapsedMs:number;attempts:number};receiptCount:number;
   guildId:string;channelId:string;messageId:string;userId:string;
   sources:{url:string;title:string}[];
 }
 export interface CodexPacket {
   scope:string;guildId:string;channelId:string;messageId:string;userId:string;question:string;context:string;checkpoint?:unknown;
   route:CodexRoute;artifacts:CodexArtifact[];
+}
+export interface CodexDiscordReadRequest {
+  id:string;jobId:string;guildId:string;channelId:string;userId:string;sourceMessageId:string;
+  kind:'recent'|'message';messageId?:string;before?:string;limit:number;includeImage:boolean;
 }
 const socket=()=>process.env.CODEX_CONTROL_SOCKET||'/run/hackerika-codex/control.sock';
 export const codexSolverEnabled=()=>['1','true','yes','on'].includes((process.env.CODEX_SOLVER_ENABLED||'').trim().toLowerCase());
@@ -36,6 +40,8 @@ export const getCodexJob=(jobId:string|undefined,scope:string,userId:string,sign
 export const cancelCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/cancel',{jobId,scope,userId},{signal});
 export const completedCodexJobs=()=>codexRequest<{ok:true;jobs:CodexPublicJob[]}>('/jobs/completed',{});
 export const markCodexJobDelivered=(jobId:string)=>codexRequest<{ok:true}>('/jobs/delivered',{jobId});
+export const pendingCodexDiscordReads=()=>codexRequest<{ok:true;requests:CodexDiscordReadRequest[]}>('/jobs/context/pending',{});
+export const respondCodexDiscordRead=(id:string,jobId:string,result:unknown)=>codexRequest<{ok:true}>('/jobs/context/respond',{id,jobId,result});
 
 export function formatCodexResult(job:CodexPublicJob):string{
   const short=job.id.slice(0,8),model=job.model==='gpt-daybreak-blue-latest'?'Daybreak Blue':job.model==='gpt-6-luna'?'Luna':job.model||'solver';

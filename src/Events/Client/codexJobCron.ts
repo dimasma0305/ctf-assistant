@@ -2,11 +2,24 @@ import { PermissionFlagsBits as P } from 'discord.js';
 import { Event } from '../../Handlers/eventHandler';
 import { MyClient } from '../../Model/client';
 import { canShareChannel } from '../../Services/AI/discordAccess';
-import { completedCodexJobs, codexSolverEnabled, formatCodexResult, markCodexJobDelivered } from '../../Services/AI/codexJobs';
+import { completedCodexJobs, codexSolverEnabled, formatCodexResult, markCodexJobDelivered, pendingCodexDiscordReads, respondCodexDiscordRead } from '../../Services/AI/codexJobs';
+import { readCodexDiscordContext } from '../../Services/AI/codexDiscordContext';
 import { sanitizeMentions } from '../../Services/Moderation';
 
-let initialized=false,running=false;
+let initialized=false,running=false,reading=false;
 const failures=new Map<string,number>();
+
+export async function serveCodexDiscordReads(client:MyClient):Promise<void>{
+  if(!codexSolverEnabled()||reading)return;reading=true;
+  try{
+    const {requests}=await pendingCodexDiscordReads();
+    for(const request of requests){
+      const result=await readCodexDiscordContext(client,request);
+      await respondCodexDiscordRead(request.id,request.jobId,result).catch(()=>undefined);
+    }
+  }catch(error:unknown){console.warn('[CodexDiscordRead] controller unavailable:',String(error instanceof Error?error.message:error).slice(0,120));}
+  finally{reading=false;}
+}
 
 export async function deliverCodexJobs(client:MyClient):Promise<void>{
   if(!codexSolverEnabled()||running)return;running=true;
@@ -45,5 +58,6 @@ export const event:Event={name:'clientReady',once:true,async execute(client:MyCl
   if(initialized)return;initialized=true;if(!codexSolverEnabled())return;
   setTimeout(()=>void deliverCodexJobs(client),5000).unref?.();
   setInterval(()=>void deliverCodexJobs(client),15_000).unref?.();
+  setInterval(()=>void serveCodexDiscordReads(client),1500).unref?.();
   console.log('✅ Isolated Codex result delivery loaded');
 }};

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { chooseModel, newJob, publicJob, validatePacket, type Job } from './protocol';
 import { executeJob } from './executor';
+import { DiscordContextBroker } from './discordBroker';
 
 const socket = process.env.CODEX_CONTROL_SOCKET || '/run/hackerika-codex/control.sock';
 const stateRoot = process.env.CODEX_JOB_STATE_ROOT || '/var/lib/hackerika-codex/jobs';
@@ -16,6 +17,7 @@ const jobs = new Map<string, Job>();
 const queue: string[] = [];
 const aborters = new Map<string, AbortController>();
 const submissions = new Map<string, number[]>();
+const discord = new DiscordContextBroker();
 let running = false;
 
 function file(id: string) { return join(stateRoot, `${id}.json`); }
@@ -64,14 +66,15 @@ async function runNext(){
     const deadline=AbortSignal.any([controller.signal,AbortSignal.timeout(300_000)]);
     let result:Awaited<ReturnType<typeof executeJob>>|undefined;
     for(let attempt=0;attempt<2;attempt++){
-      try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry:attempt===1});break;}
+      try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry:attempt===1,
+        gateway:{discordRead:query=>discord.ask(job,query,deadline)}});break;}
       catch(error:any){if(attempt!==0||String(error?.message)!=='flag_without_matching_execution_receipt'||deadline.aborted||job.stats.calls>=8)throw error;}
     }
     if(!result)throw Error('solver_result_missing');
     job.result=result.result;job.state='completed';
   }catch(error:any){job.state=controller.signal.aborted?'cancelled':'failed';job.error=String(error?.message||'solver_failed').slice(0,120);}
   finally{
-    job.stats.elapsedMs+=Date.now()-started;job.packet.artifacts=[];aborters.delete(id);
+    discord.clearJob(id);job.stats.elapsedMs+=Date.now()-started;job.packet.artifacts=[];aborters.delete(id);
     try{await persist(job);await cleanup();}finally{running=false;schedule();}
   }
 }
@@ -83,6 +86,9 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
     if(request.method==='GET'&&path==='/health')return response({ok:true,queued:queue.length,running,verified:[...verified]});
     if(request.method!=='POST')return response({ok:false,error:'method_not_allowed'},405);
     const body=await json(request);
+    if(path==='/jobs/context/pending')return response({ok:true,requests:discord.list()});
+    if(path==='/jobs/context/respond')return typeof body?.id==='string'&&typeof body?.jobId==='string'&&discord.respond(body.id,body.jobId,body.result)
+      ?response({ok:true}):response({ok:false,error:'request_expired'},404);
     if(path==='/jobs'){
       const packet=validatePacket(body);await cleanup();
       const outstanding=[...jobs.values()].filter(j=>j.packet.scope===packet.scope&&['pending','running'].includes(j.state));

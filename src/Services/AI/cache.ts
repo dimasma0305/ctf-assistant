@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import { isNoDbMode } from '../../utils/env';
 import { mentionReferences, type MentionReference } from './mentions';
 
-export const MAX_CACHE_SIZE = 20; // Max number of messages to keep per channel cache
+export const MAX_CACHE_SIZE = 40; // Enough for an active multi-person topic before a late summon.
 
 // A deletion can race an in-flight cache/index write. Mark it synchronously,
 // wait for that write, then remove both copies. Keep tombstones bounded.

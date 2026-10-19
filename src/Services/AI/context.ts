@@ -1,5 +1,5 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
-import { getChannelCache, updateChannelCache, SimplifiedMessage } from "./cache";
+import { getChannelCache, SimplifiedMessage } from "./cache";
 import { mentionReferences, type MentionReference } from './mentions';
 
 
@@ -40,79 +40,64 @@ export function neutralizeControlTokens(text: string): string {
     .replace(/⚡/g, '');
 }
 
-// Token-budget knobs for channel context. Bumped from 6→12 so multi-party
-// conversations (where Hackerika needs to track what User A asked, what she
-// answered, and what User B is now adding) have enough scroll-back.
-const CHANNEL_CONTEXT_LIMIT = 12;
-const PER_MESSAGE_CHAR_LIMIT = 450;
+// Cover an active multi-person topic while bounding the prompt to roughly
+// the same byte order as 12 verbose turns. The cache holds slightly more than
+// this window so a late summon can still see the topic opening.
+const CHANNEL_CONTEXT_LIMIT = 32;
+const PER_MESSAGE_CHAR_LIMIT = 280;
 
 function truncate(s: string, n: number): string {
   return s.length <= n ? s : s.slice(0, n - 1) + '…';
 }
 const mentionContext = (mentions: MentionReference[]) => mentions.length
   ? ` mentions=${JSON.stringify(mentions.slice(0, 3).map(({ id, displayName, isBot }) => ({ id, displayName, isBot })))}` : '';
+interface ContextLine { id: string; at: number; line: string; mentions: MentionReference[] }
+function lineFromCache(msg: SimplifiedMessage): ContextLine {
+  const name = msg.member?.displayName || msg.author.username;
+  const content = msg.content || (msg.system || msg.type !== 0 ? '[sys]'
+    : msg.attachments && msg.embeds ? '[attach+embed]' : msg.attachments ? '[attach]' : msg.embeds ? '[embed]' : '[empty]');
+  const mentions = msg.mentions || [];
+  return { id: msg.id, at: msg.createdTimestamp, mentions,
+    line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${mentionContext(mentions)}` };
+}
+function lineFromDiscord(msg: DiscordMessage): ContextLine {
+  const name = msg.member?.displayName || msg.author.username;
+  const content = msg.content || (msg.system || msg.type !== 0 ? '[sys]'
+    : msg.attachments.size && msg.embeds.length ? '[attach+embed]' : msg.attachments.size ? '[attach]'
+      : msg.embeds.length ? '[embed]' : '[empty]');
+  const mentions = mentionReferences(msg);
+  return { id: msg.id, at: msg.createdTimestamp, mentions,
+    line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${mentionContext(mentions)}` };
+}
 
-// Compact channel context — last N messages, each truncated to a fixed budget.
+// Compact same-channel context. A cache created by an older release may still
+// contain only 20 messages, so backfill once from Discord when an active topic
+// appears to reach its oldest cached edge. Never read another channel or DM.
 export async function getChannelContext(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, startSep: string, endSep: string,
   onMentions?: (mentions: MentionReference[]) => void): Promise<string> {
   try {
     const channelId = message.channel.id;
-    let contextMessages: string[];
-
     const cachedMessages = await getChannelCache(channelId);
-    const sliceCount = CHANNEL_CONTEXT_LIMIT + 1; // +1 because the current msg may be at the tail
-    const relevantCachedMessages = cachedMessages.filter(msg => msg.id !== message.id).slice(-sliceCount);
-
-    // Format lines as `[DisplayName <@ID>] content` — matches the speaker-tag
-    // format used everywhere else (user messages, assistant messages in memory,
-    // reply-to block) so the model can use ONE rule to identify speakers across
-    // all surfaces. `<@ID>` prevents display-name collisions when two users
-    // share a nickname.
-    if (relevantCachedMessages.length >= 3) {
-      contextMessages = relevantCachedMessages.slice(-CHANNEL_CONTEXT_LIMIT).map((msg: SimplifiedMessage) => {
-        const authorName = msg.member?.displayName || msg.author.username;
-        const authorId = msg.author.id;
-        let content = msg.content;
-        if (!content) {
-          if (msg.system || msg.type !== 0) content = '[sys]';
-          else if (msg.attachments && msg.embeds) content = '[attach+embed]';
-          else if (msg.attachments) content = '[attach]';
-          else if (msg.embeds) content = '[embed]';
-          else content = '[empty]';
+    const currentAt = message.createdTimestamp || Date.now();
+    const relevant = cachedMessages.filter(msg => msg.id !== message.id && msg.createdTimestamp <= currentAt
+      && (msg.createdTimestamp !== currentAt || msg.id < message.id)).slice(-CHANNEL_CONTEXT_LIMIT);
+    const lines = new Map(relevant.map(item => [item.id, lineFromCache(item)]));
+    const oldest = relevant[0]?.createdTimestamp;
+    const now = currentAt;
+    const activeEdge = relevant.length >= 18 && relevant.length < CHANNEL_CONTEXT_LIMIT
+      && Number.isFinite(oldest) && oldest <= now && now - oldest < 20 * 60_000;
+    if (relevant.length < 3 || activeEdge) {
+      try {
+        const fetched = await message.channel.messages.fetch({ limit: CHANNEL_CONTEXT_LIMIT, before: message.id });
+        for (const item of fetched.values()) if (item.id !== message.id && item.channelId === channelId) {
+          lines.set(item.id, lineFromDiscord(item as DiscordMessage));
         }
-        onMentions?.(msg.mentions || []);
-        const targets = mentionContext(msg.mentions || []);
-        return `[${neutralizeControlTokens(authorName)} <@${authorId}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${targets}`;
-      });
-    } else {
-      const fetchedMessages = await message.channel.messages.fetch({ limit: CHANNEL_CONTEXT_LIMIT, before: message.id });
-      const messageArray = Array.from(fetchedMessages.values()).reverse();
-
-      // prime cache for next turn
-      for (const msg of messageArray) {
-        await updateChannelCache(msg as DiscordMessage);
-      }
-
-      contextMessages = messageArray.map(msg => {
-        const authorName = msg.member?.displayName || msg.author.username;
-        const authorId = msg.author.id;
-        let content = msg.content;
-        if (!content) {
-          if (msg.system || msg.type !== 0) content = '[sys]';
-          else if (msg.attachments.size > 0 && msg.embeds.length > 0) content = '[attach+embed]';
-          else if (msg.attachments.size > 0) content = '[attach]';
-          else if (msg.embeds.length > 0) content = '[embed]';
-          else content = '[empty]';
-        }
-        const mentions = mentionReferences(msg);
-        onMentions?.(mentions);
-        const targets = mentionContext(mentions);
-        return `[${neutralizeControlTokens(authorName)} <@${authorId}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${targets}`;
-      });
+      } catch { /* Keep the same-channel cache when Discord history is unavailable. */ }
     }
-
-    return contextMessages.length > 0
-      ? `\n${startSep}\n${contextMessages.join('\n')}\n${endSep}`
+    const selected = [...lines.values()].sort((a, b) => a.at - b.at || a.id.localeCompare(b.id)).slice(-CHANNEL_CONTEXT_LIMIT);
+    for (const item of selected) onMentions?.(item.mentions);
+    return selected.length > 0
+      ? `\n${startSep}\n${selected.map(item => item.line).join('\n')}\n${endSep}`
       : '';
   } catch (error) {
     console.error('Error fetching channel context:', error);

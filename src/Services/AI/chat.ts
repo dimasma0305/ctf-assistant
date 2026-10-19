@@ -1048,9 +1048,10 @@ async function runChatTurn(
             }
 
             const rawContent = choiceMsg.content || '';
-            if ((spontaneous || options.continuation) && !rawContent.trim()) {
+            if ((spontaneous || options.continuation) && !rawContent.trim() && totalToolCalls === 0) {
                 // An unsolicited chime is optional. A deliberate empty result
-                // must not be retried into a forced interruption.
+                // must not be retried into a forced interruption. Once a tool
+                // has run, an empty completion must still deliver its result.
                 rollbackUserMessage();
                 return;
             }
