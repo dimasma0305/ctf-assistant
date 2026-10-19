@@ -61,7 +61,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           }catch{return Response.json({...result,imageObservation:{ok:false,error:'vision_unavailable'}});}
         }
         if(path==='/sources/search'){
-          if(++job.stats.searches>2)return Response.json({error:'search_budget'},{status:429});
+          if(++job.stats.searches>(job.packet.kind==='investigation'?6:2))return Response.json({error:'search_budget'},{status:429});
           const x=await request.json() as any;const query=String(x?.query||'').trim();
           if(!query||query.length>350||/[\w-]+\{[^}]*\}|%7[bBdD]|\b(?:sk-[\w-]+|Bearer\s+\S+)|<@!?\d+>|(?:password|api.?key|token)\s*[:=]/i.test(query))
             return Response.json({error:'invalid_or_private_query'},{status:400});
@@ -70,7 +70,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           return Response.json(result);
         }
         if(path==='/sources/read'){
-          if(++job.stats.sourceReads>8)return Response.json({error:'source_budget'},{status:429});
+          if(++job.stats.sourceReads>(job.packet.kind==='investigation'?16:8))return Response.json({error:'source_budget'},{status:429});
           const x=await request.json() as any;const url=publicResearchUrl(x?.url);
           if(!url||!allowedSources.has(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))return Response.json({error:'invalid_or_private_source'},{status:400});
           const doc=await new ResearchSourceReader(signal).read(url,String(x.query||'').slice(0,350));

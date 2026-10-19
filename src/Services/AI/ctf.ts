@@ -113,9 +113,9 @@ async function investigate(args: { question?: string; newCase?: boolean; solver?
       if(checkpoint&&JSON.stringify(checkpoint).length>23_000)checkpoint={title:previous?.title,summary:previous?.summary,candidates:previous?.candidates,
         unresolved:previous?.unresolved,teamProgress:previous?.teamProgress};
       const artifacts=await collectCodexArtifacts(context.originals,signal,turn.id);
-      const queued=await submitCodexJob({scope,guildId:turn.guildId!,channelId:turn.channelId!,messageId:turn.id!,userId:turn.author!.id!,
+      const queued=await submitCodexJob({scope,guildId:turn.guildId!,channelId:turn.channelId!,messageId:turn.id!,userId:turn.author!.id!,kind:'ctf',
         question:`${context.thread?.name?`[thread ${context.thread.name}] `:''}${String(args.question||turn.content||'')}`.slice(0,8000),context:context.text.slice(0,50_000),checkpoint,
-        route:['auto','luna','daybreak'].includes(args.solver||'')?args.solver!:'auto',artifacts},signal);
+        route:['auto','luna','sol','daybreak'].includes(args.solver||'')?args.solver!:'auto',artifacts},signal);
       report.ok=true;report.status='queued';report.job=queued.job;report.notes=previous||emptyNotes();report.notes.summary=`Job solver ${queued.job.id.slice(0,8)} masuk antrean.`;
       report.notes.unresolved=['Hasil akan dikirim otomatis ke channel asal setelah sandbox selesai.'];report.stats.elapsedMs=performance.now()-start;return report;
     }catch(error:any){

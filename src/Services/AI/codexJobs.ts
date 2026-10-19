@@ -1,16 +1,16 @@
 import http from 'node:http';
 
-export type CodexRoute = 'auto'|'luna'|'daybreak';
+export type CodexRoute = 'auto'|'luna'|'sol'|'daybreak';
 export interface CodexArtifact { name:string;data:string;image:boolean;sourceMessageId:string }
 export interface CodexPublicJob {
-  id:string;state:'pending'|'running'|'completed'|'failed'|'cancelled';createdAt:number;updatedAt:number;deliveredAt?:number;model?:string;
+  id:string;kind?:'ctf'|'investigation';state:'pending'|'running'|'completed'|'failed'|'cancelled';createdAt:number;updatedAt:number;deliveredAt?:number;model?:string;
   result?:{summary:string;flags:string[];findings:string[];unresolved:string[];needsStrongerModel:boolean};error?:string;
   stats:{calls:number;searches:number;sourceReads:number;visionReads:number;inputChars:number;outputBytes:number;elapsedMs:number;attempts:number};receiptCount:number;
   guildId:string;channelId:string;messageId:string;userId:string;
   sources:{url:string;title:string}[];
 }
 export interface CodexPacket {
-  scope:string;guildId:string;channelId:string;messageId:string;userId:string;question:string;context:string;checkpoint?:unknown;
+  scope:string;guildId:string;channelId:string;messageId:string;userId:string;question:string;context:string;checkpoint?:unknown;kind?:'ctf'|'investigation';
   route:CodexRoute;artifacts:CodexArtifact[];
 }
 export interface CodexDiscordReadRequest {
@@ -44,11 +44,12 @@ export const pendingCodexDiscordReads=()=>codexRequest<{ok:true;requests:CodexDi
 export const respondCodexDiscordRead=(id:string,jobId:string,result:unknown)=>codexRequest<{ok:true}>('/jobs/context/respond',{id,jobId,result});
 
 export function formatCodexResult(job:CodexPublicJob):string{
-  const short=job.id.slice(0,8),model=job.model==='gpt-daybreak-blue-latest'?'Daybreak Blue':job.model==='gpt-6-luna'?'Luna':job.model||'solver';
-  if(job.state==='failed')return `job CTF \`${short}\` gagal di sandbox (${job.error||'solver_failed'}). konteks dan file mentahnya sudah dibuang; kirim ulang kalau mau dicoba lagi.`;
-  if(job.state==='cancelled')return `job CTF \`${short}\` dibatalin.`;
-  const result=job.result;if(!result)return `job CTF \`${short}\` selesai tanpa hasil yang bisa dipakai.`;
-  const parts=[`🧩 **hasil ${model}** · job \`${short}\``,result.summary.trim()];
+  const short=job.id.slice(0,8),model=job.model==='gpt-daybreak-blue-latest'?'Daybreak Blue':job.model==='gpt-6-luna'?'Luna':job.model==='gpt-6.1-sol'?'Sol':job.model||'Codex';
+  const label=job.kind==='investigation'?'riset':'CTF';
+  if(job.state==='failed')return `job ${label} \`${short}\` gagal di sandbox (${job.error||'worker_failed'}). kirim ulang kalau mau dicoba lagi.`;
+  if(job.state==='cancelled')return `job ${label} \`${short}\` dibatalin.`;
+  const result=job.result;if(!result)return `job ${label} \`${short}\` selesai tanpa hasil yang bisa dipakai.`;
+  const parts=[`${job.kind==='investigation'?'🔎':'🧩'} **hasil ${model}** · job \`${short}\``,result.summary.trim()];
   if(result.flags.length)parts.push(`kandidat flag (belum dicek remote):\n${result.flags.map(flag=>`\`${flag.replace(/`/g,'')}\``).join('\n')}`);
   if(result.findings.length)parts.push(result.findings.slice(0,5).map(item=>`• ${item}`).join('\n'));
   if(job.sources?.length)parts.push(`sumber: ${job.sources.slice(0,2).map(source=>source.url).join(' · ')}`);

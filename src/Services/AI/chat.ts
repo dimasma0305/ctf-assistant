@@ -1,6 +1,6 @@
 import { formatTeamProgress, mergeTeamProgress } from './ctfProgress';
 import { loadThreadContext, formatThreadContext } from './threadContext';
-import { requiresCTFSolve, ctfToolAvailable, isCTFRetryRequest, setCTFTurnContext, getCTFReport, groundCTFReply } from './ctf';
+import { setCTFTurnContext, getCTFReport, groundCTFReply } from './ctf';
 import { ctfScope, loadCTFCase } from './ctfCases';
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { openai } from "../../utils/openai";
@@ -35,8 +35,8 @@ import { prepareVisionMessages, trimVisionMemory, forgetVisionReferences, hasVis
 import { inlineDiscordImages, type VisionDownloadCache } from './visionTransport';
 import { stripInternalAnnotations } from './output';
 import { ACTOR_ATTRIBUTION_CONTEXT, messageSources } from './attribution';
-import { requiresResearch, getResearchReport, groundResearchReply } from './research';
-import { classifyTurnIntent, needsSemanticRouting } from './intentRouter';
+import { getResearchReport, groundResearchReply } from './research';
+import { hasCodexDelegation } from './codexDelegate';
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -119,7 +119,7 @@ async function dispatchToolBounded(name: string, args: any, message: any, turnId
             dispatch,
             new Promise<string>((_, reject) => { timer = setTimeout(() => {
                 cancellation.abort(); reject(new Error('tool_timeout'));
-            }, ['research_topic', 'solve_ctf'].includes(name) ? 85_000 : TOOL_EXEC_TIMEOUT_MS); }),
+            }, ['research_topic', 'delegate_codex', 'solve_ctf'].includes(name) ? 85_000 : TOOL_EXEC_TIMEOUT_MS); }),
         ]);
         try { const p = JSON.parse(resultStr); if (p && REAL_TOOL_FAILURES.has(p.error)) loopStats.toolErrors++; } catch { /* non-JSON result */ }
         console.log(`   [${turnId}] tool ${name} ok ${Date.now() - t0}ms`);
@@ -727,29 +727,17 @@ async function runChatTurn(
         && (!entry.at || Date.now() - entry.at < 10 * 60_000)).slice(-5).map(entry => entry.content).join('\n')
         + (messageReference?.content || '');
     const ctfContext = [channelContext, replyContext, attachmentBlock.promptBlock, recentOwnText, threadBlock].join('\n');
-    const ctfRetry = !spontaneous && await isCTFRetryRequest(message);
     let lastTeamProgress = '';
-    const ctfHelp = /\b(?:bantu(?:in)?|tolong|solve|lanjut(?:kan)?|decode|decrypt|recover|pecahkan)\b/i.test(content);
-    const ctfCheckpoint = !spontaneous && (ctfHelp || ctfRetry || threadSnapshot) ? await loadCTFCase(ctfScope(message)) : null;
+    const ctfCheckpoint = !spontaneous ? await loadCTFCase(ctfScope(message)) : null;
     if (ctfCheckpoint?.teamProgress) {
         const progress = threadSnapshot ? mergeTeamProgress(ctfCheckpoint.teamProgress, undefined,
             [...threadSnapshot.messages, ...(threadSnapshot.starter ? [threadSnapshot.starter] : [])]) : ctfCheckpoint.teamProgress;
         lastTeamProgress = formatTeamProgress(progress);
     }
-    let ctfRequired = !spontaneous && (requiresCTFSolve(content, ctfContext, !!ctfCheckpoint) || ctfRetry);
-    let ctfAvailable = !spontaneous && (ctfToolAvailable(content, ctfContext, !!ctfCheckpoint) || ctfRetry);
-    let researchRequired = !ctfRequired && !spontaneous && requiresResearch(content, recentOwnText);
-    if (!spontaneous && !ctfRetry && needsSemanticRouting(content, { ctf: ctfRequired, research: requiresResearch(content, recentOwnText) })) {
-        const intent = await classifyTurnIntent({ text: content, threadName: threadSnapshot?.name,
-            threadStarter: threadSnapshot?.starter?.content,
-            recent: history.slice(-4).map(entry => typeof entry.content === 'string' ? entry.content : '') });
-        if (intent) {
-            ctfRequired = intent === 'ctf_solve';
-            researchRequired = intent === 'research';
-            ctfAvailable = ctfRequired;
-        }
-    }
-    const turnTools = ctfAvailable ? TOOL_DEFINITIONS : TOOL_DEFINITIONS.filter(tool => tool.function.name !== 'solve_ctf');
+    // The model chooses whether to use a quick tool, a research worker, or an
+    // isolated Codex job. Only an unsolicited chime is barred from creating a
+    // costly background job; no keyword list pre-routes addressed requests.
+    const turnTools = spontaneous ? TOOL_DEFINITIONS.filter(tool => tool.function.name !== 'delegate_codex') : TOOL_DEFINITIONS;
     setCTFTurnContext(message, { text: ctfContext, thread: threadSnapshot, images: [...attachmentBlock.images,
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
     const lastUserMessage: ChatMessage = {
@@ -948,9 +936,9 @@ async function runChatTurn(
                 {
                     model: MODELS.chat,
                     messages: conversation,
-                    tools: turnTools as any,
-                    tool_choice: getResearchReport(message) || getCTFReport(message) ? 'none' : iter === 0 && (researchRequired || ctfRequired)
-                        ? { type: 'function', function: { name: ctfRequired ? 'solve_ctf' : 'research_topic' } } : 'auto',
+                    tools: (getResearchReport(message)
+                        ? turnTools.filter(tool => tool.function.name !== 'research_topic') : turnTools) as any,
+                    tool_choice: getCTFReport(message) || hasCodexDelegation(message) ? 'none' : 'auto',
                     parallel_tool_calls: false,
                     n: 1,
                 } as any,
@@ -993,12 +981,6 @@ async function runChatTurn(
                         continue;
                     }
                     const fnName = tc.function?.name || '';
-                    if (fnName === 'solve_ctf' && !ctfAvailable) {
-                        conversation.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify({ error: 'unrelated_current_request',
-                            detail: 'Use the supplied conversation evidence to answer the current request; this turn does not request a CTF investigation.' }) });
-                        totalToolCalls++;
-                        continue;
-                    }
                     const rawArgs = tc.function?.arguments ?? '';
                     let parsedArgs: any;
                     try {
@@ -1174,7 +1156,7 @@ async function runChatTurn(
             return;
         }
 
-        finalContent = groundResearchReply(finalContent, getResearchReport(message), content);
+        if (!hasCodexDelegation(message)) finalContent = groundResearchReply(finalContent, getResearchReport(message), content);
         finalContent = groundCTFReply(finalContent, getCTFReport(message));
 
         // Output anti-spoof: if the model accidentally copied the speaker-tag

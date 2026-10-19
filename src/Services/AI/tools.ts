@@ -4,7 +4,7 @@ import { searchMessagesForTool, recallMemoryForTool } from "./search";
 import { grantFanRoleForTool } from "./fanRole";
 import { reflectOnInteraction, ignoreUserForTool, moveConversationToDM } from './socialTools';
 import { getEnvironmentForTool } from './environment';
-import { getDiscordProfileForTool, discordPersonResearchSubject } from './discordProfile';
+import { getDiscordProfileForTool } from './discordProfile';
 import { DISCORD_TOOL_DEFINITIONS, DISCORD_TOOL_NAMES, dispatchDiscordAction } from './discordActions';
 import {
     setReminderForTool,
@@ -22,6 +22,7 @@ import {
     completeTaskForTool,
 } from "./tasks";
 import { cancelCodexJob, codexSolverEnabled, getCodexJob } from './codexJobs';
+import { delegateCodexForTurn } from './codexDelegate';
 
 /**
  * Native function-calling tool registry for Hackerika.
@@ -42,24 +43,26 @@ export const TOOL_DEFINITIONS = [
     {
         type: 'function' as const,
         function: {
-            name: 'solve_ctf',
-            description: 'Kerjakan challenge CTF/OSINT/crypto/misc yang diminta. Saat solver terisolasi aktif, ini mengantrekan Codex dengan file/gambar asli dan konteks thread lengkap; hasil dikirim otomatis sesudah selesai. Pakai sebelum mengklaim hasil decode/flag. Tidak submit flag ke checker. Pertahankan hipotesis vs bukti dan minta clue asli yang benar-benar hilang.',
+            name: 'delegate_codex',
+            description: 'Pilihanmu untuk membuka agen Codex terisolasi jika pekerjaan memang butuh investigasi/eksperimen multi-langkah, membaca banyak sumber atau file, menjalankan kode, atau menyelesaikan challenge CTF. Hasil menyusul otomatis di channel/thread ini. Pilih sendiri berdasar kebutuhan percakapan, bukan kata kunci: untuk jawaban singkat, obrolan, atau cek satu sumber, jawab langsung atau pakai tool ringan. Jangan delegasi hanya karena ada kata CTF/OSINT/deepsearch. Agen dapat membaca konteks thread dan bukti Discord yang diizinkan; ia tidak dapat mengakses DM/channel lain atau submit flag. Default model Luna hemat; pilih model lebih kuat hanya jika kompleksitas memang perlu dan tersedia.',
             parameters: { type: 'object', properties: {
-                question: { type: 'string', maxLength: 4000, description: 'Challenge dan bagian yang perlu diselesaikan; konteks tim/gambar dilampirkan sistem. Jangan mengarang isi clue.' },
-                newCase: { type: 'boolean', description: 'true HANYA jika user jelas mulai challenge berbeda; false untuk melanjutkan checkpoint channel ini.' },
-                solver: { type:'string',enum:['auto','luna','daybreak'],description:'Default auto. Luna untuk challenge ringan/hemat. Daybreak hanya bila user yang terverifikasi memang meminta atau challenge eksploitasi memerlukannya.' },
-            }, required: ['question'], additionalProperties: false },
+                question: { type: 'string', maxLength: 4000, description: 'Tujuan spesifik agen berdasarkan permintaan user dan progres percakapan, bukan jawaban/hasil yang dikarang.' },
+                kind: { type: 'string', enum: ['ctf', 'investigation'], description: 'ctf untuk puzzle/challenge yang perlu dipecahkan; investigation untuk riset atau analisis multi-langkah lainnya. Pilihanmu, bukan aturan keyword.' },
+                targetUserId: { type: 'string', description: 'Opsional untuk riset profil member: hanya ID orang yang ditag eksplisit dalam pesan sekarang. Backend memvalidasi.' },
+                newCase: { type: 'boolean', description: 'Untuk CTF saja: true jika jelas mulai challenge berbeda; false untuk melanjutkan checkpoint channel.' },
+                solver: { type:'string',enum:['auto','luna','daybreak'],description:'auto/luna = paling hemat; daybreak hanya bila pekerjaan perlu kemampuan lebih dan akses peminta tersedia.' },
+            }, required: ['question', 'kind'], additionalProperties: false },
         },
     },
     {
         type:'function' as const,
-        function:{name:'ctf_job_status',description:'Cek status job CTF terakhir milik speaker sekarang di channel ini. jobId boleh dikosongkan.',
-            parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job CTF jika diketahui.'}},additionalProperties:false}},
+        function:{name:'codex_job_status',description:'Cek status job Codex CTF/riset terakhir milik speaker sekarang di channel ini. jobId boleh dikosongkan.',
+            parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job jika diketahui.'}},additionalProperties:false}},
     },
     {
         type:'function' as const,
-        function:{name:'cancel_ctf_job',description:'Batalkan job CTF aktif milik speaker sekarang di channel ini. jobId boleh dikosongkan untuk job aktif terakhir. Tidak bisa membatalkan job orang/channel lain.',
-            parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job CTF jika diketahui.'}},additionalProperties:false}},
+        function:{name:'cancel_codex_job',description:'Batalkan job Codex CTF/riset aktif milik speaker sekarang di channel ini. jobId boleh dikosongkan untuk job aktif terakhir. Tidak bisa membatalkan job orang/channel lain.',
+            parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job jika diketahui.'}},additionalProperties:false}},
     },
     {
         type: 'function' as const,
@@ -106,7 +109,7 @@ export const TOOL_DEFINITIONS = [
         type: 'function' as const,
         function: {
             name: 'get_environment',
-            description: 'Cek lingkungan Discord sekarang: DM vs guild, channel/topic/thread, izin nyata, channel yang user DAN bot bisa lihat, event dari cache. Tidak mengakses channel tersembunyi atau guild lain dari DM. Cache bisa belum lengkap.',
+            description: 'Cek lingkungan Discord sekarang jika informasi yang dibutuhkan belum ada di live-environment/context: DM vs guild, channel/topic/thread, izin nyata, channel yang user DAN bot bisa lihat, event dari cache. Bukan langkah rutin sebelum riset atau delegasi. Tidak mengakses channel tersembunyi atau guild lain dari DM. Cache bisa belum lengkap.',
             parameters: { type: 'object', properties: {
                 query: { type: 'string', maxLength: 100, description: 'Opsional, cari nama/topic channel atau nama event.' },
             }, additionalProperties: false },
@@ -380,10 +383,12 @@ export const TOOL_DEFINITIONS = [
         type: 'function' as const,
         function: {
             name: 'research_topic',
-            description: 'Riset bertahap untuk rekomendasi teknis, perbandingan produk, fitur/config/install, atau user minta cek repo/docs. UTAMAKAN tool ini untuk pertanyaan riset; jangan menebak dari nama/ingatan atau berhenti setelah README. Worker membaca sumber primer, menelusuri tautan dan tree/file GitHub pada commit yang dipin, mengecek bukti lalu mengembalikan findings + kutipan + URL + unresolved. Pertahankan URL/proyek user persis, termasuk dari konteks percakapan. Question cukup kebutuhan riset, bukan profil/DM/catatan pribadi. Ringkas hasil yang terdukung dan tautkan sumbernya; unresolved/stats hanya catatan internal, jangan salin ke jawaban. Jika bukti kurang, jawab secara umum dan bersyarat tanpa detail sumber yang belum dicek, lalu tanyakan satu fakta yang menentukan. Satu riset per turn, hingga 80 detik. Tidak menjalankan kode atau aksi Discord.',
+            description: 'Riset dalam turn ini untuk pertanyaan yang bisa selesai dengan beberapa sumber web/repo/docs. Worker menelusuri sumber primer dan tautan relevan, mengembalikan findings + kutipan + URL. Jika riset sebelumnya sudah berhenti dangkal/parsial dan user meminta investigasi lanjut, atau tugas butuh eksperimen kode/file/kelanjutan panjang, pilih delegate_codex bila satu cek cepat tidak cukup. Pertahankan URL/proyek user persis. Ringkas temuan terdukung; unresolved/stats hanya catatan internal. Satu riset per turn, hingga 80 detik. Tidak menjalankan kode atau aksi Discord.',
             parameters: { type: 'object', properties: {
                 question: { type: 'string', maxLength: 2400, description: 'Pertanyaan riset konkret lengkap dengan objek/versi yang dimaksud. Bedakan klaim user dari fakta.' },
                 urls: { type: 'array', maxItems: 4, items: { type: 'string' }, description: 'URL sumber yang diberikan user atau sumber primer relevan. Jangan ganti repo bernama mirip.' },
+                targetUserId: { type: 'string', description: 'Opsional: ID member yang ditag eksplisit pada pesan sekarang jika riset ini tentang profilnya. Backend memvalidasi.' },
+                deep: { type: 'boolean', description: 'Perlu penelusuran beberapa sumber/tautan terkait, dipilih berdasar tugas dan waktu yang tersedia.' },
             }, required: ['question'], additionalProperties: false },
         },
     },
@@ -478,26 +483,27 @@ export async function dispatchTool(
     options: { signal?: AbortSignal } = {},
 ): Promise<string> {
     try {
+        if (name === 'delegate_codex') return JSON.stringify(await delegateCodexForTurn(args || {}, message, options));
         if (name === 'solve_ctf') return JSON.stringify(await solveCTFForTurn(args || {}, message, options));
-        if(name==='ctf_job_status'||name==='cancel_ctf_job'){
+        if(['codex_job_status','cancel_codex_job','ctf_job_status','cancel_ctf_job'].includes(name)){
             if(!codexSolverEnabled())return JSON.stringify({ok:false,error:'isolated_solver_disabled'});
             const jobId=typeof args?.jobId==='string'&&/^[0-9a-f-]{36}$/i.test(args.jobId)?args.jobId:undefined;
             const scope=message.guildId?`${message.guildId}:${message.channelId}`:'';
             if(!scope||args?.jobId&& !jobId)return JSON.stringify({ok:false,error:'invalid_job'});
-            const result=name==='ctf_job_status'?await getCodexJob(jobId,scope,message.author.id,options.signal)
+            const result=name==='ctf_job_status'||name==='codex_job_status'?await getCodexJob(jobId,scope,message.author.id,options.signal)
                 :await cancelCodexJob(jobId,scope,message.author.id,options.signal);
             return JSON.stringify(result);
         }
         if (name === 'research_topic') {
             const suppliedUrls = [...(message.content || '').matchAll(/https?:\/\/[^\s<>]+/g)]
                 .map(match => match[0].replace(/[),.!?;]+$/, ''));
-            const targetId = discordPersonResearchSubject(message);
+            const targetId = typeof args?.targetUserId === 'string' ? args.targetUserId : null;
             const profileResult = targetId ? await getDiscordProfileForTool(message, { userId: targetId }) : null;
             const discordProfile = profileResult?.ok ? profileResult.profile : undefined;
             const result = await researchForTurn({ question: args?.question,
                 urls: [...new Set([...suppliedUrls, ...(Array.isArray(args?.urls) ? args.urls : [])])].slice(0, 4),
                 discordProfile,
-                deep: !!discordProfile && /\b(?:deep\s*search|osint|riset\s+mendalam|telusuri\s+mendalam)\b/i.test(message.content) }, message, options);
+                deep: args?.deep === true }, message, options);
             return JSON.stringify(result);
         }
         if (DISCORD_TOOL_NAMES.has(name)) return JSON.stringify(await dispatchDiscordAction(name, args, message));

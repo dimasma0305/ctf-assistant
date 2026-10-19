@@ -12,11 +12,15 @@ import { codexRequest, formatCodexResult } from '../../src/Services/AI/codexJobs
 const packet=()=>({scope:'555555555555555555:700000000000000001',guildId:'555555555555555555',channelId:'700000000000000001',
   messageId:'800000000000000001',userId:'663394727688798231',question:'solve pwn exploit ini',context:'thread evidence',route:'auto' as const,artifacts:[]});
 
-test('job packet validation and routing keep Daybreak owner-gated and Luna economical',()=>{
+test('model route is chosen by the manager, with economical auto and owner-gated Daybreak',()=>{
   const valid=validatePacket(packet());
   expect(chooseModel(valid,new Set(),new Set(['gpt-6-luna']))).toBe('gpt-6-luna');
-  expect(chooseModel(valid,new Set([valid.userId]),new Set(['gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-daybreak-blue-latest');
+  expect(chooseModel(valid,new Set([valid.userId]),new Set(['gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-6-luna');
+  expect(chooseModel({...valid,route:'daybreak'},new Set([valid.userId]),new Set(['gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-daybreak-blue-latest');
+  expect(chooseModel({...valid,route:'sol'},new Set(),new Set(['gpt-6-luna','gpt-6.1-sol']))).toBe('gpt-6.1-sol');
   expect(()=>chooseModel({...valid,route:'daybreak'},new Set(),new Set(['gpt-6-luna','gpt-daybreak-blue-latest']))).toThrow('daybreak_not_enabled');
+  expect(validatePacket({...packet(),kind:'investigation'}).kind).toBe('investigation');
+  expect(()=>validatePacket({...packet(),kind:'other'})).toThrow('invalid_job_packet');
   expect(()=>validatePacket({...packet(),scope:'other'})).toThrow('invalid_job_packet');
   expect(()=>validatePacket({...packet(),artifacts:[{name:'x',data:'not base64!',image:false,sourceMessageId:packet().messageId}]})).toThrow('invalid_artifact');
 });
@@ -46,6 +50,16 @@ test('public job output hides challenge bytes and formats only validated solver 
   job.state='completed';job.model='gpt-6-luna';job.result=resultFromText(JSON.stringify({summary:'selesai',flags:['LabCTF{ok}','not-a-flag'],findings:['python verified'],unresolved:[],needsStrongerModel:false}));
   const exposed=JSON.stringify(publicJob(job));expect(exposed).not.toContain('PRIVATE');expect(exposed).not.toContain('data');
   const rendered=formatCodexResult(publicJob(job));expect(rendered).toContain('LabCTF{ok}');expect(rendered).not.toContain('not-a-flag');expect(rendered).toContain('belum dicek remote');
+});
+
+test('investigation jobs keep their kind and render sourced findings without CTF framing',()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation',question:'compare two public projects'}));
+  job.state='completed';job.model='gpt-6-luna';job.result=resultFromText(JSON.stringify({summary:'Perbedaannya ada pada webhook.',flags:[],findings:['Konfigurasi A tercatat di docs publik.'],unresolved:[],needsStrongerModel:false}));
+  job.sources=[{url:'https://example.org/docs',title:'docs'}];
+  const exposed=publicJob(job);
+  expect(exposed.kind).toBe('investigation');
+  const rendered=formatCodexResult(exposed);
+  expect(rendered).toContain('🔎');expect(rendered).toContain('https://example.org/docs');expect(rendered).not.toContain('kandidat flag');
 });
 
 test('omitted flag is recovered only from explanatory prose and a successful proof command',()=>{
