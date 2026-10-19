@@ -279,7 +279,7 @@ function formatDeepDiscordProfileReply(report: ResearchReport, candidates: strin
   const profile = report.discordProfile!;
   const facts = formatDiscordProfileReply(profile).replace(/ Aku belum menemukan halaman publik.*$/u, '');
   const byId = new Map(report.sources.filter(source => source.kind !== 'search').map(source => [source.id, source]));
-  const claims = report.findings.flatMap(finding => {
+  const findings = report.findings.flatMap(finding => {
     const source = byId.get(finding.evidence[0]?.sourceId);
     if (!source || !publicResearchUrl(source.url)) return [];
     // Even a quote-backed claim can overstate identity. Keep the Discord facts
@@ -291,9 +291,33 @@ function formatDeepDiscordProfileReply(report: ResearchReport, candidates: strin
     const title = source.title.replace(/[\[\]()\\`]/g, '').replace(/@/g, '＠').slice(0, 60) || new URL(source.url).hostname;
     const claim = finding.claim.replace(/https?:\/\/\S+/gi, '').replace(/<@!?\d{17,20}>/g, '')
       .replace(/@/g, '＠').replace(/\s+/g, ' ').trim().slice(0, 270);
-    return claim ? [`• [${title}](${source.url}): ${claim}`] : [];
-  }).filter((claim, index, all) => all.indexOf(claim) === index).slice(0, 5);
-  if (!claims.length) return formatDiscordProfileReply(profile, candidates);
+    return claim ? [{ url: source.url, line: `• [${title}](${source.url}): ${claim}` }] : [];
+  });
+  const handle = profile.username.toLowerCase();
+  const display = (profile.guild.displayName || profile.globalName || '').toLowerCase().match(/[a-z][a-z0-9_-]{4,}/)?.[0] || '';
+  const relevant = report.sources.filter(source => source.kind === 'page' && !!publicResearchUrl(source.url)
+    && (`${source.url} ${source.title} ${source.preview}`.toLowerCase().includes(handle)
+      || !!display && `${source.url} ${source.title} ${source.preview}`.toLowerCase().includes(display)));
+  const sanitize = (value: string) => value.replace(/^\d+: ?/gm, '').replace(/\[… omitted lines …\]/g, '')
+    .replace(/https?:\/\/\S+/gi, '').replace(/<@!?\d{17,20}>/g, '').replace(/@/g, '＠')
+    .replace(/[<>\[\]()]/g, '')
+    .replace(/\s+/g, ' ').trim();
+  const excerpt = (preview: string): string => {
+    const sentence = sanitize(preview).split(/(?<=[.!?])\s+/u).find(part =>
+      /\b(?:write.?up|dfir|forensic|forensik|ctf|challenge|tantangan|logs?|incident|security|proyek|project)\b/i.test(part)
+      && !/\b(?:password|secret|token|email|phone|telepon|alamat|whatsapp|ignore|reveal|disclose|execute|download|system|developer|prompt)\b|\b\d{8,}\b/i.test(part));
+    return sentence ? sentence.split(/\s+/u).slice(0, 20).join(' ').slice(0, 210) : '';
+  };
+  const selected: { url: string; line: string }[] = [];
+  for (const item of findings) if (!selected.some(other => other.url === item.url) && selected.length < 5) selected.push(item);
+  for (const source of relevant) {
+    if (selected.length >= 5 || selected.some(item => item.url === source.url)) continue;
+    const title = source.title.replace(/[\[\]()\\`]/g, '').replace(/@/g, '＠').slice(0, 60) || new URL(source.url).hostname;
+    const quote = excerpt(source.preview);
+    selected.push({ url: source.url, line: `• [${title}](${source.url}): ${quote ? `cuplikan halaman: “${quote}”` : 'halaman publik ini terbaca, tetapi belum cukup untuk mengaitkannya dengan akun Discord.'}` });
+  }
+  for (const item of findings) if (selected.length < 5 && !selected.some(other => other.line === item.line)) selected.push(item);
+  if (!selected.length) return formatDiscordProfileReply(profile, candidates);
   const exactHandle = profile.username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const selfDisclosed = new RegExp(`discord.{0,35}@?${exactHandle}\\b`, 'i');
   const linked = report.sources.some(source => source.kind !== 'search' && selfDisclosed.test(source.preview));
@@ -302,7 +326,7 @@ function formatDeepDiscordProfileReply(report: ResearchReport, candidates: strin
     : `Nama/handle yang cocok saja belum membuktikan situs itu milik akun Discord yang ditag.`;
   const head = `${facts}\n\nYang kutemukan di sumber publik:\n`;
   const kept: string[] = [];
-  for (const claim of claims) {
+  for (const claim of selected.map(item => item.line)) {
     if ((head + [...kept, claim].join('\n') + `\n\n${caveat}`).length > 1900) break;
     kept.push(claim);
   }

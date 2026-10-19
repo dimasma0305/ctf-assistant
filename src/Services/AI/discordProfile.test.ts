@@ -137,3 +137,24 @@ test('deep profile answer includes multiple sourced professional findings while 
   expect(answer).not.toContain('pemilik website');
   expect(answer).toContain('belum membuktikan');
 });
+
+test('deep profile includes an inspected writeup and other read candidates when synthesis omits them', () => {
+  const profile: DiscordProfile = { id: target, username: 'mossbyte', globalName: 'Moss Byte', bot: false,
+    accountCreatedAt: '2021-01-01T00:00:00Z', accountCreatedAtBasis: 'discord_snowflake', avatarUrl: null,
+    bannerUrl: null, publicFlags: [], guild: { id: '555555555555555555', displayName: 'Moss Byte', nickname: null,
+      joinedAt: '2026-08-01T00:00:00Z', roles: [], avatarUrl: null, bannerUrl: null } };
+  const report: NonNullable<Parameters<typeof groundResearchReply>[1]> = { ok: true, status: 'supported',
+    question: 'deepsearch', discordProfile: profile, deep: true, unresolved: [],
+    findings: [{ claim: 'Halaman About menyebut fokus DFIR.', evidence: [{ sourceId: 'S1', quote: 'DFIR' }] }],
+    sources: [
+      { id: 'S1', kind: 'page', url: 'https://example.com/mossbyte/about', title: 'About', preview: 'Mossbyte focuses on DFIR.' },
+      { id: 'S2', kind: 'page', url: 'https://example.com/mossbyte/writeups', title: 'Writeup', preview: 'Blue Lantern writeup documents timeline reconstruction from proxy and authentication logs.' },
+      { id: 'S3', kind: 'page', url: 'https://example.com/mossbyte/other', title: 'Other', preview: 'A page with no relevant professional facts.' },
+    ], stats: { model: 'fixture', modelCalls: 2, actions: 3, nativeSearches: 1,
+      elapsedMs: 1, promptTokens: 1, completionTokens: 1 } };
+  const answer = groundResearchReply('short draft', report);
+  expect(answer).toContain('https://example.com/mossbyte/writeups');
+  expect(answer).toContain('proxy and authentication logs');
+  expect(answer).toContain('https://example.com/mossbyte/other');
+  expect(answer).toContain('belum membuktikan');
+});

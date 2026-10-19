@@ -17,6 +17,7 @@ RestartSec=3
 UMask=0077
 RuntimeDirectory=hackerika-codex hackerika-codex-jobs
 RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=yes
 StateDirectory=hackerika-codex
 StateDirectoryMode=0700
 ReadWritePaths=/run/hackerika-codex /run/hackerika-codex-jobs /var/lib/hackerika-codex /root/app/ctf-assistant/runtime-secrets/chatgpt
