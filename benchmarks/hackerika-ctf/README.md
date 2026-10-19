@@ -1,5 +1,9 @@
 # Hackerika CTF capability benchmark
 
+## TCP1P “solve another challenge” routing — 2026-10-19
+
+The live request `@Hackerika solve 1 soal lagi yg ada di tcp1p` called `research_topic` and ended with a generic search failure. Its wording had the solve verb but no keyword recognized as a CTF task, so `solve_ctf` was omitted from that turn's tool list. The router now treats a challenge/soal/tantangan tied to TCP1P as a CTF request. The [matched image comparison](tcp1p-route-comparison-20261019.json) moved from **4/6 to 6/6** routing cases: the incident and an equivalent challenge request now require and expose `solve_ctf`; reminder, platform-research and banter controls remain outside that route. This checks routing only, not whether an unspecified challenge can ultimately be solved or its flag accepted.
+
 This evaluates requested CTF investigations through the real chat handler, native tools, original Discord image transport, nested model calls, primary-source reader and isolated calculator. Discord sends, profiles and channel histories are synthetic. Public search/page responses use controlled fixtures; no real flags are submitted and no real Discord messages are sent. A separate live search/reader smoke and a private MongoDB checkpoint round trip validate transport/persistence independently.
 
 ## Results

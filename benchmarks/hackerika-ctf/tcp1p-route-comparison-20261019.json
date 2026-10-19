@@ -1,0 +1,113 @@
+{
+  "at": "2026-10-19T08:51:17.548Z",
+  "method": "Same frozen prompts and context, production TypeScript imported from isolated Docker images, no model or network calls.",
+  "baselineImage": "ctf-assistant:3f82c40",
+  "candidateImage": "ctf-assistant:tcp1p-route-candidate-20261019",
+  "cases": [
+    {
+      "id": "incident",
+      "text": "<@1077393568647352320> solve 1 soal lagi yg ada di tcp1p",
+      "context": "Denis JS write-up, challenge sebelumnya",
+      "want": true
+    },
+    {
+      "id": "another_challenge",
+      "text": "tolong pecahkan challenge TCP1P yang lain",
+      "context": "",
+      "want": true
+    },
+    {
+      "id": "existing_ctf",
+      "text": "bantu solve CTF crypto",
+      "context": "",
+      "want": true
+    },
+    {
+      "id": "reminder",
+      "text": "bantu buat reminder TCP1P besok",
+      "context": "W: earlier CTF flag clue",
+      "want": false
+    },
+    {
+      "id": "platform_research",
+      "text": "tolong riset platform TCP1P",
+      "context": "",
+      "want": false
+    },
+    {
+      "id": "banter",
+      "text": "TCP1P tadi seru wkwk",
+      "context": "",
+      "want": false
+    }
+  ],
+  "baseline": [
+    {
+      "id": "incident",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "another_challenge",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "existing_ctf",
+      "required": true,
+      "available": true
+    },
+    {
+      "id": "reminder",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "platform_research",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "banter",
+      "required": false,
+      "available": false
+    }
+  ],
+  "candidate": [
+    {
+      "id": "incident",
+      "required": true,
+      "available": true
+    },
+    {
+      "id": "another_challenge",
+      "required": true,
+      "available": true
+    },
+    {
+      "id": "existing_ctf",
+      "required": true,
+      "available": true
+    },
+    {
+      "id": "reminder",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "platform_research",
+      "required": false,
+      "available": false
+    },
+    {
+      "id": "banter",
+      "required": false,
+      "available": false
+    }
+  ],
+  "correct": {
+    "baseline": 4,
+    "candidate": 6,
+    "total": 6
+  }
+}

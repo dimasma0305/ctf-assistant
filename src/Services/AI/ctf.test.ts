@@ -10,6 +10,16 @@ test('CTF intent routes team help but leaves research recommendations and banter
   expect(requiresCTFSolve('lanjut yang tadi','',true)).toBe(true);
   for(const text of ['saran platform CTF yang bisa deploy','CTF tadi seru wkwk','istirahat dulu, nanti lanjut CTF','jangan jawab dulu, aku mau kirim CTF','sayang rika']) expect(requiresCTFSolve(text)).toBe(false);
 });
+test('request to solve another TCP1P challenge forces the CTF solver', () => {
+  const message = '<@1077393568647352320> solve 1 soal lagi yg ada di tcp1p';
+  expect(requiresCTFSolve(message, 'Denis JS write-up, challenge sebelumnya')).toBe(true);
+  expect(ctfToolAvailable(message, 'Denis JS write-up, challenge sebelumnya')).toBe(true);
+  expect(requiresCTFSolve('tolong pecahkan challenge TCP1P yang lain')).toBe(true);
+  for (const unrelated of ['bantu buat reminder TCP1P besok', 'tolong riset platform TCP1P', 'TCP1P tadi seru wkwk']) {
+    expect(requiresCTFSolve(unrelated, 'W: earlier CTF flag clue', true)).toBe(false);
+    expect(ctfToolAvailable(unrelated)).toBe(false);
+  }
+});
 test('public discovery rejects complete flags and credentials including URL-encoded flags', () => {
   expect(publicCTFQuery('Andrew Prahlow official composer')).toBe('Andrew Prahlow official composer');
   for(const input of ['Securinets{private_value}','LabCTF%7Bprivate%7D','token=private','<@111111111111111111> question','x'.repeat(351)]) expect(publicCTFQuery(input)).toBe(null);

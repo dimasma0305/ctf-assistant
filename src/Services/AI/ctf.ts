@@ -36,6 +36,8 @@ Only JSON: {"done":boolean,"title":"short challenge identity","summary":"progres
 export function requiresCTFSolve(text: string, context = '', activeCase = false): boolean {
   if (/\b(?:jangan|ga usah|nggak usah|tidak perlu)\s+(?:jawab|balas|reply|solve)|\b(?:wait|do not reply|don't reply|istirahat)\b/i.test(text)) return false;
   const task = /\b(?:ctf|osint|cipher|ciphertext|flag|forensics|steganografi|reverse engineering)\b|[\w-]+\{[^\n}]{3,}\}/i;
+  const contestChallenge = /\b(?:soal|challenge|tantangan)\b/i.test(text)
+    && /\b(?:tcp1p|ctf|1pc\.tf)\b/i.test(text);
   const progress = /\b(?:rekap|ringkas(?:kan)?|progres|progress|(?:sudah|udah)\s+(?:ketemu|dapet|didapat))\b/i.test(text);
   if (progress && (task.test(context) || activeCase)) return true;
   const help = /\b(?:bantu(?:in)?|tolong|solve|selesai(?:kan)?|pecah(?:kan)?|decode|decrypt|recover|lanjut(?:kan)?|cari|bruteforce|generate|analisis)\b/i.test(text);
@@ -43,14 +45,15 @@ export function requiresCTFSolve(text: string, context = '', activeCase = false)
   const reference = /\b(?:tadi|lanjut(?:kan)?|yang\s+(?:ini|itu)|punya\s+\S+)\b/i.test(text);
   const bareHelp = /^(?:bantu(?:in)?|tolong|solve|decode|decrypt)(?:\s+(?:ini|itu))?(?:\s+(?:dong|ya|pls|please))?[!?.]*$/i.test(
     text.replace(/<@!?\d+>/g, '').replace(/\b(?:hackerika|rika|rik|erika)\b/ig, '').trim());
-  return help && (task.test(text) || (task.test(context) || activeCase) && (reference || bareHelp));
+  return help && (task.test(text) || contestChallenge || (task.test(context) || activeCase) && (reference || bareHelp));
 }
 /** The channel name or old CTF chatter alone must not launch an investigation
  * for an unrelated current request. Explicit puzzle questions remain eligible
  * even when they do not use a verb that forces the tool. */
 export function ctfToolAvailable(text: string, context = '', activeCase = false): boolean {
   return requiresCTFSolve(text, context, activeCase)
-    || /\b(?:ctf|osint|cipher|ciphertext|flag|forensics|steganografi|reverse engineering)\b|[\w-]+\{[^\n}]{3,}\}/i.test(text);
+    || /\b(?:ctf|osint|cipher|ciphertext|flag|forensics|steganografi|reverse engineering)\b|[\w-]+\{[^\n}]{3,}\}/i.test(text)
+    || /\b(?:soal|challenge|tantangan)\b/i.test(text) && /\b(?:tcp1p|1pc\.tf)\b/i.test(text);
 }
 export function publicCTFQuery(value: unknown): string | null {
   if (typeof value !== 'string') return null;
