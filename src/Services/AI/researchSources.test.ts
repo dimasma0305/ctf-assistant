@@ -26,6 +26,42 @@ test('HTML reader follows portfolio routes kept only in the header without treat
   expect(result.content).not.toContain('About CTF');
 });
 
+test('static Slidev shell reveals its slide modules and a slide reveals public archive links', async () => {
+  const pages: Record<string, [string,string]> = {
+    'https://example.com/2': ['text/html', '<title>Training slides</title><script type="module" src="/assets/index-a.js"></script><div id="app"></div>'],
+    'https://example.com/assets/index-a.js': ['application/javascript', 'const __vite__mapDeps=["assets/md-a.js","assets/md-b.js"];'],
+    'https://example.com/assets/md-b.js': ['application/javascript', 'const __slidev_2=a(`a`,{href:`/downloads/student.zip`},`Download challenge ZIP`);'],
+  };
+  restores.push(spyOn(researchTransport, 'fetch').mockImplementation((async (url: any) => {
+    const [type, body] = pages[String(url)] || ['text/plain', 'missing'];
+    return new Response(body, { status: pages[String(url)] ? 200 : 404, headers: { 'content-type': type } });
+  }) as any));
+  const reader = new ResearchSourceReader(AbortSignal.timeout(1000));
+  const shell = await reader.read('https://example.com/2');
+  expect(shell.links[0].url).toBe('https://example.com/assets/index-a.js');
+  const entry = await reader.read(shell.links[0].url);
+  expect(entry.links.map(link => link.url)).toContain('https://example.com/assets/md-b.js');
+  const slide = await reader.read('https://example.com/assets/md-b.js');
+  expect(slide.content).toContain('Download challenge ZIP');
+  expect(slide.links[0].url).toBe('https://example.com/downloads/student.zip');
+});
+
+test('ordinary JavaScript source remains readable as code', async () => {
+  restores.push(spyOn(researchTransport, 'fetch').mockResolvedValue(new Response('export function solve(x) { return x + 1; }',
+    { headers: { 'content-type': 'application/javascript' } })));
+  const result = await new ResearchSourceReader(AbortSignal.timeout(1000)).read('https://example.com/solver.js');
+  expect(result.content).toContain('export function solve(x)');
+});
+
+test('public binary downloads preserve bytes and reject oversized bodies', async () => {
+  const payload = Buffer.from('504b030400ff00', 'hex');
+  restores.push(spyOn(researchTransport, 'fetch').mockResolvedValue(new Response(payload,
+    { headers: { 'content-type': 'application/zip', 'content-length': String(payload.length) } })));
+  const reader = new ResearchSourceReader(AbortSignal.timeout(1000));
+  expect((await reader.download('https://example.com/downloads/student.zip')).data).toEqual(payload);
+  await expect(reader.download('https://example.com/downloads/student.zip', payload.length - 1)).rejects.toThrow('source_file_too_large');
+});
+
 test('repository reads pin files to the resolved commit and preserve metadata without assuming ancestry', async () => {
   const sha = 'c3'.repeat(20), requests: string[] = [];
   restores.push(spyOn(researchTransport, 'fetch').mockImplementation((async (url: any) => {
@@ -72,4 +108,5 @@ test('source URLs reject credentials and repository parsing rejects foreign or m
 
 test('production transport rejects private destinations before any HTTP request', async () => {
   await expect(new ResearchSourceReader(AbortSignal.timeout(1000)).read('http://127.0.0.1/private')).rejects.toThrow('private_target');
+  await expect(new ResearchSourceReader(AbortSignal.timeout(1000)).download('http://127.0.0.1/private')).rejects.toThrow('private_target');
 });

@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 
-const pinnedImage='hackerika-codex-worker:0.163.0-3';
+const pinnedImage='hackerika-codex-worker:0.163.0-4';
 const pinnedBin='/root/.codex/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/bin';
 
 async function run(args:string[],timeoutMs:number):Promise<number>{

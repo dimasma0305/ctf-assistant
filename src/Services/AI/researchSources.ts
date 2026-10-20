@@ -75,11 +75,26 @@ function parsePage(raw: string, url: string, html: boolean): { title: string; te
     if (target && !links.some(link => link.url === target) && links.length < 60) links.push({ url: target, title: title.slice(0, 160) });
   };
   if (!html) {
+    if (/\.m?js(?:\?|$)/i.test(url) && /__vite__mapDeps|__slidev_/i.test(raw)) {
+      // Static Slidev/Vite builds put slide text in JS chunks. Expose their
+      // public asset frontier without executing the bundle.
+      const candidates = [...raw.matchAll(/["'`]((?:https?:\/\/|\/downloads\/|\/?assets\/(?:slidev\/)?md-)[^"'`\s]{1,1500})["'`]/g)]
+        .map(match => match[1]);
+      for (const candidate of candidates) addLink(candidate.startsWith('assets/') ? `/${candidate}` : candidate, candidate);
+      const isSlideChunk = /(?:^|\/)md-[\w-]+\.js(?:\?|$)/i.test(url);
+      const strings = isSlideChunk ? [...raw.matchAll(/`((?:\\.|[^`\\])*)`/g)]
+        .map(match => match[1].replace(/\\n/g, '\n').replace(/\\`/g, '`'))
+        .filter(value => /[\p{L}\p{N}]/u.test(value) && value.length < 2000).slice(0, 180) : [];
+      return { title: url.split('/').at(-1) || url,
+        text: [...(strings.length ? strings : ['Static JavaScript bundle. Follow its linked slide chunks for content.']),
+          ...links.map(link => `Link: ${link.url}`)].join('\n'), links };
+    }
     for (const match of raw.matchAll(/\[([^\]]{1,180})\]\(([^\s)]+)\)/g)) addLink(match[2], match[1]);
     return { title: url.split('/').at(-1) || url, text: raw, links };
   }
   const $ = cheerio.load(raw);
   const title = $('title').first().text().trim() || $('h1').first().text().trim() || new URL(url).hostname;
+  $('script[src]').slice(0, 8).each((_i, element) => addLink($(element).attr('src'), 'Static page script'));
   // Portfolio and documentation sites often put their only About/Projects
   // routes in the header. Keep a small link frontier before dropping nav text.
   $('nav a[href], header a[href]').slice(0, 12).each((_i, element) => addLink($(element).attr('href'), $(element).text().trim()));
@@ -102,10 +117,10 @@ export class ResearchSourceReader {
     const pending = (async () => {
       const response = await researchTransport.fetch(url, { method: 'GET',
         signal: AbortSignal.any([this.signal, AbortSignal.timeout(12_000)]),
-        headers: { 'User-Agent': 'Hackerika-Research/1', Accept: 'application/json,text/html,text/plain;q=0.9', 'X-GitHub-Api-Version': '2022-11-28' } });
+        headers: { 'User-Agent': 'Hackerika-Research/1', Accept: 'application/json,text/html,text/plain,application/javascript;q=0.9', 'X-GitHub-Api-Version': '2022-11-28' } });
       if (!response.ok) { await response.body?.cancel(); throw new Error(`source_http_${response.status}`); }
       const type = response.headers.get('content-type') || '';
-      if (type && !/text|json|xml|html/i.test(type)) { await response.body?.cancel(); throw new Error('source_non_text'); }
+      if (type && !/text|json|xml|html|javascript|ecmascript/i.test(type)) { await response.body?.cancel(); throw new Error('source_non_text'); }
       return { raw: await readResponseTextWithLimit(response, maxBytes), url: response.url || url, type };
     })();
     this.textCache.set(url, pending);
@@ -126,6 +141,34 @@ export class ResearchSourceReader {
     const parsed = parsePage(page.raw, page.url, /html/i.test(page.type) || /^\s*<(?:!doctype|html|main)/i.test(page.raw));
     const excerpt = sourceExcerpt(parsed.text, focus);
     return { url: page.url, title: parsed.title, kind: 'page', ...excerpt, links: parsed.links };
+  }
+
+  async download(urlValue: string, maxBytes = 8 * 1024 * 1024): Promise<{ url: string; name: string; data: Buffer }> {
+    const url = publicResearchUrl(urlValue);
+    if (!url) throw new Error('invalid_source_url');
+    const response = await researchTransport.fetch(url, { method: 'GET',
+      signal: AbortSignal.any([this.signal, AbortSignal.timeout(25_000)]),
+      headers: { 'User-Agent': 'Hackerika-Research/1' } });
+    if (!response.ok) { await response.body?.cancel(); throw new Error(`source_http_${response.status}`); }
+    const length = Number(response.headers.get('content-length'));
+    if (Number.isFinite(length) && length > maxBytes) { await response.body?.cancel(); throw new Error('source_file_too_large'); }
+    const chunks: Buffer[] = []; let size = 0;
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error('source_empty_body');
+    try {
+      for (;;) {
+        const { done, value } = await reader.read(); if (done) break;
+        size += value.byteLength;
+        if (size > maxBytes) { await reader.cancel(); throw new Error('source_file_too_large'); }
+        chunks.push(Buffer.from(value));
+      }
+    } finally { reader.releaseLock(); }
+    const finalUrl = response.url || url;
+    const finalSegment = new URL(finalUrl).pathname.split('/').at(-1) || 'download.bin';
+    let decodedName = finalSegment;
+    try { decodedName = decodeURIComponent(finalSegment); } catch { /* Keep the URL-encoded name. */ }
+    const name = decodedName.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 80) || 'download.bin';
+    return { url: finalUrl, name, data: Buffer.concat(chunks, size) };
   }
 
   private async snapshot(repo: string, ref?: string): Promise<any> {

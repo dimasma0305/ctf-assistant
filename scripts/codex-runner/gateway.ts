@@ -16,6 +16,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
   const maxInputChars=dependencies.maxInputChars??(job.packet.kind==='investigation'?3_000_000:2_000_000);
   const visionCache=new Map<string,string>();
   job.stats.searches ||= 0;job.stats.sourceReads ||= 0;job.stats.visionReads ||= 0;
+  let downloads=0;
   const allowedSources=new Set<string>();
   for(const match of `${job.packet.question}\n${job.packet.context}\n${JSON.stringify(job.packet.checkpoint||{})}`.matchAll(/https?:\/\/[^\s<>`"']+/g)){
     const url=publicResearchUrl(match[0].replace(/[),.!?;]+$/,''));if(url&&allowedSources.size<24)allowedSources.add(url);
@@ -81,6 +82,15 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           // destination and redirect before making a network request.
           for(const link of doc.links||[]){const next=publicResearchUrl(link.url);if(next&&allowedSources.size<60)allowedSources.add(next);}
           sources.push({url:doc.url,title:doc.title,content:doc.content.slice(0,12000)});return Response.json(doc);
+        }
+        if(path==='/sources/download'){
+          if(++downloads>3)return Response.json({error:'download_budget'},{status:429});
+          const x=await request.json() as any;const url=publicResearchUrl(x?.url);
+          if(!url||!allowedSources.has(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))
+            return Response.json({error:'invalid_or_private_source'},{status:400});
+          const file=await new ResearchSourceReader(signal).download(url);
+          return new Response(new Uint8Array(file.data),{headers:{'Content-Type':'application/octet-stream',
+            'Content-Disposition':`attachment; filename="${file.name}"`,'Cache-Control':'no-store'}});
         }
         if(path!=='/v1/responses')return Response.json({error:'route_not_found'},{status:404});
         const waitStarted=Date.now();while(active&&Date.now()-waitStarted<15_000)await new Promise(resolve=>setTimeout(resolve,25));

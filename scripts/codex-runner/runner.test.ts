@@ -56,9 +56,9 @@ test('Docker worker arguments expose only disposable tmpfs and one inference soc
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
   const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-3',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-4',dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-3',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-4',dependencies);
   expect(builds).toBe(1);
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');
@@ -190,6 +190,35 @@ test('source gateway follows a public cross-domain link found on an inspected pa
     const second=await codexRequest<{url:string;content:string}>('/sources/read',
       {url:'https://fixture-b.example/original'},{socketPath:socket});
     expect(second.content).toContain('Original record confirms');
+  }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
+});
+
+test('source gateway downloads only a discovered Slidev archive as exact binary bytes',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-slide-download-test-')),socket=join(directory,'source.sock');
+  const originalFetch=researchTransport.fetch;
+  const archive=Buffer.from('504b030400ff00', 'hex');
+  researchTransport.fetch=async url=>{
+    const path=new URL(String(url)).pathname;
+    if(path==='/2')return new Response('<script type="module" src="/assets/index-a.js"></script>',{headers:{'content-type':'text/html'}});
+    if(path==='/assets/index-a.js')return new Response('const __vite__mapDeps=["assets/md-a.js"];',{headers:{'content-type':'application/javascript'}});
+    if(path==='/assets/md-a.js')return new Response('const __slidev_2=a(`a`,{href:`/downloads/lab.zip`},`Download lab`)',{headers:{'content-type':'application/javascript'}});
+    if(path==='/downloads/lab.zip')return new Response(archive,{headers:{'content-type':'application/zip'}});
+    return new Response('missing',{status:404});
+  };
+  const job=newJob(validatePacket({...packet(),question:'Read https://slides.example/2',kind:'investigation'}));
+  const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal);
+  const read=(url:string)=>codexRequest<{links:{url:string}[]}>('/sources/read',{url},{socketPath:socket});
+  const download=(url:string)=>fetch('http://localhost/sources/download',{unix:socket,method:'POST',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({url})} as RequestInit & {unix:string});
+  try{
+    expect((await download('https://slides.example/downloads/lab.zip')).status).toBe(400);
+    const shell=await read('https://slides.example/2');
+    const entry=await read(shell.links[0].url);
+    const slide=await read(entry.links[0].url);
+    const response=await download(slide.links[0].url);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-disposition')).toContain('lab.zip');
+    expect(Buffer.from(await response.arrayBuffer())).toEqual(archive);
   }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
 });
 
