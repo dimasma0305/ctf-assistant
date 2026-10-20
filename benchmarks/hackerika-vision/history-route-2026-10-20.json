@@ -1,0 +1,29 @@
+{
+  "model": "gpt-6-luna",
+  "synthetic": true,
+  "noDiscordActions": true,
+  "rows": [
+    {
+      "id": "historical_charts",
+      "expectedTool": "read_channel_images",
+      "actualTool": "read_channel_images",
+      "pass": true,
+      "text": ""
+    },
+    {
+      "id": "historical_chart_detail",
+      "expectedTool": "read_channel_images",
+      "actualTool": "read_channel_images",
+      "pass": true,
+      "text": "",
+      "visualAnswer": "Rabu, nilainya 19 peserta."
+    },
+    {
+      "id": "text_only",
+      "expectedTool": null,
+      "actualTool": null,
+      "pass": true,
+      "text": "Dimas bilang freshgrad harus nunggu senior pensiun dan pasar kerja terasa kayak crypto, berharap rebound; !n4cttt pengin masuk blue team. Dimas menyarankan jadi SOC AI phishing.\n"
+    }
+  ]
+}

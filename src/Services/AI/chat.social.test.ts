@@ -258,8 +258,24 @@ if (visionMode) {
     : new Response(Buffer.from('89504e470d0a1a0a0000000000000000', 'hex'), { headers: { 'content-type': 'image/png' } });
   message.author.id = '663394727688798231';
   message.content = 'hackerika lihat gambar ini';
-  message.attachments.set('image', { name: 'screen.png', contentType: 'image/png', size: 2048,
+  if (mode !== 'vision_history') message.attachments.set('image', { name: 'screen.png', contentType: 'image/png', size: 2048,
     url: 'https://cdn.discordapp.com/attachments/111111111111111111/222222222222222222/screen.png?ex=ffffffff&hm=private' });
+  if (mode === 'vision_history') {
+    const { Collection } = await import('discord.js');
+    const now = Date.now(); message.createdTimestamp = now;
+    message.content = 'hackerika tolong validasi percakapan dan gambar-gambar di atas';
+    message.member = { id: message.author.id, roles: { cache: new Collection() } };
+    message.guild.members.me = { id: 'bot' };
+    channel.guildId = message.guild.id;
+    channel.permissionsFor = () => ({ has: () => true });
+    const old = [1, 2, 3, 4].map(n => ({ id: String(222222222222222220n + BigInt(n)), channelId: channel.id,
+      createdTimestamp: now - (5 - n) * 60000, author: { id: 'another-member-' + n, username: 'member' + n },
+      content: n === 1 ? 'grafik pekerjaan' : 'prediksi rebound',
+      attachments: new Collection([[String(n), { name: 'chart-' + n + '.png', contentType: 'image/png', size: 2048,
+        url: 'https://cdn.discordapp.com/attachments/111111111111111111/' + String(222222222222222220n + BigInt(n)) + '/chart.png?ex=ffffffff' }]]) }));
+    channel.messages.fetch = async arg => typeof arg === 'string' ? old.find(item => item.id === arg) || null
+      : new Collection(old.map(item => [item.id, item]));
+  }
   if (mode === 'vision_dm') { message.guild = null; message.guildId = null; message.content = ''; }
   if (mode === 'vision_fallback') console.warn = text => visionWarnings.push(text);
   if (mode === 'vision_burst' || mode === 'vision_reply') {
@@ -291,6 +307,18 @@ openai.chat.completions.create = async payload => {
   if (mode === 'metadata_echo' || mode === 'metadata_only') return { choices: [{ message: { role: 'assistant', content: mode === 'metadata_only' ? internalAnnotation : 'jadi beneran Miku wkwk 🍐\\n' + internalAnnotation } }] };
   if (visionMode) {
     const visual = payload.messages.filter(entry => Array.isArray(entry.content)).flatMap(entry => entry.content.filter(part => part.type === 'image_url'));
+    if (mode === 'vision_history') {
+      if (calls === 1) {
+        assert.equal(visual.length, 0);
+        return { choices: [{ message: { role: 'assistant', content: null, tool_calls: [{ id: 'history-images', type: 'function',
+          function: { name: 'read_channel_images', arguments: '{}' } }] } }] };
+      }
+      assert.equal(visual.length, 4);
+      assert(visual.every(part => part.image_url.url.startsWith('data:image/png;base64,')));
+      assert(payload.messages.some(entry => entry.role === 'tool' && entry.tool_call_id === 'history-images'));
+      assert(JSON.stringify(payload.messages).includes('another-member-1'));
+      return { choices: [{ message: { role: 'assistant', content: 'empat grafik itu sudah kubaca' } }] };
+    }
     if (mode === 'vision_download_failure') {
       assert.equal(visual.length, 0); assert.equal(payload.model, 'text-only-fixture');
       assert(payload.messages.at(-1).content.includes('No pixels are available'));
@@ -357,7 +385,7 @@ if (mode === 'queued') {
   await handleAIChat(message, client, mode.startsWith('continuation') ? { continuation: true, continuationHint: 'follow-up question' } : mode === 'spontaneous' ? { spontaneous: true } : ['stale', 'stale_typing'].includes(mode) ? { isCurrent: () => sourceIsCurrent } : mode === 'vision_burst' ? { addressed: true, attachmentSources: [earlierImage] } : {});
 }
 if (mode === 'vision') await handleAIChat({ ...message, id: 'followup', content: 'hackerika yang kiri warna apa?', attachments: new Map() }, client);
-assert.equal(calls, mode === 'continuation_tool_empty' ? 3 : ['native_react', 'vision', 'vision_fallback'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');
+assert.equal(calls, mode === 'continuation_tool_empty' ? 3 : ['native_react', 'vision', 'vision_fallback', 'vision_history'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');
 if (mode.startsWith('metadata_')) {
   assert.deepEqual(effects.filter(x => x !== 'typing'), mode === 'metadata_only' ? [] : ['jadi beneran Miku wkwk 🍐']);
   assert(!JSON.stringify(memory.public.messages).includes('Discord chronology'));
@@ -403,7 +431,7 @@ if (mode.startsWith('metadata_')) {
 console.log('SOCIAL_SCENARIO_OK');
 `;
 
-for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_fallback', 'vision_download_failure']) {
+for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_history', 'vision_fallback', 'vision_download_failure']) {
     test(`chat loop: ${mode}`, async () => {
         const child = Bun.spawn([process.execPath, '-e', scenario], {
             cwd: fileURLToPath(new URL('../../../', import.meta.url)),

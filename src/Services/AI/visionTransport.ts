@@ -54,6 +54,9 @@ async function download(url: string, signal?: AbortSignal): Promise<Download> {
 export async function inlineDiscordImages(messages: any[], options: { cache?: VisionDownloadCache; signal?: AbortSignal } = {}) {
     const cache = options.cache || new Map<string, Promise<Download>>();
     let deliveredImages = 0, considered = 0;
+    const totalImages = messages.reduce((sum, message) => sum + (Array.isArray(message.content)
+        ? message.content.filter((part: any) => part.type === 'image_url').length : 0), 0);
+    const skipOldest = Math.max(0, totalImages - MAX_VISION_IMAGES);
     const failures: Failure[] = [];
     const result = [];
     for (const message of messages) {
@@ -61,10 +64,11 @@ export async function inlineDiscordImages(messages: any[], options: { cache?: Vi
         const content = [];
         for (const part of message.content) {
             if (part.type !== 'image_url') { content.push(part); continue; }
+            const position = ++considered;
             const url = part.image_url?.url;
             let image: Download;
             if (message.role !== 'user' || !allowedDiscordImageUrl(url)) image = { reason: 'invalid_url' };
-            else if (++considered > MAX_VISION_IMAGES) image = { reason: 'image_budget' };
+            else if (position <= skipOldest) image = { reason: 'image_budget' };
             else {
                 if (!cache.has(url)) cache.set(url, download(url, options.signal));
                 image = await cache.get(url)!;

@@ -2,7 +2,7 @@ process.env.NODB = 'true';
 
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { ChannelType, Collection, PermissionFlagsBits as P } from 'discord.js';
-import { dispatchDiscordAction, getDiscordTurnOutcome, guardDiscordActions, validReactionEmoji } from './discordActions';
+import { dispatchDiscordAction, getDiscordTurnOutcome, guardDiscordActions, takeReadChannelImages, validReactionEmoji } from './discordActions';
 import { getChannelCache } from './cache';
 
 let serial = 0n;
@@ -113,7 +113,39 @@ describe('Discord actions', () => {
         expect((await dispatchDiscordAction('react_to_message', { emoji: '👏' }, source)).ok).toBe(false);
         callerPermissions.delete(P.ViewChannel);
         expect((await dispatchDiscordAction('read_channel_messages', {}, source)).error).toBe('channel_not_accessible');
+        expect((await dispatchDiscordAction('read_channel_images', {}, source)).error).toBe('channel_not_accessible');
         expect(effects).toEqual([]);
+        const restricted = fixture(); restricted.callerPermissions.delete(P.ReadMessageHistory);
+        expect((await dispatchDiscordAction('read_channel_messages', {}, restricted.source)).error).toBe('channel_not_accessible');
+        expect((await dispatchDiscordAction('read_channel_images', {}, restricted.source)).error).toBe('channel_not_accessible');
+    });
+
+    test('on-demand image read keeps URLs internal and attributes earlier same-channel uploads', async () => {
+        const { source, channel } = fixture();
+        const now = Date.now(); source.createdTimestamp = now;
+        const uploaded = Array.from({ length: 5 }, (_, index) => {
+            const id = nextId();
+            return { id, channelId: channel.id, createdTimestamp: now - (5 - index) * 1000,
+                author: { id: nextId(), username: `member-${index}` }, content: `chart ${index}`,
+                attachments: new Collection([[id, { name: `chart-${index}.png`, contentType: 'image/png', size: 2048,
+                    url: `https://cdn.discordapp.com/attachments/${channel.id}/${id}/chart-${index}.png?ex=ffffffff` }]]) };
+        });
+        const foreign = { ...uploaded[4], id: nextId(), channelId: nextId() };
+        channel.messages.fetch = async (arg: any) => typeof arg === 'string'
+            ? uploaded.find(item => item.id === arg) || foreign.id === arg && foreign || null
+            : new Collection([...uploaded, foreign, source].map(item => [item.id, item]));
+        const result = await dispatchDiscordAction('read_channel_images', {}, source);
+        expect(result.ok).toBe(true);
+        expect(result.images).toHaveLength(4);
+        expect(result.images[0].sourceMessageId).toBe(uploaded[1].id);
+        expect(JSON.stringify(result)).not.toContain('cdn.discordapp.com');
+        const refs = takeReadChannelImages(source);
+        expect(refs).toHaveLength(4);
+        expect(refs[3].authorId).toBe(uploaded[4].author.id);
+        expect(takeReadChannelImages(source)).toEqual([]);
+        expect((await dispatchDiscordAction('read_channel_images', { messageIds: [uploaded[0].id] }, source)).images[0].sourceMessageId).toBe(uploaded[0].id);
+        expect((await dispatchDiscordAction('read_channel_images', { messageIds: ['not-an-id'] }, source)).error).toBe('invalid_arguments');
+        expect((await dispatchDiscordAction('read_channel_images', { messageIds: [foreign.id] }, source)).images).toEqual([]);
     });
 
     test('pins require both the bot and initiating member permission', async () => {

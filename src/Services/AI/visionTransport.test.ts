@@ -88,10 +88,11 @@ test('obeys the outer turn cancellation instead of starting a text-only retry', 
     await expect(inlineDiscordImages(input(), { signal: controller.signal })).rejects.toThrow('turn superseded');
 });
 
-test('bounds downloads at four images and leaves ordinary text untouched', async () => {
+test('bounds downloads at four newest images and leaves ordinary text untouched', async () => {
     const spy = mockFetch(async () => new Response(png));
     const result = await inlineDiscordImages(input([1, 2, 3, 4, 5].map(url)));
     expect(result.deliveredImages).toBe(4); expect(result.failures).toEqual(['image_budget']);
     expect(spy).toHaveBeenCalledTimes(4);
+    expect(spy.mock.calls.map(call => call[0])).toEqual([2, 3, 4, 5].map(url));
     const text = [{ role: 'user', content: 'halo' }]; expect((await inlineDiscordImages(text)).messages).toEqual(text);
 });
