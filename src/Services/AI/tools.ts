@@ -14,7 +14,7 @@ import {
     setUserTimezoneForTool,
 } from "./reminders";
 import { webSearchForTurn, fetchUrlForTool } from "./web";
-import { researchForTurn } from './research';
+import { recordResearchFollowupSource, researchForTurn } from './research';
 import {
     createTaskForTool,
     listTasksForTool,
@@ -44,7 +44,7 @@ export const TOOL_DEFINITIONS = [
         type: 'function' as const,
         function: {
             name: 'delegate_codex',
-            description: 'Pilihanmu untuk membuka agen Codex terisolasi jika pekerjaan memang butuh investigasi/eksperimen multi-langkah, membaca banyak sumber atau file, menjalankan kode, atau menyelesaikan challenge CTF. Hasil menyusul otomatis di channel/thread ini. Pilih sendiri berdasar kebutuhan percakapan, bukan kata kunci: untuk jawaban singkat, obrolan, atau cek satu sumber, jawab langsung atau pakai tool ringan. Jangan delegasi hanya karena ada kata CTF/OSINT/deepsearch. Agen dapat membaca konteks thread dan bukti Discord yang diizinkan; ia tidak dapat mengakses DM/channel lain atau submit flag. Default model Luna hemat; pilih model lebih kuat hanya jika kompleksitas memang perlu dan tersedia.',
+            description: 'Pilihanmu untuk membuka agen Codex terisolasi jika pekerjaan memang butuh investigasi/eksperimen multi-langkah, membaca banyak sumber atau file, menjalankan kode, atau menyelesaikan challenge CTF. Hasil menyusul otomatis di channel/thread ini. Pilih sendiri berdasar kebutuhan percakapan, bukan kata kunci: untuk jawaban singkat, obrolan, atau cek satu sumber, jawab langsung atau pakai tool ringan. Jangan delegasi hanya karena ada kata CTF/OSINT/deepsearch. Untuk riset profil orang yang meminta jejak publik mendalam, beberapa pivot akun/repo/writeup biasanya perlu agen; jika riset dalam turn hanya menghasilkan data Discord atau sumber tidak relevan, delegasikan kelanjutannya. Agen dapat membaca konteks thread dan bukti Discord yang diizinkan; ia tidak dapat mengakses DM/channel lain atau submit flag. Default model Luna hemat; pilih model lebih kuat hanya jika kompleksitas memang perlu dan tersedia.',
             parameters: { type: 'object', properties: {
                 question: { type: 'string', maxLength: 4000, description: 'Tujuan spesifik agen berdasarkan permintaan user dan progres percakapan, bukan jawaban/hasil yang dikarang.' },
                 kind: { type: 'string', enum: ['ctf', 'investigation'], description: 'ctf untuk puzzle/challenge yang perlu dipecahkan; investigation untuk riset atau analisis multi-langkah lainnya. Pilihanmu, bukan aturan keyword.' },
@@ -383,7 +383,7 @@ export const TOOL_DEFINITIONS = [
         type: 'function' as const,
         function: {
             name: 'research_topic',
-            description: 'Riset dalam turn ini untuk pertanyaan yang bisa selesai dengan beberapa sumber web/repo/docs. Worker menelusuri sumber primer dan tautan relevan, mengembalikan findings + kutipan + URL. Jika riset sebelumnya sudah berhenti dangkal/parsial dan user meminta investigasi lanjut, atau tugas butuh eksperimen kode/file/kelanjutan panjang, pilih delegate_codex bila satu cek cepat tidak cukup. Pertahankan URL/proyek user persis. Ringkas temuan terdukung; unresolved/stats hanya catatan internal. Satu riset per turn, hingga 80 detik. Tidak menjalankan kode atau aksi Discord.',
+            description: 'Riset dalam turn ini untuk pertanyaan yang bisa selesai dengan beberapa sumber web/repo/docs. Worker menelusuri sumber primer dan tautan relevan, mengembalikan findings + kutipan + URL. Untuk riset profil publik yang perlu banyak pivot, pilih delegate_codex; data Discord dan halaman yang hanya menjelaskan kata pada username bukan hasil deepsearch. Jika riset berhenti dangkal/parsial, atau tugas butuh eksperimen kode/file/kelanjutan panjang, lanjutkan dengan delegate_codex bila satu cek cepat tidak cukup. Pertahankan URL/proyek user persis. Ringkas temuan terdukung; unresolved/stats hanya catatan internal. Satu riset per turn, hingga 80 detik. Tidak menjalankan kode atau aksi Discord.',
             parameters: { type: 'object', properties: {
                 question: { type: 'string', maxLength: 2400, description: 'Pertanyaan riset konkret lengkap dengan objek/versi yang dimaksud. Bedakan klaim user dari fakta.' },
                 urls: { type: 'array', maxItems: 4, items: { type: 'string' }, description: 'URL sumber yang diberikan user atau sumber primer relevan. Jangan ganti repo bernama mirip.' },
@@ -571,6 +571,7 @@ export async function dispatchTool(
         }
         if (name === 'fetch_url') {
             const result = await fetchUrlForTool(args || {});
+            recordResearchFollowupSource(message, result, args?.url);
             return JSON.stringify(result);
         }
         return JSON.stringify({ ok: false, error: 'unknown_tool', name });

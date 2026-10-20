@@ -3,6 +3,7 @@ import { MODELS } from './models';
 import { webSearchForTool } from './web';
 import { ResearchSourceReader, githubRepository, publicResearchUrl, type ResearchDocument } from './researchSources';
 import type { DiscordProfile } from './discordProfile';
+import type { FetchUrlResult } from './web';
 
 export interface ResearchArgs { question?: string; urls?: string[]; discordProfile?: DiscordProfile; deep?: boolean }
 interface Evidence { sourceId: string; quote: string }
@@ -36,6 +37,41 @@ export function discordProfileSearchQueries(profile: DiscordProfile): string[] {
   const display = term(profile.guild.displayName || profile.globalName || '');
   return [...new Set([handle ? `"${handle}"` : '', display && display.toLowerCase() !== handle.toLowerCase() ? `"${display}"` : ''])]
     .filter(Boolean);
+}
+// A word-definition hit is about the word, even when its URL exactly matches
+// someone's handle. It must not become a person-profile lead or citation.
+const lexicalSource = (source: { url: string; title: string }) =>
+  /(?:^|\.)(?:kbbi|wiktionary|dictionary|wikipedia|wikidata|britannica)\./i.test(new URL(source.url).hostname)
+  || /\b(?:arti kata|definisi kata|definition of|meaning of|kamus|dictionary|ensiklopedia|encyclopedia)\b/i.test(source.title);
+
+export function profileSearchLeads(results: { url?: unknown; title?: unknown }[], profile: DiscordProfile, limit = 3): string[] {
+  const handle = profile.username.toLowerCase();
+  const display = (profile.guild.displayName || profile.globalName || '').toLowerCase();
+  const ranked = results.flatMap(item => {
+    const url = publicResearchUrl(item.url);
+    if (!url) return [];
+    const title = typeof item.title === 'string' ? item.title : '';
+    if (lexicalSource({ url, title })) return [];
+    const parsed = new URL(url);
+    const path = parsed.pathname.toLowerCase();
+    const label = `${url} ${title}`.toLowerCase();
+    const exactHandlePath = path.split('/').some(part => part === handle);
+    const exactDisplay = display.length >= 5 && label.includes(display);
+    const identityScore = (exactHandlePath ? 8 : label.includes(handle) ? 3 : 0)
+      + (exactDisplay ? 2 : 0);
+    if (!identityScore) return [];
+    const score = identityScore
+      + (/github|gitlab|ctf|write.?up|security|portfolio|blog|hackerdna/i.test(label) ? 2 : 0);
+    return score ? [{ url, score }] : [];
+  }).sort((a, b) => b.score - a.score);
+  const seenUrls = new Set<string>(), perHost = new Map<string, number>(), leads: string[] = [];
+  for (const { url } of ranked) {
+    const host = new URL(url).hostname;
+    if (seenUrls.has(url) || (perHost.get(host) || 0) >= 2) continue;
+    seenUrls.add(url); perHost.set(host, (perHost.get(host) || 0) + 1); leads.push(url);
+    if (leads.length >= limit) break;
+  }
+  return leads;
 }
 const failureNote = (error: unknown) => {
   const message = error instanceof Error ? error.message : '';
@@ -155,22 +191,7 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
       observations.push(...searches);
       if (args.discordProfile) {
         const raw = searches.flatMap(result => Array.isArray(result.results) ? result.results : []);
-        const handle = args.discordProfile.username.toLowerCase();
-        const firstName = (args.discordProfile.guild.displayName || args.discordProfile.globalName || '')
-          .toLowerCase().match(/[a-z][a-z0-9_-]{4,}/)?.[0] || '';
-        const ranked = raw.map((item: { url?: unknown; title?: unknown }) => {
-          const url = typeof item.url === 'string' ? publicResearchUrl(item.url) : null;
-          const label = `${url || ''} ${typeof item.title === 'string' ? item.title : ''}`.toLowerCase();
-          return { url, score: (handle && label.includes(handle) ? 3 : 0) + (firstName && label.includes(firstName) ? 2 : 0) };
-        }).filter((item: { url: string | null; score: number }): item is { url: string; score: number } => !!item.url)
-          .sort((a: { score: number }, b: { score: number }) => b.score - a.score);
-        const seenUrls = new Set<string>(), perHost = new Map<string, number>(), leads: string[] = [];
-        for (const { url } of ranked) {
-          const host = new URL(url).hostname;
-          if (seenUrls.has(url) || (perHost.get(host) || 0) >= 2) continue;
-          seenUrls.add(url); perHost.set(host, (perHost.get(host) || 0) + 1); leads.push(url);
-          if (leads.length >= (args.deep ? 3 : 4)) break;
-        }
+        const leads = profileSearchLeads(raw, args.discordProfile, args.deep ? 3 : 4);
         observations.push(...await Promise.all(leads.map(url => perform({ type: githubRepository(url) ? 'repository' : 'read', url }))));
       }
     }
@@ -259,6 +280,21 @@ export function researchForTurn(args: ResearchArgs, turn: object, options: { sig
 
 export const getResearchReport = (turn: object) => completed.get(turn);
 
+/** Preserve pages opened after the in-turn worker has returned, so profile
+ * grounding can use the most recent inspected source instead of a stale report. */
+export function appendResearchFollowupSource(report: ResearchReport | undefined, result: FetchUrlResult, requestedUrl?: string): void {
+  if (!report?.discordProfile || !result.ok || !result.content?.trim()) return;
+  const url = publicResearchUrl(result.finalUrl || requestedUrl);
+  if (!url || lexicalSource({ url, title: result.title || '' })
+    || report.sources.some(source => source.url === url)) return;
+  report.sources.push({ id: `F${report.sources.length + 1}`, kind: 'page', url,
+    title: result.title || new URL(url).hostname, preview: result.content.slice(0, 8_000),
+    truncated: result.truncated });
+}
+export function recordResearchFollowupSource(turn: object, result: FetchUrlResult, requestedUrl?: string): void {
+  appendResearchFollowupSource(completed.get(turn), result, requestedUrl);
+}
+
 export function formatDiscordProfileReply(profile: DiscordProfile, candidateUrls: string[] = []): string {
   const label = profile.globalName && profile.globalName !== profile.username
     ? `${profile.globalName} (@${profile.username})` : `@${profile.username}`;
@@ -281,7 +317,7 @@ function formatDeepDiscordProfileReply(report: ResearchReport, candidates: strin
   const byId = new Map(report.sources.filter(source => source.kind !== 'search').map(source => [source.id, source]));
   const findings = report.findings.flatMap(finding => {
     const source = byId.get(finding.evidence[0]?.sourceId);
-    if (!source || !publicResearchUrl(source.url)) return [];
+    if (!source || !publicResearchUrl(source.url) || lexicalSource(source)) return [];
     // Even a quote-backed claim can overstate identity. Keep the Discord facts
     // separate and reject a direct attribution from a same-name web page.
     if (/\b(?:akun|member|pengguna)\s+discord\b/i.test(finding.claim)
@@ -296,6 +332,7 @@ function formatDeepDiscordProfileReply(report: ResearchReport, candidates: strin
   const handle = profile.username.toLowerCase();
   const display = (profile.guild.displayName || profile.globalName || '').toLowerCase().match(/[a-z][a-z0-9_-]{4,}/)?.[0] || '';
   const relevant = report.sources.filter(source => source.kind === 'page' && !!publicResearchUrl(source.url)
+    && !lexicalSource(source)
     && (`${source.url} ${source.title} ${source.preview}`.toLowerCase().includes(handle)
       || !!display && `${source.url} ${source.title} ${source.preview}`.toLowerCase().includes(display)));
   const sanitize = (value: string) => value.replace(/^\d+: ?/gm, '').replace(/\[… omitted lines …\]/g, '')
@@ -357,6 +394,7 @@ export function groundResearchReply(text: string, report?: ResearchReport, userQ
     const distinctive = display.match(/[a-z][a-z0-9_-]{4,}/)?.[0] || '';
     const candidates = report.sources.filter(source => source.kind === 'page'
       && !!publicResearchUrl(source.url)
+      && !lexicalSource(source)
       && (source.url.toLowerCase().includes(handle) || source.title.toLowerCase().includes(handle)
         || source.preview.toLowerCase().includes(handle)
         || !!distinctive && `${source.url} ${source.title} ${source.preview}`.toLowerCase().includes(distinctive)))

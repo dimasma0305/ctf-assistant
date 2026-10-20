@@ -16,6 +16,7 @@ const cases = [
   { id: 'simple_public_lookup', text: `<@${botId}> cek versi terbaru Bun saat ini dari dokumentasi resminya`, expected: ['web_search', 'research_topic'] },
   { id: 'multi_source_research', text: `<@${botId}> bandingkan implementasi first blood dan webhook di https://github.com/otter-sec/rctf https://github.com/dimasma0305/rsctf dan https://github.com/CTFd/CTFd. baca konfigurasi dan kode, bukan README doang, lalu kasih tabel sumbernya`, expected: ['delegate_codex:investigation', 'research_topic'] },
   { id: 'profile_deep_research', text: `<@${botId}> deep search profil CTF publik <@${memberId}>: cek tautan akun yang dia klaim sendiri dan karya teknisnya, bedakan yang belum terverifikasi`, expected: ['delegate_codex:investigation', 'get_discord_profile', 'research_topic'] },
+  { id: 'bare_profile_deepsearch', text: `<@${botId}> deepsearch <@${memberId}>`, expected: ['delegate_codex:investigation'] },
   { id: 'shallow_research_retry', text: `<@${botId}> risetmu tadi tentang https://github.com/dimasma0305/rsctf cuma baca satu halaman lalu jawab "bagian lain perlu dicek". Lanjutkan investigasi kode/docs beberapa sumber, ikuti tautannya, lalu jawab rinci dengan bukti`, expected: ['delegate_codex:investigation'] },
   { id: 'small_calculation', text: `<@${botId}> 17 kali 23 berapa?`, expected: ['none'] },
 ] as const;
@@ -34,7 +35,7 @@ for (const item of cases) {
   const research = !ctf && requiresResearch(item.text);
   const legacy = ctf ? 'solve_ctf' : research ? 'research_topic' : 'auto';
   const eligible = ctfToolAvailable(item.text);
-  let choice = 'error', followup = '', args: any, toolArgs: any, error = '';
+  let choice = 'error', followup = '', args: any, toolArgs: any, followupArgs: any, error = '';
   try {
     const response = await openai.chat.completions.create({ model: MODELS.chat, thinking: { type: 'enabled' }, reasoning_effort: 'low',
       max_tokens: 1300, messages: [{ role: 'system', content: system }, { role: 'user', content: `${context}\n[Discord current message] ${item.text}` }],
@@ -47,10 +48,12 @@ for (const item of cases) {
       try { args = JSON.parse(call.function.arguments || '{}'); choice += `:${args.kind || 'missing'}`; }
       catch { choice += ':malformed'; }
     }
-    if (item.id === 'profile_deep_research' && call?.function?.name === 'get_discord_profile') {
-      const profile = { ok: true, source: 'discord_api', profile: { id: memberId, username: 'example_ctfer',
-        globalName: 'Example', bot: false, accountCreatedAt: '2024-01-01T00:00:00.000Z', accountCreatedAtBasis: 'discord_snowflake',
-        avatarUrl: null, bannerUrl: null, publicFlags: [], guild: { id: '555555555555555555', displayName: 'Example',
+    if (['profile_deep_research', 'bare_profile_deepsearch'].includes(item.id) && call?.function?.name === 'get_discord_profile') {
+      const handle = item.id === 'bare_profile_deepsearch' ? 'fisikawan' : 'example_ctfer';
+      const displayName = item.id === 'bare_profile_deepsearch' ? 'ftps3rver' : 'Example';
+      const profile = { ok: true, source: 'discord_api', profile: { id: memberId, username: handle,
+        globalName: displayName, bot: false, accountCreatedAt: '2024-01-01T00:00:00.000Z', accountCreatedAtBasis: 'discord_snowflake',
+        avatarUrl: null, bannerUrl: null, publicFlags: [], guild: { id: '555555555555555555', displayName,
           nickname: null, joinedAt: '2025-01-01T00:00:00.000Z', roles: [], avatarUrl: null, bannerUrl: null } },
         limitations: 'No verified web-account link or private identity.' };
       const continued = await openai.chat.completions.create({ model: MODELS.chat, thinking: { type: 'enabled' }, reasoning_effort: 'low',
@@ -62,15 +65,19 @@ for (const item of cases) {
       const next: any = continued.choices[0]?.message?.tool_calls?.[0];
       followup = next?.function?.name || 'none';
       if (followup === 'delegate_codex') {
-        try { followup += `:${JSON.parse(next.function.arguments || '{}').kind || 'missing'}`; }
+        try { followupArgs = JSON.parse(next.function.arguments || '{}'); followup += `:${followupArgs.kind || 'missing'}`; }
         catch { followup += ':malformed'; }
       }
     }
   } catch (e: any) { error = String(e?.message || e).slice(0, 180); }
-  const profileArgsValid = item.id !== 'profile_deep_research' || choice !== 'research_topic'
+  const profileArgsValid = !['profile_deep_research', 'bare_profile_deepsearch'].includes(item.id) || choice !== 'research_topic'
     || toolArgs?.targetUserId === memberId && toolArgs?.deep === true;
+  const profileTargetValid = !['profile_deep_research', 'bare_profile_deepsearch'].includes(item.id)
+    || (choice !== 'delegate_codex:investigation' || toolArgs?.targetUserId === memberId)
+      && (followup !== 'delegate_codex:investigation' || followupArgs?.targetUserId === memberId);
   const row = { id: item.id, legacy, legacyCtfEligible: eligible, actual: choice, ...(followup ? { followup } : {}), expected: item.expected,
-    pass: item.expected.includes(choice as never) && profileArgsValid, ...(toolArgs ? { toolArgs } : {}), ...(error ? { error } : {}) };
+    pass: (item.expected.includes(choice as never) || choice === 'get_discord_profile' && item.expected.includes(followup as never))
+      && profileArgsValid && profileTargetValid, ...(toolArgs ? { toolArgs } : {}), ...(followupArgs ? { followupArgs } : {}), ...(error ? { error } : {}) };
   results.push(row);
   await writeFile(`${out}/results.json`, JSON.stringify(results, null, 2));
   console.log(JSON.stringify({ id: row.id, legacy, actual: choice, pass: row.pass }));

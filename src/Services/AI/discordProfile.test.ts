@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { Collection } from 'discord.js';
 import { discordPersonResearchSubject, discordProfileSubject, getDiscordProfileForTool, type DiscordProfile } from './discordProfile';
-import { discordProfileSearchQueries, formatDiscordProfileReply, groundResearchReply, requiresResearch } from './research';
+import { appendResearchFollowupSource, discordProfileSearchQueries, formatDiscordProfileReply, groundResearchReply, profileSearchLeads, requiresResearch } from './research';
 
 const speaker = '663394727688798231';
 const bot = '1077393568647352320';
@@ -156,5 +156,33 @@ test('deep profile includes an inspected writeup and other read candidates when 
   expect(answer).toContain('https://example.com/mossbyte/writeups');
   expect(answer).toContain('proxy and authentication logs');
   expect(answer).toContain('https://example.com/mossbyte/other');
+  expect(answer).toContain('belum membuktikan');
+});
+
+test('a dictionary hit for a common-word handle is never treated as a person lead', () => {
+  const profile: DiscordProfile = { id: target, username: 'fisikawan', globalName: 'ftps3rver', bot: false,
+    accountCreatedAt: '2016-08-09T00:00:00Z', accountCreatedAtBasis: 'discord_snowflake',
+    avatarUrl: null, bannerUrl: null, publicFlags: [], guild: { id: '555555555555555555',
+      displayName: 'ftps3rver', nickname: null, joinedAt: '2026-08-23T00:00:00Z',
+      roles: ['Cryptography'], avatarUrl: null, bannerUrl: null } };
+  const dictionary = { id: 'S1', kind: 'page', url: 'https://kbbi.web.id/fisikawan',
+    title: 'Arti kata fisikawan - Kamus Besar Bahasa Indonesia', preview: 'fisikawan adalah ahli fisika' };
+  const github = { id: 'S2', kind: 'page', url: 'https://github.com/ftps3rver',
+    title: 'ftps3rver · GitHub', preview: 'ftps3rver z0d1ak CTF 2026 repository' };
+  expect(profileSearchLeads([dictionary, { url: 'https://github.com/unrelated', title: 'CTF repository' }, github], profile))
+    .toEqual(['https://github.com/ftps3rver']);
+  const report: NonNullable<Parameters<typeof groundResearchReply>[1]> = { ok: false, status: 'partial',
+    question: 'deepsearch', discordProfile: profile, deep: true, unresolved: [], findings: [
+      { claim: 'KBBI menjelaskan kata fisikawan.', evidence: [{ sourceId: 'S1', quote: 'ahli fisika' }] },
+    ], sources: [dictionary], stats: { model: 'fixture', modelCalls: 2, actions: 3,
+      nativeSearches: 2, elapsedMs: 1, promptTokens: 1, completionTokens: 1 } };
+  appendResearchFollowupSource(report, { ok: true, finalUrl: github.url, title: github.title,
+    content: github.preview });
+  appendResearchFollowupSource(report, { ok: true, finalUrl: dictionary.url, title: dictionary.title,
+    content: dictionary.preview });
+  const answer = groundResearchReply('GitHub repo dibaca', report);
+  expect(answer).toContain('https://github.com/ftps3rver');
+  expect(answer).not.toContain('kbbi.web.id');
+  expect(answer).not.toContain('KBBI');
   expect(answer).toContain('belum membuktikan');
 });
