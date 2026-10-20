@@ -1,13 +1,19 @@
-import { PermissionFlagsBits as P } from 'discord.js';
+import { createHash } from 'node:crypto';
+import { AttachmentBuilder, PermissionFlagsBits as P } from 'discord.js';
 import { Event } from '../../Handlers/eventHandler';
 import { MyClient } from '../../Model/client';
 import { canShareChannel } from '../../Services/AI/discordAccess';
-import { completedCodexJobs, codexSolverEnabled, formatCodexResult, isDeliveredCodexReply, markCodexJobDelivered, pendingCodexDiscordReads, respondCodexDiscordRead } from '../../Services/AI/codexJobs';
+import { completedCodexJobs, codexSolverEnabled, formatCodexResult, getCodexJobFile, isDeliveredCodexReply, markCodexJobDelivered, pendingCodexDiscordReads, respondCodexDiscordRead } from '../../Services/AI/codexJobs';
 import { readCodexDiscordContext } from '../../Services/AI/codexDiscordContext';
 import { sanitizeMentions } from '../../Services/Moderation';
 
 let initialized=false,running=false,reading=false;
 const failures=new Map<string,number>();
+const attachmentPermissionNote='\n\nFile hasil agent belum bisa dilampirkan karena izin Attach Files tidak tersedia di channel ini.';
+const attachmentFailureNote='\n\nFile hasil agent gagal dikirim. Minta aku buat ulang jika masih diperlukan.';
+function resultWithNote(job:Parameters<typeof formatCodexResult>[0],guild:any,note=''){
+  return sanitizeMentions(formatCodexResult(job).slice(0,1990-note.length)+note,guild);
+}
 
 export async function serveCodexDiscordReads(client:MyClient):Promise<void>{
   if(!codexSolverEnabled()||reading)return;reading=true;
@@ -36,16 +42,35 @@ export async function deliverCodexJobs(client:MyClient):Promise<void>{
           ||!channel.permissionsFor?.(original.guild?.members?.me)?.has(sendPermission)){await markCodexJobDelivered(job.id);continue;}
         // A send can succeed while the controller's delivered ACK fails.
         // Match the exact reply instead of exposing a job marker in chat.
-        const content=sanitizeMentions(formatCodexResult(job),original.guild);
+        const canAttach=!!channel.permissionsFor?.(original.guild?.members?.me)?.has(P.AttachFiles);
+        const hasFiles=!!job.exportedFiles?.length;
+        const content=resultWithNote(job,original.guild,hasFiles&&!canAttach?attachmentPermissionNote:'');
         const recent=await channel.messages.fetch({limit:50}).catch(()=>null);
         if(recent?.some((message:any)=>isDeliveredCodexReply(message,client.user?.id,original.id,content))){
           await markCodexJobDelivered(job.id);failures.delete(job.id);continue;
         }
-        await original.reply({content,allowedMentions:{parse:[],repliedUser:false}});
+        const files:AttachmentBuilder[]=[];
+        if(hasFiles&&canAttach)for(const item of job.exportedFiles||[]){
+          const delivered=await getCodexJobFile(job,item.index);
+          const data=Buffer.from(delivered.data,'base64');
+          if(delivered.name!==item.name||data.length!==item.size||createHash('sha256').update(data).digest('hex')!==item.sha256)
+            throw Error('codex_file_mismatch');
+          files.push(new AttachmentBuilder(data,{name:item.name}));
+        }
+        await original.reply({content,files,allowedMentions:{parse:[],repliedUser:false}});
         await markCodexJobDelivered(job.id);failures.delete(job.id);
       }catch(error){
         const count=(failures.get(job.id)||0)+1;failures.set(job.id,count);
-        if(count>=5){console.error(`[CodexDelivery] abandoning ${job.id.slice(0,8)} after ${count} delivery failures`);await markCodexJobDelivered(job.id).catch(()=>undefined);}
+        if(count>=5){
+          console.error(`[CodexDelivery] abandoning attachments for ${job.id.slice(0,8)} after ${count} delivery failures`);
+          if(original&&job.exportedFiles?.length){
+            const content=resultWithNote(job,original.guild,attachmentFailureNote);
+            const recent=await channel?.messages?.fetch({limit:50}).catch(()=>null);
+            if(!recent?.some((message:any)=>isDeliveredCodexReply(message,client.user?.id,original.id,content)))
+              await original.reply({content,allowedMentions:{parse:[],repliedUser:false}}).catch(()=>undefined);
+          }
+          await markCodexJobDelivered(job.id).catch(()=>undefined);
+        }
         else console.warn(`[CodexDelivery] retry ${job.id.slice(0,8)} (${count}/5)`);
       }
     }

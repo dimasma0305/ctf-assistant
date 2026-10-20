@@ -9,18 +9,20 @@ export interface Packet {
 export interface SolverResult {
   summary: string; flags: string[]; findings: string[]; unresolved: string[]; needsStrongerModel: boolean;
 }
+export interface ExportedFileMeta { index: number; name: string; size: number; sha256: string }
 export interface Job {
   id: string; packet: Packet; state: 'pending'|'running'|'completed'|'failed'|'cancelled';
   createdAt: number; updatedAt: number; deliveredAt?: number; model?: string; result?: SolverResult; error?: string;
   stats: { calls: number; searches: number; sourceReads: number; visionReads: number; inputChars: number; outputBytes: number; elapsedMs: number; attempts: number };
   receipts: { command: string; exitCode: number; output: string }[];
   sources: { url: string; title: string }[];
+  exportedFiles?: ExportedFileMeta[];
 }
 export interface PublicJob {
   id: string; kind: 'ctf'|'investigation'; state: Job['state']; createdAt: number; updatedAt: number; deliveredAt?: number; model?: string;
   result?: SolverResult; error?: string; stats: Job['stats']; receiptCount: number;
   guildId: string; channelId: string; messageId: string; userId: string;
-  sources: { url: string; title: string }[];
+  sources: { url: string; title: string }[]; exportedFiles?: ExportedFileMeta[];
 }
 const id = (x: unknown) => typeof x==='string' && /^\d{17,20}$/.test(x);
 export function validatePacket(value: any): Packet {
@@ -67,7 +69,17 @@ export function newJob(packet:Packet):Job{return{id:randomUUID(),packet,state:'p
 export function publicJob(job: Job): PublicJob { return { id:job.id,kind:job.packet.kind||'ctf',state:job.state,createdAt:job.createdAt,updatedAt:job.updatedAt,
   ...(job.deliveredAt?{deliveredAt:job.deliveredAt}:{}),...(job.model?{model:job.model}:{}),...(job.result?{result:job.result}:{}),
   ...(job.error?{error:job.error}:{}),stats:job.stats,receiptCount:job.receipts.length,guildId:job.packet.guildId,
-  channelId:job.packet.channelId,messageId:job.packet.messageId,userId:job.packet.userId,sources:(job.sources||[]).slice(0,8) }; }
+  channelId:job.packet.channelId,messageId:job.packet.messageId,userId:job.packet.userId,sources:(job.sources||[]).slice(0,8),
+  ...(job.exportedFiles?.length?{exportedFiles:job.exportedFiles.slice(0,2)}:{}) }; }
+export function parseWorkerExport(value: string): {name: string; data: Buffer} {
+  if(value.length>6*1024*1024)throw Error('invalid_export');
+  const parsed=JSON.parse(value);
+  if(typeof parsed?.name!=='string'||!(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/).test(parsed.name)
+    ||parsed.name.includes('..')||typeof parsed.data!=='string'||!/^[A-Za-z0-9+/]*={0,2}$/.test(parsed.data))throw Error('invalid_export');
+  const data=Buffer.from(parsed.data,'base64');
+  if(!data.length||data.length>4*1024*1024||data.toString('base64')!==parsed.data)throw Error('invalid_export');
+  return {name:parsed.name,data};
+}
 export function resultFromText(text: string): SolverResult {
   const x=JSON.parse(text);
   if(typeof x?.summary!=='string'||!x.summary.trim()||!['flags','findings','unresolved'].every(k=>Array.isArray(x[k])))throw Error('invalid_solver_result');

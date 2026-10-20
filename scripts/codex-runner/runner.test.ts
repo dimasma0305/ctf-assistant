@@ -1,8 +1,9 @@
 import { expect, test } from 'bun:test';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, promoteReceiptCandidates, publicJob, resultFromText, validateInvestigationBatch, validatePacket } from './protocol';
+import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, validateInvestigationBatch, validatePacket } from './protocol';
+import { deleteExportedFiles, exportDirectory, readExportedFile, saveExportedFiles } from './exports';
 import { workerArgs } from './executor';
 import { startGateway } from './gateway';
 import { DiscordContextBroker } from './discordBroker';
@@ -55,9 +56,9 @@ test('Docker worker arguments expose only disposable tmpfs and one inference soc
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
   const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-2',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-3',dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-2',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-3',dependencies);
   expect(builds).toBe(1);
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');
@@ -69,6 +70,33 @@ test('public job output hides challenge bytes and formats only validated solver 
   job.state='completed';job.model='gpt-6-luna';job.result=resultFromText(JSON.stringify({summary:'selesai',flags:['LabCTF{ok}','not-a-flag'],findings:['python verified'],unresolved:[],needsStrongerModel:false}));
   const exposed=JSON.stringify(publicJob(job));expect(exposed).not.toContain('PRIVATE');expect(exposed).not.toContain('data');
   const rendered=formatCodexResult(publicJob(job));expect(rendered).toContain('LabCTF{ok}');expect(rendered).not.toContain('not-a-flag');expect(rendered).toContain('belum dicek remote');
+});
+
+test('worker exports ZIP and image bytes with safe names and no path traversal',()=>{
+  const zip=Buffer.from('504b0304aabbcc','hex');
+  const parsed=parseWorkerExport(JSON.stringify({name:'result.zip',data:zip.toString('base64')}));
+  expect(parsed).toEqual({name:'result.zip',data:zip});
+  expect(()=>parseWorkerExport(JSON.stringify({name:'../secret.txt',data:zip.toString('base64')}))).toThrow('invalid_export');
+  expect(()=>parseWorkerExport(JSON.stringify({name:'image.png',data:'!!!'}))).toThrow('invalid_export');
+  expect(()=>parseWorkerExport(JSON.stringify({name:'large.zip',data:Buffer.alloc(4*1024*1024+1).toString('base64')}))).toThrow('invalid_export');
+});
+
+test('exported files are private durable bytes until delivery, with integrity checked on read',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'codex-exports-test-'));
+  const job=newJob(validatePacket(packet()));
+  const zip=Buffer.from('504b0304aabbcc','hex'),png=Buffer.from('89504e470d0a1a0a0000','hex');
+  try{
+    const metadata=await saveExportedFiles(root,job.id,[{name:'result.zip',data:zip},{name:'plot.png',data:png}]);
+    job.exportedFiles=metadata;
+    expect(metadata.map(file=>file.name)).toEqual(['result.zip','plot.png']);
+    expect(JSON.stringify(publicJob(job))).not.toContain(zip.toString('base64'));
+    expect(await readExportedFile(root,job.id,metadata[0])).toEqual(zip);
+    expect(await readExportedFile(root,job.id,metadata[1])).toEqual(png);
+    await writeFile(join(exportDirectory(root,job.id),'0.bin'),Buffer.from('tampered'));
+    await expect(readExportedFile(root,job.id,metadata[0])).rejects.toThrow('file_corrupt');
+    await deleteExportedFiles(root,job.id);
+    await expect(readExportedFile(root,job.id,metadata[1])).rejects.toThrow();
+  }finally{await rm(root,{recursive:true,force:true});}
 });
 
 test('investigation jobs keep their kind and render sourced findings without CTF framing',()=>{

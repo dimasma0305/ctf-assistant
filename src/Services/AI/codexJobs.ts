@@ -8,6 +8,7 @@ export interface CodexPublicJob {
   stats:{calls:number;searches:number;sourceReads:number;visionReads:number;inputChars:number;outputBytes:number;elapsedMs:number;attempts:number};receiptCount:number;
   guildId:string;channelId:string;messageId:string;userId:string;
   sources:{url:string;title:string}[];
+  exportedFiles?:{index:number;name:string;size:number;sha256:string}[];
 }
 export interface CodexPacket {
   scope:string;guildId:string;channelId:string;messageId:string;userId:string;question:string;context:string;checkpoint?:unknown;kind?:'ctf'|'investigation';
@@ -20,13 +21,13 @@ export interface CodexDiscordReadRequest {
 const socket=()=>process.env.CODEX_CONTROL_SOCKET||'/run/hackerika-codex/control.sock';
 export const codexSolverEnabled=()=>['1','true','yes','on'].includes((process.env.CODEX_SOLVER_ENABLED||'').trim().toLowerCase());
 
-export async function codexRequest<T>(path:string,body:unknown,options:{socketPath?:string;signal?:AbortSignal}={}):Promise<T>{
+export async function codexRequest<T>(path:string,body:unknown,options:{socketPath?:string;signal?:AbortSignal;maxResponseBytes?:number}={}):Promise<T>{
   const payload=Buffer.from(JSON.stringify(body));
   if(payload.length>30*1024*1024)throw Error('codex_request_too_large');
   return await new Promise<T>((resolve,reject)=>{
     const request=http.request({socketPath:options.socketPath||socket(),path,method:'POST',headers:{'Content-Type':'application/json','Content-Length':payload.length}},response=>{
       const chunks:Buffer[]=[];let bytes=0;
-      response.on('data',(chunk:Buffer)=>{bytes+=chunk.length;if(bytes>512*1024){request.destroy(Error('codex_response_too_large'));return;}chunks.push(chunk);});
+      response.on('data',(chunk:Buffer)=>{bytes+=chunk.length;if(bytes>(options.maxResponseBytes||512*1024)){request.destroy(Error('codex_response_too_large'));return;}chunks.push(chunk);});
       response.on('end',()=>{try{const value=JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');if((response.statusCode||500)>=400)reject(Object.assign(Error(value.error||'codex_request_failed'),{status:response.statusCode,job:value.job,retryAfterSeconds:value.retryAfterSeconds,limit:value.limit}));else resolve(value);}catch(error){reject(error);}});
     });
     const timeout=setTimeout(()=>request.destroy(Error('codex_controller_timeout')),10_000);timeout.unref?.();
@@ -40,6 +41,8 @@ export const submitCodexJobBatch=(packets:CodexPacket[],signal?:AbortSignal)=>co
 export const getCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/get',{jobId,scope,userId},{signal});
 export const cancelCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/cancel',{jobId,scope,userId},{signal});
 export const completedCodexJobs=()=>codexRequest<{ok:true;jobs:CodexPublicJob[]}>('/jobs/completed',{});
+export const getCodexJobFile=(job:CodexPublicJob,index:number)=>codexRequest<{ok:true;name:string;size:number;sha256:string;data:string}>('/jobs/file',
+  {jobId:job.id,index,scope:`${job.guildId}:${job.channelId}`,userId:job.userId},{maxResponseBytes:6*1024*1024});
 export const markCodexJobDelivered=(jobId:string)=>codexRequest<{ok:true}>('/jobs/delivered',{jobId});
 export const pendingCodexDiscordReads=()=>codexRequest<{ok:true;requests:CodexDiscordReadRequest[]}>('/jobs/context/pending',{});
 export const respondCodexDiscordRead=(id:string,jobId:string,result:unknown)=>codexRequest<{ok:true}>('/jobs/context/respond',{id,jobId,result});
