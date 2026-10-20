@@ -57,6 +57,19 @@ export const schema = {
     // IDs of this user's own messages supporting the latest relationship judgment.
     lastRelationshipEvidenceMessageIds: { type: [String], default: [] },
     evaluatedRelationshipMessageIds: { type: [String], default: [] },
+    // Public guild exchanges that actually received a bot reply. The
+    // relationship evaluator uses this bounded per-user window across
+    // channels; a busy channel's short conversation buffer is not enough.
+    recentRelationshipExchanges: {
+        type: [{
+            messageId: { type: String, required: true },
+            at: { type: Date, required: true },
+            userText: { type: String, default: '' },
+            assistantText: { type: String, default: '' },
+            sources: { type: [{ messageId: String, authorId: String, kind: String }], default: [] },
+        }],
+        default: [],
+    },
 
     // Four independent relationship dimensions. They move separately, share
     // the same symmetric -100..100 range as affection:

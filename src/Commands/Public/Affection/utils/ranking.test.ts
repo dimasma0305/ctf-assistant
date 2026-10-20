@@ -19,11 +19,15 @@ test('trust ranking includes a trusted person with cold affection and sorts dete
 });
 
 test('emotions use elapsed-time decay, and affection change retains negative history', () => {
-  const [entry] = rankingEntries([profile('user', { affection: -5, previousAffection: -10, interactionCount: 42 })],
+  const [entry] = rankingEntries([profile('user', { affection: -5, previousAffection: -10,
+    interactionCount: 42, lastDistilledAtCount: 39 })],
     [{ userId: 'user', anger: 48, hurt: 30, warmth: 60, updatedAt: new Date(now.getTime() - 2 * 3_600_000) }], now);
   expect(entry.metrics).toEqual({ affection: -5, trust: 0, respect: 0, comfort: 0, chemistry: 0,
     anger: 24, hurt: 18, warmth: 56, change: 5, interactions: 42 });
   expect(formatRankingMetrics(entry)).toContain('Δ +5');
+  expect(formatRankingMetrics(entry)).toContain('evaluasi 3/5');
+  const [late] = rankingEntries([profile('late', { interactionCount: 50, lastDistilledAtCount: 40 })], [], now);
+  expect(formatRankingMetrics(late)).toContain('evaluasi tertunda');
   const [fractional] = rankingEntries([profile('fractional')], [{ userId: 'fractional', anger: 42.4, hurt: 30.6, warmth: 60.4,
     updatedAt: new Date(now.getTime() - 0.4 * 3_600_000) }], now);
   expect(fractional.metrics.anger).toBe(38);

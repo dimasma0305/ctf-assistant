@@ -19,6 +19,7 @@ import {
     shouldDistill,
     distillProfile,
     buildExchangeTranscript,
+    buildStoredRelationshipTranscript,
     formatProfile,
 } from "./userProfile";
 import { loadBotState, formatBotState } from "./botState";
@@ -763,16 +764,20 @@ async function runChatTurn(
     };
 
     let interactionRecorded = false;
-    const recordDeliveredInteraction = () => {
-        if (interactionRecorded) return;
+    const recordDeliveredInteraction = (assistantText: string) => {
+        // DMs are private and must not change the public server ranking.
+        if (interactionRecorded || !message.guild) return;
         interactionRecorded = true;
         const transcriptMemory = (memory[channelId]?.messages || []).map(entry => ({ ...entry }));
-        recordInteraction(userId, author, displayName)
+        recordInteraction(userId, author, displayName, { messageId: message.id,
+            at: new Date(message.createdTimestamp || Date.now()), userText: sanitizedUserContent,
+            assistantText, sources: userMessageEntry.sources })
             .then((updatedProfile) => {
-                // Private conversations never feed a globally visible profile.
-                if (!message.guild || !shouldDistill(updatedProfile)) return;
-                const transcript = buildExchangeTranscript(userId, displayName, transcriptMemory,
-                    updatedProfile.affectionResetAt, updatedProfile.evaluatedRelationshipMessageIds);
+                if (!shouldDistill(updatedProfile)) return;
+                const transcript = updatedProfile.recentRelationshipExchanges?.length
+                    ? buildStoredRelationshipTranscript(updatedProfile)
+                    : buildExchangeTranscript(userId, displayName, transcriptMemory,
+                        updatedProfile.affectionResetAt, updatedProfile.evaluatedRelationshipMessageIds);
                 void distillProfile(updatedProfile, transcript);
             })
             .catch((err) => console.error('[Profile] recordInteraction failed:', err));
@@ -812,7 +817,7 @@ async function runChatTurn(
             memory[channelId].messages.push({ role: 'assistant', reasoning_content: '', messageId: outcome.messageId, at: Date.now(), replyToMessageId: message.id,
                 content: `${speakerTag(HACKERIKA_DISPLAY_NAME, client.user?.id || HACKERIKA_BOT_ID)} ${outcome.content}` });
             memory[channelId].messages = memory[channelId].messages.slice(-MAX_MEMORY);
-            recordDeliveredInteraction();
+            recordDeliveredInteraction(outcome.content);
         }
         releaseSlot?.();
         return true;
@@ -1320,7 +1325,7 @@ async function runChatTurn(
         // counter and, every DISTILL_INTERVAL turns, fire a background distill
         // call that updates Hackerika's psychological notes + opinion of this
         // user. Fire-and-forget — failures here must not affect the reply.
-        recordDeliveredInteraction();
+        recordDeliveredInteraction(deliveredBursts.join('\n\n'));
     } catch (error: any) {
         // A later cleanup failure cannot restart a public conversation whose
         // private opening has already been delivered.

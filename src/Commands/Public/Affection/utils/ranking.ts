@@ -2,6 +2,7 @@ import { EmbedBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
 import type { SubCommand } from '../../../../Model/command';
 import { SocialStateModel, UserProfileModel } from '../../../../Database/connect';
 import { newSocialState, settleSocialState } from '../../../../Services/AI/socialState';
+import { RELATIONSHIP_DISTILL_INTERVAL } from '../../../../Services/AI/userProfile';
 
 export const RANKING_METRICS = [
   { value: 'affection', name: 'Afeksi' },
@@ -17,7 +18,7 @@ export const RANKING_METRICS = [
 ] as const;
 export type RankingMetric = typeof RANKING_METRICS[number]['value'];
 type Metrics = Record<RankingMetric, number>;
-export interface RankingEntry { userId: string; metrics: Metrics; lastInteractionAt: number }
+export interface RankingEntry { userId: string; metrics: Metrics; lastInteractionAt: number; pendingEvaluation: number }
 
 // Profiles are global. Resolve membership after this bounded candidate read;
 // hitting the cap or a failed member batch makes the board explicitly partial.
@@ -28,7 +29,7 @@ const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 25;
 const COOLDOWN_MS = 15_000;
 const lastUsedAt = new Map<string, number>(); // Shared by rank and ranking aliases.
-const PROFILE_FIELDS = 'userId affection previousAffection trust respect comfort chemistry interactionCount lastInteractionAt';
+const PROFILE_FIELDS = 'userId affection previousAffection trust respect comfort chemistry interactionCount lastDistilledAtCount lastInteractionAt';
 const SOCIAL_FIELDS = 'userId anger hurt warmth updatedAt'; // No DM content or reasons.
 const inRange = (value: unknown, min: number, max: number, fallback = 0) =>
   typeof value === 'number' && Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
@@ -50,11 +51,14 @@ export function rankingEntries(profiles: any[], socialStates: any[], now = new D
       updatedAt: new Date(timestamp(stored?.updatedAt, now.getTime())),
     }, now);
     const affection = bounded(profile.affection, -100, 100);
-    return { userId: profile.userId, lastInteractionAt: timestamp(profile.lastInteractionAt), metrics: {
+    const interactions = bounded(profile.interactionCount, 0, Number.MAX_SAFE_INTEGER);
+    const lastEvaluated = bounded(profile.lastDistilledAtCount, 0, Number.MAX_SAFE_INTEGER);
+    return { userId: profile.userId, lastInteractionAt: timestamp(profile.lastInteractionAt),
+      pendingEvaluation: Math.max(0, interactions - lastEvaluated), metrics: {
       affection, trust: bounded(profile.trust, -100, 100), respect: bounded(profile.respect, -100, 100),
       comfort: bounded(profile.comfort, -100, 100), chemistry: bounded(profile.chemistry, -100, 100),
       warmth: Math.round(state.warmth), anger: Math.round(state.anger), hurt: Math.round(state.hurt),
-      interactions: bounded(profile.interactionCount, 0, Number.MAX_SAFE_INTEGER),
+      interactions,
       change: affection - bounded(profile.previousAffection, -100, 100),
     } };
   });
@@ -67,14 +71,16 @@ export function sortRanking(entries: RankingEntry[], metric: RankingMetric): Ran
 
 export function formatRankingMetrics(entry: RankingEntry): string {
   const m = entry.metrics;
+  const progress = entry.pendingEvaluation >= RELATIONSHIP_DISTILL_INTERVAL
+    ? 'evaluasi tertunda' : `evaluasi ${entry.pendingEvaluation}/${RELATIONSHIP_DISTILL_INTERVAL}`;
   return `Afeksi ${m.affection} · Trust ${m.trust} · Respect ${m.respect} · Comfort ${m.comfort} · Chemistry ${m.chemistry}\n` +
-    `Warmth ${m.warmth} · Anger ${m.anger} · Hurt ${m.hurt} · Δ ${delta(m.change)} · Interaksi ${m.interactions}`;
+    `Warmth ${m.warmth} · Anger ${m.anger} · Hurt ${m.hurt} · Δ ${delta(m.change)} · Interaksi ${m.interactions} · ${progress}`;
 }
 
 export function buildRankingEmbeds(ranked: RankingEntry[], metric: RankingMetric, limit: number,
   requesterId: string, partial: boolean): EmbedBuilder[] {
   const top = ranked.slice(0, limit);
-  const range = 'Hubungan −100..100; emosi 0..100. Δ = perubahan afeksi sejak evaluasi terakhir.';
+  const range = 'Hubungan −100..100; emosi 0..100. Interaksi = total balasan, termasuk sebelum reset. Afeksi dinilai tiap 5 balasan, tidak naik otomatis. Δ = perubahan pada evaluasi terakhir.';
   const meaning = metric === 'anger' || metric === 'hurt' ? '\nSkor ini tinggi berarti lebih marah/terluka, bukan lebih dekat.' : '';
   const heading = `Diurutkan menurut **${label(metric)}**, tertinggi dulu.\n${range}${meaning}`;
   const rows = top.map((entry, index) => {

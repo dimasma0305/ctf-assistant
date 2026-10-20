@@ -1,9 +1,9 @@
 import { UserProfileModel } from "../../Database/connect";
 import { openai } from "../../utils/openai";
-import { ChatMessage } from "./memory";
+import type { ChatMessage, MessageSource } from "./memory";
 import { MODELS } from "./models";
 
-const DISTILL_INTERVAL = 5;             // re-distill every N interactions
+export const RELATIONSHIP_DISTILL_INTERVAL = 5; // re-distill every N answered guild interactions
 const MAX_DISTILL_EXCHANGES = 30;       // how many recent exchanges to feed in
 const FIELD_CHAR_BUDGET = 300;          // soft cap per profile field
 const MOMENT_CHAR_BUDGET = 160;         // soft cap per moment summary
@@ -16,6 +16,9 @@ const MAX_DISPLAYED_MOMENTS = 4;         // how many we surface in the per-turn 
 const DISTILL_TIMEOUT_MS = 25_000;
 const PROFILE_MODEL = MODELS.light;
 const MAX_EVALUATED_MESSAGE_IDS = 256;
+const MAX_STORED_RELATIONSHIP_EXCHANGES = 24;
+const MAX_RELATIONSHIP_USER_CHARS = 800;
+const MAX_RELATIONSHIP_REPLY_CHARS = 500;
 
 const VALID_MOMENT_TONES = new Set(['fun', 'helpful', 'touching', 'tense', 'impressive']);
 export type MomentTone = 'fun' | 'helpful' | 'touching' | 'tense' | 'impressive';
@@ -24,6 +27,14 @@ export interface Moment {
     summary: string;
     tone: MomentTone;
     createdAt: Date;
+}
+
+export interface RelationshipExchange {
+    messageId: string;
+    at: Date;
+    userText: string;
+    assistantText: string;
+    sources?: Pick<MessageSource, 'messageId' | 'authorId' | 'kind'>[];
 }
 
 export interface UserProfile {
@@ -43,6 +54,7 @@ export interface UserProfile {
     affectionResetAt?: Date;
     /** Bounded deduplication history, never included in the visible persona. */
     evaluatedRelationshipMessageIds?: string[];
+    recentRelationshipExchanges?: RelationshipExchange[];
     /** Four independent relationship dimensions, all 0-100. */
     trust: number;
     respect: number;
@@ -162,6 +174,9 @@ function hydrateProfile(doc: any): UserProfile {
             ...(Array.isArray(doc.evaluatedRelationshipMessageIds) ? doc.evaluatedRelationshipMessageIds : []),
             ...(Array.isArray(doc.lastRelationshipEvidenceMessageIds) ? doc.lastRelationshipEvidenceMessageIds : []),
         ].filter((id: unknown): id is string => typeof id === 'string'))].slice(-MAX_EVALUATED_MESSAGE_IDS),
+        recentRelationshipExchanges: (Array.isArray(doc.recentRelationshipExchanges) ? doc.recentRelationshipExchanges : [])
+            .filter((exchange: RelationshipExchange) => typeof exchange?.messageId === 'string')
+            .slice(-MAX_STORED_RELATIONSHIP_EXCHANGES),
         trust: typeof doc.trust === 'number' ? doc.trust : 0,
         respect: typeof doc.respect === 'number' ? doc.respect : 0,
         comfort: typeof doc.comfort === 'number' ? doc.comfort : 0,
@@ -175,7 +190,9 @@ function hydrateProfile(doc: any): UserProfile {
 }
 
 export async function loadProfile(userId: string): Promise<UserProfile | null> {
-    const doc = await UserProfileModel.findOne({ userId }).lean();
+    // Chat needs the compact profile, not the raw answered-exchange window.
+    // recordInteraction returns that window only when a distillation may run.
+    const doc = await UserProfileModel.findOne({ userId }).select('-recentRelationshipExchanges').lean();
     if (!doc) return null;
     return hydrateProfile(doc);
 }
@@ -189,7 +206,17 @@ export async function recordInteraction(
     userId: string,
     username: string,
     displayName: string,
+    exchange?: RelationshipExchange,
 ): Promise<UserProfile> {
+    const safeExchange = exchange?.messageId ? {
+        messageId: exchange.messageId,
+        at: exchange.at,
+        userText: exchange.userText.slice(0, MAX_RELATIONSHIP_USER_CHARS),
+        assistantText: exchange.assistantText.slice(0, MAX_RELATIONSHIP_REPLY_CHARS),
+        sources: (exchange.sources || []).slice(0, 4).map(source => ({
+            messageId: source.messageId, authorId: source.authorId, kind: source.kind,
+        })),
+    } : null;
     const doc = await UserProfileModel.findOneAndUpdate(
         { userId },
         {
@@ -199,6 +226,9 @@ export async function recordInteraction(
                 lastInteractionAt: new Date(),
             },
             $inc: { interactionCount: 1 },
+            ...(safeExchange ? { $push: { recentRelationshipExchanges: {
+                $each: [safeExchange], $slice: -MAX_STORED_RELATIONSHIP_EXCHANGES,
+            } } } : {}),
             $setOnInsert: { createdAt: new Date() },
         },
         { upsert: true, new: true, lean: true }
@@ -207,9 +237,22 @@ export async function recordInteraction(
     return hydrateProfile(doc);
 }
 
+/** Build one bounded, evidence-checked timeline from the target's answered
+ * server interactions, even when they happened in different channels. */
+export function buildStoredRelationshipTranscript(profile: UserProfile): string {
+    const messages: ChatMessage[] = (profile.recentRelationshipExchanges || []).flatMap(exchange => [
+        { role: 'user' as const, name: `${profile.userId}-relationship`, messageId: exchange.messageId,
+            at: new Date(exchange.at).getTime(), content: exchange.userText,
+            ...(exchange.sources?.length ? { sources: exchange.sources } : {}) },
+        { role: 'assistant' as const, content: exchange.assistantText },
+    ]);
+    return buildExchangeTranscript(profile.userId, profile.displayName, messages,
+        profile.affectionResetAt, profile.evaluatedRelationshipMessageIds);
+}
+
 export function shouldDistill(profile: UserProfile): boolean {
     const delta = profile.interactionCount - (profile.lastDistilledAtCount || 0);
-    return delta >= DISTILL_INTERVAL;
+    return delta >= RELATIONSHIP_DISTILL_INTERVAL;
 }
 
 /**

@@ -20,7 +20,9 @@ const { loadSocialState, isIgnoring } = await import('./src/Services/AI/socialSt
 const { memory } = await import('./src/Services/AI/memory.ts');
 const effects = [];
 let interactionWrites = 0;
-db.UserProfileModel.findOneAndUpdate = () => { interactionWrites++; return query({ userId: 'caller', interactionCount: 1 }); };
+let interactionUpdate;
+db.UserProfileModel.findOneAndUpdate = (_filter, update) => { interactionWrites++; interactionUpdate = update;
+  return query({ userId: 'caller', interactionCount: 1 }); };
 const mode = process.env.SOCIAL_TEST_MODE;
 const internalAnnotation = '[Discord chronology: {"sentAt":"2026-10-15T16:04:00.253Z","replyToMessageId":"1560322302267363349"}]';
 if (mode === 'reset_guard') {
@@ -367,6 +369,7 @@ if (mode.startsWith('metadata_')) {
   assert.equal(effects.filter(x => x !== 'typing').length, 1);
 } else if (visionMode) {
   assert.equal(effects.filter(x => x !== 'typing').length, mode === 'vision' ? 2 : 1);
+  if (mode === 'vision_dm') assert.equal(interactionWrites, 0, 'private replies must not alter public relationship counts');
   if (mode === 'vision_fallback') {
     assert.equal(visionWarnings.length, 1);
     assert(!memory.public.messages.some(entry => entry.images?.length));
@@ -376,6 +379,8 @@ if (mode.startsWith('metadata_')) {
   assert.deepEqual(effects.filter(x => x !== 'typing'), ['delivered through tool']);
   assert(memory.public.messages.at(-1).content.includes('delivered through tool'));
   assert.equal(interactionWrites, 1, 'a delivered native reply must count as one relationship interaction');
+  assert.equal(interactionUpdate.$push.recentRelationshipExchanges.$each[0].messageId, 'source');
+  assert.equal(interactionUpdate.$push.recentRelationshipExchanges.$each[0].assistantText, 'delivered through tool');
 } else if (mode === 'native_react') {
   assert.deepEqual(effects.filter(x => x !== 'typing'), ['reaction']);
 } else if (mode === 'spontaneous' || mode === 'stale' || mode === 'stale_typing') {

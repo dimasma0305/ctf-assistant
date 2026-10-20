@@ -1,7 +1,7 @@
 process.env.NODB = 'true';
 
 import { expect, test } from 'bun:test';
-import { buildExchangeTranscript, hasOwnedRelationshipEvidence } from './userProfile';
+import { buildExchangeTranscript, buildStoredRelationshipTranscript, hasOwnedRelationshipEvidence, type UserProfile } from './userProfile';
 import type { ChatMessage } from './memory';
 
 test('relationship reset excludes old and undated exchanges without attributing other users to this profile', () => {
@@ -53,4 +53,38 @@ test('already evaluated messages stay available as context but cannot support an
     expect(hasOwnedRelationshipEvidence('caller', transcript, ['old'])).toBe(false);
     expect(hasOwnedRelationshipEvidence('caller', transcript, ['old', 'fresh'])).toBe(false);
     expect(hasOwnedRelationshipEvidence('caller', transcript, ['fresh'])).toBe(true);
+});
+
+test('answered exchanges from separate channels remain available for one person without replaying old evidence', () => {
+    const profile = { userId: 'caller', displayName: 'Caller', affectionResetAt: new Date(1000),
+        evaluatedRelationshipMessageIds: ['old'], recentRelationshipExchanges: [
+            { messageId: 'before-reset', at: new Date(999), userText: 'old conflict', assistantText: 'old reply' },
+            { messageId: 'old', at: new Date(1001), userText: 'first channel', assistantText: 'first answer' },
+            { messageId: 'fresh', at: new Date(1002), userText: 'liat ini', assistantText: 'second answer',
+                sources: [{ kind: 'reply', messageId: 'someone-else', authorId: 'other' }] },
+        ] } as UserProfile;
+    const transcript = buildStoredRelationshipTranscript(profile);
+    const turns = JSON.parse(transcript).turns;
+    expect(turns.map((turn: { text: string }) => turn.text)).toEqual([
+        'first channel', 'first answer', 'liat ini', 'second answer',
+    ]);
+    expect(turns[0].contextOnly).toBe(true);
+    expect(turns[2].sources).toEqual([{ kind: 'reply', messageId: 'someone-else', authorId: 'other' }]);
+    expect(hasOwnedRelationshipEvidence('caller', transcript, ['old'])).toBe(false);
+    expect(hasOwnedRelationshipEvidence('caller', transcript, ['fresh'])).toBe(true);
+    expect(hasOwnedRelationshipEvidence('caller', transcript, ['someone-else'])).toBe(false);
+});
+
+test('cross-channel evaluation retains all five answered turns when the last channel has only one', () => {
+    const exchanges = Array.from({ length: 5 }, (_, index) => ({ messageId: `turn-${index + 1}`,
+        at: new Date(2000 + index), userText: `pesan ${index + 1}`, assistantText: `jawaban ${index + 1}` }));
+    const profile = { userId: 'caller', displayName: 'Caller', recentRelationshipExchanges: exchanges } as UserProfile;
+    const oldLastChannel = buildExchangeTranscript('caller', 'Caller', [
+        { role: 'user', name: 'caller-name', messageId: 'turn-5', content: 'pesan 5' },
+        { role: 'assistant', content: 'jawaban 5' },
+    ]);
+    const current = buildStoredRelationshipTranscript(profile);
+    expect(JSON.parse(oldLastChannel).turns.filter((turn: { role: string }) => turn.role === 'user')).toHaveLength(1);
+    expect(JSON.parse(current).turns.filter((turn: { role: string }) => turn.role === 'user')).toHaveLength(5);
+    expect(hasOwnedRelationshipEvidence('caller', current, ['turn-1', 'turn-5'])).toBe(true);
 });
