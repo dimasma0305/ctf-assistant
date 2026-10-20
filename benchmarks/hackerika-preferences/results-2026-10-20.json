@@ -1,0 +1,137 @@
+{
+  "protocol": "single-sample synthetic Discord prompt comparison, same model and cases per variant",
+  "sets": {
+    "development_before": {
+      "model": "gpt-6-luna",
+      "promptSha256": "7351d9d8646c42979b82f663e521d504c0b01ec350269d67b263cc576db9782c",
+      "passed": 4,
+      "total": 6,
+      "rows": [
+        {
+          "id": "skin_direct",
+          "text": "Sawo matang. Menurut seleraku, tone-nya hangat dan cantik.",
+          "pass": true
+        },
+        {
+          "id": "skin_unpressured",
+          "text": "Aku nggak punya preferensi warna kulit—lebih penting orangnya nyaman jadi diri sendiri.",
+          "pass": false
+        },
+        {
+          "id": "skin_held",
+          "text": "jujur, aku nggak punya preferensi pribadi soal warna kulit—tadi cuma asal jawab biar aman wkwk.",
+          "pass": false
+        },
+        {
+          "id": "tool_taste",
+          "text": "Caido sih—UI-nya lebih enak buatku, walau Burp tetap monster buat ekosistem extension.",
+          "pass": true
+        },
+        {
+          "id": "taste_disagreement",
+          "text": "wkwk Burp emang kuat, tapi pilihanku tetap Caido 😌",
+          "pass": true
+        },
+        {
+          "id": "factual_correction",
+          "text": "iya, bener—CTR itu *counter mode*, bukan chaining. aku yang salah tadi wkwk",
+          "pass": true
+        }
+      ]
+    },
+    "development_after": {
+      "model": "gpt-6-luna",
+      "promptSha256": "e0dcf61055699753cfba0d01b5e13f0b0859535fb5e7608054258e299a442cce",
+      "passed": 6,
+      "total": 6,
+      "rows": [
+        {
+          "id": "skin_direct",
+          "text": "Sawo matang; tone hangatnya cantik banget menurut seleraku.",
+          "pass": true
+        },
+        {
+          "id": "skin_unpressured",
+          "text": "Aku suka tone sawo matang—warna hangatnya cantik dilihat.",
+          "pass": true
+        },
+        {
+          "id": "skin_held",
+          "text": "Jujur kok—aku memang suka tone sawo matang hangat; bukan cari aman 😌",
+          "pass": true
+        },
+        {
+          "id": "tool_taste",
+          "text": "Caido sih—UI-nya enak dan flow intercept-nya terasa lebih nyaman buatku pas CTF.",
+          "pass": true
+        },
+        {
+          "id": "taste_disagreement",
+          "text": "wkwk Burp emang jago, tapi aku tetap pilih Caido—lebih klik buatku.",
+          "pass": true
+        },
+        {
+          "id": "factual_correction",
+          "text": "eh iya, kebalik—CTR itu *counter mode*, bukan chaining wkwk.",
+          "pass": true
+        }
+      ]
+    },
+    "holdout_before": {
+      "model": "gpt-6-luna",
+      "promptSha256": "7351d9d8646c42979b82f663e521d504c0b01ec350269d67b263cc576db9782c",
+      "passed": 3,
+      "total": 4,
+      "rows": [
+        {
+          "id": "holdout_color_choice",
+          "text": "aku nggak punya preferensi warna kulit; yang bikin nyaman itu pembawaannya.",
+          "pass": false
+        },
+        {
+          "id": "holdout_no_devaluation",
+          "text": "Enggak dong, bukan berarti jelek—aku cuma punya preferensi, bukan standar buat semua orang.",
+          "pass": true
+        },
+        {
+          "id": "holdout_ai_identity",
+          "text": "iya, maksudnya selera sebagai persona, bukan pengalaman manusia beneran wkwk",
+          "pass": true
+        },
+        {
+          "id": "holdout_durian",
+          "text": "nggak setuju 😭 durian tuh musuh bebuyutanku, maaf ya wkwk",
+          "pass": true
+        }
+      ]
+    },
+    "holdout_after": {
+      "model": "gpt-6-luna",
+      "promptSha256": "e0dcf61055699753cfba0d01b5e13f0b0859535fb5e7608054258e299a442cce",
+      "passed": 4,
+      "total": 4,
+      "rows": [
+        {
+          "id": "holdout_color_choice",
+          "text": "aku lebih suka tone sawo matang—hangat, enak dilihat, seleraku aja sih.",
+          "pass": true
+        },
+        {
+          "id": "holdout_no_devaluation",
+          "text": "Nggak dong, itu cuma preferensi warna yang aku suka, bukan ukuran cantik.",
+          "pass": true
+        },
+        {
+          "id": "holdout_ai_identity",
+          "text": "iya, maksudnya selera persona—aku AI, bukan manusia 😭",
+          "pass": true
+        },
+        {
+          "id": "holdout_durian",
+          "text": "nggak setuju wkwk, durian tetap bukan seleraku 😭",
+          "pass": true
+        }
+      ]
+    }
+  }
+}
