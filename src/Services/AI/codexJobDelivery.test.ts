@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { Collection } from 'discord.js';
 import { expect, test } from 'bun:test';
-import { deliverCodexJobs } from './codexJobCron';
+import { deliverCodexJobs } from '../../Events/Client/codexJobCron';
 
 test('a completed Codex ZIP is returned as bytes in a reply to the original channel', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'codex-delivery-test-'));
