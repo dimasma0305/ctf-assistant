@@ -27,7 +27,7 @@ export async function codexRequest<T>(path:string,body:unknown,options:{socketPa
     const request=http.request({socketPath:options.socketPath||socket(),path,method:'POST',headers:{'Content-Type':'application/json','Content-Length':payload.length}},response=>{
       const chunks:Buffer[]=[];let bytes=0;
       response.on('data',(chunk:Buffer)=>{bytes+=chunk.length;if(bytes>512*1024){request.destroy(Error('codex_response_too_large'));return;}chunks.push(chunk);});
-      response.on('end',()=>{try{const value=JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');if((response.statusCode||500)>=400)reject(Object.assign(Error(value.error||'codex_request_failed'),{status:response.statusCode,job:value.job}));else resolve(value);}catch(error){reject(error);}});
+      response.on('end',()=>{try{const value=JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');if((response.statusCode||500)>=400)reject(Object.assign(Error(value.error||'codex_request_failed'),{status:response.statusCode,job:value.job,retryAfterSeconds:value.retryAfterSeconds,limit:value.limit}));else resolve(value);}catch(error){reject(error);}});
     });
     const timeout=setTimeout(()=>request.destroy(Error('codex_controller_timeout')),10_000);timeout.unref?.();
     const abort=()=>request.destroy(options.signal?.reason instanceof Error?options.signal.reason:Error('codex_request_aborted'));

@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { chooseModel, newJob, promoteReceiptCandidates, publicJob, resultFromText, validateInvestigationBatch, validatePacket } from './protocol';
+import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, promoteReceiptCandidates, publicJob, resultFromText, validateInvestigationBatch, validatePacket } from './protocol';
 import { workerArgs } from './executor';
 import { startGateway } from './gateway';
 import { DiscordContextBroker } from './discordBroker';
@@ -33,6 +33,15 @@ test('multi-person investigation batch shares one request but keeps separate job
   expect(()=>validateInvestigationBatch({packets:[first,{...second,messageId:'800000000000000002'}]})).toThrow('invalid_job_batch');
   expect(()=>validateInvestigationBatch({packets:[first,{...second,kind:'ctf'}]})).toThrow('invalid_job_batch');
   expect(()=>validateInvestigationBatch({packets:[first]})).toThrow('invalid_job_batch');
+});
+
+test('hourly job cap gives trusted requestors more room and a precise retry delay',()=>{
+  const now=2_000_000_000;
+  const recent=[now-30*60_000,now-20*60_000,now-10*60_000];
+  expect(hourlyLimitRetryAfterSeconds(recent,1,3,now)).toBe(30*60);
+  expect(hourlyLimitRetryAfterSeconds(recent,2,12,now)).toBeNull();
+  expect(hourlyLimitRetryAfterSeconds([...recent,now-5*60_000],2,4,now)).toBe(40*60);
+  expect(hourlyLimitRetryAfterSeconds([now-61*60_000],1,3,now)).toBeNull();
 });
 
 test('Docker worker arguments expose only disposable tmpfs and one inference socket',()=>{

@@ -12,7 +12,7 @@ export const hasCodexDelegation = (turn: object) => delegated.has(turn);
  * current-channel scope, explicit profile mentions and controller budgets. */
 export async function delegateCodexForTurn(args: {
     question?: string; kind?: 'ctf' | 'investigation'; targetUserId?: string;
-    newCase?: boolean; solver?: CodexRoute;
+    newCase?: boolean; solver?: CodexRoute; investigationMode?: 'joint' | 'separate';
 }, message: Turn, options: { signal?: AbortSignal } = {}) {
     if (delegated.has(message)) return { ok: false, error: 'already_delegated_this_turn' };
     if (args.kind !== 'ctf' && args.kind !== 'investigation') return { ok: false, error: 'invalid_kind' };
@@ -45,13 +45,18 @@ export async function delegateCodexForTurn(args: {
     const packetBase = { kind: 'investigation' as const, scope: `${message.guildId}:${message.channelId}`,
         guildId: message.guildId, channelId: message.channelId, messageId: message.id, userId: message.author.id,
         route, artifacts };
-    const packets: CodexPacket[] = profiles.length ? profiles.map(profile => {
+    const separate = explicitSubjects.length > 1 && args.investigationMode === 'separate';
+    const packets: CodexPacket[] = profiles.length && !separate && explicitSubjects.length > 1
+        ? [{ ...packetBase,
+            question: `Permintaan user: ${JSON.stringify(message.content)}. Tangani semua member yang ditag sebagai satu pertanyaan riset. Profil Discord terverifikasi untuk tiap target ada di context; jangan menyamakan akun publik hanya karena nama mirip. Tujuan tambahan: ${args.question.trim()}`.slice(0, 8000),
+            context: `${gathered.text}\n${profiles.map(profile => `[verified Discord API profile for explicitly mentioned member] ${JSON.stringify(profile)}`).join('\n')}`.slice(0, 50_000) }]
+        : profiles.length ? profiles.map(profile => {
         const target = profile.profile;
-        const focus = explicitSubjects.length > 1
+        const focus = separate
             ? `Objek riset job ini hanya member Discord ${JSON.stringify(target.guild.displayName)} (@${target.username}, ID ${target.id}); member lain yang ditag ditangani job terpisah. `
             : 'Objek riset adalah satu member Discord yang ditag eksplisit; ';
         const question = explicitSubjects.length
-            ? `Permintaan user: ${JSON.stringify(message.content)}. ${focus}Profil terverifikasi ada di context. Telusuri jejak publik/profesional yang relevan, periksa sumber, dan bedakan akun yang hanya bernama mirip. Jangan minta klarifikasi tentang objek yang sudah jelas.${explicitSubjects.length === 1 ? ` Tujuan tambahan: ${args.question!.trim()}` : ''}`
+            ? `Permintaan user: ${JSON.stringify(message.content)}. ${focus}Profil terverifikasi ada di context. Telusuri jejak publik/profesional yang relevan, periksa sumber, dan bedakan akun yang hanya bernama mirip. Jangan minta klarifikasi tentang objek yang sudah jelas.${separate ? '' : ` Tujuan tambahan: ${args.question!.trim()}`}`
             : args.question!.trim();
         return { ...packetBase, question: question.slice(0, 8000),
             context: `${gathered.text}\n[verified Discord API profile for explicitly mentioned member] ${JSON.stringify(profile)}`.slice(0, 50_000) };
@@ -61,15 +66,18 @@ export async function delegateCodexForTurn(args: {
             ? await submitCodexJob(packets[0], signal)
             : await submitCodexJobBatch(packets, signal);
         delegated.add(message);
-        return { ok: true, status: 'queued', ...('jobs' in queued ? { jobs: queued.jobs,
-            targets: profiles.map(profile => profile.profile.guild.displayName) } : { job: queued.job }),
+        return { ok: true, status: 'queued', ...('jobs' in queued ? { jobs: queued.jobs } : { job: queued.job }),
+            ...(explicitSubjects.length > 1 ? { targets: profiles.map(profile => profile.profile.guild.displayName), investigationMode: separate ? 'separate' : 'joint' } : {}),
             note: `${packets.length} hasil riset akan dikirim otomatis di channel/thread ini. Jangan klaim pekerjaan selesai sebelum semua hasil tiba.` };
     } catch (caught: unknown) {
-        const error = caught as Error & { job?: CodexPublicJob };
+        const error = caught as Error & { job?: CodexPublicJob; retryAfterSeconds?: number; limit?: number };
         if (error.job) {
             delegated.add(message);
             return { ok: true, status: 'busy', job: error.job, note: 'Job di channel ini masih berjalan.' };
         }
+        if (error?.message === 'user_hourly_limit') return { ok: false, error: 'user_hourly_limit',
+            retryAfterSeconds: error.retryAfterSeconds, limit: error.limit,
+            note: `Kuota job Codex per jam sedang penuh${error.retryAfterSeconds ? `; coba lagi sekitar ${Math.ceil(error.retryAfterSeconds / 60)} menit lagi` : ''}. Jelaskan batas ini kepada user, bukan "gagal mulai" tanpa alasan.` };
         return { ok: false, error: String(error?.message || 'codex_unavailable').slice(0, 120) };
     }
 }

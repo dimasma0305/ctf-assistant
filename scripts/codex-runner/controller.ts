@@ -1,7 +1,7 @@
 import { chmod, chown, mkdir, open, readdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { chooseModel, newJob, publicJob, validateInvestigationBatch, validatePacket, type Job } from './protocol';
+import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, publicJob, validateInvestigationBatch, validatePacket, type Job } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { ensureWorkerImage } from './workerImage';
@@ -11,6 +11,8 @@ const stateRoot = process.env.CODEX_JOB_STATE_ROOT || '/var/lib/hackerika-codex/
 const runtimeRoot = process.env.CODEX_JOB_RUNTIME_ROOT || '/run/hackerika-codex-jobs';
 const image = process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-2';
 const maxQueued = Math.max(1, Math.min(16, Number(process.env.CODEX_MAX_QUEUED) || 8));
+const hourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_JOBS_PER_USER_HOUR) || 3));
+const trustedHourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_TRUSTED_JOBS_PER_USER_HOUR) || 12));
 const ttlMs = 24 * 60 * 60_000;
 const daybreakUsers = new Set((process.env.CODEX_DAYBREAK_USER_IDS || '').split(',').map(s=>s.trim()).filter(Boolean));
 const verified = new Set((process.env.CODEX_VERIFIED_MODELS || 'gpt-6-luna').split(',').map(s=>s.trim()).filter(Boolean));
@@ -98,7 +100,11 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
       if(outstanding.length)return response({ok:false,error:'channel_job_active',job:publicJob(outstanding[0])},409);
       if(queue.length+(running?1:0)+packets.length>maxQueued)return response({ok:false,error:'queue_full'},429);
       const key=`${packet.guildId}:${packet.userId}`,recent=(submissions.get(key)||[]).filter(t=>t>Date.now()-60*60_000);
-      if(recent.length+packets.length>3)return response({ok:false,error:'user_hourly_limit'},429);
+      const limit=daybreakUsers.has(packet.userId)?trustedHourlyLimit:hourlyLimit;
+      const retryAfterSeconds=hourlyLimitRetryAfterSeconds(recent,packets.length,limit,Date.now());
+      if(retryAfterSeconds!==null){
+        return response({ok:false,error:'user_hourly_limit',limit,retryAfterSeconds},429);
+      }
       for(const entry of packets)chooseModel(entry,daybreakUsers,verified);
       const created=packets.map(newJob);
       for(const job of created){jobs.set(job.id,job);queue.push(job.id);}

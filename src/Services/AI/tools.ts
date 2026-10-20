@@ -49,6 +49,7 @@ export const TOOL_DEFINITIONS = [
                 question: { type: 'string', maxLength: 4000, description: 'Tujuan spesifik agen berdasarkan permintaan user dan progres percakapan, bukan jawaban/hasil yang dikarang.' },
                 kind: { type: 'string', enum: ['ctf', 'investigation'], description: 'ctf untuk puzzle/challenge yang perlu dipecahkan; investigation untuk riset atau analisis multi-langkah lainnya. Pilihanmu, bukan aturan keyword.' },
                 targetUserId: { type: 'string', description: 'Opsional untuk riset profil member: hanya ID orang yang ditag eksplisit dalam pesan sekarang. Backend memvalidasi.' },
+                investigationMode: { type: 'string', enum: ['joint', 'separate'], description: 'Jika riset melibatkan beberapa member: joint untuk hubungan, korelasi, perbandingan atau satu pertanyaan bersama; separate untuk riset profil masing-masing secara mandiri. Default joint agar pertanyaan lintas orang tidak terpecah.' },
                 newCase: { type: 'boolean', description: 'Untuk CTF saja: true jika jelas mulai challenge berbeda; false untuk melanjutkan checkpoint channel.' },
                 solver: { type:'string',enum:['auto','luna','daybreak'],description:'auto/luna = paling hemat; daybreak hanya bila pekerjaan perlu kemampuan lebih dan akses peminta tersedia.' },
             }, required: ['question', 'kind'], additionalProperties: false },

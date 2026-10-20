@@ -39,6 +39,29 @@ test('manager-selected investigation queues a scoped job once with current conve
     }
 });
 
+test('hourly cap is returned with a user-facing retry time instead of an opaque start failure', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'hackerika-hourly-limit-test-'));
+    const socket = join(directory, 'control.sock');
+    const previousEnabled = process.env.CODEX_SOLVER_ENABLED, previousSocket = process.env.CODEX_CONTROL_SOCKET;
+    process.env.CODEX_SOLVER_ENABLED = '1'; process.env.CODEX_CONTROL_SOCKET = socket;
+    const server = Bun.serve({ unix: socket, fetch: () => Response.json(
+        { ok: false, error: 'user_hourly_limit', limit: 3, retryAfterSeconds: 1800 }, { status: 429 }) });
+    const message: any = { id: '800000000000000005', guildId: '555555555555555555', channelId: '700000000000000001',
+        content: 'deepsearch daffainfo', author: { id: '663394727688798231', bot: false },
+        attachments: new Map(), channel: { isThread: () => false, messages: { fetch: async () => new Map() } } };
+    try {
+        const result = await delegateCodexForTurn({ kind: 'investigation', question: 'Investigate public work' }, message);
+        expect(result).toMatchObject({ ok: false, error: 'user_hourly_limit', limit: 3, retryAfterSeconds: 1800 });
+        expect(result.note).toContain('30 menit');
+        expect(hasCodexDelegation(message)).toBe(false);
+    } finally {
+        server.stop(true);
+        if (previousEnabled === undefined) delete process.env.CODEX_SOLVER_ENABLED; else process.env.CODEX_SOLVER_ENABLED = previousEnabled;
+        if (previousSocket === undefined) delete process.env.CODEX_CONTROL_SOCKET; else process.env.CODEX_CONTROL_SOCKET = previousSocket;
+        await rm(directory, { recursive: true, force: true });
+    }
+});
+
 test('explicit deep search mention grounds the tagged member even when manager omits targetUserId', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'hackerika-profile-delegation-test-'));
     const socket = join(directory, 'control.sock');
@@ -87,7 +110,9 @@ test('two tagged research subjects queue two focused jobs even when manager pick
     const server = Bun.serve({ unix: socket, async fetch(request) {
         path = new URL(request.url).pathname;
         submitted = await request.json();
-        return Response.json({ ok: true, jobs: submitted.packets.map((_: unknown, i: number) => ({ id: `00000000-0000-0000-0000-00000000000${i + 1}`, state: 'pending' })) });
+        return Response.json(path === '/jobs/batch'
+            ? { ok: true, jobs: submitted.packets.map((_: unknown, i: number) => ({ id: `00000000-0000-0000-0000-00000000000${i + 1}`, state: 'pending' })) }
+            : { ok: true, job: { id: '00000000-0000-0000-0000-000000000003', state: 'pending' } });
     } });
     const botId = '1077393568647352320';
     const users = ids.map((id, i) => ({ id, username: names[i], globalName: names[i], bot: false,
@@ -102,7 +127,7 @@ test('two tagged research subjects queue two focused jobs even when manager pick
             roles: { cache: new Collection([['555555555555555555', { id: '555555555555555555', name: '@everyone', position: 0 }]]) } }) } },
         attachments: new Map(), channel: { isThread: () => false, messages: { fetch: async () => new Map() } } };
     try {
-        const result = await delegateCodexForTurn({ kind: 'investigation', question: 'Research keii only', targetUserId: ids[0] }, message);
+        const result = await delegateCodexForTurn({ kind: 'investigation', investigationMode: 'separate', question: 'Research keii only', targetUserId: ids[0] }, message);
         expect(result.ok).toBe(true);
         expect(path).toBe('/jobs/batch');
         expect(submitted.packets).toHaveLength(2);
@@ -114,6 +139,15 @@ test('two tagged research subjects queue two focused jobs even when manager pick
         expect(profileContexts[0]).toContain(`"id":"${ids[0]}"`);
         expect(profileContexts[0]).not.toContain(`"id":"${ids[1]}"`);
         expect(profileContexts[1]).toContain(`"id":"${ids[1]}"`);
+        const joint = await delegateCodexForTurn({ kind: 'investigation',
+            question: 'Investigate the public CTF connection between both members', targetUserId: ids[0] },
+            { ...message, id: '800000000000000004' });
+        expect(joint.ok).toBe(true);
+        expect(joint.investigationMode).toBe('joint');
+        expect(path).toBe('/jobs');
+        expect(submitted.question).toContain('connection between both members');
+        expect(submitted.context).toContain(`"id":"${ids[0]}"`);
+        expect(submitted.context).toContain(`"id":"${ids[1]}"`);
     } finally {
         server.stop(true);
         if (previousEnabled === undefined) delete process.env.CODEX_SOLVER_ENABLED; else process.env.CODEX_SOLVER_ENABLED = previousEnabled;

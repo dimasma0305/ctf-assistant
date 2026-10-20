@@ -50,6 +50,13 @@ export function validateInvestigationBatch(value: any): Packet[] {
     ||p.userId!==first.userId||p.route!==first.route))throw Error('invalid_job_batch');
   return packets;
 }
+export function hourlyLimitRetryAfterSeconds(recent: number[], requested: number, limit: number, now: number): number | null {
+  if(requested<1||requested>limit)throw Error('invalid_hourly_request');
+  const active=recent.filter(time=>time>now-60*60_000).sort((a,b)=>a-b);
+  if(active.length+requested<=limit)return null;
+  const expiry=active[active.length+requested-limit-1]+60*60_000;
+  return Math.max(1,Math.ceil((expiry-now)/1000));
+}
 export function chooseModel(packet: Packet, daybreakUsers: Set<string>, verified: Set<string>): string {
   const eligible=daybreakUsers.has(packet.userId)&&verified.has('gpt-daybreak-blue-latest');
   if(packet.route==='daybreak') {if(!eligible)throw Error('daybreak_not_enabled_for_requestor');return 'gpt-daybreak-blue-latest';}
