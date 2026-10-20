@@ -1,7 +1,7 @@
 import { chmod, chown, mkdir, open, readdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { chooseModel, newJob, publicJob, validatePacket, type Job } from './protocol';
+import { chooseModel, newJob, publicJob, validateInvestigationBatch, validatePacket, type Job } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { ensureWorkerImage } from './workerImage';
@@ -91,16 +91,26 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
     if(path==='/jobs/context/pending')return response({ok:true,requests:discord.list()});
     if(path==='/jobs/context/respond')return typeof body?.id==='string'&&typeof body?.jobId==='string'&&discord.respond(body.id,body.jobId,body.result)
       ?response({ok:true}):response({ok:false,error:'request_expired'},404);
-    if(path==='/jobs'){
-      const packet=validatePacket(body);await cleanup();
+    if(path==='/jobs'||path==='/jobs/batch'){
+      const packets=path==='/jobs/batch'?validateInvestigationBatch(body):[validatePacket(body)];
+      const packet=packets[0];await cleanup();
       const outstanding=[...jobs.values()].filter(j=>j.packet.scope===packet.scope&&['pending','running'].includes(j.state));
       if(outstanding.length)return response({ok:false,error:'channel_job_active',job:publicJob(outstanding[0])},409);
-      if(queue.length+(running?1:0)>=maxQueued)return response({ok:false,error:'queue_full'},429);
+      if(queue.length+(running?1:0)+packets.length>maxQueued)return response({ok:false,error:'queue_full'},429);
       const key=`${packet.guildId}:${packet.userId}`,recent=(submissions.get(key)||[]).filter(t=>t>Date.now()-60*60_000);
-      if(recent.length>=3)return response({ok:false,error:'user_hourly_limit'},429);
-      chooseModel(packet,daybreakUsers,verified);
-      const job=newJob(packet);jobs.set(job.id,job);queue.push(job.id);recent.push(Date.now());submissions.set(key,recent);await persist(job);schedule();
-      return response({ok:true,job:publicJob(job)},202);
+      if(recent.length+packets.length>3)return response({ok:false,error:'user_hourly_limit'},429);
+      for(const entry of packets)chooseModel(entry,daybreakUsers,verified);
+      const created=packets.map(newJob);
+      for(const job of created){jobs.set(job.id,job);queue.push(job.id);}
+      submissions.set(key,[...recent,...created.map(job=>job.createdAt)]);
+      try{await Promise.all(created.map(persist));}
+      catch(error){
+        for(const job of created){jobs.delete(job.id);const index=queue.indexOf(job.id);if(index>=0)queue.splice(index,1);await rm(file(job.id),{force:true});}
+        recent.length?submissions.set(key,recent):submissions.delete(key);
+        throw error;
+      }
+      schedule();
+      return response(path==='/jobs/batch'?{ok:true,jobs:created.map(publicJob)}:{ok:true,job:publicJob(created[0])},202);
     }
     const matching=[...jobs.values()].filter(candidate=>owner(body,candidate)).sort((a,b)=>b.createdAt-a.createdAt);
     const job=typeof body?.jobId==='string'&&body.jobId?jobs.get(body.jobId)

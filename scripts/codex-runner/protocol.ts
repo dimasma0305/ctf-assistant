@@ -41,6 +41,15 @@ export function validatePacket(value: any): Packet {
   return {scope:value.scope,guildId:value.guildId,channelId:value.channelId,messageId:value.messageId,userId:value.userId,
     question:value.question,context:value.context,checkpoint:JSON.parse(checkpoint),route:value.route,kind:value.kind||'ctf',artifacts};
 }
+/** A multi-person request must be submitted atomically, with one job per subject. */
+export function validateInvestigationBatch(value: any): Packet[] {
+  if(!Array.isArray(value?.packets)||value.packets.length<2||value.packets.length>3)throw Error('invalid_job_batch');
+  const packets=value.packets.map(validatePacket);
+  const first=packets[0];
+  if(packets.some(p=>p.kind!=='investigation'||p.scope!==first.scope||p.messageId!==first.messageId
+    ||p.userId!==first.userId||p.route!==first.route))throw Error('invalid_job_batch');
+  return packets;
+}
 export function chooseModel(packet: Packet, daybreakUsers: Set<string>, verified: Set<string>): string {
   const eligible=daybreakUsers.has(packet.userId)&&verified.has('gpt-daybreak-blue-latest');
   if(packet.route==='daybreak') {if(!eligible)throw Error('daybreak_not_enabled_for_requestor');return 'gpt-daybreak-blue-latest';}

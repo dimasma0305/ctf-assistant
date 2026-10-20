@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { chooseModel, newJob, promoteReceiptCandidates, publicJob, resultFromText, validatePacket } from './protocol';
+import { chooseModel, newJob, promoteReceiptCandidates, publicJob, resultFromText, validateInvestigationBatch, validatePacket } from './protocol';
 import { workerArgs } from './executor';
 import { startGateway } from './gateway';
 import { DiscordContextBroker } from './discordBroker';
@@ -24,6 +24,15 @@ test('model route is chosen by the manager, with economical auto and owner-gated
   expect(()=>validatePacket({...packet(),kind:'other'})).toThrow('invalid_job_packet');
   expect(()=>validatePacket({...packet(),scope:'other'})).toThrow('invalid_job_packet');
   expect(()=>validatePacket({...packet(),artifacts:[{name:'x',data:'not base64!',image:false,sourceMessageId:packet().messageId}]})).toThrow('invalid_artifact');
+});
+
+test('multi-person investigation batch shares one request but keeps separate job questions',()=>{
+  const first={...packet(),kind:'investigation',question:'research keii'};
+  const second={...first,question:'research belugagemink'};
+  expect(validateInvestigationBatch({packets:[first,second]}).map(p=>p.question)).toEqual(['research keii','research belugagemink']);
+  expect(()=>validateInvestigationBatch({packets:[first,{...second,messageId:'800000000000000002'}]})).toThrow('invalid_job_batch');
+  expect(()=>validateInvestigationBatch({packets:[first,{...second,kind:'ctf'}]})).toThrow('invalid_job_batch');
+  expect(()=>validateInvestigationBatch({packets:[first]})).toThrow('invalid_job_batch');
 });
 
 test('Docker worker arguments expose only disposable tmpfs and one inference socket',()=>{

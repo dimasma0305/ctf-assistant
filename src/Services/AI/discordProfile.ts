@@ -18,14 +18,18 @@ export function discordProfileSubject(message: Pick<ChatMessage, 'content' | 'au
 /** A person/profile question about exactly one tagged member. Keep CTF team
  * mentions and ordinary name references out of this research path. */
 export function discordPersonResearchSubject(message: Pick<ChatMessage, 'content' | 'author' | 'client'>): string | null {
-    const id = discordProfileSubject(message);
-    if (!id || id === message.author.id) return null;
+    const subjects = discordPersonResearchSubjects(message);
+    return subjects.length === 1 ? subjects[0] : null;
+}
+
+/** Return every explicitly tagged subject of a person-research request. */
+export function discordPersonResearchSubjects(message: Pick<ChatMessage, 'content' | 'author' | 'client'>): string[] {
+    const ids = extractMentionIds(message.content).filter(id => id !== message.client.user?.id && id !== message.author.id);
+    if (!ids.length) return [];
     const direct = /\b(?:siapa(?:\s+(?:itu|dia))?|who\s+is|profil(?:e)?(?:\s+discord)?|identitas(?:\s+akun)?)\s*<@!?(\d{17,20})>/i.exec(message.content);
-    if (direct?.[1] === id) return id;
-    // A bare "deepsearch @member" is still a request about that member. The
-    // single-mention guard above excludes ambiguous multi-person lookups.
+    if (direct && ids.includes(direct[1])) return ids;
     return /\b(?:deep\s*search|osint|riset(?:\s+mendalam)?|telusuri(?:\s+mendalam)?)\b/i.test(message.content)
-        && new RegExp(`<@!?${id}>`).test(message.content) ? id : null;
+        ? ids : [];
 }
 
 export interface DiscordProfile {

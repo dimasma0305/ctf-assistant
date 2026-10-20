@@ -75,3 +75,48 @@ test('explicit deep search mention grounds the tagged member even when manager o
         await rm(directory, { recursive: true, force: true });
     }
 });
+
+test('two tagged research subjects queue two focused jobs even when manager picks the first ID', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'hackerika-multi-profile-test-'));
+    const socket = join(directory, 'control.sock');
+    const previousEnabled = process.env.CODEX_SOLVER_ENABLED, previousSocket = process.env.CODEX_CONTROL_SOCKET;
+    process.env.CODEX_SOLVER_ENABLED = '1'; process.env.CODEX_CONTROL_SOCKET = socket;
+    const ids = ['450152595189923860', '583840262460145665'];
+    const names = ['keii', 'belugagemink'];
+    let path = '', submitted: any;
+    const server = Bun.serve({ unix: socket, async fetch(request) {
+        path = new URL(request.url).pathname;
+        submitted = await request.json();
+        return Response.json({ ok: true, jobs: submitted.packets.map((_: unknown, i: number) => ({ id: `00000000-0000-0000-0000-00000000000${i + 1}`, state: 'pending' })) });
+    } });
+    const botId = '1077393568647352320';
+    const users = ids.map((id, i) => ({ id, username: names[i], globalName: names[i], bot: false,
+        createdAt: new Date('2021-01-01T00:00:00Z'), avatarURL: () => null, bannerURL: () => null,
+        flags: { toArray: () => [] } }));
+    const message: any = { id: '800000000000000003', guildId: '555555555555555555', channelId: '700000000000000001',
+        content: `<@${botId}> deepsearch <@${ids[0]}> dan juga <@${ids[1]}>`,
+        author: { id: '663394727688798231', bot: false }, client: { user: { id: botId }, users: { fetch: async (id: string) => users[ids.indexOf(id)] } },
+        guild: { id: '555555555555555555', members: { fetch: async (id: string) => ({ id, user: users[ids.indexOf(id)],
+            displayName: names[ids.indexOf(id)], nickname: null, joinedAt: new Date('2024-01-01T00:00:00Z'),
+            avatarURL: () => null, bannerURL: () => null,
+            roles: { cache: new Collection([['555555555555555555', { id: '555555555555555555', name: '@everyone', position: 0 }]]) } }) } },
+        attachments: new Map(), channel: { isThread: () => false, messages: { fetch: async () => new Map() } } };
+    try {
+        const result = await delegateCodexForTurn({ kind: 'investigation', question: 'Research both members', targetUserId: ids[0] }, message);
+        expect(result.ok).toBe(true);
+        expect(path).toBe('/jobs/batch');
+        expect(submitted.packets).toHaveLength(2);
+        expect(submitted.packets.map((p: any) => p.messageId)).toEqual([message.id, message.id]);
+        expect(submitted.packets[0].question).toContain('keii');
+        expect(submitted.packets[1].question).toContain('belugagemink');
+        const profileContexts = submitted.packets.map((p: any) => p.context.split('[verified Discord API profile for explicitly mentioned member] ')[1]);
+        expect(profileContexts[0]).toContain(`"id":"${ids[0]}"`);
+        expect(profileContexts[0]).not.toContain(`"id":"${ids[1]}"`);
+        expect(profileContexts[1]).toContain(`"id":"${ids[1]}"`);
+    } finally {
+        server.stop(true);
+        if (previousEnabled === undefined) delete process.env.CODEX_SOLVER_ENABLED; else process.env.CODEX_SOLVER_ENABLED = previousEnabled;
+        if (previousSocket === undefined) delete process.env.CODEX_CONTROL_SOCKET; else process.env.CODEX_CONTROL_SOCKET = previousSocket;
+        await rm(directory, { recursive: true, force: true });
+    }
+});

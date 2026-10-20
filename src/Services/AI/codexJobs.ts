@@ -36,6 +36,7 @@ export async function codexRequest<T>(path:string,body:unknown,options:{socketPa
   });
 }
 export const submitCodexJob=(packet:CodexPacket,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs',packet,{signal});
+export const submitCodexJobBatch=(packets:CodexPacket[],signal?:AbortSignal)=>codexRequest<{ok:true;jobs:CodexPublicJob[]}>('/jobs/batch',{packets},{signal});
 export const getCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/get',{jobId,scope,userId},{signal});
 export const cancelCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/cancel',{jobId,scope,userId},{signal});
 export const completedCodexJobs=()=>codexRequest<{ok:true;jobs:CodexPublicJob[]}>('/jobs/completed',{});

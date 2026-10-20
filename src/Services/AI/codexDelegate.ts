@@ -1,8 +1,8 @@
 import type { Message, OmitPartialGroupDMChannel } from 'discord.js';
 import { collectCTFInputs, collectCodexArtifacts } from './ctfInputs';
 import { solveCTFForTurn } from './ctf';
-import { codexSolverEnabled, submitCodexJob, type CodexRoute, type CodexPublicJob } from './codexJobs';
-import { discordPersonResearchSubject, getDiscordProfileForTool } from './discordProfile';
+import { codexSolverEnabled, submitCodexJob, submitCodexJobBatch, type CodexPacket, type CodexRoute, type CodexPublicJob } from './codexJobs';
+import { discordPersonResearchSubjects, getDiscordProfileForTool } from './discordProfile';
 
 type Turn = OmitPartialGroupDMChannel<Message<boolean>>;
 const delegated = new WeakSet<object>();
@@ -29,30 +29,41 @@ export async function delegateCodexForTurn(args: {
 
     const signal = AbortSignal.any([AbortSignal.timeout(70_000), ...(options.signal ? [options.signal] : [])]);
     const gathered = await collectCTFInputs(message, { text: message.content || '' }, signal);
-    let context = gathered.text;
-    // Ground an explicit one-person research request even when the manager
-    // omits targetUserId. This identifies the subject; it does not choose a
-    // research route or infer a public account from a matching username.
-    const explicitProfileSubject = discordPersonResearchSubject(message);
-    const targetUserId = explicitProfileSubject || args.targetUserId;
-    let question = args.question.trim();
-    if (targetUserId !== undefined) {
-        const profile = await getDiscordProfileForTool(message, { userId: targetUserId });
+    // A request naming several people needs one bounded investigation per
+    // person. A manager-supplied targetUserId must not silently drop the rest.
+    const explicitSubjects = discordPersonResearchSubjects(message);
+    if (explicitSubjects.length > 3) return { ok: false, error: 'too_many_profile_targets' };
+    const targetIds = explicitSubjects.length ? explicitSubjects : args.targetUserId ? [args.targetUserId] : [];
+    const profiles = [];
+    for (const id of targetIds) {
+        const profile = await getDiscordProfileForTool(message, { userId: id });
         if (!profile.ok) return profile;
-        context += `\n[verified Discord API profile for explicitly mentioned member] ${JSON.stringify(profile)}`;
-        if (explicitProfileSubject) {
-            question = `Permintaan user: ${JSON.stringify(message.content)}. Objek riset adalah satu member Discord yang ditag eksplisit; profil terverifikasi ada di context. Telusuri jejak publik/profesional yang relevan, periksa sumber, dan bedakan akun yang hanya bernama mirip. Jangan minta klarifikasi tentang objek yang sudah jelas. Tujuan tambahan: ${question}`;
-        }
+        profiles.push(profile);
     }
     const artifacts = await collectCodexArtifacts(gathered.originals, signal, message.id);
     const route: CodexRoute = ['auto', 'luna', 'sol', 'daybreak'].includes(args.solver || '') ? args.solver! : 'auto';
+    const packetBase = { kind: 'investigation' as const, scope: `${message.guildId}:${message.channelId}`,
+        guildId: message.guildId, channelId: message.channelId, messageId: message.id, userId: message.author.id,
+        route, artifacts };
+    const packets: CodexPacket[] = profiles.length ? profiles.map(profile => {
+        const target = profile.profile;
+        const focus = explicitSubjects.length > 1
+            ? `Objek riset job ini hanya member Discord ${JSON.stringify(target.guild.displayName)} (@${target.username}, ID ${target.id}); member lain yang ditag ditangani job terpisah. `
+            : 'Objek riset adalah satu member Discord yang ditag eksplisit; ';
+        const question = explicitSubjects.length
+            ? `Permintaan user: ${JSON.stringify(message.content)}. ${focus}Profil terverifikasi ada di context. Telusuri jejak publik/profesional yang relevan, periksa sumber, dan bedakan akun yang hanya bernama mirip. Jangan minta klarifikasi tentang objek yang sudah jelas. Tujuan tambahan: ${args.question!.trim()}`
+            : args.question!.trim();
+        return { ...packetBase, question: question.slice(0, 8000),
+            context: `${gathered.text}\n[verified Discord API profile for explicitly mentioned member] ${JSON.stringify(profile)}`.slice(0, 50_000) };
+    }) : [{ ...packetBase, question: args.question.trim().slice(0, 8000), context: gathered.text.slice(0, 50_000) }];
     try {
-        const queued = await submitCodexJob({ kind: 'investigation', scope: `${message.guildId}:${message.channelId}`,
-            guildId: message.guildId, channelId: message.channelId, messageId: message.id, userId: message.author.id,
-            question: question.slice(0, 8000), context: context.slice(0, 50_000), route, artifacts }, signal);
+        const queued = packets.length === 1
+            ? await submitCodexJob(packets[0], signal)
+            : await submitCodexJobBatch(packets, signal);
         delegated.add(message);
-        return { ok: true, status: 'queued', job: queued.job,
-            note: 'Hasil riset akan dikirim otomatis di channel/thread ini. Jangan klaim pekerjaan selesai sebelum hasil tiba.' };
+        return { ok: true, status: 'queued', ...('jobs' in queued ? { jobs: queued.jobs,
+            targets: profiles.map(profile => profile.profile.guild.displayName) } : { job: queued.job }),
+            note: `${packets.length} hasil riset akan dikirim otomatis di channel/thread ini. Jangan klaim pekerjaan selesai sebelum semua hasil tiba.` };
     } catch (caught: unknown) {
         const error = caught as Error & { job?: CodexPublicJob };
         if (error.job) {

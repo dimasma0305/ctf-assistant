@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { Collection } from 'discord.js';
-import { discordPersonResearchSubject, discordProfileSubject, getDiscordProfileForTool, type DiscordProfile } from './discordProfile';
+import { discordPersonResearchSubject, discordPersonResearchSubjects, discordProfileSubject, getDiscordProfileForTool, type DiscordProfile } from './discordProfile';
 import { appendResearchFollowupSource, discordProfileSearchQueries, formatDiscordProfileReply, groundResearchReply, profileSearchLeads, requiresResearch } from './research';
 
 const speaker = '663394727688798231';
@@ -54,10 +54,12 @@ test('natural siapa @member deep search request selects one profile, not generic
   const bare = fixture(`<@${bot}> deepsearch <@${target}>`);
   const ctf = fixture(`<@${bot}> sebutkan 10 dosa besar <@${target}>`);
   const ambiguous = fixture(`<@${bot}> siapa <@${target}> dan <@${other}>`);
+  const multiple = fixture(`<@${bot}> deepsearch <@${target}> dan juga <@${other}>`);
   for (const value of [direct, prior, bare])
     expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(target);
   for (const value of [ctf, ambiguous])
     expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(null);
+  expect(discordPersonResearchSubjects(multiple.message as unknown as Parameters<typeof discordPersonResearchSubjects>[0])).toEqual([target,other]);
 });
 
 test('a failed global-user refresh still uses the freshly fetched guild member user', async () => {
