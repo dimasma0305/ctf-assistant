@@ -102,13 +102,14 @@ test('two tagged research subjects queue two focused jobs even when manager pick
             roles: { cache: new Collection([['555555555555555555', { id: '555555555555555555', name: '@everyone', position: 0 }]]) } }) } },
         attachments: new Map(), channel: { isThread: () => false, messages: { fetch: async () => new Map() } } };
     try {
-        const result = await delegateCodexForTurn({ kind: 'investigation', question: 'Research both members', targetUserId: ids[0] }, message);
+        const result = await delegateCodexForTurn({ kind: 'investigation', question: 'Research keii only', targetUserId: ids[0] }, message);
         expect(result.ok).toBe(true);
         expect(path).toBe('/jobs/batch');
         expect(submitted.packets).toHaveLength(2);
         expect(submitted.packets.map((p: any) => p.messageId)).toEqual([message.id, message.id]);
         expect(submitted.packets[0].question).toContain('keii');
         expect(submitted.packets[1].question).toContain('belugagemink');
+        expect(submitted.packets[1].question).not.toContain('Research keii only');
         const profileContexts = submitted.packets.map((p: any) => p.context.split('[verified Discord API profile for explicitly mentioned member] ')[1]);
         expect(profileContexts[0]).toContain(`"id":"${ids[0]}"`);
         expect(profileContexts[0]).not.toContain(`"id":"${ids[1]}"`);

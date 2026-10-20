@@ -24,12 +24,11 @@ export function discordPersonResearchSubject(message: Pick<ChatMessage, 'content
 
 /** Return every explicitly tagged subject of a person-research request. */
 export function discordPersonResearchSubjects(message: Pick<ChatMessage, 'content' | 'author' | 'client'>): string[] {
-    const ids = extractMentionIds(message.content).filter(id => id !== message.client.user?.id && id !== message.author.id);
-    if (!ids.length) return [];
     const direct = /\b(?:siapa(?:\s+(?:itu|dia))?|who\s+is|profil(?:e)?(?:\s+discord)?|identitas(?:\s+akun)?)\s*<@!?(\d{17,20})>/i.exec(message.content);
-    if (direct && ids.includes(direct[1])) return ids;
-    return /\b(?:deep\s*search|osint|riset(?:\s+mendalam)?|telusuri(?:\s+mendalam)?)\b/i.test(message.content)
-        ? ids : [];
+    const research = /\b(?:deep\s*search|osint|riset(?:\s+mendalam)?|telusuri(?:\s+mendalam)?)\b/i.exec(message.content);
+    const start = direct?.index ?? research?.index;
+    if (start === undefined) return [];
+    return extractMentionIds(message.content.slice(start)).filter(id => id !== message.client.user?.id && id !== message.author.id);
 }
 
 export interface DiscordProfile {

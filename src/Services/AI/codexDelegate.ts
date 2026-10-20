@@ -51,7 +51,7 @@ export async function delegateCodexForTurn(args: {
             ? `Objek riset job ini hanya member Discord ${JSON.stringify(target.guild.displayName)} (@${target.username}, ID ${target.id}); member lain yang ditag ditangani job terpisah. `
             : 'Objek riset adalah satu member Discord yang ditag eksplisit; ';
         const question = explicitSubjects.length
-            ? `Permintaan user: ${JSON.stringify(message.content)}. ${focus}Profil terverifikasi ada di context. Telusuri jejak publik/profesional yang relevan, periksa sumber, dan bedakan akun yang hanya bernama mirip. Jangan minta klarifikasi tentang objek yang sudah jelas. Tujuan tambahan: ${args.question!.trim()}`
+            ? `Permintaan user: ${JSON.stringify(message.content)}. ${focus}Profil terverifikasi ada di context. Telusuri jejak publik/profesional yang relevan, periksa sumber, dan bedakan akun yang hanya bernama mirip. Jangan minta klarifikasi tentang objek yang sudah jelas.${explicitSubjects.length === 1 ? ` Tujuan tambahan: ${args.question!.trim()}` : ''}`
             : args.question!.trim();
         return { ...packetBase, question: question.slice(0, 8000),
             context: `${gathered.text}\n[verified Discord API profile for explicitly mentioned member] ${JSON.stringify(profile)}`.slice(0, 50_000) };

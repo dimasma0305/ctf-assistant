@@ -55,11 +55,13 @@ test('natural siapa @member deep search request selects one profile, not generic
   const ctf = fixture(`<@${bot}> sebutkan 10 dosa besar <@${target}>`);
   const ambiguous = fixture(`<@${bot}> siapa <@${target}> dan <@${other}>`);
   const multiple = fixture(`<@${bot}> deepsearch <@${target}> dan juga <@${other}>`);
+  const addressed = fixture(`<@${other}> tolong lihat, deepsearch <@${target}>`);
   for (const value of [direct, prior, bare])
     expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(target);
   for (const value of [ctf, ambiguous])
     expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(null);
   expect(discordPersonResearchSubjects(multiple.message as unknown as Parameters<typeof discordPersonResearchSubjects>[0])).toEqual([target,other]);
+  expect(discordPersonResearchSubjects(addressed.message as unknown as Parameters<typeof discordPersonResearchSubjects>[0])).toEqual([target]);
 });
 
 test('a failed global-user refresh still uses the freshly fetched guild member user', async () => {
