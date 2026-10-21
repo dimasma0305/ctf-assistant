@@ -132,10 +132,22 @@ export class ResearchSourceReader {
     if (!url) throw new Error('invalid_source_url');
     const github = githubRepository(url);
     if (github?.path) {
-      const snapshot = await this.repository(url, focus, [github.path]);
-      const document = snapshot.documents.find(doc => doc.kind === 'repository-file');
-      if (!document) throw new Error('source_file_missing');
-      return document;
+      // A direct blob link names one file. Fetching the entire recursive tree
+      // first fails for large repositories (php-src exceeds MAX_BYTES), and
+      // tree discovery intentionally indexes only common documentation files.
+      const { repo, ref, path } = github;
+      if (!ref || path.split('/').some(part => !part || part === '.' || part === '..' || /[\\\0]/.test(part)))
+        throw new Error('invalid_repository_path');
+      const metadata = JSON.parse((await this.text(`https://api.github.com/repos/${repo}`)).raw);
+      if (metadata.full_name?.toLowerCase() !== repo.toLowerCase()) throw new Error('repository_identity_mismatch');
+      const commit = JSON.parse((await this.text(`https://api.github.com/repos/${repo}/commits/${encodeURIComponent(ref)}`)).raw);
+      if (!/^[a-f0-9]{40}$/i.test(commit.sha)) throw new Error('invalid_repository_revision');
+      const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+      const file = await this.text(`https://raw.githubusercontent.com/${repo}/${commit.sha}/${encodedPath}`, MAX_FILE_BYTES);
+      const documentUrl = `https://github.com/${repo}/blob/${commit.sha}/${encodedPath}`;
+      const page = parsePage(file.raw, documentUrl, false);
+      return { url: documentUrl, title: `${repo}: ${path}`, kind: 'repository-file',
+        ...sourceExcerpt(page.text, focus), links: page.links };
     }
     const page = await this.text(url);
     const parsed = parsePage(page.raw, page.url, /html/i.test(page.type) || /^\s*<(?:!doctype|html|main)/i.test(page.raw));

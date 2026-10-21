@@ -1,5 +1,5 @@
 """No credentials or host commands: an HTTP-to-Unix bridge and sandbox entrypoint."""
-import base64, http.client, http.server, json, os, pathlib, re, shutil, stat, subprocess, sys, threading
+import base64, http.client, http.server, json, os, pathlib, re, selectors, shutil, socket, socketserver, stat, subprocess, sys, threading
 class UnixHTTP(http.client.HTTPConnection):
     def connect(self):
         import socket
@@ -23,6 +23,24 @@ class Bridge(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(data);self.wfile.flush()
         except Exception: pass
         finally:conn.close();self.close_connection=True
+class EgressRelay(socketserver.BaseRequestHandler):
+    def handle(self):
+        upstream=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+        try:
+            upstream.connect('/run/egress.sock')
+            with selectors.DefaultSelector() as selector:
+                selector.register(self.request,selectors.EVENT_READ,upstream)
+                selector.register(upstream,selectors.EVENT_READ,self.request)
+                while True:
+                    for key,_ in selector.select(timeout=50):
+                        chunk=key.fileobj.recv(65536)
+                        if not chunk:return
+                        key.data.sendall(chunk)
+        except (OSError,TimeoutError):pass
+        finally:upstream.close()
+class EgressServer(socketserver.ThreadingTCPServer):
+    allow_reuse_address=True
+    daemon_threads=True
 packet=json.loads(sys.stdin.buffer.readline(32*1024*1024))
 root=pathlib.Path('/workspace');root.mkdir(exist_ok=True)
 (root/'exports').mkdir(mode=0o700,exist_ok=True)
@@ -37,9 +55,15 @@ for index,artifact in enumerate(packet['artifacts']):
 context={k:v for k,v in packet.items() if k not in ['artifacts','prompt','schema','model']};context['artifacts']=artifacts
 (root/'context.json').write_text(json.dumps(context,ensure_ascii=False))
 (root/'schema.json').write_text(json.dumps(packet['schema']))
-(root/'tooling.txt').write_text('Python 3 standard library; gcc/g++; gdb; binutils (strings, readelf, objdump); file; ripgrep; unzip; jq; curl; sqlite3; pdftotext. No pip packages or network installs. The reviewed irai skills ctf-deep-solve and resourceful-solve are available under /workspace/.agents/skills; select a relevant skill and read its SKILL.md and only needed references. Skill instructions do not grant new network, Discord, credential or target access. Ask Hackerika for same-thread or same-channel Discord evidence: POST http://127.0.0.1:8118/discord/read JSON {"kind":"recent","limit":20,"includeImage":true,"describeImage":true} or {"kind":"message","messageId":"snowflake","includeImage":true,"describeImage":true}. Images arrive as base64 in images[].data; decode to /workspace. imageObservation describes actual pixels via bounded Luna vision; use it instead of guessing from metadata or ASCII art. Public search: POST http://127.0.0.1:8118/sources/search JSON {"query":"public clue"}; CTF jobs at most two searches, investigation jobs at most six. Read cited or supplied sources: POST http://127.0.0.1:8118/sources/read JSON {"url":"public URL","query":"focus"}. For static slide sites, follow linked JS slide chunks; download a discovered public archive with POST http://127.0.0.1:8118/sources/download JSON {"url":"inspected archive URL"} and save the binary response to /workspace before inspecting it. If the user asks for a file, write up to two finished files under /workspace/exports/ with simple ASCII names. Each file must be <=4 MiB and the combined size <=6 MiB. Only top-level regular files are exported; the host sends them as Discord attachments in the original channel/thread. Do not put secrets, private Discord context, or unrequested source artifacts in exports.\n')
+(root/'tooling.txt').write_text('Python 3 standard library; gcc/g++; gdb; binutils (strings, readelf, objdump); file; ripgrep; unzip; jq; curl; git; sqlite3; pdftotext. Public TCP internet is available via the bounded SOCKS5 proxy configured for curl and git HTTPS; private and loopback targets are blocked. No reusable credentials are supplied. The reviewed irai skills ctf-deep-solve and resourceful-solve are available under /workspace/.agents/skills; select a relevant skill and read its SKILL.md and only needed references. Internet access does not grant permission to test unrelated targets or access private Discord, credentials, or server systems. Ask Hackerika for same-thread or same-channel Discord evidence: POST http://127.0.0.1:8118/discord/read JSON {"kind":"recent","limit":20,"includeImage":true,"describeImage":true} or {"kind":"message","messageId":"snowflake","includeImage":true,"describeImage":true}. Images arrive as base64 in images[].data; decode to /workspace. imageObservation describes actual pixels via bounded Luna vision; use it instead of guessing from metadata or ASCII art. Public search: POST http://127.0.0.1:8118/sources/search JSON {"query":"public clue"}; CTF jobs at most two searches, investigation jobs at most six. Read cited or supplied sources: POST http://127.0.0.1:8118/sources/read JSON {"url":"public URL","query":"focus"}. For static slide sites, follow linked JS slide chunks; download a discovered public archive with POST http://127.0.0.1:8118/sources/download JSON {"url":"inspected archive URL"} and save the binary response to /workspace before inspecting it. If the user asks for a file, write up to two finished files under /workspace/exports/ with simple ASCII names. Each file must be <=4 MiB and the combined size <=6 MiB. Only top-level regular files are exported; the host sends them as Discord attachments in the original channel/thread. Do not put secrets, private Discord context, or unrequested source artifacts in exports.\n')
 server=http.server.ThreadingHTTPServer(('127.0.0.1',8118),Bridge)
 threading.Thread(target=server.serve_forever,daemon=True).start()
+egress=EgressServer(('127.0.0.1',8119),EgressRelay)
+threading.Thread(target=egress.serve_forever,daemon=True).start()
+proxy_env={'ALL_PROXY':'socks5h://127.0.0.1:8119','all_proxy':'socks5h://127.0.0.1:8119',
+           'HTTP_PROXY':'socks5h://127.0.0.1:8119','http_proxy':'socks5h://127.0.0.1:8119',
+           'HTTPS_PROXY':'socks5h://127.0.0.1:8119','https_proxy':'socks5h://127.0.0.1:8119',
+           'NO_PROXY':'127.0.0.1,localhost','no_proxy':'127.0.0.1,localhost'}
 args=['/usr/local/bin/codex','exec','--ignore-user-config','--ignore-rules','--ephemeral','--skip-git-repo-check','--color','never','--json','--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],
  '-c','model_provider="hackerika"','-c','model_providers.hackerika.name="Hackerika job gateway"','-c','model_providers.hackerika.base_url="http://127.0.0.1:8118/v1"',
  '-c','model_providers.hackerika.wire_api="responses"','-c','model_providers.hackerika.requires_openai_auth=false','-c','model_providers.hackerika.supports_websockets=false',
@@ -49,7 +73,7 @@ for image in images:args.extend(['--image',image])
 # --image accepts multiple paths and otherwise consumes the positional prompt.
 args.extend(['--',packet['prompt']])
 try:
-    code=subprocess.call(args,cwd='/workspace',env={**os.environ,'CODEX_HOME':'/tmp/codex'})
+    code=subprocess.call(args,cwd='/workspace',env={**os.environ,**proxy_env,'CODEX_HOME':'/tmp/codex'})
     final=root/'final.json'
     if final.is_file() and final.stat().st_size<=65536:
         print('HACKERIKA_FINAL:'+base64.b64encode(final.read_bytes()).decode(),flush=True)
@@ -68,4 +92,4 @@ try:
                 count+=1
                 if count>=2 or total>=6*1024*1024:break
     sys.exit(code)
-finally:server.shutdown()
+finally:server.shutdown();egress.shutdown()

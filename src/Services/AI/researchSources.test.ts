@@ -82,6 +82,25 @@ test('repository reads pin files to the resolved commit and preserve metadata wi
   expect(requests).toHaveLength(count);
 });
 
+test('direct GitHub C source reads the pinned file without requesting a large repository tree', async () => {
+  const sha = 'ab'.repeat(20), requests: string[] = [];
+  restores.push(spyOn(researchTransport, 'fetch').mockImplementation((async (url: any) => {
+    const current = String(url); requests.push(current);
+    if (current.endsWith('/repos/php/php-src')) return Response.json({ full_name: 'php/php-src', default_branch: 'master' });
+    if (current.endsWith('/commits/PHP-8.6')) return Response.json({ sha });
+    if (current === `https://raw.githubusercontent.com/php/php-src/${sha}/ext/session/session.c`)
+      return new Response('static void php_session_rfc1867_callback(void) {}', { headers: { 'content-type': 'text/plain' } });
+    throw Error(`unexpected request: ${current}`);
+  }) as any));
+  const result = await new ResearchSourceReader(AbortSignal.timeout(1000))
+    .read('https://github.com/php/php-src/blob/PHP-8.6/ext/session/session.c', 'php_session_rfc1867_callback');
+  expect(result.kind).toBe('repository-file');
+  expect(result.url).toBe(`https://github.com/php/php-src/blob/${sha}/ext/session/session.c`);
+  expect(result.content).toContain('php_session_rfc1867_callback');
+  expect(requests).toHaveLength(3);
+  expect(requests.some(url => url.includes('/git/trees/'))).toBe(false);
+});
+
 test('one failed repository file does not discard independently fetched metadata and docs', async () => {
   const sha = 'd4'.repeat(20);
   restores.push(spyOn(researchTransport, 'fetch').mockImplementation((async (url: any) => {

@@ -28,11 +28,11 @@ try{
     {id:'daybreak-ret2win',model:'gpt-daybreak-blue-latest',route:'daybreak' as const,expected:'BlueCTF{ret2win_local_0x41}',question:'Solve this authorized local pwn ELF. Derive and execute a ret2win payload, then report the printed flag.',context:'Deliberately vulnerable local CTF binary. No remote target or checker.',artifacts:[{name:'ret2win',data:(await readFile(binary)).toString('base64'),image:false}]},
   ];
   const cases=filter?allCases.filter(test=>test.id===filter):allCases;if(!cases.length)throw Error('unknown_benchmark_case');
-  const protocol={startedAt:new Date().toISOString(),workerImage:process.env.CODEX_WORKER_IMAGE||'hackerika-codex-worker:0.163.0-4',codexVersion:'0.163.0',
+  const protocol={startedAt:new Date().toISOString(),workerImage:process.env.CODEX_WORKER_IMAGE||'hackerika-codex-worker:0.163.0-5',codexVersion:'0.163.0',
     promptHash:hash(SOLVER_PROMPT),caseIds:cases.map(test=>test.id),fixtureHashes:{image:hash(image),ret2win:hash(await readFile(binary))},
     limits:{sequential:true,maxSecondsPerCase:180,maxModelCalls:10,maxInputChars:1_200_000},
     acceptance:'Exact expected flag must appear in final structured output and in stdout of a successful local command receipt. The public-source case additionally requires a primary source read through the gateway.',
-    scope:'Real ChatGPT-plan inference through the credential broker and fresh network-none Docker workers. The host gateway may search and read public sources; workers have no direct network. Synthetic authorized fixtures only; no Discord sends, remote targets, or checker submissions.'};
+    scope:'Real ChatGPT-plan inference through the credential broker and fresh network-none Docker workers. Workers have bounded public TCP egress through a per-job proxy and a separate host gateway for public source search/read. Synthetic authorized fixtures only; no Discord sends, remote targets, or checker submissions.'};
   await writeFile(join(out,'protocol.json'),JSON.stringify(protocol,null,2));const results:any[]=[];
   for(const [index,test] of cases.entries()){
     const messageId=String(800000000000000100n+BigInt(index)),channelId=String(700000000000000100n+BigInt(index));

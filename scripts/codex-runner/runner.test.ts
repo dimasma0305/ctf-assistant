@@ -45,10 +45,10 @@ test('hourly job cap gives trusted requestors more room and a precise retry dela
   expect(hourlyLimitRetryAfterSeconds([now-61*60_000],1,3,now)).toBeNull();
 });
 
-test('Docker worker arguments expose only disposable tmpfs and one inference socket',()=>{
-  const args=workerArgs('worker:fixture','/run/jobs/model.sock','hackerika-solver-fixture');
+test('Docker worker has no network and receives only per-job model and public-egress sockets',()=>{
+  const args=workerArgs('worker:fixture','/run/jobs/model.sock','/run/jobs/egress.sock','hackerika-solver-fixture');
   const joined=args.join(' ');
-  for(const required of ['--network none','--read-only','--cap-drop ALL','no-new-privileges:true','--user 1000:1000','--pids-limit 128','/run/inference.sock'])expect(joined).toContain(required);
+  for(const required of ['--network none','--read-only','--cap-drop ALL','no-new-privileges:true','--user 1000:1000','--pids-limit 128','/run/inference.sock','/run/egress.sock'])expect(joined).toContain(required);
   expect(joined).not.toContain('/var/run/docker.sock');expect(joined).not.toContain('/root/app');expect(joined).not.toContain('credentials.json');
   expect(joined).toContain('/workspace:rw,exec,nosuid,nodev');
 });
@@ -56,9 +56,9 @@ test('Docker worker arguments expose only disposable tmpfs and one inference soc
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
   const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-4',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-5',dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-4',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-5',dependencies);
   expect(builds).toBe(1);
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');
