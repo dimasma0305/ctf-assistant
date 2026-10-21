@@ -22,7 +22,7 @@ globalThis.Date = class extends realDate {
     static now() { return fixedNow; }
 } as DateConstructor;
 const callerId = '111111111111111111', otherId = '222222222222222222', botId = '1077393568647352320';
-const callerName = CASE.history?.findLast((m: any) => m.who === 'caller' && m.name)?.name || 'Dimas';
+const callerName = CASE.callerName || CASE.history?.findLast((m: any) => m.who === 'caller' && m.name)?.name || 'Dimas';
 const channelId = '700000000000000001', guildId = '555555555555555555';
 const effects: any[] = [], completions: any[] = [], toolCalls: any[] = [];
 const providerFailures: string[] = [];
@@ -34,12 +34,13 @@ db.UserProfileModel.findOneAndUpdate = () => { interactionWrites++; return query
 db.UserProfileModel.updateOne = (_filter: any, update: any) => { profileWrites.push(update.$set); return query({ matchedCount: 1 }); };
 db.BotStateModel.findOneAndUpdate = () => query({ mood: 'calm', energy: 65, focus: '', activity: '', preoccupations: '', latestDiarySummary: '' });
 const originalFetch = globalThis.fetch;
+const fixtureSourceUrl = CASE.id === 'linked-scoreboard-followup' ? 'https://ctftime.org/event/3364/' : 'https://example.com/event';
 globalThis.fetch = (async (input: any, init: any = {}) => {
     const url = String(input?.url || input);
     if (url === 'https://api.openai.com/v1/responses' && JSON.parse(String(init.body || '{}')).tools?.some((tool:any)=>tool.type==='web_search')) {
         effects.push({kind:'native-web-request'});
         if(!CASE.web||CASE.web.mode==='failed')return Response.json({error:{code:'search_unavailable'}},{status:503});
-        const output=[{type:'web_search_call',status:'completed'},{type:'message',content:[{type:'output_text',text:CASE.web.summary,annotations:[{type:'url_citation',title:'Official event source (synthetic fixture)',url:'https://example.com/event'}]}]}];
+        const output=[{type:'web_search_call',status:'completed'},{type:'message',content:[{type:'output_text',text:CASE.web.summary,annotations:[{type:'url_citation',title:'Event source (synthetic fixture)',url:fixtureSourceUrl}]}]}];
         return new Response('data: '+JSON.stringify({type:'response.completed',response:{status:'completed',output}})+'\n\n',{headers:{'Content-Type':'text/event-stream'}});
     }
     if (url === 'https://api.deepseek.com/anthropic/v1/messages') {
@@ -47,13 +48,22 @@ globalThis.fetch = (async (input: any, init: any = {}) => {
         if (!CASE.web || CASE.web.mode === 'failed') return Response.json({ error: { type: 'search_unavailable' } }, { status: 503 });
         return Response.json({ content: [
             { type: 'server_tool_use', id: 'native-search', name: 'web_search', input: { query: 'fixture query' } },
-            { type: 'web_search_tool_result', tool_use_id: 'native-search', content: [{ type: 'web_search_result', title: 'Official event source (synthetic fixture)', url: 'https://example.com/event', encrypted_content: 'opaque' }] },
+            { type: 'web_search_tool_result', tool_use_id: 'native-search', content: [{ type: 'web_search_result', title: 'Event source (synthetic fixture)', url: fixtureSourceUrl, encrypted_content: 'opaque' }] },
             { type: 'text', text: CASE.web.summary },
         ] });
     }
-    if (url.startsWith('https://fixture-worker.example/')) return Response.json(url.includes('/fetch?') && CASE.web?.mode === 'success'
-        ? { ok: true, title: 'Official fixture', content: CASE.web.page, finalUrl: 'https://example.com/event', contentType: 'text/html' }
-        : { ok: false, error: 'no_results', results: [] });
+    if (url.startsWith('https://fixture-worker.example/')) {
+        const target = new URL(url).searchParams.get('url') || '';
+        if (CASE.id === 'linked-scoreboard-followup' && url.includes('/fetch?')) {
+            if (target === 'https://ctf.securinets.tn/') return Response.json({ ok: false, error: 'http_error', status: 525, finalUrl: target });
+            if (target === 'https://quals.securinets.tn/scoreboard') return Response.json({ ok: true, title: 'Scoreboard', content: 'Securinets CTF Quals 2026 Scoreboard. Loading... JavaScript required.', finalUrl: target, contentType: 'text/html' });
+            if (target === fixtureSourceUrl) return Response.json({ ok: true, title: 'CTFtime event', content: CASE.web.page, finalUrl: target, contentType: 'text/html' });
+            return Response.json({ ok: false, error: 'http_error', status: 404, finalUrl: target });
+        }
+        return Response.json(url.includes('/fetch?') && CASE.web?.mode === 'success'
+            ? { ok: true, title: 'Official fixture', content: CASE.web.page, finalUrl: fixtureSourceUrl, contentType: 'text/html' }
+            : { ok: false, error: 'no_results', results: [] });
+    }
     if (url.startsWith(`https://cdn.discordapp.com/attachments/${channelId}/`)) {
         const name = new URL(url).pathname.split('/').at(-1)!;
         if (!FIXTURES[name]) throw new Error('unexpected_fixture');

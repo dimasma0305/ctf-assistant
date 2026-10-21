@@ -3,6 +3,7 @@ export interface CapabilityCase {
     split: 'dev' | 'holdout';
     category: string;
     prompt: string;
+    callerName?: string;
     expected: string;
     maxWords: number;
     history?: { who: 'caller' | 'other' | 'bot'; text: string; name?: string }[];
@@ -39,19 +40,21 @@ export const CASES: CapabilityCase[] = [
         { who: 'caller', name: 'ftps3rver', text: 'rika @Hackerika' },
     ], expected: 'Reply to ftps3rver as a greeting or ask what they need. Do not resume Dimas’s Aryma search, invoke research, or delegate an agent.', maxWords: 25, critical: true,
         forbiddenTools: ['research_topic', 'delegate_codex', 'web_search', 'fetch_url'], forbiddenPatterns: ['Aryma', 'nama asli', 'profil publik', 'belum.*terverifikasi'] },
-    { id: 'cross-speaker-first-ping', split: 'dev', category: 'attribution', prompt: 'rika @Hackerika', hydrateMemory: true, history: [
+    { id: 'cross-speaker-first-ping', split: 'dev', category: 'attribution', callerName: 'ftps3rver', prompt: 'rika @Hackerika', hydrateMemory: true, history: [
         { who: 'other', name: 'Dimas', text: '@Hackerika deepsearch nama asli @Aryma' },
         { who: 'bot', text: 'Aku mulai telusuri jejak publiknya; kalau tidak ada nama asli yang dia ungkapkan, aku tidak akan menebak.' },
         { who: 'bot', text: 'Aku tidak menemukan bukti publik terverifikasi soal nama asli Aryma.' },
     ], expected: 'Reply to ftps3rver as a greeting or ask what they need. The old Aryma search belongs to Dimas and is already answered.', maxWords: 25, critical: true,
         forbiddenTools: ['research_topic', 'delegate_codex', 'web_search', 'fetch_url'], forbiddenPatterns: ['Aryma', 'nama asli', 'profil publik', 'belum.*terverifikasi'] },
     { id: 'linked-scoreboard-followup', split: 'dev', category: 'research', prompt: 'coba liat yang info acara scoreboard nya', history: [
+        { who: 'caller', text: 'rika coba liat Securinets CTF rank MENA region' },
+        { who: 'bot', text: 'CTFtime menampilkan peringkat global, tetapi belum menemukan tabel MENA terpisah. https://ctftime.org/event/3364/' },
         { who: 'caller', text: '@Hackerika jelasin Securinets CTF Quals 2026' },
         { who: 'bot', text: 'Kualifikasinya 17–18 Oktober. [Scoreboard resmi](https://quals.securinets.tn/scoreboard) · [Info acara](https://ctf.securinets.tn/)' },
-    ], web: { mode: 'success', summary: 'CTFtime lists Securinets CTF Quals 2026 on 17–18 October 2026 and a global scoreboard. The official scoreboard page returns only a JavaScript shell in this test; the event site is unavailable. No MENA-specific ranking is verified.',
+    ], web: { mode: 'success', summary: 'CTFtime https://ctftime.org/event/3364/ lists Securinets CTF Quals 2026 on 17–18 October 2026 and a global scoreboard. The official scoreboard page returns only a JavaScript shell in this test; the event site is unavailable. No MENA-specific ranking is verified.',
         page: 'Securinets CTF Quals 2026. Qualifiers October 17–18, 2026. Finals December 12–13, 2026. Global scoreboard: 321 teams. No separate MENA regional table appears in this readable page.' },
         expected: 'Inspect the linked pages or a readable fallback. Report concrete verified event information and clearly say the MENA regional ranking remains unverified; do not ask the caller to provide the same source again.', maxWords: 105, critical: true,
-        requiredPatterns: ['2026', 'MENA', 'scoreboard|peringkat'],
+        requiredPatterns: ['2026', 'MENA', 'scoreboard|peringkat', 'ctftime', 'gagal|tak bisa|nggak bisa|tidak bisa|525|403|JS|javascript|belum kebaca'],
         forbiddenPatterns: ['perlu sumber asli', 'detail yang lebih spesifik', 'belum cukup untuk memastikan kasus ini', 'waduh error', 'coba tanya lagi', 'pencarian belum memberiku sumber'] },
     { id: 'wait-silence', split: 'dev', category: 'attention', prompt: 'bentar jangan jawab dulu, aku belum selesai ngetik', expected: 'Absolute silence: finish_turn without a visible message, reaction, or DM.', maxWords: 0, critical: true },
     { id: 'reply-image-table', split: 'dev', category: 'vision', prompt: 'berapa total belanjanya? cukup totalnya aja.', history: [{ who: 'other', text: '' }], replyTo: 0, imagesOnReply: true, images: ['table-dev.png'], expected: 'Rp53.000 (2 × 19.000 + 3 × 5.000). Read native pixels from the replied-to upload even though current caller attached nothing.', maxWords: 20, requiredPatterns: ['53[., ]?000|53\\s*(rb|ribu)'] },

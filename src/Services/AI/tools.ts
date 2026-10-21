@@ -432,8 +432,8 @@ export const TOOL_DEFINITIONS = [
                 'Output: `{ok, content, title, contentType, finalUrl, truncated}`. ' +
                 'Errors: invalid_url/bad_scheme/private_target/http_error/non_text_content/body_too_large/fetch_failed.\n' +
                 'Reply pattern: ringkas, credit source ("dari [judul] di [domain]: ...").\n' +
-                '**MAX 2-3 fetch per turn**. Kalo content thin/menu-only setelah 2-3 page, STOP — kemungkinan client-rendered. ' +
-                'Bilang "site-nya butuh JS, ga bisa aku baca langsung".',
+                '**MAX 2-3 fetch per turn**. Jika user meminta dua tautan, periksa keduanya. Kalo content thin/menu-only atau gagal, cek satu sumber cadangan yang relevan dari riwayat atau web_search bila pertanyaan faktualnya belum terjawab. ' +
+                'Bilang terus terang bagian yang butuh JS atau tidak bisa diakses; jangan mengira halaman kosong sebagai scoreboard kosong.',
             parameters: {
                 type: 'object',
                 properties: {

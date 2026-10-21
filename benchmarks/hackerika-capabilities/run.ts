@@ -42,8 +42,11 @@ await Promise.all(Array.from({ length: concurrency }, async () => {
         clearTimeout(timer);
         const marker = stdout.split('\n').findLast(line => line.startsWith('CAPABILITY_RESULT:'));
         const row = marker ? JSON.parse(marker.slice('CAPABILITY_RESULT:'.length)) : { caseId: test.id, category: test.category, failure: `worker_exit_${exit}`, text: '', effects: [], completions: [], toolCalls: [], interactionWrites: 0, profileWrites: [], memory: [] };
-        if ((!marker || row.failure) && process.env.BENCH_PRIVATE_LOG_DIR) { await mkdir(process.env.BENCH_PRIVATE_LOG_DIR, { recursive: true, mode: 0o700 }); await writeFile(`${process.env.BENCH_PRIVATE_LOG_DIR}/${test.id}-${trial}.log`, stdout + '\n' + stderr, { mode: 0o600 }); }
         row.trial = trial; row.deterministicFailures = deterministicGrade(test, row); row.deterministicPass = row.deterministicFailures.length === 0;
+        if ((!marker || row.failure || !row.deterministicPass) && process.env.BENCH_PRIVATE_LOG_DIR) {
+            await mkdir(process.env.BENCH_PRIVATE_LOG_DIR, { recursive: true, mode: 0o700 });
+            await writeFile(`${process.env.BENCH_PRIVATE_LOG_DIR}/${test.id}-${trial}.log`, stdout + '\n' + stderr, { mode: 0o600 });
+        }
         rows.push(row); await writeFile(`${out}/results.json`, JSON.stringify(rows, null, 2));
         console.log(JSON.stringify({ completed: rows.length, total: jobs.length, caseId: test.id, deterministicPass: row.deterministicPass, failure: row.failure || '' }));
     }
