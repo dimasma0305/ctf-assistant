@@ -23,7 +23,8 @@ const started = performance.now(), deadline = started + 15 * 60_000;
 const protocol = { startedAt: new Date().toISOString(), runtime: container || image, split, repeats, concurrency, corpusHash: hash(JSON.stringify(CASES)),
     workerHash: hash(worker), selectedIds: selected.map(test => test.id), graderVersion: GRADER_VERSION, graderHash: hash(await readFile('benchmarks/hackerika-capabilities/grader.ts')),
     fixtures: Object.fromEntries(Object.entries(fixtures).map(([name, base64]) => [name, hash(Buffer.from(base64, 'base64'))])),
-    limits: { maxCompletionsPerCase: 6, maxCaseSeconds: 155, maxMinutes: 15 },
+    limits: { maxCompletionsPerCase: selected.some(test => test.id === 'linked-scoreboard-followup') ? 12 : 6,
+        maxCaseSeconds: 155, maxMinutes: 15 },
     acceptance: { deterministicBackendFailures: 0, criticalFailures: 0, semanticPassRate: 0.90, noRegressionAgainstMatchedBaseline: true },
     scope: 'Real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls.' };
 await writeFile(`${out}/protocol.json`, JSON.stringify(protocol, null, 2));

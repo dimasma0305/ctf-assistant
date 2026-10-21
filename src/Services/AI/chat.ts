@@ -38,6 +38,7 @@ import { stripInternalAnnotations } from './output';
 import { ACTOR_ATTRIBUTION_CONTEXT, messageSources } from './attribution';
 import { getResearchReport, groundResearchReply } from './research';
 import { hasCodexDelegation } from './codexDelegate';
+import { recentAssistantLinksForSpeaker } from './conversationLinks';
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -724,6 +725,11 @@ async function runChatTurn(
     // per-conversation prefix to cache-hit on every subsequent turn.
     const history = memory[channelId].messages.slice(0, -1).map(entry => entry.role === 'assistant'
         ? { ...entry, reasoning_content: entry.reasoning_content || '' } : entry);
+    const earlierLinks = /https?:\/\//i.test(sanitizedUserContent) ? []
+        : recentAssistantLinksForSpeaker(history, userId, Date.now());
+    const earlierLinkNote = earlierLinks.length
+        ? `\n\n[INTERNAL_NOTE: Tautan yang baru kamu berikan kepada speaker ini dalam kanal ini: ${JSON.stringify(earlierLinks)}. Ini petunjuk untuk menelusuri pesan lanjutan, bukan bukti bahwa halaman sudah berhasil dibaca. Jika tautan utama gagal, cek sumber cadangan yang relevan dari daftar ini.]`
+        : '';
     const recentOwnText = history.filter(entry => entry.role === 'user' && entry.name?.startsWith(`${userId}-`)
         && (!entry.at || Date.now() - entry.at < 10 * 60_000)).slice(-5).map(entry => entry.content).join('\n')
         + (messageReference?.content || '');
@@ -743,7 +749,7 @@ async function runChatTurn(
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
     const lastUserMessage: ChatMessage = {
         ...userMessageEntry,
-        content: `${contextBlock}${lastTeamProgress ? `\n${neutralizeControlTokens(lastTeamProgress)}` : ''}\n\n${userMessageEntry.content}${spontaneousNote}`,
+        content: `${contextBlock}${lastTeamProgress ? `\n${neutralizeControlTokens(lastTeamProgress)}` : ''}\n\n${userMessageEntry.content}${spontaneousNote}${earlierLinkNote}`,
     };
     const messages = prepareVisionMessages([
         { role: 'system', content: STATIC_SYSTEM_PROMPT },

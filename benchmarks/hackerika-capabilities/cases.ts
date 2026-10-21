@@ -46,7 +46,7 @@ export const CASES: CapabilityCase[] = [
         { who: 'bot', text: 'Aku tidak menemukan bukti publik terverifikasi soal nama asli Aryma.' },
     ], expected: 'Reply to ftps3rver as a greeting or ask what they need. The old Aryma search belongs to Dimas and is already answered.', maxWords: 25, critical: true,
         forbiddenTools: ['research_topic', 'delegate_codex', 'web_search', 'fetch_url'], forbiddenPatterns: ['Aryma', 'nama asli', 'profil publik', 'belum.*terverifikasi'] },
-    { id: 'linked-scoreboard-followup', split: 'dev', category: 'research', prompt: 'coba liat yang info acara scoreboard nya', history: [
+    { id: 'linked-scoreboard-followup', split: 'dev', category: 'research', prompt: 'coba liat yang info acara scoreboard nya', hydrateMemory: true, history: [
         { who: 'caller', text: 'rika coba liat Securinets CTF rank MENA region' },
         { who: 'bot', text: 'CTFtime menampilkan peringkat global, tetapi belum menemukan tabel MENA terpisah. https://ctftime.org/event/3364/' },
         { who: 'caller', text: '@Hackerika jelasin Securinets CTF Quals 2026' },

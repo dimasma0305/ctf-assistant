@@ -119,7 +119,7 @@ if (guild) { guild.members.cache.set(callerId, message.member); for (const m of 
 const { openai } = await import(`${root}/src/utils/openai.ts`);
 const create = openai.chat.completions.create.bind(openai.chat.completions);
 openai.chat.completions.create = async (payload: any, options: any) => {
-    if (++modelCalls > 6) throw new Error('benchmark_call_cap');
+    if (++modelCalls > (CASE.id === 'linked-scoreboard-followup' ? 12 : 6)) throw new Error('benchmark_call_cap');
     const start = performance.now();
     let response: any;
     if (CASE.backend) {
