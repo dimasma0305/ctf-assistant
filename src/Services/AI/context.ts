@@ -51,13 +51,13 @@ function truncate(s: string, n: number): string {
 }
 const mentionContext = (mentions: MentionReference[]) => mentions.length
   ? ` mentions=${JSON.stringify(mentions.slice(0, 3).map(({ id, displayName, isBot }) => ({ id, displayName, isBot })))}` : '';
-interface ContextLine { id: string; at: number; line: string; mentions: MentionReference[] }
+interface ContextLine { id: string; at: number; authorId: string; content: string; line: string; mentions: MentionReference[] }
 function lineFromCache(msg: SimplifiedMessage): ContextLine {
   const name = msg.member?.displayName || msg.author.username;
   const content = msg.content || (msg.system || msg.type !== 0 ? '[sys]'
     : msg.attachments && msg.embeds ? '[attach+embed]' : msg.attachments ? '[attach]' : msg.embeds ? '[embed]' : '[empty]');
   const mentions = msg.mentions || [];
-  return { id: msg.id, at: msg.createdTimestamp, mentions,
+  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions,
     line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${mentionContext(mentions)}` };
 }
 function lineFromDiscord(msg: DiscordMessage): ContextLine {
@@ -66,7 +66,7 @@ function lineFromDiscord(msg: DiscordMessage): ContextLine {
     : msg.attachments.size && msg.embeds.length ? '[attach+embed]' : msg.attachments.size ? '[attach]'
       : msg.embeds.length ? '[embed]' : '[empty]');
   const mentions = mentionReferences(msg);
-  return { id: msg.id, at: msg.createdTimestamp, mentions,
+  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions,
     line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${mentionContext(mentions)}` };
 }
 
@@ -96,8 +96,20 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
     }
     const selected = [...lines.values()].sort((a, b) => a.at - b.at || a.id.localeCompare(b.id)).slice(-CHANNEL_CONTEXT_LIMIT);
     for (const item of selected) onMentions?.(item.mentions);
+    // A short follow-up often refers to the speaker's own earlier claim even
+    // when another person spoke in between. Repeat only the same-speaker lines
+    // as candidate antecedents; explicit Discord replies have their own source.
+    const speakerId = message.author?.id;
+    const previousOwn = selected.filter(item => speakerId && item.authorId === speakerId
+      && item.at <= currentAt && currentAt - item.at <= 5 * 60_000).slice(-4);
+    const ownBotId = message.client?.user?.id;
+    const interleaved = previousOwn.length > 0 && selected.some(item => item.authorId !== speakerId && item.authorId !== ownBotId
+      && item.at > previousOwn[previousOwn.length - 1].at);
+    const continuity = !message.reference?.messageId && (message.content || '').trim().length <= 120 && interleaved
+      ? `\nsame-speaker-earlier (copies of recent messages; possible antecedents, not new turns):\n${previousOwn.reverse().map(item => `message-id=${item.id} ${item.content}`).join('\n')}`
+      : '';
     return selected.length > 0
-      ? `\n${startSep}\n${selected.map(item => item.line).join('\n')}\n${endSep}`
+      ? `\n${startSep}\n${selected.map(item => item.line).join('\n')}${continuity}\n${endSep}`
       : '';
   } catch (error) {
     console.error('Error fetching channel context:', error);
@@ -144,7 +156,7 @@ export async function getReplyContext(
     // disambiguates when two users share a display name.
     const mentions = mentionReferences(referencedMessage);
     const targets = mentionContext(mentions);
-    return `\n${startSep}\n[${neutralizeControlTokens(referencedAuthor)} <@${referencedAuthorId}>] ${referencedContent}${targets}\n${endSep}`;
+    return `\n${startSep}\nexplicit-reply-target (pesan yang sedang di-reply):\n[${neutralizeControlTokens(referencedAuthor)} <@${referencedAuthorId}>] ${referencedContent}${targets}\n${endSep}`;
   } catch (error) {
     console.error('Error getting reply context:', error);
     return '';

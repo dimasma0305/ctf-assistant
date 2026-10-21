@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-21",
+  "model": "gpt-6-luna",
+  "beforeCommit": "9195f42",
+  "cases": [
+    {
+      "id": "interleaved-own-cvss-confirmation",
+      "expectedReferent": "Dimas's CVSS claim, not W.'s 2hu Wiki aside",
+      "before": [
+        { "pass": true, "text": "Nggak gitu, CVSS ngukur tingkat keparahan kerentanan—bukan ada atau nggaknya breach. Perlu detail teknis dampak dan eksploitabilitasnya buat kasih skor." },
+        { "pass": false, "text": "nggak bisa ditentuin gitu 😭 CVSS ngukur severity kerentanan, bukan ada-tidaknya breach; 2hu Wiki itu konteksnya apa?" }
+      ],
+      "after": [
+        { "pass": true, "text": "nggak gitu, Dimas 😭 CVSS ngukur tingkat keparahan kerentanan, bukan ada-tidaknya breach. Skornya perlu dinilai dari dampak dan exploitability kerentanannya—breach sendiri nggak otomatis berarti 10." },
+        { "pass": true, "text": "Nggak. CVSS ngukur severity kerentanan, bukan skala insiden breach; skornya harus dihitung dari dampak dan vektor eksploitasi spesifik, jadi nggak otomatis 10 atau 9.2." }
+      ]
+    },
+    {
+      "id": "explicit-reply-overrides-own-cvss",
+      "expectedReferent": "W.'s explicitly replied-to 2hu Wiki question, not Dimas's earlier CVSS statement",
+      "before": [
+        { "pass": false, "text": "Kalau nggak ada data CVSS yang valid, jangan asal tebak 9.2—cek advisory atau sumber resminya dulu." },
+        { "pass": false, "text": "kalau maksudmu skor CVSS-nya, belum bisa dipastikan cuma dari “nggak ada”; butuh detail kerentanannya." }
+      ],
+      "after": [
+        { "pass": true, "text": "Belum bisa kupastiin—“2hu” biasanya merujuk Touhou, tapi konteks “wiki” bisa beda." },
+        { "pass": true, "text": "Kalau maksudnya “Touhou Wiki”, biasanya ditulis “2hu wiki” sebagai singkatan Touhou Project Wiki—tapi konteksnya belum jelas." }
+      ]
+    }
+  ],
+  "summary": "The before source passed 1/4 focused samples; the candidate passed 4/4. This is a small replay, not a statistical accuracy estimate. Both used the same synthetic Discord histories, model, fake delivery, and no real Discord writes.",
+  "factualReference": "https://www.first.org/cvss/v4-0/specification-document"
+}

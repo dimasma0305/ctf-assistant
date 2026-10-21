@@ -59,3 +59,60 @@ test('a 20-message legacy cache backfills only the current channel before render
   expect(context).toContain('TNI/POLRI cyber discussion opened here');
   expect(context).not.toContain('PRIVATE-FOREIGN-CONTEXT');
 });
+
+test('a short confirmation after an interjection preserves the current speaker’s own antecedent', async () => {
+  const channelId = 'context-window-interleaved-confirmation';
+  const started = Date.parse('2026-10-21T10:50:00Z');
+  const dimas = '663394727688798231';
+  const w = '212606900854980609';
+  const entries = [
+    [dimas, 'tinggal nunggu, ada apa engga data breach lagi dari website pemerintah indo'],
+    [dimas, 'klo misal ada berarti CVSS nya bisa 10'],
+    [dimas, 'klo engga ada berarti mungkin 9.2'],
+    [w, '2hu wiki?'],
+    [w, 'yg mana itu'],
+  ] as const;
+  const channel = { id: channelId, messages: { fetch: async () => new Collection() } };
+  for (const [index, [authorId, content]] of entries.entries()) {
+    await updateChannelCache({ id: String(820000000000000000n + BigInt(index)), content,
+      author: { id: authorId, username: authorId, tag: authorId }, member: null,
+      channel, channelId, createdTimestamp: started + index * 10_000, system: false, type: 0,
+      attachments: new Collection(), embeds: [], mentions: { users: new Collection(), members: new Collection() },
+    } as Parameters<typeof updateChannelCache>[0]);
+  }
+  const current = { id: '820000000000000099', content: 'betul gak <@1077393568647352320>?',
+    author: { id: dimas }, channel, channelId, createdTimestamp: started + 35_000 };
+  const context = await getChannelContext(current as Parameters<typeof getChannelContext>[0], 'BEGIN', 'END');
+  const anchor = context.split('same-speaker-earlier')[1];
+  expect(anchor).toContain('CVSS nya bisa 10');
+  expect(anchor).toContain('mungkin 9.2');
+  expect(anchor).not.toContain('2hu wiki');
+  expect(context).toContain('2hu wiki?');
+  expect(context).not.toContain('yg mana itu');
+
+  const replyMessage = { ...current, reference: { messageId: '820000000000000003' } } as Parameters<typeof getChannelContext>[0];
+  const explicitReply = await getChannelContext(replyMessage, 'BEGIN', 'END');
+  expect(explicitReply).not.toContain('same-speaker-earlier');
+});
+
+test('a bot answer alone does not trigger an unrelated same-speaker anchor', async () => {
+  const channelId = 'context-window-bot-reply';
+  const started = Date.parse('2026-10-21T10:50:00Z');
+  const callerId = '663394727688798231';
+  const botId = '1077393568647352320';
+  const channel = { id: channelId, messages: { fetch: async () => new Collection() } };
+  for (const [index, [authorId, content]] of ([
+    [callerId, 'ini apa?'], [botId, 'ini challenge CTF'],
+  ] as const).entries()) {
+    await updateChannelCache({ id: String(830000000000000000n + BigInt(index)), content,
+      author: { id: authorId, username: authorId, tag: authorId }, member: null,
+      channel, channelId, createdTimestamp: started + index * 10_000, system: false, type: 0,
+      attachments: new Collection(), embeds: [], mentions: { users: new Collection(), members: new Collection() },
+    } as Parameters<typeof updateChannelCache>[0]);
+  }
+  const current = { id: '830000000000000099', content: 'betul gak?', author: { id: callerId },
+    client: { user: { id: botId } }, channel, channelId, createdTimestamp: started + 20_000 };
+  const context = await getChannelContext(current as Parameters<typeof getChannelContext>[0], 'BEGIN', 'END');
+  expect(context).toContain('ini challenge CTF');
+  expect(context).not.toContain('same-speaker-earlier');
+});

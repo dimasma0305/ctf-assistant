@@ -720,6 +720,9 @@ async function runChatTurn(
         : spontaneous
         ? `\n\n[INTERNAL_NOTE: kamu ga di-mention/di-summon. Hint: ${options.spontaneousHint || 'just feel like nimbrung'}. Reply singkat & casual aja, ga harus jawab pertanyaan — bisa cuma satu reaksi/komentar pendek, max 1-2 burst. Kalo ga ada yang menarik buat dikomentarin, output empty string aja.]`
         : '';
+    const replyFocusNote = messageReference && sanitizedUserContent.trim().length <= 120
+        ? '\n\n[INTERNAL_NOTE: Pesan sekarang adalah reply Discord eksplisit ke blok explicit-reply-target. Untuk pertanyaan pendek tanpa subjek baru yang jelas, jawab target reply itu saja; topik lain dalam recent bukan pertanyaan tambahan.]'
+        : '';
 
     // Construct messages: static system + clean history + final user-with-context.
     // Memory entries are clean (no context block), which is what enables the
@@ -751,7 +754,7 @@ async function runChatTurn(
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
     const lastUserMessage: ChatMessage = {
         ...userMessageEntry,
-        content: `${contextBlock}${lastTeamProgress ? `\n${neutralizeControlTokens(lastTeamProgress)}` : ''}\n\n${userMessageEntry.content}${spontaneousNote}${earlierLinkNote}`,
+        content: `${contextBlock}${lastTeamProgress ? `\n${neutralizeControlTokens(lastTeamProgress)}` : ''}\n\n${userMessageEntry.content}${replyFocusNote}${spontaneousNote}${earlierLinkNote}`,
     };
     const messages = prepareVisionMessages([
         { role: 'system', content: STATIC_SYSTEM_PROMPT },
