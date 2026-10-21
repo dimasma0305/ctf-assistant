@@ -62,6 +62,15 @@ globalThis.fetch = (async (input: any, init: any = {}) => {
     if (url.startsWith('https://api.deepseek.com/') || url.startsWith('https://api.openai.com/v1/') || url.startsWith('https://auth.openai.com/')) return originalFetch(input, init);
     throw new Error('benchmark_network_boundary');
 }) as typeof fetch;
+if (CASE.id === 'linked-scoreboard-followup') {
+    const { researchTransport } = await import(`${root}/src/Services/AI/researchSources.ts`);
+    researchTransport.fetch = async (url: string) => {
+        if (/^https:\/\/(?:quals|ctf)\.securinets\.tn\//.test(url)) return new Response('unavailable', { status: 403 });
+        if (url === 'https://ctftime.org/event/3364/' || url === 'https://example.com/event')
+            return new Response(`<main><h1>Securinets CTF Quals 2026</h1><p>${CASE.web.page}</p></main>`, { headers: { 'content-type': 'text/html' } });
+        return new Response('unavailable', { status: 404 });
+    };
+}
 const permissions = { has: () => true };
 const guild: any = CASE.dm ? null : { id: guildId, name: 'Synthetic TCP1P', memberCount: 3,
     roles: { everyone: { id: 'everyone' }, cache: new Collection() }, emojis: { cache: new Collection() },
@@ -129,6 +138,11 @@ try {
         const { handleAIChat } = await import(`${root}/src/Services/AI/chat.ts`);
         const { memory } = await import(`${root}/src/Services/AI/memory.ts`);
         memory['unrelated-private-channel'] = { messages: [{ role: 'user', content: 'MANGO-PRIVATE-742' }], lastAccessed: fixedNow };
+        if (CASE.hydrateMemory) memory[channelId] = { lastAccessed: fixedNow, messages: history.map(m => ({
+            role: m.author.bot ? 'assistant' : 'user', messageId: m.id, at: m.createdTimestamp,
+            name: m.author.bot ? undefined : `${m.author.id}-${m.author.username}`,
+            content: `[${m.author.username} <@${m.author.id}>] ${m.content}`,
+        })) };
         if (CASE.route) {
             const { shouldChimeIn } = await import(`${root}/src/Services/AI/spontaneous.ts`);
             decision = await shouldChimeIn(message, botId, history.map(m => ({ id: m.id, authorId: m.author.id, isBot: m.author.bot, content: m.content, at: m.createdTimestamp })));

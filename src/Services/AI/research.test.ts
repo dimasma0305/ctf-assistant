@@ -60,18 +60,18 @@ const {openai}=await import('./src/utils/openai.ts');
 const {researchTransport}=await import('./src/Services/AI/researchSources.ts');
 const {researchForTurn}=await import('./src/Services/AI/research.ts');
 const mode=process.env.RESEARCH_TEST_MODE;let calls=0,reads=0;
-researchTransport.fetch=async(url,options)=>{reads++;if(mode==='cancel')return new Promise((resolve,reject)=>{options.signal.addEventListener('abort',()=>reject(new Error('source_aborted')),{once:true});});return new Response(String(url).endsWith('/start')?'<main><a href="/config">Configuration</a></main>':'<main><p>Set AUDIT_LOG=on to enable auditing.</p></main>',{headers:{'content-type':'text/html'}});};
+researchTransport.fetch=async(url,options)=>{reads++;if(mode==='cancel')return new Promise((resolve,reject)=>{options.signal.addEventListener('abort',()=>reject(new Error('source_aborted')),{once:true});});if(mode==='third-fallback'&&(String(url).endsWith('/start')||String(url).endsWith('/other')))return new Response('blocked',{status:403});return new Response(String(url).endsWith('/start')?'<main><a href="/config">Configuration</a></main>':'<main><p>Set AUDIT_LOG=on to enable auditing.</p></main>',{headers:{'content-type':'text/html'}});};
 openai.chat.completions.create=async(request)=>{calls++;const input=JSON.parse(request.messages[1].content);if(mode==='multiple-targets')assert.equal(input.requestedUrls.length,3);const payload=mode==='review-rejects'&&input.proposed?{answered:false,findings:[],unresolved:['Evidence does not establish configuration scope.']}:input.instruction.startsWith('Check the answer')?{answered:mode!=='false-answer',findings:[{claim:'Audit log bisa diaktifkan.',evidence:[{sourceId:mode==='bad-citation'?'S9':'S2',quote:'Set AUDIT_LOG=on'}]}],unresolved:[]}:{ready:false,actions:[{type:'read',url:'https://example.com/config'}]};if(input.proposed)assert(request.messages[0].content.startsWith('Verify a proposed research answer'));return {choices:[{message:{content:JSON.stringify(payload)}}],usage:{prompt_tokens:10,completion_tokens:5}};};
 const turn={};const controller=new AbortController();if(mode==='cancel')setTimeout(()=>controller.abort(),15);
-const first=researchForTurn({question:'Find audit configuration',urls:mode==='multiple-targets'?['https://example.com/start','https://example.com/other','https://example.com/third']:['https://example.com/start']},turn,{signal:controller.signal});
+const first=researchForTurn({question:'Find audit configuration',urls:['multiple-targets','third-fallback'].includes(mode)?['https://example.com/start','https://example.com/other','https://example.com/third']:['https://example.com/start']},turn,{signal:controller.signal});
 const second=researchForTurn({question:'repeat'},turn);assert.equal(first,second);
 const report=await first;
 if(mode==='cancel'){assert.equal(calls,0);assert.equal(report.ok,false);assert.equal(report.status,'unavailable');assert(report.unresolved.length>0);}
 else if(['bad-citation','false-answer','review-rejects'].includes(mode)){assert.equal(report.ok,false);assert.equal(report.status,'partial');assert.equal(report.findings.length,mode==='false-answer'?1:0);}
-else{assert.equal(report.status,'supported');assert.equal(report.findings[0].evidence[0].sourceId,'S2');assert.equal(calls,3);assert.equal(reads,mode==='multiple-targets'?3:2);assert.equal(report.stats.promptTokens,30);}
+else{assert.equal(report.status,'supported');assert.equal(report.findings[0].evidence[0].sourceId,'S2');assert.equal(calls,mode==='third-fallback'?4:3);assert.equal(reads,['multiple-targets','third-fallback'].includes(mode)?4:2);if(mode==='third-fallback')assert(report.sources.some(source=>source.url==='https://example.com/third'));assert.equal(report.stats.promptTokens,10*calls);}
 console.log('RESEARCH_SCENARIO_OK');process.exit(0);
 `;
-for (const mode of ['multihop', 'multiple-targets', 'bad-citation', 'false-answer', 'review-rejects', 'cancel']) {
+for (const mode of ['multihop', 'multiple-targets', 'third-fallback', 'bad-citation', 'false-answer', 'review-rejects', 'cancel']) {
   test(`research worker: ${mode}`, async () => {
     const child = Bun.spawn([process.execPath, '-e', scenario], { cwd: process.cwd(), env: { ...process.env,
       NODB: 'true', OPENAI_API_KEY: 'fixture-no-network', RESEARCH_TEST_MODE: mode }, stdout: 'pipe', stderr: 'pipe' });

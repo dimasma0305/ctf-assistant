@@ -182,7 +182,9 @@ export async function runResearch(args: ResearchArgs, options: { signal?: AbortS
   try {
     const urls = requestedUrls;
     // Open the exact supplied sources before allowing query/name substitution.
-    observations.push(...await Promise.all(urls.slice(0, 2).map(url => perform({ type: githubRepository(url) ? 'repository' : 'read', url }))));
+    // User-provided links are the exact evidence frontier. Reading only the
+    // first two could hide the one accessible fallback behind two dead sites.
+    observations.push(...await Promise.all(urls.map(url => perform({ type: githubRepository(url) ? 'repository' : 'read', url }))));
     if (!urls.length) {
       // Search two independently observed Discord names; never send the
       // snowflake or model's long question to the public search provider.
