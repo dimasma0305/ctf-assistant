@@ -41,9 +41,9 @@ try {
     }
   }
   if (!result) throw Error('missing_benchmark_result');
-  const { sourceInspected, localBuild, localTest, uafReproduced, pass } = evaluatePhpSourceReceipts(job.receipts);
+  const { sourceInspected, versionDiffInspected, localBuild, localTest, uafReproduced, pass } = evaluatePhpSourceReceipts(job.receipts);
   const report = {
-    sourceInspected, localBuild, localTest, uafReproduced,
+    sourceInspected, versionDiffInspected, localBuild, localTest, uafReproduced,
     pass,
     model, image: process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-8',
     promptSha256: createHash('sha256').update(INVESTIGATION_PROMPT).digest('hex'),
@@ -51,7 +51,7 @@ try {
     receipts: job.receipts.map(receipt => ({ command: receipt.command, exitCode: receipt.exitCode, output: receipt.output.slice(0, 1200) })),
   };
   await writeFile(join(out, 'result.json'), JSON.stringify(report, null, 2));
-  console.log(JSON.stringify({ workflowPass: report.pass, sourceInspected, localBuild, localTest, uafReproduced,
+  console.log(JSON.stringify({ workflowPass: report.pass, sourceInspected, versionDiffInspected, localBuild, localTest, uafReproduced,
     elapsedMs: report.elapsedMs, summary: result.result.summary }));
   if (!report.pass) process.exitCode = 1;
 } catch (error) {

@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-21",
+  "case": "PHP 8.6 session.upload_progress UAF claim, isolated local investigation",
+  "model": "gpt-6-sol",
+  "workerImage": "hackerika-codex-worker:0.163.0-8",
+  "sameFixture": true,
+  "before": {
+    "promptSha256": "5c1b0b50b6ab8a9d2f6e3868cd3f019cb510f8589b148c945eed6ec692ab789d",
+    "sourceInspected": true,
+    "versionDiffInspected": false,
+    "localBuild": true,
+    "localTest": true,
+    "uafReproduced": false,
+    "elapsedMs": 425357,
+    "modelCalls": 27,
+    "inputChars": 4733351,
+    "evidence": "The source checkout was depth 1; git log for ext/session/session.c returned only one merge commit."
+  },
+  "after": {
+    "promptSha256": "93e1523b5cf80b5e7c83411ed454874996cdfa41d7623ef4aaadaecfc8b98869",
+    "sourceInspected": true,
+    "versionDiffInspected": true,
+    "localBuild": true,
+    "localTest": true,
+    "uafReproduced": false,
+    "elapsedMs": 480668,
+    "modelCalls": 31,
+    "inputChars": 5915616,
+    "evidence": "The worker verified a non-shallow checkout and compared php-8.6.0RC3 (98db23e86f9fe6d638094ea1ad528eeaea9044b3) with c20480380a99027a95ec4f71354267bd528cac12. The diff changed session save/ID code, not the upload progress callback. An ASan build processed a two-file multipart upload with progress visible when cleanup was off; no ASan UAF appeared. Three RFC1867 PHPT tests passed."
+  },
+  "interpretation": "The new prompt improved version-history investigation, not vulnerability reproduction. It used more model calls and input context. No public primary patch or affected-version range was available during this run; negative probes do not disprove the claim."
+}
