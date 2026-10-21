@@ -28,6 +28,7 @@ const effects: any[] = [], completions: any[] = [], toolCalls: any[] = [];
 const providerFailures: string[] = [];
 setTimeout(() => { console.log('CAPABILITY_RESULT:' + JSON.stringify({ caseId: CASE.id, category: CASE.category, backend: CASE.backend, failure: 'worker_deadline', effects: [], text: '', completions: [], toolCalls: [], interactionWrites: 0, profileWrites: [], memory: [] })); process.exit(1); }, 145_000).unref();
 let interactionWrites = 0, profileWrites: any[] = [], modelCalls = 0;
+let emptyResearchReadPlanned = false;
 const userProfile: any = { userId: callerId, username: 'fixture', displayName: callerName, personality: '', interests: '', communicationStyle: '', opinion: '', emotionalState: '', affection: 5, previousAffection: 5, trust: 5, respect: 5, comfort: 5, chemistry: 5, moments: [], implicitGoals: [], timezone: 'Asia/Jakarta', interactionCount: 1, lastDistilledAtCount: 1, lastRelationshipEvidenceMessageIds: ['old-known'], evaluatedRelationshipMessageIds: ['old-known'] };
 db.UserProfileModel.findOne = () => query({ ...userProfile });
 db.UserProfileModel.findOneAndUpdate = () => { interactionWrites++; return query({ ...userProfile, interactionCount: 2 }); };
@@ -160,7 +161,29 @@ openai.chat.completions.create = async (payload: any, options: any) => {
     if (++modelCalls > 14) throw new Error('benchmark_call_cap');
     const start = performance.now();
     let response: any;
-    if (CASE.backend) {
+    if (CASE.forceResearch && modelCalls === 1 && payload.tools?.some((tool: any) => tool.function?.name === 'research_topic')) {
+        response = { choices: [{ message: { role: 'assistant', content: null, reasoning_content: '', tool_calls: [{
+            id: 'fixture-research', type: 'function', function: { name: 'research_topic',
+                arguments: JSON.stringify({ question: CASE.question, deep: true }) },
+        }] } }] };
+    } else if (CASE.forceEmptyResearch) {
+        const system = String(payload.messages?.[0]?.content || '');
+        const instruction = String(payload.messages?.[1]?.content || '');
+        let content: string;
+        if (system.includes('read-only research worker') || system.includes('Verify a proposed research answer')) {
+            if (instruction.includes('Break the question into')) content = JSON.stringify({
+                verificationPoints: ['Apakah PoC yang beredar menghasilkan false positive?', 'Apakah ada situs produksi yang terbukti terkompromi?'],
+                searchQueries: ['CedarPanel 5.4 PoC false positive', 'CedarPanel 5.4 confirmed production compromise'],
+            });
+            else if (instruction.includes('Decide whether inspected evidence')) {
+                content = JSON.stringify(emptyResearchReadPlanned
+                    ? { ready: true, actions: [], unresolved: [] }
+                    : { ready: false, actions: [{ type: 'read', url: Object.keys(CASE.pages)[0] }], unresolved: [] });
+                emptyResearchReadPlanned = true;
+            } else content = JSON.stringify({ answered: false, findings: [], unresolved: [] });
+        } else content = 'Aku perlu sumber asli atau detail yang lebih spesifik.';
+        response = { choices: [{ message: { role: 'assistant', content } }] };
+    } else if (CASE.backend) {
         const name = CASE.backend === 'native-send' ? 'send_discord_message' : CASE.backend === 'file-send' ? 'share_text_file' : 'finish_turn';
         const args = CASE.backend === 'native-send' ? { content: 'jawaban uji' } : CASE.backend === 'file-send' ? { content: 'contohnya', filename: 'sample.txt', text: 'hello' } : {};
         response = { choices: [{ message: CASE.backend === 'ordinary-send' ? { content: 'jawaban uji' }

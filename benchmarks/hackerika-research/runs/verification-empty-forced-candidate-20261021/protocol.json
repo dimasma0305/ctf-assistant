@@ -1,0 +1,29 @@
+{
+  "startedAt": "2026-10-21T14:11:21.505Z",
+  "runtime": "ctf-assistant:5233609",
+  "split": "dev",
+  "repeats": 1,
+  "concurrency": 3,
+  "corpusHash": "e9b55f20f45e330efd1bfdfa1f59d1e4a91375e8872ca5b9e8081da95f3537e7",
+  "workerHash": "ec2f3d5552f171c063c2cf0b5dadcc95bd5567959d4e445702597d84fa0142e8",
+  "selectedIds": [
+    "verify-empty-findings-fallback"
+  ],
+  "graderVersion": "research-v2",
+  "graderHash": "80e4ddaf9f7e90f6a7ddcd44c234d536bdf2ca04dcbb71761a48ce5a46d69a10",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 14,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 20
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls. Public-source HTTP transport is replaced by identical synthetic responses; repository parsing, commit pinning, evidence validation and nested research model calls are real.",
+  "routeControl": "For forceResearch cases, the first research_topic tool choice is forced so the same backend path is compared; subsequent research and answer completions use the configured model unless forceEmptyResearch is set.",
+  "emptyResearchControl": "The forceEmptyResearch case returns fixed research planning and zero-findings JSON plus a fixed low-information chat draft. Source search and reading, tool dispatch, report construction and final grounding run in the selected image. This is a deterministic integration regression, not a model-quality measurement."
+}

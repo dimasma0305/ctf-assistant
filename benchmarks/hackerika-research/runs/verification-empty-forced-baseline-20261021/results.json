@@ -1,0 +1,97 @@
+[
+  {
+    "caseId": "verify-empty-findings-fallback",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "native-search"
+      },
+      {
+        "kind": "read-source",
+        "url": "https://example.com/cedarpanel/early-bulletin"
+      },
+      {
+        "kind": "send",
+        "content": "Risetku belum cukup untuk memastikan kasus ini. Aku perlu sumber asli atau detail yang lebih spesifik.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] verifikasi ini <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Risetku belum cukup untuk memastikan kasus ini. Aku perlu sumber asli atau detail yang lebih spesifik.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "research_topic",
+        "args": {
+          "question": "Verify whether circulating CedarPanel 5.4 PoCs give false positives and whether a production site has been confirmed compromised.",
+          "deep": true
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 0.06641000000001895,
+        "usage": null
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 0.02370100000007369,
+        "usage": null
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 0.012799999999970169,
+        "usage": null
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 0.006250000000022737,
+        "usage": null
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 0.08746099999996204,
+        "usage": null
+      }
+    ],
+    "modelCalls": 5,
+    "elapsedMs": 3965.5981280000005,
+    "action": null,
+    "text": "Risetku belum cukup untuk memastikan kasus ini. Aku perlu sumber asli atau detail yang lebih spesifik.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:PoC",
+      "missing:kompromi",
+      "missing:https://example.com/cedarpanel/early-bulletin",
+      "forbidden:Risetku belum cukup untuk memastikan kasus ini",
+      "forbidden:Aku perlu sumber asli atau detail yang lebih spesifik"
+    ],
+    "deterministicPass": false
+  }
+]

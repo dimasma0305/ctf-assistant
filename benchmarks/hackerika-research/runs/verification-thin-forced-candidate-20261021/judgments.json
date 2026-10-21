@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "verify-thin-source-without-generic-reply",
+    "trial": 0,
+    "pass": true,
+    "reason": "The reply accurately says the claims remain unverified, names both unresolved points (PoC false positives and production compromise), and cites the inspected bulletin, which says PoC assessment and incident reporting are pending.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 720,
+      "completion_tokens": 63,
+      "total_tokens": 783,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 720
+    }
+  }
+]

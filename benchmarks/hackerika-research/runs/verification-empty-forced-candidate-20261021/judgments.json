@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "verify-empty-findings-fallback",
+    "trial": 0,
+    "pass": true,
+    "reason": "The reply accurately leaves both claims unresolved, links the inspected CedarPanel bulletin, and does not invent findings beyond its statement that PoC assessment and production incident reports are pending.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 603,
+      "completion_tokens": 57,
+      "total_tokens": 660,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 603
+    }
+  }
+]

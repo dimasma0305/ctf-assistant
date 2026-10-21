@@ -1,0 +1,20 @@
+[
+  {
+    "caseId": "verify-empty-findings-fallback",
+    "trial": 0,
+    "pass": false,
+    "reason": "The inspected bulletin says the upload-handler issue is under investigation and that both technical PoC assessment and production incident reports are pending. The reply should identify those two unresolved claims and link the bulletin; instead, it asks generically for a source or more detail.",
+    "criticalFailures": [
+      "Does not address the two specific claims about PoC false positives and confirmed production compromise.",
+      "Omits the inspected bulletin link."
+    ],
+    "grounding": 2,
+    "usage": {
+      "prompt_tokens": 498,
+      "completion_tokens": 98,
+      "total_tokens": 596,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 498
+    }
+  }
+]

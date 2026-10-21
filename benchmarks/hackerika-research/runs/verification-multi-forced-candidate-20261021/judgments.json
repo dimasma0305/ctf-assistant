@@ -1,0 +1,17 @@
+[
+  {
+    "caseId": "verify-multiple-claims-from-context",
+    "trial": 0,
+    "pass": true,
+    "reason": "The reply accurately distinguishes the two tested PoCs’ status-code-only false positives from all circulating scripts, and attributes the absence of verified production-exploitation reports to the vendor’s dated bulletin rather than claiming no compromise occurred. Both links match inspected sources.",
+    "criticalFailures": [],
+    "grounding": 5,
+    "usage": {
+      "prompt_tokens": 908,
+      "completion_tokens": 72,
+      "total_tokens": 980,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 908
+    }
+  }
+]

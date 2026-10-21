@@ -410,13 +410,14 @@ function formatResearchGap(report: ResearchReport): string {
     .replace(/https?:\/\/\S+|<@!?\d{17,20}>|@everyone|@here/gi, '')
     .replace(/[\[\]`*_]/g, '').replace(/\s+/g, ' ').trim().replace(/[.?!]+$/, '').slice(0, 150))
     .filter(Boolean);
-  const inspected = report.sources.filter(source => source.kind !== 'search' && publicResearchUrl(source.url)).slice(0, 2);
+  const inspected = report.sources.filter(source => source.kind !== 'search' && source.url.length <= 350
+    && publicResearchUrl(source.url)).slice(0, 2);
   const opening = inspected.length
     ? 'Bukti yang berhasil kubaca belum cukup untuk memastikan klaim itu.'
     : 'Pencarian kali ini belum menghasilkan sumber yang bisa kuperiksa, jadi klaim itu belum terverifikasi.';
   const gaps = points.length ? ` Yang masih terbuka: ${points.join('; ')}.` : '';
   const sources = inspected.length ? ` Yang sempat kubaca: ${inspected.map(source =>
-    `[${source.title.replace(/[\[\]()\\`]/g, '').slice(0, 55)}](${source.url})`).join(' · ')}.` : '';
+    `[${source.title.replace(/[\[\]()\\`\r\n]/g, '').replace(/@/g, '＠').slice(0, 55)}](${source.url})`).join(' · ')}.` : '';
   return `${opening}${gaps}${sources}`;
 }
 
