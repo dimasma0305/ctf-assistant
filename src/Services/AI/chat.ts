@@ -38,7 +38,7 @@ import { stripInternalAnnotations } from './output';
 import { ACTOR_ATTRIBUTION_CONTEXT, messageSources } from './attribution';
 import { getResearchReport, groundResearchReply } from './research';
 import { hasCodexDelegation } from './codexDelegate';
-import { recentAssistantLinksForSpeaker } from './conversationLinks';
+import { recentAssistantLinksForSpeaker, setTurnSourceLinks } from './conversationLinks';
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -727,6 +727,7 @@ async function runChatTurn(
         ? { ...entry, reasoning_content: entry.reasoning_content || '' } : entry);
     const earlierLinks = /https?:\/\//i.test(sanitizedUserContent) ? []
         : recentAssistantLinksForSpeaker(history, userId, Date.now());
+    setTurnSourceLinks(message, earlierLinks);
     const earlierLinkNote = earlierLinks.length
         ? `\n\n[INTERNAL_NOTE: Tautan yang baru kamu berikan kepada speaker ini dalam kanal ini: ${JSON.stringify(earlierLinks)}. Ini petunjuk untuk menelusuri pesan lanjutan, bukan bukti bahwa halaman sudah berhasil dibaca. Jika tautan utama gagal, cek sumber cadangan yang relevan dari daftar ini.]`
         : '';

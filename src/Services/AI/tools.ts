@@ -23,6 +23,7 @@ import {
 } from "./tasks";
 import { cancelCodexJob, codexSolverEnabled, getCodexJob } from './codexJobs';
 import { delegateCodexForTurn } from './codexDelegate';
+import { relatedSourceLeads } from './conversationLinks';
 
 /**
  * Native function-calling tool registry for Hackerika.
@@ -501,8 +502,9 @@ export async function dispatchTool(
             const targetId = typeof args?.targetUserId === 'string' ? args.targetUserId : null;
             const profileResult = targetId ? await getDiscordProfileForTool(message, { userId: targetId }) : null;
             const discordProfile = profileResult?.ok ? profileResult.profile : undefined;
+            const requestedUrls = [...new Set([...suppliedUrls, ...(Array.isArray(args?.urls) ? args.urls : [])])];
             const result = await researchForTurn({ question: args?.question,
-                urls: [...new Set([...suppliedUrls, ...(Array.isArray(args?.urls) ? args.urls : [])])].slice(0, 4),
+                urls: [...new Set([...requestedUrls, ...relatedSourceLeads(message, requestedUrls)])].slice(0, 4),
                 discordProfile,
                 deep: args?.deep === true }, message, options);
             return JSON.stringify(result);
@@ -573,7 +575,12 @@ export async function dispatchTool(
         if (name === 'fetch_url') {
             const result = await fetchUrlForTool(args || {});
             recordResearchFollowupSource(message, result, args?.url);
-            return JSON.stringify(result);
+            const thin = !result.ok || !!result.content && result.content.length < 500
+                && /\b(?:loading|javascript required|enable javascript)\b/i.test(result.content);
+            const relatedUrls = thin && typeof args?.url === 'string'
+                ? relatedSourceLeads(message, [args.url]) : [];
+            return JSON.stringify(relatedUrls.length ? { ...result, relatedUrls,
+                note: 'Same-speaker links from this conversation are leads, not verified sources. Read a relevant one if the question still needs evidence.' } : result);
         }
         return JSON.stringify({ ok: false, error: 'unknown_tool', name });
     } catch (error: any) {

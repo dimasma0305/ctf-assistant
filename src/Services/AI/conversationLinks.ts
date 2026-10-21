@@ -17,3 +17,14 @@ export function recentAssistantLinksForSpeaker(history: ChatMessage[], speakerId
     }
     return urls;
 }
+
+const turnLinks = new WeakMap<object, string[]>();
+export function setTurnSourceLinks(turn: object, links: string[]): void { turnLinks.set(turn, links); }
+
+/** Only extend a cited follow-up with other links from the same speaker's prior answers. */
+export function relatedSourceLeads(turn: object, requested: string[]): string[] {
+    const links = turnLinks.get(turn) || [];
+    const exact = requested.map(url => publicResearchUrl(url)).filter(Boolean) as string[];
+    if (!exact.some(url => links.includes(url))) return [];
+    return links.filter(url => !exact.includes(url)).slice(0, 3);
+}

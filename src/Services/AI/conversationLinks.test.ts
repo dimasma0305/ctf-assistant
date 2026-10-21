@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { recentAssistantLinksForSpeaker } from './conversationLinks';
+import { recentAssistantLinksForSpeaker, relatedSourceLeads, setTurnSourceLinks } from './conversationLinks';
 import type { ChatMessage } from './memory';
 
 test('recent assistant links keep source leads with the right speaker', () => {
@@ -27,4 +27,16 @@ test('old or credentialed links never become follow-up leads', () => {
         { role: 'assistant', content: 'https://example.com/private?token=secret and https://example.com/public', at: now - 500 },
     ];
     expect(recentAssistantLinksForSpeaker(history, 'ftp', now)).toEqual(['https://example.com/public']);
+});
+
+test('fallback leads require an exact previously shared link in this turn', () => {
+    const turn = {};
+    setTurnSourceLinks(turn, ['https://ctf.securinets.tn/', 'https://quals.securinets.tn/scoreboard', 'https://ctftime.org/event/3364/']);
+    expect(relatedSourceLeads(turn, ['https://ctf.securinets.tn/'])).toEqual([
+        'https://quals.securinets.tn/scoreboard', 'https://ctftime.org/event/3364/',
+    ]);
+    expect(relatedSourceLeads(turn, ['https://ctf.securinets.tn/', 'https://quals.securinets.tn/scoreboard']))
+        .toEqual(['https://ctftime.org/event/3364/']);
+    expect(relatedSourceLeads(turn, ['https://unrelated.example/'])).toEqual([]);
+    expect(relatedSourceLeads({}, ['https://ctf.securinets.tn/'])).toEqual([]);
 });
