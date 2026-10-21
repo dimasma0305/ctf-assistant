@@ -20,12 +20,22 @@ export async function collectCTFInputs(turn: any, initial: { text: string; image
     + `\n[current request] ${turn.content || ''}\n[thread coverage] ${JSON.stringify(snapshot!.coverage)}`;
   const sources: any[] = [turn];
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let replyTimer: ReturnType<typeof setTimeout> | undefined;
   try {
     const messages: any = snapshot ? null : await Promise.race([turn.channel?.messages?.fetch({ limit: 30, before: turn.id }),
       new Promise((_, reject) => { timer = setTimeout(() => reject(Error('context_timeout')), 3000); })]);
     const recent = messages ? Array.from(messages.values()) as any[] : [];
-    const reply = recent.find(m => m.id === turn.reference?.messageId);
-    if (reply) sources.push(reply);
+    const replyId = turn.reference?.messageId;
+    let reply = recent.find(m => m.id === replyId);
+    // Discord's most-recent page can omit the message being replied to. Fetch
+    // that exact same-channel message so its URLs/files reach the worker.
+    if (!reply && /^\d{17,20}$/.test(replyId || '') && turn.channel?.messages?.fetch) {
+      reply = await Promise.race([
+        turn.channel.messages.fetch(replyId).catch(() => null),
+        new Promise<null>(resolve => { replyTimer = setTimeout(() => resolve(null), 3000); }),
+      ]);
+    }
+    if (reply?.channelId === turn.channelId) sources.push(reply);
     sources.push(...recent.sort((a, b) => b.createdTimestamp - a.createdTimestamp));
     // Approved starter/selected sources are scoped to this thread for vision,
     // while originChannelId keeps their true parent-channel provenance.
@@ -33,11 +43,12 @@ export async function collectCTFInputs(turn: any, initial: { text: string; image
       content: '', createdTimestamp: entry.createdAt, author: { id: entry.authorId, bot: entry.isBot },
       attachments: new Map(entry.attachments.map((attachment, index) => [String(index), attachment])) })));
   } catch { /* supplied context and attachments remain usable */ }
-  finally { clearTimeout(timer); }
+  finally { clearTimeout(timer); clearTimeout(replyTimer); }
   const seen = new Set<string>(); let fileCount = 0, textBytes = 0;
   for (const source of sources) {
     if (signal.aborted || source?.channelId !== turn.channelId || source?.author?.bot || seen.has(source.id)) continue;
-    if (!snapshot && source !== turn && Number.isFinite(source.createdTimestamp) && Date.now() - source.createdTimestamp > 2 * 60 * 60_000) continue;
+    if (!snapshot && source !== turn && source.id !== turn.reference?.messageId
+      && Number.isFinite(source.createdTimestamp) && Date.now() - source.createdTimestamp > 2 * 60 * 60_000) continue;
     seen.add(source.id);
     if (source.content) result.text += `\n[challenge channel source ${JSON.stringify({ messageId: source.id, authorId: source.author?.id })}] ${String(source.content).slice(0, 4000)}`;
     for (const attachment of Array.from(source.attachments?.values?.() || []) as any[]) {

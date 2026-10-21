@@ -10,13 +10,13 @@ import { deleteExportedFiles, readExportedFile, saveExportedFiles } from './expo
 const socket = process.env.CODEX_CONTROL_SOCKET || '/run/hackerika-codex/control.sock';
 const stateRoot = process.env.CODEX_JOB_STATE_ROOT || '/var/lib/hackerika-codex/jobs';
 const runtimeRoot = process.env.CODEX_JOB_RUNTIME_ROOT || '/run/hackerika-codex-jobs';
-const image = process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-5';
+const image = process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-8';
 const maxQueued = Math.max(1, Math.min(16, Number(process.env.CODEX_MAX_QUEUED) || 8));
 const hourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_JOBS_PER_USER_HOUR) || 3));
 const trustedHourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_TRUSTED_JOBS_PER_USER_HOUR) || 12));
 const ttlMs = 24 * 60 * 60_000;
 const daybreakUsers = new Set((process.env.CODEX_DAYBREAK_USER_IDS || '').split(',').map(s=>s.trim()).filter(Boolean));
-const verified = new Set((process.env.CODEX_VERIFIED_MODELS || 'gpt-6-luna').split(',').map(s=>s.trim()).filter(Boolean));
+const verified = new Set((process.env.CODEX_VERIFIED_MODELS || 'gpt-6-sol,gpt-6-luna').split(',').map(s=>s.trim()).filter(Boolean));
 const jobs = new Map<string, Job>();
 const queue: string[] = [];
 const aborters = new Map<string, AbortController>();
@@ -74,12 +74,18 @@ async function runNext(){
     await persist(job);
     const model=chooseModel(job.packet,daybreakUsers,verified);
     await ensureWorkerImage(image);
-    const deadline=AbortSignal.any([controller.signal,AbortSignal.timeout(300_000)]);
+    const deadline=AbortSignal.any([controller.signal,AbortSignal.timeout(job.packet.kind==='investigation'?900_000:600_000)]);
     let result:Awaited<ReturnType<typeof executeJob>>|undefined;
+    let evidenceRetry=false;
     for(let attempt=0;attempt<2;attempt++){
-      try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry:attempt===1,
+      try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry:attempt===1&&!evidenceRetry,evidenceRetry:attempt===1&&evidenceRetry,
         gateway:{discordRead:query=>discord.ask(job,query,deadline)}});break;}
-      catch(error:any){if(attempt!==0||String(error?.message)!=='flag_without_matching_execution_receipt'||deadline.aborted||job.stats.calls>=8)throw error;}
+      catch(error:any){
+        const reason=String(error?.message);
+        if(attempt!==0||deadline.aborted||job.stats.calls>=8
+          ||!['flag_without_matching_execution_receipt','investigation_without_execution_receipt'].includes(reason))throw error;
+        evidenceRetry=reason==='investigation_without_execution_receipt';
+      }
     }
     if(!result)throw Error('solver_result_missing');
     job.result=result.result;

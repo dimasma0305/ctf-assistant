@@ -27,6 +27,8 @@ test('manager-selected investigation queues a scoped job once with current conve
         expect(submitted.kind).toBe('investigation');
         expect(submitted.route).toBe('auto');
         expect(submitted.scope).toBe(`${message.guildId}:${message.channelId}`);
+        expect(submitted.question).toContain(`Permintaan asli user: ${JSON.stringify(message.content)}`);
+        expect(submitted.question).toContain('Tujuan agen: bandingkan dua file');
         expect(submitted.context).toContain(message.content);
         expect(submitted.artifacts).toEqual([]);
         expect(hasCodexDelegation(message)).toBe(true);

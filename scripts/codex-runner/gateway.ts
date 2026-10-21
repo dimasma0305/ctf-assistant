@@ -12,8 +12,8 @@ export async function startGateway(socket: string, job: Job, model: string, sign
 }={}) {
   const auth=new ChatGPTAuth(), credentials=dependencies.credentials||(()=>auth.credentials(signal));
   const fetcher=dependencies.fetcher||fetch;let active=false;let failureReason='';const sources:any[]=[];
-  const maxCalls=dependencies.maxCalls??(job.packet.kind==='investigation'?18:14);
-  const maxInputChars=dependencies.maxInputChars??(job.packet.kind==='investigation'?3_000_000:2_000_000);
+  const maxCalls=dependencies.maxCalls??(job.packet.kind==='investigation'?36:14);
+  const maxInputChars=dependencies.maxInputChars??(job.packet.kind==='investigation'?6_000_000:2_000_000);
   const visionCache=new Map<string,string>();
   job.stats.searches ||= 0;job.stats.sourceReads ||= 0;job.stats.visionReads ||= 0;
   let downloads=0;
@@ -33,7 +33,16 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           if(Number(request.headers.get('content-length')||0)>1024)return Response.json({ok:false,error:'invalid_query'},{status:413});
           const body=await request.text();if(body.length>1024)return Response.json({ok:false,error:'invalid_query'},{status:413});
           const x=JSON.parse(body) as DiscordReadQuery;
-          const result=await dependencies.discordRead(x) as {ok?:boolean;images?:{data?:string;name?:string}[]};
+          const result=await dependencies.discordRead(x) as {ok?:boolean;messages?:{content?:string;embeds?:{url?:string;description?:string}[]}[];images?:{data?:string;name?:string}[]};
+          // A worker can ask for an older reply after the job starts. Let it
+          // read public URLs present in that freshly authorized channel data.
+          if(result?.ok)for(const message of (result.messages||[]).slice(0,30)){
+            const citations=[message.content||'',...(message.embeds||[]).flatMap(embed=>[embed.url||'',embed.description||''])].join('\n').slice(0,12_000);
+            for(const match of citations.matchAll(/https?:\/\/[^\s<>\x00-\x1f`"']+/g)){
+              const url=publicResearchUrl(match[0].replace(/[),.!?;]+$/,''));
+              if(url&&allowedSources.size<60)allowedSources.add(url);
+            }
+          }
           if(!x.describeImage||!result?.ok)return Response.json(result);
           const picture=result.images?.[0];
           if(!picture?.data)return Response.json({...result,imageObservation:{ok:false,error:'image_unavailable'}});

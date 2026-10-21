@@ -87,6 +87,24 @@ test('teammate artifacts include real same-channel source attribution and exclud
   const result=await collectCTFInputs(current,{text:'initial'},new AbortController().signal);
   expect(result.text).toContain('CTF ciphertext 3132');expect(result.text).toContain('teammate');expect(result.text).not.toContain('PRIVATE-NOT-FOR-PUBLIC');
 });
+test('a replied-to source outside the newest page is still carried into the Codex packet', async () => {
+  const replyId = '1562269823776596008', channelId = '700000000000000001';
+  const reply = { id: replyId, channelId,
+    content: 'Source: https://github.com/php/php-src/blob/PHP-8.6/ext/session/session.c',
+    createdTimestamp: Date.now() - 3 * 60 * 60_000,
+    author: { id: '765094257228120074', bot: false }, attachments: new Map() };
+  const current: any = { id: '800000000000000001', channelId,
+    content: 'coba bikin poc.py', createdTimestamp: Date.now(),
+    reference: { messageId: replyId }, author: { id: '663394727688798231', bot: false },
+    attachments: new Map(), channel: { isThread: () => false,
+      messages: { fetch: async (query: any) => typeof query === 'string' ? reply : new Map() } } };
+  const result = await collectCTFInputs(current, { text: current.content }, new AbortController().signal);
+  expect(result.text).toContain('https://github.com/php/php-src/blob/PHP-8.6/ext/session/session.c');
+  expect(result.originals.some(source => source.id === replyId)).toBe(true);
+  current.channel.messages.fetch = async (query: any) => typeof query === 'string' ? { ...reply, channelId: 'another-channel' } : new Map();
+  const denied = await collectCTFInputs(current, { text: current.content }, new AbortController().signal);
+  expect(denied.text).not.toContain('github.com/php/php-src');
+});
 test('isolated runner receives bounded original Discord bytes with magic-checked image metadata',async()=>{
   const png=Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,0,0,0,0]);
   const original=globalThis.fetch;globalThis.fetch=async()=>new Response(png,{headers:{'content-length':String(png.length)}});

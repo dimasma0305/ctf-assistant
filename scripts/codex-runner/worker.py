@@ -1,5 +1,5 @@
 """No credentials or host commands: an HTTP-to-Unix bridge and sandbox entrypoint."""
-import base64, http.client, http.server, json, os, pathlib, re, selectors, shutil, socket, socketserver, stat, subprocess, sys, threading
+import base64, http.client, http.server, json, os, pathlib, re, resource, selectors, shutil, socket, socketserver, stat, subprocess, sys, threading
 class UnixHTTP(http.client.HTTPConnection):
     def connect(self):
         import socket
@@ -55,7 +55,7 @@ for index,artifact in enumerate(packet['artifacts']):
 context={k:v for k,v in packet.items() if k not in ['artifacts','prompt','schema','model']};context['artifacts']=artifacts
 (root/'context.json').write_text(json.dumps(context,ensure_ascii=False))
 (root/'schema.json').write_text(json.dumps(packet['schema']))
-(root/'tooling.txt').write_text('Python 3 standard library; gcc/g++; gdb; binutils (strings, readelf, objdump); file; ripgrep; unzip; jq; curl; git; sqlite3; pdftotext. Public TCP internet is available via the bounded SOCKS5 proxy configured for curl and git HTTPS; private and loopback targets are blocked. No reusable credentials are supplied. The reviewed irai skills ctf-deep-solve and resourceful-solve are available under /workspace/.agents/skills; select a relevant skill and read its SKILL.md and only needed references. Internet access does not grant permission to test unrelated targets or access private Discord, credentials, or server systems. Ask Hackerika for same-thread or same-channel Discord evidence: POST http://127.0.0.1:8118/discord/read JSON {"kind":"recent","limit":20,"includeImage":true,"describeImage":true} or {"kind":"message","messageId":"snowflake","includeImage":true,"describeImage":true}. Images arrive as base64 in images[].data; decode to /workspace. imageObservation describes actual pixels via bounded Luna vision; use it instead of guessing from metadata or ASCII art. Public search: POST http://127.0.0.1:8118/sources/search JSON {"query":"public clue"}; CTF jobs at most two searches, investigation jobs at most six. Read cited or supplied sources: POST http://127.0.0.1:8118/sources/read JSON {"url":"public URL","query":"focus"}. For static slide sites, follow linked JS slide chunks; download a discovered public archive with POST http://127.0.0.1:8118/sources/download JSON {"url":"inspected archive URL"} and save the binary response to /workspace before inspecting it. If the user asks for a file, write up to two finished files under /workspace/exports/ with simple ASCII names. Each file must be <=4 MiB and the combined size <=6 MiB. Only top-level regular files are exported; the host sends them as Discord attachments in the original channel/thread. Do not put secrets, private Discord context, or unrequested source artifacts in exports.\n')
+(root/'tooling.txt').write_text('Python 3 standard library; gcc/g++; gdb; binutils (strings, readelf, objdump); make; autoconf; bison; re2c; pkg-config; PHP build libraries; file; ripgrep; unzip; jq; curl; git; sqlite3; pdftotext. Public TCP internet is available via the bounded SOCKS5 proxy configured for curl and git HTTPS; private and loopback targets are blocked. No reusable credentials are supplied. The reviewed irai skills ctf-deep-solve and resourceful-solve are available under /workspace/.agents/skills; select a relevant skill and read its SKILL.md and only needed references. Internet access does not grant permission to test unrelated targets or access private Discord, credentials, or server systems. Ask Hackerika for same-thread or same-channel Discord evidence: POST http://127.0.0.1:8118/discord/read JSON {"kind":"recent","limit":20,"includeImage":true,"describeImage":true} or {"kind":"message","messageId":"snowflake","includeImage":true,"describeImage":true}. Images arrive as base64 in images[].data; decode to /workspace. imageObservation describes actual pixels via bounded Luna vision; use it instead of guessing from metadata or ASCII art. Public search: POST http://127.0.0.1:8118/sources/search JSON {"query":"public clue"}; CTF jobs at most two searches, investigation jobs at most six. Read cited or supplied sources: POST http://127.0.0.1:8118/sources/read JSON {"url":"public URL","query":"focus"}. For static slide sites, follow linked JS slide chunks; download a discovered public archive with POST http://127.0.0.1:8118/sources/download JSON {"url":"inspected archive URL"} and save the binary response to /workspace before inspecting it. If the user asks for a file, write up to two finished files under /workspace/exports/ with simple ASCII names. Each file must be <=4 MiB and the combined size <=6 MiB. Only top-level regular files are exported; the host sends them as Discord attachments in the original channel/thread. Do not put secrets, private Discord context, or unrequested source artifacts in exports.\n')
 server=http.server.ThreadingHTTPServer(('127.0.0.1',8118),Bridge)
 threading.Thread(target=server.serve_forever,daemon=True).start()
 egress=EgressServer(('127.0.0.1',8119),EgressRelay)
@@ -67,12 +67,16 @@ proxy_env={'ALL_PROXY':'socks5h://127.0.0.1:8119','all_proxy':'socks5h://127.0.0
 args=['/usr/local/bin/codex','exec','--ignore-user-config','--ignore-rules','--ephemeral','--skip-git-repo-check','--color','never','--json','--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],
  '-c','model_provider="hackerika"','-c','model_providers.hackerika.name="Hackerika job gateway"','-c','model_providers.hackerika.base_url="http://127.0.0.1:8118/v1"',
  '-c','model_providers.hackerika.wire_api="responses"','-c','model_providers.hackerika.requires_openai_auth=false','-c','model_providers.hackerika.supports_websockets=false',
- '-c','model_reasoning_effort="low"','-c','web_search="disabled"','-c','features.multi_agent=false',
+ '-c','model_reasoning_effort="medium"' if packet.get('kind')=='investigation' else 'model_reasoning_effort="low"','-c','web_search="disabled"','-c','features.multi_agent=false',
  '--output-schema','/workspace/schema.json','--output-last-message','/workspace/final.json']
 for image in images:args.extend(['--image',image])
 # --image accepts multiple paths and otherwise consumes the positional prompt.
 args.extend(['--',packet['prompt']])
 try:
+    # Crash reproducers can accidentally emit unbounded sanitizer logs. Keep
+    # individual files below a quarter of the disposable workspace.
+    resource.setrlimit(resource.RLIMIT_FSIZE,(256*1024*1024,256*1024*1024))
+    resource.setrlimit(resource.RLIMIT_CORE,(0,0))
     code=subprocess.call(args,cwd='/workspace',env={**os.environ,**proxy_env,'CODEX_HOME':'/tmp/codex'})
     final=root/'final.json'
     if final.is_file() and final.stat().st_size<=65536:

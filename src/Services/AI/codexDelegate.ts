@@ -60,7 +60,9 @@ export async function delegateCodexForTurn(args: {
             : args.question!.trim();
         return { ...packetBase, question: question.slice(0, 8000),
             context: `${gathered.text}\n[verified Discord API profile for explicitly mentioned member] ${JSON.stringify(profile)}`.slice(0, 50_000) };
-    }) : [{ ...packetBase, question: args.question.trim().slice(0, 8000), context: gathered.text.slice(0, 50_000) }];
+    }) : [{ ...packetBase,
+        question: `Permintaan asli user: ${JSON.stringify(message.content || '')}\nTujuan agen: ${args.question.trim()}`.slice(0, 8000),
+        context: gathered.text.slice(0, 50_000) }];
     try {
         const queued = packets.length === 1
             ? await submitCodexJob(packets[0], signal)

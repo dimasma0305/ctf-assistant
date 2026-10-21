@@ -38,6 +38,7 @@ import { stripInternalAnnotations } from './output';
 import { ACTOR_ATTRIBUTION_CONTEXT, messageSources } from './attribution';
 import { getResearchReport, groundResearchReply } from './research';
 import { hasCodexDelegation } from './codexDelegate';
+import { groundCodexHandoff } from './codexHandoff';
 import { recentAssistantLinksForSpeaker, setTurnSourceLinks } from './conversationLinks';
 
 const MAX_MEMORY = 20;
@@ -860,6 +861,7 @@ async function runChatTurn(
     let finalContent = '';
     let finalReasoningContent = '';
     let grantSucceeded = false;
+    let codexToolResult: string | undefined;
     let totalToolCalls = 0;
     const appendReadImages = (name: string) => {
         if (name !== 'read_channel_images') return;
@@ -1034,6 +1036,7 @@ async function runChatTurn(
                     console.log(`🛠️  [${turnId}] ${fnName}(${loggedArgs}) for ${author} (${userId})`);
                     loopStats.toolCalls++;
                     const resultStr = await dispatchToolBounded(fnName, parsedArgs, message, turnId, controller.signal);
+                    if (fnName === 'delegate_codex') codexToolResult = resultStr;
                     if (fnName === 'grant_fan_role') {
                         try { if (JSON.parse(resultStr).granted) grantSucceeded = true; } catch { /* ignore */ }
                     }
@@ -1187,6 +1190,7 @@ async function runChatTurn(
 
         if (!hasCodexDelegation(message)) finalContent = groundResearchReply(finalContent, getResearchReport(message), content);
         finalContent = groundCTFReply(finalContent, getCTFReport(message));
+        finalContent = groundCodexHandoff(finalContent, codexToolResult);
 
         // Output anti-spoof: if the model accidentally copied the speaker-tag
         // pattern at the start of its reply (because it sees it everywhere

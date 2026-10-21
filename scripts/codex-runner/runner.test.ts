@@ -14,12 +14,14 @@ import { researchTransport } from '../../src/Services/AI/researchSources';
 const packet=()=>({scope:'555555555555555555:700000000000000001',guildId:'555555555555555555',channelId:'700000000000000001',
   messageId:'800000000000000001',userId:'663394727688798231',question:'solve pwn exploit ini',context:'thread evidence',route:'auto' as const,artifacts:[]});
 
-test('model route is chosen by the manager, with economical auto and owner-gated Daybreak',()=>{
+test('model route defaults to Sol, preserves explicit Luna, and gates Daybreak',()=>{
   const valid=validatePacket(packet());
-  expect(chooseModel(valid,new Set(),new Set(['gpt-6-luna']))).toBe('gpt-6-luna');
-  expect(chooseModel(valid,new Set([valid.userId]),new Set(['gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-6-luna');
-  expect(chooseModel({...valid,route:'daybreak'},new Set([valid.userId]),new Set(['gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-daybreak-blue-latest');
-  expect(chooseModel({...valid,route:'sol'},new Set(),new Set(['gpt-6-luna','gpt-6.1-sol']))).toBe('gpt-6.1-sol');
+  expect(chooseModel(valid,new Set(),new Set(['gpt-6-sol']))).toBe('gpt-6-sol');
+  expect(chooseModel(valid,new Set([valid.userId]),new Set(['gpt-6-sol','gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-6-sol');
+  expect(chooseModel({...valid,route:'luna'},new Set(),new Set(['gpt-6-luna']))).toBe('gpt-6-luna');
+  expect(()=>chooseModel(valid,new Set(),new Set(['gpt-6-luna']))).toThrow('model_not_verified');
+  expect(chooseModel({...valid,route:'daybreak'},new Set([valid.userId]),new Set(['gpt-6-sol','gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-daybreak-blue-latest');
+  expect(chooseModel({...valid,route:'sol'},new Set(),new Set(['gpt-6-luna','gpt-6-sol']))).toBe('gpt-6-sol');
   expect(()=>chooseModel({...valid,route:'daybreak'},new Set(),new Set(['gpt-6-luna','gpt-daybreak-blue-latest']))).toThrow('daybreak_not_enabled');
   expect(validatePacket({...packet(),kind:'investigation'}).kind).toBe('investigation');
   expect(()=>validatePacket({...packet(),kind:'other'})).toThrow('invalid_job_packet');
@@ -56,9 +58,9 @@ test('Docker worker has no network and receives only per-job model and public-eg
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
   const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-5',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-8',dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-5',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-8',dependencies);
   expect(builds).toBe(1);
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');
@@ -166,8 +168,8 @@ test('investigation gateway has enough calls for deep research and reports an ex
   const request=()=>fetch('http://localhost/v1/responses',{unix:socket,method:'POST',
     headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gpt-6-luna'})} as RequestInit & {unix:string});
   try{
-    for(let i=0;i<18;i++){const response=await request();expect(response.status).toBe(200);await response.text();}
-    expect(job.stats.calls).toBe(18);
+    for(let i=0;i<36;i++){const response=await request();expect(response.status).toBe(200);await response.text();}
+    expect(job.stats.calls).toBe(36);
     const rejected=await request();expect(rejected.status).toBe(429);
     expect(await rejected.json()).toEqual({error:'model_call_budget'});
     expect(gateway.failureReason()).toBe('model_call_budget');
@@ -247,6 +249,21 @@ test('isolated gateway forwards a Discord read without exposing a Discord creden
     expect(await codexRequest('/discord/read',{kind:'recent',limit:10},{socketPath:socket})).toEqual({ok:true,messages:[]});
     expect(seen).toEqual([{kind:'recent',limit:10}]);
   }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
+});
+
+test('a public source URL discovered in an authorized older Discord reply becomes readable',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-discord-source-test-')),socket=join(directory,'gateway.sock');
+  const source='https://example.com/verified-source',originalFetch=researchTransport.fetch;
+  researchTransport.fetch=async()=>new Response('Original source contents.',{headers:{'content-type':'text/plain'}});
+  const job=newJob(validatePacket({...packet(),kind:'investigation',question:'Inspect the older reply',context:'No URL in initial context'}));
+  const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal,
+    {discordRead:async()=>({ok:true,messages:[{content:'See '+source,embeds:[]}]})});
+  try{
+    await expect(codexRequest('/sources/read',{url:source},{socketPath:socket})).rejects.toThrow('invalid_or_private_source');
+    await codexRequest('/discord/read',{kind:'message',messageId:'800000000000000003'},{socketPath:socket});
+    const document=await codexRequest<{content:string}>('/sources/read',{url:source},{socketPath:socket});
+    expect(document.content).toContain('Original source contents.');
+  }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
 });
 
 test('an on-demand Discord image is described through bounded Luna vision',async()=>{
