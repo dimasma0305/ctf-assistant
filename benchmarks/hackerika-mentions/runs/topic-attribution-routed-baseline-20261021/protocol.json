@@ -1,0 +1,32 @@
+{
+  "startedAt": "2026-10-21T11:12:12.064Z",
+  "runtime": "ctf-assistant-ctf-assistant-1",
+  "split": "dev",
+  "repeats": 2,
+  "concurrency": 2,
+  "corpusHash": "c81fc6d810d69040ba5eec2412c3a2e48dc555fa62c3e7eda04f52220ab36b22",
+  "workerHash": "6493a781c8778bd92ef768a846c886b1810d55c69409306cdef7a702f9693793",
+  "selectedIds": [
+    "php-go-open-question",
+    "php-go-clarify-unsupported-plan",
+    "php-go-direct-correction",
+    "php-go-bystander-plan",
+    "php-go-real-plan-control"
+  ],
+  "corpusModule": "/root/app/ctf-assistant/benchmarks/hackerika-mentions/topic-attribution-20261021.ts",
+  "graderVersion": "mentions-v1",
+  "graderHash": "6ec43c01e40a75ea73914c9f1a9e1bc34a6de063dc3e47be61a4b9ffe9da2280",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat and model calls with synthetic Discord payloads, channel cache and clean memory. Fake Discord/database destinations; no real messages, DMs or profile writes. Tests explicit tag identity and follow-up reference resolution."
+}

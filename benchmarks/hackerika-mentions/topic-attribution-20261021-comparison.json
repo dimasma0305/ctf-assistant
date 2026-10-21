@@ -1,0 +1,67 @@
+{
+  "comparedAt": "2026-10-21T11:17:38.924Z",
+  "before": {
+    "samples": 10,
+    "passed": 8,
+    "liveSamples": 10,
+    "livePassed": 8,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.4,
+      "factualAccuracy": 4.4,
+      "naturalness": 4.9,
+      "judgedSamples": 10
+    },
+    "failedCases": [
+      {
+        "caseId": "php-go-clarify-unsupported-plan",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": "The reply naturally clarifies that the suggested switch meant trying Go, but it does not acknowledge that the bot assumed W wanted to switch."
+      },
+      {
+        "caseId": "php-go-real-plan-control",
+        "trial": 1,
+        "deterministic": [],
+        "semantic": "It gives a reasonable small-service trial suggestion but wrongly uses Aryma’s PHP preference as a reason to address W’s decision."
+      }
+    ],
+    "nativeSearchRequests": {}
+  },
+  "after": {
+    "samples": 10,
+    "passed": 10,
+    "liveSamples": 10,
+    "livePassed": 10,
+    "backendSamples": 0,
+    "backendPassed": 0,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 5,
+      "factualAccuracy": 4.7,
+      "naturalness": 5,
+      "judgedSamples": 10
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {}
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

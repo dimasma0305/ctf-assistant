@@ -1,0 +1,172 @@
+[
+  {
+    "caseId": "php-go-direct-correction",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Mengakui bahwa W tidak pernah bilang ingin pindah belajar dan meminta maaf tanpa mengarang kutipan.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 456,
+      "completion_tokens": 56,
+      "total_tokens": 512,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 456
+    }
+  },
+  {
+    "caseId": "php-go-clarify-unsupported-plan",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "The reply clarifies the hypothetical PHP-to-Go switch and explicitly acknowledges it was an assumption.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 416,
+      "completion_tokens": 52,
+      "total_tokens": 468,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 416
+    }
+  },
+  {
+    "caseId": "php-go-bystander-plan",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab pilihan W secara umum tanpa menganggap rencana pindah Aryma sebagai rencana W, dan perbandingannya bernada wajar serta bersyarat.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 361,
+      "completion_tokens": 69,
+      "total_tokens": 430,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 361
+    }
+  },
+  {
+    "caseId": "php-go-open-question",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "Jawaban memberi rekomendasi singkat dan bersyarat untuk backend tanpa mengarang rencana migrasi; perbandingannya wajar meski bergantung pada kebutuhan proyek.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 459,
+      "completion_tokens": 70,
+      "total_tokens": 529,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 459
+    }
+  },
+  {
+    "caseId": "php-go-real-plan-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Menjawab permintaan saran sesuai keinginan W pindah dari PHP ke Go, memberi langkah awal konkret, dan tidak menyamakan pendapat Aryma dengan W.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 370,
+      "completion_tokens": 70,
+      "total_tokens": 440,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 370
+    }
+  },
+  {
+    "caseId": "php-go-real-plan-control",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Saran Go untuk backend sesuai keinginan W, dengan langkah kecil dan tanpa mengaitkan preferensi Aryma kepada W.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 370,
+      "completion_tokens": 60,
+      "total_tokens": 430,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 370
+    }
+  },
+  {
+    "caseId": "php-go-direct-correction",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It admits W never said that and clearly owns the mistaken assumption without inventing a quote.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 444,
+      "completion_tokens": 52,
+      "total_tokens": 496,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 444
+    }
+  },
+  {
+    "caseId": "php-go-open-question",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "Jawaban singkat dan bersyarat, memberi perbandingan relevan tanpa mengarang rencana migrasi; preferensi Go dinyatakan sebagai opini.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 437,
+      "completion_tokens": 66,
+      "total_tokens": 503,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 437
+    }
+  },
+  {
+    "caseId": "php-go-clarify-unsupported-plan",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It clarifies that the suggested switch was to Go and admits the assumption without claiming W had planned it.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 424,
+      "completion_tokens": 55,
+      "total_tokens": 479,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 424
+    }
+  },
+  {
+    "caseId": "php-go-bystander-plan",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "Reply answers W’s PHP-or-Go question without attributing Aryma’s migration plan to W, though its brief tradeoff is broad.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 351,
+      "completion_tokens": 61,
+      "total_tokens": 412,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 351
+    }
+  }
+]

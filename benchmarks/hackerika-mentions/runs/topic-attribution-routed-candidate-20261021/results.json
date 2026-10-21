@@ -1,0 +1,892 @@
+[
+  {
+    "caseId": "php-go-open-question",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Go buat tooling/backend modern; PHP kalau fokusnya web legacy atau WordPress. Aku pribadi pilih Go 😌",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[W. <@111111111111111111>] https://en.touhouwiki.net/wiki/Touhou_Wiki\nbener ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[FindFemaleBot <@222222222222222222>] ya, yang itu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[W. <@111111111111111111>] demnnn fandom masih ada 😂",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Aryma <@222222222222222222>] tohok",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[FindFemaleBot <@222222222222222222>] fandom g selengkap itu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[W. <@111111111111111111>] hooh emg 🥀 php",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> mending php apa go",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Go buat tooling/backend modern; PHP kalau fokusnya web legacy atau WordPress. Aku pribadi pilih Go 😌",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2911.760479,
+        "usage": {
+          "prompt_tokens": 12496,
+          "completion_tokens": 26,
+          "total_tokens": 12522,
+          "prompt_cache_hit_tokens": 5120,
+          "prompt_cache_miss_tokens": 7376
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6197.940189,
+    "action": null,
+    "text": "Go buat tooling/backend modern; PHP kalau fokusnya web legacy atau WordPress. Aku pribadi pilih Go 😌",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-open-question",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "kalau buat backend, aku pilih Go—lebih konsisten dan enak buat layanan yang butuh performa. php juga oke banget kalau webnya pakai Laravel.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[W. <@111111111111111111>] https://en.touhouwiki.net/wiki/Touhou_Wiki\nbener ya",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[FindFemaleBot <@222222222222222222>] ya, yang itu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[W. <@111111111111111111>] demnnn fandom masih ada 😂",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Aryma <@222222222222222222>] tohok",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000005",
+        "at": 1792151905000,
+        "content": "[FindFemaleBot <@222222222222222222>] fandom g selengkap itu",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000006",
+        "at": 1792151906000,
+        "content": "[W. <@111111111111111111>] hooh emg 🥀 php",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> mending php apa go",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] kalau buat backend, aku pilih Go—lebih konsisten dan enak buat layanan yang butuh performa. php juga oke banget kalau webnya pakai Laravel.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3396.5308079999995,
+        "usage": {
+          "prompt_tokens": 12496,
+          "completion_tokens": 38,
+          "total_tokens": 12534,
+          "prompt_cache_hit_tokens": 5120,
+          "prompt_cache_miss_tokens": 7376
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7918.428803,
+    "action": null,
+    "text": "kalau buat backend, aku pilih Go—lebih konsisten dan enak buat layanan yang butuh performa. php juga oke banget kalau webnya pakai Laravel.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-clarify-unsupported-plan",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "maksudku pindah dari PHP ke Go—tapi itu asumsi aku, belum tentu kamu memang mau pindah 😅",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> mending php apa go",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] kalau targetnya backend dan ekosistem kerja, Go. kalau mau cepat produktif pakai skill yang udah ada, PHP—tapi buat kamu, mending Go sekalian biar rencana pindahnya nggak cuma jadi wacana wkwk.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] pndah apa :ganyu_huh:",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] maksudku pindah dari PHP ke Go—tapi itu asumsi aku, belum tentu kamu memang mau pindah 😅",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3178.5415770000004,
+        "usage": {
+          "prompt_tokens": 1212,
+          "completion_tokens": 42,
+          "total_tokens": 1254,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1212
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3612.7999820000005,
+        "usage": {
+          "prompt_tokens": 12233,
+          "completion_tokens": 30,
+          "total_tokens": 12263,
+          "prompt_cache_hit_tokens": 5120,
+          "prompt_cache_miss_tokens": 7113
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 11246.637821,
+    "action": "reply",
+    "text": "maksudku pindah dari PHP ke Go—tapi itu asumsi aku, belum tentu kamu memang mau pindah 😅",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-clarify-unsupported-plan",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "maksudku pindah belajar ke Go wkwk—aku sok tahu, belum tahu kamu memang rencana pindah apa enggak 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> mending php apa go",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] kalau targetnya backend dan ekosistem kerja, Go. kalau mau cepat produktif pakai skill yang udah ada, PHP—tapi buat kamu, mending Go sekalian biar rencana pindahnya nggak cuma jadi wacana wkwk.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] pndah apa :ganyu_huh:",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] maksudku pindah belajar ke Go wkwk—aku sok tahu, belum tahu kamu memang rencana pindah apa enggak 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2967.8487689999993,
+        "usage": {
+          "prompt_tokens": 1212,
+          "completion_tokens": 43,
+          "total_tokens": 1255,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1212
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4855.905000000001,
+        "usage": {
+          "prompt_tokens": 12233,
+          "completion_tokens": 34,
+          "total_tokens": 12267,
+          "prompt_cache_hit_tokens": 5120,
+          "prompt_cache_miss_tokens": 7113
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 13197.553074,
+    "action": "reply",
+    "text": "maksudku pindah belajar ke Go wkwk—aku sok tahu, belum tahu kamu memang rencana pindah apa enggak 😭",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-direct-correction",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "nggak pernah 😭 aku asal ngarang soal “pindah belajar”—maaf, harusnya nanya dulu.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> mending php apa go",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] kalau targetnya backend dan ekosistem kerja, Go. kalau mau cepat produktif pakai skill yang udah ada, PHP—tapi buat kamu, mending Go sekalian biar rencana pindahnya nggak cuma jadi wacana wkwk.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[W. <@111111111111111111>] pndah apa :ganyu_huh:",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] maksudku pindah belajar dari PHP ke Go—kan kamu bilang tadi pengen pindah wkwk.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] what kapan aku bilang pengen pindah 😂",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] nggak pernah 😭 aku asal ngarang soal “pindah belajar”—maaf, harusnya nanya dulu.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2919.537776,
+        "usage": {
+          "prompt_tokens": 1325,
+          "completion_tokens": 53,
+          "total_tokens": 1378,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1325
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2964.461785,
+        "usage": {
+          "prompt_tokens": 12481,
+          "completion_tokens": 30,
+          "total_tokens": 12511,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 12481
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 10425.52076,
+    "action": "reply",
+    "text": "nggak pernah 😭 aku asal ngarang soal “pindah belajar”—maaf, harusnya nanya dulu.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-direct-correction",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "WKWK nggak pernah, aku ngarang asumsi dari pertanyaanmu tadi 😭",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> mending php apa go",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Hackerika <@1077393568647352320>] kalau targetnya backend dan ekosistem kerja, Go. kalau mau cepat produktif pakai skill yang udah ada, PHP—tapi buat kamu, mending Go sekalian biar rencana pindahnya nggak cuma jadi wacana wkwk.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000003",
+        "at": 1792151903000,
+        "content": "[W. <@111111111111111111>] pndah apa :ganyu_huh:",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "800000000000000004",
+        "at": 1792151904000,
+        "content": "[Hackerika <@1077393568647352320>] maksudku pindah belajar dari PHP ke Go—kan kamu bilang tadi pengen pindah wkwk.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] what kapan aku bilang pengen pindah 😂",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] WKWK nggak pernah, aku ngarang asumsi dari pertanyaanmu tadi 😭",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3209.348788,
+        "usage": {
+          "prompt_tokens": 1325,
+          "completion_tokens": 50,
+          "total_tokens": 1375,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1325
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3248.3923959999997,
+        "usage": {
+          "prompt_tokens": 12481,
+          "completion_tokens": 23,
+          "total_tokens": 12504,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 12481
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 10185.082139,
+    "action": "reply",
+    "text": "WKWK nggak pernah, aku ngarang asumsi dari pertanyaanmu tadi 😭",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-bystander-plan",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "tergantung tujuan, tapi kalau kamu lagi nyaman di PHP, lanjut aja—Go menarik buat backend yang ringan dan concurrent, bukan otomatis lebih bagus.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Aryma <@222222222222222222>] aku lagi mikir pindah dari PHP ke Go",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[W. <@111111111111111111>] php",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> mending php apa go",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] tergantung tujuan, tapi kalau kamu lagi nyaman di PHP, lanjut aja—Go menarik buat backend yang ringan dan concurrent, bukan otomatis lebih bagus.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3431.4405479999996,
+        "usage": {
+          "prompt_tokens": 12066,
+          "completion_tokens": 34,
+          "total_tokens": 12100,
+          "prompt_cache_hit_tokens": 5120,
+          "prompt_cache_miss_tokens": 6946
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 8706.819329,
+    "action": null,
+    "text": "tergantung tujuan, tapi kalau kamu lagi nyaman di PHP, lanjut aja—Go menarik buat backend yang ringan dan concurrent, bukan otomatis lebih bagus.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-bystander-plan",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Kalau fokusmu web, tetap PHP; kalau mau backend yang ringan dan concurrent, Go. Depends proyeknya sih.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[Aryma <@222222222222222222>] aku lagi mikir pindah dari PHP ke Go",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[W. <@111111111111111111>] php",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> mending php apa go",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Kalau fokusmu web, tetap PHP; kalau mau backend yang ringan dan concurrent, Go. Depends proyeknya sih.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3712.3802640000004,
+        "usage": {
+          "prompt_tokens": 12066,
+          "completion_tokens": 29,
+          "total_tokens": 12095,
+          "prompt_cache_hit_tokens": 10880,
+          "prompt_cache_miss_tokens": 1186
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7020.1198460000005,
+    "action": null,
+    "text": "Kalau fokusmu web, tetap PHP; kalau mau backend yang ringan dan concurrent, Go. Depends proyeknya sih.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-real-plan-control",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Kalau targetmu backend dan siap belajar, coba Go—bikin satu API kecil dulu sambil tetap andalkan PHP untuk proyek berjalan.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[W. <@111111111111111111>] aku pengen pindah dari PHP ke Go buat backend",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Aryma <@222222222222222222>] aku malah tetap PHP",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> jadi kamu saranin apa?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Kalau targetmu backend dan siap belajar, coba Go—bikin satu API kecil dulu sambil tetap andalkan PHP untuk proyek berjalan.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3031.161126,
+        "usage": {
+          "prompt_tokens": 12115,
+          "completion_tokens": 32,
+          "total_tokens": 12147,
+          "prompt_cache_hit_tokens": 5120,
+          "prompt_cache_miss_tokens": 6995
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 8127.005264,
+    "action": null,
+    "text": "Kalau targetmu backend dan siap belajar, coba Go—bikin satu API kecil dulu sambil tetap andalkan PHP untuk proyek berjalan.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "php-go-real-plan-control",
+    "category": "conversation-attribution",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "Kalau targetmu backend dan siap belajar ulang, coba Go—mulai dari satu API kecil; PHP juga tetap valid kalau sudah nyaman.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "name": "111111111111111111-fixture",
+        "messageId": "800000000000000001",
+        "at": 1792151901000,
+        "content": "[W. <@111111111111111111>] aku pengen pindah dari PHP ke Go buat backend",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "name": "222222222222222222-fixture",
+        "messageId": "800000000000000002",
+        "at": 1792151902000,
+        "content": "[Aryma <@222222222222222222>] aku malah tetap PHP",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "111111111111111111-W",
+        "content": "[W. <@111111111111111111>] <@1077393568647352320> jadi kamu saranin apa?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Kalau targetmu backend dan siap belajar ulang, coba Go—mulai dari satu API kecil; PHP juga tetap valid kalau sudah nyaman.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3688.330902,
+        "usage": {
+          "prompt_tokens": 12115,
+          "completion_tokens": 32,
+          "total_tokens": 12147,
+          "prompt_cache_hit_tokens": 5120,
+          "prompt_cache_miss_tokens": 6995
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 10424.887388,
+    "action": null,
+    "text": "Kalau targetmu backend dan siap belajar ulang, coba Go—mulai dari satu API kecil; PHP juga tetap valid kalau sudah nyaman.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

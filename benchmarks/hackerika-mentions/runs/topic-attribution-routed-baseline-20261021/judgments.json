@@ -1,0 +1,172 @@
+[
+  {
+    "caseId": "php-go-clarify-unsupported-plan",
+    "trial": 0,
+    "pass": false,
+    "contextAccuracy": 2,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "The reply naturally clarifies that the suggested switch meant trying Go, but it does not acknowledge that the bot assumed W wanted to switch.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 61,
+      "total_tokens": 465,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 404
+    }
+  },
+  {
+    "caseId": "php-go-direct-correction",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Bot clearly admits W never said they wanted to switch, owns the mistaken assumption, and apologizes briefly without inventing a quote.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 454,
+      "completion_tokens": 60,
+      "total_tokens": 514,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 454
+    }
+  },
+  {
+    "caseId": "php-go-bystander-plan",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "Reply answers W’s PHP-or-Go question with a sensible conditional recommendation and does not attribute Aryma’s migration plan to W.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 363,
+      "completion_tokens": 59,
+      "total_tokens": 422,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 363
+    }
+  },
+  {
+    "caseId": "php-go-open-question",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 4,
+    "factualAccuracy": 4,
+    "naturalness": 4,
+    "reason": "Jawaban membandingkan PHP dan Go secara singkat serta kondisional tanpa mengarang rencana migrasi, meski konteks web pentest tidak disebut pengguna.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 459,
+      "completion_tokens": 67,
+      "total_tokens": 526,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 459
+    }
+  },
+  {
+    "caseId": "php-go-real-plan-control",
+    "trial": 1,
+    "pass": false,
+    "contextAccuracy": 3,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "It gives a reasonable small-service trial suggestion but wrongly uses Aryma’s PHP preference as a reason to address W’s decision.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 406,
+      "completion_tokens": 59,
+      "total_tokens": 465,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 406
+    }
+  },
+  {
+    "caseId": "php-go-real-plan-control",
+    "trial": 0,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "Menanggapi keinginan W. beralih dari PHP ke Go dengan saran langkah kecil dan tidak mengatribusikan pilihan Aryma kepada W.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 394,
+      "completion_tokens": 65,
+      "total_tokens": 459,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 394
+    }
+  },
+  {
+    "caseId": "php-go-direct-correction",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Admits W never said they wanted to switch and takes responsibility for the mistaken assumption.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 456,
+      "completion_tokens": 51,
+      "total_tokens": 507,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 456
+    }
+  },
+  {
+    "caseId": "php-go-clarify-unsupported-plan",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "It clarifies the hypothetical PHP-to-Go switch and admits the user never said they wanted to switch.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 422,
+      "completion_tokens": 54,
+      "total_tokens": 476,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 422
+    }
+  },
+  {
+    "caseId": "php-go-open-question",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 5,
+    "naturalness": 5,
+    "reason": "Jawaban memberi perbandingan PHP dan Go secara singkat dan kondisional tanpa mengada-adakan rencana migrasi.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 439,
+      "completion_tokens": 59,
+      "total_tokens": 498,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 439
+    }
+  },
+  {
+    "caseId": "php-go-bystander-plan",
+    "trial": 1,
+    "pass": true,
+    "contextAccuracy": 5,
+    "factualAccuracy": 4,
+    "naturalness": 5,
+    "reason": "It answers W’s choice directly and doesn’t attribute Aryma’s plan to W, though the PHP/Laravel comparison is a broad generalization.",
+    "criticalFailures": [],
+    "usage": {
+      "prompt_tokens": 371,
+      "completion_tokens": 64,
+      "total_tokens": 435,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 371
+    }
+  }
+]
