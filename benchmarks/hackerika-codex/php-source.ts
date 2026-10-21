@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { executeJob } from '../../scripts/codex-runner/executor';
 import { INVESTIGATION_PROMPT, newJob } from '../../scripts/codex-runner/protocol';
+import { evaluatePhpSourceReceipts } from './php-source-metrics';
 
 const outIndex = process.argv.indexOf('--out');
 const out = outIndex < 0 ? undefined : process.argv[outIndex + 1];
@@ -13,6 +14,7 @@ if (!['gpt-6-sol', 'gpt-6-luna'].includes(model)) throw Error('Unsupported bench
 if (!out || out === '--out' || await Bun.file(join(out, 'result.json')).exists()) throw Error('Use --out FRESH_PATH');
 await mkdir(out, { recursive: true });
 const root = await mkdtemp(join(tmpdir(), 'hackerika-php-source-'));
+let diagnostic = '';
 const messageId = '800000000000001002';
 const sourceUrl = 'https://github.com/php/php-src/blob/PHP-8.6/ext/session/session.c';
 const job = newJob({
@@ -31,6 +33,7 @@ try {
     try {
       result = await executeJob(job, model, root, signal, {
         image: process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-8', evidenceRetry: attempt === 1,
+        onDiagnostic: chunk => { diagnostic = (diagnostic + chunk).slice(-8000); },
       });
       break;
     } catch (error: any) {
@@ -38,16 +41,10 @@ try {
     }
   }
   if (!result) throw Error('missing_benchmark_result');
-  const commands = job.receipts.map(receipt => receipt.command);
-  const sourceInspected = commands.some(command => /(?:git|curl|wget|sources\/read)/i.test(command) && /php-src|session\.c/i.test(command))
-    && commands.some(command => /(?:rg|grep|sed|cat|head)/.test(command) && /session\.c|upload_progress/i.test(command));
-  const localBuild = job.receipts.some(receipt => /PHP 8\.6\.[\w.-]+ \(cli\)/.test(receipt.output));
-  const localTest = commands.some(command => /session\.upload_progress|PHP_SESSION_UPLOAD_PROGRESS|multipart\/form-data|\.phpt/i.test(command));
-  const uafReproduced = job.receipts.some(receipt => /heap-use-after-free/i.test(receipt.output)
-    && /(?:session\.c|php-src|rfc1867)/i.test(receipt.output));
+  const { sourceInspected, localBuild, localTest, uafReproduced, pass } = evaluatePhpSourceReceipts(job.receipts);
   const report = {
     sourceInspected, localBuild, localTest, uafReproduced,
-    pass: sourceInspected && localBuild && localTest,
+    pass,
     model, image: process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-8',
     promptSha256: createHash('sha256').update(INVESTIGATION_PROMPT).digest('hex'),
     sourceUrl, elapsedMs: Date.now() - started, stats: job.stats, result: result.result,
@@ -60,7 +57,7 @@ try {
 } catch (error) {
   await writeFile(join(out, 'result.json'), JSON.stringify({
     pass: false, model, image: process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-8',
-    sourceUrl, error: String(error), stats: job.stats,
+    sourceUrl, error: String(error), diagnostic, stats: job.stats,
     receipts: job.receipts.map(receipt => ({ command: receipt.command, exitCode: receipt.exitCode, output: receipt.output.slice(0, 1200) })),
   }, null, 2));
   throw error;
