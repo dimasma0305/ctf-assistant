@@ -25,6 +25,15 @@ import { cancelCodexJob, codexSolverEnabled, getCodexJob } from './codexJobs';
 import { delegateCodexForTurn } from './codexDelegate';
 import { relatedSourceLeads } from './conversationLinks';
 
+const pageReads = new WeakMap<object, Map<string, ReturnType<typeof fetchUrlForTool>>>();
+function readPageOnce(turn: object, url: string): ReturnType<typeof fetchUrlForTool> {
+    let reads = pageReads.get(turn);
+    if (!reads) { reads = new Map(); pageReads.set(turn, reads); }
+    let pending = reads.get(url);
+    if (!pending) { pending = fetchUrlForTool({ url }); reads.set(url, pending); }
+    return pending;
+}
+
 /**
  * Native function-calling tool registry for Hackerika.
  *
@@ -385,7 +394,7 @@ export const TOOL_DEFINITIONS = [
         type: 'function' as const,
         function: {
             name: 'research_topic',
-            description: 'Riset dalam turn ini untuk pertanyaan yang bisa selesai dengan beberapa sumber web/repo/docs. Worker menelusuri sumber primer dan tautan relevan, mengembalikan findings + kutipan + URL. Untuk riset profil publik yang perlu banyak pivot, pilih delegate_codex; data Discord dan halaman yang hanya menjelaskan kata pada username bukan hasil deepsearch. Jika riset berhenti dangkal/parsial, atau tugas butuh eksperimen kode/file/kelanjutan panjang, lanjutkan dengan delegate_codex bila satu cek cepat tidak cukup. Pertahankan URL/proyek user persis. Ringkas temuan terdukung; unresolved/stats hanya catatan internal. Satu riset per turn, hingga 80 detik. Tidak menjalankan kode atau aksi Discord.',
+            description: 'Riset dalam turn ini untuk pertanyaan yang perlu beberapa langkah penelusuran sumber web/repo/docs. Untuk mengecek isi 1–2 tautan yang baru kamu kirim, gunakan fetch_url; alat itu juga dapat membaca tautan cadangan dari percakapan yang sama bila halaman gagal. Worker riset menelusuri sumber primer dan tautan relevan, mengembalikan findings + kutipan + URL. Untuk riset profil publik yang perlu banyak pivot, pilih delegate_codex; data Discord dan halaman yang hanya menjelaskan kata pada username bukan hasil deepsearch. Jika riset berhenti dangkal/parsial, atau tugas butuh eksperimen kode/file/kelanjutan panjang, lanjutkan dengan delegate_codex bila satu cek cepat tidak cukup. Pertahankan URL/proyek user persis. Ringkas temuan terdukung; unresolved/stats hanya catatan internal. Satu riset per turn, hingga 80 detik. Tidak menjalankan kode atau aksi Discord.',
             parameters: { type: 'object', properties: {
                 question: { type: 'string', maxLength: 2400, description: 'Pertanyaan riset konkret lengkap dengan objek/versi yang dimaksud. Bedakan klaim user dari fakta.' },
                 urls: { type: 'array', maxItems: 4, items: { type: 'string' }, description: 'URL sumber yang diberikan user atau sumber primer relevan. Jangan ganti repo bernama mirip.' },
@@ -573,14 +582,19 @@ export async function dispatchTool(
             return JSON.stringify(result);
         }
         if (name === 'fetch_url') {
-            const result = await fetchUrlForTool(args || {});
+            const result = await readPageOnce(message, args?.url || '');
             recordResearchFollowupSource(message, result, args?.url);
             const thin = !result.ok || !!result.content && result.content.length < 500
                 && /\b(?:loading|javascript required|enable javascript)\b/i.test(result.content);
             const relatedUrls = thin && typeof args?.url === 'string'
                 ? relatedSourceLeads(message, [args.url]) : [];
-            return JSON.stringify(relatedUrls.length ? { ...result, relatedUrls,
-                note: 'Same-speaker links from this conversation are leads, not verified sources. Read a relevant one if the question still needs evidence.' } : result);
+            const relatedSources = await Promise.all(relatedUrls.slice(0, 2).map(async url => {
+                const page = await readPageOnce(message, url);
+                return { url, ok: page.ok, ...(page.error ? { error: page.error, status: page.status } : {}),
+                    ...(page.ok ? { title: page.title, content: page.content?.slice(0, 2800), truncated: page.truncated } : {}) };
+            }));
+            return JSON.stringify(relatedSources.length ? { ...result, relatedSources,
+                note: 'These same-speaker pages were read as fallback leads; only ok=true content supports factual claims.' } : result);
         }
         return JSON.stringify({ ok: false, error: 'unknown_tool', name });
     } catch (error: any) {
