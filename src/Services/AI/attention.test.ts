@@ -75,7 +75,7 @@ describe('conversation attention', () => {
         expect(replies).toHaveLength(1);
         expect(replies[0].options.continuation).toBe(true);
         expect(replies[0].options.spontaneous).toBeUndefined();
-        expect(replies[0].options.continuationHint).toBe('answer their follow-up');
+        expect(replies[0].options.continuationHint).toBeUndefined();
         expect(replies[0].options.isCurrent()).toBe(false); // The completed turn has left the active set.
     });
 

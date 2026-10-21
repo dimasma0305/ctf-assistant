@@ -351,10 +351,14 @@ openai.chat.completions.create = async payload => {
     const args = mode === 'native_send' ? { content: 'delivered through tool' } : calls === 1 ? { emoji: '👏' } : {};
     return { choices: [{ message: { role: 'assistant', content: null, ...(mode === 'native_react' && calls === 1 ? {} : { reasoning_content: '' }), tool_calls: [{ id: 'tool-' + calls, type: 'function', function: { name, arguments: JSON.stringify(args) } }] } }] };
   }
-  if (mode === 'spontaneous') return { choices: [{ message: { role: 'assistant', content: '' } }] };
+  if (mode === 'spontaneous') {
+    assert(!payload.messages.at(-1).content.includes('unverified-planner-claim'));
+    return { choices: [{ message: { role: 'assistant', content: '' } }] };
+  }
   if (mode.startsWith('continuation')) {
     assert(payload.messages.at(-1).content.includes('Ini lanjutan percakapan'));
     assert(!payload.messages.at(-1).content.includes('kamu ga di-mention/di-summon'));
+    assert(!payload.messages.at(-1).content.includes('unverified-planner-claim'));
     return { choices: [{ message: { role: 'assistant', content: mode === 'continuation_silent' ? '' : 'iya, kita lanjut dari bagian nonce tadi' } }] };
   }
   if (mode === 'reasoning') {
@@ -382,7 +386,7 @@ if (mode === 'queued') {
   finishFirstCall();
   await Promise.all([first, second]);
 } else {
-  await handleAIChat(message, client, mode.startsWith('continuation') ? { continuation: true, continuationHint: 'follow-up question' } : mode === 'spontaneous' ? { spontaneous: true } : ['stale', 'stale_typing'].includes(mode) ? { isCurrent: () => sourceIsCurrent } : mode === 'vision_burst' ? { addressed: true, attachmentSources: [earlierImage] } : {});
+  await handleAIChat(message, client, mode.startsWith('continuation') ? { continuation: true, continuationHint: 'unverified-planner-claim' } : mode === 'spontaneous' ? { spontaneous: true, spontaneousHint: 'unverified-planner-claim' } : ['stale', 'stale_typing'].includes(mode) ? { isCurrent: () => sourceIsCurrent } : mode === 'vision_burst' ? { addressed: true, attachmentSources: [earlierImage] } : {});
 }
 if (mode === 'vision') await handleAIChat({ ...message, id: 'followup', content: 'hackerika yang kiri warna apa?', attachments: new Map() }, client);
 assert.equal(calls, mode === 'continuation_tool_empty' ? 3 : ['native_react', 'vision', 'vision_fallback', 'vision_history'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');

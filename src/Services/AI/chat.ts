@@ -480,10 +480,8 @@ export interface HandleAIChatOptions {
      *  shouldRespond gate (the caller already decided to chime in) and
      *  shifts the system-prompt tone to "you weren't summoned, nimbrung". */
     spontaneous?: boolean;
-    spontaneousHint?: string;
     /** Contextual follow-up in a conversation she is already participating in. */
     continuation?: boolean;
-    continuationHint?: string;
     /** A prior message in the coalesced burst addressed her. */
     addressed?: boolean;
     /** False after the source was edited/deleted or superseded while thinking. */
@@ -716,9 +714,9 @@ async function runChatTurn(
     // tell the model so it shifts tone: shorter, lower-key, "joining the
     // convo casually" instead of "answering a question".
     const spontaneousNote = options.continuation
-        ? `\n\n[INTERNAL_NOTE: Ini lanjutan percakapan yang sedang kamu ikuti, walau speaker tidak mention atau quote-reply kamu. Ikuti konteks dan pertanyaan terakhir seperti ngobrol biasa; jangan mulai ulang dengan sapaan atau menganggap dirimu baru nimbrung. Hint konteks: ${neutralizeControlTokens(options.continuationHint || 'lanjutan obrolan')}. Pilih panjang jawaban sesuai kebutuhan, dan tetap boleh react atau finish_turn jika cukup.]`
+        ? '\n\n[INTERNAL_NOTE: Ini lanjutan percakapan yang sedang kamu ikuti, walau speaker tidak mention atau quote-reply kamu. Ikuti pesan terbaru dan konteks bersumber; jangan mulai ulang dengan sapaan. Pilih panjang jawaban sesuai kebutuhan; react atau finish_turn juga boleh.]'
         : spontaneous
-        ? `\n\n[INTERNAL_NOTE: kamu ga di-mention/di-summon. Hint: ${options.spontaneousHint || 'just feel like nimbrung'}. Reply singkat & casual aja, ga harus jawab pertanyaan — bisa cuma satu reaksi/komentar pendek, max 1-2 burst. Kalo ga ada yang menarik buat dikomentarin, output empty string aja.]`
+        ? '\n\n[INTERNAL_NOTE: Kamu tidak di-mention. Baca pesan dan konteks bersumber sebelum nimbrung; balas singkat, react, atau diam bila tidak perlu.]'
         : '';
     const replyFocusNote = messageReference && sanitizedUserContent.trim().length <= 120
         ? '\n\n[INTERNAL_NOTE: Pesan sekarang adalah reply Discord eksplisit ke blok explicit-reply-target. Untuk pertanyaan pendek tanpa subjek baru yang jelas, jawab target reply itu saja; topik lain dalam recent bukan pertanyaan tambahan.]'

@@ -104,9 +104,12 @@ export class ConversationAttention {
                     if (result && typeof result === 'object' && 'ok' in result && result.ok === false)
                         console.warn(`[Attention] source=${message.id} action=react outcome=failed`);
                 }
+                // The planner only chooses whether/how to engage. Its freeform
+                // reason can contain an inference about the conversation, so
+                // the answer model must ground itself in the actual messages.
                 else if (decision.shouldChime) await this.deps.respond(message, { ...(decision.continuation
-                    ? { continuation: true, continuationHint: decision.promptHint }
-                    : { spontaneous: true, spontaneousHint: decision.promptHint }), isCurrent, burstContext, attachmentSources });
+                    ? { continuation: true }
+                    : { spontaneous: true }), isCurrent, burstContext, attachmentSources });
             }
         } finally { if (this.active.get(turn.key) === turn) this.active.delete(turn.key); }
     }
