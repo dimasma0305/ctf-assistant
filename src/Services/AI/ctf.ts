@@ -74,7 +74,7 @@ export async function isCTFRetryRequest(message: OmitPartialGroupDMChannel<Disco
     const recent = [...fetched.values()].filter(item => item.createdTimestamp <= now && now - item.createdTimestamp < 2 * 60 * 60_000)
       .sort((a, b) => b.createdTimestamp - a.createdTimestamp);
     const lastBot = recent.find(item => item.author.id === botId);
-    if (!lastBot || !/^(?:Pencarian belum memberiku sumber yang bisa kuperiksa|Sumbernya belum bisa kuakses|Risetku belum cukup untuk memastikan kasus ini)/i.test(lastBot.content.trim())) return false;
+    if (!lastBot || !/^(?:Pencarian belum memberiku sumber yang bisa kuperiksa|Sumbernya belum bisa kuakses|Risetku belum cukup untuk memastikan kasus ini|Bukti yang berhasil kubaca belum cukup|Pencarian kali ini belum menghasilkan sumber)/i.test(lastBot.content.trim())) return false;
     const afterFailure = recent.filter(item => item.createdTimestamp > lastBot.createdTimestamp);
     const requestWords = /\b(?:tolong|bantu|solve|cari|cek|riset|research|apa|gimana|siapa|buat|hapus|ingatkan)\b|\?/i;
     if (afterFailure.some(item => requestWords.test(item.content))) return false;

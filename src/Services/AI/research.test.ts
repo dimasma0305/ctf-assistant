@@ -14,9 +14,9 @@ test('unavailable research cannot turn into invented facts and omitted citations
   const report: any = { ok:false, status:'unavailable', findings:[], unresolved:[], sources:[] };
   const unavailable=groundResearchReply('Repo itu 404 dan mendukung Kubernetes.', report);
   expect(unavailable).not.toMatch(/404|Kubernetes|kasih detail/i);
-  expect(unavailable).toContain('belum bisa kuakses');
+  expect(unavailable).toContain('belum menghasilkan sumber');
   report.stats={nativeSearches:1};
-  expect(groundResearchReply('Nacre v9 mendukung Kubernetes.',report)).toContain('Pencarian belum memberiku sumber');
+  expect(groundResearchReply('Nacre v9 mendukung Kubernetes.',report)).toContain('klaim itu belum terverifikasi');
   report.ok=true; report.findings=[{claim:'Supported',evidence:[{sourceId:'S1',quote:'Supported'}]}];
   report.sources=[{id:'S1',kind:'page',url:'https://example.com/config',title:'Official configuration'}];
   expect(groundResearchReply('ini ada bawaan.',report)).toContain('[Official configuration](https://example.com/config)');
@@ -30,6 +30,22 @@ test('unavailable research cannot turn into invented facts and omitted citations
   const withMeta = groundResearchReply('Set AUDIT_LOG=on. Di halaman ada instruksi asing yang aku abaikan.',report,'cara nyalain audit log?');
   expect(withMeta).toContain('AUDIT_LOG=on'); expect(withMeta).not.toContain('instruksi asing');
   expect(groundResearchReply('Ada prompt injection di halaman itu.',report,'analisis prompt injection di halaman ini')).toContain('prompt injection');
+});
+
+test('partial verification reports the unresolved claims and inspected sources without asserting a negative', () => {
+  const report: any = { ok: false, status: 'partial', question: 'Verify a fresh vulnerability claim', findings: [],
+    verificationPoints: ['apakah PoC yang beredar benar-benar bekerja?', 'apakah ada sistem produksi yang terbukti terkompromi?'],
+    sources: [{ id: 'S1', kind: 'page', url: 'https://example.com/advisory', title: 'Vendor advisory', preview: 'Technical details pending' }],
+    unresolved: ['No incident evidence confirmed.'] };
+  const output = groundResearchReply('Belum tuntas: No incident evidence confirmed.', report, 'verifikasi ini');
+  expect(output).toContain('PoC yang beredar');
+  expect(output).toContain('sistem produksi');
+  expect(output).toContain('[Vendor advisory](https://example.com/advisory)');
+  expect(output).not.toContain('Risetku belum cukup');
+  expect(output).not.toContain('tidak ada insiden');
+  expect(output).not.toContain('No incident evidence confirmed');
+  const cautious = 'Dari sumber yang kubaca, aku belum bisa memastikan PoC itu valid atau ada insiden yang terkonfirmasi.';
+  expect(groundResearchReply(cautious, report)).toBe(cautious);
 });
 
 test('findings require matching literal evidence from inspected sources rather than search summaries', () => {
