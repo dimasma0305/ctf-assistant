@@ -8,6 +8,8 @@ export interface DiscordReadQuery {
   limit?: number;
   includeImage?: boolean;
   describeImage?: boolean;
+  includeFile?: boolean;
+  fileName?: string;
 }
 
 export interface DiscordReadRequest extends DiscordReadQuery {
@@ -34,6 +36,9 @@ export class DiscordContextBroker {
     if (query.kind === 'message' && !snowflake(query.messageId)) return { ok: false, error: 'invalid_message_id' };
     if (query.before !== undefined && !snowflake(query.before)) return { ok: false, error: 'invalid_before_id' };
     if (query.limit !== undefined && (!Number.isInteger(query.limit) || query.limit < 1 || query.limit > 30)) return { ok: false, error: 'invalid_limit' };
+    if (query.includeFile && (query.kind!=='message'||!snowflake(query.messageId)
+      || query.fileName!==undefined&&(typeof query.fileName!=='string'||!query.fileName||query.fileName.length>160)))
+      return {ok:false,error:'invalid_file_query'};
     const count = (this.counts.get(job.id) || 0) + 1;
     if (count > 6) return { ok: false, error: 'discord_read_budget' };
     this.counts.set(job.id, count);
@@ -41,7 +46,8 @@ export class DiscordContextBroker {
       channelId: job.packet.channelId, userId: job.packet.userId, sourceMessageId: job.packet.messageId,
       kind: query.kind, ...(query.messageId ? { messageId: query.messageId } : {}),
       ...(query.before ? { before: query.before } : {}), limit: query.limit || 20, includeImage: query.includeImage === true,
-      describeImage: query.describeImage === true };
+      describeImage: query.describeImage === true, includeFile:query.includeFile===true,
+      ...(query.fileName?{fileName:query.fileName}:{}) };
     return await new Promise(resolve => {
       let done = false;
       const finish = (value: unknown) => { if (done) return; done = true; clearTimeout(timer); signal.removeEventListener('abort', abort); this.pending.delete(request.id); resolve(value); };

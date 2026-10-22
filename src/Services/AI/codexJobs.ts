@@ -17,6 +17,7 @@ export interface CodexPacket {
 export interface CodexDiscordReadRequest {
   id:string;jobId:string;guildId:string;channelId:string;userId:string;sourceMessageId:string;
   kind:'recent'|'message';messageId?:string;before?:string;limit:number;includeImage:boolean;
+  includeFile?:boolean;fileName?:string;
 }
 const socket=()=>process.env.CODEX_CONTROL_SOCKET||'/run/hackerika-codex/control.sock';
 export const codexSolverEnabled=()=>['1','true','yes','on'].includes((process.env.CODEX_SOLVER_ENABLED||'').trim().toLowerCase());

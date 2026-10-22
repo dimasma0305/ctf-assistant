@@ -1,4 +1,5 @@
 import { ChannelType, PermissionFlagsBits as P, type Collection, type GuildMember, type Message } from 'discord.js';
+import { createHash } from 'node:crypto';
 import type { MyClient } from '../../Model/client';
 import { canShareChannel, type ChatMessage } from './discordAccess';
 import { collectCodexArtifacts, imageMagic, responseBytes } from './ctfInputs';
@@ -82,6 +83,23 @@ export async function readCodexDiscordContext(client:MyClient, request:CodexDisc
       const batch=await channel.messages.fetch({limit,...(before?{before}:{})}) as Collection<string,Message>;
       messages=[...batch.values()].filter(item=>item.channelId===request.channelId).sort((a,b)=>a.createdTimestamp-b.createdTimestamp);
     } else return {ok:false,error:'invalid_query'};
+    if(request.includeFile){
+      const target=messages[0];
+      if(request.kind!=='message'||!target||target.author.id!==client.user?.id)
+        return {ok:false,error:'own_file_unavailable'};
+      const attachment=[...target.attachments.values()].find(item=>(!request.fileName||item.name===request.fileName)
+        &&Number.isFinite(item.size)&&item.size>0&&item.size<=4*1024*1024&&allowedDiscordImageUrl(item.url));
+      if(!attachment)return {ok:false,error:'own_file_unavailable'};
+      try{
+        const response=await fetch(attachment.url,{redirect:'error',signal:AbortSignal.timeout(15_000)});
+        if(!response.ok)throw Error('file_download_failed');
+        const bytes=await responseBytes(response,4*1024*1024);
+        if(bytes.length!==attachment.size)throw Error('file_size_mismatch');
+        return {ok:true,scope:{guildId:request.guildId,channelId:request.channelId},
+          file:{name:attachment.name.slice(0,160),sourceMessageId:target.id,size:bytes.length,
+            sha256:createHash('sha256').update(bytes).digest('hex'),data:bytes.toString('base64')}};
+      }catch{return {ok:false,error:'own_file_unavailable'};}
+    }
     const imageSource=request.includeImage ? [...messages].reverse().find(message=>[...message.attachments.values()]
       .some(item=>item.size>0&&item.size<=4*1024*1024&&allowedDiscordImageUrl(item.url)&&!!item.contentType?.startsWith('image/'))
       ||message.embeds.some(embed=>discordProxyImageUrl(embed.image?.proxyURL)||discordProxyImageUrl(embed.thumbnail?.proxyURL))) : undefined;

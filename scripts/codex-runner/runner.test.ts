@@ -339,6 +339,28 @@ test('worker can repeatedly request only scoped Discord reads through the bot br
   broker.clearJob(job.id);
 });
 
+test('same-channel prior bot file is streamed to the worker as verified bytes',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-prior-file-test-')),socket=join(directory,'source.sock');
+  const job=newJob(validatePacket(packet()));
+  const bytes=Buffer.from('RIFF\x14\x00\x00\x00AVI LISTdummy video');
+  const sha256=createHash('sha256').update(bytes).digest('hex');
+  let query:any;
+  const gateway=await startGateway(socket,job,'gpt-6-sol',new AbortController().signal,{discordRead:async input=>{
+    query=input;
+    return {ok:true,file:{name:'tcp1p_recap.avi',sourceMessageId:'800000000000000003',
+      size:bytes.length,sha256,data:bytes.toString('base64')}};
+  }});
+  try{
+    const response=await fetch('http://localhost/discord/file',{unix:socket,method:'POST',
+      body:JSON.stringify({messageId:'800000000000000003',fileName:'tcp1p_recap.avi'}),
+      headers:{'Content-Type':'application/json'}} as RequestInit & {unix:string});
+    expect(response.status).toBe(200);
+    expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes);
+    expect(response.headers.get('x-artifact-sha256')).toBe(sha256);
+    expect(query).toMatchObject({kind:'message',messageId:'800000000000000003',includeFile:true,fileName:'tcp1p_recap.avi'});
+  }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
+});
+
 test('isolated gateway forwards a Discord read without exposing a Discord credential',async()=>{
   const directory=await mkdtemp(join(tmpdir(),'codex-discord-test-')),socket=join(directory,'gateway.sock');
   const job=newJob(validatePacket(packet()));job.state='running';const seen:unknown[]=[];

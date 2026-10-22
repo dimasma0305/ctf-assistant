@@ -44,6 +44,31 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           if(generated.ok)imageDigest=createHash('sha256').update(Buffer.from(await generated.clone().arrayBuffer())).digest('hex');
           return generated;
         }
+        if(path==='/discord/file'){
+          if(!dependencies.discordRead)return Response.json({error:'discord_bridge_unavailable'},{status:503});
+          if(Number(request.headers.get('content-length')||0)>1024)return Response.json({error:'invalid_query'},{status:413});
+          const raw=await request.text();if(raw.length>1024)return Response.json({error:'invalid_query'},{status:413});
+          const x=JSON.parse(raw) as {messageId?:string;fileName?:string};
+          if(!/^\d{17,20}$/.test(x.messageId||'')||x.fileName!==undefined
+            &&(typeof x.fileName!=='string'||!x.fileName||x.fileName.length>160))
+            return Response.json({error:'invalid_file_query'},{status:400});
+          const result=await dependencies.discordRead({kind:'message',messageId:x.messageId,
+            includeFile:true,...(x.fileName?{fileName:x.fileName}:{})}) as {ok?:boolean;error?:string;
+              file?:{name?:string;size?:number;sha256?:string;data?:string;sourceMessageId?:string}};
+          const file=result?.file;
+          if(!result?.ok||!file)return Response.json({error:result?.error||'own_file_unavailable'},{status:404});
+          if(typeof file.data!=='string'||file.data.length>Math.ceil(4*1024*1024*4/3)+4
+            ||!/^[A-Za-z0-9+/]+={0,2}$/.test(file.data)||typeof file.name!=='string'
+            ||file.sourceMessageId!==x.messageId||!Number.isInteger(file.size)||!/^[a-f0-9]{64}$/i.test(file.sha256||''))
+            return Response.json({error:'invalid_file_response'},{status:502});
+          const bytes=Buffer.from(file.data,'base64');
+          if(!bytes.length||bytes.length>4*1024*1024||bytes.length!==file.size
+            ||bytes.toString('base64')!==file.data||createHash('sha256').update(bytes).digest('hex')!==file.sha256)
+            return Response.json({error:'invalid_file_response'},{status:502});
+          return new Response(new Uint8Array(bytes),{headers:{'Content-Type':'application/octet-stream',
+            'Content-Disposition':`attachment; filename="${file.name.replace(/[^A-Za-z0-9._-]/g,'_').slice(0,80)}"`,
+            'X-Artifact-SHA256':file.sha256,'Cache-Control':'no-store'}});
+        }
         if(path==='/discord/read'){
           if(!dependencies.discordRead)return Response.json({ok:false,error:'discord_bridge_unavailable'},{status:503});
           if(Number(request.headers.get('content-length')||0)>1024)return Response.json({ok:false,error:'invalid_query'},{status:413});
