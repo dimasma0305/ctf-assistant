@@ -51,14 +51,22 @@ function truncate(s: string, n: number): string {
 }
 const mentionContext = (mentions: MentionReference[]) => mentions.length
   ? ` mentions=${JSON.stringify(mentions.slice(0, 3).map(({ id, displayName, isBot }) => ({ id, displayName, isBot })))}` : '';
-interface ContextLine { id: string; at: number; authorId: string; content: string; line: string; mentions: MentionReference[] }
+const attachmentContext = (attachments: { name: string; contentType?: string | null }[]) => attachments.length
+  ? ` attachments=${JSON.stringify(attachments.slice(0, 3).map(({ name, contentType }) => ({
+    name: truncate(neutralizeControlTokens(name || 'file'), 100),
+    contentType: truncate(neutralizeControlTokens(contentType || ''), 60),
+  })))}` : '';
+interface ContextLine { id: string; at: number; authorId: string; content: string; line: string; mentions: MentionReference[];
+  attachmentNote: string }
 function lineFromCache(msg: SimplifiedMessage): ContextLine {
   const name = msg.member?.displayName || msg.author.username;
   const content = msg.content || (msg.system || msg.type !== 0 ? '[sys]'
     : msg.attachments && msg.embeds ? '[attach+embed]' : msg.attachments ? '[attach]' : msg.embeds ? '[embed]' : '[empty]');
   const mentions = msg.mentions || [];
-  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions,
-    line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${mentionContext(mentions)}` };
+  const files = attachmentContext(msg.attachmentInfo || []);
+  const attachmentNote = files || (msg.attachments ? ' attachments=[details unavailable]' : '');
+  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions, attachmentNote,
+    line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${attachmentNote}${mentionContext(mentions)}` };
 }
 function lineFromDiscord(msg: DiscordMessage): ContextLine {
   const name = msg.member?.displayName || msg.author.username;
@@ -66,15 +74,16 @@ function lineFromDiscord(msg: DiscordMessage): ContextLine {
     : msg.attachments.size && msg.embeds.length ? '[attach+embed]' : msg.attachments.size ? '[attach]'
       : msg.embeds.length ? '[embed]' : '[empty]');
   const mentions = mentionReferences(msg);
-  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions,
-    line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${mentionContext(mentions)}` };
+  const files = attachmentContext([...msg.attachments.values()]);
+  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions, attachmentNote: files,
+    line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${files}${mentionContext(mentions)}` };
 }
 
 // Compact same-channel context. A cache created by an older release may still
 // contain only 20 messages, so backfill once from Discord when an active topic
 // appears to reach its oldest cached edge. Never read another channel or DM.
 export async function getChannelContext(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, startSep: string, endSep: string,
-  onMentions?: (mentions: MentionReference[]) => void): Promise<string> {
+  onMentions?: (mentions: MentionReference[]) => void, onOwnFileDelivery?: () => void): Promise<string> {
   try {
     const channelId = message.channel.id;
     const cachedMessages = await getChannelCache(channelId);
@@ -103,6 +112,11 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
     const previousOwn = selected.filter(item => speakerId && item.authorId === speakerId
       && item.at <= currentAt && currentAt - item.at <= 5 * 60_000).slice(-4);
     const ownBotId = message.client?.user?.id;
+    const ownDeliveries = ownBotId ? selected.filter(item => item.authorId === ownBotId && item.attachmentNote
+      && currentAt - item.at <= 10 * 60_000).slice(-2) : [];
+    if (ownDeliveries.length) onOwnFileDelivery?.();
+    const deliveryEvidence = ownDeliveries.length
+      ? `\nconfirmed-own-file-delivery (Discord message metadata, not image pixels):\n${ownDeliveries.map(item => `message-id=${item.id}${item.attachmentNote}`).join('\n')}` : '';
     const interleaved = previousOwn.length > 0 && selected.some(item => item.authorId !== speakerId && item.authorId !== ownBotId
       && item.at > previousOwn[previousOwn.length - 1].at);
     const continuity = !message.reference?.messageId && (message.content || '').trim().length <= 120 && interleaved
@@ -120,7 +134,7 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
       ? `\nlatest-per-speaker (source ownership; copies, not new turns):\n${distinctOthers.slice(0, 3).reverse().map(item => item.line).join('\n')}`
       : '';
     return selected.length > 0
-      ? `\n${startSep}\n${selected.map(item => item.line).join('\n')}${continuity}${speakerLedger}\n${endSep}`
+      ? `\n${startSep}\n${selected.map(item => item.line).join('\n')}${continuity}${speakerLedger}${deliveryEvidence}\n${endSep}`
       : '';
   } catch (error) {
     console.error('Error fetching channel context:', error);
@@ -162,12 +176,13 @@ export async function getReplyContext(
     const referencedAuthor = referencedMessage.member?.displayName || referencedMessage.author.username;
     const referencedAuthorId = referencedMessage.author.id;
     const referencedContent = truncate(neutralizeControlTokens(referencedMessage.content || '') || '[attachment/embed]', REPLY_CONTEXT_CHAR_LIMIT);
+    const files = attachmentContext([...referencedMessage.attachments.values()]);
 
     // Same `[Name <@ID>] content` format as the speaker-tag / channel block —
     // disambiguates when two users share a display name.
     const mentions = mentionReferences(referencedMessage);
     const targets = mentionContext(mentions);
-    return `\n${startSep}\nexplicit-reply-target (pesan yang sedang di-reply):\n[${neutralizeControlTokens(referencedAuthor)} <@${referencedAuthorId}>] ${referencedContent}${targets}\n${endSep}`;
+    return `\n${startSep}\nexplicit-reply-target (pesan yang sedang di-reply):\n[${neutralizeControlTokens(referencedAuthor)} <@${referencedAuthorId}>] ${referencedContent}${files}${targets}\n${endSep}`;
   } catch (error) {
     console.error('Error getting reply context:', error);
     return '';

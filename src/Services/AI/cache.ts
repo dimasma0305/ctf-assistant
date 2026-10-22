@@ -29,6 +29,7 @@ export interface SimplifiedMessage {
         nickname: string | null;
     } | null;
     attachments: boolean;
+    attachmentInfo?: { name: string; contentType: string }[];
     embeds: boolean;
     mentions?: MentionReference[];
 }
@@ -63,6 +64,10 @@ async function writeChannelCache(message: DiscordMessage) {
             nickname: message.member.nickname
         } : null,
         attachments: message.attachments.size > 0,
+        attachmentInfo: [...message.attachments.values()].slice(0, 3).map(attachment => ({
+            name: (attachment.name || 'file').slice(0, 100),
+            contentType: (attachment.contentType || '').slice(0, 60),
+        })),
         embeds: message.embeds.length > 0,
         mentions: mentionReferences(message),
     };

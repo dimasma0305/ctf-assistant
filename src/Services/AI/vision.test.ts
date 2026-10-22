@@ -23,6 +23,8 @@ describe('native Discord vision', () => {
         const grounded = groundVisionDelivery(messages);
         expect(grounded[0].content).toBe(messages[0].content);
         expect(grounded[1].content).toContain('zero images');
+        expect(groundVisionDelivery(messages, { ownFileDeliveryConfirmed: true })[1].content)
+            .toContain('Discord confirms an earlier message from you included a delivered file attachment');
         expect(messages[1].content).toBe('who sent it?');
         const native = [{ role: 'user', content: [{ type: 'image_url', image_url: { url: 'data:image/png;base64,fixture' } }] }];
         expect(groundVisionDelivery(native)).toBe(native);

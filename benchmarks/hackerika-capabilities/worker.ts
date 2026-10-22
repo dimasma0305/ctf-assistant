@@ -105,6 +105,10 @@ const makeMessage = (who: string, text: string, index: number, name?: string): a
     return message;
 };
 const history: any[] = (CASE.history || []).map((m: any, index: number) => makeMessage(m.who, m.text, index + 1, m.name));
+for (const [index, item] of (CASE.history || []).entries())
+    for (const [fileIndex, file] of (item.files || []).entries())
+        history[index].attachments.set(String(fileIndex), { name: file.name, contentType: file.contentType,
+            size: 34_000, url: `https://cdn.discordapp.com/attachments/${channelId}/${history[index].id}/${encodeURIComponent(file.name)}` });
 // Discord REST returns newest first; the production context reader reverses it.
 channel.messages = { fetch: async (args: any) => typeof args === 'string' ? history.find(m => m.id === args) || null : new Collection([...history].reverse().map(m => [m.id, m])) };
 if (guild) { guild.channels.cache.set(channelId, channel); guild.channels.fetch = async (id: string) => guild.channels.cache.get(id) || null; }

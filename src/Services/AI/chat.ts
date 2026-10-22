@@ -598,8 +598,10 @@ async function runChatTurn(
     const displayName = message.member?.displayName || author;
 
     const contextMentionSeeds: MentionReference[] = [];
+    let ownFileDeliveryConfirmed = false;
     const [channelContext, userInfo, replyContext, userProfile, botState, socialState, threadSnapshot] = await Promise.all([
-        getChannelContext(message, CHAN_OPEN, CHAN_CLOSE, mentions => contextMentionSeeds.push(...mentions)),
+        getChannelContext(message, CHAN_OPEN, CHAN_CLOSE, mentions => contextMentionSeeds.push(...mentions),
+            () => { ownFileDeliveryConfirmed = true; }),
         getUserInfo(message),
         getReplyContext(message, REPLY_OPEN, REPLY_CLOSE, messageReference as DiscordMessage | null),
         loadProfile(userId),
@@ -933,7 +935,7 @@ async function runChatTurn(
         const images = await inlineDiscordImages(payload.messages, { cache: visionDownloads, signal: controller.signal });
         if (images.deliveredImages || images.failures.length) console.log(`[Vision] [${turnId}] inline=${images.deliveredImages} unavailable=${images.failures.length}${images.failures.length ? ` reasons=${images.failures.join(',')}` : ''}`);
         const forcedResearch = typeof payload.tool_choice === 'object';
-        payload = { ...payload, messages: groundVisionDelivery(images.messages), model: hasVisionContent(images.messages) ? MODELS.vision : payload.model,
+        payload = { ...payload, messages: groundVisionDelivery(images.messages, { ownFileDeliveryConfirmed }), model: hasVisionContent(images.messages) ? MODELS.vision : payload.model,
             thinking: { type: forcedResearch ? 'disabled' : 'enabled' },
             ...(forcedResearch ? {} : { reasoning_effort: CHAT_REASONING_EFFORT }) };
         let repaired = false;
@@ -954,7 +956,7 @@ async function runChatTurn(
                     console.warn(`[Vision] [${turnId}] provider rejected image input status=${error.status}; continuing without pixels`);
                     conversation = withoutVisionContent(conversation);
                     forgetVisionReferences(memory[channelId].messages);
-                    payload = { ...payload, model: MODELS.chat, messages: groundVisionDelivery(withoutVisionContent(payload.messages)) };
+                    payload = { ...payload, model: MODELS.chat, messages: groundVisionDelivery(withoutVisionContent(payload.messages), { ownFileDeliveryConfirmed }) };
                     continue;
                 }
                 throw error;

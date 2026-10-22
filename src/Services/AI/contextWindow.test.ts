@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { Collection } from 'discord.js';
-import { getChannelContext } from './context';
+import { getChannelContext, getReplyContext } from './context';
 import { updateChannelCache } from './cache';
 
 process.env.NODB = 'true';
@@ -146,4 +146,43 @@ test('a short follow-up keeps two other speakers’ latest statements attached t
   expect(ledger).toContain(`[Max Si Rubah Komputer <@${max}>]`);
   expect(ledger).toContain('Coba search lewat dorking google');
   expect(ledger).not.toContain('Aku berhenti cari identitasmu');
+});
+
+test('a delivered bot image stays visible as an attachment in later context', async () => {
+  const channelId = 'context-window-generated-image';
+  const botId = '1077393568647352320';
+  const sentAt = Date.parse('2026-10-22T23:18:00Z');
+  const image = { name: 'kudaliar-liar.png', contentType: 'image/png', size: 34_000,
+    url: 'https://cdn.discordapp.com/attachments/private-token/kudaliar-liar.png' };
+  const botMessage = { id: '850000000000000001', content: 'Jadi! Unduh gambarnya: kudaliar-liar.png.',
+    author: { id: botId, username: 'Hackerika', tag: 'Hackerika', bot: true },
+    member: null, channelId, createdTimestamp: sentAt, system: false, type: 0,
+    attachments: new Collection([['image', image]]), embeds: [],
+    mentions: { users: new Collection(), members: new Collection() } };
+  const channel = { id: channelId, messages: { fetch: async () => new Collection() } };
+  await updateChannelCache({ ...botMessage, channel } as Parameters<typeof updateChannelCache>[0]);
+  const followup = { id: '850000000000000002', content: 'Wtf was that',
+    author: { id: '604688514772107274' }, client: { user: { id: botId } },
+    channel, channelId, createdTimestamp: sentAt + 120_000 };
+  let confirmed = false;
+  const context = await getChannelContext(followup as Parameters<typeof getChannelContext>[0], 'BEGIN', 'END',
+    undefined, () => { confirmed = true; });
+  expect(confirmed).toBe(true);
+  expect(context).toContain('kudaliar-liar.png');
+  expect(context).toContain('attachments=[{"name":"kudaliar-liar.png","contentType":"image/png"}]');
+  expect(context).toContain('confirmed-own-file-delivery');
+  expect(context).not.toContain('private-token');
+
+  const reply = await getReplyContext({ ...followup, reference: { messageId: botMessage.id } } as Parameters<typeof getReplyContext>[0],
+    'REPLY', 'END', botMessage as Parameters<typeof getReplyContext>[3]);
+  expect(reply).toContain('attachments=[{"name":"kudaliar-liar.png","contentType":"image/png"}]');
+  expect(reply).not.toContain('private-token');
+
+  const fetchedChannel = { id: `${channelId}-fetch`, messages: { fetch: async () => new Collection([['bot', {
+    ...botMessage, channelId: `${channelId}-fetch`,
+  }]]) } };
+  const fetchedContext = await getChannelContext({ ...followup, channel: fetchedChannel } as Parameters<typeof getChannelContext>[0],
+    'BEGIN', 'END');
+  expect(fetchedContext).toContain('attachments=[{"name":"kudaliar-liar.png","contentType":"image/png"}]');
+  expect(fetchedContext).toContain('confirmed-own-file-delivery');
 });
