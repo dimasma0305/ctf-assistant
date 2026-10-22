@@ -1,0 +1,15 @@
+{
+  "startedAt": "2026-10-22T14:56:18.943Z",
+  "model": "gpt-6-luna",
+  "rubricVersion": "capabilities-v2+native-fixture-evidence-v1",
+  "rubricHash": "a97b3cc32e8a723b1fe1ea34b9dd9e115efc1f500680b04e269cb69f76927f8b",
+  "inputBuilderHash": "e629115a34b2e55b5706d5af1250e8be410fc23fbe7b9d863ae22fda9edfc55b",
+  "fixtures": {
+    "table-dev.png": "0f6aba5f04beba74def7c0124f007a0b0518e4a7f8f62935023a4494c50b64a9",
+    "cards-dev.png": "75ea2caba62483610ba71f3fa0a4406869808dd31c3772fe4365f7450ddccc9a"
+  },
+  "samples": 16,
+  "maxCalls": 16,
+  "maxSecondsPerCall": 60,
+  "blindVariantLabels": true
+}

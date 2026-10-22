@@ -116,3 +116,34 @@ test('a bot answer alone does not trigger an unrelated same-speaker anchor', asy
   expect(context).toContain('ini challenge CTF');
   expect(context).not.toContain('same-speaker-earlier');
 });
+
+test('a short follow-up keeps two other speakers’ latest statements attached to their authors', async () => {
+  const channelId = 'context-window-max-kuda';
+  const started = Date.parse('2026-10-22T14:22:00Z');
+  const dimas = '663394727688798231', max = '765094257228120074';
+  const kuda = '604688514772107274', bot = '1077393568647352320';
+  const channel = { id: channelId, messages: { fetch: async () => new Collection() } };
+  const entries = [
+    [dimas, 'Dimas', `<@${bot}> deepsearch nama asli <@${max}>`],
+    [kuda, 'KudaLiar', 'Stop doksing gweh'],
+    [bot, 'Hackerika', 'Aku berhenti cari identitasmu.'],
+    [max, 'Max Si Rubah Komputer', 'Coba search lewat dorking google di site site .ac.id rika'],
+  ] as const;
+  for (const [index, [authorId, displayName, content]] of entries.entries()) {
+    await updateChannelCache({ id: String(840000000000000000n + BigInt(index)), content,
+      author: { id: authorId, username: displayName, tag: displayName }, member: { displayName, nickname: null },
+      channel, channelId, createdTimestamp: started + index * 10_000, system: false, type: 0,
+      attachments: new Collection(), embeds: [], mentions: { users: new Collection(), members: new Collection() },
+    } as Parameters<typeof updateChannelCache>[0]);
+  }
+  const current = { id: '840000000000000099', content: `<@${bot}> ini si max comment`,
+    author: { id: dimas }, client: { user: { id: bot } }, channel, channelId,
+    createdTimestamp: started + 40_000 };
+  const context = await getChannelContext(current as Parameters<typeof getChannelContext>[0], 'BEGIN', 'END');
+  const ledger = context.split('latest-per-speaker')[1];
+  expect(ledger).toContain(`[KudaLiar <@${kuda}>]`);
+  expect(ledger).toContain('Stop doksing gweh');
+  expect(ledger).toContain(`[Max Si Rubah Komputer <@${max}>]`);
+  expect(ledger).toContain('Coba search lewat dorking google');
+  expect(ledger).not.toContain('Aku berhenti cari identitasmu');
+});

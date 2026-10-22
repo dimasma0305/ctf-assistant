@@ -9,7 +9,7 @@ import { getChannelContext, getUserInfo, getReplyContext, getEnvironmentContext,
 import { memory, ChatMessage } from "./memory";
 import { sanitizeMentions } from "../Moderation";
 import { buildAttachmentBlock } from "./attachments";
-import { FAN_ROLE_NAME } from "./fanRole";
+import { FAN_ROLE_NAME, FAN_ROLE_AFFECTION_THRESHOLD } from "./fanRole";
 import { TOOL_DEFINITIONS, dispatchTool } from "./tools";
 import { MODELS, CHAT_REASONING_EFFORT } from "./models";
 import { extractMentionIds, resolveUsers, buildMentionLegend, mentionReferences, type MentionReference } from "./mentions";
@@ -747,7 +747,13 @@ async function runChatTurn(
     // The model chooses whether to use a quick tool, a research worker, or an
     // isolated Codex job. Only an unsolicited chime is barred from creating a
     // costly background job; no keyword list pre-routes addressed requests.
-    const turnTools = spontaneous ? TOOL_DEFINITIONS.filter(tool => tool.function.name !== 'delegate_codex') : TOOL_DEFINITIONS;
+    // A low-affection caller cannot pass the backend fan-role gate. Hide the
+    // tool until it is eligible, so a forged creator claim cannot waste a
+    // model/tool turn or become part of a misleading reply.
+    const canGrantFanRole = isDeveloper || (userProfile?.affection ?? 0) >= FAN_ROLE_AFFECTION_THRESHOLD;
+    const turnTools = TOOL_DEFINITIONS.filter(tool =>
+        (!spontaneous || tool.function.name !== 'delegate_codex')
+        && (canGrantFanRole || tool.function.name !== 'grant_fan_role'));
     setCTFTurnContext(message, { text: ctfContext, thread: threadSnapshot, images: [...attachmentBlock.images,
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
     const lastUserMessage: ChatMessage = {

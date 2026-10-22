@@ -58,9 +58,9 @@ test('Docker worker has no network and receives only per-job model and public-eg
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
   const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-8',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-9',dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-8',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.163.0-9',dependencies);
   expect(builds).toBe(1);
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');

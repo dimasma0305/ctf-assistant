@@ -1,5 +1,5 @@
 """No credentials or host commands: an HTTP-to-Unix bridge and sandbox entrypoint."""
-import base64, http.client, http.server, json, os, pathlib, re, resource, selectors, shutil, socket, socketserver, stat, subprocess, sys, threading
+import base64, http.client, http.server, json, os, pathlib, re, resource, selectors, shutil, socket, socketserver, stat, subprocess, sys, threading, time
 class UnixHTTP(http.client.HTTPConnection):
     def connect(self):
         import socket
@@ -64,10 +64,11 @@ proxy_env={'ALL_PROXY':'socks5h://127.0.0.1:8119','all_proxy':'socks5h://127.0.0
            'HTTP_PROXY':'socks5h://127.0.0.1:8119','http_proxy':'socks5h://127.0.0.1:8119',
            'HTTPS_PROXY':'socks5h://127.0.0.1:8119','https_proxy':'socks5h://127.0.0.1:8119',
            'NO_PROXY':'127.0.0.1,localhost','no_proxy':'127.0.0.1,localhost'}
-args=['/usr/local/bin/codex','exec','--ignore-user-config','--ignore-rules','--ephemeral','--skip-git-repo-check','--color','never','--json','--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],
- '-c','model_provider="hackerika"','-c','model_providers.hackerika.name="Hackerika job gateway"','-c','model_providers.hackerika.base_url="http://127.0.0.1:8118/v1"',
+provider_args=['-c','model_provider="hackerika"','-c','model_providers.hackerika.name="Hackerika job gateway"','-c','model_providers.hackerika.base_url="http://127.0.0.1:8118/v1"',
  '-c','model_providers.hackerika.wire_api="responses"','-c','model_providers.hackerika.requires_openai_auth=false','-c','model_providers.hackerika.supports_websockets=false',
- '-c','model_reasoning_effort="medium"' if packet.get('kind')=='investigation' else 'model_reasoning_effort="low"','-c','web_search="disabled"','-c','features.multi_agent=false',
+ '-c','model_reasoning_effort="medium"' if packet.get('kind')=='investigation' else 'model_reasoning_effort="low"','-c','web_search="disabled"','-c','features.multi_agent=false']
+args=['/usr/local/bin/codex','exec','--ignore-user-config','--ignore-rules','--skip-git-repo-check','--color','never','--json','--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],
+ *provider_args,
  '--output-schema','/workspace/schema.json','--output-last-message','/workspace/final.json']
 for image in images:args.extend(['--image',image])
 # --image accepts multiple paths and otherwise consumes the positional prompt.
@@ -77,10 +78,41 @@ try:
     # individual files below a quarter of the disposable workspace.
     resource.setrlimit(resource.RLIMIT_FSIZE,(256*1024*1024,256*1024*1024))
     resource.setrlimit(resource.RLIMIT_CORE,(0,0))
-    code=subprocess.call(args,cwd='/workspace',env={**os.environ,**proxy_env,'CODEX_HOME':'/tmp/codex'})
+    started=time.monotonic()
+    environment={**os.environ,**proxy_env,'CODEX_HOME':'/tmp/codex'}
+    code=subprocess.call(args,cwd='/workspace',env=environment)
     final=root/'final.json'
-    if final.is_file() and final.stat().st_size<=65536:
-        print('HACKERIKA_FINAL:'+base64.b64encode(final.read_bytes()).decode(),flush=True)
+    final_bytes=final.read_bytes() if final.is_file() and final.stat().st_size<=65536 else None
+    seen_steps=set()
+    for _ in range(2):
+        if code!=0 or not final_bytes:break
+        try: next_step=json.loads(final_bytes).get('nextStep','')
+        except (ValueError,TypeError):break
+        if not isinstance(next_step,str) or not next_step.strip() or len(next_step)>200:break
+        step=next_step.strip()
+        if step.casefold() in seen_steps or time.monotonic()-started>=(420 if packet.get('kind')=='investigation' else 240):break
+        seen_steps.add(step.casefold())
+        # A Codex Goal is thread-scoped; this isolated job keeps the same
+        # local thread and resumes for at most two distinct evidence steps.
+        # The whole container still obeys the host job deadline.
+        final.unlink(missing_ok=True)
+        resume=['/usr/local/bin/codex','exec','resume','--last','--ignore-user-config','--ignore-rules','--skip-git-repo-check','--json',
+            '--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],*provider_args,
+            '--output-schema','/workspace/schema.json','--output-last-message','/workspace/final.json','--',
+            'Continue the same bounded objective. The previous answer identified one possible next action: '+json.dumps(step)+'. '
+            'Check whether it is still useful and within scope, then perform it if feasible. Do not repeat exhausted paths. '
+            'Return the strongest evidence-backed final JSON. Set nextStep only for a different concrete untried action; otherwise use an empty string.']
+        resumed=subprocess.call(resume,cwd='/workspace',env=environment)
+        if resumed!=0 or not final.is_file() or final.stat().st_size>65536:break
+        candidate=final.read_bytes()
+        try:
+            result=json.loads(candidate)
+            if not isinstance(result,dict) or not isinstance(result.get('summary'),str) or not result['summary'].strip() \
+                or not all(isinstance(result.get(key),list) for key in ('flags','findings','unresolved')):break
+        except (ValueError,TypeError):break
+        final_bytes=candidate
+    if final_bytes:
+        print('HACKERIKA_FINAL:'+base64.b64encode(final_bytes).decode(),flush=True)
         if code==0:
             total=0;count=0
             for item in sorted((root/'exports').iterdir()):

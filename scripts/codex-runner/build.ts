@@ -8,7 +8,7 @@ const source=await realpath(binDir),codex=join(source,'codex'),host=join(source,
 const versionProcess=Bun.spawn([codex,'--version'],{stdout:'pipe',stderr:'pipe'});
 const version=(await new Response(versionProcess.stdout).text()).trim();
 if(await versionProcess.exited!==0||!/^codex-cli 0\.163\.0\b/.test(version))throw Error(`unsupported_codex_version:${version}`);
-const tag=process.argv[3]||'hackerika-codex-worker:0.163.0-8';
+const tag=process.argv[3]||'hackerika-codex-worker:0.163.0-9';
 const directory=await mkdtemp(join(tmpdir(),'hackerika-codex-build-'));
 try{
   await Promise.all([

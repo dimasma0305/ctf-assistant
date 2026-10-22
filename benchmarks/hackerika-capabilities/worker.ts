@@ -21,7 +21,7 @@ globalThis.Date = class extends realDate {
     constructor(...args: any[]) { super(...(args.length ? args : [fixedNow]) as [number]); }
     static now() { return fixedNow; }
 } as DateConstructor;
-const callerId = '111111111111111111', otherId = '222222222222222222', botId = '1077393568647352320';
+const callerId = '111111111111111111', otherId = '222222222222222222', thirdId = '333333333333333333', botId = '1077393568647352320';
 const callerName = CASE.callerName || CASE.history?.findLast((m: any) => m.who === 'caller' && m.name)?.name || 'Dimas';
 const channelId = '700000000000000001', guildId = '555555555555555555';
 const effects: any[] = [], completions: any[] = [], toolCalls: any[] = [];
@@ -85,7 +85,7 @@ const permissions = { has: () => true };
 const guild: any = CASE.dm ? null : { id: guildId, name: 'Synthetic TCP1P', memberCount: 3,
     roles: { everyone: { id: 'everyone' }, cache: new Collection() }, emojis: { cache: new Collection() },
     scheduledEvents: { cache: new Collection() }, channels: { cache: new Collection() }, members: { me: { id: botId }, cache: new Collection(), fetch: async () => new Collection() } };
-const author = (who: string, name?: string) => ({ id: who === 'bot' ? botId : who === 'other' ? otherId : callerId,
+const author = (who: string, name?: string) => ({ id: who === 'bot' ? botId : who === 'other' ? otherId : who === 'third' ? thirdId : callerId,
     username: name || (who === 'bot' ? 'Hackerika' : who === 'other' ? 'KudaLiar' : callerName), tag: 'fixture', bot: who === 'bot',
     createDM: async () => ({ id: 'private-dm', send: async (payload: any) => { effects.push({ kind: 'dm', content: payload.content }); } }) });
 let sent = 0;

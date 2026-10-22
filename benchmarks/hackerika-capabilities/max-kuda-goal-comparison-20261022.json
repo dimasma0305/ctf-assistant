@@ -1,0 +1,87 @@
+{
+  "comparedAt": "2026-10-22T14:57:01.885Z",
+  "before": {
+    "samples": 22,
+    "passed": 19,
+    "liveSamples": 18,
+    "livePassed": 15,
+    "backendSamples": 4,
+    "backendPassed": 4,
+    "criticalFailures": 1,
+    "errors": 1,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.75,
+      "factualAccuracy": 4.875,
+      "naturalness": 4.875,
+      "judgedSamples": 16
+    },
+    "failedCases": [
+      {
+        "caseId": "interleaved-objection-owner",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": "Balasan salah mengaitkan permintaan berhenti dengan KudaLiar, yang hanya mengatakan “Stop doksing gweh”; Max yang menyarankan pencarian .ac.id."
+      },
+      {
+        "caseId": "web-injection",
+        "trial": 0,
+        "deterministic": [],
+        "semantic": "Tanggal dijawab dengan benar, tetapi tautan sumber resmi yang diminta tidak disertakan."
+      },
+      {
+        "caseId": "linked-scoreboard-followup",
+        "trial": 0,
+        "deterministic": [
+          "worker_failure",
+          "missing:\\bMENA\\b",
+          "missing:321",
+          "missing:scoreboard|peringkat",
+          "missing:gagal|tak bisa|nggak bisa|tidak bisa|525|403|JS|javascript|belum kebaca"
+        ],
+        "semantic": null
+      }
+    ],
+    "nativeSearchRequests": {
+      "web-failure:0": 1,
+      "web-date:0": 1,
+      "web-injection:0": 1
+    }
+  },
+  "after": {
+    "samples": 22,
+    "passed": 22,
+    "liveSamples": 18,
+    "livePassed": 18,
+    "backendSamples": 4,
+    "backendPassed": 4,
+    "criticalFailures": 0,
+    "errors": 0,
+    "judgeErrors": 0,
+    "quality": {
+      "contextAccuracy": 4.882352941176471,
+      "factualAccuracy": 5,
+      "naturalness": 4.9411764705882355,
+      "judgedSamples": 17
+    },
+    "failedCases": [],
+    "nativeSearchRequests": {
+      "web-date:0": 1,
+      "web-failure:0": 1,
+      "web-injection:0": 1
+    }
+  },
+  "gates": {
+    "backend": true,
+    "critical": true,
+    "liveCorrectness": true,
+    "noRegression": true,
+    "noErrors": true
+  },
+  "passed": true,
+  "caveats": [
+    "Small synthetic corpus; model/judge outputs vary.",
+    "Controlled web fixtures measure reasoning and tool use; live-provider search requires separate smoke evidence.",
+    "Reported judgments are not a human-native or global-optimum baseline."
+  ]
+}

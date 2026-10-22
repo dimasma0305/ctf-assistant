@@ -108,8 +108,19 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
     const continuity = !message.reference?.messageId && (message.content || '').trim().length <= 120 && interleaved
       ? `\nsame-speaker-earlier (copies of recent messages; possible antecedents, not new turns):\n${previousOwn.reverse().map(item => `message-id=${item.id} ${item.content}`).join('\n')}`
       : '';
+    // In a short multi-person follow-up, channel memory may contain a reply
+    // to one person while another person's intervening message was ignored by
+    // the attention planner. Repeat each person's latest sourced statement
+    // next to the current turn, so a request or objection cannot silently move
+    // from its actual author to the person currently being discussed.
+    const others = [...selected].reverse().filter(item => item.authorId !== speakerId && item.authorId !== ownBotId
+      && currentAt - item.at <= 5 * 60_000);
+    const distinctOthers = others.filter((item, index) => others.findIndex(other => other.authorId === item.authorId) === index);
+    const speakerLedger = (message.content || '').trim().length <= 160 && distinctOthers.length >= 2
+      ? `\nlatest-per-speaker (source ownership; copies, not new turns):\n${distinctOthers.slice(0, 3).reverse().map(item => item.line).join('\n')}`
+      : '';
     return selected.length > 0
-      ? `\n${startSep}\n${selected.map(item => item.line).join('\n')}${continuity}\n${endSep}`
+      ? `\n${startSep}\n${selected.map(item => item.line).join('\n')}${continuity}${speakerLedger}\n${endSep}`
       : '';
   } catch (error) {
     console.error('Error fetching channel context:', error);

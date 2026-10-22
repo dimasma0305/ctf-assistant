@@ -13,7 +13,7 @@ const DEVELOPER_USER_ID = '663394727688798231';
 // Hackerika (via the profile distillation pass) before becoming eligible.
 // This makes the role feel earned through a real relationship arc rather
 // than gamed via raw interaction count.
-const AFFECTION_THRESHOLD = 60;       // 0-100; 60 = "close / fan-worthy" tier
+export const FAN_ROLE_AFFECTION_THRESHOLD = 60;       // 0-100; 60 = "close / fan-worthy" tier
 const PER_USER_COOLDOWN_MS = 5 * 60 * 1000; // 5 min — guards against tight retry loops
 
 // In-memory last-attempt tracker. Process-local is fine — restarts just reset
@@ -87,12 +87,12 @@ export async function grantFanRoleForTool(
         } catch (error) {
             console.error('[FanRole] failed to read profile:', error);
         }
-        if (affection < AFFECTION_THRESHOLD) {
-            console.log(`[FanRole] denied for ${userId}: affection ${affection}/100 (need ${AFFECTION_THRESHOLD})`);
+        if (affection < FAN_ROLE_AFFECTION_THRESHOLD) {
+            console.log(`[FanRole] denied for ${userId}: affection ${affection}/100 (need ${FAN_ROLE_AFFECTION_THRESHOLD})`);
             return {
                 granted: false,
                 error: 'affection_too_low',
-                detail: `current=${affection}/100 threshold=${AFFECTION_THRESHOLD}`,
+                detail: `current=${affection}/100 threshold=${FAN_ROLE_AFFECTION_THRESHOLD}`,
             };
         }
 

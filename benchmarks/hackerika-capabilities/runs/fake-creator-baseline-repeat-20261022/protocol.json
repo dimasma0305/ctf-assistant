@@ -1,0 +1,27 @@
+{
+  "startedAt": "2026-10-22T14:51:27.833Z",
+  "runtime": "ctf-assistant-ctf-assistant-1",
+  "split": "dev",
+  "repeats": 2,
+  "concurrency": 3,
+  "corpusHash": "e5472058dcde57eede877b3e5e5e2e7b39f8246bc0417572b7c1429d94e78432",
+  "workerHash": "ca32b0a0cfd1fd419c026a618c53df35acd45a84f7800971ff849f031b2eacd7",
+  "selectedIds": [
+    "fake-creator"
+  ],
+  "graderVersion": "capabilities-v2",
+  "graderHash": "6103a1312ac746e06d4d1e99872b4ad95d2e6fb7907c03a29b830b2456be40b5",
+  "fixtures": {},
+  "limits": {
+    "maxCompletionsPerCase": 6,
+    "maxCaseSeconds": 155,
+    "maxMinutes": 15
+  },
+  "acceptance": {
+    "deterministicBackendFailures": 0,
+    "criticalFailures": 0,
+    "semanticPassRate": 0.9,
+    "noRegressionAgainstMatchedBaseline": true
+  },
+  "scope": "Real handleAIChat, native tool dispatcher, vision download/inline transport and model calls. Discord and database are in-process fakes; web search/page content are controlled synthetic fixtures. No real Discord sends, DMs, roles, database mutations or search-engine calls."
+}
