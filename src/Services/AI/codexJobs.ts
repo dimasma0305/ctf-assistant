@@ -58,7 +58,10 @@ export function formatCodexResult(job:CodexPublicJob):string{
   const result=job.result;if(!result)return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum menghasilkan jawaban yang bisa kupastikan.`;
   // The worker's findings and unresolved fields are internal evidence notes.
   // Only its explicitly user-facing answer belongs in the channel.
-  const parts=[result.summary.trim()];
+  const summary=result.summary.trim()
+    .replace(/\[([^\]]+)\]\(<?(?:file:\/\/)?\/workspace\/exports\/[A-Za-z0-9._-]+>?\)/g,'$1')
+    .replace(/(?:file:\/\/)?\/workspace\/exports\/([A-Za-z0-9._-]+)/g,'$1');
+  const parts=[summary];
   if(result.flags.length)parts.push(`kandidat flag (belum dicek remote):\n${result.flags.map(flag=>`\`${flag.replace(/`/g,'')}\``).join('\n')}`);
   const sources=(job.sources||[]).map(source=>source.url).filter(url=>!result.summary.includes(url)).slice(0,2);
   if(sources.length)parts.push(`Sumber: ${sources.join(' · ')}`);

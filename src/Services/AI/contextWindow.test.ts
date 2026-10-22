@@ -185,4 +185,13 @@ test('a delivered bot image stays visible as an attachment in later context', as
     'BEGIN', 'END');
   expect(fetchedContext).toContain('attachments=[{"name":"kudaliar-liar.png","contentType":"image/png"}]');
   expect(fetchedContext).toContain('confirmed-own-file-delivery');
+
+  const later = { ...followup, id: '850000000000000003', content: 'lah tadi bisa',
+    createdTimestamp: sentAt + 23 * 60_000 };
+  let recentDelivery = false;
+  const laterContext = await getChannelContext(later as Parameters<typeof getChannelContext>[0], 'BEGIN', 'END',
+    undefined, () => { recentDelivery = true; });
+  expect(laterContext).toContain('confirmed-own-file-delivery');
+  expect(laterContext).toContain('kudaliar-liar.png');
+  expect(recentDelivery).toBe(false); // Old file evidence does not imply fresh pixels.
 });

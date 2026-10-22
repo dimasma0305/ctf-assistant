@@ -112,9 +112,13 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
     const previousOwn = selected.filter(item => speakerId && item.authorId === speakerId
       && item.at <= currentAt && currentAt - item.at <= 5 * 60_000).slice(-4);
     const ownBotId = message.client?.user?.id;
-    const ownDeliveries = ownBotId ? selected.filter(item => item.authorId === ownBotId && item.attachmentNote
-      && currentAt - item.at <= 10 * 60_000).slice(-2) : [];
-    if (ownDeliveries.length) onOwnFileDelivery?.();
+    const deliveryCandidates = new Map([...cachedMessages.map(lineFromCache), ...selected]
+      .map(item => [item.id, item] as const));
+    const ownDeliveries = ownBotId ? [...deliveryCandidates.values()]
+      .filter(item => item.authorId === ownBotId && item.attachmentNote
+        && currentAt >= item.at && currentAt - item.at <= 60 * 60_000)
+      .sort((a, b) => a.at - b.at).slice(-2) : [];
+    if (ownDeliveries.some(item => currentAt - item.at <= 10 * 60_000)) onOwnFileDelivery?.();
     const deliveryEvidence = ownDeliveries.length
       ? `\nconfirmed-own-file-delivery (Discord message metadata, not image pixels):\n${ownDeliveries.map(item => `message-id=${item.id}${item.attachmentNote}`).join('\n')}` : '';
     const interleaved = previousOwn.length > 0 && selected.some(item => item.authorId !== speakerId && item.authorId !== ownBotId

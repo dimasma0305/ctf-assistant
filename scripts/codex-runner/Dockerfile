@@ -1,5 +1,5 @@
 FROM python:3.12-slim-bookworm
-RUN apt-get update && apt-get install -y --no-install-recommends gcc g++ gdb binutils make autoconf bison re2c pkg-config libxml2-dev libsqlite3-dev libpcre2-dev zlib1g-dev file ripgrep unzip jq curl git sqlite3 poppler-utils ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends gcc g++ gdb binutils make autoconf bison re2c pkg-config libxml2-dev libsqlite3-dev libpcre2-dev zlib1g-dev file ripgrep unzip jq curl git sqlite3 poppler-utils librsvg2-bin ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY codex /usr/local/bin/codex
 COPY codex-code-mode-host /usr/local/bin/codex-code-mode-host
 COPY worker.py /opt/worker.py

@@ -81,6 +81,15 @@ export function parseWorkerExport(value: string): {name: string; data: Buffer} {
   if(!data.length||data.length>4*1024*1024||data.toString('base64')!==parsed.data)throw Error('invalid_export');
   return {name:parsed.name,data};
 }
+/** Reject an error document masquerading as a generated image. */
+export function validImageExport(name:string,data:Buffer):boolean {
+  const ext=name.split('.').pop()?.toLowerCase();
+  if(ext==='png')return data.length>=8&&data.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+  if(ext==='webp')return data.length>=12&&data.subarray(0,4).toString()==='RIFF'&&data.subarray(8,12).toString()==='WEBP';
+  if(ext==='jpg'||ext==='jpeg')return data.length>=3&&data[0]===255&&data[1]===216&&data[2]===255;
+  if(ext==='gif')return data.length>=6&&['GIF87a','GIF89a'].includes(data.subarray(0,6).toString());
+  return true;
+}
 export function resultFromText(text: string): SolverResult {
   const x=JSON.parse(text);
   if(typeof x?.summary!=='string'||!x.summary.trim()||!['flags','findings','unresolved'].every(k=>Array.isArray(x[k])))throw Error('invalid_solver_result');

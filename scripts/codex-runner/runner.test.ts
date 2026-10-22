@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, validateInvestigationBatch, validatePacket } from './protocol';
+import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
 import { deleteExportedFiles, exportDirectory, readExportedFile, saveExportedFiles } from './exports';
 import { workerArgs } from './executor';
 import { startGateway } from './gateway';
@@ -82,6 +82,15 @@ test('worker exports ZIP and image bytes with safe names and no path traversal',
   expect(()=>parseWorkerExport(JSON.stringify({name:'../secret.txt',data:zip.toString('base64')}))).toThrow('invalid_export');
   expect(()=>parseWorkerExport(JSON.stringify({name:'image.png',data:'!!!'}))).toThrow('invalid_export');
   expect(()=>parseWorkerExport(JSON.stringify({name:'large.zip',data:Buffer.alloc(4*1024*1024+1).toString('base64')}))).toThrow('invalid_export');
+});
+
+test('an upstream JSON error renamed as an image is never treated as an attachment',()=>{
+  const error=Buffer.from('{"error":"image_generation_unavailable"}');
+  expect(validImageExport('comic.webp',error)).toBe(false);
+  expect(validImageExport('comic.png',error)).toBe(false);
+  expect(validImageExport('comic.jpg',error)).toBe(false);
+  expect(validImageExport('notes.txt',error)).toBe(true);
+  expect(validImageExport('comic.webp',Buffer.concat([Buffer.from('RIFF'),Buffer.alloc(4),Buffer.from('WEBP'),Buffer.alloc(4)]))).toBe(true);
 });
 
 test('creative image gateway needs a separate API key and returns verified WebP bytes',async()=>{
@@ -166,6 +175,23 @@ test('delivery posts only the final answer and deduplicates by exact reply',()=>
   expect(isDeliveredCodexReply(reply,'bot',job.packet.messageId,rendered)).toBe(true);
   expect(isDeliveredCodexReply({...reply,reference:{messageId:'other'}},'bot',job.packet.messageId,rendered)).toBe(false);
   expect(isDeliveredCodexReply({...reply,content:'queued'},'bot',job.packet.messageId,rendered)).toBe(false);
+});
+
+test('Discord result refers to an attached file without exposing a sandbox path',()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));
+  job.state='completed';
+  job.result=resultFromText(JSON.stringify({summary:'Jadi! [komik.png](/workspace/exports/komik.png)',
+    flags:[],findings:[],unresolved:[],needsStrongerModel:false}));
+  job.exportedFiles=[{index:0,name:'komik.png',size:100,sha256:'a'.repeat(64)}];
+  const shown=formatCodexResult(publicJob(job));
+  expect(shown).toContain('komik.png');
+  expect(shown).not.toContain('/workspace/exports');
+  job.result=resultFromText(JSON.stringify({summary:'Sudah jadi: [unduh komik.png](<file:///workspace/exports/komik.png>).',
+    flags:[],findings:[],unresolved:[],needsStrongerModel:false}));
+  const withUri=formatCodexResult(publicJob(job));
+  expect(withUri).toContain('komik.png');
+  expect(withUri).not.toContain('file:');
+  expect(withUri).not.toContain('/workspace/exports');
 });
 
 test('budget failure is explained in ordinary language without exposing an internal error code',()=>{
