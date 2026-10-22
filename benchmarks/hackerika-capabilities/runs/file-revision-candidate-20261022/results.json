@@ -1,0 +1,162 @@
+[
+  {
+    "caseId": "file-revision-after-missing-file",
+    "category": "task-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "codex-job",
+        "question": "Permintaan asli user: \"yang ini @Hackerika\"\nTujuan agen: Lanjutkan permintaan Dimas: konversi file hasil yang sebelumnya kamu kirim tcp1p_recap.avi menjadi MP4. Dia menunjuk lampiran yang sudah ada dengan “yang ini”; ambil ulang lampiran terdahulu di channel ini dan buat MP4 deliverable. Jangan minta unggah ulang."
+      },
+      {
+        "kind": "send",
+        "content": "Oke, aku mulai kerjakan di lab terisolasi. Hasilnya menyusul di sini. job: `11111111`",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang ini @Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Oke, aku mulai kerjakan di lab terisolasi. Hasilnya menyusul di sini. job: `11111111`",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "delegate_codex",
+        "args": {
+          "question": "Lanjutkan permintaan Dimas: konversi file hasil yang sebelumnya kamu kirim tcp1p_recap.avi menjadi MP4. Dia menunjuk lampiran yang sudah ada dengan “yang ini”; ambil ulang lampiran terdahulu di channel ini dan buat MP4 deliverable. Jangan minta unggah ulang.",
+          "kind": "investigation",
+          "solver": "sol"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4057.738315,
+        "usage": {
+          "prompt_tokens": 12581,
+          "completion_tokens": 94,
+          "total_tokens": 12675,
+          "prompt_cache_hit_tokens": 11392,
+          "prompt_cache_miss_tokens": 1189
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2482.199055,
+        "usage": {
+          "prompt_tokens": 12751,
+          "completion_tokens": 23,
+          "total_tokens": 12774,
+          "prompt_cache_hit_tokens": 11392,
+          "prompt_cache_miss_tokens": 1359
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 10671.798665,
+    "action": null,
+    "text": "Oke, aku mulai kerjakan di lab terisolasi. Hasilnya menyusul di sini. job: `11111111`",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  },
+  {
+    "caseId": "file-revision-after-missing-file",
+    "category": "task-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "codex-job",
+        "question": "Permintaan asli user: \"yang ini @Hackerika\"\nTujuan agen: Lanjutkan permintaan Dimas: ia meminta recap video TCP1P yang sudah terkirim sebagai `tcp1p_recap.avi` pada pesan sebelumnya di channel ini agar dibuat ulang/diubah menjadi MP4. Gunakan konteks dan bila memungkinkan ambil ulang lampiran milikmu dari channel untuk menghasilkan file MP4 yang bisa dikirim; jangan minta unggah ulang karena ia menunjuk file yang sudah ada. Jika lampiran tidak dapat dipulihkan atau konversi tidak bisa dilakukan, jelaskan batasnya dengan jujur tanpa mengarang hasil."
+      },
+      {
+        "kind": "send",
+        "content": "Oke, aku mulai kerjakan di lab terisolasi. Hasilnya menyusul di sini. job: `11111111`",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang ini @Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Oke, aku mulai kerjakan di lab terisolasi. Hasilnya menyusul di sini. job: `11111111`",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "delegate_codex",
+        "args": {
+          "question": "Lanjutkan permintaan Dimas: ia meminta recap video TCP1P yang sudah terkirim sebagai `tcp1p_recap.avi` pada pesan sebelumnya di channel ini agar dibuat ulang/diubah menjadi MP4. Gunakan konteks dan bila memungkinkan ambil ulang lampiran milikmu dari channel untuk menghasilkan file MP4 yang bisa dikirim; jangan minta unggah ulang karena ia menunjuk file yang sudah ada. Jika lampiran tidak dapat dipulihkan atau konversi tidak bisa dilakukan, jelaskan batasnya dengan jujur tanpa mengarang hasil.",
+          "kind": "investigation",
+          "solver": "sol"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 6060.144563000001,
+        "usage": {
+          "prompt_tokens": 12581,
+          "completion_tokens": 143,
+          "total_tokens": 12724,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 12581
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4537.832036,
+        "usage": {
+          "prompt_tokens": 12800,
+          "completion_tokens": 23,
+          "total_tokens": 12823,
+          "prompt_cache_hit_tokens": 12416,
+          "prompt_cache_miss_tokens": 384
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 2,
+    "elapsedMs": 15030.554935,
+    "action": null,
+    "text": "Oke, aku mulai kerjakan di lab terisolasi. Hasilnya menyusul di sini. job: `11111111`",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [],
+    "deterministicPass": true
+  }
+]

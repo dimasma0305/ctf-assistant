@@ -25,6 +25,24 @@ const callerId = '111111111111111111', otherId = '222222222222222222', thirdId =
 const callerName = CASE.callerName || CASE.history?.findLast((m: any) => m.who === 'caller' && m.name)?.name || 'Dimas';
 const channelId = '700000000000000001', guildId = '555555555555555555';
 const effects: any[] = [], completions: any[] = [], toolCalls: any[] = [];
+if (CASE.mockCodexJob) {
+    const { createServer } = await import('node:http');
+    const socket = '/tmp/hackerika-benchmark-codex.sock';
+    const server = createServer(async (request: any, response: any) => {
+        const chunks: Buffer[] = [];
+        for await (const chunk of request) chunks.push(Buffer.from(chunk));
+        const packet = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
+        const valid = request.url === '/jobs' && packet.kind === 'investigation'
+            && /tcp1p_recap\.avi/i.test(packet.question) && /mp4/i.test(packet.question);
+        if (valid) effects.push({ kind: 'codex-job', question: packet.question });
+        response.writeHead(valid ? 200 : 400, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify(valid ? { ok: true, job: { id: '11111111-1111-4111-8111-111111111111', state: 'pending' } }
+            : { error: 'benchmark_job_goal_mismatch' }));
+    });
+    await new Promise<void>(resolve => server.listen(socket, resolve));
+    process.env.CODEX_CONTROL_SOCKET = socket;
+    process.env.CODEX_SOLVER_ENABLED = 'true';
+}
 const providerFailures: string[] = [];
 setTimeout(() => { console.log('CAPABILITY_RESULT:' + JSON.stringify({ caseId: CASE.id, category: CASE.category, backend: CASE.backend, failure: 'worker_deadline', effects: [], text: '', completions: [], toolCalls: [], interactionWrites: 0, profileWrites: [], memory: [] })); process.exit(1); }, 145_000).unref();
 let interactionWrites = 0, profileWrites: any[] = [], modelCalls = 0;

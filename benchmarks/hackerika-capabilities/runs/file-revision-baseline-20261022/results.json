@@ -1,0 +1,120 @@
+[
+  {
+    "caseId": "file-revision-after-missing-file",
+    "category": "task-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "ohh iya, yang video recap itu. Benar, file AVI-nya sudah terkirim—aku tadi minta unggah ulang karena belum bisa akses file buat konversi MP4.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang ini @Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] ohh iya, yang video recap itu. Benar, file AVI-nya sudah terkirim—aku tadi minta unggah ulang karena belum bisa akses file buat konversi MP4.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3106.8589250000005,
+        "usage": {
+          "prompt_tokens": 12308,
+          "completion_tokens": 43,
+          "total_tokens": 12351,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 12308
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 6904.809512,
+    "action": null,
+    "text": "ohh iya, yang video recap itu. Benar, file AVI-nya sudah terkirim—aku tadi minta unggah ulang karena belum bisa akses file buat konversi MP4.",
+    "failure": "",
+    "trial": 0,
+    "deterministicFailures": [
+      "missing:job:",
+      "missing_tool:delegate_codex",
+      "job_not_queued"
+    ],
+    "deterministicPass": false
+  },
+  {
+    "caseId": "file-revision-after-missing-file",
+    "category": "task-continuity",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "content": "iyaa, yang tadi juga. tapi aku perlu file AVI-nya diunggah ulang buat konversi ke MP4.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 1,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1792151999000,
+        "mentions": [],
+        "name": "111111111111111111-Dimas",
+        "content": "[Dimas <@111111111111111111>] yang ini @Hackerika",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] iyaa, yang tadi juga. tapi aku perlu file AVI-nya diunggah ulang buat konversi ke MP4.",
+        "at": 1792152000000,
+        "replyToMessageId": "800000000000000099",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3382.072792,
+        "usage": {
+          "prompt_tokens": 12308,
+          "completion_tokens": 29,
+          "total_tokens": 12337,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 12308
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 1,
+    "elapsedMs": 7951.286199,
+    "action": null,
+    "text": "iyaa, yang tadi juga. tapi aku perlu file AVI-nya diunggah ulang buat konversi ke MP4.",
+    "failure": "",
+    "trial": 1,
+    "deterministicFailures": [
+      "missing:job:",
+      "missing_tool:delegate_codex",
+      "job_not_queued"
+    ],
+    "deterministicPass": false
+  }
+]
