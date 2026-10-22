@@ -6,8 +6,10 @@ import { ResearchSourceReader, publicResearchUrl } from '../../src/Services/AI/r
 import { webSearchForTool } from '../../src/Services/AI/web';
 import type { Job } from './protocol';
 import type { DiscordReadQuery } from './discordBroker';
+import { generateJobImage } from './imageGeneration';
 export async function startGateway(socket: string, job: Job, model: string, signal: AbortSignal, dependencies: {
   credentials?: () => Promise<{access_token:string}>; fetcher?:typeof fetch; maxCalls?:number; maxInputChars?:number;
+  imageKey?:string; imageFetcher?:typeof fetch;
   discordRead?: (query: DiscordReadQuery) => Promise<unknown>;
 }={}) {
   const auth=new ChatGPTAuth(), credentials=dependencies.credentials||(()=>auth.credentials(signal));
@@ -17,6 +19,8 @@ export async function startGateway(socket: string, job: Job, model: string, sign
   const visionCache=new Map<string,string>();
   job.stats.searches ||= 0;job.stats.sourceReads ||= 0;job.stats.visionReads ||= 0;
   let downloads=0;
+  let imageGenerations=0;
+  let imageResult='';
   const allowedSources=new Set<string>();
   for(const match of `${job.packet.question}\n${job.packet.context}\n${JSON.stringify(job.packet.checkpoint||{})}`.matchAll(/https?:\/\/[^\s<>`"']+/g)){
     const url=publicResearchUrl(match[0].replace(/[),.!?;]+$/,''));if(url&&allowedSources.size<24)allowedSources.add(url);
@@ -28,6 +32,17 @@ export async function startGateway(socket: string, job: Job, model: string, sign
         const path=new URL(request.url).pathname;
         if(signal.aborted)return Response.json({error:'job_closed'},{status:410});
         if(request.method!=='POST')return Response.json({error:'method_not_allowed'},{status:405});
+        if(path==='/images/generate'){
+          if(++imageGenerations>1)return Response.json({error:'image_generation_budget'},{status:429});
+          if(Number(request.headers.get('content-length')||0)>7000)return Response.json({error:'invalid_image_prompt'},{status:413});
+          const raw=await request.text();
+          if(raw.length>7000)return Response.json({error:'invalid_image_prompt'},{status:413});
+          let input:unknown;
+          try{input=JSON.parse(raw);}catch{return Response.json({error:'invalid_image_prompt'},{status:400});}
+          const generated=await generateJobImage(job,input,{signal,key:dependencies.imageKey,fetcher:dependencies.imageFetcher});
+          imageResult=generated.ok?'generated':String((await generated.clone().json().catch(()=>({error:'image_provider_unavailable'}))).error||'image_provider_unavailable');
+          return generated;
+        }
         if(path==='/discord/read'){
           if(!dependencies.discordRead)return Response.json({ok:false,error:'discord_bridge_unavailable'},{status:503});
           if(Number(request.headers.get('content-length')||0)>1024)return Response.json({ok:false,error:'invalid_query'},{status:413});
@@ -126,5 +141,5 @@ export async function startGateway(socket: string, job: Job, model: string, sign
     }});
   await chmod(socket,0o666); // Parent is owner-only; only this job receives this socket.
   const stop=()=>{server.stop(true);};signal.addEventListener('abort',stop,{once:true});
-  return {sources,failureReason:()=>failureReason,close(){signal.removeEventListener('abort',stop);stop();}};
+  return {sources,failureReason:()=>failureReason,imageResult:()=>imageResult,close(){signal.removeEventListener('abort',stop);stop();}};
 }

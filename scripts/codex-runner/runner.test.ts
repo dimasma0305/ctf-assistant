@@ -6,6 +6,7 @@ import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, parseWorkerExport, p
 import { deleteExportedFiles, exportDirectory, readExportedFile, saveExportedFiles } from './exports';
 import { workerArgs } from './executor';
 import { startGateway } from './gateway';
+import { generateJobImage } from './imageGeneration';
 import { DiscordContextBroker } from './discordBroker';
 import { ensureWorkerImage } from './workerImage';
 import { codexRequest, formatCodexResult, isDeliveredCodexReply } from '../../src/Services/AI/codexJobs';
@@ -81,6 +82,48 @@ test('worker exports ZIP and image bytes with safe names and no path traversal',
   expect(()=>parseWorkerExport(JSON.stringify({name:'../secret.txt',data:zip.toString('base64')}))).toThrow('invalid_export');
   expect(()=>parseWorkerExport(JSON.stringify({name:'image.png',data:'!!!'}))).toThrow('invalid_export');
   expect(()=>parseWorkerExport(JSON.stringify({name:'large.zip',data:Buffer.alloc(4*1024*1024+1).toString('base64')}))).toThrow('invalid_export');
+});
+
+test('creative image gateway needs a separate API key and returns verified WebP bytes',async()=>{
+  const job=newJob(validatePacket({...packet(),question:'Generate a four-panel cartoon'}));
+  const noKey=await generateJobImage(job,{prompt:'A small cartoon'},{key:''});
+  expect(noKey.status).toBe(503);
+  expect(await noKey.json()).toEqual({error:'image_generation_unavailable'});
+  let request:any;
+  const webp=Buffer.concat([Buffer.from('RIFF'),Buffer.alloc(4),Buffer.from('WEBP'),Buffer.alloc(12)]);
+  const fetcher=(async(_url:unknown,init:any)=>{
+    request=init;
+    return Response.json({data:[{b64_json:webp.toString('base64')}]});
+  }) as typeof fetch;
+  const result=await generateJobImage(job,{prompt:'A small cartoon'},{key:'fixture-secret',fetcher});
+  expect(result.status).toBe(200);
+  expect(result.headers.get('content-type')).toBe('image/webp');
+  expect(Buffer.from(await result.arrayBuffer())).toEqual(webp);
+  const body=JSON.parse(request.body);
+  expect(body.model).toBe('gpt-image-2.5-flare');
+  expect(body.quality).toBe('low');
+  expect(body.n).toBe(1);
+  expect(body.prompt).toBe('A small cartoon');
+  expect(body.safety_identifier).toMatch(/^[0-9a-f]{64}$/);
+  expect(request.headers.Authorization).toBe('Bearer fixture-secret');
+  const invalid=await generateJobImage(job,{prompt:'A small cartoon'},{key:'fixture-secret',
+    fetcher:(async()=>new Response('bad',{status:401})) as typeof fetch});
+  expect(await invalid.json()).toEqual({error:'image_api_key_invalid'});
+});
+
+test('creative image gateway allows only one bounded generation per job',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-image-test-')),socket=join(directory,'source.sock');
+  const job=newJob(validatePacket(packet()));
+  const gateway=await startGateway(socket,job,'gpt-6-sol',new AbortController().signal,{imageKey:''});
+  try{
+    const first=await fetch('http://localhost/images/generate',{unix:socket,method:'POST',
+      body:JSON.stringify({prompt:'A cartoon'}),headers:{'Content-Type':'application/json'}} as RequestInit & {unix:string});
+    expect(first.status).toBe(503);
+    expect(await first.json()).toEqual({error:'image_generation_unavailable'});
+    const second=await fetch('http://localhost/images/generate',{unix:socket,method:'POST',
+      body:JSON.stringify({prompt:'Try again'}),headers:{'Content-Type':'application/json'}} as RequestInit & {unix:string});
+    expect(second.status).toBe(429);
+  }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
 });
 
 test('exported files are private durable bytes until delivery, with integrity checked on read',async()=>{

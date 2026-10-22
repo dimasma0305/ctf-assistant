@@ -49,6 +49,8 @@ export const respondCodexDiscordRead=(id:string,jobId:string,result:unknown)=>co
 
 export function formatCodexResult(job:CodexPublicJob):string{
   const label=job.kind==='investigation'?'riset':'CTF';
+  if(job.state==='failed'&&['image_generation_unavailable','image_api_key_invalid'].includes(job.error||''))
+    return 'Belum bisa bikin gambarnya: layanan gambar belum terhubung ke kunci API yang aktif. Aku nggak mau bilang gambar sudah jadi sebelum ada file yang benar-benar terkirim.';
   if(job.state==='failed')return ['model_call_budget','input_budget'].includes(job.error||'')
     ? `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi kepotong sebelum kesimpulannya siap. Minta aku lanjutkan nanti ya; aku belum mau nebak dari bukti yang belum tuntas.`
     : `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum berhasil. Coba lagi sebentar ya.`;

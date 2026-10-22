@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { startGateway } from './gateway';
 import { startEgressProxy } from './egressProxy';
 import { OUTPUT_SCHEMA, SOLVER_PROMPT, INVESTIGATION_PROMPT, parseWorkerExport, promoteReceiptCandidates, resultFromText, type Job } from './protocol';
-const FILE_EXPORT_PROMPT='\nFor a user-supplied static slide site, read the page, follow its linked JavaScript slide chunks and public challenge download links through the source gateway; a sparse SPA shell is not proof that its content is unavailable. Download a discovered public archive with POST /sources/download JSON {"url":"exact inspected link"}, saving the binary response to /workspace. Inspect downloaded files locally within the disposable sandbox. If the user asks for a downloadable result (ZIP, image, document, code, or another file), create the actual finished file under /workspace/exports with a simple filename. The runner will attach up to two regular files, each at most 4 MiB and 6 MiB combined, to your final Discord reply in the same channel/thread. Mention exported filenames in your summary. Do not export unrequested source files, secrets, private Discord context, or intermediate artifacts. If a file exceeds the limit, explain that constraint and provide the useful result in text.';
+const FILE_EXPORT_PROMPT='\nFor a user-supplied static slide site, read the page, follow its linked JavaScript slide chunks and public challenge download links through the source gateway; a sparse SPA shell is not proof that its content is unavailable. Download a discovered public archive with POST /sources/download JSON {"url":"exact inspected link"}, saving the binary response to /workspace. Inspect downloaded files locally within the disposable sandbox. For a requested creative illustration, call POST http://127.0.0.1:8118/images/generate with JSON {"prompt":"complete visual description"}. A successful response is binary WebP; save it to /workspace/exports with a .webp filename. The endpoint allows one generation per job. If it returns JSON error image_generation_unavailable or image_api_key_invalid, say that image generation is not configured; do not claim a drawing was made or substitute a prompt as the requested deliverable. If the user asks for another downloadable result (ZIP, document, code, or a plot you can produce with code), create the actual finished file under /workspace/exports with a simple filename. The runner will attach up to two regular files, each at most 4 MiB and 6 MiB combined, to your final Discord reply in the same channel/thread. Mention exported filenames in your summary only after verifying they exist. Do not export unrequested source files, secrets, private Discord context, or intermediate artifacts. If a file exceeds the limit, explain that constraint and provide the useful result in text.';
 const GOAL_CONTRACT='\nThis job has a bounded goal: resolve the actual user request with evidence, or identify the specific evidence or permission that is unavailable. Before finalizing, compare the objective with the inspected sources, commands, and results. If one concrete, untried, in-scope action could materially improve an incomplete answer, put that action in nextStep (at most 200 characters); the runner may resume this same session for up to two distinct evidence steps. Otherwise set nextStep to an empty string. Do not set nextStep just to repeat a failed search, evade a resource limit, or pursue private identity after public self-disclosure paths are exhausted. An unresolved fact can be an honest final result when no defensible path remains.';
 export function workerArgs(image:string,socket:string,egressSocket:string,name:string):string[]{
   return ['run','--rm','--init','-i','--name',name,'--label','hackerika.solver=true','--user','1000:1000','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges:true',
@@ -41,6 +41,8 @@ export async function executeJob(job:Job,model:string,root:string,signal:AbortSi
       if(line.startsWith('HACKERIKA_FINAL:')){const value=line.slice(16);if(value.length<100000)final=Buffer.from(value,'base64').toString('utf8');return;}
       if(line.startsWith('HACKERIKA_FILE:')){
         const exported=parseWorkerExport(line.slice(15));
+        if(exported.name.toLowerCase().endsWith('.webp')
+          &&(exported.data.subarray(0,4).toString()!=='RIFF'||exported.data.subarray(8,12).toString()!=='WEBP'))return;
         if(files.length>=2||fileBytes+exported.data.length>6*1024*1024)throw Error('export_budget');
         fileBytes+=exported.data.length;files.push(exported);return;
       }
@@ -58,6 +60,14 @@ export async function executeJob(job:Job,model:string,root:string,signal:AbortSi
     if(job.packet.kind==='investigation'&&!job.receipts.length&&!gateway.sources.length
       &&!job.packet.artifacts.some(artifact=>artifact.image))throw Error('investigation_without_execution_receipt');
     const result=job.packet.kind==='investigation'?{...parsed,flags:[]}:promoteReceiptCandidates(parsed,job.receipts);
+    if(gateway.imageResult()&&!files.some(file=>/\.(?:webp|png|jpe?g|gif)$/i.test(file.name))){
+      const reason=gateway.imageResult();
+      result.summary=reason==='image_generation_unavailable'||reason==='image_api_key_invalid'
+        ?'Belum bisa bikin gambarnya: layanan gambar belum terhubung ke kunci API yang aktif.'
+        :reason==='generated'?'Gambarnya sempat dibuat, tapi file hasilnya gagal kusimpan untuk dikirim. Coba lagi ya.'
+        :'Belum berhasil bikin gambarnya kali ini. Layanan gambar menolak atau gagal memproses permintaan.';
+      result.flags=[];
+    }
     if(result.flags.some(flag=>!job.receipts.some(receipt=>receipt.exitCode===0&&receipt.output.includes(flag))))throw Error('flag_without_matching_execution_receipt');
     return {result,sources:gateway.sources,files};
   }finally{
