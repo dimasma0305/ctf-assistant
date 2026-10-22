@@ -20,7 +20,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
   job.stats.searches ||= 0;job.stats.sourceReads ||= 0;job.stats.visionReads ||= 0;
   let downloads=0;
   let imageGenerations=0;
-  let imageResult='';
+  let imageResult='';let imageDigest='';
   const allowedSources=new Set<string>();
   for(const match of `${job.packet.question}\n${job.packet.context}\n${JSON.stringify(job.packet.checkpoint||{})}`.matchAll(/https?:\/\/[^\s<>`"']+/g)){
     const url=publicResearchUrl(match[0].replace(/[),.!?;]+$/,''));if(url&&allowedSources.size<24)allowedSources.add(url);
@@ -41,6 +41,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           try{input=JSON.parse(raw);}catch{return Response.json({error:'invalid_image_prompt'},{status:400});}
           const generated=await generateJobImage(job,input,{signal,key:dependencies.imageKey,fetcher:dependencies.imageFetcher});
           imageResult=generated.ok?'generated':String((await generated.clone().json().catch(()=>({error:'image_provider_unavailable'}))).error||'image_provider_unavailable');
+          if(generated.ok)imageDigest=createHash('sha256').update(Buffer.from(await generated.clone().arrayBuffer())).digest('hex');
           return generated;
         }
         if(path==='/discord/read'){
@@ -141,5 +142,6 @@ export async function startGateway(socket: string, job: Job, model: string, sign
     }});
   await chmod(socket,0o666); // Parent is owner-only; only this job receives this socket.
   const stop=()=>{server.stop(true);};signal.addEventListener('abort',stop,{once:true});
-  return {sources,failureReason:()=>failureReason,imageResult:()=>imageResult,close(){signal.removeEventListener('abort',stop);stop();}};
+  return {sources,failureReason:()=>failureReason,imageResult:()=>imageResult,imageDigest:()=>imageDigest,
+    close(){signal.removeEventListener('abort',stop);stop();}};
 }

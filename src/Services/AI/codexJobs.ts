@@ -3,7 +3,7 @@ import http from 'node:http';
 export type CodexRoute = 'auto'|'luna'|'sol'|'daybreak';
 export interface CodexArtifact { name:string;data:string;image:boolean;sourceMessageId:string }
 export interface CodexPublicJob {
-  id:string;kind?:'ctf'|'investigation';state:'pending'|'running'|'completed'|'failed'|'cancelled';createdAt:number;updatedAt:number;deliveredAt?:number;model?:string;
+  id:string;kind?:'ctf'|'investigation';imageMode?:'auto'|'generative'|'vector';state:'pending'|'running'|'completed'|'failed'|'cancelled';createdAt:number;updatedAt:number;deliveredAt?:number;model?:string;
   result?:{summary:string;flags:string[];findings:string[];unresolved:string[];needsStrongerModel:boolean};error?:string;
   stats:{calls:number;searches:number;sourceReads:number;visionReads:number;inputChars:number;outputBytes:number;elapsedMs:number;attempts:number};receiptCount:number;
   guildId:string;channelId:string;messageId:string;userId:string;
@@ -12,7 +12,7 @@ export interface CodexPublicJob {
 }
 export interface CodexPacket {
   scope:string;guildId:string;channelId:string;messageId:string;userId:string;question:string;context:string;checkpoint?:unknown;kind?:'ctf'|'investigation';
-  route:CodexRoute;artifacts:CodexArtifact[];
+  route:CodexRoute;imageMode?:'auto'|'generative'|'vector';artifacts:CodexArtifact[];
 }
 export interface CodexDiscordReadRequest {
   id:string;jobId:string;guildId:string;channelId:string;userId:string;sourceMessageId:string;
@@ -49,8 +49,13 @@ export const respondCodexDiscordRead=(id:string,jobId:string,result:unknown)=>co
 
 export function formatCodexResult(job:CodexPublicJob):string{
   const label=job.kind==='investigation'?'riset':'CTF';
-  if(job.state==='failed'&&['image_generation_unavailable','image_api_key_invalid'].includes(job.error||''))
-    return 'Belum bisa bikin gambarnya: layanan gambar belum terhubung ke kunci API yang aktif. Aku nggak mau bilang gambar sudah jadi sebelum ada file yang benar-benar terkirim.';
+  if(job.state==='failed'&&(job.imageMode||['image_generation_unavailable','image_api_key_invalid'].includes(job.error||''))){
+    if(job.error==='image_generation_unavailable')return 'Belum bisa pakai image gen: kunci API gambar belum dikonfigurasi. Gambar kode yang tadi memang metode berbeda, dan aku nggak akan mengirimnya sebagai pengganti image gen.';
+    if(job.error==='image_api_key_invalid')return 'Belum bisa pakai image gen: kunci API gambar yang terpasang ditolak layanan. Belum ada file gambar yang berhasil dibuat.';
+    if(job.error==='image_api_limit')return 'Image gen sedang kena batas pemakaian. Belum ada file gambar yang berhasil dibuat.';
+    if(job.error==='image_request_rejected')return 'Image gen menolak permintaan gambar ini. Belum ada file gambar yang berhasil dibuat.';
+    return 'Gambar kali ini belum berhasil dibuat atau dikirim. Aku belum punya file jadi untuk ditunjukkan.';
+  }
   if(job.state==='failed')return ['model_call_budget','input_budget'].includes(job.error||'')
     ? `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi kepotong sebelum kesimpulannya siap. Minta aku lanjutkan nanti ya; aku belum mau nebak dari bukti yang belum tuntas.`
     : `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum berhasil. Coba lagi sebentar ya.`;

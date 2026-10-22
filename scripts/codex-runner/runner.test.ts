@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test';
+import { createHash } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -135,6 +136,25 @@ test('creative image gateway allows only one bounded generation per job',async()
   }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
 });
 
+test('generative image mode requires an actual generator result, with a verifiable digest',async()=>{
+  const packetWithMode={...packet(),kind:'investigation',imageMode:'generative'};
+  const job=newJob(validatePacket(packetWithMode));
+  expect(publicJob(job).imageMode).toBe('generative');
+  expect(()=>validatePacket({...packetWithMode,kind:'ctf'})).toThrow('invalid_job_packet');
+  const directory=await mkdtemp(join(tmpdir(),'codex-image-digest-test-')),socket=join(directory,'source.sock');
+  const webp=Buffer.concat([Buffer.from('RIFF'),Buffer.alloc(4),Buffer.from('WEBP'),Buffer.alloc(12)]);
+  const gateway=await startGateway(socket,job,'gpt-6-sol',new AbortController().signal,{
+    imageKey:'fixture-secret',imageFetcher:(async()=>Response.json({data:[{b64_json:webp.toString('base64')}]})) as typeof fetch});
+  try{
+    const response=await fetch('http://localhost/images/generate',{unix:socket,method:'POST',
+      body:JSON.stringify({prompt:'A cartoon'}),headers:{'Content-Type':'application/json'}} as RequestInit & {unix:string});
+    expect(response.status).toBe(200);
+    expect(Buffer.from(await response.arrayBuffer())).toEqual(webp);
+    expect(gateway.imageResult()).toBe('generated');
+    expect(gateway.imageDigest()).toBe(createHash('sha256').update(webp).digest('hex'));
+  }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
+});
+
 test('exported files are private durable bytes until delivery, with integrity checked on read',async()=>{
   const root=await mkdtemp(join(tmpdir(),'codex-exports-test-'));
   const job=newJob(validatePacket(packet()));
@@ -200,6 +220,15 @@ test('budget failure is explained in ordinary language without exposing an inter
   const rendered=formatCodexResult(publicJob(job));
   expect(rendered).toContain('kepotong');
   expect(rendered).not.toContain('model_call_budget');
+});
+
+test('image job failure is described as an image problem instead of research',()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation',imageMode:'generative'}));
+  job.state='failed';job.error='image_api_key_invalid';
+  expect(formatCodexResult(publicJob(job))).toContain('kunci API gambar');
+  job.error='worker_failed';
+  expect(formatCodexResult(publicJob(job))).toContain('Gambar kali ini');
+  expect(formatCodexResult(publicJob(job))).not.toContain('Riset tadi');
 });
 
 test('omitted flag is recovered only from explanatory prose and a successful proof command',()=>{

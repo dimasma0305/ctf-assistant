@@ -4,6 +4,7 @@ export type Route = typeof ROUTES[number];
 export interface Packet {
   scope: string; guildId: string; channelId: string; messageId: string; userId: string;
   question: string; context: string; checkpoint?: unknown; route: Route; kind?: 'ctf'|'investigation';
+  imageMode?: 'auto'|'generative'|'vector';
   artifacts: { name: string; data: string; image: boolean; sourceMessageId: string }[];
 }
 export interface SolverResult {
@@ -19,7 +20,7 @@ export interface Job {
   exportedFiles?: ExportedFileMeta[];
 }
 export interface PublicJob {
-  id: string; kind: 'ctf'|'investigation'; state: Job['state']; createdAt: number; updatedAt: number; deliveredAt?: number; model?: string;
+  id: string; kind: 'ctf'|'investigation'; imageMode?: Packet['imageMode']; state: Job['state']; createdAt: number; updatedAt: number; deliveredAt?: number; model?: string;
   result?: SolverResult; error?: string; stats: Job['stats']; receiptCount: number;
   guildId: string; channelId: string; messageId: string; userId: string;
   sources: { url: string; title: string }[]; exportedFiles?: ExportedFileMeta[];
@@ -29,6 +30,8 @@ export function validatePacket(value: any): Packet {
   if (!value || !['guildId','channelId','messageId','userId'].every(k=>id(value[k]))
     || value.scope!==`${value.guildId}:${value.channelId}` || !ROUTES.includes(value.route)
     || ![undefined,'ctf','investigation'].includes(value.kind)
+    || ![undefined,'auto','generative','vector'].includes(value.imageMode)
+    || (value.imageMode && (value.kind??'ctf')==='ctf')
     || typeof value.question!=='string' || !value.question.trim() || value.question.length>8000
     || typeof value.context!=='string' || value.context.length>50000 || !Array.isArray(value.artifacts) || value.artifacts.length>8) throw Error('invalid_job_packet');
   let total=0;
@@ -41,7 +44,8 @@ export function validatePacket(value: any): Packet {
   });
   const checkpoint=JSON.stringify(value.checkpoint??null);if(checkpoint.length>24000)throw Error('checkpoint_budget');
   return {scope:value.scope,guildId:value.guildId,channelId:value.channelId,messageId:value.messageId,userId:value.userId,
-    question:value.question,context:value.context,checkpoint:JSON.parse(checkpoint),route:value.route,kind:value.kind||'ctf',artifacts};
+    question:value.question,context:value.context,checkpoint:JSON.parse(checkpoint),route:value.route,kind:value.kind||'ctf',
+    ...(value.imageMode?{imageMode:value.imageMode}:{}),artifacts};
 }
 /** A multi-person request must be submitted atomically, with one job per subject. */
 export function validateInvestigationBatch(value: any): Packet[] {
@@ -49,7 +53,7 @@ export function validateInvestigationBatch(value: any): Packet[] {
   const packets=value.packets.map(validatePacket);
   const first=packets[0];
   if(packets.some(p=>p.kind!=='investigation'||p.scope!==first.scope||p.messageId!==first.messageId
-    ||p.userId!==first.userId||p.route!==first.route))throw Error('invalid_job_batch');
+    ||p.userId!==first.userId||p.route!==first.route||p.imageMode!==first.imageMode))throw Error('invalid_job_batch');
   return packets;
 }
 export function hourlyLimitRetryAfterSeconds(recent: number[], requested: number, limit: number, now: number): number | null {
@@ -67,7 +71,8 @@ export function chooseModel(packet: Packet, daybreakUsers: Set<string>, verified
   return model;
 }
 export function newJob(packet:Packet):Job{return{id:randomUUID(),packet,state:'pending',createdAt:Date.now(),updatedAt:Date.now(),stats:{calls:0,searches:0,sourceReads:0,visionReads:0,inputChars:0,outputBytes:0,elapsedMs:0,attempts:0},receipts:[],sources:[]};}
-export function publicJob(job: Job): PublicJob { return { id:job.id,kind:job.packet.kind||'ctf',state:job.state,createdAt:job.createdAt,updatedAt:job.updatedAt,
+export function publicJob(job: Job): PublicJob { return { id:job.id,kind:job.packet.kind||'ctf',
+  ...(job.packet.imageMode?{imageMode:job.packet.imageMode}:{}),state:job.state,createdAt:job.createdAt,updatedAt:job.updatedAt,
   ...(job.deliveredAt?{deliveredAt:job.deliveredAt}:{}),...(job.model?{model:job.model}:{}),...(job.result?{result:job.result}:{}),
   ...(job.error?{error:job.error}:{}),stats:job.stats,receiptCount:job.receipts.length,guildId:job.packet.guildId,
   channelId:job.packet.channelId,messageId:job.packet.messageId,userId:job.packet.userId,sources:(job.sources||[]).slice(0,8),

@@ -127,6 +127,8 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
     }
     if(path==='/jobs'||path==='/jobs/batch'){
       const packets=path==='/jobs/batch'?validateInvestigationBatch(body):[validatePacket(body)];
+      if(packets.some(packet=>packet.imageMode==='generative')&&!process.env.OPENAI_IMAGE_API_KEY?.trim())
+        return response({ok:false,error:'image_generation_unavailable'},503);
       const packet=packets[0];await cleanup();
       const outstanding=[...jobs.values()].filter(j=>j.packet.scope===packet.scope&&['pending','running'].includes(j.state));
       if(outstanding.length)return response({ok:false,error:'channel_job_active',job:publicJob(outstanding[0])},409);

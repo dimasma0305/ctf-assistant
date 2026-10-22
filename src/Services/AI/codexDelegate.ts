@@ -13,6 +13,7 @@ export const hasCodexDelegation = (turn: object) => delegated.has(turn);
 export async function delegateCodexForTurn(args: {
     question?: string; kind?: 'ctf' | 'investigation'; targetUserId?: string;
     newCase?: boolean; solver?: CodexRoute; investigationMode?: 'joint' | 'separate';
+    imageMode?: 'auto'|'generative'|'vector';
 }, message: Turn, options: { signal?: AbortSignal } = {}) {
     if (delegated.has(message)) return { ok: false, error: 'already_delegated_this_turn' };
     if (args.kind !== 'ctf' && args.kind !== 'investigation') return { ok: false, error: 'invalid_kind' };
@@ -44,7 +45,7 @@ export async function delegateCodexForTurn(args: {
     const route: CodexRoute = ['auto', 'luna', 'sol', 'daybreak'].includes(args.solver || '') ? args.solver! : 'auto';
     const packetBase = { kind: 'investigation' as const, scope: `${message.guildId}:${message.channelId}`,
         guildId: message.guildId, channelId: message.channelId, messageId: message.id, userId: message.author.id,
-        route, artifacts };
+        route, ...(args.imageMode?{imageMode:args.imageMode}:{}), artifacts };
     const separate = explicitSubjects.length > 1 && args.investigationMode === 'separate';
     const packets: CodexPacket[] = profiles.length && !separate && explicitSubjects.length > 1
         ? [{ ...packetBase,
@@ -80,6 +81,8 @@ export async function delegateCodexForTurn(args: {
         if (error?.message === 'user_hourly_limit') return { ok: false, error: 'user_hourly_limit',
             retryAfterSeconds: error.retryAfterSeconds, limit: error.limit,
             note: `Kuota job Codex per jam sedang penuh${error.retryAfterSeconds ? `; coba lagi sekitar ${Math.ceil(error.retryAfterSeconds / 60)} menit lagi` : ''}. Jelaskan batas ini kepada user, bukan "gagal mulai" tanpa alasan.` };
+        if (error?.message === 'image_generation_unavailable') return { ok: false, error: 'image_generation_unavailable',
+            note: 'Image gen belum aktif karena controller belum punya kunci API gambar. Jelaskan langsung; jangan janji hasil menyusul atau menggantinya diam-diam dengan gambar kode.' };
         return { ok: false, error: String(error?.message || 'codex_unavailable').slice(0, 120) };
     }
 }
