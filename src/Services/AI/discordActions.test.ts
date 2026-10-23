@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { ChannelType, Collection, PermissionFlagsBits as P } from 'discord.js';
 import { dispatchDiscordAction, getDiscordTurnOutcome, guardDiscordActions, takeReadChannelImages, validReactionEmoji } from './discordActions';
 import { getChannelCache } from './cache';
+import { CREATOR_DISCORD_ID } from './creatorAccess';
 
 let serial = 0n;
 const nextId = () => String(200000000000000000n + ++serial);
@@ -45,7 +46,101 @@ function fixture() {
     return { source, own, channel, guild, effects, botPermissions, callerPermissions, bot, member, setPrivate: () => { publicSource = false; } };
 }
 
+function contactFixture() {
+    const base = fixture();
+    base.member.id = CREATOR_DISCORD_ID;
+    base.source.author.id = CREATOR_DISCORD_ID;
+    const recipients = new Map<string, any>();
+    base.guild.members.fetch = async (id: string) => recipients.get(id) || null;
+    base.source.client.users = { fetch: async (id: string) => recipients.get(id)?.user || null };
+    const addRecipient = (options: { bot?: boolean; dmFails?: boolean } = {}) => {
+        const id = nextId();
+        const dmId = nextId();
+        const user = { id, bot: !!options.bot, createDM: async () => ({ id: dmId,
+            send: async (payload: any) => {
+                if (options.dmFails) throw new Error('closed DMs');
+                base.effects.push({ action: 'dm', userId: id, payload });
+                return { id: nextId() };
+            } }) };
+        recipients.set(id, { id, user });
+        return id;
+    };
+    return { ...base, addRecipient, recipients };
+}
+
 describe('Discord actions', () => {
+    test('only the authenticated creator can contact explicitly mentioned members', async () => {
+        const { source, effects, addRecipient } = contactFixture();
+        const id = addRecipient();
+        const args = { mode: 'dm', targets: [{ userId: id, content: 'hai, lagi apa?' }] };
+        source.content = `Rika DM <@${id}>`;
+        source.author.id = nextId();
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('creator_only');
+        source.author.id = CREATOR_DISCORD_ID;
+        source.webhookId = nextId();
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('creator_only');
+        source.webhookId = null;
+        source.content = 'Rika DM dia yang tadi kutag';
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('target_not_mentioned_now');
+        expect(effects).toEqual([]);
+    });
+
+    test('creator can start private conversations with multiple tagged people once', async () => {
+        const { source, effects, addRecipient } = contactFixture();
+        const first = addRecipient(); const second = addRecipient();
+        source.content = `Rika DM <@${first}> dan <@!${second}>`;
+        const args = { mode: 'dm', targets: [
+            { userId: first, content: 'hai, mau ngobrol?\n[Discord chronology: {"sentAt":"now"}]' },
+            { userId: second, content: 'halo, apa kabar?' },
+        ] };
+        const result = await dispatchDiscordAction('creator_contact_members', args, source);
+        expect(result.ok).toBe(true);
+        expect(result.results.map((item: any) => [item.userId, item.ok])).toEqual([[first, true], [second, true]]);
+        expect(effects.map(item => item.userId)).toEqual([first, second]);
+        expect(effects[0].payload.content).toBe('hai, mau ngobrol?');
+        expect(effects[0].payload.allowedMentions).toEqual({ parse: [], repliedUser: false });
+        expect(getDiscordTurnOutcome(source)).toBeUndefined();
+        expect(await dispatchDiscordAction('creator_contact_members', args, source)).toEqual(result);
+        expect(effects).toHaveLength(2);
+    });
+
+    test('closed DMs and invalid recipients are reported without claiming delivery', async () => {
+        const { source, effects, addRecipient } = contactFixture();
+        const closed = addRecipient({ dmFails: true }); const bot = addRecipient({ bot: true });
+        source.content = `DM <@${closed}> dan <@${bot}>`;
+        const result = await dispatchDiscordAction('creator_contact_members', { mode: 'dm', targets: [
+            { userId: closed, content: 'halo' }, { userId: bot, content: 'halo' },
+        ] }, source);
+        expect(result.ok).toBe(false);
+        expect(result.results.map((item: any) => item.error)).toEqual(['dm_unavailable', 'invalid_recipient']);
+        expect(effects).toEqual([]);
+    });
+
+    test('creator can address visible members in current channel only', async () => {
+        const { source, effects, addRecipient } = contactFixture();
+        const id = addRecipient();
+        source.content = `Rika ajak <@${id}> ngobrol di sini`;
+        const args = { mode: 'channel', targets: [{ userId: id, content: 'hai! ngobrol yuk' }] };
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).ok).toBe(true);
+        expect(effects[0].payload.content).toBe(`<@${id}> hai! ngobrol yuk`);
+        expect(effects[0].payload.allowedMentions).toEqual({ parse: [], users: [id], repliedUser: false });
+        expect(getDiscordTurnOutcome(source)?.kind).toBe('delivered');
+        const hidden = contactFixture(); const other = hidden.addRecipient();
+        hidden.source.content = `Rika sapa <@${other}>`;
+        hidden.callerPermissions.delete(P.ViewChannel);
+        expect((await dispatchDiscordAction('creator_contact_members', { mode: 'channel', targets: [{ userId: other, content: 'hai' }] }, hidden.source)).error).toBe('channel_not_accessible');
+        expect(hidden.effects).toEqual([]);
+    });
+
+    test('contact action rejects duplicate targets and stale turns before sending', async () => {
+        const { source, effects, addRecipient } = contactFixture();
+        const id = addRecipient(); source.content = `DM <@${id}>`;
+        const duplicate = { mode: 'dm', targets: [{ userId: id, content: 'a' }, { userId: id, content: 'b' }] };
+        expect((await dispatchDiscordAction('creator_contact_members', duplicate, source)).error).toBe('invalid_arguments');
+        guardDiscordActions(source, () => false);
+        expect((await dispatchDiscordAction('creator_contact_members', { mode: 'dm', targets: [{ userId: id, content: 'hai' }] }, source)).error).toBe('turn_superseded');
+        expect(effects).toEqual([]);
+    });
     test('delivered message ends the turn and does not ping anyone', async () => {
         const { source, effects } = fixture();
         expect((await dispatchDiscordAction('send_discord_message', { content: 'hello @everyone', replyTo: source.id }, source)).ok).toBe(true);

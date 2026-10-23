@@ -40,6 +40,7 @@ import { getResearchReport, groundResearchReply } from './research';
 import { hasCodexDelegation } from './codexDelegate';
 import { groundCodexHandoff } from './codexHandoff';
 import { recentAssistantLinksForSpeaker, setTurnSourceLinks } from './conversationLinks';
+import { CREATOR_DISCORD_ID } from './creatorAccess';
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -139,7 +140,7 @@ async function dispatchToolBounded(name: string, args: any, message: any, turnId
 
 // Creator identity comes from the authenticated Discord ID. It informs
 // familiarity without overriding permissions or the character's boundaries.
-const DEVELOPER_USER_ID = '663394727688798231';
+const DEVELOPER_USER_ID = CREATOR_DISCORD_ID;
 const DEVELOPER_USERNAME = 'dimasmaulana';
 
 // Fallback identity used by the persona; routing prefers the live client ID.
@@ -755,7 +756,8 @@ async function runChatTurn(
     const canGrantFanRole = isDeveloper || (userProfile?.affection ?? 0) >= FAN_ROLE_AFFECTION_THRESHOLD;
     const turnTools = TOOL_DEFINITIONS.filter(tool =>
         (!spontaneous || tool.function.name !== 'delegate_codex')
-        && (canGrantFanRole || tool.function.name !== 'grant_fan_role'));
+        && (canGrantFanRole || tool.function.name !== 'grant_fan_role')
+        && (isDeveloper || tool.function.name !== 'creator_contact_members'));
     setCTFTurnContext(message, { text: ctfContext, thread: threadSnapshot, images: [...attachmentBlock.images,
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
     const lastUserMessage: ChatMessage = {
