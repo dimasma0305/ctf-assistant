@@ -203,11 +203,11 @@ if (mode === 'native_send' || mode === 'native_react') {
   channel.guildId = message.guild.id;
   channel.permissionsFor = () => ({ has: () => true });
 }
-if (mode === 'creator_contact' || mode === 'noncreator_contact') {
+if (mode === 'creator_contact' || mode === 'creator_contact_provider_empty' || mode === 'noncreator_contact') {
   const targetId = '222222222222222222';
   const user = { id: targetId, username: 'target', bot: false, createDM: async () => ({ id: 'dm-target',
     send: async ({ content }) => { effects.push('DM_TO_TARGET: ' + content); return { id: 'sent-dm' }; } }) };
-  message.author.id = mode === 'creator_contact' ? '663394727688798231' : 'another-member';
+  message.author.id = mode.startsWith('creator_contact') ? '663394727688798231' : 'another-member';
   message.content = 'hackerika tolong DM <@' + targetId + '> dan ajak ngobrol';
   message.mentions = { users: new Map([[targetId, user]]) };
   message.guild.members.fetch = async id => Array.isArray(id) ? new Map([[targetId, { id: targetId, user }]]) : { id: targetId, user };
@@ -307,16 +307,19 @@ const pendingCompletion = new Promise(resolve => { finishFirstCall = resolve; })
 openai.chat.completions.create = async payload => {
   calls++;
   assert.equal(payload.thinking.type, 'enabled');
-  if (mode === 'creator_contact' || mode === 'noncreator_contact') {
+  if (mode === 'creator_contact' || mode === 'creator_contact_provider_empty' || mode === 'noncreator_contact') {
     const offered = payload.tools.some(tool => tool.function.name === 'creator_contact_members');
-    assert.equal(offered, mode === 'creator_contact', 'only creator sees the outbound contact tool');
+    assert.equal(offered, mode.startsWith('creator_contact'), 'only creator sees the outbound contact tool');
     if (mode === 'noncreator_contact') return { choices: [{ message: { role: 'assistant', content: 'aku perlu Dimas yang minta langsung' } }] };
     if (calls === 1) return { choices: [{ message: { role: 'assistant', content: null, tool_calls: [{ id: 'contact-call', type: 'function',
       function: { name: 'creator_contact_members', arguments: JSON.stringify({ mode: 'dm',
         targets: [{ userId: '222222222222222222', content: 'hai, mau ngobrol?' }] }) } }] } }] };
-    assert(payload.messages.some(entry => entry.role === 'tool' && entry.tool_call_id === 'contact-call'
-      && JSON.parse(entry.content).results[0].ok === true));
-    return { choices: [{ message: { role: 'assistant', content: 'udah kusapa via DM.' } }] };
+    throw Object.assign(new Error('ChatGPT: empty_completed_response'), { code: 'empty_completed_response' });
+  }
+  if (mode === 'provider_empty_response') {
+    if (calls === 1) throw Object.assign(new Error('ChatGPT: empty_completed_response'), { code: 'empty_completed_response' });
+    assert.equal(payload.tool_choice, 'none');
+    return { choices: [{ message: { role: 'assistant', content: 'iya, sekarang sudah kebaca' } }] };
   }
   if (mode === 'continuation_tool_empty') {
     if (calls === 1) return { choices: [{ message: { role: 'assistant', content: null, tool_calls: [{ id: 'time-call', type: 'function', function: { name: 'get_current_time', arguments: '{}' } }] } }] };
@@ -410,7 +413,7 @@ if (mode === 'queued') {
   await handleAIChat(message, client, mode.startsWith('continuation') ? { continuation: true, continuationHint: 'unverified-planner-claim' } : mode === 'spontaneous' ? { spontaneous: true, spontaneousHint: 'unverified-planner-claim' } : ['stale', 'stale_typing'].includes(mode) ? { isCurrent: () => sourceIsCurrent } : mode === 'vision_burst' ? { addressed: true, attachmentSources: [earlierImage] } : {});
 }
 if (mode === 'vision') await handleAIChat({ ...message, id: 'followup', content: 'hackerika yang kiri warna apa?', attachments: new Map() }, client);
-assert.equal(calls, mode === 'continuation_tool_empty' ? 3 : ['native_react', 'vision', 'vision_fallback', 'vision_history', 'creator_contact'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');
+assert.equal(calls, mode === 'continuation_tool_empty' ? 3 : ['native_react', 'vision', 'vision_fallback', 'vision_history', 'provider_empty_response'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');
 if (mode.startsWith('metadata_')) {
   assert.deepEqual(effects.filter(x => x !== 'typing'), mode === 'metadata_only' ? [] : ['jadi beneran Miku wkwk 🍐']);
   assert(!JSON.stringify(memory.public.messages).includes('Discord chronology'));
@@ -436,8 +439,11 @@ if (mode.startsWith('metadata_')) {
   assert.equal(interactionUpdate.$push.recentRelationshipExchanges.$each[0].assistantText, 'delivered through tool');
 } else if (mode === 'native_react') {
   assert.deepEqual(effects.filter(x => x !== 'typing'), ['reaction']);
-} else if (mode === 'creator_contact') {
-  assert.deepEqual(effects.filter(x => x !== 'typing'), ['DM_TO_TARGET: hai, mau ngobrol?', 'udah kusapa via DM.']);
+} else if (mode === 'creator_contact' || mode === 'creator_contact_provider_empty') {
+  assert.deepEqual(effects.filter(x => x !== 'typing'), ['DM_TO_TARGET: hai, mau ngobrol?', 'udah, DM-nya terkirim.']);
+  assert.equal(interactionWrites, 1);
+} else if (mode === 'provider_empty_response') {
+  assert.deepEqual(effects.filter(x => x !== 'typing'), ['iya, sekarang sudah kebaca']);
 } else if (mode === 'noncreator_contact') {
   assert.deepEqual(effects.filter(x => x !== 'typing'), ['aku perlu Dimas yang minta langsung']);
 } else if (mode === 'spontaneous' || mode === 'stale' || mode === 'stale_typing') {
@@ -460,7 +466,7 @@ if (mode.startsWith('metadata_')) {
 console.log('SOCIAL_SCENARIO_OK');
 `;
 
-for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'creator_contact', 'noncreator_contact', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_history', 'vision_fallback', 'vision_download_failure']) {
+for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'creator_contact', 'creator_contact_provider_empty', 'noncreator_contact', 'provider_empty_response', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_history', 'vision_fallback', 'vision_download_failure']) {
     test(`chat loop: ${mode}`, async () => {
         const child = Bun.spawn([process.execPath, '-e', scenario], {
             cwd: fileURLToPath(new URL('../../../', import.meta.url)),

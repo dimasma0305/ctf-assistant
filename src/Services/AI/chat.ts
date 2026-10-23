@@ -30,7 +30,7 @@ import { getSocialDisposition } from './socialTools';
 import { getEnvironmentSnapshot } from './environment';
 import { shouldRespondToMessage } from './routing';
 import { buildHackerikaSystemPrompt } from './persona';
-import { DISCORD_TOOL_NAMES, getDiscordTurnOutcome, guardDiscordActions, takeReadChannelImages } from './discordActions';
+import { DISCORD_TOOL_NAMES, formatCreatorContactReceipt, getDiscordTurnOutcome, guardDiscordActions, takeReadChannelImages } from './discordActions';
 import { formatRecentObservations } from './observations';
 import { prepareVisionMessages, trimVisionMemory, forgetVisionReferences, hasVisionContent, withoutVisionContent, groundVisionDelivery, isVisionInputError } from './vision';
 import { inlineDiscordImages, type VisionDownloadCache } from './visionTransport';
@@ -873,6 +873,7 @@ async function runChatTurn(
     let finalReasoningContent = '';
     let grantSucceeded = false;
     let codexToolResult: string | undefined;
+    let contactReceipt: string | null = null;
     let totalToolCalls = 0;
     const appendReadImages = (name: string) => {
         if (name !== 'read_channel_images') return;
@@ -944,6 +945,13 @@ async function runChatTurn(
         for (let attempt = 0; attempt < 3; attempt++) {
             try { return await openai.chat.completions.create(payload, requestOptions); }
             catch (error: any) {
+                if (error?.code === 'empty_completed_response') {
+                    // A terminal but empty provider response is an empty draft,
+                    // not a failed Discord action. The ordinary empty-reply
+                    // fallback below can ask once more for a final answer.
+                    console.log(`   [${turnId}] provider completed without visible output`);
+                    return { choices: [{ message: { role: 'assistant', content: '' } }] };
+                }
                 const detail = String(error?.message || error || '');
                 const malformedBody = error?.status === 400
                     && /parse (?:the )?request body as JSON|hex escape|invalid (?:unicode|escape)/i.test(detail);
@@ -1048,6 +1056,10 @@ async function runChatTurn(
                     loopStats.toolCalls++;
                     const resultStr = await dispatchToolBounded(fnName, parsedArgs, message, turnId, controller.signal);
                     if (fnName === 'delegate_codex') codexToolResult = resultStr;
+                    if (fnName === 'creator_contact_members') {
+                        try { contactReceipt = formatCreatorContactReceipt(JSON.parse(resultStr)) || contactReceipt; }
+                        catch { /* Keep the model's tool-error recovery path. */ }
+                    }
                     if (fnName === 'grant_fan_role') {
                         try { if (JSON.parse(resultStr).granted) grantSucceeded = true; } catch { /* ignore */ }
                     }
@@ -1059,6 +1071,13 @@ async function runChatTurn(
                     appendReadImages(fnName);
                     totalToolCalls++;
                     if (await finishSocialTurn() || finishDiscordTurn()) return;
+                }
+                if (contactReceipt && toolCalls.length === 1) {
+                    // The DM receipt is authoritative. Asking the model to
+                    // paraphrase it can fail after the message was sent and
+                    // wrongly tell the creator that the whole action failed.
+                    finalContent = contactReceipt;
+                    break;
                 }
                 // Hard stop if we've blown the absolute cap. Inject a synthetic
                 // tool result so the model knows it has to give a final answer
@@ -1370,7 +1389,7 @@ async function runChatTurn(
         // private opening has already been delivered.
         if (await finishSocialTurn() || finishDiscordTurn()) return;
         if (options.isCurrent && !options.isCurrent()) { rollbackUserMessage(); return; }
-        rollbackUserMessage();
+        if (!contactReceipt) rollbackUserMessage();
         const aborted = error?.name === 'AbortError' || controller.signal.aborted;
         if (aborted) {
             loopStats.llmTimeouts++;
@@ -1379,12 +1398,18 @@ async function runChatTurn(
             console.error(`❌ [${turnId}] Error with OpenAI API:`, error);
         }
 
-        const fallbackMessage = aborted
+        const fallbackMessage = contactReceipt || (aborted
             ? "hmm otakku lagi nge-lag nih 😅 ntar aku bales lagi yaa"
-            : "waduh error nih 😅 coba tanya lagi ntar yaa";
+            : "waduh error nih 😅 coba tanya lagi ntar yaa");
         const sanitizedFallback = sanitizeMentions(fallbackMessage, message.guild);
         try {
-            await channelRef.send({ content: sanitizedFallback });
+            const sent = await channelRef.send({ content: sanitizedFallback, allowedMentions: { parse: [] } });
+            if (contactReceipt) {
+                memory[channelId].messages.push({ role: 'assistant', reasoning_content: '', messageId: sent.id, at: Date.now(), replyToMessageId: message.id,
+                    content: `${speakerTag(HACKERIKA_DISPLAY_NAME, client.user?.id || HACKERIKA_BOT_ID)} ${sanitizedFallback}` });
+                memory[channelId].messages = memory[channelId].messages.slice(-MAX_MEMORY);
+                recordDeliveredInteraction(sanitizedFallback);
+            }
         } catch (sendError) {
             console.error('Failed to send fallback reply:', sendError);
         }

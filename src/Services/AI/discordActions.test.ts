@@ -2,7 +2,7 @@ process.env.NODB = 'true';
 
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { ChannelType, Collection, PermissionFlagsBits as P } from 'discord.js';
-import { dispatchDiscordAction, getDiscordTurnOutcome, guardDiscordActions, takeReadChannelImages, validReactionEmoji } from './discordActions';
+import { dispatchDiscordAction, formatCreatorContactReceipt, getDiscordTurnOutcome, guardDiscordActions, takeReadChannelImages, validReactionEmoji } from './discordActions';
 import { getChannelCache } from './cache';
 import { CREATOR_DISCORD_ID } from './creatorAccess';
 
@@ -73,6 +73,20 @@ function contactFixture() {
 }
 
 describe('Discord actions', () => {
+    test('contact receipts report only verified DM outcomes', () => {
+        const first = nextId(); const second = nextId();
+        expect(formatCreatorContactReceipt({ mode: 'dm', selected: 1, deliveredCount: 1, failedCount: 0,
+            results: [{ userId: first, ok: true, messageId: nextId() }] })).toBe('udah, DM-nya terkirim.');
+        expect(formatCreatorContactReceipt({ mode: 'dm', selected: 2, deliveredCount: 1, failedCount: 1,
+            results: [{ userId: first, ok: true }, { userId: second, ok: false, error: 'dm_unavailable' }] }))
+            .toBe('1 dari 2 DM terkirim; 1 belum berhasil.');
+        expect(formatCreatorContactReceipt({ mode: 'dm', selected: 1, deliveredCount: 0, failedCount: 1,
+            results: [{ userId: first, ok: false, error: 'dm_unavailable' }] })).toBe('DM-nya belum terkirim.');
+        expect(formatCreatorContactReceipt({ mode: 'dm', selected: 1, deliveredCount: 1, failedCount: 0,
+            results: [{ userId: first, ok: false }] })).toBeNull();
+        expect(formatCreatorContactReceipt({ mode: 'channel', selected: 1, deliveredCount: 1, failedCount: 0,
+            results: [{ userId: first, ok: true }] })).toBeNull();
+    });
     test('only the authenticated creator can contact explicitly mentioned members', async () => {
         const { source, effects, addRecipient } = contactFixture();
         const id = addRecipient();

@@ -29,6 +29,20 @@ const MAX_CONTACT_ROLES = 3;
 const contactMentionIds = (content: string) => [...new Set([...content.matchAll(/<@!?(\d{17,20})>/g)].map(match => match[1]))];
 const contactRoleIds = (content: string) => new Set([...content.matchAll(/<@&(\d{17,20})>/g)].map(match => match[1]));
 
+/** A completed DM mutation has a verified receipt; no second model call is needed to report it. */
+export function formatCreatorContactReceipt(value: unknown): string | null {
+    const result = value as any;
+    if (result?.mode !== 'dm' || !Number.isInteger(result.selected) || result.selected < 1
+        || result.selected > MAX_CONTACT_RECIPIENTS || !Array.isArray(result.results)
+        || result.results.length !== result.selected
+        || result.results.some((item: any) => !isDiscordId(item?.userId) || typeof item.ok !== 'boolean')) return null;
+    const delivered = result.results.filter((item: any) => item.ok === true).length;
+    if (result.deliveredCount !== delivered || result.failedCount !== result.selected - delivered) return null;
+    if (delivered === result.selected) return delivered === 1 ? 'udah, DM-nya terkirim.' : `udah, ${delivered} DM terkirim.`;
+    if (delivered) return `${delivered} dari ${result.selected} DM terkirim; ${result.selected - delivered} belum berhasil.`;
+    return result.selected === 1 ? 'DM-nya belum terkirim.' : `belum ada DM yang terkirim ke ${result.selected} orang itu.`;
+}
+
 export function validReactionEmoji(value: unknown): value is string {
     if (typeof value !== 'string' || !value || value.length > 100) return false;
     if (/^<a?:[A-Za-z0-9_]{2,32}:\d{17,20}>$/.test(value)) return true;
@@ -46,7 +60,9 @@ async function mutateOnce(message: ChatMessage, key: string, run: () => Promise<
     const promise = Promise.resolve().then(() => turnGuards.get(message)?.() === false ? failure('turn_superseded') : run()).catch(() => failure('discord_action_failed'));
     receipts.set(key, promise);
     const result = await promise;
-    console.log(`[DiscordAction] source=${message.id} action=${key.split(':')[0]} ok=${!!result.ok}`);
+    const delivery = key.startsWith('creator-contact:') && Number.isInteger(result.deliveredCount)
+        ? ` mode=${result.mode} delivered=${result.deliveredCount}/${result.selected}` : '';
+    console.log(`[DiscordAction] source=${message.id} action=${key.split(':')[0]} ok=${!!result.ok}${delivery}`);
     return result;
 }
 
