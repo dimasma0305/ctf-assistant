@@ -28,13 +28,17 @@ const channelId = '700000000000000001', guildId = '555555555555555555';
 const effects: any[] = [], completions: any[] = [], toolCalls: any[] = [];
 if (CASE.mockCodexJob) {
     const { createServer } = await import('node:http');
-    const socket = '/tmp/hackerika-benchmark-codex.sock';
+    const socket = `/tmp/hackerika-benchmark-codex-${process.pid}.sock`;
     const server = createServer(async (request: any, response: any) => {
         const chunks: Buffer[] = [];
         for await (const chunk of request) chunks.push(Buffer.from(chunk));
         const packet = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
+        const goal = String(packet.question || '').split('Tujuan tambahan:').at(-1) || '';
         const valid = request.url === '/jobs' && packet.kind === 'investigation'
-            && /tcp1p_recap\.avi/i.test(packet.question) && /mp4/i.test(packet.question);
+            && (CASE.taggedResearchTarget
+                ? /(?:search|inspect|check|investigate|telusuri|periksa|cek|cari).*(?:profil|karya|jejak|sumber publik|public source|professional)|(?:profil|karya|jejak|professional).*(?:search|inspect|check|investigate|telusuri|periksa|cek|cari)/i.test(goal)
+                    && !/(?:assess only whether this should be declined|nilai apakah harus ditolak|do not search|jangan cari sumber)/i.test(goal)
+                : /tcp1p_recap\.avi/i.test(packet.question) && /mp4/i.test(packet.question));
         if (valid) effects.push({ kind: 'codex-job', question: packet.question });
         response.writeHead(valid ? 200 : 400, { 'Content-Type': 'application/json' });
         response.end(JSON.stringify(valid ? { ok: true, job: { id: '11111111-1111-4111-8111-111111111111', state: 'pending' } }
@@ -146,6 +150,24 @@ if (CASE.creatorContact) {
     }
     guild.members.fetch = async (id: string | object) => typeof id === 'string' ? guild.members.cache.get(id) || null : guild.members.cache;
     message.client.users = { fetch: async (id: string) => guild.members.cache.get(id)?.user || null };
+}
+if (CASE.taggedResearchTarget) {
+    const targetId = CASE.taggedResearchTarget === 'other' ? otherId
+        : CASE.taggedResearchTarget === 'third' ? thirdId : fourthId;
+    const target = history.find((item: any) => item.author.id === targetId);
+    if (!target) throw new Error('benchmark_profile_target_missing');
+    const member = target.member;
+    member.user.createdAt = new Date('2019-01-01T00:00:00Z');
+    member.user.globalName = member.displayName;
+    member.user.avatarURL = () => null;
+    member.user.bannerURL = () => null;
+    member.user.flags = { toArray: () => [] };
+    member.joinedAt = new Date('2025-01-01T00:00:00Z');
+    member.avatarURL = () => null;
+    member.bannerURL = () => null;
+    guild.members.fetch = async (id: string) => guild.members.cache.get(id) || null;
+    message.client.users = { fetch: async (id: string) => guild.members.cache.get(id)?.user || null };
+    message.mentions.users.set(member.id, member.user);
 }
 const { openai } = await import(`${root}/src/utils/openai.ts`);
 const create = openai.chat.completions.create.bind(openai.chat.completions);

@@ -83,7 +83,8 @@ function lineFromDiscord(msg: DiscordMessage): ContextLine {
 // contain only 20 messages, so backfill once from Discord when an active topic
 // appears to reach its oldest cached edge. Never read another channel or DM.
 export async function getChannelContext(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, startSep: string, endSep: string,
-  onMentions?: (mentions: MentionReference[]) => void, onOwnFileDelivery?: () => void): Promise<string> {
+  onMentions?: (mentions: MentionReference[]) => void, onOwnFileDelivery?: () => void,
+  onSpeakerLedger?: (lines: string[]) => void): Promise<string> {
   try {
     const channelId = message.channel.id;
     const cachedMessages = await getChannelCache(channelId);
@@ -134,8 +135,11 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
     const others = [...selected].reverse().filter(item => item.authorId !== speakerId && item.authorId !== ownBotId
       && currentAt - item.at <= 5 * 60_000);
     const distinctOthers = others.filter((item, index) => others.findIndex(other => other.authorId === item.authorId) === index);
-    const speakerLedger = (message.content || '').trim().length <= 160 && distinctOthers.length >= 2
-      ? `\nlatest-per-speaker (source ownership; copies, not new turns):\n${distinctOthers.slice(0, 3).reverse().map(item => item.line).join('\n')}`
+    const speakerLines = (message.content || '').trim().length <= 160 && distinctOthers.length >= 2
+      ? distinctOthers.slice(0, 3).reverse().map(item => item.line) : [];
+    if (speakerLines.length) onSpeakerLedger?.(speakerLines);
+    const speakerLedger = speakerLines.length
+      ? `\nlatest-per-speaker (source ownership; copies, not new turns):\n${speakerLines.join('\n')}`
       : '';
     return selected.length > 0
       ? `\n${startSep}\n${selected.map(item => item.line).join('\n')}${continuity}${speakerLedger}${deliveryEvidence}\n${endSep}`

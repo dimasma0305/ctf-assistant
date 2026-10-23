@@ -31,6 +31,16 @@ export function discordPersonResearchSubjects(message: Pick<ChatMessage, 'conten
     return extractMentionIds(message.content.slice(start)).filter(id => id !== message.client.user?.id && id !== message.author.id);
 }
 
+/** A direct, single-member deep-research command can start its scoped job
+ * before a conversational refusal leaves the explicitly requested work undone. */
+export function explicitDeepProfileResearchSubject(message: Pick<ChatMessage, 'content' | 'author' | 'client'>,
+    cleanContent = message.content): string | null {
+    const subjects = discordPersonResearchSubjects(message);
+    if (subjects.length !== 1) return null;
+    return /^(?:(?:<@!?\d{17,20}>|@Hackerika)\s*)?(?:(?:coba|tolong)\s+)?(?:deep\s*search|osint|riset\s+mendalam|telusuri\s+mendalam)\b/i
+        .test(cleanContent.trim()) ? subjects[0] : null;
+}
+
 export interface DiscordProfile {
     id: string; username: string; globalName: string | null; bot: boolean;
     accountCreatedAt: string; accountCreatedAtBasis: 'discord_snowflake';

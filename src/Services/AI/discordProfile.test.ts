@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { Collection } from 'discord.js';
-import { discordPersonResearchSubject, discordPersonResearchSubjects, discordProfileSubject, getDiscordProfileForTool, type DiscordProfile } from './discordProfile';
+import { discordPersonResearchSubject, discordPersonResearchSubjects, discordProfileSubject, explicitDeepProfileResearchSubject, getDiscordProfileForTool, type DiscordProfile } from './discordProfile';
 import { appendResearchFollowupSource, discordProfileSearchQueries, formatDiscordProfileReply, groundResearchReply, profileSearchLeads, requiresResearch } from './research';
 
 const speaker = '663394727688798231';
@@ -62,6 +62,19 @@ test('natural siapa @member deep search request selects one profile, not generic
     expect(discordPersonResearchSubject(value.message as unknown as Parameters<typeof discordPersonResearchSubject>[0])).toBe(null);
   expect(discordPersonResearchSubjects(multiple.message as unknown as Parameters<typeof discordPersonResearchSubjects>[0])).toEqual([target,other]);
   expect(discordPersonResearchSubjects(addressed.message as unknown as Parameters<typeof discordPersonResearchSubjects>[0])).toEqual([target]);
+});
+
+test('automatic profile investigation requires a direct command about one tagged member', () => {
+  for (const content of [`<@${bot}> deepsearch nama asli <@${target}>`, `@Hackerika tolong osint <@${target}>`,
+    `riset mendalam <@${target}>`]) {
+    const message = fixture(content).message;
+    expect(explicitDeepProfileResearchSubject(message as unknown as Parameters<typeof explicitDeepProfileResearchSubject>[0])).toBe(target);
+  }
+  for (const content of [`kenapa kamu deepsearch <@${target}>?`, `jangan deepsearch <@${target}>`,
+    `deepsearch <@${target}> dan <@${other}>`, `deepsearch writeup CTF ini`, `> deepsearch <@${target}>`]) {
+    const message = fixture(content).message;
+    expect(explicitDeepProfileResearchSubject(message as unknown as Parameters<typeof explicitDeepProfileResearchSubject>[0])).toBeNull();
+  }
 });
 
 test('a failed global-user refresh still uses the freshly fetched guild member user', async () => {

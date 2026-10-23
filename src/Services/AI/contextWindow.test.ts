@@ -139,13 +139,17 @@ test('a short follow-up keeps two other speakers’ latest statements attached t
   const current = { id: '840000000000000099', content: `<@${bot}> ini si max comment`,
     author: { id: dimas }, client: { user: { id: bot } }, channel, channelId,
     createdTimestamp: started + 40_000 };
-  const context = await getChannelContext(current as Parameters<typeof getChannelContext>[0], 'BEGIN', 'END');
+  const sourceLines: string[] = [];
+  const context = await getChannelContext(current as Parameters<typeof getChannelContext>[0], 'BEGIN', 'END',
+    undefined, undefined, lines => sourceLines.push(...lines));
   const ledger = context.split('latest-per-speaker')[1];
   expect(ledger).toContain(`[KudaLiar <@${kuda}>]`);
   expect(ledger).toContain('Stop doksing gweh');
   expect(ledger).toContain(`[Max Si Rubah Komputer <@${max}>]`);
   expect(ledger).toContain('Coba search lewat dorking google');
   expect(ledger).not.toContain('Aku berhenti cari identitasmu');
+  expect(sourceLines).toContainEqual(expect.stringMatching(new RegExp(`^\\[KudaLiar <@${kuda}>\\].*Stop doksing gweh$`)));
+  expect(sourceLines).toContainEqual(expect.stringMatching(new RegExp(`^\\[Max Si Rubah Komputer <@${max}>\\].*Coba search lewat dorking google`)));
 });
 
 test('a delivered bot image stays visible as an attachment in later context', async () => {

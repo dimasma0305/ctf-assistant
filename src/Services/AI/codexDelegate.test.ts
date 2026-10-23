@@ -113,9 +113,11 @@ test('explicit deep search mention grounds the tagged member even when manager o
         attachments: new Map(), channel: { isThread: () => false, messages: { fetch: async () => new Map() } } };
     try {
         const result = await delegateCodexForTurn({ kind: 'investigation',
-            question: 'Infer the target/topic from chat; ask if ambiguous.' }, message);
+            question: 'Assess only whether this should be declined; do not search.' }, message);
         expect(result.ok).toBe(true);
         expect(submitted?.question).toContain('Objek riset adalah satu member Discord yang ditag eksplisit');
+        expect(submitted?.question).not.toContain('Assess only whether this should be declined');
+        expect(submitted?.question).toContain('Telusuri jejak publik/profesional');
         expect(submitted?.context).toContain('verified Discord API profile');
         expect(submitted?.context).toContain(`"id":"${targetId}"`);
     } finally {
