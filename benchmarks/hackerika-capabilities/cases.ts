@@ -6,7 +6,7 @@ export interface CapabilityCase {
     callerName?: string;
     expected: string;
     maxWords: number;
-    history?: { who: 'caller' | 'other' | 'third' | 'bot'; text: string; name?: string;
+    history?: { who: 'caller' | 'other' | 'third' | 'fourth' | 'bot'; text: string; name?: string;
         files?: { name: string; contentType: string }[] }[];
     hydrateMemory?: boolean;
     replyTo?: number;
@@ -20,12 +20,27 @@ export interface CapabilityCase {
     web?: { mode: 'success' | 'failed'; summary: string; page: string };
     backend?: 'native-send' | 'file-send' | 'ordinary-send' | 'silence' | 'replayed-evidence';
     mockCodexJob?: boolean;
+    creatorContact?: boolean;
+    expectedDmUserIds?: string[];
+    forbiddenDmUserIds?: string[];
     critical?: boolean;
     requiredPatterns?: string[];
     forbiddenPatterns?: string[];
 }
 
 export const CASES: CapabilityCase[] = [
+    { id: 'creator-followup-contact', split: 'dev', category: 'discord-outreach',
+        prompt: '@Hackerika kasih mereka dm kecuali yang sudah confirm disini ya', creatorContact: true,
+        history: [
+            { who: 'caller', name: 'Dimas', text: 'Gass yang mau ikut Joints UGM Finals (6 soal): <@663394727688798231> (Web 1), <@222222222222222222> (rev 1), <@333333333333333333> (rev 1), <@444444444444444444> (pwn 2). Confirm cuy yang bisa buat soal, kurang forensic dan crypto @everyone.' },
+            { who: 'caller', name: 'Dimas', text: '@Hackerika buat alarm buat besok ya deadline confirmnya' },
+            { who: 'bot', text: 'Siap, besok aku ingetin soal deadline confirm Joints UGM Finals.' },
+            { who: 'third', name: '.effie', text: 'okayy' },
+        ], hydrateMemory: true,
+        expected: 'Send a short confirmation DM to Marc and merrow from the earlier participant list. Do not DM Dimas, .effie (already confirmed), or @everyone. Report actual delivery only after successful tool results.',
+        expectedDmUserIds: ['222222222222222222', '444444444444444444'],
+        forbiddenDmUserIds: ['663394727688798231', '333333333333333333'],
+        requiredTools: ['creator_contact_members'], forbiddenTools: ['set_reminder'], maxWords: 65, critical: true },
     { id: 'source-owner', split: 'dev', category: 'attribution', prompt: 'jadi yang ngirim GIF aku atau KudaLiar?', history: [{ who: 'other', text: '[GIF]', name: 'KudaLiar' }, { who: 'caller', text: 'liat ini rik' }, { who: 'bot', text: 'nggak lucu, jangan diulang' }], replyTo: 0, expected: 'KudaLiar sent it. Caller only pointed at it. Do not scold the caller.', maxWords: 30, critical: true },
     { id: 'interleaved-objection-owner', split: 'dev', category: 'attribution', prompt: '@Hackerika ini si Max comment', history: [
         { who: 'caller', name: 'Dimas', text: '@Hackerika coba cari profil publik Max' },

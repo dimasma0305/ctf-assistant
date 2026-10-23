@@ -85,7 +85,7 @@ describe('Discord actions', () => {
         expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('creator_only');
         source.webhookId = null;
         source.content = 'Rika DM dia yang tadi kutag';
-        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('target_not_mentioned_now_or_in_reply');
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('recent_list_not_found');
         expect(effects).toEqual([]);
     });
 
@@ -158,6 +158,87 @@ describe('Discord actions', () => {
         }, wrong.source)).error).toBe('source_list_unavailable');
     });
 
+    test('"DM mereka kecuali yang sudah confirm" uses the recent creator list and reviews participant replies', async () => {
+        const { source, channel, effects, addRecipient } = contactFixture();
+        const marc = addRecipient(); const effie = addRecipient(); const merrow = addRecipient();
+        const list = { id: nextId(), channelId: channel.id, author: { id: CREATOR_DISCORD_ID },
+            createdTimestamp: source.createdTimestamp - 28 * 60_000,
+            content: `Joints UGM Finals: <@${CREATOR_DISCORD_ID}> (web), <@${marc}> (rev), <@${effie}> (rev), <@${merrow}> (pwn) @everyone` };
+        const reply = { id: nextId(), channelId: channel.id, author: { id: effie },
+            createdTimestamp: source.createdTimestamp - 4 * 60_000, content: 'okayy' };
+        channel.messages.fetch = async (arg: any) => typeof arg === 'string'
+            ? arg === list.id ? list : null
+            : new Collection([[list.id, list], [reply.id, reply]]);
+        source.content = 'Hackerika kasih mereka dm kecuali yang sudah confirm disini ya';
+        const args = { mode: 'dm', includeRecentList: true, content: 'hai, bisa konfirmasi ikut bikin soal Joints UGM Finals?' };
+        const preview = await dispatchDiscordAction('creator_contact_members', args, source);
+        expect(preview.error).toBe('review_participant_replies');
+        expect(preview.sourceListMessageId).toBe(list.id);
+        expect(preview.participantReplies).toEqual([{ messageId: reply.id, userId: effie, content: 'okayy' }]);
+        expect(effects).toEqual([]);
+        const result = await dispatchDiscordAction('creator_contact_members', { ...args, excludeUserIds: [effie] }, source);
+        expect(result.ok).toBe(true);
+        expect(result.selected).toBe(2);
+        expect(effects.map(effect => effect.userId)).toEqual([marc, merrow]);
+    });
+
+    test('a direct listMessageId cannot bypass confirmation review', async () => {
+        const { source, channel, effects, addRecipient } = contactFixture();
+        const marc = addRecipient(); const effie = addRecipient(); const merrow = addRecipient();
+        const list = { id: nextId(), channelId: channel.id, author: { id: CREATOR_DISCORD_ID },
+            createdTimestamp: source.createdTimestamp - 10_000,
+            content: `<@${CREATOR_DISCORD_ID}> <@${marc}> <@${effie}> <@${merrow}>` };
+        const reply = { id: nextId(), channelId: channel.id, author: { id: effie },
+            createdTimestamp: source.createdTimestamp - 5_000, content: 'okayy' };
+        const unrelated = { id: nextId(), channelId: channel.id, author: { id: CREATOR_DISCORD_ID },
+            createdTimestamp: source.createdTimestamp - 1_000,
+            content: `<@${addRecipient()}> <@${addRecipient()}>` };
+        channel.messages.fetch = async (arg: any) => typeof arg === 'string'
+            ? arg === list.id ? list : null : new Collection([[list.id, list], [reply.id, reply], [unrelated.id, unrelated]]);
+        source.content = 'Rika DM mereka kecuali yang sudah confirm';
+        const args = { mode: 'dm', listMessageId: list.id, includeRecentList: true,
+            targets: [{ userId: CREATOR_DISCORD_ID, content: 'tolong konfirmasi ya' }], content: 'tolong konfirmasi ya' };
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('review_participant_replies');
+        expect(effects).toEqual([]);
+        const result = await dispatchDiscordAction('creator_contact_members', { ...args, excludeUserIds: [effie] }, source);
+        expect(result.selected).toBe(2);
+        expect(effects.map(effect => effect.userId)).toEqual([marc, merrow]);
+    });
+
+    test('explicit targets can be grounded in a recent list without replying to it', async () => {
+        const { source, channel, effects, addRecipient } = contactFixture();
+        const marc = addRecipient(); const merrow = addRecipient();
+        const list = { id: nextId(), channelId: channel.id, author: { id: CREATOR_DISCORD_ID },
+            createdTimestamp: source.createdTimestamp - 10 * 60_000,
+            content: `Joints UGM Finals: <@${marc}> <@${merrow}>` };
+        channel.messages.fetch = async (arg: any) => typeof arg === 'string'
+            ? arg === list.id ? list : null : new Collection([[list.id, list]]);
+        source.content = 'Rika DM mereka ya';
+        const result = await dispatchDiscordAction('creator_contact_members', { mode: 'dm', targets: [
+            { userId: marc, content: 'Marc, bisa konfirmasi?' },
+            { userId: merrow, content: 'Merrow, bisa konfirmasi?' },
+        ] }, source);
+        expect(result.ok).toBe(true);
+        expect(result.sourceListMessageId).toBe(list.id);
+        expect(effects.map(effect => effect.userId)).toEqual([marc, merrow]);
+    });
+
+    test('recent-list fallback does not authorize a list from another author or channel', async () => {
+        const { source, channel, effects, addRecipient } = contactFixture();
+        const first = addRecipient(); const second = addRecipient();
+        source.content = 'Rika DM mereka';
+        const list = { id: nextId(), channelId: channel.id, author: { id: first },
+            createdTimestamp: source.createdTimestamp - 1000,
+            content: `<@${first}> <@${second}>` };
+        channel.messages.fetch = async () => new Collection([[list.id, list]]);
+        const args = { mode: 'dm', includeRecentList: true, content: 'halo' };
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('recent_list_not_found');
+        list.author.id = CREATOR_DISCORD_ID;
+        list.channelId = nextId();
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('recent_list_not_found');
+        expect(effects).toEqual([]);
+    });
+
     test('only a role mentioned in the creator message can select actual role members', async () => {
         const { source, effects, addRecipient, addRole } = contactFixture();
         const roleId = addRole();
@@ -171,6 +252,19 @@ describe('Discord actions', () => {
         const result = await dispatchDiscordAction('creator_contact_members', args, source);
         expect(result.selected).toBe(7);
         expect(effects.map(effect => effect.userId)).toEqual(selected);
+    });
+
+    test('excluded members are not re-added by role expansion', async () => {
+        const { source, effects, addRecipient, addRole } = contactFixture();
+        const roleId = addRole();
+        const confirmed = addRecipient({ roles: [roleId] });
+        const pending = addRecipient({ roles: [roleId] });
+        source.content = `Rika DM <@&${roleId}> kecuali yang sudah confirm`;
+        const result = await dispatchDiscordAction('creator_contact_members', {
+            mode: 'dm', roleIds: [roleId], excludeUserIds: [confirmed], content: 'bisa konfirmasi?',
+        }, source);
+        expect(result.ok).toBe(true);
+        expect(effects.map(effect => effect.userId)).toEqual([pending]);
     });
 
     test('oversized role expansion rejects before sending any messages', async () => {

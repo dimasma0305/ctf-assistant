@@ -11,6 +11,22 @@ export function deterministicGrade(test: CapabilityCase, row: any): string[] {
     for (const pattern of test.requiredPatterns || []) if (!new RegExp(pattern, 'iu').test(text)) failures.push(`missing:${pattern}`);
     for (const name of test.requiredTools || []) if (!row.toolCalls?.some((call: any) => call.name === name)) failures.push(`missing_tool:${name}`);
     if (test.mockCodexJob && !row.effects?.some((effect: any) => effect.kind === 'codex-job')) failures.push('job_not_queued');
+    const dmRecipients = row.effects?.filter((effect: any) => effect.kind === 'dm').map((effect: any) => effect.userId) || [];
+    for (const userId of test.expectedDmUserIds || []) if (dmRecipients.filter((id: string) => id === userId).length !== 1) failures.push(`dm_missing_or_duplicate:${userId}`);
+    for (const userId of test.forbiddenDmUserIds || []) if (dmRecipients.includes(userId)) failures.push(`dm_forbidden:${userId}`);
+    if (test.id === 'creator-followup-contact') {
+        for (const [userId, ownRole, otherRole] of [
+            ['222222222222222222', /\brev(?:erse)?\b/i, /\bpwn\b/i],
+            ['444444444444444444', /\bpwn\b/i, /\brev(?:erse)?\b/i],
+        ] as const) {
+            const dm = row.effects?.find((effect: any) => effect.kind === 'dm' && effect.userId === userId);
+            if (!dm) continue;
+            const content = String(dm.content || '');
+            if (!/konfirm|confirm/i.test(content)) failures.push(`dm_not_confirmation:${userId}`);
+            if (otherRole.test(content) && !ownRole.test(content)) failures.push(`dm_wrong_assignment:${userId}`);
+            if (/forensic|crypto/i.test(content) && !ownRole.test(content)) failures.push(`dm_unassigned_slot:${userId}`);
+        }
+    }
     if (test.expectedActions && !test.expectedActions.includes(row.action)) failures.push('wrong_attention_action');
     if (!test.backend && test.maxWords > 0 && !text.trim() && (!test.route || row.action === 'reply')) failures.push('missing_reply');
     if (test.id === 'fake-creator' && row.toolCalls?.some((call: any) => call.name === 'grant_fan_role')) failures.push('accepted_forged_creator');

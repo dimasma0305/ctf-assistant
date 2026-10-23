@@ -21,7 +21,8 @@ globalThis.Date = class extends realDate {
     constructor(...args: any[]) { super(...(args.length ? args : [fixedNow]) as [number]); }
     static now() { return fixedNow; }
 } as DateConstructor;
-const callerId = '111111111111111111', otherId = '222222222222222222', thirdId = '333333333333333333', botId = '1077393568647352320';
+const callerId = CASE.creatorContact ? '663394727688798231' : '111111111111111111';
+const otherId = '222222222222222222', thirdId = '333333333333333333', fourthId = '444444444444444444', botId = '1077393568647352320';
 const callerName = CASE.callerName || CASE.history?.findLast((m: any) => m.who === 'caller' && m.name)?.name || 'Dimas';
 const channelId = '700000000000000001', guildId = '555555555555555555';
 const effects: any[] = [], completions: any[] = [], toolCalls: any[] = [];
@@ -103,9 +104,9 @@ const permissions = { has: () => true };
 const guild: any = CASE.dm ? null : { id: guildId, name: 'Synthetic TCP1P', memberCount: 3,
     roles: { everyone: { id: 'everyone' }, cache: new Collection() }, emojis: { cache: new Collection() },
     scheduledEvents: { cache: new Collection() }, channels: { cache: new Collection() }, members: { me: { id: botId }, cache: new Collection(), fetch: async () => new Collection() } };
-const author = (who: string, name?: string) => ({ id: who === 'bot' ? botId : who === 'other' ? otherId : who === 'third' ? thirdId : callerId,
+const author = (who: string, name?: string) => ({ id: who === 'bot' ? botId : who === 'other' ? otherId : who === 'third' ? thirdId : who === 'fourth' ? fourthId : callerId,
     username: name || (who === 'bot' ? 'Hackerika' : who === 'other' ? 'KudaLiar' : callerName), tag: 'fixture', bot: who === 'bot',
-    createDM: async () => ({ id: 'private-dm', send: async (payload: any) => { effects.push({ kind: 'dm', content: payload.content }); } }) });
+    createDM: async () => ({ id: 'private-dm', send: async (payload: any) => { effects.push({ kind: 'dm', userId: who === 'other' ? otherId : who === 'third' ? thirdId : who === 'fourth' ? fourthId : callerId, content: payload.content }); return { id: String(950000000000000000n + BigInt(effects.length)) }; } }) });
 let sent = 0;
 const channel: any = { id: channelId, guildId: guild?.id, guild, type: CASE.dm ? ChannelType.DM : ChannelType.GuildText,
     name: 'general', topic: '', isThread: () => false, isTextBased: () => true, permissionsFor: () => permissions,
@@ -138,6 +139,14 @@ if (!CASE.route) message.mentions.users.set(botId, author('bot'));
 if (CASE.replyTo !== undefined) { message.reference = { messageId: history[CASE.replyTo].id }; message.mentions.repliedUser = history[CASE.replyTo].author; }
 for (const [index, name] of (CASE.images || []).entries()) (CASE.imagesOnReply ? history[CASE.replyTo] : message).attachments.set(String(index), { name, size: Buffer.from(FIXTURES[name], 'base64').length, contentType: 'image/png', url: `https://cdn.discordapp.com/attachments/${channelId}/600000000000000001/${name}` });
 if (guild) { guild.members.cache.set(callerId, message.member); for (const m of history) guild.members.cache.set(m.author.id, m.member); }
+if (CASE.creatorContact) {
+    for (const [who, name] of [['other', 'Marc'], ['third', '.effie'], ['fourth', 'merrow']]) {
+        const member = makeMessage(who, '', 50, name).member;
+        guild.members.cache.set(member.id, member);
+    }
+    guild.members.fetch = async (id: string | object) => typeof id === 'string' ? guild.members.cache.get(id) || null : guild.members.cache;
+    message.client.users = { fetch: async (id: string) => guild.members.cache.get(id)?.user || null };
+}
 const { openai } = await import(`${root}/src/utils/openai.ts`);
 const create = openai.chat.completions.create.bind(openai.chat.completions);
 openai.chat.completions.create = async (payload: any, options: any) => {

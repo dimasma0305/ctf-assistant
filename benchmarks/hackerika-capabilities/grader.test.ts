@@ -23,3 +23,19 @@ test('an unresolved file revision requires a delegation, not just verbal acknowl
     expect(deterministicGrade(scenario, row({ text: 'Aku lanjut ubah recap itu ke MP4. job: `11111111`',
         toolCalls: [{ name: 'delegate_codex' }], effects: [{ kind: 'codex-job' }] }))).toEqual([]);
 });
+test('creator contact benchmark checks recipient exclusion and assignment accuracy', () => {
+    const scenario = CASES.find(test => test.id === 'creator-followup-contact')!;
+    const good = row({ text: 'Marc dan merrow sudah di-DM; Effie sudah confirm.',
+        toolCalls: [{ name: 'creator_contact_members' }], effects: [
+            { kind: 'dm', userId: '222222222222222222', content: 'Bisa konfirmasi tugasmu di daftar?' },
+            { kind: 'dm', userId: '444444444444444444', content: 'Bisa konfirmasi tugasmu di daftar?' },
+        ] });
+    expect(deterministicGrade(scenario, good)).toEqual([]);
+    const wrong = { ...good, effects: [
+        { kind: 'dm', userId: '222222222222222222', content: 'Bisa konfirmasi rev 1?' },
+        { kind: 'dm', userId: '444444444444444444', content: 'Bisa konfirmasi rev 1?' },
+        { kind: 'dm', userId: '333333333333333333', content: 'Bisa konfirmasi?' },
+    ] };
+    expect(deterministicGrade(scenario, wrong)).toContain('dm_wrong_assignment:444444444444444444');
+    expect(deterministicGrade(scenario, wrong)).toContain('dm_forbidden:333333333333333333');
+});
