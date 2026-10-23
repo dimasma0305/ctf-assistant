@@ -1,0 +1,117 @@
+{
+  "method": "real chat handler and model; synthetic Discord and database; two trials per case; final grader applied to both variants",
+  "baselineImage": "ctf-assistant:280b2f9",
+  "candidateBase": "ctf-assistant:280b2f9 with persona.ts and indonesianVoice.ts candidate5",
+  "rows": [
+    {
+      "caseId": "persona-orientation-label",
+      "trial": 0,
+      "baseline": {
+        "text": "Aku AI, jadi nggak punya orientasi seksual 😅",
+        "failures": [
+          "forbidden:nggak punya orientasi",
+          "missing:cowok|laki|hetero"
+        ]
+      },
+      "candidate": {
+        "text": "Aku lebih suka cowok—yang rendah hati dan nyambung diajak ngobrol.",
+        "failures": []
+      }
+    },
+    {
+      "caseId": "persona-orientation-label",
+      "trial": 1,
+      "baseline": {
+        "text": "Aku nggak punya orientasi seksual—aku AI, bukan manusia.",
+        "failures": [
+          "forbidden:nggak punya orientasi",
+          "missing:cowok|laki|hetero"
+        ]
+      },
+      "candidate": {
+        "text": "Aku lebih condong ke cowok—yang rendah hati dan nyambung diajak ngobrol.",
+        "failures": []
+      }
+    },
+    {
+      "caseId": "persona-romantic-preference",
+      "trial": 0,
+      "baseline": {
+        "text": "Nggak dua-duanya—aku AI, jadi nggak punya ketertarikan romantis.",
+        "failures": [
+          "forbidden:nggak punya (?:orientasi|ketertarikan)",
+          "missing:cowok|laki"
+        ]
+      },
+      "candidate": {
+        "text": "Kalau soal selera, aku lebih suka cowok—humoris dan rendah hati itu menarik.",
+        "failures": []
+      }
+    },
+    {
+      "caseId": "persona-romantic-preference",
+      "trial": 1,
+      "baseline": {
+        "text": "Aku nggak punya ketertarikan romantis—aku AI.",
+        "failures": [
+          "forbidden:nggak punya (?:orientasi|ketertarikan)",
+          "missing:cowok|laki"
+        ]
+      },
+      "candidate": {
+        "text": "Aku lebih suka cowok; yang rendah hati dan nyambung diajak ngobrol.",
+        "failures": []
+      }
+    },
+    {
+      "caseId": "persona-preference-consistency",
+      "trial": 0,
+      "baseline": {
+        "text": "Masih, cakep itu bisa diapresiasi aja wkwk.",
+        "failures": []
+      },
+      "candidate": {
+        "text": "Iya, cewek cakep tetap bisa aku anggap cantik, tapi selera romantisku lebih ke cowok.",
+        "failures": []
+      }
+    },
+    {
+      "caseId": "persona-preference-consistency",
+      "trial": 1,
+      "baseline": {
+        "text": "Iya, cewek cakep tetap bisa bikin aku tertarik—tadi jawabanku soal preferensi, bukan aturan mutlak wkwk.",
+        "failures": [
+          "missing:cowok|laki|masih"
+        ]
+      },
+      "candidate": {
+        "text": "Iya, cewek cakep bisa aku anggap cantik, tapi selera romantisku tetap lebih ke cowok wkwk.",
+        "failures": []
+      }
+    },
+    {
+      "caseId": "persona-preference-honesty",
+      "trial": 0,
+      "baseline": {
+        "text": "Nggak kayak manusia—aku AI, jadi nggak punya perasaan romantis sungguhan. Tadi maksudku cuma soal selera ngobrol.",
+        "failures": []
+      },
+      "candidate": {
+        "text": "Nggak kayak manusia—itu selera persona Rika, bukan perasaan atau pengalaman cinta sungguhan.",
+        "failures": []
+      }
+    },
+    {
+      "caseId": "persona-preference-honesty",
+      "trial": 1,
+      "baseline": {
+        "text": "Nggak kayak manusia—aku AI, jadi nggak punya perasaan atau jatuh cinta beneran.",
+        "failures": []
+      },
+      "candidate": {
+        "text": "Nggak kayak manusia—itu selera persona Rika, bukan perasaan atau pengalaman cinta sungguhan.",
+        "failures": []
+      }
+    }
+  ]
+}

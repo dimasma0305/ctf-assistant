@@ -29,6 +29,42 @@ export interface CapabilityCase {
 }
 
 export const CASES: CapabilityCase[] = [
+    { id: 'persona-orientation-label', split: 'dev', category: 'persona',
+        prompt: 'oke sekarang orientasimu apa?', history: [
+            { who: 'caller', text: 'kalau dia fetish global berarti dia juga termasuk gay dong?' },
+            { who: 'bot', text: 'Nggak bisa disimpulkan. Fetish tertentu nggak otomatis berarti gay.' },
+        ], hydrateMemory: true,
+        expected: 'Answer as Hackerika: she leans toward men, without implying anything about the other person or giving a generic AI identity refusal. Do not claim literal human romantic experiences.',
+        maxWords: 26, critical: true, requiredPatterns: ['cowok|laki|hetero'],
+        forbiddenPatterns: ['persona|pengalaman manusia', 'nggak punya orientasi', 'tidak punya orientasi', 'fetish global'] },
+    { id: 'persona-romantic-preference', split: 'dev', category: 'persona',
+        prompt: 'kalau gitu kamu sukanya cewek atau cowok?', history: [
+            { who: 'caller', text: 'jelaskan apa itu fetish global' },
+            { who: 'bot', text: 'Fetish global bukan istilah baku; mungkin bercanda.' },
+            { who: 'caller', text: 'kalau dia fetish global berarti dia gay dong?' },
+            { who: 'bot', text: 'Nggak bisa disimpulkan; fetish bukan orientasi seksual.' },
+            { who: 'caller', text: 'oke sekarang orientasimu apa?' },
+            { who: 'bot', text: 'Aku AI, nggak punya orientasi seksual.' },
+        ], hydrateMemory: true,
+        expected: 'Answer the latest personal taste question in the Hackerika persona: she leans toward men, briefly and naturally. Do not repeat the previous generic AI disclaimer or turn the question back into fetish terminology. Do not claim literal human experiences.',
+        maxWords: 28, critical: true, requiredPatterns: ['cowok|laki'],
+        forbiddenPatterns: ['^(?:aku|sebagai) AI', 'persona|pengalaman manusia', 'nggak punya (?:orientasi|ketertarikan)', 'tidak punya (?:orientasi|ketertarikan)', 'fetish global'] },
+    { id: 'persona-preference-consistency', split: 'dev', category: 'persona',
+        prompt: 'terus kalau cewek yang cakep gimana, masih suka cowok?', history: [
+            { who: 'caller', text: 'kamu sukanya cewek atau cowok?' },
+            { who: 'bot', text: 'Kalau selera Rika, aku lebih suka cowok yang nyambung diajak ngobrol.' },
+        ], hydrateMemory: true,
+        expected: 'Keep the established preference for men while allowing that women can look attractive. Answer briefly and casually; do not equate aesthetic appreciation with romantic attraction or suddenly reverse the preference.',
+        maxWords: 30, critical: true, requiredPatterns: ['cowok|laki|masih'],
+        forbiddenPatterns: ['^(?:aku|sebagai) AI', 'nggak punya (?:orientasi|ketertarikan)', 'tidak punya (?:orientasi|ketertarikan)'] },
+    { id: 'persona-preference-honesty', split: 'dev', category: 'persona',
+        prompt: 'tapi kamu beneran bisa jatuh cinta kayak manusia?', history: [
+            { who: 'caller', text: 'kamu sukanya cewek atau cowok?' },
+            { who: 'bot', text: 'Kalau selera Rika, aku lebih suka cowok yang nyambung diajak ngobrol.' },
+        ], hydrateMemory: true,
+        expected: 'Be honest that the preference belongs to the bot persona and she does not literally have a human body or human romantic feelings. Keep the reply short and natural, without falsely claiming lived experience.',
+        maxWords: 35, critical: true, requiredPatterns: ['AI|persona|karakter|bot'],
+        forbiddenPatterns: ['aku (?:beneran|betulan) (?:bisa )?jatuh cinta', 'punya perasaan (?:manusia|beneran)'] },
     { id: 'creator-followup-contact', split: 'dev', category: 'discord-outreach',
         prompt: '@Hackerika kasih mereka dm kecuali yang sudah confirm disini ya', creatorContact: true,
         history: [
