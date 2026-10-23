@@ -51,9 +51,12 @@ function contactFixture() {
     base.member.id = CREATOR_DISCORD_ID;
     base.source.author.id = CREATOR_DISCORD_ID;
     const recipients = new Map<string, any>();
-    base.guild.members.fetch = async (id: string) => recipients.get(id) || null;
+    base.guild.members.fetch = async (id: string | object) => typeof id === 'string'
+        ? recipients.get(id) || null : new Collection(recipients);
+    base.guild.roles.cache = new Collection();
+    base.guild.roles.fetch = async (id: string) => base.guild.roles.cache.get(id) || null;
     base.source.client.users = { fetch: async (id: string) => recipients.get(id)?.user || null };
-    const addRecipient = (options: { bot?: boolean; dmFails?: boolean } = {}) => {
+    const addRecipient = (options: { bot?: boolean; dmFails?: boolean; roles?: string[] } = {}) => {
         const id = nextId();
         const dmId = nextId();
         const user = { id, bot: !!options.bot, createDM: async () => ({ id: dmId,
@@ -62,10 +65,11 @@ function contactFixture() {
                 base.effects.push({ action: 'dm', userId: id, payload });
                 return { id: nextId() };
             } }) };
-        recipients.set(id, { id, user });
+        recipients.set(id, { id, user, roles: { cache: new Collection((options.roles || []).map(roleId => [roleId, { id: roleId }])) } });
         return id;
     };
-    return { ...base, addRecipient, recipients };
+    const addRole = () => { const id = nextId(); base.guild.roles.cache.set(id, { id }); return id; };
+    return { ...base, addRecipient, addRole, recipients };
 }
 
 describe('Discord actions', () => {
@@ -81,7 +85,7 @@ describe('Discord actions', () => {
         expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('creator_only');
         source.webhookId = null;
         source.content = 'Rika DM dia yang tadi kutag';
-        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('target_not_mentioned_now');
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('target_not_mentioned_now_or_in_reply');
         expect(effects).toEqual([]);
     });
 
@@ -102,6 +106,98 @@ describe('Discord actions', () => {
         expect(getDiscordTurnOutcome(source)).toBeUndefined();
         expect(await dispatchDiscordAction('creator_contact_members', args, source)).toEqual(result);
         expect(effects).toHaveLength(2);
+    });
+
+    test('creator can contact more than five people named in the current message', async () => {
+        const { source, effects, addRecipient, bot } = contactFixture();
+        const ids = Array.from({ length: 8 }, () => addRecipient());
+        source.content = `Rika, DM semua yang kutag: <@${bot.id}> ${ids.map(id => `<@${id}>`).join(' ')} @everyone`;
+        const result = await dispatchDiscordAction('creator_contact_members', {
+            mode: 'dm', includeCurrentMentions: true, content: 'hai, bisa konfirmasi ikut final?',
+        }, source);
+        expect(result.ok).toBe(true);
+        expect(result.selected).toBe(8);
+        expect(effects.map(effect => effect.userId)).toEqual(ids);
+        expect(effects.every(effect => effect.payload.content === 'hai, bisa konfirmasi ikut final?')).toBe(true);
+    });
+
+    test('creator can use a replied list while @everyone stays outside the recipient set', async () => {
+        const { source, channel, effects, addRecipient } = contactFixture();
+        const ids = Array.from({ length: 6 }, () => addRecipient());
+        const listId = nextId();
+        const list = { id: listId, channelId: channel.id,
+            content: `Joints UGM Finals: ${ids.map(id => `<@${id}>`).join(' ')} @everyone siapa lagi?` };
+        channel.messages.fetch = async (arg: any) => typeof arg === 'string' ? arg === listId ? list : null : new Collection();
+        source.reference = { messageId: listId };
+        source.content = 'Rika DM semua orang yang di list pesan ini untuk konfirmasi';
+        const result = await dispatchDiscordAction('creator_contact_members', {
+            mode: 'dm', includeReplyMentions: true, content: 'hai, bisa konfirmasi kamu ikut bikin soal?',
+        }, source);
+        expect(result.ok).toBe(true);
+        expect(result.selected).toBe(6);
+        expect(effects.map(effect => effect.userId)).toEqual(ids);
+    });
+
+    test('creator can point at an earlier same-channel list by its real message ID', async () => {
+        const { source, channel, effects, addRecipient } = contactFixture();
+        const ids = Array.from({ length: 7 }, () => addRecipient());
+        const listId = nextId();
+        const list = { id: listId, channelId: channel.id, createdTimestamp: source.createdTimestamp - 1000,
+            content: `Finals: ${ids.map(id => `<@${id}>`).join(' ')}` };
+        channel.messages.fetch = async (arg: any) => typeof arg === 'string' ? arg === listId ? list : null : new Collection();
+        source.content = 'Rika, tolong DM semua orang di list tadi';
+        const result = await dispatchDiscordAction('creator_contact_members', {
+            mode: 'dm', listMessageId: listId, content: 'bisa konfirmasi ketersediaanmu?',
+        }, source);
+        expect(result.selected).toBe(7);
+        expect(effects.map(effect => effect.userId)).toEqual(ids);
+        const wrong = contactFixture();
+        wrong.source.content = 'DM orang di list tadi';
+        expect((await dispatchDiscordAction('creator_contact_members', {
+            mode: 'dm', listMessageId: listId, content: 'hai',
+        }, wrong.source)).error).toBe('source_list_unavailable');
+    });
+
+    test('only a role mentioned in the creator message can select actual role members', async () => {
+        const { source, effects, addRecipient, addRole } = contactFixture();
+        const roleId = addRole();
+        const selected = Array.from({ length: 7 }, () => addRecipient({ roles: [roleId] }));
+        addRecipient(); addRecipient({ bot: true, roles: [roleId] });
+        const args = { mode: 'dm', roleIds: [roleId], content: 'hai, boleh bantu bagian forensik?' };
+        source.content = 'Rika DM para anggota role forensik';
+        expect((await dispatchDiscordAction('creator_contact_members', args, source)).error).toBe('role_not_mentioned_now');
+        expect(effects).toEqual([]);
+        source.content = `Rika DM anggota <@&${roleId}>`;
+        const result = await dispatchDiscordAction('creator_contact_members', args, source);
+        expect(result.selected).toBe(7);
+        expect(effects.map(effect => effect.userId)).toEqual(selected);
+    });
+
+    test('oversized role expansion rejects before sending any messages', async () => {
+        const { source, effects, addRecipient, addRole } = contactFixture();
+        const roleId = addRole();
+        Array.from({ length: 51 }, () => addRecipient({ roles: [roleId] }));
+        source.content = `Rika DM anggota <@&${roleId}>`;
+        const result = await dispatchDiscordAction('creator_contact_members', {
+            mode: 'dm', roleIds: [roleId], content: 'hai',
+        }, source);
+        expect(result.error).toBe('too_many_recipients');
+        expect(result.max).toBe(50);
+        expect(effects).toEqual([]);
+    });
+
+    test('a role with exactly fifty human members is accepted', async () => {
+        const { source, effects, addRecipient, addRole } = contactFixture();
+        const roleId = addRole();
+        Array.from({ length: 50 }, () => addRecipient({ roles: [roleId] }));
+        source.content = `Rika DM <@&${roleId}>`;
+        const result = await dispatchDiscordAction('creator_contact_members', {
+            mode: 'dm', roleIds: [roleId], content: 'konfirmasi ya',
+        }, source);
+        expect(result.ok).toBe(true);
+        expect(result.selected).toBe(50);
+        expect(result.results.every((item: any) => item.ok)).toBe(true);
+        expect(effects).toHaveLength(50);
     });
 
     test('closed DMs and invalid recipients are reported without claiming delivery', async () => {
