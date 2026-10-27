@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-27",
+  "incident": {
+    "job": "070ab83d",
+    "error": "worker_image_unavailable",
+    "modelCalls": 0,
+    "searches": 0,
+    "sourceReads": 0
+  },
+  "rootCause": "The worker image was absent. The systemd service mounts /root read-only, but Docker Buildx tried to write /root/.docker/buildx/activity. Automatic build stderr was discarded.",
+  "systemdBuildProof": {
+    "before": {
+      "exitCode": 1,
+      "error": "failed to update builder last activity time: read-only file system"
+    },
+    "after": {
+      "exitCode": 0,
+      "elapsedMs": 8050,
+      "change": "Disposable writable DOCKER_CONFIG outside the build context; systemd restrictions retained."
+    }
+  },
+  "regressions": {
+    "uniqueTestsPassed": 45,
+    "typecheck": "passed",
+    "applicationBuild": "passed",
+    "covers": [
+      "image recovery readiness and concurrent build",
+      "HTTP 503 before job creation when worker unavailable",
+      "existing file exports",
+      "full-length research and intact citations",
+      "multipart retries and failed delivery acknowledgements",
+      "retention after five failed text sends"
+    ]
+  },
+  "liveRuns": [
+    {
+      "path": "runs/investigation-recovery-20261027",
+      "elapsedMs": 284237,
+      "completed": true,
+      "fullDelivery": false
+    },
+    {
+      "path": "runs/investigation-complete-delivery-20261027",
+      "elapsedMs": 216057,
+      "completed": true,
+      "fullDelivery": true,
+      "parts": 2,
+      "inspectedGatewaySources": 3
+    }
+  ],
+  "limits": "Two real worker runs of one public research question, with synthetic Discord IDs and no live Discord sends. This validates this incident and complete delivery; it is not an overall factual-accuracy score or a latency benchmark."
+}

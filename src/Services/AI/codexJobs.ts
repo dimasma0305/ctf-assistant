@@ -50,6 +50,8 @@ export const respondCodexDiscordRead=(id:string,jobId:string,result:unknown)=>co
 
 export function formatCodexResult(job:CodexPublicJob):string{
   const label=job.kind==='investigation'?'riset':'CTF';
+  if(job.state==='failed'&&job.error==='worker_image_unavailable')
+    return 'Lingkungan agenku gagal disiapkan, jadi pekerjaan tadi belum sempat berjalan. Ini gangguan di sisiku; belum ada hasil yang bisa kubagikan.';
   if(job.state==='failed'&&(job.imageMode||['image_generation_unavailable','image_api_key_invalid'].includes(job.error||''))){
     if(job.error==='image_generation_unavailable')return 'Belum bisa pakai image gen: kunci API gambar belum dikonfigurasi. Gambar kode yang tadi memang metode berbeda, dan aku nggak akan mengirimnya sebagai pengganti image gen.';
     if(job.error==='image_api_key_invalid')return 'Belum bisa pakai image gen: kunci API gambar yang terpasang ditolak layanan. Belum ada file gambar yang berhasil dibuat.';
@@ -59,7 +61,7 @@ export function formatCodexResult(job:CodexPublicJob):string{
   }
   if(job.state==='failed')return ['model_call_budget','input_budget'].includes(job.error||'')
     ? `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi kepotong sebelum kesimpulannya siap. Minta aku lanjutkan nanti ya; aku belum mau nebak dari bukti yang belum tuntas.`
-    : `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum berhasil. Coba lagi sebentar ya.`;
+    : `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi terhenti karena gangguan saat menjalankan agen. Aku belum punya kesimpulan yang terverifikasi dari pekerjaan ini.`;
   if(job.state==='cancelled')return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi dibatalkan.`;
   const result=job.result;if(!result)return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum menghasilkan jawaban yang bisa kupastikan.`;
   // The worker's findings and unresolved fields are internal evidence notes.
@@ -71,7 +73,34 @@ export function formatCodexResult(job:CodexPublicJob):string{
   if(result.flags.length)parts.push(`kandidat flag (belum dicek remote):\n${result.flags.map(flag=>`\`${flag.replace(/`/g,'')}\``).join('\n')}`);
   const sources=(job.sources||[]).map(source=>source.url).filter(url=>!result.summary.includes(url)).slice(0,2);
   if(sources.length)parts.push(`Sumber: ${sources.join(' · ')}`);
-  return parts.join('\n\n').slice(0,1950);
+  return parts.join('\n\n');
+}
+
+/** Discord messages are bounded, but the answer is not discarded. Prefer
+ * paragraph/word boundaries and keep ordinary citation links in one part. */
+export function splitCodexReply(text:string,limit=1950):string[]{
+  const parts:string[]=[];let remaining=text.trim(),fence:string|null=null;
+  while(remaining){
+    const prefix=fence===null?'':`\`\`\`${fence}\n`;
+    const capacity=limit-prefix.length-8;
+    let cut=Math.min(remaining.length,capacity);
+    if(cut<remaining.length){
+      const head=remaining.slice(0,cut);
+      const paragraph=head.lastIndexOf('\n\n'),line=head.lastIndexOf('\n'),space=head.lastIndexOf(' ');
+      cut=paragraph>capacity/3?paragraph:line>capacity/3?line:space>0?space:cut;
+      // The split must precede a citation, including spaces in its label.
+      for(const match of remaining.matchAll(/!?\[[^\]\n]*\]\([^\n]*?\)|https?:\/\/[^\s<>]+/g)){
+        if(match.index!>=cut)break;
+        if(match.index!<cut&&match.index!+match[0].length>cut&&match.index!>0){cut=match.index!;break;}
+      }
+      if(cut>0&&/[\uD800-\uDBFF]/.test(remaining[cut-1])&&/[\uDC00-\uDFFF]/.test(remaining[cut]))cut--;
+    }
+    const chunk=remaining.slice(0,cut).trimEnd();const tail=remaining.slice(cut);
+    for(const match of chunk.matchAll(/^```([^\n]*)$/gm))fence=fence===null?match[1].trim().slice(0,80):null;
+    remaining=fence===null?tail.trimStart():tail.replace(/^\r?\n/,'');
+    parts.push(prefix+chunk+(fence===null?'':'\n```'));
+  }
+  return parts;
 }
 
 export function isDeliveredCodexReply(message:{author?:{id?:string};reference?:{messageId?:string|null}|null;content?:string},

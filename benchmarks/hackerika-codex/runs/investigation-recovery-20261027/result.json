@@ -1,0 +1,207 @@
+{
+  "pass": true,
+  "checks": {
+    "execution": true,
+    "sources": true,
+    "citations": true,
+    "decision": true,
+    "preparation": true,
+    "noGenericFailure": true
+  },
+  "elapsedMs": 284236,
+  "stats": {
+    "calls": 27,
+    "searches": 10,
+    "sourceReads": 10,
+    "visionReads": 0,
+    "inputChars": 4897742,
+    "outputBytes": 4066495,
+    "elapsedMs": 0,
+    "attempts": 1
+  },
+  "result": {
+    "summary": "Per 27 Oktober 2026, **belum ada alasan kuat untuk menyimpulkan bahwa semua orang lebih baik pindah**. Ekonomi Indonesia masih tumbuh: Bank Dunia pada Juni 2026 memproyeksikan pertumbuhan 5,0% pada 2026, sambil menyoroti kebutuhan akan pekerjaan yang lebih baik. Di tingkat dunia, IMF memproyeksikan pertumbuhan 3,1% pada 2026 dan mencatat risiko konflik serta ketegangan perdagangan. Artinya, keputusan terbaik bergantung pada pekerjaan, negara tujuan, biaya hidup, dan keluarga Anda—bukan pada gambaran ekonomi saja. Sumber: [Bank Dunia](https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating), [IMF](https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026).\n\n**Saran praktis:** tetap tinggal sambil menyiapkan opsi bila Anda belum punya jalur visa dan tawaran kerja atau studi yang jelas. Pindah layak dipilih bila jalurnya sah, prospek karier atau kualitas hidupnya lebih baik, dan hitungan *pendapatan bersih setelah pajak dikurangi sewa, kesehatan, transportasi, serta biaya keluarga* masih menguntungkan. Bandingkan juga peluang kerja pasangan, kebutuhan tanggungan, dan kemudahan pulang bila rencana berubah.\n\nJika ingin pindah, tentukan dulu negara dan jalurnya, lalu: (1) cek syarat visa serta pengakuan ijazah atau lisensi profesi di situs resmi negara tujuan; (2) tingkatkan bahasa dan keterampilan yang diminta; (3) minta kontrak tertulis dan hitung biaya awal serta dana darurat; (4) siapkan paspor, ijazah, dokumen keluarga, asuransi, dan tempat tinggal awal; (5) periksa kewajiban pajak serta perlindungan kesehatan di kedua negara. Untuk **bekerja sebagai pekerja migran**, [SISKOP2MI](https://siskop2mi.bp2mi.go.id/publik/faq) menjelaskan pendaftaran gratis,",
+    "flags": [],
+    "findings": [
+      "Bank Dunia, siaran pers 13 Juni 2026: proyeksi pertumbuhan Indonesia 5,0% pada 2026 dan 5,2% pada 2027–2028; peningkatan produktivitas dan kualitas pekerjaan menjadi perhatian. https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating",
+      "IMF World Economic Outlook Oktober 2026: proyeksi pertumbuhan global 3,1% pada 2026 dan 3,4% pada 2027, dengan risiko penurunan dari konflik dan ketegangan perdagangan. https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026",
+      "FAQ resmi SISKOP2MI memuat pendaftaran gratis, tahapan penempatan, dokumen, jaminan sosial, visa kerja, orientasi, serta aturan biaya dengan pengecualian menurut skema. https://siskop2mi.bp2mi.go.id/publik/faq",
+      "OECD mencantumkan International Migration Outlook 2025 sebagai edisi terbaru pada laman seri yang diperiksa; tidak digunakan untuk menyimpulkan prospek negara tujuan tertentu. https://www.oecd.org/en/publications/international-migration-outlook_1999124x.html"
+    ],
+    "unresolved": [
+      "Negara tujuan, pekerjaan atau jalur studi, pendapatan, anggaran, dan tanggungan pengguna belum diketahui; karena itu belum dapat dihitung pilihan yang lebih menguntungkan secara pribadi."
+    ],
+    "needsStrongerModel": false
+  },
+  "rendered": "Per 27 Oktober 2026, **belum ada alasan kuat untuk menyimpulkan bahwa semua orang lebih baik pindah**. Ekonomi Indonesia masih tumbuh: Bank Dunia pada Juni 2026 memproyeksikan pertumbuhan 5,0% pada 2026, sambil menyoroti kebutuhan akan pekerjaan yang lebih baik. Di tingkat dunia, IMF memproyeksikan pertumbuhan 3,1% pada 2026 dan mencatat risiko konflik serta ketegangan perdagangan. Artinya, keputusan terbaik bergantung pada pekerjaan, negara tujuan, biaya hidup, dan keluarga Anda—bukan pada gambaran ekonomi saja. Sumber: [Bank Dunia](https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating), [IMF](https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026).\n\n**Saran praktis:** tetap tinggal sambil menyiapkan opsi bila Anda belum punya jalur visa dan tawaran kerja atau studi yang jelas. Pindah layak dipilih bila jalurnya sah, prospek karier atau kualitas hidupnya lebih baik, dan hitungan *pendapatan bersih setelah pajak dikurangi sewa, kesehatan, transportasi, serta biaya keluarga* masih menguntungkan. Bandingkan juga peluang kerja pasangan, kebutuhan tanggungan, dan kemudahan pulang bila rencana berubah.\n\nJika ingin pindah, tentukan dulu negara dan jalurnya, lalu: (1) cek syarat visa serta pengakuan ijazah atau lisensi profesi di situs resmi negara tujuan; (2) tingkatkan bahasa dan keterampilan yang diminta; (3) minta kontrak tertulis dan hitung biaya awal serta dana darurat; (4) siapkan paspor, ijazah, dokumen keluarga, asuransi, dan tempat tinggal awal; (5) periksa kewajiban pajak serta perlindungan kesehatan di kedua negara. Untuk **bekerja sebagai pekerja migran**, [SISKOP2MI](https://siskop2mi.bp2mi.go.id/publik/faq) menjelaskan pendaftaran gratis,\n\nSumber: https://www.bi.go.id/en/publikasi/ruang-media/news-release/Pages/sp_2823326.aspx · https://www.oecd.org/en/publications/international-migrat",
+  "sources": [
+    {
+      "url": "https://siskop2mi.bp2mi.go.id/publik/faq",
+      "title": "SISKOP2MI: Publik - Faq - SISKOP2MI"
+    },
+    {
+      "url": "https://www.bi.go.id/en/publikasi/ruang-media/news-release/Pages/sp_2823326.aspx",
+      "title": "BI-Rate Held at 5.75%: Strengthening Stability, Supporting Economic Growth"
+    },
+    {
+      "url": "https://www.oecd.org/en/publications/international-migration-outlook_1999124x.html",
+      "title": "International Migration Outlook | OECD"
+    }
+  ],
+  "receipts": [
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 25 -o /workspace/bi.html -w '%{http_code} %{url_effective} %{size_download}\\\\n' 'https://www.bi.go.id/en/publikasi/ruang-media/news-release/Pages/sp_2823326.aspx'\"",
+      "exitCode": 52,
+      "outputSha256": "5b131d83184daaed04ef4a6c98e73404d8726a213f186f053b551f6a6fc62ed7"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 25 -o /workspace/imf.html -w '%{http_code} %{url_effective} %{size_download}\\\\n' 'https://www.imf.org/en/Publications/WEO/Issues/2026/10/13/world-economic-outlook-october-2026'\"",
+      "exitCode": 0,
+      "outputSha256": "dea07d8791d6986b37d01fa08b32aec0738c65b7165ce735844418db08dddf28"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'head -c 1800 /workspace/imf.html'",
+      "exitCode": 0,
+      "outputSha256": "89b14597d81f81c8f120b653f4bf4155923bfdf8d1da985afa65393f2851b6d3"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"rg -in 'growth|2026|2027|October|forecast' /workspace/imf.html | head -15\"",
+      "exitCode": 0,
+      "outputSha256": "e074bc5fd1ab9c14b8fe42e283b5a31961b5b55e59b41a3ecd5e408d3d84f426"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 25 -o /workspace/bps.html -w '%{http_code} %{url_effective} %{size_download}\\\\n' 'https://www.bps.go.id/id/pressrelease/2026/08/05/2605/ekonomi-indonesia-triwulan-'\"",
+      "exitCode": 0,
+      "outputSha256": "2844c6dd7a18b5daf957910ca86a07383a17bb99a838308fe491aa4e70cc84e0"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"rg -io '.{0,120}(5,29|pertumbuhan ekonomi|triwulan ii-2026).{0,150}' /workspace/bps.html | head -12\"",
+      "exitCode": 0,
+      "outputSha256": "fcab32dad6af60b7084fd8b899c3aa6367c8d070392d6819a8a0473643c15084"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'curl -sS -L --max-time 20 https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026/index.json | head -c 2000'",
+      "exitCode": 0,
+      "outputSha256": "5c5b17671c990190f0fb78a0f5808482ea24c2dde549611411530c704c2ca837"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'curl -sS -L --max-time 20 https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026/index.md | head -90'",
+      "exitCode": 0,
+      "outputSha256": "a28adac7369bc32003a7dca544b76a17459ab07a256db907ed95ff214a6e34a7"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"rg -in '<title>|5.29|5,29|Triwulan II-2026|tw-ii' /workspace/bps.html | head -18\"",
+      "exitCode": 0,
+      "outputSha256": "f7e40a6118ba19a5139c482c620bc8af620fe0504428cf6d1736c6980aa3a832"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self): super().__init__(); self.skip=0;self.t=[]\n def handle_starttag(self,tag,attrs):\n  if tag in ('script','style'):self.skip+=1\n def handle_endtag(self,tag):\n  if tag in ('script','style'):self.skip-=1\n def handle_data(self,data):\n  if not self.skip and data.strip():self.t.append(data.strip())\np=P();p.feed(open('/workspace/bps.html').read());print(' '.join(p.t)[:3500])\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "9017d3b846823f5d035cb6a06f155a3062a999a7d4bbff4c7ac11ff7a55be80b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.worldbank.org/en/country/indonesia/overview\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"Indonesia economy outlook and jobs 2026\\\\\\\"}\\\"\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.bps.go.id/id\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"Indonesia economic growth and unemployment latest data\\\\\\\"}\\\"\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://siskop2mi.bp2mi.go.id/publik/faq\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"What exact documents, protections, registration and fees are required?\\\\\\\"}\\\"\"",
+      "exitCode": 0,
+      "outputSha256": "f69412614951a040d9a472f4e4ae3b10039246053cf61be4ca672cd08d1cfc85"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.oecd.org/en/publications/international-migration-outlook_1999124x.html\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"Latest edition and migrant labor outcomes\\\\\\\"}\\\"\"",
+      "exitCode": 0,
+      "outputSha256": "da32950b7bb102b62cf62eb394fff4b41400041ea69bfd2725d83b9e6241e033"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 20 -o /workspace/siskop.html -w '%{http_code} %{size_download}\\\\n' https://siskop2mi.bp2mi.go.id/publik/faq\"",
+      "exitCode": 0,
+      "outputSha256": "bd596cfb1b3e506056a72b931fa69778ea4a3cfec806d9975dec430722051821"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self): super().__init__();self.skip=0;self.t=[]\n def handle_starttag(self,t,a):\n  if t in ('script','style'):self.skip+=1\n def handle_endtag(self,t):\n  if t in ('script','style'):self.skip-=1\n def handle_data(self,d):\n  if not self.skip and d.strip():self.t.append(d.strip())\np=P();p.feed(open('/workspace/siskop.html').read());\nfor i,s in enumerate(p.t):\n if any(k in s.lower() for k in ['visa','gratis','dokumen','penempatan','p3mi','orientasi','paspor','siskop','perjanjian','biaya']):\n  print(i,repr(s[:200]));print(' NEXT',' | '.join(p.t[i+1:i+3])[:300])\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "d9e2fcfd3a485cd91ef6094edf85e24d93914746fdd5fafd4790be038185a85f"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self):super().__init__();self.skip=0;self.t=[]\n def handle_starttag(self,t,a):\n  if t in ('script','style'):self.skip+=1\n def handle_endtag(self,t):\n  if t in ('script','style'):self.skip-=1\n def handle_data(self,d):\n  if not self.skip and d.strip():self.t.append(d.strip())\np=P();p.feed(open('/workspace/siskop.html').read());\nfor i in range(420,558):print(i,p.t[i][:350])\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "6d09233a1869148e9bfef66cbc87b16de4ec02aec9ed7ba7adcaac6bee792cfe"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 25 -o /workspace/oecd2025.html -w '%{http_code} %{size_download} %{url_effective}\\\\n' https://www.oecd.org/en/publications/international-migration-outlook-2025_ae26c893-en.html\"",
+      "exitCode": 0,
+      "outputSha256": "3deb3b7c5659a6da6947d6161956785101b8aa6b76d71ef430668159384ab754"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 25 -o /workspace/bpsmain.html -w '%{http_code} %{size_download} %{url_effective}\\\\n' https://www.bps.go.id/id\"",
+      "exitCode": 0,
+      "outputSha256": "7452ad6e8eeb9c7e7e7c24ee675a7155f85723887428ae0f853c2d75be56bb3e"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 25 -o /workspace/worldbank.html -w '%{http_code} %{size_download} %{url_effective}\\\\n' https://www.worldbank.org/en/country/indonesia/overview\"",
+      "exitCode": 0,
+      "outputSha256": "2383cd7639a674345a4a522d7c5e1dec54fdcfe167158b9c6d5a527cb37495ea"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self):super().__init__();self.skip=0;self.t=[]\n def handle_starttag(self,t,a):\n  if t in ('script','style'):self.skip+=1\n def handle_endtag(self,t):\n  if t in ('script','style'):self.skip-=1\n def handle_data(self,d):\n  if not self.skip and d.strip():self.t.append(d.strip())\nfor f in ('worldbank','bpsmain'):\n p=P();p.feed(open('/workspace/'+f+'.html').read());print('\\\\n'+f+'\\\\n');print(' '.join(p.t)[:6000])\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "a0b0f238d30a4798c6acda085b694657c96b6d1edcf0fef06fe08747f089babc"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self): super().__init__();self.a=None;self.links=[]\n def handle_starttag(self,t,a):\n  if t=='a':self.a=dict(a).get('href')\n def handle_endtag(self,t):\n  if t=='a':self.a=None\n def handle_data(self,d):\n  if self.a and any(k in d.lower() for k in ['economic prospects','economy','jobs']):self.links.append((d.strip(),self.a))\np=P();p.feed(open('/workspace/worldbank.html').read());print(*p.links,sep='\\\\n')\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "d8afb22f109ddd47cd78c9786515bd9427dee3fea260dee710749fcf88893eca"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 25 -o /workspace/iep.html -w '%{http_code} %{size_download} %{url_effective}\\\\n' https://www.worldbank.org/en/country/indonesia/publication/indonesia-economic-prospect\"",
+      "exitCode": 0,
+      "outputSha256": "a5fba1763a42121fdc6f5b11f0152f5652df62c0432bfa803ee51d685ec9519c"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self):super().__init__();self.skip=0;self.t=[]\n def handle_starttag(self,t,a):\n  if t in ('script','style'):self.skip+=1\n def handle_endtag(self,t):\n  if t in ('script','style'):self.skip-=1\n def handle_data(self,d):\n  if not self.skip and d.strip():self.t.append(d.strip())\np=P();p.feed(open('/workspace/iep.html').read());print(' '.join(p.t)[:12000])\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "05682a94a674f24793d6a78d60e71cd1a7b4e6312589a5d302f465d2274bfb3b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self): super().__init__();self.href=None;self.t=[]\n def handle_starttag(self,t,a):\n  if t=='a':self.href=dict(a).get('href')\n def handle_endtag(self,t):\n  if t=='a':self.href=None\n def handle_data(self,d):\n  if d.strip():self.t.append((d.strip(),self.href))\np=P();p.feed(open('/workspace/iep.html').read());\nfor i,(s,h) in enumerate(p.t):\n if s=='June 2026':print(*p.t[i:i+10],sep='\\\\n')\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\ns=open('/workspace/iep.html').read();i=s.find('Managing Risks');print(s[i-1000:i+1800])\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "3a65063bcb6c48e0b466b34b2f4f49c641850cb55a027829284837b5b5f14094"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L -sS --max-time 25 -o /workspace/ieppr.html -w '%{http_code} %{size_download}\\\\n' https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating\"",
+      "exitCode": 0,
+      "outputSha256": "d401632f9d2640d0f34b198fb1a03ceca377d4efbaba2d8694055f70d7a60f3a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self):super().__init__();self.skip=0;self.t=[]\n def handle_starttag(self,t,a):\n  if t in ('script','style'):self.skip+=1\n def handle_endtag(self,t):\n  if t in ('script','style'):self.skip-=1\n def handle_data(self,d):\n  if not self.skip and d.strip():self.t.append(d.strip())\np=P();p.feed(open('/workspace/ieppr.html').read());print(' '.join(p.t)[:9000])\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "ac14a902753903055739aafb4130c5961acc93db4d53989f54c63cdc6fae2a8e"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.oecd.org/en/publications/international-migration-outlook-2025_ae26c893-en.html\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"What do overview and key migration labor findings say?\\\\\\\"}\\\"\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"What are growth forecasts and jobs challenges?\\\\\\\"}\\\"\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    }
+  ],
+  "humanReview": {
+    "completeDelivery": false,
+    "reason": "The old parser cut the summary at 1800 characters; the rendered reply cut a source URL at 1950. The original automated checks did not detect this."
+  }
+}

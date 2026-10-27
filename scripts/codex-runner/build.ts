@@ -10,6 +10,10 @@ const version=(await new Response(versionProcess.stdout).text()).trim();
 if(await versionProcess.exited!==0||!/^codex-cli 0\.163\.0\b/.test(version))throw Error(`unsupported_codex_version:${version}`);
 const tag=process.argv[3]||'hackerika-codex-worker:0.163.0-9';
 const directory=await mkdtemp(join(tmpdir(),'hackerika-codex-build-'));
+// systemd deliberately mounts /root read-only. Buildx writes activity and
+// builder metadata under DOCKER_CONFIG even when no registry login is needed.
+// Keep that state outside both /root and the Docker build context.
+const dockerConfig=await mkdtemp(join(tmpdir(),'hackerika-codex-docker-'));
 try{
   await Promise.all([
     copyFile(join(import.meta.dir,'Dockerfile'),join(directory,'Dockerfile')),
@@ -19,7 +23,12 @@ try{
     copyFile(host,join(directory,'codex-code-mode-host')),
   ]);
   await Promise.all([chmod(join(directory,'worker.py'),0o600),chmod(join(directory,'codex'),0o700),chmod(join(directory,'codex-code-mode-host'),0o700)]);
-  const build=Bun.spawn(['docker','build','--pull=false','-t',tag,directory],{stdin:'ignore',stdout:'inherit',stderr:'inherit'});
-  if(await build.exited!==0)throw Error('worker_image_build_failed');
+  const build=Bun.spawn(['docker','build','--pull=false','-t',tag,directory],{
+    stdin:'ignore',stdout:'inherit',stderr:'inherit',env:{...process.env,DOCKER_CONFIG:dockerConfig}});
+  const stop=()=>build.kill('SIGTERM');
+  process.on('SIGTERM',stop);process.on('SIGINT',stop);
+  let code:number;
+  try{code=await build.exited;}finally{process.off('SIGTERM',stop);process.off('SIGINT',stop);}
+  if(code!==0)throw Error('worker_image_build_failed');
   console.log(`[CodexWorker] built ${tag} from ${version}`);
-}finally{await rm(directory,{recursive:true,force:true});}
+}finally{await Promise.all([rm(directory,{recursive:true,force:true}),rm(dockerConfig,{recursive:true,force:true})]);}

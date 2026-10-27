@@ -11,5 +11,7 @@ export function groundCodexHandoff(modelReply: string, toolResult: string | unde
   const marker = ids.length ? ' job: ' + ids.map(id => '`' + id + '`').join(', ') : '';
   return result.status === 'busy'
     ? 'Masih ada job yang jalan di channel ini; hasilnya menyusul.' + marker
+    : (result.job?.kind === 'investigation' || result.jobs?.length && result.jobs.every((job: any) => job.kind === 'investigation'))
+    ? 'Aku kerjakan dulu. Hasilnya nanti kukirim di sini.' + marker
     : 'Oke, aku mulai kerjakan di lab terisolasi. Hasilnya menyusul di sini.' + marker;
 }

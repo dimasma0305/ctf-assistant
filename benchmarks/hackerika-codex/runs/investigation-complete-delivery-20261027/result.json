@@ -1,0 +1,192 @@
+{
+  "pass": true,
+  "checks": {
+    "execution": true,
+    "sources": true,
+    "citations": true,
+    "decision": true,
+    "preparation": true,
+    "noGenericFailure": true,
+    "completeDelivery": true
+  },
+  "elapsedMs": 216056,
+  "stats": {
+    "calls": 15,
+    "searches": 6,
+    "sourceReads": 7,
+    "visionReads": 0,
+    "inputChars": 2134163,
+    "outputBytes": 2193114,
+    "elapsedMs": 0,
+    "attempts": 1
+  },
+  "result": {
+    "summary": "**Per 27 Oktober 2026, saya tidak akan menyarankan pindah atau menetap untuk semua orang.** Indonesia masih punya prospek pertumbuhan: Bank Dunia memproyeksikan 5,0% pada 2026. Namun, laporannya juga mencatat setengah menganggur 32,7% dan penurunan upah riil sekitar 1–2% per tahun sejak 2018 pada pekerjaan berketerampilan menengah dan tinggi. Di luar negeri pun peluang tidak merata; ILO mencatat tekanan pada pekerjaan dan pekerja migran akibat gangguan ekonomi global. Sumber: [Bank Dunia](https://openknowledge.worldbank.org/server/api/core/bitstreams/229b85c1-fc35-46ad-ab26-ede5d18b51f2/content) dan [ILO](https://www.ilo.org/resource/news/middle-east-crisis-weighs-global-labour-markets).\n\n**Pindah masuk akal** bila ada jalur tinggal dan kerja yang sah, tawaran kerja atau rencana studi yang jelas, serta hasil bersih yang lebih baik setelah pajak, sewa, asuransi, biaya keluarga, dan ongkos pindah dihitung. **Tinggal sementara di Indonesia lebih masuk akal** bila pekerjaan di sini sudah baik, tawaran luar negeri belum pasti, atau pindah akan menghabiskan tabungan. Bandingkan dua anggaran bulanan dalam mata uang yang sama; jangan membandingkan gaji kotor saja. Masukkan pula prospek karier, kesehatan, keamanan, dan kebutuhan keluarga.\n\nJika ingin pindah, siapkan: (1) negara dan jalur visa yang sesuai tujuan; cek syarat terbaru di situs imigrasi negara tujuan sebelum membayar apa pun; (2) kontrak tertulis, rincian gaji dan potongan, serta pemeriksaan pemberi kerja atau agen; (3) paspor, ijazah/sertifikasi, bukti pengalaman, kemampuan bahasa, dan dokumen keluarga bila ikut; (4) dana biaya awal dan cadangan beberapa bulan, tempat tinggal sementara, asuransi kesehatan, serta rencana pajak; (5) rencana pulang jika pekerjaan atau izin tinggal berakhir. Untuk jalur pekerja migran Indonesia, periksa lowongan dan prosedur di [SISKOP2MI](https://siskop2mi.bp2mi.go.id/publik/faq); FAQ resminya juga meminta biaya penempatan tercantum dalam dokumen dan mengingatkan agar tidak membayar di luar ketentuan.\n\nKalau kamu sebutkan **negara tujuan, bidang pekerjaan, kisaran tabungan, dan apakah keluarga ikut**, perbandingannya bisa dibuat jauh lebih tegas.",
+    "flags": [],
+    "findings": [
+      "Laporan Indonesia Economic Prospects Bank Dunia Juni 2026 diperiksa langsung sebagai PDF: proyeksi pertumbuhan 5,0% pada 2026; setengah menganggur 32,7%; upah riil pekerjaan berketerampilan menengah dan tinggi turun sekitar 1–2% per tahun sejak 2018. https://openknowledge.worldbank.org/server/api/core/bitstreams/229b85c1-fc35-46ad-ab26-ede5d18b51f2/content",
+      "Rilis ILO 18 Mei 2026 diperiksa langsung: risiko pasar kerja global dan pekerja migran tidak merata; angka dampak dalam rilis adalah skenario, sehingga tidak dipakai sebagai ramalan pasti. https://www.ilo.org/resource/news/middle-east-crisis-weighs-global-labour-markets",
+      "FAQ resmi SISKOP2MI diperiksa langsung: menyediakan jalur informasi lowongan dan penempatan; biaya penempatan harus tercantum resmi dan pembayaran di luar ketentuan harus dihindari. https://siskop2mi.bp2mi.go.id/publik/faq"
+    ],
+    "unresolved": [
+      "Negara tujuan, pekerjaan, pendapatan/tawaran, anggaran, dan tanggungan pengguna belum diketahui; keputusan pribadi dan syarat visa spesifik belum dapat dipastikan."
+    ],
+    "needsStrongerModel": false
+  },
+  "rendered": "**Per 27 Oktober 2026, saya tidak akan menyarankan pindah atau menetap untuk semua orang.** Indonesia masih punya prospek pertumbuhan: Bank Dunia memproyeksikan 5,0% pada 2026. Namun, laporannya juga mencatat setengah menganggur 32,7% dan penurunan upah riil sekitar 1–2% per tahun sejak 2018 pada pekerjaan berketerampilan menengah dan tinggi. Di luar negeri pun peluang tidak merata; ILO mencatat tekanan pada pekerjaan dan pekerja migran akibat gangguan ekonomi global. Sumber: [Bank Dunia](https://openknowledge.worldbank.org/server/api/core/bitstreams/229b85c1-fc35-46ad-ab26-ede5d18b51f2/content) dan [ILO](https://www.ilo.org/resource/news/middle-east-crisis-weighs-global-labour-markets).\n\n**Pindah masuk akal** bila ada jalur tinggal dan kerja yang sah, tawaran kerja atau rencana studi yang jelas, serta hasil bersih yang lebih baik setelah pajak, sewa, asuransi, biaya keluarga, dan ongkos pindah dihitung. **Tinggal sementara di Indonesia lebih masuk akal** bila pekerjaan di sini sudah baik, tawaran luar negeri belum pasti, atau pindah akan menghabiskan tabungan. Bandingkan dua anggaran bulanan dalam mata uang yang sama; jangan membandingkan gaji kotor saja. Masukkan pula prospek karier, kesehatan, keamanan, dan kebutuhan keluarga.\n\nJika ingin pindah, siapkan: (1) negara dan jalur visa yang sesuai tujuan; cek syarat terbaru di situs imigrasi negara tujuan sebelum membayar apa pun; (2) kontrak tertulis, rincian gaji dan potongan, serta pemeriksaan pemberi kerja atau agen; (3) paspor, ijazah/sertifikasi, bukti pengalaman, kemampuan bahasa, dan dokumen keluarga bila ikut; (4) dana biaya awal dan cadangan beberapa bulan, tempat tinggal sementara, asuransi kesehatan, serta rencana pajak; (5) rencana pulang jika pekerjaan atau izin tinggal berakhir. Untuk jalur pekerja migran Indonesia, periksa lowongan dan prosedur di [SISKOP2MI](https://siskop2mi.bp2mi.go.id/publik/faq); FAQ resminya juga meminta biaya penempatan tercantum dalam dokumen dan mengingatkan agar tidak membayar di luar ketentuan.\n\nKalau kamu sebutkan **negara tujuan, bidang pekerjaan, kisaran tabungan, dan apakah keluarga ikut**, perbandingannya bisa dibuat jauh lebih tegas.\n\nSumber: https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating",
+  "parts": [
+    "**Per 27 Oktober 2026, saya tidak akan menyarankan pindah atau menetap untuk semua orang.** Indonesia masih punya prospek pertumbuhan: Bank Dunia memproyeksikan 5,0% pada 2026. Namun, laporannya juga mencatat setengah menganggur 32,7% dan penurunan upah riil sekitar 1–2% per tahun sejak 2018 pada pekerjaan berketerampilan menengah dan tinggi. Di luar negeri pun peluang tidak merata; ILO mencatat tekanan pada pekerjaan dan pekerja migran akibat gangguan ekonomi global. Sumber: [Bank Dunia](https://openknowledge.worldbank.org/server/api/core/bitstreams/229b85c1-fc35-46ad-ab26-ede5d18b51f2/content) dan [ILO](https://www.ilo.org/resource/news/middle-east-crisis-weighs-global-labour-markets).\n\n**Pindah masuk akal** bila ada jalur tinggal dan kerja yang sah, tawaran kerja atau rencana studi yang jelas, serta hasil bersih yang lebih baik setelah pajak, sewa, asuransi, biaya keluarga, dan ongkos pindah dihitung. **Tinggal sementara di Indonesia lebih masuk akal** bila pekerjaan di sini sudah baik, tawaran luar negeri belum pasti, atau pindah akan menghabiskan tabungan. Bandingkan dua anggaran bulanan dalam mata uang yang sama; jangan membandingkan gaji kotor saja. Masukkan pula prospek karier, kesehatan, keamanan, dan kebutuhan keluarga.",
+    "Jika ingin pindah, siapkan: (1) negara dan jalur visa yang sesuai tujuan; cek syarat terbaru di situs imigrasi negara tujuan sebelum membayar apa pun; (2) kontrak tertulis, rincian gaji dan potongan, serta pemeriksaan pemberi kerja atau agen; (3) paspor, ijazah/sertifikasi, bukti pengalaman, kemampuan bahasa, dan dokumen keluarga bila ikut; (4) dana biaya awal dan cadangan beberapa bulan, tempat tinggal sementara, asuransi kesehatan, serta rencana pajak; (5) rencana pulang jika pekerjaan atau izin tinggal berakhir. Untuk jalur pekerja migran Indonesia, periksa lowongan dan prosedur di [SISKOP2MI](https://siskop2mi.bp2mi.go.id/publik/faq); FAQ resminya juga meminta biaya penempatan tercantum dalam dokumen dan mengingatkan agar tidak membayar di luar ketentuan.\n\nKalau kamu sebutkan **negara tujuan, bidang pekerjaan, kisaran tabungan, dan apakah keluarga ikut**, perbandingannya bisa dibuat jauh lebih tegas.\n\nSumber: https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating"
+  ],
+  "sources": [
+    {
+      "url": "https://siskop2mi.bp2mi.go.id/publik/faq",
+      "title": "SISKOP2MI: Publik - Faq - SISKOP2MI"
+    },
+    {
+      "url": "https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating",
+      "title": "Indonesia’s Growth Remains Resilient, but Productivity Reforms Are Key to Creating Jobs and Sustaining Momentum"
+    },
+    {
+      "url": "https://www.ilo.org/resource/news/middle-east-crisis-weighs-global-labour-markets",
+      "title": "Middle East crisis weighs on global labour markets | International Labour Organization"
+    }
+  ],
+  "receipts": [
+    {
+      "command": "/usr/bin/bash -lc 'cat /workspace/.agents/skills/resourceful-solve/SKILL.md'",
+      "exitCode": 0,
+      "outputSha256": "c2a977b291c7a42eb34ef5838e90907baa50ca9916c5f3ae812bccab44d259ca"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'cat /workspace/context.json'",
+      "exitCode": 0,
+      "outputSha256": "40b6a62cb35e8e575d4899819fded0cd5cc6cdb384c610833d13bbd2bba97917"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'ls -la /workspace'",
+      "exitCode": 0,
+      "outputSha256": "92eac8d7b427caa6a5c6ecfd56cd7a8acf1c64b844b1f60f33e1e0524d8ddbb3"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'cat /workspace/.agents/skills/resourceful-solve/references/investigation-method.md'",
+      "exitCode": 0,
+      "outputSha256": "e8e68104f0f4306d197b1b7c74987f72064866d8f25b99e128ab9d8b7e53ac35"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'cat /workspace/tooling.txt'",
+      "exitCode": 0,
+      "outputSha256": "7943af8381c38e1b9356e93b60a9582f6c20daf1ab20c8b85d790b6d0217bdc8"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'cat /workspace/schema.json'",
+      "exitCode": 0,
+      "outputSha256": "3582af6e62a65333fdba08e5ace28469485068f2cdeb6eee43c3c00a3b4f156e"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"query\\\\\\\":\\\\\\\"site:ilo.org World Employment and Social Outlook Trends 2026 global unemployment\\\\\\\"}\\\" http://127.0.0.1:8118/sources/search\"",
+      "exitCode": 0,
+      "outputSha256": "ce3deea244e73c230480e3b8362913a854cecd0b9c98d5272962542b3f2c9ccf"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"query\\\\\\\":\\\\\\\"site:worldbank.org Indonesia Economic Prospects 2026 June growth jobs wages\\\\\\\"}\\\" http://127.0.0.1:8118/sources/search\"",
+      "exitCode": 0,
+      "outputSha256": "1951b793e278e43c3a7315cb237820a3278b2007a5d08291b5fb84859748e866"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"query\\\\\\\":\\\\\\\"site:bps.go.id keadaan ketenagakerjaan Indonesia Februari 2026 tingkat pengangguran terbuka\\\\\\\"}\\\" http://127.0.0.1:8118/sources/search\"",
+      "exitCode": 0,
+      "outputSha256": "9d54d79b02bbb8ad866e3e9f2008b1cd0c280914027d5a2d16d62eae99b79d56"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"query\\\\\\\":\\\\\\\"site:oecd.org international migration outlook 2026 labour market immigrants\\\\\\\"}\\\" http://127.0.0.1:8118/sources/search\"",
+      "exitCode": 0,
+      "outputSha256": "96f3af1595c39bcb0f652fc0cfd680e26a1eedcd0426acd270c5c4228918515b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"query\\\\\\\":\\\\\\\"site:imf.org Indonesia 2026 Article IV 2026 growth inflation outlook\\\\\\\"}\\\" http://127.0.0.1:8118/sources/search\"",
+      "exitCode": 0,
+      "outputSha256": "fafe94171c2585d70f139d1d0ebc10ee903d320872daf74fc04fe582736bdbaa"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"query\\\\\\\":\\\\\\\"site:imigrasi.go.id WNI bekerja luar negeri persiapan dokumen BP2MI resmi 2026\\\\\\\"}\\\" http://127.0.0.1:8118/sources/search\"",
+      "exitCode": 0,
+      "outputSha256": "fe9e7ba59db083320aed41562273f1428d8c534b5911806c44bb5ffb6fc6cbf8"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 45 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.oecd.org/en/publications/international-migration-outlook-2025_ae26c893-en.html\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"migration and immigrant employment 2025\\\\\\\"}\\\" http://127.0.0.1:8118/sources/read\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 45 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://siskop2mi.bp2mi.go.id/publik/faq\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"persiapan jalur legal kerja luar negeri dokumen biaya\\\\\\\"}\\\" http://127.0.0.1:8118/sources/read\"",
+      "exitCode": 0,
+      "outputSha256": "524ffa5da83fa7521064c63525e5db8daa99bf6251f3ce66045047d1fa456275"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 45 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.imf.org/en/countries/idn\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"latest October 2026 forecast Indonesia\\\\\\\"}\\\" http://127.0.0.1:8118/sources/read\"",
+      "exitCode": 0,
+      "outputSha256": "b2fe9ba34c361214dfd07b863b6cdf7eb36991f13ef290677f70f0524d236a60"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 45 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"Indonesia 2026 growth and jobs\\\\\\\"}\\\" http://127.0.0.1:8118/sources/read\"",
+      "exitCode": 0,
+      "outputSha256": "39e8971eda128f0da40eb070ece0c186db040415821466c402567e9c4973fb62"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 45 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.ilo.org/resource/news/middle-east-crisis-weighs-global-labour-markets\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"global jobs risks 2026 update\\\\\\\"}\\\" http://127.0.0.1:8118/sources/read\"",
+      "exitCode": 0,
+      "outputSha256": "0f633c9fbb52002247d132a67277d38b31b513d1c6b4cee0e535307416046f8c"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 45 -H 'Content-Type: application/json' -d \\\"{\\\\\\\"url\\\\\\\":\\\\\\\"https://www.bps.go.id/id/pressrelease/2026/02/05/2547/november-2025--tingkat-\\\\\\\",\\\\\\\"query\\\\\\\":\\\\\\\"TPT dan upah buruh Indonesia November 2025\\\\\\\"}\\\" http://127.0.0.1:8118/sources/read\"",
+      "exitCode": 0,
+      "outputSha256": "b2fe9ba34c361214dfd07b863b6cdf7eb36991f13ef290677f70f0524d236a60"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -LsS --max-time 35 -o /workspace/oecd.html -w '%{http_code} %{size_download}\\\\n' 'https://www.oecd.org/en/publications/international-migration-outlook-2025_ae26c893-en.html'\"",
+      "exitCode": 0,
+      "outputSha256": "34251694c1ca52dcfe5e9ff8a2f50cd2f3208d12c3b0c29f9930ada8cf2b4862"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -LsS --max-time 35 -o /workspace/imf.html -w '%{http_code} %{size_download}\\\\n' 'https://www.imf.org/en/news/articles/2026/01/21/pr-26010-indnonesia-imf-executive-board-concludes-2025-article-iv-consultation'\"",
+      "exitCode": 0,
+      "outputSha256": "59b44ba1a2106143a47f24b9bd8c98f3f9ff160f31c517292e40bf47413a542b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -LsS --max-time 35 -o /workspace/bps.html -w '%{http_code} %{size_download}\\\\n' 'https://www.bps.go.id/id/pressrelease/2026/02/05/2547/november-2025--tingkat-'\"",
+      "exitCode": 0,
+      "outputSha256": "83086cfac01b64c489cf30795efa7875740cb5b26f462e05b0b0fef111c47d5a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom html.parser import HTMLParser\nclass P(HTMLParser):\n def __init__(self): super().__init__(); self.skip=0;self.parts=[]\n def handle_starttag(self,t,a):\n  if t in ('script','style'):self.skip+=1\n def handle_endtag(self,t):\n  if t in ('script','style') and self.skip:self.skip-=1\n def handle_data(self,d):\n  if not self.skip and d.strip():self.parts.append(d.strip())\nfor f in ['/workspace/bps.html','/workspace/imf.html']:\n p=P();p.feed(open(f).read());print('\\\\nFILE',f);s=' '.join(p.parts)\n for q in ['4,74','3,33','2026','2025','inflation']:\n  start=0\n  for i in range(4):\n   k=s.lower().find(q.lower(),start)\n   if k<0:break\n   print(q,s[max(0,k-140):k+210]);start=k+len(q)\nPY\"",
+      "exitCode": 0,
+      "outputSha256": "421a4ac07f929aa7b91bc196490212103cf4efc639b8696587d36ed29c14ee0a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -H 'Content-Type: application/json' -d '{\\\"url\\\":\\\"https://siskop2mi.bp2mi.go.id/publik/faq\\\",\\\"query\\\":\\\"Persyaratan, dokumen, tahapan, biaya resmi bekerja ke luar negeri\\\"}' http://127.0.0.1:8118/sources/read | jq -r '.content' | rg -n -i 'persyaratan|paspor|visa kerja|jaminan sosial|gratis|perjanjian|biaya penempatan' | head -55\"",
+      "exitCode": 0,
+      "outputSha256": "07e1a12b952934d43049ff35d97e7ca0770d38ed78b928a3c8503b70a8befedb"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"rg -o -i '.{0,140}(4,74|3,33|Pengangguran Terbuka).{0,200}' /workspace/bps.html | head -12\"",
+      "exitCode": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -LsS --max-time 45 -o /workspace/iep.pdf -w '%{http_code} %{size_download}\\\\n' 'https://openknowledge.worldbank.org/server/api/core/bitstreams/229b85c1-fc35-46ad-ab26-ede5d18b51f2/content'\"",
+      "exitCode": 0,
+      "outputSha256": "0ea5288f809f1907f0754a5591d03b36318b867dee6b6723ee540aead3c2952a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"pdftotext -layout /workspace/iep.pdf /workspace/iep.txt && rg -n -i 'real wages|underemployment|quality jobs|high-skilled|medium-skilled' /workspace/iep.txt | head -30\"",
+      "exitCode": 0,
+      "outputSha256": "f88923c5e68ea1475f8079d454d9cd9ca056153a9b733559d0cade7cfe82a9d7"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"sed -n '622,642p;2029,2045p;2077,2090p' /workspace/iep.txt\"",
+      "exitCode": 0,
+      "outputSha256": "43c344e1d34c80154217521edb89d3ef3826823795ad5a8f8578f329872c582c"
+    }
+  ]
+}

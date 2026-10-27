@@ -8,6 +8,32 @@ Build the pinned worker from the matching standalone Codex release. The controll
 bun scripts/codex-runner/build.ts /root/.codex/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/bin
 ```
 
+The build uses a private temporary `DOCKER_CONFIG`, so Buildx can write its
+activity files while the controller's systemd unit keeps `/root` read-only.
+Startup and periodic checks repair a missing pinned image; concurrent checks
+share one build. `/health` returns HTTP 503 until the worker image is ready,
+and new submissions receive `worker_preparing` or `worker_image_unavailable`
+before a job or hourly quota is consumed. Build failures retain a bounded
+diagnostic tail in the controller journal. The build has a ten-minute limit;
+the agent's own research deadline starts after image preparation.
+
+Completed answers retain their full text. Discord delivery splits them at
+paragraph or word boundaries, keeps citation links together, and sends exports
+with the final part. Successful parts are recognized on retry and use stable
+Discord nonces; the controller is acknowledged only after every part is sent.
+Repeated text-delivery errors back off instead of discarding the answer.
+
+Run the real public-research regression with `AI_PROVIDER=chatgpt` and the
+controller's `CHATGPT_AUTH_FILE` in the environment:
+
+```sh
+bun benchmarks/hackerika-codex/investigation.ts --out /tmp/hackerika-research-check
+```
+
+It uses Sol, the production worker and source gateway, and synthetic Discord
+IDs without sending messages. Inspect the resulting answer as well as the
+automated execution, source, citation and complete-delivery checks.
+
 The build includes two reviewed skills from the pinned [irai bundle](skills/README.md):
 `ctf-deep-solve` and `resourceful-solve`. Each job copies them into its disposable
 workspace for Codex skill discovery. The worker still has only the tools and

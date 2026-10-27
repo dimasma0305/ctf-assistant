@@ -83,6 +83,9 @@ export async function delegateCodexForTurn(args: {
             note: `Kuota job Codex per jam sedang penuh${error.retryAfterSeconds ? `; coba lagi sekitar ${Math.ceil(error.retryAfterSeconds / 60)} menit lagi` : ''}. Jelaskan batas ini kepada user, bukan "gagal mulai" tanpa alasan.` };
         if (error?.message === 'image_generation_unavailable') return { ok: false, error: 'image_generation_unavailable',
             note: 'Image gen belum aktif karena controller belum punya kunci API gambar. Jelaskan langsung; jangan janji hasil menyusul atau menggantinya diam-diam dengan gambar kode.' };
+        if (['worker_preparing', 'worker_image_unavailable'].includes(error?.message)) return { ok: false, error: error.message,
+            retryAfterSeconds: error.retryAfterSeconds,
+            note: 'Agen belum siap dan job belum diterima. Untuk riset web tanpa kebutuhan eksekusi/file, pakai research_topic jika belum dipakai; jika sudah, lanjutkan web_search/fetch_url dari bukti yang tersedia. Jangan mengklaim job berjalan atau menyuruh user mengulang pertanyaan tanpa menjelaskan gangguan.' };
         return { ok: false, error: String(error?.message || 'codex_unavailable').slice(0, 120) };
     }
 }

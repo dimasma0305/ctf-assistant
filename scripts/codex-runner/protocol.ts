@@ -99,7 +99,7 @@ export function resultFromText(text: string): SolverResult {
   const x=JSON.parse(text);
   if(typeof x?.summary!=='string'||!x.summary.trim()||!['flags','findings','unresolved'].every(k=>Array.isArray(x[k])))throw Error('invalid_solver_result');
   const strings=(v:any[],count:number,max:number)=>v.filter(s=>typeof s==='string').slice(0,count).map(s=>s.slice(0,max));
-  return {summary:x.summary.slice(0,1800),flags:strings(x.flags,8,400).filter(s=>/^[^\r\n{}]{1,40}\{[^\r\n{}]{1,350}\}$/.test(s)),
+  return {summary:x.summary.trim(),flags:strings(x.flags,8,400).filter(s=>/^[^\r\n{}]{1,40}\{[^\r\n{}]{1,350}\}$/.test(s)),
     findings:strings(x.findings,12,500),unresolved:strings(x.unresolved,8,500),needsStrongerModel:x.needsStrongerModel===true};
 }
 /** Recover an omitted candidate only when the model's own explanation and a

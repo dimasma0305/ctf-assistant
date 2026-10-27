@@ -10,7 +10,7 @@ import { startGateway } from './gateway';
 import { generateJobImage } from './imageGeneration';
 import { DiscordContextBroker } from './discordBroker';
 import { ensureWorkerImage } from './workerImage';
-import { codexRequest, formatCodexResult, isDeliveredCodexReply } from '../../src/Services/AI/codexJobs';
+import { codexRequest, formatCodexResult, isDeliveredCodexReply, splitCodexReply } from '../../src/Services/AI/codexJobs';
 import { researchTransport } from '../../src/Services/AI/researchSources';
 
 const packet=()=>({scope:'555555555555555555:700000000000000001',guildId:'555555555555555555',channelId:'700000000000000001',
@@ -67,6 +67,15 @@ test('a missing pinned worker image is repaired before a job, while custom image
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');
   expect(builds).toBe(1);
+});
+
+test('worker setup failure says the task never started without asking the user to repeat it',()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));
+  job.state='failed';job.error='worker_image_unavailable';
+  const answer=formatCodexResult(publicJob(job));
+  expect(answer).toContain('belum sempat berjalan');
+  expect(answer).not.toContain('Coba lagi');
+  expect(answer).not.toContain('worker_image_unavailable');
 });
 
 test('public job output hides challenge bytes and formats only validated solver fields',()=>{
@@ -195,6 +204,28 @@ test('delivery posts only the final answer and deduplicates by exact reply',()=>
   expect(isDeliveredCodexReply(reply,'bot',job.packet.messageId,rendered)).toBe(true);
   expect(isDeliveredCodexReply({...reply,reference:{messageId:'other'}},'bot',job.packet.messageId,rendered)).toBe(false);
   expect(isDeliveredCodexReply({...reply,content:'queued'},'bot',job.packet.messageId,rendered)).toBe(false);
+});
+
+test('long research keeps the final recommendation and whole citation URLs across Discord messages',()=>{
+  const summary=('Pertimbangkan pekerjaan, biaya, keluarga, dan jalur visa. '.repeat(38))
+    +'\n\nPersiapan terakhir: periksa kontrak dan perlindungan kesehatan. '
+    +'[Panduan resmi yang sudah diperiksa](https://example.org/migration/documents-and-health-insurance).';
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));job.state='completed';
+  job.result=resultFromText(JSON.stringify({summary,flags:[],findings:[],unresolved:[],needsStrongerModel:false}));
+  expect(job.result.summary).toBe(summary);
+  const rendered=formatCodexResult(publicJob(job)),parts=splitCodexReply(rendered);
+  expect(parts.length).toBeGreaterThan(1);
+  expect(parts.every(part=>part.length<=2000)).toBe(true);
+  expect(parts.join('').replace(/\s/g,'')).toBe(summary.replace(/\s/g,''));
+  expect(parts.at(-1)).toContain('[Panduan resmi yang sudah diperiksa](https://example.org/migration/documents-and-health-insurance)');
+});
+
+test('splitting a long code block keeps its fences and indentation usable',()=>{
+  const lines=Array.from({length:70},(_,index)=>`    print("hasil ${index}: diuji lokal dengan input yang berbeda")`).join('\n');
+  const parts=splitCodexReply('```python\n'+lines+'\n```');
+  expect(parts.length).toBeGreaterThan(1);
+  expect(parts.every(part=>part.startsWith('```python\n')&&part.endsWith('\n```')&&part.length<=2000)).toBe(true);
+  expect(parts.map(part=>part.slice('```python\n'.length,-4)).join('\n')).toBe(lines);
 });
 
 test('Discord result refers to an attached file without exposing a sandbox path',()=>{

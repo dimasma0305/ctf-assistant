@@ -64,6 +64,28 @@ test('hourly cap is returned with a user-facing retry time instead of an opaque 
     }
 });
 
+test('a warming worker does not claim acceptance and leaves research available to the manager',async()=>{
+    const directory=await mkdtemp(join(tmpdir(),'hackerika-worker-warming-test-'));
+    const socket=join(directory,'control.sock');
+    const previousEnabled=process.env.CODEX_SOLVER_ENABLED,previousSocket=process.env.CODEX_CONTROL_SOCKET;
+    process.env.CODEX_SOLVER_ENABLED='1';process.env.CODEX_CONTROL_SOCKET=socket;
+    const server=Bun.serve({unix:socket,fetch:()=>Response.json({ok:false,error:'worker_preparing',retryAfterSeconds:30},{status:503})});
+    const message:any={id:'800000000000000009',guildId:'555555555555555555',channelId:'700000000000000001',
+        content:'riset situasi Indonesia dan dunia sekarang',author:{id:'663394727688798231',bot:false},
+        attachments:new Map(),channel:{isThread:()=>false,messages:{fetch:async()=>new Map()}}};
+    try{
+        const result=await delegateCodexForTurn({kind:'investigation',question:'Periksa sumber terkini'},message);
+        expect(result).toMatchObject({ok:false,error:'worker_preparing',retryAfterSeconds:30});
+        expect(result.note).toContain('research_topic');
+        expect(hasCodexDelegation(message)).toBe(false);
+    }finally{
+        server.stop(true);
+        if(previousEnabled===undefined)delete process.env.CODEX_SOLVER_ENABLED;else process.env.CODEX_SOLVER_ENABLED=previousEnabled;
+        if(previousSocket===undefined)delete process.env.CODEX_CONTROL_SOCKET;else process.env.CODEX_CONTROL_SOCKET=previousSocket;
+        await rm(directory,{recursive:true,force:true});
+    }
+});
+
 test('explicit image generation carries its mode and reports missing capability before a job starts',async()=>{
     const directory=await mkdtemp(join(tmpdir(),'hackerika-image-mode-test-'));
     const socket=join(directory,'control.sock');

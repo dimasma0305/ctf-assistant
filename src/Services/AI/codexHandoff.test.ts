@@ -18,3 +18,11 @@ test('a rejected delegation keeps the manager explanation, while a busy job is n
   expect(busy).toContain('Masih ada job');
   expect(busy).not.toContain('mulai kerjakan');
 });
+
+test('a queued investigation acknowledges the task without lab jargon or claiming findings',()=>{
+  const answer=groundCodexHandoff('Ini hasil riset lengkapnya',JSON.stringify({ok:true,status:'queued',
+    job:{id:'7bae9e20-1804-4ba6-8be5-eb4580dc2fb2',kind:'investigation',state:'pending'}}));
+  expect(answer).toContain('Hasilnya nanti');
+  expect(answer).not.toContain('lab terisolasi');
+  expect(answer).not.toContain('hasil riset lengkap');
+});

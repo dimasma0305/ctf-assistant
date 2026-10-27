@@ -4,13 +4,14 @@ import { dirname, join } from 'node:path';
 import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, publicJob, validateInvestigationBatch, validatePacket, type Job } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
-import { ensureWorkerImage } from './workerImage';
+import { createWorkerImageReadiness } from './workerImage';
 import { deleteExportedFiles, readExportedFile, saveExportedFiles } from './exports';
 
 const socket = process.env.CODEX_CONTROL_SOCKET || '/run/hackerika-codex/control.sock';
 const stateRoot = process.env.CODEX_JOB_STATE_ROOT || '/var/lib/hackerika-codex/jobs';
 const runtimeRoot = process.env.CODEX_JOB_RUNTIME_ROOT || '/run/hackerika-codex-jobs';
 const image = process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-9';
+const workerImage = createWorkerImageReadiness(image);
 const maxQueued = Math.max(1, Math.min(16, Number(process.env.CODEX_MAX_QUEUED) || 8));
 const hourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_JOBS_PER_USER_HOUR) || 3));
 const trustedHourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_TRUSTED_JOBS_PER_USER_HOUR) || 12));
@@ -73,7 +74,7 @@ async function runNext(){
   try{
     await persist(job);
     const model=chooseModel(job.packet,daybreakUsers,verified);
-    await ensureWorkerImage(image);
+    await workerImage.ensure();
     const deadline=AbortSignal.any([controller.signal,AbortSignal.timeout(job.packet.kind==='investigation'?900_000:600_000)]);
     let result:Awaited<ReturnType<typeof executeJob>>|undefined;
     let evidenceRetry=false;
@@ -93,11 +94,14 @@ async function runNext(){
       try{
         job.exportedFiles=await saveExportedFiles(stateRoot,job.id,result.files);
       }catch{
-        job.result.summary=`${job.result.summary}\nFile hasil agent tidak bisa disimpan untuk dikirim.`.slice(0,1800);
+        job.result.summary=`${job.result.summary}\nFile hasil agent tidak bisa disimpan untuk dikirim.`;
       }
     }
     job.state='completed';
-  }catch(error:any){job.state=controller.signal.aborted?'cancelled':'failed';job.error=String(error?.message||'solver_failed').slice(0,120);}
+  }catch(error:any){
+    job.state=controller.signal.aborted?'cancelled':'failed';job.error=String(error?.message||'solver_failed').slice(0,120);
+    console.error(`[CodexController] job=${job.id} state=${job.state} error=${job.error} calls=${job.stats.calls} receipts=${job.receipts.length}`);
+  }
   finally{
     discord.clearJob(id);job.stats.elapsedMs+=Date.now()-started;job.packet.artifacts=[];aborters.delete(id);
     try{await persist(job);await cleanup();}finally{running=false;schedule();}
@@ -108,7 +112,10 @@ const socketGid=Math.max(0,Number(process.env.CODEX_SOCKET_GID)||1000);if(proces
 const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(request){
   try{
     const path=new URL(request.url).pathname;
-    if(request.method==='GET'&&path==='/health')return response({ok:true,queued:queue.length,running,verified:[...verified]});
+    if(request.method==='GET'&&path==='/health'){
+      const worker=workerImage.status();
+      return response({ok:worker.ready,queued:queue.length,running,worker,verified:[...verified]},worker.ready?200:503);
+    }
     if(request.method!=='POST')return response({ok:false,error:'method_not_allowed'},405);
     const body=await json(request);
     if(path==='/jobs/context/pending')return response({ok:true,requests:discord.list()});
@@ -129,6 +136,11 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
       const packets=path==='/jobs/batch'?validateInvestigationBatch(body):[validatePacket(body)];
       if(packets.some(packet=>packet.imageMode==='generative')&&!process.env.OPENAI_IMAGE_API_KEY?.trim())
         return response({ok:false,error:'image_generation_unavailable'},503);
+      const readiness=workerImage.status();
+      if(!readiness.ready){
+        void workerImage.ensure().catch(()=>{});
+        return response({ok:false,error:readiness.state==='unavailable'?'worker_image_unavailable':'worker_preparing',retryAfterSeconds:30},503);
+      }
       const packet=packets[0];await cleanup();
       const outstanding=[...jobs.values()].filter(j=>j.packet.scope===packet.scope&&['pending','running'].includes(j.state));
       if(outstanding.length)return response({ok:false,error:'channel_job_active',job:publicJob(outstanding[0])},409);
@@ -173,4 +185,9 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
 await chmod(socket,0o660);if(process.getuid?.()===0)await chown(socket,0,socketGid);
 setInterval(()=>void cleanup().catch(error=>console.warn('[CodexController] cleanup failed:',String(error?.message||error).slice(0,120))),60*60_000).unref?.();
 for(const signal of ['SIGINT','SIGTERM'] as const)process.on(signal,()=>{for(const abort of aborters.values())abort.abort();server.stop(true);process.exit(0);});
-console.log(`[CodexController] ready socket=${socket} verified=${[...verified].join(',')}`);
+console.log(`[CodexController] listening socket=${socket}; checking worker image`);
+const prepareWorker=()=>workerImage.ensure().then(()=>{
+  console.log(`[CodexController] worker ready image=${image} verified=${[...verified].join(',')}`);
+}).catch(error=>console.error('[CodexController] worker unavailable:',String(error?.message||error).slice(0,120)));
+void prepareWorker();
+setInterval(()=>{if(!running)void workerImage.ensure().catch(()=>{});},60_000).unref?.();
