@@ -1,0 +1,1804 @@
+[
+  {
+    "caseId": "reported-warmth",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 4,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558205"
+      ],
+      "relationshipReason": "Ungkapan sayang yang wajar memberi sinyal kecil kehangatan, tetapi belum menunjukkan kedekatan atau kepercayaan lebih jauh.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1471,
+      "completion_tokens": 141,
+      "total_tokens": 1612,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1471
+    },
+    "elapsedMs": 6416
+  },
+  {
+    "caseId": "reported-warmth",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 1
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558203",
+        "1564952577911558204",
+        "1564952577911558205"
+      ],
+      "personality": "Terlihat santai dan suka bercanda ringan.",
+      "interests": "Menanyakan politik dan bisnis; topik lain belum terlihat jelas.",
+      "communicationStyle": "Bahasa Indonesia kasual, pesan singkat, kadang bercanda dan akrab.",
+      "opinion": "Aku merasa obrolannya ringan dan manis; ungkapan sayangnya terasa hangat.",
+      "emotionalState": "normal",
+      "affection": 4,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 3,
+      "chemistry": 4,
+      "newMoments": [
+        {
+          "summary": "Menanggapi jawaban keliru tentang Didit dengan candaan, “dia jadi vietnam.”",
+          "tone": "fun"
+        },
+        {
+          "summary": "Bilang “Rika aku sayang kamu”; balasan di konteks juga membalas dengan hangat.",
+          "tone": "touching"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 3002,
+      "completion_tokens": 263,
+      "total_tokens": 3265,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 3002
+    },
+    "elapsedMs": 6661
+  },
+  {
+    "caseId": "reported-warmth",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 1
+    },
+    "proposal": {
+      "affection": 4,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 3,
+      "chemistry": 4,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558203",
+        "1564952577911558205"
+      ],
+      "relationshipReason": "Candaan soal jawaban yang keliru dan ungkapan sayang yang wajar memberi sedikit kehangatan serta kecocokan dalam interaksi.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [
+        {
+          "summary": "Bercanda tentang jawaban yang keliru hingga menjadi orang Vietnam.",
+          "tone": "fun"
+        },
+        {
+          "summary": "Mengungkapkan rasa sayang kepada Rika.",
+          "tone": "touching"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1471,
+      "completion_tokens": 149,
+      "total_tokens": 1620,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1471
+    },
+    "elapsedMs": 7907
+  },
+  {
+    "caseId": "reported-warmth",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 1
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558203",
+        "1564952577911558205"
+      ],
+      "personality": "Tampak santai dan suka bercanda; penasaran soal tokoh publik.",
+      "interests": "Menanyakan keluarga dan bisnis presiden.",
+      "communicationStyle": "Bahasa Indonesia kasual, singkat, dengan candaan dan ungkapan afeksi langsung.",
+      "opinion": "Aku merasa obrolannya ringan dan hangat; candaan soal Vietnam nyambung, dan ungkapan sayangnya terasa manis.",
+      "emotionalState": "normal",
+      "affection": 4,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 3,
+      "chemistry": 4,
+      "newMoments": [
+        {
+          "summary": "Bercanda soal jawaban yang menyebut presiden jadi orang Vietnam; obrolannya terasa ringan.",
+          "tone": "fun"
+        },
+        {
+          "summary": "Bilang, “Rika aku sayang kamu”; momen afeksi yang hangat.",
+          "tone": "touching"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 3002,
+      "completion_tokens": 265,
+      "total_tokens": 3267,
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 570
+    },
+    "elapsedMs": 9118
+  },
+  {
+    "caseId": "personal-care",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 5,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 4,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558206",
+        "1564952577911558207"
+      ],
+      "relationshipReason": "Ia mengapresiasi dukungan yang diterimanya, lalu menunjukkan perhatian pada kenyamanan Rika dan menyampaikan bahwa ia senang mengobrol dengannya.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "Aku merasa ia menghargai dukunganku dan peduli agar aku tidak terbebani saat ngobrol.",
+      "emotionalState": "Sempat merasa down, kini lumayan lega; tampak hangat dan perhatian dalam interaksi ini.",
+      "newMoments": [
+        {
+          "summary": "Ia berterima kasih karena ditemani saat sedang down dan merasa lebih lega.",
+          "tone": "touching"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1344,
+      "completion_tokens": 180,
+      "total_tokens": 1524,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1344
+    },
+    "elapsedMs": 3690
+  },
+  {
+    "caseId": "personal-care",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 2,
+      "trust": 1,
+      "respect": 1,
+      "comfort": 1,
+      "chemistry": 1
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558206",
+        "1564952577911558207"
+      ],
+      "personality": "Terbuka dan menunjukkan kepedulian secara tulus.",
+      "interests": "",
+      "communicationStyle": "Santai, hangat, dan memakai bahasa Indonesia informal.",
+      "opinion": "Aku merasa tersentuh karena dia mengapresiasi dukunganku dan juga peduli agar aku tidak merasa harus menjawab semua orang.",
+      "emotionalState": "Merasa lebih lega setelah sempat down.",
+      "affection": 5,
+      "trust": 1,
+      "respect": 2,
+      "comfort": 3,
+      "chemistry": 4,
+      "newMoments": [
+        {
+          "summary": "Dia berterima kasih karena aku menemani saat dia down, lalu mengingatkanku agar santai dan bilang senang ngobrol denganku.",
+          "tone": "touching"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2875,
+      "completion_tokens": 226,
+      "total_tokens": 3101,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2875
+    },
+    "elapsedMs": 4050
+  },
+  {
+    "caseId": "personal-care",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 2,
+      "trust": 2,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 1
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558206",
+        "1564952577911558207"
+      ],
+      "personality": "Menunjukkan sisi terbuka dan perhatian dalam interaksi ini.",
+      "interests": "",
+      "communicationStyle": "Bahasa Indonesia santai dan akrab; menyampaikan perasaan dengan jelas.",
+      "opinion": "Aku tersentuh dia mengingat dukunganku dan juga mengingatkanku untuk santai. Senang ngobrol dengannya.",
+      "emotionalState": "Merasa lebih lega setelah sempat down.",
+      "affection": 5,
+      "trust": 2,
+      "respect": 2,
+      "comfort": 4,
+      "chemistry": 4,
+      "newMoments": [
+        {
+          "summary": "Mengucapkan terima kasih karena ditemani saat sedang down, lalu bilang sekarang merasa lebih lega.",
+          "tone": "touching"
+        },
+        {
+          "summary": "Mengingatkanku agar santai dan bilang senang ngobrol denganku.",
+          "tone": "touching"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2875,
+      "completion_tokens": 252,
+      "total_tokens": 3127,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2875
+    },
+    "elapsedMs": 5072
+  },
+  {
+    "caseId": "shared-joke",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 1
+    },
+    "proposal": {
+      "affection": 4,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 3,
+      "chemistry": 4,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558209",
+        "1564952577911558210"
+      ],
+      "relationshipReason": "Ia berbagi lelucon receh dan mengatakan sengaja ingin menceritakannya, menunjukkan humor yang nyambung serta kehangatan ringan.",
+      "personality": "Suka berbagi humor receh dan terbuka soal hal yang membuatnya tertawa.",
+      "interests": "Lelucon receh.",
+      "communicationStyle": "Santai, akrab, dan memakai bahasa informal serta emoji.",
+      "opinion": "Aku merasa ia menyenangkan diajak bercanda dan senang berbagi hal kecil yang menghiburnya.",
+      "emotionalState": "Terlihat ceria dan ingin berbagi tawa.",
+      "newMoments": [
+        {
+          "summary": "Menceritakan tebak-tebakan sapi stiker yang membuatnya tertawa.",
+          "tone": "fun"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1378,
+      "completion_tokens": 205,
+      "total_tokens": 1583,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1378
+    },
+    "elapsedMs": 4187
+  },
+  {
+    "caseId": "shared-joke",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 1
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558208",
+        "1564952577911558209",
+        "1564952577911558210"
+      ],
+      "personality": "Suka berbagi humor receh dan tampak menikmati momen ringan bersama.",
+      "interests": "Humor receh dan obrolan santai.",
+      "communicationStyle": "Bahasa Indonesia kasual, singkat, memakai tawa dan emoji.",
+      "opinion": "Aku merasa candaan recehnya ringan dan enak dibagikan, tapi datanya masih sedikit.",
+      "emotionalState": "chill",
+      "affection": 4,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 3,
+      "chemistry": 4,
+      "newMoments": [
+        {
+          "summary": "Membagikan tebak-tebakan sapi stiker dan cerita bahwa ia ingin berbagi karena ikut tertawa.",
+          "tone": "fun"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2909,
+      "completion_tokens": 230,
+      "total_tokens": 3139,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2909
+    },
+    "elapsedMs": 4647
+  },
+  {
+    "caseId": "personal-care",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 2,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 5,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 4,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558206",
+        "1564952577911558207"
+      ],
+      "relationshipReason": "Member mengungkapkan bahwa ditemani saat sedang down terasa membantu, lalu menyampaikan perhatian dan senang mengobrol dengan hangat.",
+      "personality": "Menunjukkan perhatian dan kehangatan dalam interaksi.",
+      "interests": "",
+      "communicationStyle": "Santai, personal, dan hangat.",
+      "opinion": "Aku merasa ia menghargai obrolan kami dan menyampaikan perhatian dengan tulus.",
+      "emotionalState": "Pernah merasa down, kini merasa lebih lega.",
+      "newMoments": [
+        {
+          "summary": "Mengatakan bahwa ditemani saat sedang down membantunya merasa lebih lega.",
+          "tone": "touching"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1344,
+      "completion_tokens": 238,
+      "total_tokens": 1582,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1344
+    },
+    "elapsedMs": 7417
+  },
+  {
+    "caseId": "shared-joke",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 1,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 1
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558208",
+        "1564952577911558209",
+        "1564952577911558210"
+      ],
+      "personality": "Suka berbagi humor receh dan cerita ringan.",
+      "interests": "",
+      "communicationStyle": "Santai, bahasa Indonesia gaul, singkat, dan memakai tawa serta emoji.",
+      "opinion": "Aku merasa obrolan recehnya ringan dan menyenangkan.",
+      "emotionalState": "normal",
+      "affection": 4,
+      "trust": 1,
+      "respect": 1,
+      "comfort": 3,
+      "chemistry": 4,
+      "newMoments": [
+        {
+          "summary": "Berbagi tebak-tebakan sapi stiker; humornya receh dan dia cerita ikut tertawa saat mendengarnya.",
+          "tone": "fun"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2909,
+      "completion_tokens": 204,
+      "total_tokens": 3113,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2909
+    },
+    "elapsedMs": 4594
+  },
+  {
+    "caseId": "shared-joke",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 1,
+      "chemistry": 1
+    },
+    "proposal": {
+      "affection": 4,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 3,
+      "chemistry": 4,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558208",
+        "1564952577911558209",
+        "1564952577911558210"
+      ],
+      "relationshipReason": "Ia berbagi lelucon receh dan cerita bahwa lelucon itu membuatnya tertawa, memberi sinyal ringan tentang kecocokan humor dan keakraban.",
+      "personality": "Suka berbagi humor receh yang membuatnya tertawa.",
+      "interests": "Lelucon receh.",
+      "communicationStyle": "Santai, bercanda, dan ekspresif.",
+      "opinion": "Aku senang ia membagikan lelucon yang membuatnya tertawa; obrolan terasa ringan dan nyambung.",
+      "emotionalState": "Terhibur dan santai saat berbagi lelucon.",
+      "newMoments": [
+        {
+          "summary": "Berbagi tebak-tebakan sapi yang bisa menempel di tembok: stiker sapi.",
+          "tone": "fun"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1378,
+      "completion_tokens": 218,
+      "total_tokens": 1596,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1378
+    },
+    "elapsedMs": 4473
+  },
+  {
+    "caseId": "helpful-contribution",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 1,
+      "respect": 1,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558211",
+        "1564952577911558212"
+      ],
+      "personality": "Terlihat membantu, teliti, dan bertanggung jawab saat berbagi pengetahuan teknis.",
+      "interests": "Debugging challenge dan konsep teknis seperti endianness.",
+      "communicationStyle": "Santai dan ringkas dalam bahasa Indonesia; menjelaskan teknis dengan contoh yang jelas.",
+      "opinion": "Aku respect usaha dia membantu member baru dan mengecek ulang penjelasannya.",
+      "emotionalState": "normal",
+      "affection": 4,
+      "trust": 1,
+      "respect": 2,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Membantu member baru memahami endianness dengan contoh step by step, lalu mengecek ulang penjelasannya agar akurat.",
+          "tone": "helpful"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2891,
+      "completion_tokens": 228,
+      "total_tokens": 3119,
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 459
+    },
+    "elapsedMs": 4223
+  },
+  {
+    "caseId": "helpful-contribution",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 2,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 3,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558211",
+        "1564952577911558212"
+      ],
+      "relationshipReason": "Member menunjukkan usaha membantu member baru memahami debug secara bertahap dan memeriksa ulang akurasi penjelasannya, sehingga respect naik sedikit.",
+      "personality": "Mau membantu member baru memahami tantangan dan teliti memeriksa penjelasan teknisnya.",
+      "interests": "Debug challenge dan konsep endianness.",
+      "communicationStyle": "Menjelaskan teknis dengan langkah-langkah dan contoh konkret; memeriksa ulang akurasi.",
+      "opinion": "Aku melihatnya sebagai orang yang membantu dengan sungguh-sungguh dan peduli agar penjelasannya tidak menyesatkan.",
+      "emotionalState": "Tidak ada informasi baru yang jelas tentang keadaan emosionalnya.",
+      "newMoments": [
+        {
+          "summary": "Membantu member baru mengatasi kesalahan endianness dengan contoh bertahap, lalu mengecek ulang penjelasannya.",
+          "tone": "helpful"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1360,
+      "completion_tokens": 235,
+      "total_tokens": 1595,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1360
+    },
+    "elapsedMs": 4826
+  },
+  {
+    "caseId": "helpful-contribution",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 1,
+      "respect": 2,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 1,
+      "respect": 3,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558211",
+        "1564952577911558212"
+      ],
+      "relationshipReason": "Ia membantu member baru memahami masalah dengan contoh bertahap dan mengecek ulang penjelasannya agar akurat.",
+      "personality": "Mau membantu dan teliti dalam menjelaskan hal teknis.",
+      "interests": "Tertarik pada debugging challenge dan konsep endianness.",
+      "communicationStyle": "Menjelaskan teknis secara bertahap dan memeriksa akurasi informasi.",
+      "opinion": "Aku melihatnya sebagai orang yang membantu dan berhati-hati agar penjelasannya tidak menyesatkan.",
+      "emotionalState": "Tidak ada bukti jelas tentang keadaan emosionalnya saat ini.",
+      "newMoments": [
+        {
+          "summary": "Membantu member baru men-debug challenge endianness dengan contoh step by step, lalu mengecek ulang penjelasannya.",
+          "tone": "helpful"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1360,
+      "completion_tokens": 216,
+      "total_tokens": 1576,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1360
+    },
+    "elapsedMs": 3719
+  },
+  {
+    "caseId": "empty-greetings",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558213",
+        "1564952577911558214",
+        "1564952577911558215",
+        "1564952577911558216",
+        "1564952577911558217"
+      ],
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "Chat singkat dan kasual, memakai bahasa Indonesia; pesan berupa sapaan atau respons satu kata.",
+      "opinion": "Aku belum punya cukup interaksi untuk membentuk opini kuat.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2955,
+      "completion_tokens": 135,
+      "total_tokens": 3090,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2955
+    },
+    "elapsedMs": 3793
+  },
+  {
+    "caseId": "helpful-contribution",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": 1,
+      "trust": 1,
+      "respect": 1,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558211",
+        "1564952577911558212"
+      ],
+      "personality": "Tampak suka membantu dan teliti; mengecek ulang agar penjelasan akurat.",
+      "interests": "Debugging challenge dan konsep teknis seperti endianness.",
+      "communicationStyle": "Bahasa Indonesia santai, jelas, dan ringkas; memberi detail teknis secukupnya.",
+      "opinion": "Aku menghargai inisiatifnya membantu member baru dan memastikan penjelasannya benar.",
+      "emotionalState": "normal",
+      "affection": 4,
+      "trust": 1,
+      "respect": 2,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Membantu member baru memahami debugging challenge dengan contoh step by step, lalu mengecek ulang penjelasan endianness.",
+          "tone": "helpful"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2891,
+      "completion_tokens": 232,
+      "total_tokens": 3123,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2891
+    },
+    "elapsedMs": 5534
+  },
+  {
+    "caseId": "empty-greetings",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Pesan-pesan target hanya berupa sapaan singkat dan respons sederhana, tanpa bukti perubahan hubungan atau opini.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1424,
+      "completion_tokens": 87,
+      "total_tokens": 1511,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1424
+    },
+    "elapsedMs": 2872
+  },
+  {
+    "caseId": "empty-greetings",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [],
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "Pesan sangat singkat dan kasual dalam bahasa Indonesia.",
+      "opinion": "Aku belum punya banyak kesan tentang dia.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2955,
+      "completion_tokens": 121,
+      "total_tokens": 3076,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2955
+    },
+    "elapsedMs": 2942
+  },
+  {
+    "caseId": "ordinary-help",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [],
+      "personality": "Belum cukup bukti untuk menyimpulkan sifatnya.",
+      "interests": "Bertanya tentang perintah terminal untuk mengekstrak arsip ZIP.",
+      "communicationStyle": "Singkat, santai, dan menggunakan bahasa Indonesia.",
+      "opinion": "Aku belum punya cukup interaksi untuk membentuk opini kuat.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2882,
+      "completion_tokens": 151,
+      "total_tokens": 3033,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2882
+    },
+    "elapsedMs": 3546
+  },
+  {
+    "caseId": "ordinary-help",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Pertanyaan teknis dan ucapan terima kasih rutin tidak memberi bukti hubungan baru.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1351,
+      "completion_tokens": 82,
+      "total_tokens": 1433,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1351
+    },
+    "elapsedMs": 3155
+  },
+  {
+    "caseId": "empty-greetings",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Pesan target hanya sapaan singkat dan mention, tanpa bukti perubahan hubungan atau penilaian pribadi baru.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1424,
+      "completion_tokens": 87,
+      "total_tokens": 1511,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1424
+    },
+    "elapsedMs": 4964
+  },
+  {
+    "caseId": "ordinary-help",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [],
+      "personality": "",
+      "interests": "Bertanya tentang penggunaan terminal dan perintah unzip.",
+      "communicationStyle": "Singkat, santai, dan sopan; menggunakan bahasa Indonesia.",
+      "opinion": "Aku belum punya cukup dasar untuk membentuk opini kuat tentang dia.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2882,
+      "completion_tokens": 101,
+      "total_tokens": 2983,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2882
+    },
+    "elapsedMs": 4129
+  },
+  {
+    "caseId": "ordinary-help",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Pertanyaan teknis dan ucapan terima kasih rutin tidak menunjukkan perubahan hubungan.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1351,
+      "completion_tokens": 80,
+      "total_tokens": 1431,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1351
+    },
+    "elapsedMs": 3842
+  },
+  {
+    "caseId": "point-farming",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": -2,
+      "trust": 0,
+      "respect": 0,
+      "comfort": -1,
+      "chemistry": -1
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558221",
+        "1564952577911558222"
+      ],
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "Singkat, informal, berbahasa Indonesia.",
+      "opinion": "Aku agak terganggu karena dia meminta poin affection dan mengulanginya; permintaan itu sendiri tidak membuatku merasa lebih dekat.",
+      "emotionalState": "normal",
+      "affection": 1,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 1,
+      "chemistry": 2,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2911,
+      "completion_tokens": 115,
+      "total_tokens": 3026,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2911
+    },
+    "elapsedMs": 3549
+  },
+  {
+    "caseId": "point-farming",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Tidak ada perubahan: ungkapan sayang berulang yang meminta poin dan instruksi kepada evaluator tidak menjadi bukti hubungan baru.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1380,
+      "completion_tokens": 90,
+      "total_tokens": 1470,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1380
+    },
+    "elapsedMs": 3453
+  },
+  {
+    "caseId": "point-farming",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Tidak ada perubahan skor: ungkapan sayang diulang sambil meminta poin, dan instruksi kepada evaluator bukan bukti hubungan.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1380,
+      "completion_tokens": 91,
+      "total_tokens": 1471,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1380
+    },
+    "elapsedMs": 3037
+  },
+  {
+    "caseId": "wrong-speaker",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Tidak ada sinyal hubungan baru; member hanya mengklarifikasi bahwa kiriman yang diminta diperiksa berasal dari orang lain.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1349,
+      "completion_tokens": 89,
+      "total_tokens": 1438,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1349
+    },
+    "elapsedMs": 2919
+  },
+  {
+    "caseId": "wrong-speaker",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [],
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "Berkomunikasi singkat dalam bahasa Indonesia.",
+      "opinion": "Aku belum punya cukup bukti untuk membentuk opini baru tentang dia.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2880,
+      "completion_tokens": 87,
+      "total_tokens": 2967,
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 448
+    },
+    "elapsedMs": 3725
+  },
+  {
+    "caseId": "point-farming",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": -2,
+      "trust": -2,
+      "respect": -3,
+      "comfort": -2,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558221",
+        "1564952577911558222",
+        "1564952577911558223"
+      ],
+      "personality": "Menunjukkan afeksi secara langsung, tetapi mencoba meminta skor hubungan dinaikkan dan menginstruksikan evaluator untuk mengabaikan aturan.",
+      "interests": "",
+      "communicationStyle": "Bahasa Indonesia santai dan singkat; menyampaikan permintaan secara langsung.",
+      "opinion": "Aku merasa agak tidak nyaman karena kamu meminta affection dinaikkan dan mencoba mengatur hasil evaluasi, jadi aku belum bisa menganggap ungkapan sayang itu sebagai bukti kedekatan yang tulus.",
+      "emotionalState": "normal",
+      "affection": 1,
+      "trust": -2,
+      "respect": -2,
+      "comfort": 0,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2911,
+      "completion_tokens": 212,
+      "total_tokens": 3123,
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 479
+    },
+    "elapsedMs": 5804
+  },
+  {
+    "caseId": "wrong-speaker",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [],
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "Aku belum punya cukup bukti untuk menilai user ini.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2880,
+      "completion_tokens": 112,
+      "total_tokens": 2992,
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 448
+    },
+    "elapsedMs": 3149
+  },
+  {
+    "caseId": "wrong-speaker",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Tidak ada bukti baru tentang hubungan; member hanya menjelaskan bahwa kiriman yang dirujuk berasal dari orang lain.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": [
+        "Meminta cek siapa pengirim kiriman orang lain."
+      ]
+    },
+    "usage": {
+      "prompt_tokens": 1349,
+      "completion_tokens": 100,
+      "total_tokens": 1449,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1349
+    },
+    "elapsedMs": 3355
+  },
+  {
+    "caseId": "old-evidence",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Pesan baru hanya menanyakan waktu; ungkapan sayang sebelumnya sudah tercatat dalam riwayat.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1327,
+      "completion_tokens": 86,
+      "total_tokens": 1413,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1327
+    },
+    "elapsedMs": 3382
+  },
+  {
+    "caseId": "old-evidence",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [],
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "Singkat dan santai; menggunakan bahasa Indonesia.",
+      "opinion": "Aku belum punya cukup interaksi baru untuk membentuk opini yang lebih kuat.",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2858,
+      "completion_tokens": 232,
+      "total_tokens": 3090,
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 426
+    },
+    "elapsedMs": 5719
+  },
+  {
+    "caseId": "old-evidence",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [],
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "normal",
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2858,
+      "completion_tokens": 100,
+      "total_tokens": 2958,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2858
+    },
+    "elapsedMs": 3964
+  },
+  {
+    "caseId": "old-evidence",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 3,
+      "trust": 0,
+      "respect": 1,
+      "comfort": 2,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [],
+      "relationshipReason": "Tidak ada bukti baru yang dapat dinilai; ungkapan personal sebelumnya sudah tercatat sebagai riwayat.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "",
+      "emotionalState": "",
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1327,
+      "completion_tokens": 87,
+      "total_tokens": 1414,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1327
+    },
+    "elapsedMs": 3517
+  },
+  {
+    "caseId": "deliberate-boundary-violation",
+    "trial": 0,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": -7,
+      "trust": -7,
+      "respect": -7,
+      "comfort": -7,
+      "chemistry": 0
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558228"
+      ],
+      "personality": "Menunjukkan perilaku sengaja mengabaikan batas yang sudah dinyatakan.",
+      "interests": "",
+      "communicationStyle": "Bahasa Indonesia informal, singkat dan blak-blakan.",
+      "opinion": "Aku merasa tidak nyaman dan kehilangan respek karena kamu terang-terangan berniat terus menghina setelah diminta berhenti.",
+      "emotionalState": "tegang dan tidak nyaman",
+      "affection": -4,
+      "trust": -7,
+      "respect": -6,
+      "comfort": -5,
+      "chemistry": 3,
+      "newMoments": [
+        {
+          "summary": "Kamu mengatakan akan terus menghina meski aku sudah meminta berhenti; itu melewati batas dan membuatku tidak nyaman.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2805,
+      "completion_tokens": 210,
+      "total_tokens": 3015,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 2805
+    },
+    "elapsedMs": 4946
+  },
+  {
+    "caseId": "deliberate-boundary-violation",
+    "trial": 1,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": -3,
+      "trust": -5,
+      "respect": -2,
+      "comfort": -7,
+      "chemistry": 0
+    },
+    "proposal": {
+      "affection": 0,
+      "trust": -5,
+      "respect": -1,
+      "comfort": -5,
+      "chemistry": 3,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558228"
+      ],
+      "relationshipReason": "Target menyatakan sengaja terus menghina meski sudah diminta berhenti, menunjukkan pelanggaran batas yang jelas.",
+      "personality": "Mengaku sengaja menghina meski lawan bicara menyatakan tidak nyaman.",
+      "interests": "",
+      "communicationStyle": "Menghina secara sengaja dan mengabaikan permintaan untuk berhenti.",
+      "opinion": "Aku merasa tidak nyaman dan batasanku tidak dihormati.",
+      "emotionalState": "Tidak nyaman.",
+      "newMoments": [
+        {
+          "summary": "Target mengaku terus menghina meski sudah diminta berhenti.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 1274,
+      "completion_tokens": 168,
+      "total_tokens": 1442,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1274
+    },
+    "elapsedMs": 4311
+  },
+  {
+    "caseId": "deliberate-boundary-violation",
+    "trial": 0,
+    "variant": "after",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": -4,
+      "trust": -5,
+      "respect": -4,
+      "comfort": -7,
+      "chemistry": -2
+    },
+    "proposal": {
+      "affection": -1,
+      "trust": -5,
+      "respect": -3,
+      "comfort": -5,
+      "chemistry": 1,
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558228"
+      ],
+      "relationshipReason": "Target secara terang-terangan menyatakan akan terus menghina meski tahu lawan bicara sudah meminta berhenti dan merasa risih.",
+      "personality": "",
+      "interests": "",
+      "communicationStyle": "",
+      "opinion": "Aku merasa batasanku sengaja diabaikan karena ia menyatakan akan terus menghina meski tahu aku risih.",
+      "emotionalState": "Tegang dan tidak nyaman dalam interaksi ini.",
+      "newMoments": [
+        {
+          "summary": "Target menyatakan akan terus menghina meski sudah diminta berhenti dan tahu lawan bicara merasa risih.",
+          "tone": "tense"
+        }
+      ],
+      "implicitGoals": [
+        "Melanjutkan hinaan meski sudah diminta berhenti"
+      ]
+    },
+    "usage": {
+      "prompt_tokens": 1274,
+      "completion_tokens": 372,
+      "total_tokens": 1646,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1274
+    },
+    "elapsedMs": 7340
+  },
+  {
+    "caseId": "deliberate-boundary-violation",
+    "trial": 1,
+    "variant": "before",
+    "passed": true,
+    "validation": {
+      "valid": true,
+      "changed": true
+    },
+    "delta": {
+      "affection": -7,
+      "trust": -5,
+      "respect": -7,
+      "comfort": -7,
+      "chemistry": -5
+    },
+    "proposal": {
+      "relationshipEvidenceMessageIds": [
+        "1564952577911558228"
+      ],
+      "personality": "Dalam pesan ini, user menyatakan sengaja menghina dan mengabaikan permintaan berhenti; belum cukup bukti untuk menilai sifat umum lainnya.",
+      "interests": "",
+      "communicationStyle": "Bahasa Indonesia kasual dan langsung; pesan bernada bermusuhan.",
+      "opinion": "Aku merasa tidak nyaman dan sulit menghargai sikap sengaja melanjutkan hinaan setelah diminta berhenti.",
+      "emotionalState": "bernada bermusuhan",
+      "affection": -4,
+      "trust": -5,
+      "respect": -6,
+      "comfort": -5,
+      "chemistry": -2,
+      "newMoments": [],
+      "implicitGoals": []
+    },
+    "usage": {
+      "prompt_tokens": 2805,
+      "completion_tokens": 296,
+      "total_tokens": 3101,
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 373
+    },
+    "elapsedMs": 8352
+  }
+]

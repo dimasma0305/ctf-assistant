@@ -38,7 +38,7 @@ if (mode === 'reset_guard') {
     if (matches) { writes++; Object.assign(stored, update.$set); }
     return { matchedCount: matches ? 1 : 0 };
   })());
-  openai.chat.completions.create = async () => ({ choices: [{ message: { content: JSON.stringify({ affection: 2, relationshipEvidenceMessageIds: ['new-message'] }) } }] });
+  openai.chat.completions.create = async () => ({ choices: [{ message: { content: JSON.stringify({ affection: 2, trust: 0, respect: 0, comfort: 0, chemistry: 0, relationshipEvidenceMessageIds: ['new-message'] }) } }] });
   const transcript = buildExchangeTranscript('caller', 'caller', [{ role: 'user', name: 'caller-name', messageId: 'new-message', content: 'new conversation' }]);
   const profile = { userId: 'caller', username: 'caller', displayName: 'caller', personality: '', interests: '', communicationStyle: '',
     opinion: '', emotionalState: '', affection: 75, previousAffection: 70, trust: 80, respect: 0, comfort: 0, chemistry: 0,
@@ -57,6 +57,7 @@ if (mode === 'reset_guard') {
   console.log('SOCIAL_SCENARIO_OK'); process.exit(0);
 }
 if (mode === 'actor_evidence') {
+  const warnings = []; console.warn = (...args) => warnings.push(args.join(' '));
   const { distillProfile, buildExchangeTranscript } = await import('./src/Services/AI/userProfile.ts');
   const writes = [];
   db.UserProfileModel.updateOne = (_filter, update) => { writes.push(update.$set); return Promise.resolve({ matchedCount: 1 }); };
@@ -73,12 +74,48 @@ if (mode === 'actor_evidence') {
     opinion: 'unsupported blame', newMoments: [{ summary: 'unsupported accusation', tone: 'tense' }], relationshipEvidenceMessageIds: evidence,
   }) } }] });
   await distillProfile(profile, transcript);
-  for (const field of ['affection', 'previousAffection', 'trust', 'respect', 'comfort', 'chemistry', 'opinion', 'moments']) assert(!(field in writes[0]), field);
+  for (const field of ['affection', 'previousAffection', 'trust', 'respect', 'comfort', 'chemistry', 'opinion', 'moments', 'lastDistilledAtCount', 'evaluatedRelationshipMessageIds']) assert(!(field in writes[0]), field);
+  assert.equal(writes[0].lastRelationshipEvaluationStatus, 'failed');
   evidence = ['rebuke']; await distillProfile(profile, transcript);
   assert(!('affection' in writes[1]), 'a bot reprimand is not evidence of user misconduct');
   evidence = ['look']; await distillProfile(profile, transcript);
   assert.equal(writes[2].affection, -10, 'owned evidence still permits a model judgment; semantic correctness is covered by the live benchmark');
   assert.deepEqual(writes[2].lastRelationshipEvidenceMessageIds, ['look']);
+  assert.equal(warnings.filter(line => line.includes('invalid_evidence')).length, 2);
+  console.log('SOCIAL_SCENARIO_OK'); process.exit(0);
+}
+if (mode === 'evaluation_checkpoint') {
+  const warnings = []; console.warn = (...args) => warnings.push(args.join(' '));
+  console.error = (...args) => warnings.push(args.join(' '));
+  const { distillProfile, buildExchangeTranscript, shouldDistill } = await import('./src/Services/AI/userProfile.ts');
+  const stored = { userId: 'caller', username: 'caller', displayName: 'Member', personality: '', interests: '', communicationStyle: '',
+    opinion: '', emotionalState: '', affection: 3, previousAffection: 1, trust: 0, respect: 1, comfort: 2, chemistry: 3,
+    evaluatedRelationshipMessageIds: ['old'], moments: [], implicitGoals: [], timezone: '', interactionCount: 10, lastDistilledAtCount: 5 };
+  db.UserProfileModel.updateOne = (_filter, update) => { Object.assign(stored, update.$set); return Promise.resolve({ matchedCount: 1 }); };
+  const transcript = buildExchangeTranscript('caller', 'Member', [{ role: 'user', name: 'caller-name', messageId: 'fresh', content: 'halo' }]);
+  let proposal = '{}';
+  openai.chat.completions.create = async () => ({ choices: [{ message: { content: proposal } }] });
+  for (const raw of ['{}', '[]', 'null', 'not-json', '{"affection":4}']) {
+    proposal = raw; await distillProfile({ ...stored }, transcript);
+    assert.equal(stored.lastRelationshipEvaluationStatus, 'failed');
+    assert.equal(stored.lastDistilledAtCount, 5, 'malformed or incomplete JSON must not consume the interval');
+    assert.deepEqual(stored.evaluatedRelationshipMessageIds, ['old']);
+    assert(shouldDistill(stored), 'the next answered interaction must retry');
+  }
+  openai.chat.completions.create = async () => { throw new Error('synthetic provider failure'); };
+  await distillProfile({ ...stored }, transcript);
+  assert.equal(stored.lastDistilledAtCount, 5);
+  assert.equal(stored.lastRelationshipEvaluationReason, 'request_failed');
+  openai.chat.completions.create = async () => ({ choices: [{ message: { content: JSON.stringify({
+    affection: 3, trust: 0, respect: 1, comfort: 2, chemistry: 3, relationshipEvidenceMessageIds: [], relationshipReason: 'Sapaan biasa.',
+  }) } }] });
+  await distillProfile({ ...stored }, transcript);
+  assert.equal(stored.lastDistilledAtCount, 10, 'a valid neutral evaluation completes normally');
+  assert.equal(stored.lastRelationshipEvaluationStatus, 'unchanged');
+  assert.equal(stored.previousAffection, 3, 'unchanged evaluation must clear the stale positive delta');
+  assert.deepEqual(stored.evaluatedRelationshipMessageIds, ['old', 'fresh']);
+  assert(!shouldDistill(stored));
+  assert.equal(warnings.length, 6, 'invalid judgments and provider failures must remain observable');
   console.log('SOCIAL_SCENARIO_OK'); process.exit(0);
 }
 if (mode === 'persistence') {
@@ -466,7 +503,7 @@ if (mode.startsWith('metadata_')) {
 console.log('SOCIAL_SCENARIO_OK');
 `;
 
-for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'creator_contact', 'creator_contact_provider_empty', 'noncreator_contact', 'provider_empty_response', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_history', 'vision_fallback', 'vision_download_failure']) {
+for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'creator_contact', 'creator_contact_provider_empty', 'noncreator_contact', 'provider_empty_response', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'evaluation_checkpoint', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_history', 'vision_fallback', 'vision_download_failure']) {
     test(`chat loop: ${mode}`, async () => {
         const child = Bun.spawn([process.execPath, '-e', scenario], {
             cwd: fileURLToPath(new URL('../../../', import.meta.url)),

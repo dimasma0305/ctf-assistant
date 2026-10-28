@@ -56,6 +56,10 @@ export const schema = {
     affectionResetAt: { type: Date, default: null },
     // IDs of this user's own messages supporting the latest relationship judgment.
     lastRelationshipEvidenceMessageIds: { type: [String], default: [] },
+    lastRelationshipEvaluationStatus: { type: String, enum: ['changed', 'unchanged', 'failed'] },
+    lastRelationshipEvaluationAt: { type: Date },
+    // Internal audit note, never projected into public rankings or chat persona.
+    lastRelationshipEvaluationReason: { type: String, default: '' },
     evaluatedRelationshipMessageIds: { type: [String], default: [] },
     // Public guild exchanges that actually received a bot reply. The
     // relationship evaluator uses this bounded per-user window across

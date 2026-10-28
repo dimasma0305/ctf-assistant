@@ -1,0 +1,19 @@
+{
+  "before": {
+    "total": 20,
+    "passed": 20,
+    "errors": 0,
+    "valid": 20,
+    "meanInputTokens": 2897,
+    "failures": []
+  },
+  "after": {
+    "total": 20,
+    "passed": 20,
+    "errors": 0,
+    "valid": 20,
+    "meanInputTokens": 1366,
+    "failures": []
+  },
+  "elapsedMs": 49021
+}

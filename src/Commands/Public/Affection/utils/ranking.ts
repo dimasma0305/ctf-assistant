@@ -18,7 +18,7 @@ export const RANKING_METRICS = [
 ] as const;
 export type RankingMetric = typeof RANKING_METRICS[number]['value'];
 type Metrics = Record<RankingMetric, number>;
-export interface RankingEntry { userId: string; metrics: Metrics; lastInteractionAt: number; pendingEvaluation: number }
+export interface RankingEntry { userId: string; metrics: Metrics; lastInteractionAt: number; pendingEvaluation: number; evaluationStatus?: string }
 
 // Profiles are global. Resolve membership after this bounded candidate read;
 // hitting the cap or a failed member batch makes the board explicitly partial.
@@ -29,7 +29,7 @@ const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 25;
 const COOLDOWN_MS = 15_000;
 const lastUsedAt = new Map<string, number>(); // Shared by rank and ranking aliases.
-const PROFILE_FIELDS = 'userId affection previousAffection trust respect comfort chemistry interactionCount lastDistilledAtCount lastInteractionAt';
+const PROFILE_FIELDS = 'userId affection previousAffection trust respect comfort chemistry interactionCount lastDistilledAtCount lastInteractionAt lastRelationshipEvaluationStatus';
 const SOCIAL_FIELDS = 'userId anger hurt warmth updatedAt'; // No DM content or reasons.
 const inRange = (value: unknown, min: number, max: number, fallback = 0) =>
   typeof value === 'number' && Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
@@ -54,6 +54,7 @@ export function rankingEntries(profiles: any[], socialStates: any[], now = new D
     const interactions = bounded(profile.interactionCount, 0, Number.MAX_SAFE_INTEGER);
     const lastEvaluated = bounded(profile.lastDistilledAtCount, 0, Number.MAX_SAFE_INTEGER);
     return { userId: profile.userId, lastInteractionAt: timestamp(profile.lastInteractionAt),
+      evaluationStatus: profile.lastRelationshipEvaluationStatus,
       pendingEvaluation: Math.max(0, interactions - lastEvaluated), metrics: {
       affection, trust: bounded(profile.trust, -100, 100), respect: bounded(profile.respect, -100, 100),
       comfort: bounded(profile.comfort, -100, 100), chemistry: bounded(profile.chemistry, -100, 100),
@@ -71,8 +72,11 @@ export function sortRanking(entries: RankingEntry[], metric: RankingMetric): Ran
 
 export function formatRankingMetrics(entry: RankingEntry): string {
   const m = entry.metrics;
-  const progress = entry.pendingEvaluation >= RELATIONSHIP_DISTILL_INTERVAL
-    ? 'evaluasi tertunda' : `evaluasi ${entry.pendingEvaluation}/${RELATIONSHIP_DISTILL_INTERVAL}`;
+  const progress = entry.evaluationStatus === 'failed' ? 'evaluasi gagal'
+    : entry.pendingEvaluation >= RELATIONSHIP_DISTILL_INTERVAL ? 'evaluasi tertunda'
+    : entry.pendingEvaluation === 0 && entry.evaluationStatus === 'unchanged' ? 'evaluasi: tetap'
+    : entry.pendingEvaluation === 0 && entry.evaluationStatus === 'changed' ? 'evaluasi: berubah'
+    : `evaluasi ${entry.pendingEvaluation}/${RELATIONSHIP_DISTILL_INTERVAL}`;
   return `Afeksi ${m.affection} · Trust ${m.trust} · Respect ${m.respect} · Comfort ${m.comfort} · Chemistry ${m.chemistry}\n` +
     `Warmth ${m.warmth} · Anger ${m.anger} · Hurt ${m.hurt} · Δ ${delta(m.change)} · Interaksi ${m.interactions} · ${progress}`;
 }

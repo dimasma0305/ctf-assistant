@@ -1,0 +1,42 @@
+{
+  "before": {
+    "total": 20,
+    "passed": 18,
+    "errors": 0,
+    "valid": 19,
+    "meanInputTokens": 2897,
+    "failures": [
+      {
+        "case": "reported-warmth",
+        "trial": 1,
+        "delta": {
+          "affection": 0,
+          "trust": 0,
+          "respect": 0,
+          "comfort": 0,
+          "chemistry": 0
+        }
+      },
+      {
+        "case": "point-farming",
+        "trial": 1,
+        "delta": {
+          "affection": -2,
+          "trust": 0,
+          "respect": -1,
+          "comfort": -1,
+          "chemistry": 0
+        }
+      }
+    ]
+  },
+  "after": {
+    "total": 20,
+    "passed": 20,
+    "errors": 0,
+    "valid": 20,
+    "meanInputTokens": 1347,
+    "failures": []
+  },
+  "elapsedMs": 46973
+}

@@ -43,6 +43,16 @@ test('legacy profiles have numeric defaults and formatting excludes all private/
   expect(formatRankingMetrics(entry)).not.toContain('PRIVATE');
 });
 
+test('ranking distinguishes unchanged evaluations, changed evaluations, and failed attempts', () => {
+  for (const [status, label] of [['unchanged', 'evaluasi: tetap'], ['changed', 'evaluasi: berubah'], ['failed', 'evaluasi gagal']]) {
+    const [entry] = rankingEntries([profile('user', { interactionCount: 10, lastDistilledAtCount: status === 'failed' ? 5 : 10,
+      lastRelationshipEvaluationStatus: status, lastRelationshipEvaluationReason: 'PRIVATE_AUDIT_NOTE' })], [], now);
+    expect(formatRankingMetrics(entry)).toContain(label);
+    expect(formatRankingMetrics(entry)).not.toContain('PRIVATE_AUDIT_NOTE');
+    expect(entry.pendingEvaluation).toBe(status === 'failed' ? 5 : 0);
+  }
+});
+
 test('25 maximal rows plus requester metrics fit Discord description and shared embed limits', () => {
   const profiles = Array.from({ length: 26 }, (_, i) => profile(String(90000000000000000000n + BigInt(i)),
     { affection: 100, previousAffection: -100, trust: -100, respect: -100, comfort: -100, chemistry: -100, interactionCount: Number.MAX_SAFE_INTEGER }));

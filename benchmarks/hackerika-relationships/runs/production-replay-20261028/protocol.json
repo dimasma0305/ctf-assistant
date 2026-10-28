@@ -1,0 +1,10 @@
+{
+  "model": "gpt-6-luna",
+  "temperature": 0.3,
+  "repeats": 3,
+  "interactionCount": 529,
+  "before": "Original deployed prompt/input formatter",
+  "after": "New prompt plus explicit five-score baseline",
+  "inputHash": "6e2042c016572ded7eb3d064160d532b0226821dbb6d2ede22f6b100c6567374",
+  "privacy": "Raw profile and transcript stay in /tmp/hackerika-relationships, not repository. No DB writes, no Discord sends. Known development reproduction, not held-out benchmark."
+}

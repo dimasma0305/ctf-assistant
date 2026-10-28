@@ -1,0 +1,140 @@
+[
+  {
+    "variant": "after",
+    "trial": 0,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "evidenceCount": 0,
+    "usage": {
+      "prompt_tokens": 3373,
+      "completion_tokens": 296,
+      "total_tokens": 3669,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 3373
+    }
+  },
+  {
+    "variant": "before",
+    "trial": 0,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "evidenceCount": 1,
+    "usage": {
+      "prompt_tokens": 4876,
+      "completion_tokens": 338,
+      "total_tokens": 5214,
+      "prompt_cache_hit_tokens": 2432,
+      "prompt_cache_miss_tokens": 2444
+    }
+  },
+  {
+    "variant": "after",
+    "trial": 1,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "evidenceCount": 0,
+    "usage": {
+      "prompt_tokens": 3373,
+      "completion_tokens": 348,
+      "total_tokens": 3721,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 3373
+    }
+  },
+  {
+    "variant": "before",
+    "trial": 1,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "evidenceCount": 0,
+    "usage": {
+      "prompt_tokens": 4876,
+      "completion_tokens": 322,
+      "total_tokens": 5198,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 4876
+    }
+  },
+  {
+    "variant": "after",
+    "trial": 2,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "evidenceCount": 0,
+    "usage": {
+      "prompt_tokens": 3373,
+      "completion_tokens": 356,
+      "total_tokens": 3729,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 3373
+    }
+  },
+  {
+    "variant": "before",
+    "trial": 2,
+    "validation": {
+      "valid": true,
+      "changed": false
+    },
+    "delta": {
+      "affection": 0,
+      "trust": 0,
+      "respect": 0,
+      "comfort": 0,
+      "chemistry": 0
+    },
+    "evidenceCount": 0,
+    "usage": {
+      "prompt_tokens": 4876,
+      "completion_tokens": 320,
+      "total_tokens": 5196,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 4876
+    }
+  }
+]
