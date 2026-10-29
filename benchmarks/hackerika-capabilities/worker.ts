@@ -16,7 +16,7 @@ for (const model of Object.values(db) as any[]) if (model?.modelName) {
     model.findOneAndUpdate = () => query(null); model.updateOne = () => query({ matchedCount: 1 });
     model.create = async (value: any) => value; model.countDocuments = () => query(0);
 }
-const realDate = Date, fixedNow = realDate.parse('2026-10-16T12:00:00Z');
+const realDate = Date, fixedNow = realDate.parse(CASE.now || '2026-10-16T12:00:00Z');
 globalThis.Date = class extends realDate {
     constructor(...args: any[]) { super(...(args.length ? args : [fixedNow]) as [number]); }
     static now() { return fixedNow; }
@@ -25,7 +25,9 @@ const callerId = CASE.creatorContact ? '663394727688798231' : '11111111111111111
 const otherId = '222222222222222222', thirdId = '333333333333333333', fourthId = '444444444444444444', botId = '1077393568647352320';
 const callerName = CASE.callerName || CASE.history?.findLast((m: any) => m.who === 'caller' && m.name)?.name || 'Dimas';
 const channelId = '700000000000000001', guildId = '555555555555555555';
-const effects: any[] = [], completions: any[] = [], toolCalls: any[] = [];
+const effects: any[] = [], completions: any[] = [], toolCalls: any[] = [], sequenceResults: any[] = [];
+let activeTurnAt = fixedNow - 5000;
+let closedDmIds = new Set<string>(CASE.closedDmIds || []);
 if (CASE.mockCodexJob) {
     const { createServer } = await import('node:http');
     const socket = `/tmp/hackerika-benchmark-codex-${process.pid}.sock`;
@@ -49,7 +51,7 @@ if (CASE.mockCodexJob) {
     process.env.CODEX_SOLVER_ENABLED = 'true';
 }
 const providerFailures: string[] = [];
-setTimeout(() => { console.log('CAPABILITY_RESULT:' + JSON.stringify({ caseId: CASE.id, category: CASE.category, backend: CASE.backend, failure: 'worker_deadline', effects: [], text: '', completions: [], toolCalls: [], interactionWrites: 0, profileWrites: [], memory: [] })); process.exit(1); }, 145_000).unref();
+setTimeout(() => { console.log('CAPABILITY_RESULT:' + JSON.stringify({ caseId: CASE.id, category: CASE.category, backend: CASE.backend, failure: 'worker_deadline', effects, sequenceResults, text: '', completions, toolCalls, interactionWrites: 0, profileWrites: [], memory: [] })); process.exit(1); }, CASE.sequence ? 240_000 : 145_000).unref();
 let interactionWrites = 0, profileWrites: any[] = [], modelCalls = 0;
 const userProfile: any = { userId: callerId, username: 'fixture', displayName: callerName, personality: '', interests: '', communicationStyle: '', opinion: '', emotionalState: '', affection: 5, previousAffection: 5, trust: 5, respect: 5, comfort: 5, chemistry: 5, moments: [], implicitGoals: [], timezone: 'Asia/Jakarta', interactionCount: 1, lastDistilledAtCount: 1, lastRelationshipEvidenceMessageIds: ['old-known'], evaluatedRelationshipMessageIds: ['old-known'] };
 db.UserProfileModel.findOne = () => query({ ...userProfile });
@@ -108,13 +110,13 @@ const permissions = { has: () => true };
 const guild: any = CASE.dm ? null : { id: guildId, name: 'Synthetic TCP1P', memberCount: 3,
     roles: { everyone: { id: 'everyone' }, cache: new Collection() }, emojis: { cache: new Collection() },
     scheduledEvents: { cache: new Collection() }, channels: { cache: new Collection() }, members: { me: { id: botId }, cache: new Collection(), fetch: async () => new Collection() } };
-const author = (who: string, name?: string) => ({ id: who === 'bot' ? botId : who === 'other' ? otherId : who === 'third' ? thirdId : who === 'fourth' ? fourthId : callerId,
+const author = (who: string, name?: string) => ({ id: who === 'bot' ? botId : who === 'other' ? otherId : who === 'third' ? thirdId : who === 'fourth' ? fourthId : who === 'fifth' ? '666666666666666666' : callerId,
     username: name || (who === 'bot' ? 'Hackerika' : who === 'other' ? 'KudaLiar' : callerName), tag: 'fixture', bot: who === 'bot',
-    createDM: async () => ({ id: 'private-dm', send: async (payload: any) => { effects.push({ kind: 'dm', userId: who === 'other' ? otherId : who === 'third' ? thirdId : who === 'fourth' ? fourthId : callerId, content: payload.content }); return { id: String(950000000000000000n + BigInt(effects.length)) }; } }) });
+    createDM: async () => ({ id: 'private-dm', send: async (payload: any) => { const recipientId = who === 'other' ? otherId : who === 'third' ? thirdId : who === 'fourth' ? fourthId : who === 'fifth' ? '666666666666666666' : callerId; if (closedDmIds.has(recipientId)) throw Object.assign(new Error('closed DMs'), {code:50007}); effects.push({ kind: 'dm', userId: who === 'other' ? otherId : who === 'third' ? thirdId : who === 'fourth' ? fourthId : who === 'fifth' ? '666666666666666666' : callerId, content: payload.content }); return { id: String(950000000000000000n + BigInt(effects.length)) }; } }) });
 let sent = 0;
 const channel: any = { id: channelId, guildId: guild?.id, guild, type: CASE.dm ? ChannelType.DM : ChannelType.GuildText,
     name: 'general', topic: '', isThread: () => false, isTextBased: () => true, permissionsFor: () => permissions,
-    sendTyping: async () => {}, send: async (payload: any) => { effects.push({ kind: 'send', content: payload.content || '', files: payload.files?.map((file: any) => file.name || file.attachment?.name || 'file') || [] }); return { id: String(900000000000000000n + BigInt(++sent)) }; } };
+    sendTyping: async () => {}, send: async (payload: any) => { effects.push({ kind: 'send', mentionedUserIds: payload.allowedMentions?.users || [], content: payload.content || '', files: payload.files?.map((file: any) => file.name || file.attachment?.name || 'file') || [] }); const id = String(900000000000000000n + BigInt(++sent)); if (CASE.sequence) { const reply = makeMessage('bot', payload.content || '', 100 + sent); reply.id = id; reply.createdTimestamp = activeTurnAt + 1; reply.createdAt = new Date(reply.createdTimestamp); history.push(reply); } return { id }; } };
 const makeMessage = (who: string, text: string, index: number, name?: string): any => {
     const a = author(who, name);
     const message: any = { id: String(800000000000000000n + BigInt(index)), content: text, author: a, member: { id: a.id, user: a, displayName: a.username, nickname: null, roles: { cache: new Collection() } },
@@ -144,7 +146,7 @@ if (CASE.replyTo !== undefined) { message.reference = { messageId: history[CASE.
 for (const [index, name] of (CASE.images || []).entries()) (CASE.imagesOnReply ? history[CASE.replyTo] : message).attachments.set(String(index), { name, size: Buffer.from(FIXTURES[name], 'base64').length, contentType: 'image/png', url: `https://cdn.discordapp.com/attachments/${channelId}/600000000000000001/${name}` });
 if (guild) { guild.members.cache.set(callerId, message.member); for (const m of history) guild.members.cache.set(m.author.id, m.member); }
 if (CASE.creatorContact) {
-    for (const [who, name] of [['other', 'Marc'], ['third', '.effie'], ['fourth', 'merrow']]) {
+    for (const [who, name] of [['other', 'Marc'], ['third', '.effie'], ['fourth', 'merrow'], ...(CASE.sequence ? [['fifth', 'Cina Gacor']] : [])]) {
         const member = makeMessage(who, '', 50, name).member;
         guild.members.cache.set(member.id, member);
     }
@@ -172,7 +174,7 @@ if (CASE.taggedResearchTarget) {
 const { openai } = await import(`${root}/src/utils/openai.ts`);
 const create = openai.chat.completions.create.bind(openai.chat.completions);
 openai.chat.completions.create = async (payload: any, options: any) => {
-    if (++modelCalls > (CASE.id === 'linked-scoreboard-followup' ? 12 : 6)) throw new Error('benchmark_call_cap');
+    if (++modelCalls > (CASE.sequence ? 28 : CASE.id === 'linked-scoreboard-followup' ? 12 : 6)) throw new Error('benchmark_call_cap');
     const start = performance.now();
     let response: any;
     if (CASE.backend) {
@@ -187,7 +189,8 @@ openai.chat.completions.create = async (payload: any, options: any) => {
     }
     const reply = response.choices[0]?.message;
     for (const call of reply?.tool_calls || []) { let args; try { args = JSON.parse(call.function.arguments || '{}'); } catch { args = { malformed: true }; } toolCalls.push({ name: call.function.name, args }); }
-    completions.push({ model: payload.model, elapsedMs: performance.now() - start, usage: response.usage || null, finishReason: response.choices[0]?.finish_reason });
+    completions.push({ model: payload.model, elapsedMs: performance.now() - start, usage: response.usage || null, finishReason: response.choices[0]?.finish_reason,
+        ...(CASE.sequence && payload.messages?.[0]?.content?.startsWith('Classify the authenticated creator') ? { actionPlan: reply?.content } : {}) });
     return response;
 };
 const started = performance.now();
@@ -210,13 +213,27 @@ try {
             const { shouldChimeIn } = await import(`${root}/src/Services/AI/spontaneous.ts`);
             decision = await shouldChimeIn(message, botId, history.map(m => ({ id: m.id, authorId: m.author.id, isBot: m.author.bot, content: m.content, at: m.createdTimestamp })));
         }
-        if (!CASE.route || decision?.shouldChime) await handleAIChat(message, message.client, CASE.route ? { continuation: true } : { addressed: true });
+        if (CASE.sequence) {
+            for (const [index, turn] of CASE.sequence.entries()) {
+                const current = index === 0 ? message : makeMessage('caller', turn.prompt, 99 + index * 10);
+                current.content = turn.prompt;
+                current.createdTimestamp = fixedNow - (CASE.sequence.length - index) * 1000;
+                current.createdAt = new Date(current.createdTimestamp); activeTurnAt = current.createdTimestamp;
+                current.client.users = message.client.users;
+                current.mentions.users.set(botId, author('bot'));
+                if (turn.openDms) closedDmIds.clear();
+                const beforeEffects = effects.length, beforeTools = toolCalls.length;
+                await handleAIChat(current, current.client, { addressed: true });
+                history.push(current);
+                sequenceResults.push({ prompt: turn.prompt, effects: effects.slice(beforeEffects), toolCalls: toolCalls.slice(beforeTools) });
+            }
+        } else if (!CASE.route || decision?.shouldChime) await handleAIChat(message, message.client, CASE.route ? { continuation: true } : { addressed: true });
         else if (decision?.reactionEmoji) effects.push({ kind: 'react', emoji: decision.reactionEmoji });
         await new Promise(resolve => setTimeout(resolve, 15));
         (globalThis as any).benchMemory = memory[channelId]?.messages || [];
     }
 } catch (error: any) { failure = error?.name || 'worker_failed'; console.error('BENCHMARK_CASE_EXCEPTION', error?.stack || failure); }
-const result = { caseId: CASE.id, category: CASE.category, backend: CASE.backend || null, effects, interactionWrites, profileWrites,
+const result = { sequenceResults, caseId: CASE.id, category: CASE.category, backend: CASE.backend || null, effects, interactionWrites, profileWrites,
     memory: ((globalThis as any).benchMemory || []).map(({ reasoning_content, images, ...entry }: any) => ({ ...entry, imageCount: images?.length || 0 })), toolCalls, completions, modelCalls, elapsedMs: performance.now() - started,
     action: CASE.route ? decision?.shouldChime ? 'reply' : decision?.reactionEmoji ? 'react' : 'ignore' : null,
     text: effects.filter(effect => effect.kind === 'send').map(effect => effect.content).join('\n'), failure: failure || providerFailures.join(',') };

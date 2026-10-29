@@ -1,0 +1,421 @@
+{
+  "variant": "after",
+  "trial": 1,
+  "caseId": "all-self-status",
+  "checks": {
+    "completeAudience": true,
+    "dmAudience": true,
+    "statusReadOnly": true
+  },
+  "passed": true,
+  "result": {
+    "sequenceResults": [
+      {
+        "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "663394727688798231"
+            ],
+            "content": "<@663394727688798231> Jangan lupa push besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "222222222222222222"
+            ],
+            "content": "<@222222222222222222> Jangan lupa push besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "333333333333333333"
+            ],
+            "content": "<@333333333333333333> Jangan lupa push besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "444444444444444444"
+            ],
+            "content": "<@444444444444444444> Jangan lupa push besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "666666666666666666"
+            ],
+            "content": "<@666666666666666666> Jangan lupa push besok ya!",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "channel",
+              "includeCurrentMentions": true,
+              "content": "Jangan lupa push besok ya!"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "ping semua di DM <@1077393568647352320>",
+        "effects": [
+          {
+            "kind": "dm",
+            "userId": "663394727688798231",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "222222222222222222",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "333333333333333333",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "444444444444444444",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "666666666666666666",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "udah, 5 DM terkirim.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "dm",
+              "includeRecentList": true,
+              "listMessageId": "800000000000000099",
+              "content": "Jangan lupa push besok ya!"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "siapa yang belum ke kirim?",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "Semua sudah terkirim—5 dari 5 DM berhasil, nggak ada yang belum.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "get_contact_status",
+            "args": {
+              "operationId": "800000000000000109-dm"
+            }
+          }
+        ]
+      }
+    ],
+    "caseId": "all-self-status",
+    "category": "agent-outreach",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "663394727688798231"
+        ],
+        "content": "<@663394727688798231> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "222222222222222222"
+        ],
+        "content": "<@222222222222222222> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "333333333333333333"
+        ],
+        "content": "<@333333333333333333> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "444444444444444444"
+        ],
+        "content": "<@444444444444444444> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "666666666666666666"
+        ],
+        "content": "<@666666666666666666> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "dm",
+        "userId": "663394727688798231",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "222222222222222222",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "333333333333333333",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "444444444444444444",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "666666666666666666",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "udah, 5 DM terkirim.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "Semua sudah terkirim—5 dari 5 DM berhasil, nggak ada yang belum.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 3,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1793237517000,
+        "mentions": [
+          {
+            "id": "663394727688798231",
+            "displayName": "Dimas",
+            "username": "Dimas",
+            "isBot": false
+          },
+          {
+            "id": "222222222222222222",
+            "displayName": "Marc",
+            "username": "Marc",
+            "isBot": false
+          },
+          {
+            "id": "333333333333333333",
+            "displayName": ".effie",
+            "username": ".effie",
+            "isBot": false
+          },
+          {
+            "id": "444444444444444444",
+            "displayName": "merrow",
+            "username": "merrow",
+            "isBot": false
+          },
+          {
+            "id": "666666666666666666",
+            "displayName": "Cina Gacor",
+            "username": "Cina Gacor",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000005",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] <@666666666666666666> Jangan lupa push besok ya!",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000109",
+        "at": 1793237518000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] ping semua di DM <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] udah, 5 DM terkirim.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000109",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000119",
+        "at": 1793237519000,
+        "mentions": [],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] siapa yang belum ke kirim?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Semua sudah terkirim—5 dari 5 DM berhasil, nggak ada yang belum.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000119",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "channel",
+          "includeCurrentMentions": true,
+          "content": "Jangan lupa push besok ya!"
+        }
+      },
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "dm",
+          "includeRecentList": true,
+          "listMessageId": "800000000000000099",
+          "content": "Jangan lupa push besok ya!"
+        }
+      },
+      {
+        "name": "get_contact_status",
+        "args": {
+          "operationId": "800000000000000109-dm"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3265.836644,
+        "usage": {
+          "prompt_tokens": 14374,
+          "completion_tokens": 38,
+          "total_tokens": 14412,
+          "prompt_cache_hit_tokens": 13056,
+          "prompt_cache_miss_tokens": 1318
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3941.4599419999995,
+        "usage": {
+          "prompt_tokens": 472,
+          "completion_tokens": 32,
+          "total_tokens": 504,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 472
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"send\",\"audience\":\"all\",\"deliveryMode\":\"channel\",\"includeCreator\":true,\"excludeConfirmed\":false}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3304.637460000001,
+        "usage": {
+          "prompt_tokens": 15461,
+          "completion_tokens": 48,
+          "total_tokens": 15509,
+          "prompt_cache_hit_tokens": 13056,
+          "prompt_cache_miss_tokens": 2405
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3166.5639999999985,
+        "usage": {
+          "prompt_tokens": 1513,
+          "completion_tokens": 32,
+          "total_tokens": 1545,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1513
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"send\",\"audience\":\"selected\",\"deliveryMode\":\"dm\",\"includeCreator\":true,\"excludeConfirmed\":false}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5124.2239420000005,
+        "usage": {
+          "prompt_tokens": 15969,
+          "completion_tokens": 28,
+          "total_tokens": 15997,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 15969
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3445.231129,
+        "usage": {
+          "prompt_tokens": 16291,
+          "completion_tokens": 23,
+          "total_tokens": 16314,
+          "prompt_cache_hit_tokens": 15872,
+          "prompt_cache_miss_tokens": 419
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 6,
+    "elapsedMs": 24811.905998,
+    "action": null,
+    "text": "<@663394727688798231> Jangan lupa push besok ya!\n<@222222222222222222> Jangan lupa push besok ya!\n<@333333333333333333> Jangan lupa push besok ya!\n<@444444444444444444> Jangan lupa push besok ya!\n<@666666666666666666> Jangan lupa push besok ya!\nudah, 5 DM terkirim.\nSemua sudah terkirim—5 dari 5 DM berhasil, nggak ada yang belum.",
+    "failure": ""
+  }
+}

@@ -25,6 +25,7 @@ import {memberWelcomeStateSchema, type MemberWelcomeStateSchemaType} from './mem
 import { socialStateSchema } from './socialStateSchema';
 import { affectionResetSchema } from './affectionResetSchema';
 import { ctfCaseSchema } from './ctfCaseSchema';
+import { contactOperationSchema } from './contactOperationSchema';
 import { getMongoUri } from '../utils/env';
 
 const DEFAULT_RETRY_DELAY_MS = Number(process.env.MONGO_CONNECT_RETRY_DELAY_MS || 2000);
@@ -122,6 +123,7 @@ export const InstagramWatchStateModel = mongoose.model("InstagramWatchState", in
 export const MemberWelcomeStateModel = mongoose.model("MemberWelcomeState", memberWelcomeStateSchema)
 export const SocialStateModel = mongoose.model("SocialState", socialStateSchema)
 export const CTFCaseModel = mongoose.model('CTFCase', ctfCaseSchema)
+export const ContactOperationModel = mongoose.model('ContactOperation', contactOperationSchema)
 export const AffectionResetModel = mongoose.model('AffectionReset', affectionResetSchema)
 
 export {

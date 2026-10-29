@@ -24,6 +24,9 @@ let interactionUpdate;
 db.UserProfileModel.findOneAndUpdate = (_filter, update) => { interactionWrites++; interactionUpdate = update;
   return query({ userId: 'caller', interactionCount: 1 }); };
 const mode = process.env.SOCIAL_TEST_MODE;
+const { contactIntentPlanner } = await import('./src/Services/AI/contactIntent.ts');
+contactIntentPlanner.decide = async () => ({ intent: ['creator_contact', 'creator_contact_provider_empty'].includes(mode) ? 'send' : 'none',
+  audience: 'selected', includeCreator: false, excludeConfirmed: false });
 const internalAnnotation = '[Discord chronology: {"sentAt":"2026-10-15T16:04:00.253Z","replyToMessageId":"1560322302267363349"}]';
 if (mode === 'reset_guard') {
   const { distillProfile, buildExchangeTranscript } = await import('./src/Services/AI/userProfile.ts');

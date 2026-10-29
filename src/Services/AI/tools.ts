@@ -26,6 +26,8 @@ import { delegateCodexForTurn } from './codexDelegate';
 import { relatedSourceLeads } from './conversationLinks';
 
 const pageReads = new WeakMap<object, Map<string, ReturnType<typeof fetchUrlForTool>>>();
+const turnAllowedTools = new WeakMap<object, Set<string>>();
+export function setTurnAllowedTools(message: object, names: string[]): void { turnAllowedTools.set(message, new Set(names)); }
 function readPageOnce(turn: object, url: string): ReturnType<typeof fetchUrlForTool> {
     let reads = pageReads.get(turn);
     if (!reads) { reads = new Map(); pageReads.set(turn, reads); }
@@ -495,6 +497,8 @@ export async function dispatchTool(
     options: { signal?: AbortSignal } = {},
 ): Promise<string> {
     try {
+        const allowed = turnAllowedTools.get(message);
+        if (allowed && !allowed.has(name)) return JSON.stringify({ ok: false, error: 'tool_not_available_for_current_request', instruction: 'Follow the latest user request and current action plan; do not execute tasks mentioned only in older context.' });
         if (name === 'delegate_codex') return JSON.stringify(await delegateCodexForTurn(args || {}, message, options));
         if (name === 'solve_ctf') return JSON.stringify(await solveCTFForTurn(args || {}, message, options));
         if(['codex_job_status','cancel_codex_job','ctf_job_status','cancel_ctf_job'].includes(name)){

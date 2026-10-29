@@ -1,0 +1,596 @@
+{
+  "variant": "after",
+  "trial": 1,
+  "caseId": "all-self-status",
+  "checks": {
+    "completeAudience": true,
+    "dmAudience": true,
+    "statusReadOnly": true
+  },
+  "passed": true,
+  "result": {
+    "sequenceResults": [
+      {
+        "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "663394727688798231"
+            ],
+            "content": "<@663394727688798231> Joints UGM Finals: kamu pegang Web 1 (6 soal). Jangan lupa push besok ya.",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "222222222222222222"
+            ],
+            "content": "<@222222222222222222> Joints UGM Finals: kamu pegang rev 1 (6 soal). Jangan lupa push besok ya.",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "333333333333333333"
+            ],
+            "content": "<@333333333333333333> Joints UGM Finals: kamu pegang pwn 2 (6 soal). Jangan lupa push besok ya.",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "444444444444444444"
+            ],
+            "content": "<@444444444444444444> Joints UGM Finals: kamu pegang foren 1 (6 soal). Jangan lupa push besok ya.",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "666666666666666666"
+            ],
+            "content": "<@666666666666666666> Joints UGM Finals: kamu pegang crypto 1 (6 soal). Jangan lupa push besok ya.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "channel",
+              "targets": [
+                {
+                  "userId": "663394727688798231",
+                  "content": "Joints UGM Finals: kamu pegang Web 1 (6 soal). Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "222222222222222222",
+                  "content": "Joints UGM Finals: kamu pegang rev 1 (6 soal). Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "333333333333333333",
+                  "content": "Joints UGM Finals: kamu pegang pwn 2 (6 soal). Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "444444444444444444",
+                  "content": "Joints UGM Finals: kamu pegang foren 1 (6 soal). Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "666666666666666666",
+                  "content": "Joints UGM Finals: kamu pegang crypto 1 (6 soal). Jangan lupa push besok ya."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "ping semua di DM <@1077393568647352320>",
+        "effects": [
+          {
+            "kind": "dm",
+            "userId": "663394727688798231",
+            "content": "Joints UGM Finals: kamu pegang Web 1. Jangan lupa push besok ya."
+          },
+          {
+            "kind": "dm",
+            "userId": "222222222222222222",
+            "content": "Joints UGM Finals: kamu pegang rev 1. Jangan lupa push besok ya."
+          },
+          {
+            "kind": "dm",
+            "userId": "333333333333333333",
+            "content": "Joints UGM Finals: kamu pegang pwn 2. Jangan lupa push besok ya."
+          },
+          {
+            "kind": "dm",
+            "userId": "444444444444444444",
+            "content": "Joints UGM Finals: kamu pegang foren 1. Jangan lupa push besok ya."
+          },
+          {
+            "kind": "dm",
+            "userId": "666666666666666666",
+            "content": "Joints UGM Finals: kamu pegang crypto 1. Jangan lupa push besok ya."
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "udah, 5 DM terkirim.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "dm",
+              "includeRecentList": true,
+              "listMessageId": "800000000000000099",
+              "targets": [
+                {
+                  "userId": "663394727688798231",
+                  "content": "Joints UGM Finals: kamu pegang Web 1. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "222222222222222222",
+                  "content": "Joints UGM Finals: kamu pegang rev 1. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "333333333333333333",
+                  "content": "Joints UGM Finals: kamu pegang pwn 2. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "444444444444444444",
+                  "content": "Joints UGM Finals: kamu pegang foren 1. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "666666666666666666",
+                  "content": "Joints UGM Finals: kamu pegang crypto 1. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "1077393568647352320",
+                  "content": "Joints UGM Finals: kamu belum tercantum di daftar pembagian 6 soal. Jangan lupa push besok ya."
+                }
+              ]
+            }
+          },
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "dm",
+              "includeRecentList": true,
+              "listMessageId": "800000000000000099",
+              "targets": [
+                {
+                  "userId": "663394727688798231",
+                  "content": "Joints UGM Finals: kamu pegang Web 1. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "222222222222222222",
+                  "content": "Joints UGM Finals: kamu pegang rev 1. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "333333333333333333",
+                  "content": "Joints UGM Finals: kamu pegang pwn 2. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "444444444444444444",
+                  "content": "Joints UGM Finals: kamu pegang foren 1. Jangan lupa push besok ya."
+                },
+                {
+                  "userId": "666666666666666666",
+                  "content": "Joints UGM Finals: kamu pegang crypto 1. Jangan lupa push besok ya."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "siapa yang belum ke kirim?",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "Nggak ada yang belum—5 DM terkirim semua, termasuk kamu.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "get_contact_status",
+            "args": {
+              "operationId": "800000000000000109-dm"
+            }
+          }
+        ]
+      }
+    ],
+    "caseId": "all-self-status",
+    "category": "agent-outreach",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "663394727688798231"
+        ],
+        "content": "<@663394727688798231> Joints UGM Finals: kamu pegang Web 1 (6 soal). Jangan lupa push besok ya.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "222222222222222222"
+        ],
+        "content": "<@222222222222222222> Joints UGM Finals: kamu pegang rev 1 (6 soal). Jangan lupa push besok ya.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "333333333333333333"
+        ],
+        "content": "<@333333333333333333> Joints UGM Finals: kamu pegang pwn 2 (6 soal). Jangan lupa push besok ya.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "444444444444444444"
+        ],
+        "content": "<@444444444444444444> Joints UGM Finals: kamu pegang foren 1 (6 soal). Jangan lupa push besok ya.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "666666666666666666"
+        ],
+        "content": "<@666666666666666666> Joints UGM Finals: kamu pegang crypto 1 (6 soal). Jangan lupa push besok ya.",
+        "files": []
+      },
+      {
+        "kind": "dm",
+        "userId": "663394727688798231",
+        "content": "Joints UGM Finals: kamu pegang Web 1. Jangan lupa push besok ya."
+      },
+      {
+        "kind": "dm",
+        "userId": "222222222222222222",
+        "content": "Joints UGM Finals: kamu pegang rev 1. Jangan lupa push besok ya."
+      },
+      {
+        "kind": "dm",
+        "userId": "333333333333333333",
+        "content": "Joints UGM Finals: kamu pegang pwn 2. Jangan lupa push besok ya."
+      },
+      {
+        "kind": "dm",
+        "userId": "444444444444444444",
+        "content": "Joints UGM Finals: kamu pegang foren 1. Jangan lupa push besok ya."
+      },
+      {
+        "kind": "dm",
+        "userId": "666666666666666666",
+        "content": "Joints UGM Finals: kamu pegang crypto 1. Jangan lupa push besok ya."
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "udah, 5 DM terkirim.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "Nggak ada yang belum—5 DM terkirim semua, termasuk kamu.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 3,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1793237517000,
+        "mentions": [
+          {
+            "id": "663394727688798231",
+            "displayName": "Dimas",
+            "username": "Dimas",
+            "isBot": false
+          },
+          {
+            "id": "222222222222222222",
+            "displayName": "Marc",
+            "username": "Marc",
+            "isBot": false
+          },
+          {
+            "id": "333333333333333333",
+            "displayName": ".effie",
+            "username": ".effie",
+            "isBot": false
+          },
+          {
+            "id": "444444444444444444",
+            "displayName": "merrow",
+            "username": "merrow",
+            "isBot": false
+          },
+          {
+            "id": "666666666666666666",
+            "displayName": "Cina Gacor",
+            "username": "Cina Gacor",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000005",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] <@666666666666666666> Joints UGM Finals: kamu pegang crypto 1 (6 soal). Jangan lupa push besok ya.",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000109",
+        "at": 1793237518000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] ping semua di DM <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] udah, 5 DM terkirim.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000109",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000119",
+        "at": 1793237519000,
+        "mentions": [],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] siapa yang belum ke kirim?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Nggak ada yang belum—5 DM terkirim semua, termasuk kamu.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000119",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "channel",
+          "targets": [
+            {
+              "userId": "663394727688798231",
+              "content": "Joints UGM Finals: kamu pegang Web 1 (6 soal). Jangan lupa push besok ya."
+            },
+            {
+              "userId": "222222222222222222",
+              "content": "Joints UGM Finals: kamu pegang rev 1 (6 soal). Jangan lupa push besok ya."
+            },
+            {
+              "userId": "333333333333333333",
+              "content": "Joints UGM Finals: kamu pegang pwn 2 (6 soal). Jangan lupa push besok ya."
+            },
+            {
+              "userId": "444444444444444444",
+              "content": "Joints UGM Finals: kamu pegang foren 1 (6 soal). Jangan lupa push besok ya."
+            },
+            {
+              "userId": "666666666666666666",
+              "content": "Joints UGM Finals: kamu pegang crypto 1 (6 soal). Jangan lupa push besok ya."
+            }
+          ]
+        }
+      },
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "dm",
+          "includeRecentList": true,
+          "listMessageId": "800000000000000099",
+          "targets": [
+            {
+              "userId": "663394727688798231",
+              "content": "Joints UGM Finals: kamu pegang Web 1. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "222222222222222222",
+              "content": "Joints UGM Finals: kamu pegang rev 1. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "333333333333333333",
+              "content": "Joints UGM Finals: kamu pegang pwn 2. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "444444444444444444",
+              "content": "Joints UGM Finals: kamu pegang foren 1. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "666666666666666666",
+              "content": "Joints UGM Finals: kamu pegang crypto 1. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "1077393568647352320",
+              "content": "Joints UGM Finals: kamu belum tercantum di daftar pembagian 6 soal. Jangan lupa push besok ya."
+            }
+          ]
+        }
+      },
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "dm",
+          "includeRecentList": true,
+          "listMessageId": "800000000000000099",
+          "targets": [
+            {
+              "userId": "663394727688798231",
+              "content": "Joints UGM Finals: kamu pegang Web 1. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "222222222222222222",
+              "content": "Joints UGM Finals: kamu pegang rev 1. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "333333333333333333",
+              "content": "Joints UGM Finals: kamu pegang pwn 2. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "444444444444444444",
+              "content": "Joints UGM Finals: kamu pegang foren 1. Jangan lupa push besok ya."
+            },
+            {
+              "userId": "666666666666666666",
+              "content": "Joints UGM Finals: kamu pegang crypto 1. Jangan lupa push besok ya."
+            }
+          ]
+        }
+      },
+      {
+        "name": "get_contact_status",
+        "args": {
+          "operationId": "800000000000000109-dm"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2978.558308,
+        "usage": {
+          "prompt_tokens": 652,
+          "completion_tokens": 61,
+          "total_tokens": 713,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 652
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"send\",\"audience\":\"all\",\"deliveryMode\":\"channel\",\"includeCreator\":true,\"excludeConfirmed\":false,\"messageBrief\":\"Ping the listed participants about joining Joints UGM Finals (6 questions) and remind them to push tomorrow.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5808.881893999999,
+        "usage": {
+          "prompt_tokens": 9159,
+          "completion_tokens": 206,
+          "total_tokens": 9365,
+          "prompt_cache_hit_tokens": 7680,
+          "prompt_cache_miss_tokens": 1479
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3136.7721139999994,
+        "usage": {
+          "prompt_tokens": 1775,
+          "completion_tokens": 57,
+          "total_tokens": 1832,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1775
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"send\",\"audience\":\"all\",\"deliveryMode\":\"dm\",\"includeCreator\":true,\"excludeConfirmed\":false,\"messageBrief\":\"Joints UGM Finals: remind each participant of their assigned task and to push tomorrow.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5172.366998000001,
+        "usage": {
+          "prompt_tokens": 10339,
+          "completion_tokens": 248,
+          "total_tokens": 10587,
+          "prompt_cache_hit_tokens": 7680,
+          "prompt_cache_miss_tokens": 2659
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3096.354632999999,
+        "usage": {
+          "prompt_tokens": 10612,
+          "completion_tokens": 208,
+          "total_tokens": 10820,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10612
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2227.2025950000025,
+        "usage": {
+          "prompt_tokens": 2177,
+          "completion_tokens": 54,
+          "total_tokens": 2231,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2177
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"status\",\"audience\":\"all\",\"deliveryMode\":\"dm\",\"includeCreator\":true,\"excludeConfirmed\":false,\"messageBrief\":\"Identify who has not yet been sent the Joints UGM Finals reminder.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 1908.9082600000002,
+        "usage": {
+          "prompt_tokens": 10333,
+          "completion_tokens": 28,
+          "total_tokens": 10361,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10333
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2718.3744350000015,
+        "usage": {
+          "prompt_tokens": 10655,
+          "completion_tokens": 20,
+          "total_tokens": 10675,
+          "prompt_cache_hit_tokens": 7168,
+          "prompt_cache_miss_tokens": 3487
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 8,
+    "elapsedMs": 29314.396041,
+    "action": null,
+    "text": "<@663394727688798231> Joints UGM Finals: kamu pegang Web 1 (6 soal). Jangan lupa push besok ya.\n<@222222222222222222> Joints UGM Finals: kamu pegang rev 1 (6 soal). Jangan lupa push besok ya.\n<@333333333333333333> Joints UGM Finals: kamu pegang pwn 2 (6 soal). Jangan lupa push besok ya.\n<@444444444444444444> Joints UGM Finals: kamu pegang foren 1 (6 soal). Jangan lupa push besok ya.\n<@666666666666666666> Joints UGM Finals: kamu pegang crypto 1 (6 soal). Jangan lupa push besok ya.\nudah, 5 DM terkirim.\nNggak ada yang belum—5 DM terkirim semua, termasuk kamu.",
+    "failure": ""
+  }
+}

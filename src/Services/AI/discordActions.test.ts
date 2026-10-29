@@ -5,12 +5,17 @@ import { ChannelType, Collection, PermissionFlagsBits as P } from 'discord.js';
 import { dispatchDiscordAction, formatCreatorContactReceipt, getDiscordTurnOutcome, guardDiscordActions, takeReadChannelImages, validReactionEmoji } from './discordActions';
 import { getChannelCache } from './cache';
 import { CREATOR_DISCORD_ID } from './creatorAccess';
+import { contactIntentPlanner } from './contactIntent';
+import { loadContactOperations } from './contactOperations';
 
 let serial = 0n;
 const nextId = () => String(200000000000000000n + ++serial);
 const originalFlag = process.env.AI_DISCORD_ACTIONS;
-beforeEach(() => { process.env.AI_DISCORD_ACTIONS = 'true'; });
-afterEach(() => { if (originalFlag === undefined) delete process.env.AI_DISCORD_ACTIONS; else process.env.AI_DISCORD_ACTIONS = originalFlag; });
+const originalPlanner = contactIntentPlanner.decide;
+beforeEach(() => { process.env.AI_DISCORD_ACTIONS = 'true';
+    contactIntentPlanner.decide = async () => ({ intent: 'send', audience: 'selected', includeCreator: false, excludeConfirmed: true }); });
+afterEach(() => { contactIntentPlanner.decide = originalPlanner;
+    if (originalFlag === undefined) delete process.env.AI_DISCORD_ACTIONS; else process.env.AI_DISCORD_ACTIONS = originalFlag; });
 
 function fixture() {
     const effects: any[] = [];
@@ -61,7 +66,7 @@ function contactFixture() {
         const dmId = nextId();
         const user = { id, bot: !!options.bot, createDM: async () => ({ id: dmId,
             send: async (payload: any) => {
-                if (options.dmFails) throw new Error('closed DMs');
+                if (options.dmFails) throw Object.assign(new Error('closed DMs'), { code: 50007 });
                 base.effects.push({ action: 'dm', userId: id, payload });
                 return { id: nextId() };
             } }) };
@@ -73,6 +78,125 @@ function contactFixture() {
 }
 
 describe('Discord actions', () => {
+    test('an all-participants goal uses the current list and includes the creator when requested', async () => {
+        const { source, recipients, effects, addRecipient } = contactFixture();
+        const ids = Array.from({ length: 4 }, () => addRecipient());
+        recipients.set(CREATOR_DISCORD_ID, { id: CREATOR_DISCORD_ID, user: { id: CREATOR_DISCORD_ID, bot: false,
+            createDM: async () => ({ send: async (payload: any) => { effects.push({ action: 'dm', userId: CREATOR_DISCORD_ID, payload }); return { id: nextId() }; } }) } });
+        source.content = `Joints: <@${CREATOR_DISCORD_ID}> ${ids.map(id => `<@${id}>`).join(' ')}. Ping semua termasuk saya.`;
+        contactIntentPlanner.decide = async () => ({ intent: 'send', audience: 'all', includeCreator: true, excludeConfirmed: false });
+        const result = await dispatchDiscordAction('creator_contact_members', {
+            mode: 'dm', listMessageId: source.id, content: 'Jangan lupa push besok.',
+            // A partial model enumeration must not shrink an explicitly-all goal.
+            targets: [{ userId: ids[0] }],
+        }, source);
+        expect(result.deliveredCount).toBe(5);
+        expect(new Set(effects.map(effect => effect.userId))).toEqual(new Set([CREATOR_DISCORD_ID, ...ids]));
+        expect((await loadContactOperations(source))[0].recipients).toHaveLength(5);
+    });
+
+    test('status follow-up cannot send again even if the model selects the send tool', async () => {
+        const { source, effects, addRecipient } = contactFixture();
+        const sent = addRecipient(), failed = addRecipient({ dmFails: true });
+        source.content = `DM <@${sent}> <@${failed}>`;
+        const args = { mode: 'dm', content: 'Jangan lupa push.', includeCurrentMentions: true };
+        const first = await dispatchDiscordAction('creator_contact_members', args, source);
+        expect(first.deliveredCount).toBe(1); expect(first.failedCount).toBe(1);
+        const followup = { ...source, id: nextId(), content: 'siapa yang belum ke kirim?' };
+        contactIntentPlanner.decide = async () => ({ intent: 'status', audience: 'selected', includeCreator: false, excludeConfirmed: false });
+        const result = await dispatchDiscordAction('creator_contact_members', args, followup);
+        expect(result.readOnly).toBe(true);
+        expect(result.operations[0].recipients.find((r: any) => r.userId === failed).state).toBe('failed');
+        expect(effects.filter(e => e.action === 'dm')).toHaveLength(1);
+        expect(formatCreatorContactReceipt(result)).toBeNull();
+    });
+
+    test('moving the same participant list to DM preserves prior explicit creator inclusion', async () => {
+        const { source, channel, recipients, effects, addRecipient } = contactFixture();
+        const target = addRecipient();
+        recipients.set(CREATOR_DISCORD_ID, { id: CREATOR_DISCORD_ID, user: { id: CREATOR_DISCORD_ID, bot: false,
+            createDM: async () => ({ send: async () => { effects.push({ action: 'dm', userId: CREATOR_DISCORD_ID }); return { id: nextId() }; } }) } });
+        source.content = `Peserta <@${CREATOR_DISCORD_ID}> <@${target}>. Ping semua termasuk saya.`;
+        contactIntentPlanner.decide = async () => ({ intent: 'send', audience: 'all', deliveryMode: 'channel', includeCreator: true, excludeConfirmed: false });
+        await dispatchDiscordAction('creator_contact_members', { mode: 'channel', includeCurrentMentions: true, content: 'Reminder' }, source);
+        const followup = { ...source, id: nextId(), content: 'ping semua di DM', createdTimestamp: source.createdTimestamp + 1000 };
+        channel.messages.fetch = async () => new Collection([[source.id, source]]);
+        // The model no longer sees an explicit self mention on this turn.
+        contactIntentPlanner.decide = async () => ({ intent: 'send', audience: 'all', deliveryMode: 'dm', includeCreator: false, excludeConfirmed: false });
+        const result = await dispatchDiscordAction('creator_contact_members', { mode: 'dm', includeRecentList: true, content: 'Reminder' }, followup);
+        expect(result.selected).toBe(2);
+        expect(effects.filter(e => e.action === 'dm').map(e => e.userId).sort()).toEqual([CREATOR_DISCORD_ID, target].sort());
+        effects.length = 0;
+        // Explicit per-recipient enumeration is the same audience source,
+        // even without an includeRecentList flag or shared message body.
+        contactIntentPlanner.decide = async () => ({ intent: 'send', audience: 'selected', deliveryMode: 'dm', includeCreator: false, excludeConfirmed: false });
+        const repeated = await dispatchDiscordAction('creator_contact_members', { mode: 'dm', targets: [
+            { userId: CREATOR_DISCORD_ID, content: 'Web reminder' }, { userId: target, content: 'Pwn reminder' },
+        ] }, { ...followup, id: nextId() });
+        expect(repeated.selected).toBe(2);
+        expect(effects.filter(e => e.action === 'dm').map(e => e.userId).sort()).toEqual([CREATOR_DISCORD_ID, target].sort());
+    });
+
+    test('individual messages need no shared content when they cover the selected list', async () => {
+        const { source, channel, addRecipient, effects } = contactFixture();
+        const first = addRecipient(), second = addRecipient(), confirmed = addRecipient();
+        const list = { ...source, id: nextId(), content: `List <@${first}> rev <@${second}> pwn <@${confirmed}> web`, createdTimestamp: source.createdTimestamp - 1000 };
+        channel.messages.fetch = async (id: any) => typeof id === 'string' ? list : new Collection([[list.id, list]]);
+        source.content = 'DM peserta selain yang sudah konfirmasi';
+        const result = await dispatchDiscordAction('creator_contact_members', { mode: 'dm', listMessageId: list.id, excludeUserIds: [confirmed],
+            targets: [{ userId: first, content: 'Konfirmasi tugas rev-mu ya.' }, { userId: second, content: 'Konfirmasi tugas pwn-mu ya.' }] }, source);
+        expect(result.deliveredCount).toBe(2);
+        expect(effects.map(e => e.payload.content)).toEqual(['Konfirmasi tugas rev-mu ya.', 'Konfirmasi tugas pwn-mu ya.']);
+    });
+
+    test('explicit retry preserves original content and skips successful recipients', async () => {
+        const { source, effects, addRecipient, recipients } = contactFixture();
+        const sent = addRecipient(), failed = addRecipient({ dmFails: true });
+        source.content = `DM <@${sent}> <@${failed}>`;
+        await dispatchDiscordAction('creator_contact_members', { mode: 'dm', includeCurrentMentions: true, content: 'Jangan lupa push.' }, source);
+        recipients.get(failed).user.createDM = async () => ({ send: async (payload: any) => { effects.push({ action: 'dm', userId: failed, payload }); return { id: nextId() }; } });
+        const retry = { ...source, id: nextId(), content: 'coba kirim ulang yang gagal saja' };
+        contactIntentPlanner.decide = async () => ({ intent: 'retry', audience: 'selected', includeCreator: false, excludeConfirmed: false });
+        const result = await dispatchDiscordAction('retry_contact_members', {}, retry);
+        expect(result.deliveredCount).toBe(2); expect(result.failedCount).toBe(0);
+        expect(effects.map(e => e.userId)).toEqual([sent, failed]);
+        expect(effects[1].payload.content).toBe('Jangan lupa push.');
+        await dispatchDiscordAction('retry_contact_members', {}, { ...retry });
+        expect(effects).toHaveLength(2);
+    });
+
+    test('durable request identity prevents duplicate sends with a fresh message object', async () => {
+        const { source, effects, addRecipient } = contactFixture();
+        const target = addRecipient(); source.content = `DM <@${target}>`;
+        const args = { mode: 'dm', includeCurrentMentions: true, content: 'halo' };
+        await dispatchDiscordAction('creator_contact_members', args, source);
+        await dispatchDiscordAction('creator_contact_members', args, { ...source });
+        expect(effects).toHaveLength(1);
+        const foreign = { ...source, author: { ...source.author, id: nextId() } };
+        expect((await dispatchDiscordAction('get_contact_status', {}, foreign)).error).toBe('creator_only');
+        expect((await dispatchDiscordAction('get_contact_status', {}, { ...source, channelId: nextId() })).operations).toEqual([]);
+    });
+
+    test('uncertain network delivery is never automatically retried as failure', async () => {
+        const { source, effects, addRecipient, recipients } = contactFixture();
+        const target = addRecipient(); source.content = `DM <@${target}>`;
+        recipients.get(target).user.createDM = async () => ({ send: async () => { effects.push({ action: 'attempt' }); throw new Error('connection reset after possible delivery'); } });
+        const result = await dispatchDiscordAction('creator_contact_members', { mode: 'dm', includeCurrentMentions: true, content: 'halo' }, source);
+        expect(result.unknownCount).toBe(1); expect(result.failedCount).toBe(0);
+        expect(formatCreatorContactReceipt(result)).toBeNull();
+        contactIntentPlanner.decide = async () => ({ intent: 'retry', audience: 'selected', includeCreator: false, excludeConfirmed: false });
+        await dispatchDiscordAction('retry_contact_members', {}, { ...source, id: nextId(), content: 'retry' });
+        expect(effects).toHaveLength(1);
+    });
+
+    test('planner unavailable prevents outbound effects rather than guessing permission', async () => {
+        const { source, effects, addRecipient } = contactFixture();
+        const target = addRecipient(); source.content = `DM <@${target}>`;
+        contactIntentPlanner.decide = async () => { throw new Error('offline'); };
+        expect((await dispatchDiscordAction('creator_contact_members', { mode: 'dm', includeCurrentMentions: true, content: 'halo' }, source)).error).toBe('contact_plan_unavailable');
+        expect(effects).toEqual([]);
+    });
+
     test('contact receipts report only verified DM outcomes', () => {
         const first = nextId(); const second = nextId();
         expect(formatCreatorContactReceipt({ mode: 'dm', selected: 1, deliveredCount: 1, failedCount: 0,

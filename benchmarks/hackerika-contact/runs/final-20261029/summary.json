@@ -1,0 +1,10 @@
+{
+  "before": {
+    "passed": 0,
+    "total": 4
+  },
+  "after": {
+    "passed": 3,
+    "total": 4
+  }
+}

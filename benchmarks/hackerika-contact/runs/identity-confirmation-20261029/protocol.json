@@ -1,0 +1,53 @@
+{
+  "startedAt": "2026-10-29T02:22:38.508Z",
+  "repeats": 2,
+  "case": {
+    "id": "creator-followup-contact",
+    "split": "dev",
+    "category": "discord-outreach",
+    "prompt": "@Hackerika kasih mereka dm kecuali yang sudah confirm disini ya",
+    "creatorContact": true,
+    "history": [
+      {
+        "who": "caller",
+        "name": "Dimas",
+        "text": "Gass yang mau ikut Joints UGM Finals (6 soal): <@663394727688798231> (Web 1), <@222222222222222222> (rev 1), <@333333333333333333> (rev 1), <@444444444444444444> (pwn 2). Confirm cuy yang bisa buat soal, kurang forensic dan crypto @everyone."
+      },
+      {
+        "who": "caller",
+        "name": "Dimas",
+        "text": "@Hackerika buat alarm buat besok ya deadline confirmnya"
+      },
+      {
+        "who": "bot",
+        "text": "Siap, besok aku ingetin soal deadline confirm Joints UGM Finals."
+      },
+      {
+        "who": "third",
+        "name": ".effie",
+        "text": "okayy"
+      }
+    ],
+    "hydrateMemory": true,
+    "expected": "Send a short confirmation DM to Marc and merrow from the earlier participant list. Do not DM Dimas, .effie (already confirmed), or @everyone. Report actual delivery only after successful tool results.",
+    "expectedDmUserIds": [
+      "222222222222222222",
+      "444444444444444444"
+    ],
+    "forbiddenDmUserIds": [
+      "663394727688798231",
+      "333333333333333333"
+    ],
+    "requiredTools": [
+      "creator_contact_members"
+    ],
+    "forbiddenTools": [
+      "set_reminder"
+    ],
+    "maxWords": 65,
+    "critical": true
+  },
+  "workerHash": "2ef4be02813c01b91b9919e18a1639a2552aa4da8a16de6d56e6323b26a7a6d3",
+  "graderHash": "111ca0ed98aa5c3e7ac0346bc7097071953f6c892be8c4e792d3a0f52a0cd95b",
+  "scope": "Existing frozen confirmation-exclusion regression, real model/chat handler, simulated Discord and DB only."
+}

@@ -1,0 +1,60 @@
+{
+  "startedAt": "2026-10-29T01:54:08.077Z",
+  "before": "/tmp/hackerika-agent-before-R4w9Cb",
+  "after": "/root/app/ctf-assistant",
+  "cases": [
+    {
+      "id": "all-self-status",
+      "category": "agent-outreach",
+      "creatorContact": true,
+      "now": "2026-10-29T01:32:00Z",
+      "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+      "history": [],
+      "closedDmIds": [],
+      "sequence": [
+        {
+          "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya"
+        },
+        {
+          "prompt": "ping semua di DM <@1077393568647352320>"
+        },
+        {
+          "prompt": "siapa yang belum ke kirim?"
+        }
+      ]
+    },
+    {
+      "id": "partial-status-retry",
+      "category": "agent-outreach",
+      "creatorContact": true,
+      "now": "2026-10-29T01:32:00Z",
+      "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+      "history": [],
+      "closedDmIds": [
+        "666666666666666666"
+      ],
+      "sequence": [
+        {
+          "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya"
+        },
+        {
+          "prompt": "ping semua di DM <@1077393568647352320>"
+        },
+        {
+          "prompt": "siapa yang belum ke kirim?"
+        },
+        {
+          "prompt": "oke coba kirim ulang yang gagal saja",
+          "openDms": true
+        }
+      ]
+    }
+  ],
+  "repeats": 2,
+  "workerHash": "5dccb4a5b115f271a1e6ac9b102ccd5ff9d1f52a55b37507cab4d2bef7601b7c",
+  "corpusHash": "cb24bf6d80fb36adc6adb8c7285c27918ab6375b30ecb609875da6b61e570030",
+  "concurrency": 4,
+  "maxCallsPerSequence": 28,
+  "timeoutSeconds": 250,
+  "acceptance": "First turn pings all five including creator; DM continuation reaches exact audience, excluding only simulated closed DM. Status turn sends zero DMs. Explicit retry sends once only to recovered failed recipient. Real chat handler and models, fake Discord/DB/network boundary, no real messages."
+}

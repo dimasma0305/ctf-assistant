@@ -1,0 +1,511 @@
+{
+  "variant": "after",
+  "trial": 1,
+  "caseId": "partial-status-retry",
+  "checks": {
+    "completeAudience": true,
+    "dmAudience": false,
+    "statusReadOnly": true,
+    "retryFailedOnly": true
+  },
+  "passed": false,
+  "result": {
+    "sequenceResults": [
+      {
+        "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "663394727688798231"
+            ],
+            "content": "<@663394727688798231> Jangan lupa push besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "222222222222222222"
+            ],
+            "content": "<@222222222222222222> Jangan lupa push besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "333333333333333333"
+            ],
+            "content": "<@333333333333333333> Jangan lupa push besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "444444444444444444"
+            ],
+            "content": "<@444444444444444444> Jangan lupa push besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "666666666666666666"
+            ],
+            "content": "<@666666666666666666> Jangan lupa push besok ya!",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "channel",
+              "content": "Jangan lupa push besok ya!",
+              "includeCurrentMentions": true
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "ping semua di DM <@1077393568647352320>",
+        "effects": [
+          {
+            "kind": "dm",
+            "userId": "222222222222222222",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "333333333333333333",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "444444444444444444",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "3 dari 4 DM terkirim; 1 belum berhasil.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "get_contact_status",
+            "args": {}
+          },
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "dm",
+              "includeRecentList": true,
+              "content": "Jangan lupa push besok ya!"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "siapa yang belum ke kirim?",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "Cina Gacor belum terkirim—DM-nya tidak tersedia.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "get_contact_status",
+            "args": {
+              "operationId": "800000000000000109-dm"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "oke coba kirim ulang yang gagal saja",
+        "effects": [
+          {
+            "kind": "dm",
+            "userId": "666666666666666666",
+            "content": "Jangan lupa push besok ya!"
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "Udah, DM ke Cina Gacor berhasil terkirim kali ini.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "retry_contact_members",
+            "args": {
+              "operationId": "800000000000000109-dm"
+            }
+          }
+        ]
+      }
+    ],
+    "caseId": "partial-status-retry",
+    "category": "agent-outreach",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "663394727688798231"
+        ],
+        "content": "<@663394727688798231> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "222222222222222222"
+        ],
+        "content": "<@222222222222222222> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "333333333333333333"
+        ],
+        "content": "<@333333333333333333> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "444444444444444444"
+        ],
+        "content": "<@444444444444444444> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "666666666666666666"
+        ],
+        "content": "<@666666666666666666> Jangan lupa push besok ya!",
+        "files": []
+      },
+      {
+        "kind": "dm",
+        "userId": "222222222222222222",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "333333333333333333",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "444444444444444444",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "3 dari 4 DM terkirim; 1 belum berhasil.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "Cina Gacor belum terkirim—DM-nya tidak tersedia.",
+        "files": []
+      },
+      {
+        "kind": "dm",
+        "userId": "666666666666666666",
+        "content": "Jangan lupa push besok ya!"
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "Udah, DM ke Cina Gacor berhasil terkirim kali ini.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 4,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1793237516000,
+        "mentions": [
+          {
+            "id": "663394727688798231",
+            "displayName": "Dimas",
+            "username": "Dimas",
+            "isBot": false
+          },
+          {
+            "id": "222222222222222222",
+            "displayName": "Marc",
+            "username": "Marc",
+            "isBot": false
+          },
+          {
+            "id": "333333333333333333",
+            "displayName": ".effie",
+            "username": ".effie",
+            "isBot": false
+          },
+          {
+            "id": "444444444444444444",
+            "displayName": "merrow",
+            "username": "merrow",
+            "isBot": false
+          },
+          {
+            "id": "666666666666666666",
+            "displayName": "Cina Gacor",
+            "username": "Cina Gacor",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000005",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] <@666666666666666666> Jangan lupa push besok ya!",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000109",
+        "at": 1793237517000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] ping semua di DM <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] 3 dari 4 DM terkirim; 1 belum berhasil.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000109",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000119",
+        "at": 1793237518000,
+        "mentions": [],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] siapa yang belum ke kirim?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Cina Gacor belum terkirim—DM-nya tidak tersedia.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000119",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000129",
+        "at": 1793237519000,
+        "mentions": [],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] oke coba kirim ulang yang gagal saja",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Udah, DM ke Cina Gacor berhasil terkirim kali ini.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000129",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "channel",
+          "content": "Jangan lupa push besok ya!",
+          "includeCurrentMentions": true
+        }
+      },
+      {
+        "name": "get_contact_status",
+        "args": {}
+      },
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "dm",
+          "includeRecentList": true,
+          "content": "Jangan lupa push besok ya!"
+        }
+      },
+      {
+        "name": "get_contact_status",
+        "args": {
+          "operationId": "800000000000000109-dm"
+        }
+      },
+      {
+        "name": "retry_contact_members",
+        "args": {
+          "operationId": "800000000000000109-dm"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5542.064451,
+        "usage": {
+          "prompt_tokens": 14374,
+          "completion_tokens": 38,
+          "total_tokens": 14412,
+          "prompt_cache_hit_tokens": 14208,
+          "prompt_cache_miss_tokens": 166
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3517.9817059999996,
+        "usage": {
+          "prompt_tokens": 472,
+          "completion_tokens": 32,
+          "total_tokens": 504,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 472
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2836.6327170000004,
+        "usage": {
+          "prompt_tokens": 15461,
+          "completion_tokens": 16,
+          "total_tokens": 15477,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 15461
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4260.771943000002,
+        "usage": {
+          "prompt_tokens": 15770,
+          "completion_tokens": 37,
+          "total_tokens": 15807,
+          "prompt_cache_hit_tokens": 13056,
+          "prompt_cache_miss_tokens": 2714
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3330.5912449999996,
+        "usage": {
+          "prompt_tokens": 1513,
+          "completion_tokens": 32,
+          "total_tokens": 1545,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1513
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3782.0570279999993,
+        "usage": {
+          "prompt_tokens": 15946,
+          "completion_tokens": 28,
+          "total_tokens": 15974,
+          "prompt_cache_hit_tokens": 13056,
+          "prompt_cache_miss_tokens": 2890
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2983.562434000003,
+        "usage": {
+          "prompt_tokens": 16235,
+          "completion_tokens": 18,
+          "total_tokens": 16253,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 16235
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3641.713562000001,
+        "usage": {
+          "prompt_tokens": 16170,
+          "completion_tokens": 28,
+          "total_tokens": 16198,
+          "prompt_cache_hit_tokens": 13056,
+          "prompt_cache_miss_tokens": 3114
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2458.953211,
+        "usage": {
+          "prompt_tokens": 2007,
+          "completion_tokens": 32,
+          "total_tokens": 2039,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2007
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3722.429028999999,
+        "usage": {
+          "prompt_tokens": 16579,
+          "completion_tokens": 18,
+          "total_tokens": 16597,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 16579
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 10,
+    "elapsedMs": 39933.065162,
+    "action": null,
+    "text": "<@663394727688798231> Jangan lupa push besok ya!\n<@222222222222222222> Jangan lupa push besok ya!\n<@333333333333333333> Jangan lupa push besok ya!\n<@444444444444444444> Jangan lupa push besok ya!\n<@666666666666666666> Jangan lupa push besok ya!\n3 dari 4 DM terkirim; 1 belum berhasil.\nCina Gacor belum terkirim—DM-nya tidak tersedia.\nUdah, DM ke Cina Gacor berhasil terkirim kali ini.",
+    "failure": ""
+  }
+}
