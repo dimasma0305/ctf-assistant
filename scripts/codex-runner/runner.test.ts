@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { canCollaborateOnJob, chooseModel, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
 import { deleteExportedFiles, exportDirectory, readExportedFile, saveExportedFiles } from './exports';
 import { workerArgs } from './executor';
 import { startGateway } from './gateway';
@@ -49,6 +49,16 @@ test('same-channel members can inspect and steer a collaborative job without gai
   expect(canCollaborateOnJob(job,job.packet.scope,'899999999999999999')).toBe(true);
   expect(canCollaborateOnJob(job,'555555555555555555:700000000000000099','899999999999999999')).toBe(false);
   expect(canCollaborateOnJob(job,job.packet.scope,'not-a-user')).toBe(false);
+});
+
+test('job state filters count running work independently from terminal history',()=>{
+  const running=newJob(validatePacket(packet()));running.state='running';
+  const pending=newJob(validatePacket({...packet(),messageId:'800000000000000002'}));
+  const completed=newJob(validatePacket({...packet(),messageId:'800000000000000003'}));completed.state='completed';
+  const items=[completed,pending,running];
+  expect(filterJobsByState(items,'running').map(job=>job.id)).toEqual([running.id]);
+  expect(filterJobsByState(items,'active').map(job=>job.id)).toEqual([pending.id,running.id]);
+  expect(filterJobsByState(items,'all')).toEqual(items);
 });
 
 test('hourly job cap gives trusted requestors more room and a precise retry delay',()=>{

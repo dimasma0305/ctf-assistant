@@ -1,0 +1,11 @@
+{
+  "samples": 1,
+  "passed": 1,
+  "oldPolicyForced": 0,
+  "newCodexCalls": 0,
+  "falseCodexOnSimpleCases": 0,
+  "corpusHash": "d81b3a703cdb85952835b3fd104ec3d021de8dc1e01940622c74afffe1c3044b",
+  "promptHash": "6c3cec4f4396d88a48028861edf0d106ba7d864242063a7ed655b93537802da0",
+  "toolSchemaHash": "c85e36cda1ddeffd22826733d20ec66e1652698300eb1973b6dcbc5138b6ea20",
+  "scope": "One real manager model call per synthetic case. No tool dispatch, Discord access, searches, Codex jobs, or external writes. Old baseline is exact forced-regex policy without the optional semantic classifier."
+}

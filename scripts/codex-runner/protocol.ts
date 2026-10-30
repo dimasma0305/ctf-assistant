@@ -25,6 +25,12 @@ export interface Job {
   sources: { url: string; title: string }[];
   exportedFiles?: ExportedFileMeta[];
 }
+export type JobStateFilter = Job['state']|'active'|'all';
+export function filterJobsByState(items:Job[],state:JobStateFilter):Job[]{
+  if(state==='all')return items;
+  if(state==='active')return items.filter(job=>job.state==='pending'||job.state==='running');
+  return items.filter(job=>job.state===state);
+}
 export interface PublicJob {
   id: string; kind: 'ctf'|'investigation'; imageMode?: Packet['imageMode']; state: Job['state']; createdAt: number; updatedAt: number; deliveredAt?: number; model?: string;
   objective: string;

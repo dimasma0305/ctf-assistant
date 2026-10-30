@@ -1,7 +1,7 @@
 import { chmod, chown, mkdir, open, readdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { canCollaborateOnJob, chooseModel, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, validateInvestigationBatch, validatePacket, type Job } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { createWorkerImageReadiness } from './workerImage';
@@ -184,7 +184,11 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
       :path==='/jobs/cancel'?owned.find(candidate=>['pending','running'].includes(candidate.state)):matching[0];
     if(path==='/jobs/list'){
       const limit=Math.max(1,Math.min(20,Number(body?.limit)||10));
-      return response({ok:true,jobs:matching.slice(0,limit).map(publicJob)});
+      const requested=typeof body?.state==='string'?body.state:'all';
+      const state:JobStateFilter=['pending','running','completed','failed','cancelled','active','all'].includes(requested)
+        ?requested as JobStateFilter:'all';
+      const filtered=filterJobsByState(matching,state);
+      return response({ok:true,state,count:filtered.length,jobs:filtered.slice(0,limit).map(publicJob)});
     }
     if(path==='/jobs/get')return job&&participant(body,job)?response({ok:true,job:publicJob(job)}):response({ok:false,error:'not_found'},404);
     if(path==='/jobs/steer'){

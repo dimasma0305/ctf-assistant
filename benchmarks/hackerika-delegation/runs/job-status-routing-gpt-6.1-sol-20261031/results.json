@@ -1,0 +1,24 @@
+[
+  {
+    "id": "running_job_count",
+    "legacy": "auto",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-6.1-sol",
+    "expectedManager": "gpt-6.1-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "function_call"
+    ],
+    "actual": "list_codex_jobs",
+    "expected": [
+      "list_codex_jobs"
+    ],
+    "pass": true,
+    "expectedState": "running",
+    "stateValid": true,
+    "toolArgs": {
+      "state": "running",
+      "limit": 20
+    }
+  }
+]

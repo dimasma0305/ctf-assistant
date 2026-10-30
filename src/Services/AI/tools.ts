@@ -70,8 +70,8 @@ export const TOOL_DEFINITIONS = [
     },
     {
         type:'function' as const,
-        function:{name:'list_codex_jobs',description:'Daftar sampai 20 job Codex terbaru di channel/thread ini, termasuk state, model, progres, steering, dan apakah hasil sudah ada. Job bersifat kolaboratif bagi member yang sedang berbicara di channel yang sama.',
-            parameters:{type:'object',properties:{limit:{type:'integer',minimum:1,maximum:20}},additionalProperties:false}},
+        function:{name:'list_codex_jobs',description:'Daftar dan hitung job Codex di channel/thread ini dengan filter state nyata dari controller. Hasil memuat count sebelum pagination serta objective, state, model, progres, steering, dan hasil bila ada. Gunakan state=running untuk "berapa job running", active untuk pending+running, dan all untuk daftar umum. Job bersifat kolaboratif bagi member yang sedang berbicara di channel yang sama.',
+            parameters:{type:'object',properties:{limit:{type:'integer',minimum:1,maximum:20},state:{type:'string',enum:['pending','running','completed','failed','cancelled','active','all']}},additionalProperties:false}},
     },
     {
         type:'function' as const,
@@ -517,7 +517,8 @@ export async function dispatchTool(
             const scope=message.guildId?`${message.guildId}:${message.channelId}`:'';
             if(!scope||args?.jobId&& !jobId)return JSON.stringify({ok:false,error:'invalid_job'});
             const result=name==='list_codex_jobs'
-                ?await listCodexJobs(scope,message.author.id,Math.max(1,Math.min(20,Number(args?.limit)||10)),options.signal)
+                ?await listCodexJobs(scope,message.author.id,Math.max(1,Math.min(20,Number(args?.limit)||10)),
+                    ['pending','running','completed','failed','cancelled','active','all'].includes(args?.state)?args.state:'all',options.signal)
                 :name==='ctf_job_status'||name==='codex_job_status'
                     ?await getCodexJob(jobId,scope,message.author.id,options.signal)
                     :name==='steer_codex_job'

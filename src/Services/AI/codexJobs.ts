@@ -1,6 +1,7 @@
 import http from 'node:http';
 
 export type CodexRoute = 'auto'|'gpt-5.6-sol'|'gpt-6.1-sol'|'daybreak'|'luna'|'sol';
+export type CodexJobStateFilter='pending'|'running'|'completed'|'failed'|'cancelled'|'active'|'all';
 export interface CodexArtifact { name:string;data:string;image:boolean;sourceMessageId:string }
 export interface CodexPublicJob {
   id:string;kind?:'ctf'|'investigation';imageMode?:'auto'|'generative'|'vector';state:'pending'|'running'|'completed'|'failed'|'cancelled';createdAt:number;updatedAt:number;deliveredAt?:number;model?:string;
@@ -42,7 +43,8 @@ export async function codexRequest<T>(path:string,body:unknown,options:{socketPa
 export const submitCodexJob=(packet:CodexPacket,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs',packet,{signal});
 export const submitCodexJobBatch=(packets:CodexPacket[],signal?:AbortSignal)=>codexRequest<{ok:true;jobs:CodexPublicJob[]}>('/jobs/batch',{packets},{signal});
 export const getCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/get',{jobId,scope,userId},{signal});
-export const listCodexJobs=(scope:string,userId:string,limit=10,signal?:AbortSignal)=>codexRequest<{ok:true;jobs:CodexPublicJob[]}>('/jobs/list',{scope,userId,limit},{signal});
+export const listCodexJobs=(scope:string,userId:string,limit=10,state:CodexJobStateFilter='all',signal?:AbortSignal)=>
+  codexRequest<{ok:true;state:CodexJobStateFilter;count:number;jobs:CodexPublicJob[]}>('/jobs/list',{scope,userId,limit,state},{signal});
 export const steerCodexJob=(jobId:string|undefined,scope:string,userId:string,messageId:string,instruction:string,route?:CodexRoute,signal?:AbortSignal)=>
   codexRequest<{ok:true;job:CodexPublicJob;steeringId:string}>('/jobs/steer',{jobId,scope,userId,messageId,instruction,...(route?{route}:{})},{signal});
 export const cancelCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/cancel',{jobId,scope,userId},{signal});

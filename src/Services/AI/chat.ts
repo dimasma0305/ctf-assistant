@@ -44,7 +44,7 @@ import { groundCodexHandoff } from './codexHandoff';
 import { recentAssistantLinksForSpeaker, setTurnSourceLinks } from './conversationLinks';
 import { CREATOR_DISCORD_ID } from './creatorAccess';
 import { contactOperationSummary, loadContactOperations } from './contactOperations';
-import { contactIntentForTurn, setContactIntentContext, type ContactIntent } from './contactIntent';
+import { contactIntentForTurn, contactScopedToolNames, setContactIntentContext, type ContactIntent } from './contactIntent';
 import { buildTurnGrounding, conversationReplyReviewer, type ConversationSource } from './turnGrounding';
 
 const MAX_MEMORY = 20;
@@ -779,11 +779,7 @@ async function runChatTurn(
     // tool until it is eligible, so a forged creator claim cannot waste a
     // model/tool turn or become part of a misleading reply.
     const canGrantFanRole = isDeveloper || (userProfile?.affection ?? 0) >= FAN_ROLE_AFFECTION_THRESHOLD;
-    const contactTools = contactPlan && contactPlan.intent !== 'none' ? new Set([
-        'get_contact_status', 'read_channel_messages', 'get_current_time', 'finish_turn',
-        ...(contactPlan.intent === 'send' ? ['creator_contact_members'] : contactPlan.intent === 'retry' ? ['retry_contact_members'] : []),
-        ...(contactPlan.additionalTools || []),
-    ]) : null;
+    const contactTools=contactScopedToolNames(contactPlan);
     const turnTools = TOOL_DEFINITIONS.filter(tool =>
         (!spontaneous || tool.function.name !== 'delegate_codex')
         && (!contactTools || contactTools.has(tool.function.name))

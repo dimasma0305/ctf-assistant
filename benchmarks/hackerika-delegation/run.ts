@@ -19,6 +19,7 @@ const cases = [
   { id: 'bare_profile_deepsearch', text: `<@${botId}> deepsearch <@${memberId}>`, expected: ['delegate_codex:investigation'], expectedSolver:'gpt-5.6-sol',expectedManager:'gpt-5.6-sol' },
   { id: 'shallow_research_retry', text: `<@${botId}> risetmu tadi tentang https://github.com/dimasma0305/rsctf cuma baca satu halaman lalu jawab "bagian lain perlu dicek". Lanjutkan investigasi kode/docs beberapa sumber, ikuti tautannya, lalu jawab rinci dengan bukti`, expected: ['delegate_codex:investigation'], expectedSolver:'gpt-5.6-sol',expectedManager:'gpt-5.6-sol' },
   { id: 'general_agent_report', text: `<@${botId}> riset mendalam opsi kuliah master di lima negara, bandingkan biaya, visa, dan beasiswa dari sumber resmi, lalu buatkan file CSV hasilnya`, expected:['delegate_codex:investigation'], expectedSolver:'gpt-6.1-sol',expectedManager:'gpt-6.1-sol' },
+  { id: 'running_job_count', text: `<@${botId}> berapa jobs yang running`, expected:['list_codex_jobs'],expectedState:'running',expectedManager:'gpt-6.1-sol' },
   { id: 'small_calculation', text: `<@${botId}> 17 kali 23 berapa?`, expected: ['none'],expectedManager:'gpt-6.1-sol' },
 ] as const;
 const out = process.argv[process.argv.indexOf('--out') + 1];
@@ -82,10 +83,12 @@ for (const item of cases.filter(item=>!only||only.has(item.id))) {
       && (followup !== 'delegate_codex:investigation' || followupArgs?.targetUserId === memberId);
   const selectedArgs=choice.startsWith('delegate_codex:')?toolArgs:followup.startsWith('delegate_codex:')?followupArgs:undefined;
   const solverValid=!('expectedSolver' in item)||selectedArgs?.solver===item.expectedSolver;
+  const stateValid=!('expectedState'in item)||toolArgs?.state===item.expectedState;
   const managerValid=managerModel===item.expectedManager;
   const row = { id: item.id, legacy, legacyCtfEligible: eligible, managerModel,expectedManager:item.expectedManager,managerValid,responseItemTypes,actual: choice, ...(followup ? { followup } : {}), expected: item.expected,
     pass: (item.expected.includes(choice as never) || choice === 'get_discord_profile' && item.expected.includes(followup as never))
-      && profileArgsValid && profileTargetValid&&solverValid&&managerValid,...('expectedSolver' in item?{expectedSolver:item.expectedSolver,solverValid}:{}),
+      && profileArgsValid && profileTargetValid&&solverValid&&stateValid&&managerValid,...('expectedSolver' in item?{expectedSolver:item.expectedSolver,solverValid}:{}),
+      ...('expectedState'in item?{expectedState:item.expectedState,stateValid}:{}),
       ...(toolArgs ? { toolArgs } : {}), ...(followupArgs ? { followupArgs } : {}), ...(error ? { error } : {}) };
   results.push(row);
   await writeFile(`${out}/results.json`, JSON.stringify(results, null, 2));
