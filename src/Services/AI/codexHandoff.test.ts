@@ -26,3 +26,17 @@ test('a queued investigation acknowledges the task without lab jargon or claimin
   expect(answer).not.toContain('lab terisolasi');
   expect(answer).not.toContain('hasil riset lengkap');
 });
+
+test('unavailable worker labels inline research as a fallback after answer grounding', () => {
+  const evidence = 'Situs tim mengkredit handle tersebut. [Sumber](https://example.com/team)';
+  for (const error of ['worker_preparing', 'worker_image_unavailable', 'isolated_agent_unavailable']) {
+    const answer = groundCodexHandoff(evidence, JSON.stringify({ ok: false, error }), true);
+    expect(answer).toStartWith('Agen riset sedang tidak tersedia;');
+    expect(answer).toContain(evidence);
+    expect(answer).toContain('sementara');
+    const noEvidence = groundCodexHandoff('Sudah mulai; hasilnya menyusul.', JSON.stringify({ ok: false, error }));
+    expect(noEvidence).toContain('belum mulai');
+    expect(noEvidence).not.toContain('menyusul');
+  }
+  expect(groundCodexHandoff(evidence, undefined, true)).toBe(evidence);
+});

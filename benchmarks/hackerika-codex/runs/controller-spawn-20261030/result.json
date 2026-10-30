@@ -1,0 +1,46 @@
+{
+  "pass": true,
+  "checks": {
+    "accepted": true,
+    "completed": true,
+    "defaultSol": true,
+    "executed": true,
+    "skillRead": true,
+    "calculated": true
+  },
+  "elapsedMs": 41638,
+  "job": {
+    "id": "220542bd-6c12-4d07-92f7-5122cec55a5b",
+    "kind": "investigation",
+    "state": "completed",
+    "createdAt": 1793360224604,
+    "updatedAt": 1793360264931,
+    "model": "gpt-6-sol",
+    "result": {
+      "summary": "Median latency A = 11 ms, median B = 5 ms, dan rasio A/B = 2,2. Dihitung dari CSV terlampir dengan Python.",
+      "flags": [],
+      "findings": [
+        "CSV berisi tiga nilai A (9, 11, 13 ms) dan tiga nilai B (3, 5, 7 ms). Perhitungan Python menghasilkan median 11 ms dan 5 ms; 11/5 = 2,2."
+      ],
+      "unresolved": [],
+      "needsStrongerModel": false
+    },
+    "stats": {
+      "calls": 4,
+      "searches": 0,
+      "sourceReads": 0,
+      "visionReads": 0,
+      "inputChars": 314006,
+      "outputBytes": 502576,
+      "elapsedMs": 40308,
+      "attempts": 1
+    },
+    "receiptCount": 6,
+    "guildId": "555555555555555555",
+    "channelId": "700000000000009003",
+    "messageId": "800000000000009003",
+    "userId": "663394727688798231",
+    "sources": []
+  },
+  "scope": "Private controller/socket/state with synthetic IDs; no Discord poller or messages."
+}

@@ -93,6 +93,7 @@ export async function checkUrlSafe(urlStr: string): Promise<UrlGuardResult> {
 export type SafeFetchErrorCode =
   | NonNullable<UrlGuardResult["error"]>
   | "invalid_redirect"
+  | "invalid_response"
   | "too_many_redirects";
 
 export class SafeFetchError extends Error {
@@ -171,20 +172,32 @@ async function pinnedFetch(urlStr: string, init: RequestInit, resolvedHost: stri
         callback(null, resolvedHost, family);
       },
     } as any, (incoming) => {
-      const responseHeaders = new Headers();
-      for (const [name, value] of Object.entries(incoming.headers)) {
-        if (Array.isArray(value)) value.forEach((item) => responseHeaders.append(name, item));
-        else if (value !== undefined) responseHeaders.set(name, value);
+      // Remote sites can send nonstandard statuses (for example HTTP 999).
+      // Exceptions in this event callback do not reject the enclosing promise:
+      // without a catch they escape the request and leave research waiting.
+      try {
+        const status = incoming.statusCode || 500;
+        if (status < 200 || status > 599) {
+          throw Object.assign(new SafeFetchError("invalid_response", urlStr), { httpStatus: status });
+        }
+        const responseHeaders = new Headers();
+        for (const [name, value] of Object.entries(incoming.headers)) {
+          if (Array.isArray(value)) value.forEach((item) => responseHeaders.append(name, item));
+          else if (value !== undefined) responseHeaders.set(name, value);
+        }
+        const noBody = init.method?.toUpperCase() === "HEAD" || status === 204 || status === 205 || status === 304;
+        const response = new Response(noBody ? null : Readable.toWeb(incoming) as any, {
+          status,
+          statusText: incoming.statusMessage,
+          headers: responseHeaders,
+        });
+        if (noBody) incoming.resume();
+        try { Object.defineProperty(response, "url", { value: urlStr }); } catch { /* non-critical */ }
+        resolve(response);
+      } catch (error) {
+        incoming.destroy();
+        reject(error);
       }
-      const status = incoming.statusCode || 500;
-      const noBody = status === 204 || status === 205 || status === 304;
-      const response = new Response(noBody ? null : Readable.toWeb(incoming) as any, {
-        status,
-        statusText: incoming.statusMessage,
-        headers: responseHeaders,
-      });
-      try { Object.defineProperty(response, "url", { value: urlStr }); } catch { /* non-critical */ }
-      resolve(response);
     });
     req.once("error", reject);
     if (body) req.write(body);

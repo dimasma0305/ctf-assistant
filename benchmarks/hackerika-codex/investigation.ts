@@ -5,12 +5,13 @@ import { tmpdir } from 'node:os';
 import { executeJob } from '../../scripts/codex-runner/executor';
 import { INVESTIGATION_PROMPT, newJob, publicJob } from '../../scripts/codex-runner/protocol';
 import { ensureWorkerImage } from '../../scripts/codex-runner/workerImage';
+import { WORKER_IMAGE } from '../../scripts/codex-runner/runtime';
 import { formatCodexResult, splitCodexReply } from '../../src/Services/AI/codexJobs';
 
 const option=(name:string)=>{const index=process.argv.indexOf(name);return index<0?'':process.argv[index+1];};
 const out=option('--out');
 if(!out||await Bun.file(join(out,'protocol.json')).exists())throw Error('Use --out FRESH_PATH');
-const image=process.env.CODEX_WORKER_IMAGE||'hackerika-codex-worker:0.163.0-9';
+const image=process.env.CODEX_WORKER_IMAGE||WORKER_IMAGE;
 const question='Riset situasi Indonesia dan dunia sekarang, lebih baik pindah ke luar negeri atau tetap tinggal di sini? Jika pindah, apa yang harus disiapkan?';
 const date=new Date().toISOString().slice(0,10);
 const job=newJob({scope:'555555555555555555:700000000000009001',guildId:'555555555555555555',channelId:'700000000000009001',

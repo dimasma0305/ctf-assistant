@@ -1,0 +1,260 @@
+{
+  "pass": false,
+  "checks": {
+    "resourcefulRead": true,
+    "personOsintRead": true,
+    "distinctPages": false,
+    "discoveredPage": false,
+    "citations": true,
+    "noFlags": true
+  },
+  "stats": {
+    "calls": 14,
+    "searches": 4,
+    "sourceReads": 11,
+    "visionReads": 0,
+    "inputChars": 2015780,
+    "outputBytes": 2394079,
+    "elapsedMs": 0,
+    "attempts": 1
+  },
+  "elapsedMs": 209937,
+  "result": {
+    "summary": "Ya, jejak publik **mirai/miraicantsleep** ada. [Daftar anggota Heroes Cyber Security](https://hcs-team.com/members/) mencantumkan “mirai” sejak September 2023 dan menautkannya langsung ke [GitHub `miraicantsleep`](https://github.com/miraicantsleep). [README repositori CTF-nya](https://github.com/miraicantsleep/ctf-writeups) menyebut `mirai` sebagai salah satu nama pakainya dan memuat write-up serta skrip penyelesaian tantangan; contohnya [baby-shellcode](https://github.com/miraicantsleep/ctf-writeups/blob/main/UofT%20CTF%202024/baby-shellcode/README.md). HCS juga mengkredit “mirai” pada [analisis CVE-2026-1605](https://hcs-team.com/blog/cve-2026-1605/), sementara [template riset terkait](https://github.com/Heroes-Cyber-Security/research/blob/main/CVE-2026-1605/CVE-2026-1605.yaml) mencantumkan `miraicantsleep` bersama `daffainfo` sebagai penulis. [CTFtime](https://ctftime.org/team/70159) turut mencantumkan handle itu dalam tim HCS. Rangkaian sumber ini mendukung keberadaan profil dan karya publiknya, tetapi tidak membuktikan siapa yang mengendalikan akun Discord @miraicantsleep.",
+    "flags": [],
+    "findings": [
+      "Roster HCS menampilkan mirai, bidang Pwn dan Boot2Root, tanggal bergabung Sep 2023, serta tautan langsung ke GitHub miraicantsleep dan LinkedIn: https://hcs-team.com/members/",
+      "README GitHub secara eksplisit menyatukan alias miraicantsleep, mirai, miraimiraimirai, dan sleepymirai; klaim peringkat kompetisi di sana adalah klaim pemilik repositori: https://github.com/miraicantsleep/ctf-writeups/blob/main/README.md",
+      "Repositori memuat write-up substantif, termasuk baby-shellcode UofT CTF 2024 dan ringkasan LA CTF 2024: https://github.com/miraicantsleep/ctf-writeups/blob/main/UofT%20CTF%202024/baby-shellcode/README.md ; https://github.com/miraicantsleep/ctf-writeups/blob/main/LA%20CTF%202024/README.md",
+      "Artikel HCS bertanggal 9 Maret 2026 mengkredit mirai bersama daffainfo; template pada repositori HCS mencantumkan author daffainfo,miraicantsleep: https://hcs-team.com/blog/cve-2026-1605/ ; https://github.com/Heroes-Cyber-Security/research/blob/main/CVE-2026-1605/CVE-2026-1605.yaml",
+      "CTFtime mencantumkan miraicantsleep sebagai anggota HCS: https://ctftime.org/team/70159"
+    ],
+    "unresolved": [
+      "Tidak ada bukti publik yang diperiksa yang menghubungkan kendali akun Discord yang ditanyakan dengan pemilik profil GitHub; kesamaan handle saja tidak cukup.",
+      "Roster HCS menautkan profil LinkedIn, tetapi halaman LinkedIn menolak pembacaan sehingga isinya tidak diverifikasi."
+    ],
+    "needsStrongerModel": false
+  },
+  "sources": [
+    "https://hcs-team.com/members/",
+    "https://hcs-team.com/blog/cve-2026-1605/",
+    "https://ctftime.org/team/70159"
+  ],
+  "receipts": [
+    {
+      "command": "/usr/bin/bash -lc 'cat /workspace/context.json'",
+      "exitCode": 0,
+      "outputSha256": "9f9af64ae40ee68d2b804ab9b7ed32879016026f50f8ace475b854ffd7a9f274"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'cat /workspace/.agents/skills/resourceful-solve/SKILL.md'",
+      "exitCode": 0,
+      "outputSha256": "d8b63d7805aebb3b23ae3fd57e368b741a8060490b90a5e407e6fd07e1ac52dd"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'cat /workspace/.agents/skills/ctf-deep-solve/references/person-osint.md'",
+      "exitCode": 0,
+      "outputSha256": "9f1c07f66c3df7183ae5b0b5878e5699332e8dfb9afe38854deb6ea80f8da1be"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://hcs-team.com/members/\\\",\\\"query\\\":\\\"Find mirai or miraicantsleep attribution, outbound profile links, and exact credited work.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "222e22742ec875bc5cb0d4d398ba0a95e87130d200c302efaa1113b7f7afb893"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://hcs-team.com/blog/cve-2026-1605/\\\",\\\"query\\\":\\\"Find mirai or miraicantsleep attribution, outbound profile links, and exact credited work.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "5d5a7724884eca4d8583863280c5077088e9943816a2106957fb0726be6da6dd"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://ctftime.org/team/70159\\\",\\\"query\\\":\\\"Find mirai or miraicantsleep attribution, outbound profile links, and exact credited work.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "6bb201fda49c47b1e4be1c07b29a4cd9e6b703a9825c4729ea104d1761c92f17"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://github.com/miraicantsleep\\\",\\\"query\\\":\\\"Public bio, projects, outbound links, repository list and contributions by miraicantsleep\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://www.linkedin.com/in/mnabilar/\\\",\\\"query\\\":\\\"Profile name, work, explicit relationship to miraicantsleep or HCS\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "6fd1af7f55ada7469e815623c892a2d8f8a5b4396f63c83e3195b066104b959c"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"\\\\\\\"miraicantsleep\\\\\\\" security research writeup GitHub CTF\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "2e7ee4d7eeda9092b341bc60ef438503e7b43fd133e0c456822c6ab48cd3081e"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 30 -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"\\\\\\\"miraicantsleep\\\\\\\" CVE CTF challenge author\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "62b6c8bdd10f5faf8152aa35877304113113c585e39dbe0d3e647c6bfb2c594a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://alpacahack.com/challenges/dice-roll/solves\\\",\\\"query\\\":\\\"Find exact miraicantsleep entry and profile link in challenge solve records\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 -A 'Mozilla/5.0' -o /workspace/hcs-members.html -w '%{http_code} %{url_effective} %{size_download}\\\\n' https://hcs-team.com/members/\"",
+      "exitCode": 0,
+      "outputSha256": "f4f85539efc1ca9f4a7a46c29361c861dc7e19c750bdda7b90e25f51d7bfaa7f"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 -A 'Mozilla/5.0' -o /workspace/mirai-github.html -w '%{http_code} %{url_effective} %{size_download}\\\\n' https://github.com/miraicantsleep\"",
+      "exitCode": 0,
+      "outputSha256": "277c831eaa2233084ce40c68d884d48d6be56166935dadc2a1cc5867afe7be04"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"python - <<'PY'\nfrom bs4 import BeautifulSoup\nfor f in ['/workspace/mirai-github.html','/workspace/hcs-members.html']:\n s=BeautifulSoup(open(f).read(),'html.parser')\n print('\\\\nFILE',f,'TITLE',s.title.get_text(' ',strip=True) if s.title else '')\n for a in s.find_all('a',href=True):\n  h=a['href']; t=a.get_text(' ',strip=True)\n  if any(x in h.lower() for x in ['miraicantsleep','mnabilar']) or 'mirai' in t.lower():\n   print('LINK',repr(t[:100]),h,'PARENT',a.parent.get_text(' ',strip=True)[:250])\n print('META',[(x.get('name') or x.get('property'),x.get('content')) for x in s.find_all('meta') if 'description' in str(x.get('name') or x.get('property')).lower()][:4])\nPY\"",
+      "exitCode": 1,
+      "outputSha256": "cebc2be54ba8e44c613a064aeb884de52dc40eecf5ec1b2c52fad1a27b8f7c94"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"rg -io '.{0,350}(miraicantsleep|mnabilar).{0,500}' /workspace/mirai-github.html /workspace/hcs-members.html | head -c 12500\"",
+      "exitCode": 0,
+      "outputSha256": "39fa20ba9bd28a369205759e35d8a408fe1125ce336165b34b89f0ea81fb9bc6"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://hcs-team.com/blog/cve-2026-1605/\\\",\\\"query\\\":\\\"Summarize authorship, exact technical contribution, research repository link, publication date and whether vendor credited authors\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "a2473382d158f600ef73904a9d6e284f2573e9ff58ffc9f901962fee8832a0f9"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 -H 'Accept: application/vnd.github+json' https://api.github.com/users/miraicantsleep | python -c 'import json,sys; x=json.load(sys.stdin); print({k:x.get(k) for k in [\\\"login\\\",\\\"name\\\",\\\"bio\\\",\\\"blog\\\",\\\"company\\\",\\\"public_repos\\\",\\\"html_url\\\",\\\"created_at\\\"]})'\"",
+      "exitCode": 0,
+      "outputSha256": "5343442b266d9aec1691920f4d78882b2ee5b5cfadb6af2a4b342fbde0c6dd0d"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 -H 'Accept: application/vnd.github+json' https://api.github.com/users/miraicantsleep/repos?per_page=100 | python -c 'import json,sys; a=json.load(sys.stdin); print(\\\"\\\\n\\\".join(f\\\"{x.get(chr(110)+chr(97)+chr(109)+chr(101))} | {x.get(chr(100)+chr(101)+chr(115)+chr(99)+chr(114)+chr(105)+chr(112)+chr(116)+chr(105)+chr(111)+chr(110))} | {x.get(chr(104)+chr(116)+chr(109)+chr(108)+chr(95)+chr(117)+chr(114)+chr(108))}\\\" for x in a) if isinstance(a,list) else a)'\"",
+      "exitCode": 0,
+      "outputSha256": "a11bf836d179f306a11e27a56e08bdcd298ac214d32fa26fb5189979e2d8a5c3"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 -H 'Accept: application/vnd.github+json' 'https://api.github.com/repos/miraicantsleep/miraicantsleep/contents' | python -c 'import json,sys; x=json.load(sys.stdin); print(\\\"\\\\n\\\".join(str((v.get(\\\"name\\\"),v.get(\\\"type\\\"),v.get(\\\"html_url\\\"))) for v in x) if isinstance(x,list) else x)'\"",
+      "exitCode": 0,
+      "outputSha256": "b70cda623fa43835fcb04c853f09fe7548cd2f5d569370a9b1e29fab9d27407f"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 -H 'Accept: application/vnd.github+json' 'https://api.github.com/repos/Heroes-Cyber-Security/research/contents' | python -c 'import json,sys; x=json.load(sys.stdin); print(\\\"\\\\n\\\".join(str((v.get(\\\"name\\\"),v.get(\\\"type\\\"),v.get(\\\"html_url\\\"))) for v in x) if isinstance(x,list) else x)'\"",
+      "exitCode": 0,
+      "outputSha256": "b12c4b8fb6fe066ad8ed058103ff79bfedb9c3fe5dbfea4b8a26d5c10632652b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 -H 'Accept: application/vnd.github+json' 'https://api.github.com/repos/miraicantsleep/ctf-writeups/contents' | python -c 'import json,sys; x=json.load(sys.stdin); print(\\\"\\\\n\\\".join(str((v.get(\\\"name\\\"),v.get(\\\"type\\\"),v.get(\\\"html_url\\\"))) for v in x) if isinstance(x,list) else x)'\"",
+      "exitCode": 0,
+      "outputSha256": "0f2698db7291bc33751164d5fb1744d7991c4c75e9146a3160383744c764394a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 -H 'Accept: application/vnd.github+json' 'https://api.github.com/repos/miraicantsleep/HCS-ctf-2023/contents' | python -c 'import json,sys; x=json.load(sys.stdin); print(\\\"\\\\n\\\".join(str((v.get(\\\"name\\\"),v.get(\\\"type\\\"),v.get(\\\"html_url\\\"))) for v in x) if isinstance(x,list) else x)'\"",
+      "exitCode": 0,
+      "outputSha256": "c549de42e4605bf080ea2d2c01285ea895989a2d34eb983b28b0f4868077e95a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"\\\\\\\"miraicantsleep\\\\\\\" site:github.com/Heroes-Cyber-Security\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "e6735fe9c3532b6dd96af44df9f8e5985ec8986206d7c3451ec4451a712cc762"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"\\\\\\\"miraicantsleep\\\\\\\" -hcs-team.com -ctftime.org -github.com\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "fd78fdf60f4bdbb001020396c358afb16cdb540a0c664148d499eefb1aa586f8"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://raw.githubusercontent.com/miraicantsleep/HCS-ctf-2023/main/README.md'\"",
+      "exitCode": 0,
+      "outputSha256": "5cb86007f682ed6cbbbcd3622631e11cfe6aaa1a98ef674ce5d4a2a2cebd1b96"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://raw.githubusercontent.com/miraicantsleep/ctf-writeups/main/README.md'\"",
+      "exitCode": 0,
+      "outputSha256": "1719a1b4e5508683e0eeacf0e17916d219587b17cba94d9b1feed2cc5a365f94"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://raw.githubusercontent.com/miraicantsleep/miraicantsleep/main/README.md'\"",
+      "exitCode": 0,
+      "outputSha256": "a1862c509af32008ae41f595d6b1db13e43e03da640a37a3ccc68af366686db0"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://raw.githubusercontent.com/Heroes-Cyber-Security/research/main/README.md'\"",
+      "exitCode": 0,
+      "outputSha256": "86068b1bfb87e52afbd63dfae2ad9e42a3e4ef9bfc6c7d426059eabb04c7d389"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://ctftime.org/event/2818/weight\\\",\\\"query\\\":\\\"Find public activity and exact miraicantsleep link; do not infer identity\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://api.github.com/repos/Heroes-Cyber-Security/research/contents/CVE-2026-1605' | python -c 'import json,sys; x=json.load(sys.stdin); print(\\\"\\\\n\\\".join(str((v.get(\\\"name\\\"),v.get(\\\"html_url\\\"))) for v in x) if isinstance(x,list) else x)'\"",
+      "exitCode": 0,
+      "outputSha256": "6f2aa787e47038f6744b161c8fe44fed8430b6f88465c0ff96e8cadbcf26d058"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://api.github.com/repos/Heroes-Cyber-Security/research/contents/CVE-2026-26007' | python -c 'import json,sys; x=json.load(sys.stdin); print(\\\"\\\\n\\\".join(str((v.get(\\\"name\\\"),v.get(\\\"html_url\\\"))) for v in x) if isinstance(x,list) else x)'\"",
+      "exitCode": 0,
+      "outputSha256": "9114e4c5052dfbf4d6a53f11b702515294a5d60eb6cbfa034d9ec279cf0ec798"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://api.github.com/repos/miraicantsleep/ctf-writeups/git/trees/main?recursive=1' | python -c 'import json,sys; x=json.load(sys.stdin); a=[v[\\\"path\\\"] for v in x.get(\\\"tree\\\",[]) if v[\\\"type\\\"]==\\\"blob\\\"]; print(\\\"total_files\\\",len(a)); print(\\\"\\\\n\\\".join(a[:85]))' \"",
+      "exitCode": 0,
+      "outputSha256": "e3c59844ed1e5d0cc20cdedbeb105cb43006f290ffc1ebceac375427a169b1e1"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://api.github.com/repos/miraicantsleep/ctf-writeups/git/trees/main?recursive=1' | python -c 'import json,sys; a=[v[\\\"path\\\"] for v in json.load(sys.stdin).get(\\\"tree\\\",[]) if v[\\\"type\\\"]==\\\"blob\\\" and v[\\\"path\\\"].lower().endswith((\\\".md\\\",\\\".mdx\\\"))]; print(\\\"markdown\\\",len(a)); print(\\\"\\\\n\\\".join(a[:75]))'\"",
+      "exitCode": 0,
+      "outputSha256": "19e578353a1581b77b96139c1c6e3811a02d28f0df51a8f84511d99514157051"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'curl -sSL --max-time 25 https://raw.githubusercontent.com/Heroes-Cyber-Security/research/main/CVE-2026-1605/CVE-2026-1605.yaml | head -c 4500'",
+      "exitCode": 0,
+      "outputSha256": "d7f688a786ff1107417b7c6fee0b131b65ce69b7cb77b0f72c38b7885691f00b"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'curl -sSL --max-time 25 https://raw.githubusercontent.com/Heroes-Cyber-Security/research/main/CVE-2026-1605/README.MD | head -c 7000'",
+      "exitCode": 0,
+      "outputSha256": "41f374453127389223905b57adf0fc20df87e1e1763a46cd9998be8a93ab60fa"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'curl -sSL --max-time 25 https://raw.githubusercontent.com/Heroes-Cyber-Security/research/main/CVE-2026-26007/README.md | head -c 5000'",
+      "exitCode": 0,
+      "outputSha256": "dfe03580d5c9feb108d2deebe4c19f60ab3416d5df024a88228e14b25fa12f64"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://github.com/miraicantsleep/ctf-writeups/blob/main/WxMCTF%202024/nah%20id%20win./README.md\\\",\\\"query\\\":\\\"Find exact author credits and substantive contents of this work.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://hcs-team.com/blog/cve-2026-26007\\\",\\\"query\\\":\\\"Find exact author credits and substantive contents of this work.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS --max-time 25 -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://github.com/miraicantsleep/ctf-writeups/blob/main/UofT%20CTF%202024/baby-shellcode/README.md\\\",\\\"query\\\":\\\"Find exact author credits and substantive contents of this work.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://raw.githubusercontent.com/miraicantsleep/ctf-writeups/main/LA%20CTF%202024/README.md' | head -c 6000\"",
+      "exitCode": 0,
+      "outputSha256": "a9fcbaacc7025b615d9822c7f0cac5ef6de9810fe20606c4a4bf7456140b1819"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://raw.githubusercontent.com/miraicantsleep/ctf-writeups/main/Knight%20CTF%202024/README.md' | head -c 6000\"",
+      "exitCode": 0,
+      "outputSha256": "be96d9dcbd2acf8da25b6c26ad77aa0c2b67012d0681884259dbcee4d1dca1bf"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://raw.githubusercontent.com/miraicantsleep/ctf-writeups/main/UofT%20CTF%202024/baby-shellcode/README.md' | head -c 6000\"",
+      "exitCode": 0,
+      "outputSha256": "63a8688c0bbb42a1e363ddaff328349e897f5b3da68c8f70d866d400fb9acb69"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sSL --max-time 25 'https://raw.githubusercontent.com/miraicantsleep/ctf-writeups/main/WxMCTF%202024/nah%20id%20win./README.md' | head -c 6000\"",
+      "exitCode": 0,
+      "outputSha256": "c49014a5dcd4e5959acfc0afce7602603ef537e0ffceb52df00b2bbacf2e5f71"
+    }
+  ]
+}

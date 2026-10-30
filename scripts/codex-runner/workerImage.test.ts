@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { createWorkerImageReadiness, type WorkerImageState } from './workerImage';
 
-const image='hackerika-codex-worker:0.163.0-9';
+const image='hackerika-codex-worker:0.166.0-1';
 
 test('concurrent readiness checks share one rebuild and stay unready until the built image is inspected',async()=>{
   let present=false,builds=0;

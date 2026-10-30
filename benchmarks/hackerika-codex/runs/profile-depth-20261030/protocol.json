@@ -1,0 +1,14 @@
+{
+  "model": "gpt-6-sol",
+  "image": "hackerika-codex-worker:0.166.0-1",
+  "date": "2026-10-30T11:30:06.823Z",
+  "question": "Deepsearch profil publik/profesional @mirai (@miraicantsleep), apakah benar ada dia? Telusuri karya dan sumber terkait, bukan identitas privat.",
+  "seeds": [
+    "https://hcs-team.com/members/",
+    "https://hcs-team.com/blog/cve-2026-1605/",
+    "https://ctftime.org/team/70159"
+  ],
+  "promptSha256": "1db0359a1ce1019e12ffd9002129f8ee9bf0547c2574fe16ff16cc556ba71c01",
+  "scope": "Real worker and public web; synthetic Discord IDs, no controller job submission or Discord writes.",
+  "acceptance": "Read both irai research references, inspect at least four distinct source pages including a discovered page beyond the three prior results, and produce a cited answer. These checks measure execution/depth only; human review must assess relevance, accuracy and attribution."
+}

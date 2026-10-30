@@ -5,12 +5,13 @@ import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, publicJob, validateI
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { createWorkerImageReadiness } from './workerImage';
+import { WORKER_IMAGE } from './runtime';
 import { deleteExportedFiles, readExportedFile, saveExportedFiles } from './exports';
 
 const socket = process.env.CODEX_CONTROL_SOCKET || '/run/hackerika-codex/control.sock';
 const stateRoot = process.env.CODEX_JOB_STATE_ROOT || '/var/lib/hackerika-codex/jobs';
 const runtimeRoot = process.env.CODEX_JOB_RUNTIME_ROOT || '/run/hackerika-codex-jobs';
-const image = process.env.CODEX_WORKER_IMAGE || 'hackerika-codex-worker:0.163.0-9';
+const image = process.env.CODEX_WORKER_IMAGE || WORKER_IMAGE;
 const workerImage = createWorkerImageReadiness(image);
 const maxQueued = Math.max(1, Math.min(16, Number(process.env.CODEX_MAX_QUEUED) || 8));
 const hourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_JOBS_PER_USER_HOUR) || 3));

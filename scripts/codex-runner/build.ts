@@ -1,14 +1,12 @@
-import { chmod, copyFile, cp, mkdtemp, realpath, rm } from 'node:fs/promises';
+import { chmod, copyFile, cp, mkdtemp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { CODEX_RELEASE, retainCodexRuntime, WORKER_IMAGE } from './runtime';
 
 const binDir=process.argv[2];
-if(!binDir)throw Error('usage: bun scripts/codex-runner/build.ts /absolute/path/to/codex/bin [image-tag]');
-const source=await realpath(binDir),codex=join(source,'codex'),host=join(source,'codex-code-mode-host');
-const versionProcess=Bun.spawn([codex,'--version'],{stdout:'pipe',stderr:'pipe'});
-const version=(await new Response(versionProcess.stdout).text()).trim();
-if(await versionProcess.exited!==0||!/^codex-cli 0\.163\.0\b/.test(version))throw Error(`unsupported_codex_version:${version}`);
-const tag=process.argv[3]||'hackerika-codex-worker:0.163.0-9';
+const source=await retainCodexRuntime({seed:binDir==='--retained'?undefined:binDir});
+const codex=join(source,'codex'),host=join(source,'codex-code-mode-host');
+const tag=process.argv[3]||WORKER_IMAGE;
 const directory=await mkdtemp(join(tmpdir(),'hackerika-codex-build-'));
 // systemd deliberately mounts /root read-only. Buildx writes activity and
 // builder metadata under DOCKER_CONFIG even when no registry login is needed.
@@ -30,5 +28,5 @@ try{
   let code:number;
   try{code=await build.exited;}finally{process.off('SIGTERM',stop);process.off('SIGINT',stop);}
   if(code!==0)throw Error('worker_image_build_failed');
-  console.log(`[CodexWorker] built ${tag} from ${version}`);
+  console.log(`[CodexWorker] built ${tag} from codex-cli ${CODEX_RELEASE.version}`);
 }finally{await Promise.all([rm(directory,{recursive:true,force:true}),rm(dockerConfig,{recursive:true,force:true})]);}

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { createServer } from "node:http";
 import {
   ResponseTooLargeError,
   SafeFetchError,
@@ -32,6 +33,28 @@ describe("isPrivateIp()", () => {
 });
 
 describe("safeFetch()", () => {
+  test("nonstandard remote HTTP status rejects the pinned request and later requests still work", async () => {
+    const server = createServer((request, response) => {
+      response.writeHead(request.url === '/blocked' ? 999 : 200);
+      response.end(request.url === '/blocked' ? 'blocked' : 'readable source');
+    });
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+    const address = server.address() as { port: number };
+    // A test-only DNS decision exercises the real pinned HTTP transport. The
+    // production checkUrlSafe still blocks loopback/private targets.
+    const dependencies = { checkUrl: async (): Promise<UrlGuardResult> => ({ ok: true, resolvedHost: '127.0.0.1' }) };
+    try {
+      await expect(safeFetch(`http://fixture.example:${address.port}/blocked`, { signal: AbortSignal.timeout(2000) }, dependencies))
+        .rejects.toMatchObject({ name: 'SafeFetchError', code: 'invalid_response', httpStatus: 999 });
+      const next = await safeFetch(`http://fixture.example:${address.port}/ok`, { signal: AbortSignal.timeout(2000) }, dependencies);
+      expect(next.status).toBe(200);
+      expect(await next.text()).toBe('readable source');
+    } finally {
+      server.closeAllConnections();
+      await new Promise<void>(resolve => server.close(() => resolve()));
+    }
+  });
+
   test("rejects a public-to-private redirect before requesting the private URL", async () => {
     const requested: string[] = [];
     const fetchImpl = async (input: string | URL | Request): Promise<Response> => {

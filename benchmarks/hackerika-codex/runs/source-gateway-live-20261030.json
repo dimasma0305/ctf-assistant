@@ -1,0 +1,29 @@
+{
+  "pass": false,
+  "checks": {
+    "roster": true,
+    "trailingSlashProfile": false,
+    "newPageAfterRoster": true
+  },
+  "calls": 0,
+  "sources": [
+    {
+      "url": "https://hcs-team.com/members/",
+      "title": "Members - Heroes Cyber Security"
+    },
+    {
+      "url": "https://hcs-team.com/blog/cve-2026-1605/",
+      "title": "CVE-2026-1605 - Heroes Cyber Security"
+    },
+    {
+      "url": "https://github.com/Heroes-Cyber-Security/research",
+      "title": "GitHub - Heroes-Cyber-Security/research · GitHub"
+    }
+  ],
+  "errors": [
+    {
+      "error": "source_unavailable",
+      "reason": "source_http_410"
+    }
+  ]
+}

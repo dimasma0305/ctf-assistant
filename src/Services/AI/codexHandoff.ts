@@ -1,9 +1,17 @@
 /** A queued worker is an in-progress action. The manager's immediate chat
  * completion cannot turn that accepted action into a final refusal or claim. */
-export function groundCodexHandoff(modelReply: string, toolResult: string | undefined): string {
+export function groundCodexHandoff(modelReply: string, toolResult: string | undefined, hasInlineResearch = false): string {
   if (!toolResult) return modelReply;
   let result: any;
   try { result = JSON.parse(toolResult); } catch { return modelReply; }
+  if (result?.ok === false && ['worker_preparing', 'worker_image_unavailable', 'isolated_agent_unavailable'].includes(result.error)) {
+    // Run after research grounding: its profile formatter otherwise discards
+    // the manager's explanation and makes the fallback look like agent output.
+    const status = hasInlineResearch
+      ? 'Agen riset sedang tidak tersedia; berikut hasil penelusuran web sementara.'
+      : 'Agen riset sedang tidak tersedia, jadi tugasnya belum mulai.';
+    return hasInlineResearch && modelReply.trim() ? `${status}\n\n${modelReply}` : status;
+  }
   if (result?.ok !== true || !['queued', 'busy'].includes(result.status)) return modelReply;
   const ids = [result.job?.id, ...(Array.isArray(result.jobs) ? result.jobs.map((job: any) => job?.id) : [])]
     .filter((id: unknown): id is string => typeof id === 'string' && /^[0-9a-f-]{36}$/i.test(id))

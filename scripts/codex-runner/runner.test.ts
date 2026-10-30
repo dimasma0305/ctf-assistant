@@ -12,6 +12,7 @@ import { DiscordContextBroker } from './discordBroker';
 import { ensureWorkerImage } from './workerImage';
 import { codexRequest, formatCodexResult, isDeliveredCodexReply, splitCodexReply } from '../../src/Services/AI/codexJobs';
 import { researchTransport } from '../../src/Services/AI/researchSources';
+import { SafeFetchError } from '../../src/utils/urlGuard';
 
 const packet=()=>({scope:'555555555555555555:700000000000000001',guildId:'555555555555555555',channelId:'700000000000000001',
   messageId:'800000000000000001',userId:'663394727688798231',question:'solve pwn exploit ini',context:'thread evidence',route:'auto' as const,artifacts:[]});
@@ -60,9 +61,9 @@ test('Docker worker has no network and receives only per-job model and public-eg
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
   const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-9',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.166.0-1',dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
-  await ensureWorkerImage('hackerika-codex-worker:0.163.0-9',dependencies);
+  await ensureWorkerImage('hackerika-codex-worker:0.166.0-1',dependencies);
   expect(builds).toBe(1);
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');
@@ -321,6 +322,51 @@ test('source gateway follows a public cross-domain link found on an inspected pa
     const second=await codexRequest<{url:string;content:string}>('/sources/read',
       {url:'https://fixture-b.example/original'},{socketPath:socket});
     expect(second.content).toContain('Original record confirms');
+  }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
+});
+
+test('a blocked source is not evidence and does not prevent the next source read',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-source-block-test-')),socket=join(directory,'source.sock');
+  const originalFetch=researchTransport.fetch;
+  researchTransport.fetch=async url=>{
+    if(String(url).endsWith('/blocked'))throw Object.assign(new SafeFetchError('invalid_response',String(url)),{httpStatus:999});
+    return new Response('<main>Verified project credit.</main>',{headers:{'Content-Type':'text/html'}});
+  };
+  const job=newJob(validatePacket({...packet(),kind:'investigation',
+    question:'Read https://fixture.example/blocked and https://fixture.example/original'}));
+  const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal);
+  try{
+    const blocked=await fetch('http://localhost/sources/read',{unix:socket,method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'https://fixture.example/blocked'})});
+    expect(blocked.status).toBe(502);
+    expect(await blocked.json()).toEqual({error:'source_unavailable',reason:'invalid_response',httpStatus:999});
+    expect(gateway.sources).toHaveLength(0);
+    const next=await codexRequest<{content:string}>('/sources/read',{url:'https://fixture.example/original'},{socketPath:socket});
+    expect(next.content).toContain('Verified project credit');
+    expect(gateway.sources.map(source=>source.url)).toEqual(['https://fixture.example/original']);
+  }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
+});
+
+test('source discovery survives a full roster page and canonical trailing slashes',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-source-frontier-')),socket=join(directory,'source.sock');
+  const originalFetch=researchTransport.fetch;
+  researchTransport.fetch=async url=>new Response(String(url).endsWith('/roster')
+    ?'<main>'+Array.from({length:60},(_,i)=>`<a href="https://profiles.example/member-${i}/">Member ${i}</a>`).join('')+'</main>'
+    :String(url).endsWith('/article')?'<main><a href="https://publisher.example/original?edition=1">Original record</a></main>'
+    :'<main>Source content.</main>',{headers:{'Content-Type':'text/html'}});
+  const job=newJob(validatePacket({...packet(),kind:'investigation',
+    question:'Inspect https://team.example/roster and https://team.example/article'}));
+  const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal);
+  const read=(url:string)=>codexRequest<{content:string}>('/sources/read',{url},{socketPath:socket});
+  try{
+    await read('https://team.example/roster');
+    expect((await read('https://profiles.example/member-59')).content).toContain('Source content');
+    await read('https://team.example/article');
+    expect((await read('https://publisher.example/original?edition=1')).content).toContain('Source content');
+    // Normalization permits only a trailing-slash variant, never arbitrary
+    // siblings, queries, or hosts that were not supplied/discovered.
+    await expect(read('https://publisher.example/original?edition=2')).rejects.toThrow('invalid_or_private_source');
+    await expect(read('https://publisher.example/private')).rejects.toThrow('invalid_or_private_source');
   }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
 });
 

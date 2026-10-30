@@ -1291,7 +1291,7 @@ async function runChatTurn(
 
         if (!hasCodexDelegation(message)) finalContent = groundResearchReply(finalContent, getResearchReport(message), content);
         finalContent = groundCTFReply(finalContent, getCTFReport(message));
-        finalContent = groundCodexHandoff(finalContent, codexToolResult);
+        finalContent = groundCodexHandoff(finalContent, codexToolResult, !!getResearchReport(message));
 
         // Output anti-spoof: if the model accidentally copied the speaker-tag
         // pattern at the start of its reply (because it sees it everywhere

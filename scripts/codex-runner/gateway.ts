@@ -7,6 +7,7 @@ import { webSearchForTool } from '../../src/Services/AI/web';
 import type { Job } from './protocol';
 import type { DiscordReadQuery } from './discordBroker';
 import { generateJobImage } from './imageGeneration';
+import { SafeFetchError } from '../../src/utils/urlGuard';
 export async function startGateway(socket: string, job: Job, model: string, signal: AbortSignal, dependencies: {
   credentials?: () => Promise<{access_token:string}>; fetcher?:typeof fetch; maxCalls?:number; maxInputChars?:number;
   imageKey?:string; imageFetcher?:typeof fetch;
@@ -21,11 +22,17 @@ export async function startGateway(socket: string, job: Job, model: string, sign
   let downloads=0;
   let imageGenerations=0;
   let imageResult='';let imageDigest='';
+  // Keep discovered links usable across several source pages. Tool-call and
+  // per-page link limits bound growth; a 60-entry global cap was exhausted by
+  // the first roster page, silently preventing all later source pivots.
   const allowedSources=new Set<string>();
+  const sourceKey=(value:string)=>{const url=new URL(value);url.pathname=url.pathname.replace(/\/+$/,'')||'/';return url.href;};
+  const allowSource=(url:string)=>{if(allowedSources.size<2048)allowedSources.add(sourceKey(url));};
+  const knownSource=(url:string)=>allowedSources.has(sourceKey(url));
   for(const match of `${job.packet.question}\n${job.packet.context}\n${JSON.stringify(job.packet.checkpoint||{})}`.matchAll(/https?:\/\/[^\s<>`"']+/g)){
-    const url=publicResearchUrl(match[0].replace(/[),.!?;]+$/,''));if(url&&allowedSources.size<24)allowedSources.add(url);
+    const url=publicResearchUrl(match[0].replace(/[),.!?;]+$/,''));if(url&&allowedSources.size<24)allowSource(url);
   }
-  for(const source of job.sources||[]){const url=publicResearchUrl(source.url);if(url&&allowedSources.size<60)allowedSources.add(url);}
+  for(const source of job.sources||[]){const url=publicResearchUrl(source.url);if(url)allowSource(url);}
   const server=Bun.serve({unix:socket,maxRequestBodySize:32*1024*1024,
     async fetch(request){
       try{
@@ -81,7 +88,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
             const citations=[message.content||'',...(message.embeds||[]).flatMap(embed=>[embed.url||'',embed.description||''])].join('\n').slice(0,12_000);
             for(const match of citations.matchAll(/https?:\/\/[^\s<>\x00-\x1f`"']+/g)){
               const url=publicResearchUrl(match[0].replace(/[),.!?;]+$/,''));
-              if(url&&allowedSources.size<60)allowedSources.add(url);
+              if(url)allowSource(url);
             }
           }
           if(!x.describeImage||!result?.ok)return Response.json(result);
@@ -119,24 +126,32 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           if(!query||query.length>350||/[\w-]+\{[^}]*\}|%7[bBdD]|\b(?:sk-[\w-]+|Bearer\s+\S+)|<@!?\d+>|(?:password|api.?key|token)\s*[:=]/i.test(query))
             return Response.json({error:'invalid_or_private_query'},{status:400});
           const result=await webSearchForTool({query,maxResults:job.packet.kind==='investigation'?8:5},{signal});
-          if(result.ok)for(const row of result.results||[]){const url=publicResearchUrl(row.url);if(url&&allowedSources.size<60)allowedSources.add(url);}
+          if(result.ok)for(const row of result.results||[]){const url=publicResearchUrl(row.url);if(url)allowSource(url);}
           return Response.json(result);
         }
         if(path==='/sources/read'){
           if(++job.stats.sourceReads>(job.packet.kind==='investigation'?16:8))return Response.json({error:'source_budget'},{status:429});
           const x=await request.json() as any;const url=publicResearchUrl(x?.url);
-          if(!url||!allowedSources.has(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))return Response.json({error:'invalid_or_private_source'},{status:400});
-          const doc=await new ResearchSourceReader(signal).read(url,String(x.query||'').slice(0,350));
+          if(!url||!knownSource(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))return Response.json({error:'invalid_or_private_source'},{status:400});
+          let doc;
+          try { doc=await new ResearchSourceReader(signal).read(url,String(x.query||'').slice(0,350)); }
+          catch(error) {
+            const reason=error instanceof SafeFetchError?error.code
+              :error instanceof Error&&/^source_[a-z_0-9]+$/.test(error.message)?error.message:'source_fetch_failed';
+            const status=(error as {httpStatus?:number})?.httpStatus;
+            return Response.json({error:'source_unavailable',reason,
+              ...(Number.isInteger(status)?{httpStatus:status}:{})},{status:502});
+          }
           // A cited public page can point to a relevant primary source on a
           // different domain. The guarded reader still checks each requested
           // destination and redirect before making a network request.
-          for(const link of doc.links||[]){const next=publicResearchUrl(link.url);if(next&&allowedSources.size<60)allowedSources.add(next);}
+          for(const link of doc.links||[]){const next=publicResearchUrl(link.url);if(next)allowSource(next);}
           sources.push({url:doc.url,title:doc.title,content:doc.content.slice(0,12000)});return Response.json(doc);
         }
         if(path==='/sources/download'){
           if(++downloads>3)return Response.json({error:'download_budget'},{status:429});
           const x=await request.json() as any;const url=publicResearchUrl(x?.url);
-          if(!url||!allowedSources.has(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))
+          if(!url||!knownSource(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))
             return Response.json({error:'invalid_or_private_source'},{status:400});
           const file=await new ResearchSourceReader(signal).download(url);
           return new Response(new Uint8Array(file.data),{headers:{'Content-Type':'application/octet-stream',

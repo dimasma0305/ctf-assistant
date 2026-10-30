@@ -2,10 +2,12 @@
 
 The Discord bot lets its chat model decide when to submit a CTF solve or multi-step investigation over `/run/hackerika-codex/control.sock`. A trusted host controller owns Docker and the ChatGPT sign-in session. Every job runs in a fresh container with no network, no credentials, no Docker socket, a read-only root, dropped capabilities, and disposable `/workspace` and `/tmp` filesystems. Only a per-job inference/source Unix socket enters the worker. Containers share the host kernel; this is container isolation, not a VM boundary.
 
-Build the pinned worker from the matching standalone Codex release. The controller also checks this image before each job and rebuilds the pinned release if Docker has pruned it:
+Build the pinned worker from the matching standalone Codex release. The two executables are first retained under `/var/lib/hackerika-codex/runtime/`, outside the desktop app's release cleanup. Their SHA-256 hashes and CLI version must match `runtime.ts`. The controller checks the image before each job and rebuilds from these retained bytes if Docker has pruned it:
 
 ```sh
-bun scripts/codex-runner/build.ts /root/.codex/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/bin
+bun scripts/codex-runner/build.ts /root/.codex/packages/standalone/releases/0.166.0-x86_64-unknown-linux-musl/bin
+# Later rebuilds do not need the app-managed release folder:
+bun scripts/codex-runner/build.ts
 ```
 
 The build uses a private temporary `DOCKER_CONFIG`, so Buildx can write its
@@ -16,6 +18,21 @@ and new submissions receive `worker_preparing` or `worker_image_unavailable`
 before a job or hourly quota is consumed. Build failures retain a bounded
 diagnostic tail in the controller journal. The build has a ten-minute limit;
 the agent's own research deadline starts after image preparation.
+
+Keep `CODEX_WORKER_IMAGE` in the controller environment aligned with `WORKER_IMAGE`
+when upgrading. Unknown custom image tags are never rebuilt as another version.
+Runtime upgrades require a deliberate pin/hash update and real worker smoke;
+there is no automatic switch to whichever CLI the desktop app currently uses.
+If no retained copy and no matching seed remain, preparation fails explicitly.
+When the bot uses inline research after worker preparation fails, its reply
+labels that result as a temporary fallback rather than implying an irai run.
+
+To verify public-profile research, run `bun benchmarks/hackerika-codex/profile-depth.ts --out FRESH_PATH`
+with the same auth environment as the investigation benchmark below. It records
+completed shell reads of both irai research references and inspected sources
+beyond the supplied starting pages. It makes no Discord writes. A passing trace
+proves execution and source traversal, not universal research accuracy; review
+the resulting claims and attribution separately.
 
 Completed answers retain their full text. Discord delivery splits them at
 paragraph or word boundaries, keeps citation links together, and sends exports
