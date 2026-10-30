@@ -1,0 +1,541 @@
+{
+  "variant": "after",
+  "trial": 0,
+  "caseId": "partial-status-retry",
+  "checks": {
+    "completeAudience": true,
+    "dmAudience": true,
+    "statusReadOnly": true,
+    "retryFailedOnly": true
+  },
+  "passed": true,
+  "result": {
+    "sequenceResults": [
+      {
+        "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "663394727688798231"
+            ],
+            "content": "<@663394727688798231> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "222222222222222222"
+            ],
+            "content": "<@222222222222222222> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "333333333333333333"
+            ],
+            "content": "<@333333333333333333> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "444444444444444444"
+            ],
+            "content": "<@444444444444444444> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "666666666666666666"
+            ],
+            "content": "<@666666666666666666> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "channel",
+              "includeCurrentMentions": true,
+              "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "ping semua di DM <@1077393568647352320>",
+        "effects": [
+          {
+            "kind": "dm",
+            "userId": "663394727688798231",
+            "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "222222222222222222",
+            "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "333333333333333333",
+            "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+          },
+          {
+            "kind": "dm",
+            "userId": "444444444444444444",
+            "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "4 dari 5 DM terkirim; 1 belum berhasil.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "get_contact_status",
+            "args": {
+              "operationId": "800000000000000099-channel"
+            }
+          },
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "dm",
+              "includeRecentList": true,
+              "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "siapa yang belum ke kirim?",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "Cina Gacor belum terkirim—DM-nya tidak tersedia.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "get_contact_status",
+            "args": {
+              "operationId": "800000000000000109-dm"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "oke coba kirim ulang yang gagal saja",
+        "effects": [
+          {
+            "kind": "dm",
+            "userId": "666666666666666666",
+            "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "Berhasil, DM ulang ke Cina Gacor terkirim. Sekarang semua sudah terkirim.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "retry_contact_members",
+            "args": {
+              "operationId": "800000000000000109-dm"
+            }
+          }
+        ]
+      }
+    ],
+    "caseId": "partial-status-retry",
+    "category": "agent-outreach",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "663394727688798231"
+        ],
+        "content": "<@663394727688798231> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "222222222222222222"
+        ],
+        "content": "<@222222222222222222> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "333333333333333333"
+        ],
+        "content": "<@333333333333333333> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "444444444444444444"
+        ],
+        "content": "<@444444444444444444> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "666666666666666666"
+        ],
+        "content": "<@666666666666666666> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+        "files": []
+      },
+      {
+        "kind": "dm",
+        "userId": "663394727688798231",
+        "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "222222222222222222",
+        "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "333333333333333333",
+        "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+      },
+      {
+        "kind": "dm",
+        "userId": "444444444444444444",
+        "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "4 dari 5 DM terkirim; 1 belum berhasil.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "Cina Gacor belum terkirim—DM-nya tidak tersedia.",
+        "files": []
+      },
+      {
+        "kind": "dm",
+        "userId": "666666666666666666",
+        "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "Berhasil, DM ulang ke Cina Gacor terkirim. Sekarang semua sudah terkirim.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 4,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1793237516000,
+        "mentions": [
+          {
+            "id": "663394727688798231",
+            "displayName": "Dimas",
+            "username": "Dimas",
+            "isBot": false
+          },
+          {
+            "id": "222222222222222222",
+            "displayName": "Marc",
+            "username": "Marc",
+            "isBot": false
+          },
+          {
+            "id": "333333333333333333",
+            "displayName": ".effie",
+            "username": ".effie",
+            "isBot": false
+          },
+          {
+            "id": "444444444444444444",
+            "displayName": "merrow",
+            "username": "merrow",
+            "isBot": false
+          },
+          {
+            "id": "666666666666666666",
+            "displayName": "Cina Gacor",
+            "username": "Cina Gacor",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000005",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] <@666666666666666666> Jangan lupa push tugas Joints UGM Finals-mu besok ya!",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000109",
+        "at": 1793237517000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] ping semua di DM <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] 4 dari 5 DM terkirim; 1 belum berhasil.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000109",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000119",
+        "at": 1793237518000,
+        "mentions": [],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] siapa yang belum ke kirim?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Cina Gacor belum terkirim—DM-nya tidak tersedia.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000119",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000129",
+        "at": 1793237519000,
+        "mentions": [],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] oke coba kirim ulang yang gagal saja",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Berhasil, DM ulang ke Cina Gacor terkirim. Sekarang semua sudah terkirim.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000129",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "channel",
+          "includeCurrentMentions": true,
+          "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+        }
+      },
+      {
+        "name": "get_contact_status",
+        "args": {
+          "operationId": "800000000000000099-channel"
+        }
+      },
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "dm",
+          "includeRecentList": true,
+          "content": "Jangan lupa push tugas Joints UGM Finals-mu besok ya!"
+        }
+      },
+      {
+        "name": "get_contact_status",
+        "args": {
+          "operationId": "800000000000000109-dm"
+        }
+      },
+      {
+        "name": "retry_contact_members",
+        "args": {
+          "operationId": "800000000000000109-dm"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3851.1299279999994,
+        "usage": {
+          "prompt_tokens": 652,
+          "completion_tokens": 61,
+          "total_tokens": 713,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 652
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"send\",\"audience\":\"all\",\"deliveryMode\":\"channel\",\"includeCreator\":true,\"excludeConfirmed\":false,\"messageBrief\":\"Ping everyone on the listed Joints UGM Finals team, including the creator, to remember to push tomorrow.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 7691.308633000001,
+        "usage": {
+          "prompt_tokens": 9338,
+          "completion_tokens": 46,
+          "total_tokens": 9384,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9338
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 5921.980199,
+        "usage": {
+          "prompt_tokens": 1733,
+          "completion_tokens": 196,
+          "total_tokens": 1929,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1733
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"send\",\"audience\":\"all\",\"deliveryMode\":\"dm\",\"includeCreator\":true,\"excludeConfirmed\":false,\"messageBrief\":\"Remind the Joints UGM Finals participants to push their assigned tasks tomorrow.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2616.338141,
+        "usage": {
+          "prompt_tokens": 10466,
+          "completion_tokens": 27,
+          "total_tokens": 10493,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10466
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3295.890006999998,
+        "usage": {
+          "prompt_tokens": 10786,
+          "completion_tokens": 45,
+          "total_tokens": 10831,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10786
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4758.717149,
+        "usage": {
+          "prompt_tokens": 2135,
+          "completion_tokens": 48,
+          "total_tokens": 2183,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2135
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"status\",\"audience\":\"all\",\"deliveryMode\":\"dm\",\"includeCreator\":true,\"excludeConfirmed\":false,\"messageBrief\":\"Identify who has not received the DM reminder.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2366.2055969999965,
+        "usage": {
+          "prompt_tokens": 10461,
+          "completion_tokens": 28,
+          "total_tokens": 10489,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10461
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2942.639326999997,
+        "usage": {
+          "prompt_tokens": 10778,
+          "completion_tokens": 18,
+          "total_tokens": 10796,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10778
+        },
+        "finishReason": "stop"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3868.8507860000027,
+        "usage": {
+          "prompt_tokens": 2255,
+          "completion_tokens": 55,
+          "total_tokens": 2310,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2255
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"retry\",\"audience\":\"selected\",\"deliveryMode\":\"dm\",\"includeCreator\":false,\"excludeConfirmed\":false,\"messageBrief\":\"Retry the failed DM reminder to push the Joints UGM Finals task tomorrow.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2926.5203739999997,
+        "usage": {
+          "prompt_tokens": 10767,
+          "completion_tokens": 28,
+          "total_tokens": 10795,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10767
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2678.297547000002,
+        "usage": {
+          "prompt_tokens": 11236,
+          "completion_tokens": 23,
+          "total_tokens": 11259,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 11236
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 11,
+    "elapsedMs": 47463.677872,
+    "action": null,
+    "text": "<@663394727688798231> Jangan lupa push tugas Joints UGM Finals-mu besok ya!\n<@222222222222222222> Jangan lupa push tugas Joints UGM Finals-mu besok ya!\n<@333333333333333333> Jangan lupa push tugas Joints UGM Finals-mu besok ya!\n<@444444444444444444> Jangan lupa push tugas Joints UGM Finals-mu besok ya!\n<@666666666666666666> Jangan lupa push tugas Joints UGM Finals-mu besok ya!\n4 dari 5 DM terkirim; 1 belum berhasil.\nCina Gacor belum terkirim—DM-nya tidak tersedia.\nBerhasil, DM ulang ke Cina Gacor terkirim. Sekarang semua sudah terkirim.",
+    "failure": ""
+  }
+}

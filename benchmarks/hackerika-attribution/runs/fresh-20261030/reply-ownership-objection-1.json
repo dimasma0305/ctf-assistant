@@ -1,0 +1,116 @@
+{
+  "sequenceResults": [],
+  "caseId": "reply-ownership-objection",
+  "category": "speaker-target-grounding",
+  "backend": null,
+  "effects": [
+    {
+      "kind": "send",
+      "mentionedUserIds": [],
+      "content": "Raka yang minta berhenti—dia bilang belum selesai menjelaskan.",
+      "files": []
+    }
+  ],
+  "interactionWrites": 1,
+  "profileWrites": [],
+  "memory": [
+    {
+      "role": "user",
+      "messageId": "800000000000000001",
+      "at": 1793351700000,
+      "name": "222222222222222222-Mira",
+      "content": "[Mira <@222222222222222222>] ayo lanjut bahas desainnya",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000002",
+      "at": 1793351760000,
+      "name": "333333333333333333-Raka",
+      "content": "[Raka <@333333333333333333>] stop dulu, aku belum selesai jelasin",
+      "imageCount": 0
+    },
+    {
+      "role": "assistant",
+      "messageId": "800000000000000003",
+      "at": 1793351820000,
+      "content": "[Hackerika <@1077393568647352320>] Mira maunya berhenti ya?",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000004",
+      "at": 1793354280000,
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] itu bukan Mira",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000099",
+      "at": 1793354339000,
+      "replyToMessageId": "800000000000000002",
+      "sources": [
+        {
+          "messageId": "800000000000000002",
+          "authorId": "333333333333333333",
+          "authorName": "Raka",
+          "kind": "reply"
+        }
+      ],
+      "mentions": [
+        {
+          "id": "1077393568647352320",
+          "displayName": "Hackerika",
+          "username": "Hackerika",
+          "isBot": true
+        }
+      ],
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] <@1077393568647352320> siapa yang minta berhenti tadi?",
+      "imageCount": 0
+    },
+    {
+      "role": "assistant",
+      "content": "[Hackerika <@1077393568647352320>] Raka yang minta berhenti—dia bilang belum selesai menjelaskan.",
+      "at": 1793354340000,
+      "replyToMessageId": "800000000000000099",
+      "imageCount": 0
+    }
+  ],
+  "toolCalls": [],
+  "completions": [
+    {
+      "model": "gpt-6-luna",
+      "elapsedMs": 3098.647897,
+      "usage": {
+        "prompt_tokens": 14106,
+        "completion_tokens": 19,
+        "total_tokens": 14125,
+        "prompt_cache_hit_tokens": 12288,
+        "prompt_cache_miss_tokens": 1818
+      },
+      "finishReason": "stop",
+      "visibleModelOutput": "Raka yang minta berhenti—dia bilang belum selesai menjelaskan."
+    },
+    {
+      "model": "gpt-6-luna",
+      "elapsedMs": 3501.2627820000002,
+      "usage": {
+        "prompt_tokens": 880,
+        "completion_tokens": 90,
+        "total_tokens": 970,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 880
+      },
+      "finishReason": "stop",
+      "visibleModelOutput": "{\"attributions\":[{\"personId\":\"333333333333333333\",\"claim\":\"Raka meminta berhenti dulu.\",\"evidenceMessageIds\":[\"800000000000000002\"],\"supported\":true},{\"personId\":\"333333333333333333\",\"claim\":\"Raka mengatakan belum selesai menjelaskan.\",\"evidenceMessageIds\":[\"800000000000000002\"],\"supported\":true}],\"valid\":true}"
+    }
+  ],
+  "modelCalls": 2,
+  "elapsedMs": 9812.356863,
+  "action": null,
+  "text": "Raka yang minta berhenti—dia bilang belum selesai menjelaskan.",
+  "failure": "",
+  "trial": 1
+}

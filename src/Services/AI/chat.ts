@@ -44,6 +44,7 @@ import { recentAssistantLinksForSpeaker, setTurnSourceLinks } from './conversati
 import { CREATOR_DISCORD_ID } from './creatorAccess';
 import { contactOperationSummary, loadContactOperations } from './contactOperations';
 import { contactIntentForTurn, setContactIntentContext, type ContactIntent } from './contactIntent';
+import { buildTurnGrounding, conversationReplyReviewer, type ConversationSource } from './turnGrounding';
 
 const MAX_MEMORY = 20;
 const DISCORD_MESSAGE_LIMIT = 2000;
@@ -604,9 +605,11 @@ async function runChatTurn(
     const contextMentionSeeds: MentionReference[] = [];
     let ownFileDeliveryConfirmed = false;
     let recentSpeakerLines: string[] = [];
+    let conversationSources: ConversationSource[] = [];
     const [channelContext, userInfo, replyContext, userProfile, botState, socialState, threadSnapshot] = await Promise.all([
         getChannelContext(message, CHAN_OPEN, CHAN_CLOSE, mentions => contextMentionSeeds.push(...mentions),
-            () => { ownFileDeliveryConfirmed = true; }, lines => { recentSpeakerLines = lines; }),
+            () => { ownFileDeliveryConfirmed = true; }, lines => { recentSpeakerLines = lines; },
+            sources => { conversationSources = sources; }),
         getUserInfo(message),
         getReplyContext(message, REPLY_OPEN, REPLY_CLOSE, messageReference as DiscordMessage | null),
         loadProfile(userId),
@@ -632,6 +635,9 @@ async function runChatTurn(
         .filter(item => item.targets.length).slice(-6);
     const relatedMentionMessages = (options.attachmentSources || []).filter(source => source.channelId === channelId && source.author.id === userId);
     const currentMentions = mentionReferences(message);
+    const turnGrounding = buildTurnGrounding({ messageId: message.id, authorId: userId,
+        assistantId: client.user?.id || HACKERIKA_BOT_ID, mentionedIds: currentMentions.map(target => target.id),
+        replyToMessageId: message.reference?.messageId, at: message.createdTimestamp || Date.now() }, conversationSources);
     const mentionIds = extractMentionIds(
         content,
         ...relatedMentionMessages.map(source => source.content),
@@ -787,7 +793,7 @@ async function runChatTurn(
         ...history.filter(entry => entry.role === 'user').flatMap(entry => entry.images || [])] });
     const lastUserMessage: ChatMessage = {
         ...userMessageEntry,
-        content: `${contextBlock}${lastTeamProgress ? `\n${neutralizeControlTokens(lastTeamProgress)}` : ''}${contactContext}\n\n${userMessageEntry.content}${sourceOwnershipNote}${replyFocusNote}${spontaneousNote}${earlierLinkNote}`,
+        content: `${contextBlock}${lastTeamProgress ? `\n${neutralizeControlTokens(lastTeamProgress)}` : ''}${contactContext}\n\n${userMessageEntry.content}${turnGrounding}${sourceOwnershipNote}${replyFocusNote}${spontaneousNote}${earlierLinkNote}`,
     };
     const messages = prepareVisionMessages([
         { role: 'system', content: STATIC_SYSTEM_PROMPT },
@@ -1261,6 +1267,26 @@ async function runChatTurn(
             rollbackUserMessage();
             console.warn(`⚠️ [${turnId}] empty response from AI (post retry), not replying`);
             return;
+        }
+
+        // Review ordinary group-chat prose only. Tool receipts, agent results,
+        // moderation actions and deliberate silence retain their own contracts.
+        if (turnGrounding && totalToolCalls === 0 && !spontaneous && !contactReceipt
+            && (!contactPlan || contactPlan.intent === 'none')) {
+            try {
+                const reviewed = await conversationReplyReviewer.review(content, finalContent, turnGrounding, {
+                    signal: controller.signal, onUsage: accTokens,
+                    reply: messageReference ? { messageId: messageReference.id, authorId: messageReference.author.id,
+                        authorName: messageReference.member?.displayName || messageReference.author.username,
+                        isBot: messageReference.author.bot, at: messageReference.createdTimestamp,
+                        text: messageReference.content.slice(0, 800) } : undefined,
+                });
+                if (reviewed !== finalContent) {
+                    finalContent = reviewed;
+                    finalReasoningContent = ''; // The old draft's reasoning no longer matches this reply.
+                    console.log(`[Attribution] source=${message.id} revised before delivery`);
+                }
+            } catch { console.warn(`[Attribution] source=${message.id} review unavailable; preserving draft`); }
         }
 
         if (!hasCodexDelegation(message)) finalContent = groundResearchReply(finalContent, getResearchReport(message), content);

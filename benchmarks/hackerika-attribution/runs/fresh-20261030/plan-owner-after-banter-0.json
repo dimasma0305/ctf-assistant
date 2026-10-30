@@ -1,0 +1,115 @@
+{
+  "sequenceResults": [],
+  "caseId": "plan-owner-after-banter",
+  "category": "speaker-target-grounding",
+  "backend": null,
+  "effects": [
+    {
+      "kind": "send",
+      "mentionedUserIds": [],
+      "content": "Kamu—FindFemaleBot bilang dari awal pengen belajar Go. Mira cuma nanya opsi PHP atau Go.",
+      "files": []
+    }
+  ],
+  "interactionWrites": 1,
+  "profileWrites": [],
+  "memory": [
+    {
+      "role": "user",
+      "messageId": "800000000000000001",
+      "at": 1793351580000,
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] aku pengen pindah belajar Go",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000002",
+      "at": 1793351880000,
+      "name": "222222222222222222-Mira",
+      "content": "[Mira <@222222222222222222>] mending PHP apa Go buat aplikasi baru?",
+      "imageCount": 0
+    },
+    {
+      "role": "assistant",
+      "messageId": "800000000000000003",
+      "at": 1793352000000,
+      "content": "[Hackerika <@1077393568647352320>] Mira pindah Go sekalian aja wkwk",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000004",
+      "at": 1793354160000,
+      "name": "222222222222222222-Mira",
+      "content": "[Mira <@222222222222222222>] aku cuma nanya opsi, belum bilang mau pindah",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000005",
+      "at": 1793354280000,
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] 😄",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000099",
+      "at": 1793354339000,
+      "mentions": [
+        {
+          "id": "1077393568647352320",
+          "displayName": "Hackerika",
+          "username": "Hackerika",
+          "isBot": true
+        }
+      ],
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] <@1077393568647352320> yang pengen pindah ke Go tadi siapa?",
+      "imageCount": 0
+    },
+    {
+      "role": "assistant",
+      "content": "[Hackerika <@1077393568647352320>] Kamu—FindFemaleBot bilang dari awal pengen belajar Go. Mira cuma nanya opsi PHP atau Go.",
+      "at": 1793354340000,
+      "replyToMessageId": "800000000000000099",
+      "imageCount": 0
+    }
+  ],
+  "toolCalls": [],
+  "completions": [
+    {
+      "model": "gpt-6-luna",
+      "elapsedMs": 3070.366484,
+      "usage": {
+        "prompt_tokens": 14070,
+        "completion_tokens": 27,
+        "total_tokens": 14097,
+        "prompt_cache_hit_tokens": 12288,
+        "prompt_cache_miss_tokens": 1782
+      },
+      "finishReason": "stop",
+      "visibleModelOutput": "Kamu—FindFemaleBot bilang dari awal pengen belajar Go. Mira cuma nanya opsi PHP atau Go."
+    },
+    {
+      "model": "gpt-6-luna",
+      "elapsedMs": 3821.3266670000003,
+      "usage": {
+        "prompt_tokens": 848,
+        "completion_tokens": 100,
+        "total_tokens": 948,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 848
+      },
+      "finishReason": "stop",
+      "visibleModelOutput": "{\"attributions\":[{\"personId\":\"111111111111111111\",\"claim\":\"FindFemaleBot bilang ingin belajar Go.\",\"evidenceMessageIds\":[\"800000000000000001\"],\"supported\":true},{\"personId\":\"222222222222222222\",\"claim\":\"Mira hanya bertanya opsi PHP atau Go.\",\"evidenceMessageIds\":[\"800000000000000002\",\"800000000000000004\"],\"supported\":true}],\"valid\":true}"
+    }
+  ],
+  "modelCalls": 2,
+  "elapsedMs": 12001.716144,
+  "action": null,
+  "text": "Kamu—FindFemaleBot bilang dari awal pengen belajar Go. Mira cuma nanya opsi PHP atau Go.",
+  "failure": "",
+  "trial": 0
+}

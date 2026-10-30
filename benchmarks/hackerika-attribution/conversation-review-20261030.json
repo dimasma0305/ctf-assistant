@@ -1,0 +1,306 @@
+{
+  "review": "Manual source-attribution review by the implementing agent against the pre-recorded case expectations, not an independent human evaluation or humor-quality score. Imaginary role scenes are allowed; invented observed personal history and transferred quotes fail.",
+  "reviews": [
+    {
+      "run": "baseline-20261030",
+      "caseId": "counterfactual-quote-owner",
+      "trial": 0,
+      "passed": false,
+      "note": "Invents a claim that the target had not watched the video or had not watched together.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "counterfactual-quote-owner",
+      "trial": 1,
+      "passed": false,
+      "note": "Invents a claim that the target had not watched the video or had not watched together.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "literal-quote-owner",
+      "trial": 0,
+      "passed": true,
+      "note": "Names the requester as the quote author and keeps the answer factual.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "literal-quote-owner",
+      "trial": 1,
+      "passed": true,
+      "note": "Names the requester as the quote author and keeps the answer factual.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "new-target-no-history",
+      "trial": 0,
+      "passed": true,
+      "note": "Uses a fictional captain scene without inventing recorded history for the silent target.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "new-target-no-history",
+      "trial": 1,
+      "passed": true,
+      "note": "Uses a fictional captain scene without inventing recorded history for the silent target.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "same-topic-target-author",
+      "trial": 0,
+      "passed": false,
+      "note": "Invents a claim that the target had not watched the video or had not watched together.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "same-topic-target-author",
+      "trial": 1,
+      "passed": false,
+      "note": "Invents a claim that the target had not watched the video or had not watched together.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "sarcasm-target-switch",
+      "trial": 0,
+      "passed": false,
+      "note": "Wrong quote/action owner in the target-switch case.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "sarcasm-target-switch",
+      "trial": 1,
+      "passed": false,
+      "note": "Wrong quote/action owner in the target-switch case.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "unrelated-topic-attribution",
+      "trial": 0,
+      "passed": true,
+      "note": "Keeps rollback caution with Reno; does not assign the requester’s original Friday-deploy proposal to him.",
+      "providerFailure": ""
+    },
+    {
+      "run": "baseline-20261030",
+      "caseId": "unrelated-topic-attribution",
+      "trial": 1,
+      "passed": true,
+      "note": "Keeps rollback caution with Reno; does not assign the requester’s original Friday-deploy proposal to him.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "counterfactual-quote-owner",
+      "trial": 0,
+      "passed": true,
+      "note": "In the swapped-author fixture Dimas owns the recommendation; no invented claim that he had not watched it.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "counterfactual-quote-owner",
+      "trial": 1,
+      "passed": true,
+      "note": "In the swapped-author fixture Dimas owns the recommendation; no invented claim that he had not watched it.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "literal-quote-owner",
+      "trial": 0,
+      "passed": true,
+      "note": "Names the requester as the quote author and keeps the answer factual.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "literal-quote-owner",
+      "trial": 1,
+      "passed": true,
+      "note": "Names the requester as the quote author and keeps the answer factual.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "new-target-no-history",
+      "trial": 0,
+      "passed": true,
+      "note": "Uses a fictional captain scene without inventing recorded history for the silent target.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "new-target-no-history",
+      "trial": 1,
+      "passed": true,
+      "note": "Uses a fictional captain scene without inventing recorded history for the silent target.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "same-topic-target-author",
+      "trial": 0,
+      "passed": true,
+      "note": "Targets the requester; their own endorsement may be reused, or a hypothetical class scene.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "same-topic-target-author",
+      "trial": 1,
+      "passed": true,
+      "note": "Targets the requester; their own endorsement may be reused, or a hypothetical class scene.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "sarcasm-target-switch",
+      "trial": 0,
+      "passed": true,
+      "note": "Targets Dimas in a hypothetical teaching scene without assigning the requester’s video endorsement to him.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "sarcasm-target-switch",
+      "trial": 1,
+      "passed": true,
+      "note": "Targets Dimas in a hypothetical teaching scene without assigning the requester’s video endorsement to him.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "unrelated-topic-attribution",
+      "trial": 0,
+      "passed": true,
+      "note": "Keeps rollback caution with Reno; does not assign the requester’s original Friday-deploy proposal to him.",
+      "providerFailure": ""
+    },
+    {
+      "run": "final-20261030",
+      "caseId": "unrelated-topic-attribution",
+      "trial": 1,
+      "passed": true,
+      "note": "Keeps rollback caution with Reno; does not assign the requester’s original Friday-deploy proposal to him.",
+      "providerFailure": ""
+    },
+    {
+      "run": "fresh-20261030",
+      "caseId": "mentor-target-read-module",
+      "trial": 0,
+      "passed": true,
+      "note": "Keeps Raka as target and does not transfer the requester’s skipped reading/answer-key request.",
+      "providerFailure": ""
+    },
+    {
+      "run": "fresh-20261030",
+      "caseId": "mentor-target-read-module",
+      "trial": 1,
+      "passed": true,
+      "note": "Keeps Raka as target and does not transfer the requester’s skipped reading/answer-key request.",
+      "providerFailure": ""
+    },
+    {
+      "run": "fresh-20261030",
+      "caseId": "plan-owner-after-banter",
+      "trial": 0,
+      "passed": true,
+      "note": "Keeps the Go plan with the requester; Mira’s question and the bot suggestion are not treated as her plan.",
+      "providerFailure": ""
+    },
+    {
+      "run": "fresh-20261030",
+      "caseId": "plan-owner-after-banter",
+      "trial": 1,
+      "passed": true,
+      "note": "Keeps the Go plan with the requester; Mira’s question and the bot suggestion are not treated as her plan.",
+      "providerFailure": ""
+    },
+    {
+      "run": "fresh-20261030",
+      "caseId": "reply-ownership-objection",
+      "trial": 0,
+      "passed": true,
+      "note": "Uses the explicit reply’s author Raka, despite an earlier bot accusation against Mira.",
+      "providerFailure": ""
+    },
+    {
+      "run": "fresh-20261030",
+      "caseId": "reply-ownership-objection",
+      "trial": 1,
+      "passed": true,
+      "note": "Uses the explicit reply’s author Raka, despite an earlier bot accusation against Mira.",
+      "providerFailure": ""
+    },
+    {
+      "run": "fresh-20261030",
+      "caseId": "self-joke-owner-new-topic",
+      "trial": 0,
+      "passed": true,
+      "note": "Jokes about the requester learning bread-making, not Mira’s delivery-only behavior.",
+      "providerFailure": ""
+    },
+    {
+      "run": "fresh-20261030",
+      "caseId": "self-joke-owner-new-topic",
+      "trial": 1,
+      "passed": true,
+      "note": "Jokes about the requester learning bread-making, not Mira’s delivery-only behavior.",
+      "providerFailure": ""
+    }
+  ],
+  "metrics": {
+    "baseline-20261030": {
+      "samples": 12,
+      "passed": 6,
+      "providerFailures": 0,
+      "modelCalls": 12,
+      "promptTokens": 181404,
+      "completionTokens": 388,
+      "latencyMs": {
+        "median": 8188.2895180000005,
+        "max": 8954.246925
+      }
+    },
+    "final-20261030": {
+      "samples": 12,
+      "passed": 12,
+      "providerFailures": 0,
+      "modelCalls": 24,
+      "promptTokens": 202138,
+      "completionTokens": 1607,
+      "latencyMs": {
+        "median": 11841.871489500001,
+        "max": 14269.1176
+      }
+    },
+    "fresh-20261030": {
+      "samples": 8,
+      "passed": 8,
+      "providerFailures": 0,
+      "modelCalls": 16,
+      "promptTokens": 119869,
+      "completionTokens": 1011,
+      "latencyMs": {
+        "median": 11725.9149455,
+        "max": 13929.236015
+      }
+    }
+  },
+  "sourceHashes": {
+    "src/Services/AI/turnGrounding.ts": "a074cf81d6a61bca11380e7f767abc91d7e444c6243b34f414b3cb455ef7b1d3",
+    "src/Services/AI/chat.ts": "d0c9873b127f4031b4de8a07afd55c09e1d013981e746635703cba53a6dea8ad",
+    "src/Services/AI/context.ts": "bd105bb9f59a640613cd6acb8a497a39e4c9d1ce807e3c3d5341903539a99068",
+    "src/Services/AI/persona.ts": "81fe638c333f6da41fadb8c1d4173a8b1eeebf47c97deee62907f06968c04d55"
+  },
+  "eligibilityNote": "After the fresh evaluation, added a guard excluding existing creator outreach plans from prose review; attribution prompts/source selection unchanged. Contact sequence regression recorded separately."
+}

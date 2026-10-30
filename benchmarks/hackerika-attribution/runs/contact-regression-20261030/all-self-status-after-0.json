@@ -1,0 +1,436 @@
+{
+  "variant": "after",
+  "trial": 0,
+  "caseId": "all-self-status",
+  "checks": {
+    "completeAudience": true,
+    "dmAudience": true,
+    "statusReadOnly": true
+  },
+  "passed": true,
+  "result": {
+    "sequenceResults": [
+      {
+        "prompt": "Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "663394727688798231"
+            ],
+            "content": "<@663394727688798231> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "222222222222222222"
+            ],
+            "content": "<@222222222222222222> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "333333333333333333"
+            ],
+            "content": "<@333333333333333333> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "444444444444444444"
+            ],
+            "content": "<@444444444444444444> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+            "files": []
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [
+              "666666666666666666"
+            ],
+            "content": "<@666666666666666666> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "channel",
+              "includeCurrentMentions": true,
+              "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "ping semua di DM <@1077393568647352320>",
+        "effects": [
+          {
+            "kind": "dm",
+            "userId": "663394727688798231",
+            "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+          },
+          {
+            "kind": "dm",
+            "userId": "222222222222222222",
+            "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+          },
+          {
+            "kind": "dm",
+            "userId": "333333333333333333",
+            "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+          },
+          {
+            "kind": "dm",
+            "userId": "444444444444444444",
+            "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+          },
+          {
+            "kind": "dm",
+            "userId": "666666666666666666",
+            "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+          },
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "udah, 5 DM terkirim.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "creator_contact_members",
+            "args": {
+              "mode": "dm",
+              "includeRecentList": true,
+              "listMessageId": "800000000000000099",
+              "includeCreator": true,
+              "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+            }
+          }
+        ]
+      },
+      {
+        "prompt": "siapa yang belum ke kirim?",
+        "effects": [
+          {
+            "kind": "send",
+            "mentionedUserIds": [],
+            "content": "Nggak ada yang belum—kelima DM sudah terkirim, termasuk ke kamu.",
+            "files": []
+          }
+        ],
+        "toolCalls": [
+          {
+            "name": "get_contact_status",
+            "args": {
+              "operationId": "800000000000000109-dm"
+            }
+          }
+        ]
+      }
+    ],
+    "caseId": "all-self-status",
+    "category": "agent-outreach",
+    "backend": null,
+    "effects": [
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "663394727688798231"
+        ],
+        "content": "<@663394727688798231> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "222222222222222222"
+        ],
+        "content": "<@222222222222222222> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "333333333333333333"
+        ],
+        "content": "<@333333333333333333> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "444444444444444444"
+        ],
+        "content": "<@444444444444444444> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [
+          "666666666666666666"
+        ],
+        "content": "<@666666666666666666> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+        "files": []
+      },
+      {
+        "kind": "dm",
+        "userId": "663394727688798231",
+        "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+      },
+      {
+        "kind": "dm",
+        "userId": "222222222222222222",
+        "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+      },
+      {
+        "kind": "dm",
+        "userId": "333333333333333333",
+        "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+      },
+      {
+        "kind": "dm",
+        "userId": "444444444444444444",
+        "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+      },
+      {
+        "kind": "dm",
+        "userId": "666666666666666666",
+        "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "udah, 5 DM terkirim.",
+        "files": []
+      },
+      {
+        "kind": "send",
+        "mentionedUserIds": [],
+        "content": "Nggak ada yang belum—kelima DM sudah terkirim, termasuk ke kamu.",
+        "files": []
+      }
+    ],
+    "interactionWrites": 3,
+    "profileWrites": [],
+    "memory": [
+      {
+        "role": "user",
+        "messageId": "800000000000000099",
+        "at": 1793237517000,
+        "mentions": [
+          {
+            "id": "663394727688798231",
+            "displayName": "Dimas",
+            "username": "Dimas",
+            "isBot": false
+          },
+          {
+            "id": "222222222222222222",
+            "displayName": "Marc",
+            "username": "Marc",
+            "isBot": false
+          },
+          {
+            "id": "333333333333333333",
+            "displayName": ".effie",
+            "username": ".effie",
+            "isBot": false
+          },
+          {
+            "id": "444444444444444444",
+            "displayName": "merrow",
+            "username": "merrow",
+            "isBot": false
+          },
+          {
+            "id": "666666666666666666",
+            "displayName": "Cina Gacor",
+            "username": "Cina Gacor",
+            "isBot": false
+          },
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] Gass yang mau ikut Joints UGM Finals (6 soal):\n1. <@663394727688798231> (Web 1)\n2. <@222222222222222222> (rev 1)\n3. <@333333333333333333> (pwn 2)\n4. <@444444444444444444> (foren 1)\n5. <@666666666666666666> (crypto 1)\njangan lupa push besok ya, <@1077393568647352320> tolong ping semua termasuk saya",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "messageId": "900000000000000005",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000099",
+        "content": "[Hackerika <@1077393568647352320>] <@666666666666666666> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000109",
+        "at": 1793237518000,
+        "mentions": [
+          {
+            "id": "1077393568647352320",
+            "displayName": "Hackerika",
+            "username": "Hackerika",
+            "isBot": true
+          }
+        ],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] ping semua di DM <@1077393568647352320>",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] udah, 5 DM terkirim.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000109",
+        "imageCount": 0
+      },
+      {
+        "role": "user",
+        "messageId": "800000000000000119",
+        "at": 1793237519000,
+        "mentions": [],
+        "name": "663394727688798231-Dimas",
+        "content": "[Dimas <@663394727688798231>] siapa yang belum ke kirim?",
+        "imageCount": 0
+      },
+      {
+        "role": "assistant",
+        "content": "[Hackerika <@1077393568647352320>] Nggak ada yang belum—kelima DM sudah terkirim, termasuk ke kamu.",
+        "at": 1793237520000,
+        "replyToMessageId": "800000000000000119",
+        "imageCount": 0
+      }
+    ],
+    "toolCalls": [
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "channel",
+          "includeCurrentMentions": true,
+          "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+        }
+      },
+      {
+        "name": "creator_contact_members",
+        "args": {
+          "mode": "dm",
+          "includeRecentList": true,
+          "listMessageId": "800000000000000099",
+          "includeCreator": true,
+          "content": "Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?"
+        }
+      },
+      {
+        "name": "get_contact_status",
+        "args": {
+          "operationId": "800000000000000109-dm"
+        }
+      }
+    ],
+    "completions": [
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3663.474419,
+        "usage": {
+          "prompt_tokens": 652,
+          "completion_tokens": 57,
+          "total_tokens": 709,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 652
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"send\",\"audience\":\"all\",\"deliveryMode\":\"channel\",\"includeCreator\":true,\"excludeConfirmed\":false,\"messageBrief\":\"Ping all listed participants about pushing tomorrow for Joints UGM Finals (6 soal).\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2979.203888,
+        "usage": {
+          "prompt_tokens": 9334,
+          "completion_tokens": 50,
+          "total_tokens": 9384,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 9334
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3788.271114,
+        "usage": {
+          "prompt_tokens": 1758,
+          "completion_tokens": 59,
+          "total_tokens": 1817,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 1758
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"send\",\"audience\":\"all\",\"deliveryMode\":\"dm\",\"includeCreator\":false,\"excludeConfirmed\":false,\"messageBrief\":\"Remind everyone on the Joints UGM Finals list to push tomorrow and confirm their assigned task.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4435.905054000001,
+        "usage": {
+          "prompt_tokens": 10500,
+          "completion_tokens": 65,
+          "total_tokens": 10565,
+          "prompt_cache_hit_tokens": 7936,
+          "prompt_cache_miss_tokens": 2564
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 4335.084175,
+        "usage": {
+          "prompt_tokens": 2160,
+          "completion_tokens": 54,
+          "total_tokens": 2214,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2160
+        },
+        "finishReason": "stop",
+        "actionPlan": "{\"intent\":\"status\",\"audience\":\"all\",\"deliveryMode\":\"dm\",\"includeCreator\":true,\"excludeConfirmed\":false,\"messageBrief\":\"Identify who has not yet been sent the Joints UGM Finals reminder.\",\"additionalTools\":[]}"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 2848.2472339999986,
+        "usage": {
+          "prompt_tokens": 10492,
+          "completion_tokens": 28,
+          "total_tokens": 10520,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10492
+        },
+        "finishReason": "tool_calls"
+      },
+      {
+        "model": "gpt-6-luna",
+        "elapsedMs": 3701.5308079999995,
+        "usage": {
+          "prompt_tokens": 10814,
+          "completion_tokens": 22,
+          "total_tokens": 10836,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10814
+        },
+        "finishReason": "stop"
+      }
+    ],
+    "modelCalls": 7,
+    "elapsedMs": 28697.696003,
+    "action": null,
+    "text": "<@663394727688798231> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?\n<@222222222222222222> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?\n<@333333333333333333> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?\n<@444444444444444444> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?\n<@666666666666666666> Besok push Joints UGM Finals ya—bisa konfirmasi tugasmu yang di daftar?\nudah, 5 DM terkirim.\nNggak ada yang belum—kelima DM sudah terkirim, termasuk ke kamu.",
+    "failure": ""
+  }
+}

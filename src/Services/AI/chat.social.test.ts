@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 // A dummy key is installed BEFORE importing the provider; no live API is used.
 const scenario = `
 import assert from 'node:assert/strict';
+Math.random = () => 0.5; // Cosmetic away/typing delays must not randomly exceed the test deadline.
 const db = await import('./src/Database/connect.ts');
 const query = value => ({ sort() { return this; }, limit() { return this; }, select() { return this; }, lean: async () => value, exec: async () => value,
   then(resolve, reject) { return Promise.resolve(value).then(resolve, reject); } });
@@ -24,6 +25,10 @@ let interactionUpdate;
 db.UserProfileModel.findOneAndUpdate = (_filter, update) => { interactionWrites++; interactionUpdate = update;
   return query({ userId: 'caller', interactionCount: 1 }); };
 const mode = process.env.SOCIAL_TEST_MODE;
+const { conversationReplyReviewer } = await import('./src/Services/AI/turnGrounding.ts');
+if (!mode.startsWith('attribution_review')) conversationReplyReviewer.review = async (_request, draft) => draft;
+if (mode === 'attribution_review_unavailable') console.warn = () => {}; // asserted fallback, no live service
+
 const { contactIntentPlanner } = await import('./src/Services/AI/contactIntent.ts');
 contactIntentPlanner.decide = async () => ({ intent: ['creator_contact', 'creator_contact_provider_empty'].includes(mode) ? 'send' : 'none',
   audience: 'selected', includeCreator: false, excludeConfirmed: false });
@@ -339,6 +344,17 @@ if (visionMode) {
   }
 }
 let calls = 0;
+if (mode.startsWith('attribution_review')) {
+  message.content = 'hackerika ledekin <@222222222222222222> kalau jadi manajer';
+  message.client = { user: { id: 'bot' } };
+  const makeSource = (id, authorId, username, content, ago) => ({ id, author: { id: authorId, username, bot: false },
+    content, channelId: channel.id, channel, member: null, createdTimestamp: Date.now() - ago,
+    system: false, type: 0, attachments: new Map(), embeds: [], mentions: { users: new Map() } });
+  channel.messages.fetch = async () => new Map([
+    ['prior-1', makeSource('prior-1', 'caller', 'Find', 'aku yang bilang deploy Jumat itu ide bagus', 60000)],
+    ['prior-2', makeSource('prior-2', '222222222222222222', 'Reno', 'mending tes rollback dulu', 30000)],
+  ]);
+}
 let sourceIsCurrent = true;
 let releaseCompletion;
 const firstCallStarted = new Promise(resolve => { releaseCompletion = resolve; });
@@ -346,6 +362,17 @@ let finishFirstCall;
 const pendingCompletion = new Promise(resolve => { finishFirstCall = resolve; });
 openai.chat.completions.create = async payload => {
   calls++;
+  if (mode.startsWith('attribution_review')) {
+    if (payload.messages[0].content.startsWith('Check a proposed Discord reply')) {
+      assert(!payload.tools, 'attribution review cannot perform actions');
+      const data = JSON.parse(payload.messages[1].content);
+      assert(data.participants.find(p => p.authorId === 'caller').statements.some(s => s.text.includes('deploy Jumat')));
+      assert(data.participants.find(p => p.authorId === '222222222222222222').statements.some(s => s.text.includes('rollback')));
+      if (mode === 'attribution_review_unavailable') throw new Error('synthetic review outage');
+      return { choices: [{ message: { content: JSON.stringify({ attributions: [{personId: '222222222222222222', claim: 'Reno proposed Friday deployment', evidenceMessageIds: ['prior-1'], supported: false}], valid: false, correctedReply: 'Reno jadi manajer, rapatnya juga dites rollback dulu 😭' }) } }] };
+    }
+    return { choices: [{ message: { content: mode === 'attribution_review_unavailable' ? 'Reno kalau jadi manajer, rapatnya pakai timer wkwk' : 'Reno kan yang ngajak deploy Jumat.' } }] };
+  }
   assert.equal(payload.thinking.type, 'enabled');
   if (mode === 'creator_contact' || mode === 'creator_contact_provider_empty' || mode === 'noncreator_contact') {
     const offered = payload.tools.some(tool => tool.function.name === 'creator_contact_members');
@@ -453,7 +480,7 @@ if (mode === 'queued') {
   await handleAIChat(message, client, mode.startsWith('continuation') ? { continuation: true, continuationHint: 'unverified-planner-claim' } : mode === 'spontaneous' ? { spontaneous: true, spontaneousHint: 'unverified-planner-claim' } : ['stale', 'stale_typing'].includes(mode) ? { isCurrent: () => sourceIsCurrent } : mode === 'vision_burst' ? { addressed: true, attachmentSources: [earlierImage] } : {});
 }
 if (mode === 'vision') await handleAIChat({ ...message, id: 'followup', content: 'hackerika yang kiri warna apa?', attachments: new Map() }, client);
-assert.equal(calls, mode === 'continuation_tool_empty' ? 3 : ['native_react', 'vision', 'vision_fallback', 'vision_history', 'provider_empty_response'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');
+assert.equal(calls, mode === 'continuation_tool_empty' ? 3 : ['native_react', 'vision', 'vision_fallback', 'vision_history', 'provider_empty_response', 'attribution_review', 'attribution_review_unavailable'].includes(mode) ? 2 : 1, 'terminal action must stop the loop without fallback/retry');
 if (mode.startsWith('metadata_')) {
   assert.deepEqual(effects.filter(x => x !== 'typing'), mode === 'metadata_only' ? [] : ['jadi beneran Miku wkwk 🍐']);
   assert(!JSON.stringify(memory.public.messages).includes('Discord chronology'));
@@ -484,6 +511,11 @@ if (mode.startsWith('metadata_')) {
   assert.equal(interactionWrites, 1);
 } else if (mode === 'provider_empty_response') {
   assert.deepEqual(effects.filter(x => x !== 'typing'), ['iya, sekarang sudah kebaca']);
+} else if (mode.startsWith('attribution_review')) {
+  const expected = mode === 'attribution_review' ? 'Reno jadi manajer, rapatnya juga dites rollback dulu 😭' : 'Reno kalau jadi manajer, rapatnya pakai timer wkwk';
+  assert.deepEqual(effects.filter(x => x !== 'typing'), [expected]);
+  assert(memory.public.messages.at(-1).content.includes(expected));
+  assert(!memory.public.messages.at(-1).content.includes('Reno kan yang ngajak deploy Jumat'));
 } else if (mode === 'noncreator_contact') {
   assert.deepEqual(effects.filter(x => x !== 'typing'), ['aku perlu Dimas yang minta langsung']);
 } else if (mode === 'spontaneous' || mode === 'stale' || mode === 'stale_typing') {
@@ -506,7 +538,7 @@ if (mode.startsWith('metadata_')) {
 console.log('SOCIAL_SCENARIO_OK');
 `;
 
-for (const mode of ['ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'creator_contact', 'creator_contact_provider_empty', 'noncreator_contact', 'provider_empty_response', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'evaluation_checkpoint', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_history', 'vision_fallback', 'vision_download_failure']) {
+for (const mode of ['attribution_review', 'attribution_review_unavailable', 'ignore', 'handoff', 'queued', 'dm', 'reasoning', 'persistence', 'privacy', 'cache', 'spontaneous', 'native_send', 'native_react', 'creator_contact', 'creator_contact_provider_empty', 'noncreator_contact', 'provider_empty_response', 'stale', 'stale_typing', 'reset_guard', 'actor_evidence', 'evaluation_checkpoint', 'attention_classifier', 'followup_classifier', 'continuation', 'continuation_silent', 'continuation_tool_empty', 'metadata_echo', 'metadata_only', 'vision', 'vision_dm', 'vision_burst', 'vision_reply', 'vision_history', 'vision_fallback', 'vision_download_failure']) {
     test(`chat loop: ${mode}`, async () => {
         const child = Bun.spawn([process.execPath, '-e', scenario], {
             cwd: fileURLToPath(new URL('../../../', import.meta.url)),

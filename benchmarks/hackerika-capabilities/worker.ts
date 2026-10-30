@@ -130,6 +130,10 @@ const makeMessage = (who: string, text: string, index: number, name?: string): a
     return message;
 };
 const history: any[] = (CASE.history || []).map((m: any, index: number) => makeMessage(m.who, m.text, index + 1, m.name));
+for (const [index, item] of (CASE.history || []).entries()) if (item.at) {
+    history[index].createdTimestamp = Date.parse(item.at);
+    history[index].createdAt = new Date(history[index].createdTimestamp);
+}
 for (const [index, item] of (CASE.history || []).entries())
     for (const [fileIndex, file] of (item.files || []).entries())
         history[index].attachments.set(String(fileIndex), { name: file.name, contentType: file.contentType,
@@ -190,6 +194,7 @@ openai.chat.completions.create = async (payload: any, options: any) => {
     const reply = response.choices[0]?.message;
     for (const call of reply?.tool_calls || []) { let args; try { args = JSON.parse(call.function.arguments || '{}'); } catch { args = { malformed: true }; } toolCalls.push({ name: call.function.name, args }); }
     completions.push({ model: payload.model, elapsedMs: performance.now() - start, usage: response.usage || null, finishReason: response.choices[0]?.finish_reason,
+        ...(CASE.category === 'speaker-target-grounding' ? { visibleModelOutput: reply?.content } : {}),
         ...(CASE.sequence && payload.messages?.[0]?.content?.startsWith('Classify the authenticated creator') ? { actionPlan: reply?.content } : {}) });
     return response;
 };

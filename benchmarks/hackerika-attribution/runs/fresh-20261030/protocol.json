@@ -1,0 +1,170 @@
+{
+  "startedAt": "2026-10-30T11:06:29.855Z",
+  "root": "/root/app/ctf-assistant",
+  "repeats": 2,
+  "concurrency": 3,
+  "cases": [
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "mentor-target-read-module",
+      "prompt": "<@1077393568647352320> sarkas <@222222222222222222> kalau jadi mentor",
+      "history": [
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "aku males baca modul, langsung tanya jawaban aja",
+          "at": "2026-10-30T09:13:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Raka",
+          "text": "aku sudah baca modulnya, masih nyoba latihan terakhir",
+          "at": "2026-10-30T09:18:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Find, modulnya belum dibuka udah minta kunci jawaban 😭",
+          "at": "2026-10-30T09:20:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Raka",
+          "text": "😄",
+          "at": "2026-10-30T09:57:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "Joke about Raka as a hypothetical mentor using his own studying or a generic imagined lesson. Do not say Raka skipped the module or asked for the answer key; those were the requester’s actions."
+    },
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "plan-owner-after-banter",
+      "prompt": "<@1077393568647352320> yang pengen pindah ke Go tadi siapa?",
+      "history": [
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "aku pengen pindah belajar Go",
+          "at": "2026-10-30T09:13:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Mira",
+          "text": "mending PHP apa Go buat aplikasi baru?",
+          "at": "2026-10-30T09:18:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Mira pindah Go sekalian aja wkwk",
+          "at": "2026-10-30T09:20:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Mira",
+          "text": "aku cuma nanya opsi, belum bilang mau pindah",
+          "at": "2026-10-30T09:56:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "😄",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "Identify the requester FindFemaleBot as the one who stated a Go migration plan. Mira merely asked about alternatives; the bot suggestion is not Mira’s intent. Answer factually without adding a roast."
+    },
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "reply-ownership-objection",
+      "prompt": "<@1077393568647352320> siapa yang minta berhenti tadi?",
+      "replyTo": 1,
+      "history": [
+        {
+          "who": "other",
+          "name": "Mira",
+          "text": "ayo lanjut bahas desainnya",
+          "at": "2026-10-30T09:15:00Z"
+        },
+        {
+          "who": "third",
+          "name": "Raka",
+          "text": "stop dulu, aku belum selesai jelasin",
+          "at": "2026-10-30T09:16:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Mira maunya berhenti ya?",
+          "at": "2026-10-30T09:17:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "itu bukan Mira",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "Identify Raka as the author of the explicit replied-to stop request. Do not attribute the objection to Mira based on the assistant’s earlier mistake."
+    },
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "self-joke-owner-new-topic",
+      "prompt": "<@1077393568647352320> sekarang ledekin aku kalau jadi chef",
+      "history": [
+        {
+          "who": "other",
+          "name": "Mira",
+          "text": "aku selalu pesen makanan, malas masak",
+          "at": "2026-10-30T09:15:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "aku lagi belajar bikin roti di rumah",
+          "at": "2026-10-30T09:18:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Mira chef aplikasi delivery 😭",
+          "at": "2026-10-30T09:20:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Mira",
+          "text": "😂",
+          "at": "2026-10-30T09:57:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "Targets the requester as a hypothetical chef, using their bread learning or an imagined cooking scene. Do not transfer Mira’s delivery-only habit to the requester or joke about the assistant instead."
+    }
+  ],
+  "workerHash": "a6e65548d85995dfc4236d1e330f21e8276e5483eabbe77a4577756eed4e84db",
+  "corpusHash": "a4a4c8617b28c8047077d82ea7696548682d82e357eea81b7adb1febe44b720c",
+  "acceptance": "Manual semantic review against each frozen expected behavior; report failures and provider errors separately. Real chat/model, simulated Discord and DB; no real messaging. No keyword score substitutes for source attribution."
+}

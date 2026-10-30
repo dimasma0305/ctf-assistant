@@ -1,0 +1,115 @@
+{
+  "sequenceResults": [],
+  "caseId": "self-joke-owner-new-topic",
+  "category": "speaker-target-grounding",
+  "backend": null,
+  "effects": [
+    {
+      "kind": "send",
+      "mentionedUserIds": [],
+      "content": "kalau kamu jadi chef, ovennya mungkin lebih sering dipake daripada aplikasinya 😭",
+      "files": []
+    }
+  ],
+  "interactionWrites": 1,
+  "profileWrites": [],
+  "memory": [
+    {
+      "role": "user",
+      "messageId": "800000000000000001",
+      "at": 1793351700000,
+      "name": "222222222222222222-Mira",
+      "content": "[Mira <@222222222222222222>] aku selalu pesen makanan, malas masak",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000002",
+      "at": 1793351880000,
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] aku lagi belajar bikin roti di rumah",
+      "imageCount": 0
+    },
+    {
+      "role": "assistant",
+      "messageId": "800000000000000003",
+      "at": 1793352000000,
+      "content": "[Hackerika <@1077393568647352320>] Mira chef aplikasi delivery 😭",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000004",
+      "at": 1793354220000,
+      "name": "222222222222222222-Mira",
+      "content": "[Mira <@222222222222222222>] 😂",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000005",
+      "at": 1793354280000,
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] <@1077393568647352320>",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000099",
+      "at": 1793354339000,
+      "mentions": [
+        {
+          "id": "1077393568647352320",
+          "displayName": "Hackerika",
+          "username": "Hackerika",
+          "isBot": true
+        }
+      ],
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] <@1077393568647352320> sekarang ledekin aku kalau jadi chef",
+      "imageCount": 0
+    },
+    {
+      "role": "assistant",
+      "content": "[Hackerika <@1077393568647352320>] kalau kamu jadi chef, ovennya mungkin lebih sering dipake daripada aplikasinya 😭",
+      "at": 1793354340000,
+      "replyToMessageId": "800000000000000099",
+      "imageCount": 0
+    }
+  ],
+  "toolCalls": [],
+  "completions": [
+    {
+      "model": "gpt-6-luna",
+      "elapsedMs": 3869.6337500000004,
+      "usage": {
+        "prompt_tokens": 14120,
+        "completion_tokens": 23,
+        "total_tokens": 14143,
+        "prompt_cache_hit_tokens": 13952,
+        "prompt_cache_miss_tokens": 168
+      },
+      "finishReason": "stop",
+      "visibleModelOutput": "kalau kamu jadi chef, ovennya mungkin lebih sering dipake daripada aplikasinya 😭"
+    },
+    {
+      "model": "gpt-6-luna",
+      "elapsedMs": 2313.551461,
+      "usage": {
+        "prompt_tokens": 842,
+        "completion_tokens": 22,
+        "total_tokens": 864,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 842
+      },
+      "finishReason": "stop",
+      "visibleModelOutput": "{\"attributions\":[],\"valid\":true,\"correctedReply\":\"\"}"
+    }
+  ],
+  "modelCalls": 2,
+  "elapsedMs": 10574.9309,
+  "action": null,
+  "text": "kalau kamu jadi chef, ovennya mungkin lebih sering dipake daripada aplikasinya 😭",
+  "failure": "",
+  "trial": 0
+}

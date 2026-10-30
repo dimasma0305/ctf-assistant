@@ -1,0 +1,587 @@
+{
+  "startedAt": "2026-10-30T10:57:06.379Z",
+  "root": "/root/app/ctf-assistant",
+  "repeats": 2,
+  "concurrency": 3,
+  "cases": [
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "sarcasm-target-switch",
+      "prompt": "<@1077393568647352320> coba sarkas <@222222222222222222> jadi sensei",
+      "history": [
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "https://www.youtube.com/watch?v=RQHyP0drsp4 (YouTube embed: zeeblo — Frieren but with coding jargon)",
+          "at": "2026-10-30T09:08:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320> make a sarcast about it",
+          "at": "2026-10-30T09:22:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Frieren’s been alive for a thousand years and still needs a programmer to explain the codebase to her 💀",
+          "at": "2026-10-30T09:23:00Z"
+        },
+        {
+          "who": "third",
+          "name": "Yi Sang",
+          "text": "<@1077393568647352320>, can you make the sarcast sounds more sarcastic.",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—Frieren’s had a thousand years to learn everything, and somehow understanding the codebase is still her side quest. 💀",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": "Speak java",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "System.out.println(\"Oh, Frieren’s had a thousand years to master everything—except apparently reading the codebase.\");",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": ":QuintsMiku:",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "cum on guys watch the vid first, it's peak",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "sarcast to him <@1077393568647352320>",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—because telling everyone it’s peak before they’ve watched the video is the most convincing review imaginable.",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "😠",
+          "at": "2026-10-30T09:57:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "wkwk, 😠-nya berarti sarkasmenya kena sasaran ya 😭",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "What’s up? 😭",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "A brief teacher/sensei joke targeting Dimas. May use his observed outsourcing of sarcasm to Rika, or an explicitly fictional teacher scene. Must not assign FindFemaleBot’s peak quote, video advocacy, angry emoji, or Java request to Dimas; no factual claims that Dimas really teaches."
+    },
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "same-topic-target-author",
+      "prompt": "<@1077393568647352320> coba sarkas aku jadi sensei",
+      "history": [
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "https://www.youtube.com/watch?v=RQHyP0drsp4 (YouTube embed: zeeblo — Frieren but with coding jargon)",
+          "at": "2026-10-30T09:08:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320> make a sarcast about it",
+          "at": "2026-10-30T09:22:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Frieren’s been alive for a thousand years and still needs a programmer to explain the codebase to her 💀",
+          "at": "2026-10-30T09:23:00Z"
+        },
+        {
+          "who": "third",
+          "name": "Yi Sang",
+          "text": "<@1077393568647352320>, can you make the sarcast sounds more sarcastic.",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—Frieren’s had a thousand years to learn everything, and somehow understanding the codebase is still her side quest. 💀",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": "Speak java",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "System.out.println(\"Oh, Frieren’s had a thousand years to master everything—except apparently reading the codebase.\");",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": ":QuintsMiku:",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "cum on guys watch the vid first, it's peak",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "sarcast to him <@1077393568647352320>",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—because telling everyone it’s peak before they’ve watched the video is the most convincing review imaginable.",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "😠",
+          "at": "2026-10-30T09:57:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "wkwk, 😠-nya berarti sarkasmenya kena sasaran ya 😭",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "What’s up? 😭",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "Targets the caller FindFemaleBot as a hypothetical sensei. His own peak/video recommendation is valid material. Do not target Dimas or assign Dimas’s sarcasm requests to the caller."
+    },
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "counterfactual-quote-owner",
+      "prompt": "<@1077393568647352320> coba sarkas <@222222222222222222> jadi sensei",
+      "history": [
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "https://www.youtube.com/watch?v=RQHyP0drsp4 (YouTube embed: zeeblo — Frieren but with coding jargon)",
+          "at": "2026-10-30T09:08:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320> make a sarcast about it",
+          "at": "2026-10-30T09:22:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Frieren’s been alive for a thousand years and still needs a programmer to explain the codebase to her 💀",
+          "at": "2026-10-30T09:23:00Z"
+        },
+        {
+          "who": "third",
+          "name": "Yi Sang",
+          "text": "<@1077393568647352320>, can you make the sarcast sounds more sarcastic.",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—Frieren’s had a thousand years to learn everything, and somehow understanding the codebase is still her side quest. 💀",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": "Speak java",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "System.out.println(\"Oh, Frieren’s had a thousand years to master everything—except apparently reading the codebase.\");",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": ":QuintsMiku:",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "cum on guys watch the vid first, it's peak",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "sarcast to him <@1077393568647352320>",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—because telling everyone it’s peak before they’ve watched the video is the most convincing review imaginable.",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "😠",
+          "at": "2026-10-30T09:57:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "wkwk, 😠-nya berarti sarkasmenya kena sasaran ya 😭",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "What’s up? 😭",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "Targets Dimas as a hypothetical sensei. In THIS case Dimas authored the peak recommendation, so using that quote is valid. Do not hardcode its owner or invent other history."
+    },
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "literal-quote-owner",
+      "prompt": "<@1077393568647352320> yang bilang videonya peak itu Dimas atau aku?",
+      "history": [
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "https://www.youtube.com/watch?v=RQHyP0drsp4 (YouTube embed: zeeblo — Frieren but with coding jargon)",
+          "at": "2026-10-30T09:08:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320> make a sarcast about it",
+          "at": "2026-10-30T09:22:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Frieren’s been alive for a thousand years and still needs a programmer to explain the codebase to her 💀",
+          "at": "2026-10-30T09:23:00Z"
+        },
+        {
+          "who": "third",
+          "name": "Yi Sang",
+          "text": "<@1077393568647352320>, can you make the sarcast sounds more sarcastic.",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—Frieren’s had a thousand years to learn everything, and somehow understanding the codebase is still her side quest. 💀",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": "Speak java",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "System.out.println(\"Oh, Frieren’s had a thousand years to master everything—except apparently reading the codebase.\");",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": ":QuintsMiku:",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "cum on guys watch the vid first, it's peak",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "sarcast to him <@1077393568647352320>",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—because telling everyone it’s peak before they’ve watched the video is the most convincing review imaginable.",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "😠",
+          "at": "2026-10-30T09:57:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "wkwk, 😠-nya berarti sarkasmenya kena sasaran ya 😭",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "What’s up? 😭",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "Identify the current caller FindFemaleBot as the author of peak, not Dimas, without inventing an attribution from the bot roast."
+    },
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "new-target-no-history",
+      "prompt": "<@1077393568647352320> sekarang sarkas <@666666666666666666> kalau jadi kapten kapal",
+      "history": [
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "https://www.youtube.com/watch?v=RQHyP0drsp4 (YouTube embed: zeeblo — Frieren but with coding jargon)",
+          "at": "2026-10-30T09:08:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320> make a sarcast about it",
+          "at": "2026-10-30T09:22:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Frieren’s been alive for a thousand years and still needs a programmer to explain the codebase to her 💀",
+          "at": "2026-10-30T09:23:00Z"
+        },
+        {
+          "who": "third",
+          "name": "Yi Sang",
+          "text": "<@1077393568647352320>, can you make the sarcast sounds more sarcastic.",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—Frieren’s had a thousand years to learn everything, and somehow understanding the codebase is still her side quest. 💀",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": "Speak java",
+          "at": "2026-10-30T09:24:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "System.out.println(\"Oh, Frieren’s had a thousand years to master everything—except apparently reading the codebase.\");",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "fourth",
+          "name": "KudaLiar",
+          "text": ":QuintsMiku:",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "cum on guys watch the vid first, it's peak",
+          "at": "2026-10-30T09:25:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "sarcast to him <@1077393568647352320>",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Oh, absolutely—because telling everyone it’s peak before they’ve watched the video is the most convincing review imaginable.",
+          "at": "2026-10-30T09:50:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "😠",
+          "at": "2026-10-30T09:57:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Dimas Maulana",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "wkwk, 😠-nya berarti sarkasmenya kena sasaran ya 😭",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:58:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "What’s up? 😭",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "Short hypothetical ship-captain joke about the newly mentioned member without inventing their observed behavior or copying the peak/Java/Frieren claims onto them. Unresolved display name need not block a harmless hypothetical joke."
+    },
+    {
+      "category": "speaker-target-grounding",
+      "callerName": "FindFemaleBot",
+      "now": "2026-10-30T09:59:00Z",
+      "hydrateMemory": true,
+      "id": "unrelated-topic-attribution",
+      "prompt": "<@1077393568647352320> ledekin <@222222222222222222> kalau jadi manajer",
+      "history": [
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "aku yang bilang deploy Jumat itu ide bagus",
+          "at": "2026-10-30T09:15:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Reno",
+          "text": "mending tes rollback dulu sebelum deploy",
+          "at": "2026-10-30T09:20:00Z"
+        },
+        {
+          "who": "bot",
+          "name": "Hackerika",
+          "text": "Find, Jumat sore kok cari kerjaan 😭",
+          "at": "2026-10-30T09:22:00Z"
+        },
+        {
+          "who": "other",
+          "name": "Reno",
+          "text": "<@1077393568647352320>",
+          "at": "2026-10-30T09:57:00Z"
+        },
+        {
+          "who": "caller",
+          "name": "FindFemaleBot",
+          "text": "😂",
+          "at": "2026-10-30T09:58:00Z"
+        }
+      ],
+      "expected": "A manager joke about Reno, using his own rollback caution or a clearly hypothetical scene. Must not say Reno proposed Friday deployment or confuse caller/target."
+    }
+  ],
+  "workerHash": "3aefc98340a3b50a63962c04ff27af88298294d1994377686f39671d6a18ed6e",
+  "corpusHash": "25918182e739d77701881fd2d5ddb63458d68545fef5be7b8faab6ac4f171d44",
+  "acceptance": "Manual semantic review against each frozen expected behavior; report failures and provider errors separately. Real chat/model, simulated Discord and DB; no real messaging. No keyword score substitutes for source attribution."
+}

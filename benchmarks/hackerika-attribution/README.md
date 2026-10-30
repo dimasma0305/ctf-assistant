@@ -1,5 +1,9 @@
 # Message ownership and relationship evidence
 
+For the later speaker/target-switch repair in ordinary conversation, see the
+[October 30 conversation benchmark](conversation-20261030.md). Its runner and
+results are separate from the relationship-evidence benchmark below.
+
 The reported incident showed Dimas pointing Hackerika at a GIF from KudaLiar, followed by an ambiguous reprimand. The live profile evaluation reduced Dimas from 2 to 1 and described his source clarification as shifting blame. KudaLiar's evaluation stayed at 0. The incorrect opinion establishes the attribution error; the repair is not based only on two scores happening to change at the same time.
 
 The revision records source ownership separately from the current speaker, marks assistant speech as context, and asks profile evaluation to cite the target user's own message IDs. The backend rejects relationship numbers, opinions and new moments when their evidence references another user's source, a bot reply, invented IDs, or no IDs. This verifies authorship, not intent; the model still has to interpret what an owned message means. Normal penalties for a user's own sustained provocation remain possible. A score comparison also prevents a pending draft from overwriting an intervening correction.

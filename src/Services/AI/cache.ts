@@ -23,6 +23,7 @@ export interface SimplifiedMessage {
         id: string;
         username: string;
         tag: string;
+        bot?: boolean;
     };
     member: {
         displayName: string;
@@ -57,7 +58,8 @@ async function writeChannelCache(message: DiscordMessage) {
         author: {
             id: message.author.id,
             username: message.author.username,
-            tag: message.author.tag
+            tag: message.author.tag,
+            bot: message.author.bot
         },
         member: message.member ? {
             displayName: message.member.displayName,

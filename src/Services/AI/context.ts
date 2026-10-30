@@ -1,6 +1,7 @@
 import { OmitPartialGroupDMChannel, Message as DiscordMessage } from "discord.js";
 import { getChannelCache, SimplifiedMessage } from "./cache";
 import { mentionReferences, type MentionReference } from './mentions';
+import type { ConversationSource } from './turnGrounding';
 
 
 // Generate unique separator to prevent prompt injection
@@ -56,7 +57,7 @@ const attachmentContext = (attachments: { name: string; contentType?: string | n
     name: truncate(neutralizeControlTokens(name || 'file'), 100),
     contentType: truncate(neutralizeControlTokens(contentType || ''), 60),
   })))}` : '';
-interface ContextLine { id: string; at: number; authorId: string; content: string; line: string; mentions: MentionReference[];
+interface ContextLine { id: string; at: number; authorId: string; authorName: string; isBot: boolean; content: string; line: string; mentions: MentionReference[];
   attachmentNote: string }
 function lineFromCache(msg: SimplifiedMessage): ContextLine {
   const name = msg.member?.displayName || msg.author.username;
@@ -65,7 +66,7 @@ function lineFromCache(msg: SimplifiedMessage): ContextLine {
   const mentions = msg.mentions || [];
   const files = attachmentContext(msg.attachmentInfo || []);
   const attachmentNote = files || (msg.attachments ? ' attachments=[details unavailable]' : '');
-  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions, attachmentNote,
+  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, authorName: name, isBot: !!msg.author.bot, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions, attachmentNote,
     line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${attachmentNote}${mentionContext(mentions)}` };
 }
 function lineFromDiscord(msg: DiscordMessage): ContextLine {
@@ -75,7 +76,7 @@ function lineFromDiscord(msg: DiscordMessage): ContextLine {
       : msg.embeds.length ? '[embed]' : '[empty]');
   const mentions = mentionReferences(msg);
   const files = attachmentContext([...msg.attachments.values()]);
-  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions, attachmentNote: files,
+  return { id: msg.id, at: msg.createdTimestamp, authorId: msg.author.id, authorName: name, isBot: !!msg.author.bot, content: truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT), mentions, attachmentNote: files,
     line: `[${neutralizeControlTokens(name)} <@${msg.author.id}>] message-id=${msg.id}${Number.isFinite(msg.createdTimestamp) ? ` sent-at=${new Date(msg.createdTimestamp).toISOString()}` : ''} ${truncate(neutralizeControlTokens(content), PER_MESSAGE_CHAR_LIMIT)}${files}${mentionContext(mentions)}` };
 }
 
@@ -84,7 +85,7 @@ function lineFromDiscord(msg: DiscordMessage): ContextLine {
 // appears to reach its oldest cached edge. Never read another channel or DM.
 export async function getChannelContext(message: OmitPartialGroupDMChannel<DiscordMessage<boolean>>, startSep: string, endSep: string,
   onMentions?: (mentions: MentionReference[]) => void, onOwnFileDelivery?: () => void,
-  onSpeakerLedger?: (lines: string[]) => void): Promise<string> {
+  onSpeakerLedger?: (lines: string[]) => void, onSources?: (sources: ConversationSource[]) => void): Promise<string> {
   try {
     const channelId = message.channel.id;
     const cachedMessages = await getChannelCache(channelId);
@@ -99,12 +100,15 @@ export async function getChannelContext(message: OmitPartialGroupDMChannel<Disco
     if (relevant.length < 3 || activeEdge) {
       try {
         const fetched = await message.channel.messages.fetch({ limit: CHANNEL_CONTEXT_LIMIT, before: message.id });
-        for (const item of fetched.values()) if (item.id !== message.id && item.channelId === channelId) {
+        for (const item of fetched.values()) if (item.id !== message.id && item.channelId === channelId
+          && item.createdTimestamp <= currentAt && (item.createdTimestamp !== currentAt || item.id < message.id)) {
           lines.set(item.id, lineFromDiscord(item as DiscordMessage));
         }
       } catch { /* Keep the same-channel cache when Discord history is unavailable. */ }
     }
     const selected = [...lines.values()].sort((a, b) => a.at - b.at || a.id.localeCompare(b.id)).slice(-CHANNEL_CONTEXT_LIMIT);
+    onSources?.(selected.map(item => ({ messageId: item.id, authorId: item.authorId, authorName: item.authorName,
+      isBot: item.isBot, at: item.at, text: item.content })));
     for (const item of selected) onMentions?.(item.mentions);
     // A short follow-up often refers to the speaker's own earlier claim even
     // when another person spoke in between. Repeat only the same-speaker lines

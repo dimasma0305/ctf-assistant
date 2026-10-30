@@ -34,6 +34,17 @@ She cannot inspect other people's DMs, hidden channels, screens, or offline acti
 
 ## Indonesian voice and attention
 
+Ordinary group-chat replies now use a bounded per-person source table, keeping
+the current requester and mentioned people distinct from the owners of earlier
+quotes. Several actual statements per person survive later pings or emoji. A
+read-only check with the existing lightweight model reviews the draft for
+transferred quotes or invented personal history before delivery; a correction
+keeps the requested voice and response type. The check does not grant tool
+permissions or rewrite delivery receipts. It adds a model call to eligible
+group-chat prose; if unavailable, the original draft is preserved. The
+[conversation benchmark](https://github.com/dimasma0305/ctf-assistant/blob/main/benchmarks/hackerika-attribution/conversation-20261030.md)
+records the improvement, overhead, and remaining limits.
+
 Her voice favors brief, meaningful Indonesian texting: usually one phrase or sentence, contextual slang and emoji, and occasional CAPS for surprise, excitement, or a firm boundary. Sadness, embarrassment, disgust, happiness, and anger can change the wording without turning every exchange into a monologue. Detailed explanations remain appropriate when requested. The persona is a particular character, not a template for all Indonesian women; she answers honestly when asked whether she is a bot.
 
 The attention coordinator groups rapid messages from the same speaker, preserving an earlier mention when their follow-up adds context. Different speakers keep separate turns. Editing, deleting, or superseding a source invalidates its draft. Recent messages inform an ambient classifier that chooses a reply, an emoji reaction, or silence. It has bounded concurrency, cooldowns, a global evaluation budget, and Jakarta quiet hours. Explicit requests do not depend on that ambient decision. Edits, deletions, reactions, membership events, and thread creation provide scoped observations when Discord delivers them.

@@ -89,6 +89,7 @@ const {Collection}=await import('discord.js');const db=await import('./src/Datab
 const q=v=>({sort(){return this},limit(){return this},select(){return this},lean:async()=>v,exec:async()=>v,then(a,b){return Promise.resolve(v).then(a,b)}});
 for(const m of Object.values(db))if(m?.modelName){m.find=()=>q([]);m.findOne=()=>q(null);m.findOneAndUpdate=()=>q(null);m.updateOne=()=>q({matchedCount:1});}
 db.BotStateModel.findOneAndUpdate=()=>q({mood:'calm',energy:70});
+const {conversationReplyReviewer}=await import('./src/Services/AI/turnGrounding.ts');conversationReplyReviewer.review=async (_request,draft)=>draft;
 const {openai}=await import('./src/utils/openai.ts');const {handleAIChat}=await import('./src/Services/AI/chat.ts');const {memory}=await import('./src/Services/AI/memory.ts');
 const target='333333333333333333',caller='111111111111111111',bot='1077393568647352320';
 const u={id:target,username:'aryma_hw',globalName:'Aryma House Of Wolf',bot:false};let lookups=0,calls=0,thirdContext;

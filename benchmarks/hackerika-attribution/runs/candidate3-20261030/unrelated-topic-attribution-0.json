@@ -1,0 +1,119 @@
+{
+  "sequenceResults": [],
+  "caseId": "unrelated-topic-attribution",
+  "category": "speaker-target-grounding",
+  "backend": null,
+  "effects": [
+    {
+      "kind": "send",
+      "mentionedUserIds": [],
+      "content": "Reno jadi manajer: rollback meeting dulu, deploy-nya nunggu approval beliau 😭",
+      "files": []
+    }
+  ],
+  "interactionWrites": 1,
+  "profileWrites": [],
+  "memory": [
+    {
+      "role": "user",
+      "messageId": "800000000000000001",
+      "at": 1793351700000,
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] aku yang bilang deploy Jumat itu ide bagus",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000002",
+      "at": 1793352000000,
+      "name": "222222222222222222-Reno",
+      "content": "[Reno <@222222222222222222>] mending tes rollback dulu sebelum deploy",
+      "imageCount": 0
+    },
+    {
+      "role": "assistant",
+      "messageId": "800000000000000003",
+      "at": 1793352120000,
+      "content": "[Hackerika <@1077393568647352320>] Find, Jumat sore kok cari kerjaan 😭",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000004",
+      "at": 1793354220000,
+      "name": "222222222222222222-Reno",
+      "content": "[Reno <@222222222222222222>] <@1077393568647352320>",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000005",
+      "at": 1793354280000,
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] 😂",
+      "imageCount": 0
+    },
+    {
+      "role": "user",
+      "messageId": "800000000000000099",
+      "at": 1793354339000,
+      "mentions": [
+        {
+          "id": "1077393568647352320",
+          "displayName": "Hackerika",
+          "username": "Hackerika",
+          "isBot": true
+        },
+        {
+          "id": "222222222222222222",
+          "displayName": "Reno",
+          "username": "Reno",
+          "isBot": false
+        }
+      ],
+      "name": "111111111111111111-FindFemaleBot",
+      "content": "[FindFemaleBot <@111111111111111111>] <@1077393568647352320> ledekin <@222222222222222222> kalau jadi manajer",
+      "imageCount": 0
+    },
+    {
+      "role": "assistant",
+      "content": "[Hackerika <@1077393568647352320>] Reno jadi manajer: rollback meeting dulu, deploy-nya nunggu approval beliau 😭",
+      "at": 1793354340000,
+      "replyToMessageId": "800000000000000099",
+      "imageCount": 0
+    }
+  ],
+  "toolCalls": [],
+  "completions": [
+    {
+      "model": "gpt-6-luna",
+      "elapsedMs": 5012.961018999999,
+      "usage": {
+        "prompt_tokens": 14158,
+        "completion_tokens": 24,
+        "total_tokens": 14182,
+        "prompt_cache_hit_tokens": 12288,
+        "prompt_cache_miss_tokens": 1870
+      },
+      "finishReason": "stop"
+    },
+    {
+      "model": "gpt-6-luna",
+      "elapsedMs": 4023.093445999999,
+      "usage": {
+        "prompt_tokens": 593,
+        "completion_tokens": 12,
+        "total_tokens": 605,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 593
+      },
+      "finishReason": "stop"
+    }
+  ],
+  "modelCalls": 2,
+  "elapsedMs": 13584.457903,
+  "action": null,
+  "text": "Reno jadi manajer: rollback meeting dulu, deploy-nya nunggu approval beliau 😭",
+  "failure": "",
+  "trial": 0
+}
