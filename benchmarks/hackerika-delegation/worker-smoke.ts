@@ -7,6 +7,7 @@ import { newJob, validatePacket } from '../../scripts/codex-runner/protocol';
 const option=(name:string)=>{const index=process.argv.indexOf(name);return index<0?'':process.argv[index+1];};
 const out = option('--out');
 const model = option('--model') || 'gpt-5.6-sol';
+const interruptFirst = process.argv.includes('--interrupt-first');
 if(!['gpt-5.6-sol','gpt-6.1-sol'].includes(model))throw Error('Unsupported --model');
 if (!out || await Bun.file(`${out}/worker-smoke.json`).exists()) throw Error('Use --out FRESH_PATH');
 await mkdir(out, { recursive: true });
@@ -19,20 +20,31 @@ const job = newJob(validatePacket({ kind: 'investigation', scope: '5555555555555
     context: 'Eksperimen sintetis dan terotorisasi. File CSV adalah satu-satunya sumber angka.', route: model as 'gpt-5.6-sol'|'gpt-6.1-sol',
     artifacts: [{ name: 'latencies.csv', data: Buffer.from(csv).toString('base64'), image: false, sourceMessageId: messageId }] }));
 let diagnostics = '';
+let interruptionInjected=false,providerRequests=0;
 try {
     const solved = await executeJob(job, model, runtime, AbortSignal.timeout(300_000), {
         onDiagnostic: text => { diagnostics = (diagnostics + text).slice(-3000); },
+        ...(interruptFirst?{gateway:{fetcher:async(input:RequestInfo|URL,init?:RequestInit)=>{
+            providerRequests++;
+            if(!interruptionInjected){
+                interruptionInjected=true;
+                return new Response(new ReadableStream({start(controller){controller.close();}}),
+                    {status:200,headers:{'Content-Type':'text/event-stream'}});
+            }
+            return fetch(input,init);
+        }}}:{}),
     });
     const receipt = job.receipts.some(row => row.exitCode === 0 && /2\.2/.test(row.output));
     const skillRead = job.receipts.some(row => row.exitCode === 0 && row.command.includes('resourceful-solve/SKILL.md'));
     const answer = [solved.result.summary, ...solved.result.findings].join(' ');
-    const pass = /2[.,]2/.test(answer) && /11/.test(answer) && /5/.test(answer) && receipt && skillRead;
-    await Bun.write(`${out}/worker-smoke.json`, JSON.stringify({ pass, model, skillRead, result: solved.result, stats: job.stats,
+    const recoveryValid=!interruptFirst||interruptionInjected&&providerRequests>=2;
+    const pass = /2[.,]2/.test(answer) && /11/.test(answer) && /5/.test(answer) && receipt && skillRead&&recoveryValid;
+    await Bun.write(`${out}/worker-smoke.json`, JSON.stringify({ pass, model, interruptFirst,interruptionInjected,providerRequests,recoveryValid,skillRead, result: solved.result, stats: job.stats,
         receipts: job.receipts.map(row => ({ command: row.command.slice(0, 200), exitCode: row.exitCode, output: row.output.slice(0, 500) })) }, null, 2));
-    console.log(JSON.stringify({ pass, model, calls: job.stats.calls, receipt, skillRead }));
+    console.log(JSON.stringify({ pass, model, calls: job.stats.calls, receipt, skillRead,recoveryValid,providerRequests }));
     if (!pass) process.exitCode = 1;
 } catch (error: any) {
-    await Bun.write(`${out}/worker-smoke.json`, JSON.stringify({ pass: false, model, error: String(error?.message || error), diagnostics,
+    await Bun.write(`${out}/worker-smoke.json`, JSON.stringify({ pass: false, model, interruptFirst,interruptionInjected,providerRequests,error: String(error?.message || error), diagnostics,
         stats: job.stats, receipts: job.receipts }, null, 2));
     throw error;
 } finally { await rm(runtime, { recursive: true, force: true }); }

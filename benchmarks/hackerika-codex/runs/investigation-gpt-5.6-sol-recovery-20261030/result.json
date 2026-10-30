@@ -1,0 +1,202 @@
+{
+  "pass": false,
+  "error": "The operation timed out.",
+  "diagnostic": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/codex\"))\nReading additional input from stdin...\nWARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/codex\"))\nWARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/codex\"))\n",
+  "elapsedMs": 900296,
+  "stats": {
+    "calls": 49,
+    "searches": 33,
+    "sourceReads": 27,
+    "visionReads": 0,
+    "inputChars": 17902252,
+    "outputBytes": 5353789,
+    "elapsedMs": 0,
+    "attempts": 1
+  },
+  "sources": [
+    {
+      "url": "https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating",
+      "title": "Indonesia’s Growth Remains Resilient, but Productivity Reforms Are Key to Creating Jobs and Sustaining Momentum"
+    },
+    {
+      "url": "https://www.bps.go.id/id/pressrelease/2026/08/05/2605/ekonomi-indonesia-triwulan-",
+      "title": "Gagal Memuat Berita Resmi Statistik - Badan Pusat Statistik Indonesia"
+    },
+    {
+      "url": "https://www.bps.go.id/id/pressrelease/2026/08/05/2606/tingkat-pengangguran-terbuka--tpt--sebesar-4-65-persen---rata-rata-upah-buruh-sebesar-3-39-juta-rupiah-.html",
+      "title": "Gagal Memuat Berita Resmi Statistik - Badan Pusat Statistik Indonesia"
+    },
+    {
+      "url": "https://www.oecd.org/en/publications/2025/11/international-migration-outlook-2025_355ae9fd/full-report/recent-developments-in-migration-policy_e3826f20.html",
+      "title": "Recent developments in migration policy: International Migration Outlook 2025 | OECD"
+    },
+    {
+      "url": "https://www.bps.go.id/en/pressrelease/2026/08/05/2605/ekonomi-indonesia-triwulan-ii-2026-tumbuh-5-29-persen--y-on-y-.html",
+      "title": "Failed to load Official Statistics News - BPS-Statistics Indonesia"
+    },
+    {
+      "url": "https://www.mom.gov.sg/passes-and-permits/employment-pass/eligibility?trk=public_post_main-feed-card-text",
+      "title": "Eligibility for Employment Pass"
+    },
+    {
+      "url": "https://www.bi.go.id/id/publikasi/ruang-media/news-release/Pages/sp_2823326.aspx",
+      "title": "BI-Rate Tetap 5,75%: Memperkuat Stabilitas, Mendorong Pertumbuhan Ekonomi"
+    },
+    {
+      "url": "https://www.bi.go.id/id/iru/highlight-news/pages/ekonomi-indonesia-triwulan-ii-2026-tumbuh-5%2C29.aspx",
+      "title": "Ekonomi Indonesia Triwulan II 2026 Tumbuh 5,29%"
+    }
+  ],
+  "receipts": [
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:bp2mi.go.id calon pekerja migran Indonesia dokumen persyaratan perjanjian kerja visa BPJS\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "200316adaa75effab03a5499898d288f851390b3d6b9f2f45da5e5951433ba2c"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://apostille.ahu.go.id/pengumuman/detil?id=913\\\",\\\"query\\\":\\\"Verify the current portal for Apostille and legalization applications as of 2026.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "ef88b30c419d7ce313202cfdc0f2c6820410464a80ff42b661c306ccb4067d8d"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://www.pajak.go.id/id/peraturan/penentuan-subjek-pajak-dalam-negeri-dan-subjek-pajak-luar-negeri-0\\\",\\\"query\\\":\\\"Verify criteria for Indonesian citizen to become foreign tax subject when moving abroad; clarify 183-day rule and supporting evidence.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "80ed737b9d544c9ee8818318d41b605cbfce915869b6277a1bcaf30d4ec299d2"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://safetravel.kemlu.go.id/tips\\\",\\\"query\\\":\\\"Verify official precautions for Indonesians working abroad regarding employer, contract, visa, insurance, and document copies.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "21858fa5c74a363ec22c817bf828b2f3998d3e8f9c2058c14adc4877b53470d9"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://peduliwni.kemlu.go.id/beranda.html\\\",\\\"query\\\":\\\"Verify functions of Peduli WNI and lapor diri for residents abroad.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "ec24ebaeba79d69a9bf8b9089f095735d00ca6e857abd95508b32a11c1dfbcc8"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://bontang.imigrasi.go.id/layanan-publik/kategori/wni/sub/paspor\\\",\\\"query\\\":\\\"Verify passport application documents and process for adult Indonesian citizens.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "fca43330d0aa1a0d6e3b9030a87d8c7ddf97e290fca7a0399ecbb4d3d6e0fbb8"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L --max-time 30 -sS 'https://www.pajak.go.id/id/peraturan/penentuan-subjek-pajak-dalam-negeri-dan-subjek-pajak-luar-negeri-0' | rg -n -C 5 '183|pusat kegiatan utama|tempat tinggal permanen|surat keterangan domisili|subjek pajak negara' | head -n 220\"",
+      "exitCode": 0,
+      "outputSha256": "f9b730bf7f9ba158e301fc4a9ea3f71ba239268e25aba39290d54646c88aee8a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L --max-time 30 -sS 'https://www.pajak.go.id/id/peraturan/penentuan-subjek-pajak-dalam-negeri-dan-subjek-pajak-luar-negeri-0' | sed -n '1700,1885p' | sed -E 's/<[\"'^>]+>/ /g; s/&nbsp;/ /g; s/''^[[:space:]]+//; /''^$/d'\"' | head -n 140\"",
+      "exitCode": 0,
+      "outputSha256": "69c09455d44e4390aaed16a511f9d117365aa6b5fa2067bb65691ea2c1ce95ea"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:ssw.go.jp/en/about/visa Specified Skilled Worker Japanese language test skills proficiency test\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "f0907e5d8aeda5c39124ffaa22c5e70565fb0042362132cb9c6ff7ed1c543fd9"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:moj.go.jp isa specified skilled worker test Japanese language 2026 official\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "32f2ac92cff06520b2c27d170d7772df55ceddd72182e5f98f2e2b0f91ea95e8"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:immi.homeaffairs.gov.au visas working in australia skills assessment points tested 189 190 491 official\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "7629f58c6ef53e8e4cd0cd253b96abf95f56ed7f43a13da494d78190e86d7f34"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:immi.homeaffairs.gov.au English language visa requirements competent English official\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "2a36821694c1ca0d4240210038c32cc36c48b1a18d8c8ac95cdf18e76f7b5ca4"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:make-it-in-germany.com/en visa recognition opportunity card 2026 official requirements\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "f9d0149b6a4fa8a025e47737b43801ad9fb3e12efc8ef322a99d4cd83037dc0e"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://immi.homeaffairs.gov.au/visas/working-in-australia/skills-assessment\\\",\\\"query\\\":\\\"Verify when suitable skills assessment is required for subclasses 189, 190 and 491 and need to check occupation list.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "c29b96c5dce47c6f28a650c055b162d471969f35d21254696d46f9a5cf1efc9b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://immi.homeaffairs.gov.au/supporting/Pages/competent-english.aspx\\\",\\\"query\\\":\\\"Verify accepted English evidence and test score requirements for competent English.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "1e2555f1173dc0c61fe8c781a1eab0ef5c203c98b29114b903952376c4f36f7f"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://www.make-it-in-germany.com/en/visa-recognition/opportunity-card/job-search\\\",\\\"query\\\":\\\"Verify Opportunity Card routes, qualification, language, six points, financing amount for 2026 and permitted hours.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "d17ce94e6259910194b5ff2e06189dfc8ae8fbdb709d0a3b27d29560ef775788"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://www.ssw.go.jp/en/about/step/\\\",\\\"query\\\":\\\"Verify general SSW(i) requirements including skills test and Japanese language tests.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "e4b699dd63bf9d3439544a3b25db01867f76d714e0adf17ab5fb6c8ce6a6962a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L --max-time 30 -sS 'https://www.ssw.go.jp/en/about/step/' -o /tmp/ssw.html\ncurl -L --max-time 30 -sS 'https://immi.homeaffairs.gov.au/visas/working-in-australia/skills-assessment' -o /tmp/aus-skill.html\ncurl -L --max-time 30 -sS 'https://www.make-it-in-germany.com/en/visa-recognition/opportunity-card/job-search' -o /tmp/de-card.html\nfile /tmp/ssw.html /tmp/aus-skill.html /tmp/de-card.html\nrg -n -m 20 'JFT-Basic|JLPT|proficiency test|technical intern training|N4' /tmp/ssw.html\nrg -n -m 30 '189|190|491|suitable skills assessment|nominated occupation|assessing authority' /tmp/aus-skill.html\nrg -n -m 30 '1,091|1.091|six points|6 points|English B2|German A1|20 hours|blocked account|recognized in Germany' /tmp/de-card.html\"",
+      "exitCode": 1,
+      "outputSha256": "db422fc070278b9d21fe0460a48ade95522d72a8cd5a4e3b2dbaa1eed1a2f68a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"ls -l /tmp/ssw.html /tmp/aus-skill.html /tmp/de-card.html 2>/dev/null || true\nfile /tmp/ssw.html /tmp/aus-skill.html /tmp/de-card.html 2>/dev/null || true\nrg -n -m 25 '189|190|491|suitable skills assessment|nominated occupation|assessing authority' /tmp/aus-skill.html 2>/dev/null || true\nrg -n -m 25 '1,091|1.091|six points|6 points|English B2|German A1|20 hours|blocked account|recognised in Germany' /tmp/de-card.html 2>/dev/null || true\"",
+      "exitCode": 0,
+      "outputSha256": "746208a8fee744330a03a2c44bd73075bf8a2c0b45bd5f5128776d6ce7f32099"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"sed -n '1,80p' /tmp/de-card.html\nrg -n -m 30 '1,091|1.091|six points|6 points|English B2|German A1|20 hours|blocked account|recognised in Germany|state-recognised' /tmp/de-card.html\"",
+      "exitCode": 1,
+      "outputSha256": "5b8fc124b6616e414fc0eed56e54b8fd16beec33a9cc8f835c26561564d0f96d"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:germany.info opportunity card 2026 proof of funds 1091\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "be5c14f74fbb29fa1369b9eaa9c481f45346cc4b0fa15ce7bea33cdd8d8e4290"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:auswaertiges-amt.de opportunity card 2026 blocked account 1091 official\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "0aab9901ff1f63f6072e16de4458d29159c76f5b01f9613876f81c7868cc522b"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"site:jakarta.diplo.de opportunity card Chancenkarte Indonesia 2026 requirements\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "a69f9583acf6c6e4830bff7b0d7b69c27012f9112044e8941dcf544b7d89da2a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://jakarta.diplo.de/id-id/service-id/visa-einreise/jaminan-mata-pencaharian-2686088\\\",\\\"query\\\":\\\"Verify 2026 monthly proof-of-funds amount for Opportunity Card from German Embassy Jakarta.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "e4b699dd63bf9d3439544a3b25db01867f76d714e0adf17ab5fb6c8ce6a6962a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://www.germany.info/resource/blob/2663778/fe8bb3415b2670470761d231eca16ea1/opportunity-card-data.pdf\\\",\\\"query\\\":\\\"Verify May 2026 Opportunity Card proof of funds, qualification routes, language/points requirements, and part-time work limit.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "11e5ac8a6377f6cd8ebaa7ed16cb10883e09168ffc4548b8c6ce7679e8777331"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L --max-time 60 -sS 'https://www.germany.info/resource/blob/2663778/fe8bb3415b2670470761d231eca16ea1/opportunity-card-data.pdf' -o /tmp/de-card-2026.pdf && file /tmp/de-card-2026.pdf && pdftotext -layout /tmp/de-card-2026.pdf /tmp/de-card-2026.txt && sed -n '1,240p' /tmp/de-card-2026.txt\"",
+      "exitCode": 0,
+      "outputSha256": "63d76207ce590b7d1730276a3d081525f76624672af5b3504c25fb6420c712d8"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L --max-time 30 -sS 'https://www.bi.go.id/id/publikasi/ruang-media/news-release/Pages/sp_2823326.aspx' -o /tmp/bi-rate.html\ncurl -L --max-time 30 -sS 'https://www.bi.go.id/id/publikasi/laporan/Pages/Analisis-Inflasi-TPIP-September-2026.aspx' -o /tmp/bi-inflasi.html\nrg -n -m 30 '5,75|5\\\\.75|September 2026|3,28|3.28|2,5|2.5|rupiah|18\\\\.138|18,138' /tmp/bi-rate.html /tmp/bi-inflasi.html | head -n 120\"",
+      "exitCode": 0,
+      "outputSha256": "2df8153217d0195e4cc3c85ccff1d0fcf7c1f28ec6dce86d3656d955c7abb5c6"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -L --max-time 60 -sS 'https://www.moj.go.jp/isa/content/001454251.pdf' -o /tmp/jp-ssw.pdf && file /tmp/jp-ssw.pdf && pdftotext -layout /tmp/jp-ssw.pdf /tmp/jp-ssw.txt && rg -n -C 4 'N4|JFT-Basic|skill test|proficiency test|nursing care' /tmp/jp-ssw.txt | head -n 180\"",
+      "exitCode": 1,
+      "outputSha256": "b992b8f9e19e15db4c1de6934ca6c9ebe8bda600a3d77dfba4b13148f889c7c3"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data-binary '{\\\"url\\\":\\\"https://documents.worldbank.org/en/publication/documents-reports/documentdetail/099516510142661830\\\",\\\"query\\\":\\\"Verify October 2026 Indonesia growth, poverty, inflation, labor market and risk assessment.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "f23c82186214c5b7560d93d16de2cdb473516640e972bbf50e5beffbe6ad0689"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data-binary '{\\\"query\\\":\\\"World Bank Indonesia Macro Poverty Outlook October 2026 PDF growth 2026 2027\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "8d3446447af22d8c146576c674164cc1cb07d5dd38e03820b06aab8484a44b62"
+    }
+  ]
+}

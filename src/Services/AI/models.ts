@@ -17,6 +17,12 @@ export const DEFAULT_MODEL = process.env.AI_PROVIDER === 'chatgpt'
 export const MODELS = {
     /** Main user-facing agentic chat loop: native tool-calling + full persona. */
     chat: process.env.AI_CHAT_MODEL?.trim() || DEFAULT_MODEL,
+    /** Manager for turns that require authorized security/CTF/technical OSINT
+     *  reasoning before or while an isolated job is delegated. */
+    security: process.env.AI_SECURITY_MODEL?.trim() || (process.env.AI_PROVIDER === 'chatgpt' ? 'gpt-5.6-sol' : DEFAULT_MODEL),
+    /** Cheap semantic model selector. It chooses a manager model, never a
+     *  tool/action, so agent behavior remains flexible rather than keyword-routed. */
+    router: process.env.AI_ROUTER_MODEL?.trim() || (process.env.AI_PROVIDER === 'chatgpt' ? 'gpt-6-luna' : DEFAULT_MODEL),
     /** Background / utility completions — state distill, profile distill, cron
      *  mabar drafts, task follow-up drafts, CTF event blurbs. Latency-tolerant,
      *  no tool-calling. */

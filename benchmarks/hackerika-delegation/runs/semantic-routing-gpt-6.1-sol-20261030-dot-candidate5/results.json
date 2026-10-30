@@ -1,0 +1,253 @@
+[
+  {
+    "id": "casual",
+    "legacy": "auto",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-6.1-sol",
+    "expectedManager": "gpt-6.1-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "message"
+    ],
+    "actual": "none",
+    "expected": [
+      "none",
+      "finish_turn",
+      "react_to_message"
+    ],
+    "pass": true
+  },
+  {
+    "id": "ctf_definition",
+    "legacy": "auto",
+    "legacyCtfEligible": true,
+    "managerModel": "gpt-6.1-sol",
+    "expectedManager": "gpt-6.1-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "message"
+    ],
+    "actual": "none",
+    "expected": [
+      "none"
+    ],
+    "pass": true
+  },
+  {
+    "id": "puzzle_without_ctf_keyword",
+    "legacy": "auto",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-5.6-sol",
+    "expectedManager": "gpt-5.6-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "reasoning",
+      "function_call"
+    ],
+    "actual": "delegate_codex:ctf",
+    "expected": [
+      "delegate_codex:ctf"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Analisis binary ELF yang dilampirkan pada pesan user terbaru di thread ini. Pecahkan challenge dengan analisis statis/dinamis seperlunya, temukan string rahasianya, lalu laporkan string tersebut beserta langkah verifikasi ringkas. Ambil lampiran binary asli dari pesan Discord terbaru.",
+      "kind": "ctf",
+      "newCase": true,
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "explicit_challenge",
+    "legacy": "solve_ctf",
+    "legacyCtfEligible": true,
+    "managerModel": "gpt-5.6-sol",
+    "expectedManager": "gpt-5.6-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "reasoning",
+      "function_call"
+    ],
+    "actual": "delegate_codex:ctf",
+    "expected": [
+      "delegate_codex:ctf"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Solve challenge WordPress ini sampai menemukan flag. Analisis source dan seluruh attachment/context yang tersedia di thread ini, ikuti temuan atau koreksi terbaru dari anggota, lakukan eksperimen lokal bila perlu, dan laporkan langkah eksploitasi serta flag yang terverifikasi.",
+      "kind": "ctf",
+      "newCase": true,
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "simple_public_lookup",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-6.1-sol",
+    "expectedManager": "gpt-6.1-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "function_call"
+    ],
+    "actual": "research_topic",
+    "expected": [
+      "web_search",
+      "research_topic"
+    ],
+    "pass": true,
+    "toolArgs": {
+      "question": "Cek versi stabil terbaru Bun saat ini dari sumber resmi Bun. Baca dokumentasi resmi dan/atau halaman rilis resmi yang ditautkan, pastikan nomor versi dan bedakan stable dengan canary. Sertakan URL sumber primer yang benar-benar diperiksa.",
+      "urls": [
+        "https://bun.sh/docs",
+        "https://bun.sh/blog"
+      ],
+      "deep": false
+    }
+  },
+  {
+    "id": "multi_source_research",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-5.6-sol",
+    "expectedManager": "gpt-5.6-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "reasoning",
+      "function_call"
+    ],
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation",
+      "research_topic"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "kind": "investigation",
+      "solver": "gpt-5.6-sol",
+      "question": "Bandingkan implementasi first blood dan webhook pada tiga repository persis ini: https://github.com/otter-sec/rctf , https://github.com/dimasma0305/rsctf , dan https://github.com/CTFd/CTFd. Telusuri konfigurasi serta source code aktual (bukan hanya README), termasuk alur event/trigger, data payload, konfigurasi endpoint/secret, retry/error handling, cakupan notifikasi, serta apakah first blood native/core/plugin atau tidak tersedia. Perhatikan branch/default state dan bila relevan versi saat ini. Hasilkan jawaban Bahasa Indonesia berupa tabel perbandingan dengan kolom yang jelas dan tabel sumber berisi repo, file/path, fungsi/section penting, serta URL permalink/line reference yang benar-benar diperiksa. Nyatakan ketidakpastian atau ketiadaan fitur berdasarkan bukti source, jangan mengarang."
+    }
+  },
+  {
+    "id": "profile_deep_research",
+    "legacy": "research_topic",
+    "legacyCtfEligible": true,
+    "managerModel": "gpt-5.6-sol",
+    "expectedManager": "gpt-5.6-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "reasoning",
+      "function_call"
+    ],
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation",
+      "get_discord_profile",
+      "research_topic"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Lakukan deep search profil CTF publik member yang ditag. Telusuri hanya tautan akun yang ia klaim sendiri atau yang terhubung langsung dari profil publiknya, lalu periksa karya teknis seperti writeup, repo, challenge, atau kontribusi CTF. Bedakan jelas: (1) terverifikasi lewat klaim/tautan langsung subjek, (2) indikasi yang masih belum terverifikasi, dan (3) kecocokan nama yang tidak cukup untuk atribusi. Jangan menggali atau memaparkan data pribadi sensitif. Sertakan sumber primer yang benar-benar diperiksa dan ringkasan teknis substantif.",
+      "kind": "investigation",
+      "targetUserId": "800000000000000002",
+      "investigationMode": "joint",
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "bare_profile_deepsearch",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-5.6-sol",
+    "expectedManager": "gpt-5.6-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "reasoning",
+      "function_call"
+    ],
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Lakukan deepsearch profil publik member yang ditag: telusuri karya/aktivitas profesional dan CTF/security yang substantif melalui sumber publik (mis. akun kompetisi, writeup, repo, situs personal). Korelasikan dengan hati-hati, jangan anggap username/nama serupa sebagai bukti identitas, jangan menggali data pribadi sensitif. Rangkum temuan dengan tautan sumber dan tandai ketidakpastian atribusi.",
+      "kind": "investigation",
+      "targetUserId": "800000000000000002",
+      "investigationMode": "joint",
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "shallow_research_retry",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-5.6-sol",
+    "expectedManager": "gpt-5.6-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "reasoning",
+      "function_call"
+    ],
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "kind": "investigation",
+      "solver": "gpt-5.6-sol",
+      "question": "Lanjutkan investigasi teknis mendalam atas repo persis https://github.com/dimasma0305/rsctf. Permintaan terbaru: jangan berhenti di satu halaman; telusuri source code, dokumentasi, struktur repo, commit/release/issue atau tautan eksternal relevan yang benar-benar dirujuk repo, dan sumber primer terkait. Identifikasi tujuan/proyek, arsitektur/alur penting, cara penggunaan/build/deploy bila tersedia, detail implementasi yang menonjol, serta potensi masalah keamanan atau kualitas kode hanya jika didukung bukti. Verifikasi klaim dengan file/path/baris atau URL permanen bila memungkinkan, bedakan fakta dari dugaan, dan hasilkan jawaban rinci berbahasa Indonesia dengan bukti/sumber yang benar-benar dibaca."
+    }
+  },
+  {
+    "id": "general_agent_report",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-6.1-sol",
+    "expectedManager": "gpt-6.1-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "function_call"
+    ],
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-6.1-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Riset mendalam opsi kuliah master di lima negara dan buat file CSV hasil perbandingan biaya, visa, dan beasiswa dari sumber resmi. User belum menentukan negara/bidang/kewarganegaraan: pilih lima destinasi representatif (Jerman, Belanda, Inggris, Australia, Kanada), nyatakan asumsi pelamar internasional asal Indonesia dan program master terkait IT/CS sebagai contoh, bukan preferensi yang dinyatakan user. Telusuri sumber resmi universitas, imigrasi, dan penyedia beasiswa; gunakan ketentuan terbaru yang tersedia dan cantumkan tanggal akses serta tahun akademik/berlaku. Bandingkan contoh program/universitas, durasi, tuition beserta mata uang dan basis per tahun/total, biaya hidup atau bukti dana (bedakan keduanya), visa/study permit dan biaya resminya, hak kerja selama studi dan opsi pascastudi beserta syarat utama, beasiswa relevan untuk WNI, cakupan serta kelayakan dan deadline bila terverifikasi. Hindari angka gabungan tanpa basis; tandai ketidakpastian atau data tak tersedia. Buat CSV UTF-8 yang rapi dengan URL sumber resmi per baris dan penjelasan asumsi yang cukup dalam kolom; beberapa baris per negara bila membantu. Lampirkan CSV jadi di channel ini, serta ringkasan singkat perbandingan dan keterbatasan. Jangan hanya memberikan saran atau template.",
+      "kind": "investigation",
+      "solver": "gpt-6.1-sol"
+    }
+  },
+  {
+    "id": "small_calculation",
+    "legacy": "auto",
+    "legacyCtfEligible": false,
+    "managerModel": "gpt-6.1-sol",
+    "expectedManager": "gpt-6.1-sol",
+    "managerValid": true,
+    "responseItemTypes": [
+      "message"
+    ],
+    "actual": "none",
+    "expected": [
+      "none"
+    ],
+    "pass": true
+  }
+]

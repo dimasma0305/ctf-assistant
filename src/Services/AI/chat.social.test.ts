@@ -544,7 +544,7 @@ for (const mode of ['attribution_review', 'attribution_review_unavailable', 'ign
             cwd: fileURLToPath(new URL('../../../', import.meta.url)),
             env: { ...process.env, OPENAI_API_KEY: 'test-no-network', NODB: 'true', SOCIAL_TEST_MODE: mode,
                 AI_CHAT_MODEL: mode.startsWith('vision') ? 'text-only-fixture' : process.env.AI_CHAT_MODEL,
-                AI_VISION: 'true', AI_VISION_MODEL: 'deepseek-flash',
+                AI_VISION: 'true', AI_VISION_MODEL: 'deepseek-flash', AI_MODEL_ROUTER_ENABLED: 'false',
                 AI_ALLOW_IGNORING: 'true', AI_PRIVATE_HANDOFF: 'true', AI_DISCORD_ACTIONS: 'true', AI_SMART_ATTENTION: 'true', CF_WORKER_URL: '', CF_WORKER_TOKEN: '' },
             stdout: 'pipe', stderr: 'pipe',
         });

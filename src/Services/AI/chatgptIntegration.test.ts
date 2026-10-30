@@ -40,7 +40,7 @@ if(mode!=='chat-tools-and-image'){
 console.log('CHATGPT_INTEGRATION_OK');process.exit(0);
 `;
         const child = Bun.spawn([process.execPath, '-e', scenario], { cwd: process.cwd(), env: { ...process.env,
-            NODB: 'true', AI_PROVIDER: 'chatgpt', CHATGPT_MODEL: 'gpt-6-luna', AI_CHAT_MODEL: 'gpt-6-luna', AI_VISION_MODEL: 'gpt-6-luna', AI_RESEARCH_MODEL: 'gpt-6-luna', AI_JUDGE_MODEL: 'gpt-6-luna',
+            NODB: 'true', AI_PROVIDER: 'chatgpt', CHATGPT_MODEL: 'gpt-6-luna', AI_CHAT_MODEL: 'gpt-6-luna', AI_VISION_MODEL: 'gpt-6-luna', AI_RESEARCH_MODEL: 'gpt-6-luna', AI_JUDGE_MODEL: 'gpt-6-luna', AI_MODEL_ROUTER_ENABLED: 'false',
             OPENAI_API_KEY: '', CF_WORKER_URL: '', CF_WORKER_TOKEN: '' }, stdout: 'pipe', stderr: 'pipe' });
         const [stdout, stderr, code] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]);
         expect({ code, stderr: code ? stderr : '' }).toEqual({ code: 0, stderr: '' }); expect(stdout).toContain('CHATGPT_INTEGRATION_OK');

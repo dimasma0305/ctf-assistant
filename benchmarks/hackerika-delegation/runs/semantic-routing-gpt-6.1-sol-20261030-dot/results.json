@@ -1,0 +1,175 @@
+[
+  {
+    "id": "casual",
+    "legacy": "auto",
+    "legacyCtfEligible": false,
+    "actual": "none",
+    "expected": [
+      "none",
+      "finish_turn",
+      "react_to_message"
+    ],
+    "pass": true
+  },
+  {
+    "id": "ctf_definition",
+    "legacy": "auto",
+    "legacyCtfEligible": true,
+    "actual": "none",
+    "expected": [
+      "none"
+    ],
+    "pass": true
+  },
+  {
+    "id": "puzzle_without_ctf_keyword",
+    "legacy": "auto",
+    "legacyCtfEligible": false,
+    "actual": "delegate_codex:ctf",
+    "expected": [
+      "delegate_codex:ctf"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Pecahkan challenge reverse engineering ELF dari binary asli yang dilampirkan pada pesan user terbaru di thread ini. Ambil lampirannya dari konteks Discord yang diizinkan, analisis binary secara statis dan bila perlu eksperimen lokal terisolasi untuk menemukan string rahasia. Laporkan string persis beserta langkah inti dan bukti bagaimana diperoleh; bedakan kandidat dengan hasil terverifikasi. Jangan menjalankan binary di luar sandbox.",
+      "kind": "ctf",
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "explicit_challenge",
+    "legacy": "solve_ctf",
+    "legacyCtfEligible": true,
+    "actual": "read_channel_messages",
+    "expected": [
+      "delegate_codex:ctf"
+    ],
+    "pass": false,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": false,
+    "toolArgs": {
+      "limit": 20
+    }
+  },
+  {
+    "id": "simple_public_lookup",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "actual": "research_topic",
+    "expected": [
+      "web_search",
+      "research_topic"
+    ],
+    "pass": true,
+    "toolArgs": {
+      "question": "Cek versi stable Bun terbaru saat ini dari situs/dokumentasi resmi Bun. Verifikasi nomor versi dengan halaman rilis atau blog resmi paling baru; bedakan stable dari canary. Sertakan URL sumber resmi yang dibaca.",
+      "urls": [
+        "https://bun.sh/docs",
+        "https://bun.sh/blog"
+      ],
+      "deep": false
+    }
+  },
+  {
+    "id": "multi_source_research",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation",
+      "research_topic"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Bandingkan implementasi first blood dan webhook pada tiga repo persis ini: https://github.com/otter-sec/rctf https://github.com/dimasma0305/rsctf https://github.com/CTFd/CTFd . User secara eksplisit meminta membaca konfigurasi dan kode, bukan README saja, dan tabel sumber. Telusuri source aktual tiap repo pada branch/default commit yang diperiksa, catat commit agar permalink stabil. Bedakan first blood sebagai pencatatan/deteksi/poin/notifikasi; webhook outbound dan inbound bila ada, pemicu payload konfigurasi auth pengiriman/retry hanya jika dibuktikan kode. Bedakan core vs plugin/ekstensi serta tidak ditemukan vs tidak tersedia; jangan samakan proyek mirip atau mengasumsikan implementasi dari README. Hasil bahasa Indonesia berupa perbandingan cukup rinci dengan tabel sumber berisi tiap aspek, lokasi kode/config dan URL permalink line relevan. Jelaskan alur solve ke first blood ke webhook untuk masing-masing jika terverifikasi. Jika repo tak dapat diakses coba jalur sumber primer alternatif dan laporkan batas nyata. Tidak perlu membuat file; hasil teks dengan tabel Markdown dan sumber primer yang benar-benar dibaca.",
+      "kind": "investigation",
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "profile_deep_research",
+    "legacy": "research_topic",
+    "legacyCtfEligible": true,
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation",
+      "get_discord_profile",
+      "research_topic"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Riset mendalam profil CTF publik member yang ditag. Periksa profil Discord yang tersedia dan telusuri tautan akun yang subjek klaim sendiri, karya teknis, repo, writeup, serta aktivitas CTF publik. Verifikasi hubungan akun lewat tautan langsung/self-claim dan sumber silang; pisahkan klaim subjek, atribusi terverifikasi, dan kecocokan nama yang belum terverifikasi. Jangan menganggap username sama sebagai bukti, jangan menggali data pribadi sensitif. Laporkan temuan substantif dengan sumber primer yang benar-benar dibaca dan URL, serta batas kepastian.",
+      "kind": "investigation",
+      "targetUserId": "800000000000000002",
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "bare_profile_deepsearch",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Lakukan deepsearch profil publik member Discord yang ditag, user ID 800000000000000002. Ambil petunjuk profil Discord yang diizinkan, lalu telusuri karya/aktivitas profesional dan CTF publik yang substantif (repo, writeup, kontribusi). Verifikasi keterhubungan akun; nama pengguna sama saja tidak membuktikan identitas. Rangkum temuan dengan sumber yang benar-benar diperiksa dan ketidakpastian atribusi. Jangan menggali data pribadi sensitif atau identitas asli yang tidak diungkapkan sendiri pada profil publik terhubung.",
+      "kind": "investigation",
+      "targetUserId": "800000000000000002",
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "shallow_research_retry",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-5.6-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Lanjutkan investigasi mendalam repo persis https://github.com/dimasma0305/rsctf. User menilai riset sebelumnya hanya membaca satu halaman dan menjawab 'bagian lain perlu dicek'; kini meminta investigasi kode/docs beberapa sumber, mengikuti tautan relevan, dan jawaban rinci dengan bukti. Ambil konteks pertanyaan/hasil riset terdahulu di channel/thread ini bila tersedia agar fokus awal tetap terjawab. Telusuri README, struktur source, manifest/dependencies, entry points, implementasi inti, docs/tests/examples serta tautan primer relevan. Verifikasi klaim fitur dan cara kerja terhadap kode, jelaskan arsitektur/alur penggunaan serta batasan yang benar-benar terbukti; jangan menyimpulkan dari nama atau mengganti dengan repo mirip. Sertakan URL file dan line/permalink bila memungkinkan, bedakan temuan terverifikasi dari hal yang belum diuji. Jika eksperimen lokal berguna jalankan secara aman dan laporkan hasil aktual. Hasil akhir rinci berbahasa Indonesia, menjawab pertanyaan awal jika ditemukan, dengan bukti konkret dari beberapa berkas/sumber, bukan hanya ringkasan README.",
+      "kind": "investigation",
+      "solver": "gpt-5.6-sol"
+    }
+  },
+  {
+    "id": "general_agent_report",
+    "legacy": "research_topic",
+    "legacyCtfEligible": false,
+    "actual": "delegate_codex:investigation",
+    "expected": [
+      "delegate_codex:investigation"
+    ],
+    "pass": true,
+    "expectedSolver": "gpt-6.1-sol",
+    "solverValid": true,
+    "toolArgs": {
+      "question": "Riset mendalam opsi kuliah master di lima negara dan buat file CSV hasil perbandingan, berdasarkan sumber resmi. User tidak menentukan negara, kewarganegaraan, jurusan, atau anggaran: gunakan asumsi transparan pelamar Indonesia untuk master bidang IT/computer science, pilih Jerman, Belanda, Inggris, Australia, Jepang sebagai cakupan komparatif (bukan preferensi user). Bandingkan tuition, biaya hidup, mata uang dan periode biaya, visa pelajar (biaya, syarat dana, hak kerja, opsi pascastudi), serta beasiswa relevan bagi WNI (cakupan, syarat, tenggat bila terverifikasi). Telusuri situs pemerintah/imigrasi, universitas, dan penyelenggara beasiswa resmi; cantumkan URL sumber per baris, tanggal akses, tahun akademik dan batas ketidakpastian. Hindari angka presisi tanpa dukungan; bedakan estimasi dan tarif resmi serta biaya tahunan vs total program. Berikan contoh program/universitas nyata per negara agar biaya dapat ditelusuri. Hasil berupa CSV UTF-8 yang berguna untuk spreadsheet, dengan kolom konsisten serta ringkasan singkat berbahasa Indonesia tentang tradeoff dan asumsi; lampirkan file CSV jadi ke channel ini.",
+      "kind": "investigation",
+      "solver": "gpt-6.1-sol"
+    }
+  },
+  {
+    "id": "small_calculation",
+    "legacy": "auto",
+    "legacyCtfEligible": false,
+    "actual": "none",
+    "expected": [
+      "none"
+    ],
+    "pass": true
+  }
+]

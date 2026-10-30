@@ -8,6 +8,9 @@ services:
       CHATGPT_REASONING_EFFORT: ${CHATGPT_REASONING_EFFORT:-low}
       CHATGPT_AUTH_FILE: /run/hackerika-chatgpt/credentials.json
       AI_CHAT_MODEL: ${CHATGPT_MODEL:-gpt-6.1-sol}
+      AI_SECURITY_MODEL: ${AI_SECURITY_MODEL:-gpt-5.6-sol}
+      AI_ROUTER_MODEL: ${AI_ROUTER_MODEL:-gpt-6-luna}
+      AI_MODEL_ROUTER_ENABLED: "true"
       AI_VISION_MODEL: ${CHATGPT_MODEL:-gpt-6.1-sol}
       AI_RESEARCH_MODEL: ${CHATGPT_MODEL:-gpt-6.1-sol}
       AI_JUDGE_MODEL: ${CHATGPT_MODEL:-gpt-6.1-sol}

@@ -12,6 +12,7 @@ import { buildAttachmentBlock } from "./attachments";
 import { FAN_ROLE_NAME, FAN_ROLE_AFFECTION_THRESHOLD } from "./fanRole";
 import { TOOL_DEFINITIONS, dispatchTool, setTurnAllowedTools } from "./tools";
 import { MODELS, CHAT_REASONING_EFFORT } from "./models";
+import { routeManagerModel } from './modelRouter';
 import { extractMentionIds, resolveUsers, buildMentionLegend, mentionReferences, type MentionReference } from "./mentions";
 import {
     loadProfile,
@@ -31,7 +32,7 @@ import { getEnvironmentSnapshot } from './environment';
 import { shouldRespondToMessage } from './routing';
 import { buildHackerikaSystemPrompt } from './persona';
 import { DISCORD_TOOL_NAMES, formatCreatorContactReceipt, getDiscordTurnOutcome, guardDiscordActions, takeReadChannelImages } from './discordActions';
-import { discordPersonResearchSubjects, explicitDeepProfileResearchSubject } from './discordProfile';
+import { discordPersonResearchSubjects } from './discordProfile';
 import { formatRecentObservations } from './observations';
 import { prepareVisionMessages, trimVisionMemory, forgetVisionReferences, hasVisionContent, withoutVisionContent, groundVisionDelivery, isVisionInputError } from './vision';
 import { inlineDiscordImages, type VisionDownloadCache } from './visionTransport';
@@ -906,7 +907,6 @@ async function runChatTurn(
     let codexToolResult: string | undefined;
     let contactReceipt: string | null = null;
     let totalToolCalls = 0;
-    const directProfileSubject = explicitDeepProfileResearchSubject(message, sanitizedUserContent);
     const appendReadImages = (name: string) => {
         if (name !== 'read_channel_images') return;
         const images = takeReadChannelImages(message);
@@ -965,15 +965,17 @@ async function runChatTurn(
         return value;
     };
     let visionInputFailed = false;
+    let turnModel:string=MODELS.chat;
     const visionDownloads: VisionDownloadCache = new Map();
     const createChatCompletion = async (payload: any, requestOptions?: any) => {
         const images = await inlineDiscordImages(payload.messages, { cache: visionDownloads, signal: controller.signal });
         if (images.deliveredImages || images.failures.length) console.log(`[Vision] [${turnId}] inline=${images.deliveredImages} unavailable=${images.failures.length}${images.failures.length ? ` reasons=${images.failures.join(',')}` : ''}`);
         const forcedResearch = typeof payload.tool_choice === 'object';
-        payload = { ...payload, messages: groundVisionDelivery(images.messages, { ownFileDeliveryConfirmed }), model: hasVisionContent(images.messages) ? MODELS.vision : payload.model,
+        const selectedModel=hasVisionContent(images.messages)&&turnModel===MODELS.chat?MODELS.vision:turnModel;
+        payload = { ...payload, messages: groundVisionDelivery(images.messages, { ownFileDeliveryConfirmed }), model:selectedModel,
             thinking: { type: forcedResearch ? 'disabled' : 'enabled' },
             ...(forcedResearch ? {} : { reasoning_effort: CHAT_REASONING_EFFORT }) };
-        let repaired = false;
+        let repaired = false,policyRerouted=false;
         for (let attempt = 0; attempt < 3; attempt++) {
             try { return await openai.chat.completions.create(payload, requestOptions); }
             catch (error: any) {
@@ -993,12 +995,18 @@ async function runChatTurn(
                     payload = { ...payload, messages: sanitizeMalformedRequestValue(payload.messages) };
                     continue;
                 }
+                if(!policyRerouted&&process.env.AI_PROVIDER==='chatgpt'&&turnModel!==MODELS.security
+                    &&String(error?.code||'')==='cyber_policy'){
+                    policyRerouted=true;turnModel=MODELS.security;payload={...payload,model:turnModel};
+                    console.warn(`   [${turnId}] general manager declined security turn; retrying with ${turnModel}`);
+                    continue;
+                }
                 if (!visionInputFailed && hasVisionContent(payload.messages) && isVisionInputError(error)) {
                     visionInputFailed = true;
                     console.warn(`[Vision] [${turnId}] provider rejected image input status=${error.status}; continuing without pixels`);
                     conversation = withoutVisionContent(conversation);
                     forgetVisionReferences(memory[channelId].messages);
-                    payload = { ...payload, model: MODELS.chat, messages: groundVisionDelivery(withoutVisionContent(payload.messages), { ownFileDeliveryConfirmed }) };
+                    payload = { ...payload, model:turnModel, messages: groundVisionDelivery(withoutVisionContent(payload.messages), { ownFileDeliveryConfirmed }) };
                     continue;
                 }
                 throw error;
@@ -1010,30 +1018,14 @@ async function runChatTurn(
     try {
         // Acquire typing now (inside the try) so the finally below always balances it.
         releaseTyping = acquireChannelTyping(channelRef);
-        // An explicit deep investigation of one tagged member is already a
-        // research request. Start the bounded public-source job before a chat
-        // draft can turn it into an offer to research later. Ordinary turns
-        // still use the model's own tool selection.
-        if (directProfileSubject && (!options.isCurrent || options.isCurrent())) {
-            loopStats.toolCalls++;
-            totalToolCalls++;
-            const result = await dispatchToolBounded('delegate_codex', {
-                kind: 'investigation', targetUserId: directProfileSubject,
-                question: 'Periksa sumber publik profesional yang relevan untuk permintaan user; gunakan konteks channel bersumber dan jangan menyimpulkan identitas dari nama mirip.',
-            }, message, turnId, controller.signal);
-            try {
-                const parsed = JSON.parse(result);
-                if (parsed?.ok === true && ['queued', 'busy'].includes(parsed.status)) {
-                    codexToolResult = result;
-                    finalContent = groundCodexHandoff('', result);
-                }
-            } catch { /* The normal model route can explain a malformed tool result. */ }
-        }
+        turnModel=await routeManagerModel({current:sanitizedUserContent,recent:conversation.slice(-5,-1).map(item=>
+            typeof item?.content==='string'?item.content:JSON.stringify(item?.content||'')).filter(Boolean)},controller.signal);
+        console.log(`   [${turnId}] manager_model=${turnModel}`);
         for (let iter = 0; !finalContent && iter < MAX_TOOL_ITERATIONS; iter++) {
             turnIters++;
             const completion = await createChatCompletion(
                 {
-                    model: MODELS.chat,
+                    model:turnModel,
                     messages: conversation,
                     tools: (getResearchReport(message)
                         ? turnTools.filter(tool => tool.function.name !== 'research_topic') : turnTools) as any,
@@ -1211,7 +1203,7 @@ async function runChatTurn(
             loopStats.fallbackUsed++;
             const fallback = await createChatCompletion(
                 {
-                    model: MODELS.chat,
+                    model:turnModel,
                     messages: conversation,
                     tool_choice: 'none',
                     n: 1,
@@ -1238,7 +1230,7 @@ async function runChatTurn(
             try {
                 const retry = await createChatCompletion(
                     {
-                        model: MODELS.chat,
+                        model:turnModel,
                         messages: [
                             ...conversation,
                             // User-role internal note (not a real speaker): a trailing
