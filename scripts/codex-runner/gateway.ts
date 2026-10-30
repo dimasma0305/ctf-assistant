@@ -7,14 +7,17 @@ import { webSearchForTool } from '../../src/Services/AI/web';
 import type { Job } from './protocol';
 import type { DiscordReadQuery } from './discordBroker';
 import { generateJobImage } from './imageGeneration';
-import { SafeFetchError } from '../../src/utils/urlGuard';
+import { SafeFetchError, readResponseTextWithLimit } from '../../src/utils/urlGuard';
+import { inferenceBudget, inferenceFailure, streamFailureObserver, subscriptionInput } from './inferenceProtocol';
+import { inferenceSlots } from './inferenceSlots';
 export async function startGateway(socket: string, job: Job, model: string, signal: AbortSignal, dependencies: {
   credentials?: () => Promise<{access_token:string}>; fetcher?:typeof fetch; maxCalls?:number; maxInputChars?:number;
   imageKey?:string; imageFetcher?:typeof fetch;
   discordRead?: (query: DiscordReadQuery) => Promise<unknown>;
 }={}) {
   const auth=new ChatGPTAuth(), credentials=dependencies.credentials||(()=>auth.credentials(signal));
-  const fetcher=dependencies.fetcher||fetch;let active=false;let failureReason='';const sources:any[]=[];
+  const fetcher=dependencies.fetcher||fetch;let failureReason='';let failureCall=0;const sources:any[]=[];
+  const slots=inferenceSlots();
   const maxCalls=dependencies.maxCalls??(job.packet.kind==='investigation'?36:14);
   const maxInputChars=dependencies.maxInputChars??(job.packet.kind==='investigation'?6_000_000:2_000_000);
   const visionCache=new Map<string,string>();
@@ -158,26 +161,68 @@ export async function startGateway(socket: string, job: Job, model: string, sign
             'Content-Disposition':`attachment; filename="${file.name}"`,'Cache-Control':'no-store'}});
         }
         if(path!=='/v1/responses')return Response.json({error:'route_not_found'},{status:404});
-        const waitStarted=Date.now();while(active&&Date.now()-waitStarted<15_000)await new Promise(resolve=>setTimeout(resolve,25));
-        if(active||job.stats.calls>=maxCalls){failureReason=active?'model_busy':'model_call_budget';return Response.json({error:failureReason},{status:429});}
-        const text=await request.text();const body=JSON.parse(text);job.stats.inputChars+=JSON.stringify(body,(_key,value)=>typeof value==='string'&&value.startsWith('data:image/')?'[inline image]':value).length;
-        if(job.stats.inputChars>maxInputChars){failureReason='input_budget';return Response.json({error:failureReason},{status:429});}
-        if(body.model!==model)return Response.json({error:'model_not_allowed'},{status:403});
+        const text=await request.text();const body=JSON.parse(text);
+        const rejectRequest=(code:string,status:number)=>{
+          failureReason=code;failureCall=job.stats.calls+1;
+          job.inferenceFailure=inferenceFailure(undefined,status,null,body.input,code);
+          return Response.json({error:code},{status});
+        };
+        if(body.model!==model)return rejectRequest('model_not_allowed',403);
         const allowed=(tools:any[]):boolean=>Array.isArray(tools)&&tools.every(t=>t?.type==='function'||t?.type==='custom'||t?.type==='namespace'&&allowed(t.tools));
-        if(body.tools&&!allowed(body.tools))return Response.json({error:'server_tools_not_allowed'},{status:403});
-        active=true;job.stats.calls++;
+        if(body.tools&&!allowed(body.tools))return rejectRequest('server_tools_not_allowed',403);
+        const requestSignal=AbortSignal.any([signal,request.signal]);
+        let release:()=>void;
+        try{release=await slots.acquire(requestSignal);}
+        catch(error){return rejectRequest(error instanceof Error?error.message:'inference_queue_full',requestSignal.aborted?499:429);}
+        // Count only admitted calls. All subagents share the same existing
+        // per-job call, input, output and time budgets.
+        if(job.stats.calls>=maxCalls){release();failureReason='model_call_budget';failureCall=job.stats.calls+1;return Response.json({error:failureReason},{status:429});}
+        job.stats.inputChars+=JSON.stringify(body,(_key,value)=>typeof value==='string'&&value.startsWith('data:image/')?'[inline image]':value).length;
+        if(job.stats.inputChars>maxInputChars){release();failureReason='input_budget';failureCall=job.stats.calls+1;return Response.json({error:failureReason},{status:429});}
+        const call=++job.stats.calls;
         try{
           const token=await credentials();
-          const forwarded:any={...body,model,store:false,stream:true,max_output_tokens:Math.min(Number(body.max_output_tokens)||4096,4096)};
+          const budget=inferenceBudget(subscriptionInput(body.input),{call,maxCalls,
+            searchesLeft:(job.packet.kind==='investigation'?6:2)-job.stats.searches,
+            readsLeft:(job.packet.kind==='investigation'?16:8)-job.stats.sourceReads,investigation:job.packet.kind==='investigation'});
+          const forwarded:any={...body,input:budget.input,model,store:false,stream:true,max_output_tokens:Math.min(Number(body.max_output_tokens)||4096,4096),
+            ...(budget.finalize?{tool_choice:'none',tools:[]}: {})};
+          const peerMessages=Array.isArray(body.input)?body.input.filter((item:any)=>item?.type==='agent_message').length:0;
+          if(peerMessages)job.stats.peerMessagesAdapted=(job.stats.peerMessagesAdapted||0)+peerMessages;
           delete forwarded.previous_response_id;delete forwarded.background;
-          const response=await fetcher(`${CHATGPT_RESOURCE}/responses`,{method:'POST',redirect:'error',signal:AbortSignal.any([signal,AbortSignal.timeout(65000)]),
+          const response=await fetcher(`${CHATGPT_RESOURCE}/responses`,{method:'POST',redirect:'error',signal:AbortSignal.any([requestSignal,AbortSignal.timeout(65000)]),
             headers:{Authorization:`Bearer ${token.access_token}`,'Content-Type':'application/json'},body:JSON.stringify(forwarded)});
-          if(!response.ok){active=false;await response.body?.cancel();return Response.json({error:{message:`inference_http_${response.status}`,type:'upstream_error'}},{status:response.status});}
+          const recordFailure=(details:unknown,fallback:string)=>{
+            const failure=inferenceFailure(details,response.status,response.headers.get('x-request-id'),forwarded.input,fallback);
+            if(call>=failureCall){job.inferenceFailure=failure;failureReason=failure.code;failureCall=call;}
+            return failure;
+          };
+          if(!response.ok){
+            release();let details:unknown;
+            try{details=JSON.parse(await readResponseTextWithLimit(response,16_384));}catch{}
+            const failure=recordFailure(details,`inference_http_${response.status}`);
+            return Response.json({error:{message:failure.code,code:failure.code,type:'upstream_error',
+              ...(failure.param?{param:failure.param}:{})}},{status:response.status});
+          }
           if(!response.body)throw Error('missing_model_stream');
+          let terminal=false;
+          const observeFailure=streamFailureObserver(event=>recordFailure(event,'inference_stream_failed'),type=>{
+            terminal=true;
+            release();
+            // A previous in-flight success must not erase a newer failure.
+            if(type==='response.completed'&&call>=failureCall){failureReason='';delete job.inferenceFailure;}
+          });
           const reader=response.body.getReader();let bytes=0;
-          return new Response(new ReadableStream({async pull(controller){try{const item=await reader.read();if(item.done){active=false;controller.close();return;}bytes+=item.value.byteLength;job.stats.outputBytes+=item.value.byteLength;
-            if(bytes>2*1024*1024||job.stats.outputBytes>8*1024*1024)throw Error('output_budget');controller.enqueue(item.value);}catch{active=false;await reader.cancel().catch(()=>{});controller.error(Error('model_stream_failed'));}},async cancel(){active=false;await reader.cancel().catch(()=>{});}}),{headers:{'Content-Type':'text/event-stream'}});
-        }catch{active=false;return Response.json({error:{message:'inference_unavailable',type:'upstream_error'}},{status:502});}
+          return new Response(new ReadableStream({async pull(controller){try{const item=await reader.read();if(item.done){release();if(!terminal)recordFailure(undefined,'inference_stream_interrupted');controller.close();return;}bytes+=item.value.byteLength;job.stats.outputBytes+=item.value.byteLength;
+            if(bytes>2*1024*1024||job.stats.outputBytes>8*1024*1024)throw Error('output_budget');observeFailure(item.value);controller.enqueue(item.value);}catch(error){
+              release();if(!failureReason)recordFailure(undefined,error instanceof Error&&error.message==='output_budget'?'output_budget':'inference_stream_interrupted');
+              await reader.cancel().catch(()=>{});controller.error(Error('model_stream_failed'));}},async cancel(){release();await reader.cancel().catch(()=>{});}}),{headers:{'Content-Type':'text/event-stream'}});
+        }catch(error){
+          release();const code=error instanceof Error&&error.message==='subscription_agent_message_invalid'
+            ?'subscription_agent_message_invalid':'inference_unavailable';
+          if(call>=failureCall){failureCall=call;failureReason=code;job.inferenceFailure=inferenceFailure(undefined,undefined,null,body.input,code);}
+          return Response.json({error:{message:code,code,type:'upstream_error'}},{status:code==='subscription_agent_message_invalid'?400:502});
+        }
       }catch{return Response.json({error:'request_failed'},{status:400});}
     }});
   await chmod(socket,0o666); // Parent is owner-only; only this job receives this socket.

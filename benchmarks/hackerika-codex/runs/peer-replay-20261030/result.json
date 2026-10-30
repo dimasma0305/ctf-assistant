@@ -1,0 +1,47 @@
+{
+  "pass": true,
+  "checks": {
+    "completed": true,
+    "peerCompatibilityUsed": true,
+    "researchSkillRead": true,
+    "profileReferenceRead": true,
+    "sources": true,
+    "citedAnswer": true,
+    "withinCallBudget": true
+  },
+  "packetSha256": "1d7b087d3f5f046c0526a0082a83748687e01820fafa1c0b254bcdde4357329d",
+  "scope": "Direct isolated worker replay; no production queue submission, Discord reads or Discord writes.",
+  "model": "gpt-6-sol",
+  "elapsedMs": 123728,
+  "stats": {
+    "calls": 33,
+    "searches": 3,
+    "sourceReads": 6,
+    "visionReads": 0,
+    "inputChars": 3703189,
+    "outputBytes": 3665658,
+    "elapsedMs": 0,
+    "attempts": 1,
+    "peerMessagesAdapted": 38
+  },
+  "sources": [
+    {
+      "url": "https://ctftime.org/team/70159",
+      "title": "CTFtime.org / HCS"
+    },
+    {
+      "url": "https://hcs-team.com/",
+      "title": "Heroes Cyber Security"
+    },
+    {
+      "url": "https://hcs-team.com/members/",
+      "title": "Members - Heroes Cyber Security"
+    },
+    {
+      "url": "https://alpacahack.com/challenges/dice-roll/solves",
+      "title": "Solves - dice roll - AlpacaHack"
+    }
+  ],
+  "summarySha256": "f0888808d811b7216b0c9e7e1d032e613d6a08ccdaec0c0395af9295c3471124",
+  "unresolvedCount": 2
+}

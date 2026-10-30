@@ -101,7 +101,8 @@ async function runNext(){
     job.state='completed';
   }catch(error:any){
     job.state=controller.signal.aborted?'cancelled':'failed';job.error=String(error?.message||'solver_failed').slice(0,120);
-    console.error(`[CodexController] job=${job.id} state=${job.state} error=${job.error} calls=${job.stats.calls} receipts=${job.receipts.length}`);
+    console.error(`[CodexController] job=${job.id} state=${job.state} error=${job.error} calls=${job.stats.calls} receipts=${job.receipts.length}`
+      +(job.inferenceFailure?` inference=${JSON.stringify(job.inferenceFailure)}`:''));
   }
   finally{
     discord.clearJob(id);job.stats.elapsedMs+=Date.now()-started;job.packet.artifacts=[];aborters.delete(id);

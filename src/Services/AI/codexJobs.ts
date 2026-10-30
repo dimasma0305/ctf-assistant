@@ -61,6 +61,10 @@ export function formatCodexResult(job:CodexPublicJob):string{
   }
   if(job.state==='failed')return ['model_call_budget','input_budget'].includes(job.error||'')
     ? `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi kepotong sebelum kesimpulannya siap. Minta aku lanjutkan nanti ya; aku belum mau nebak dari bukti yang belum tuntas.`
+    : ['subscription_sharing_unsupported_capability','subscription_agent_message_invalid'].includes(job.error||'')
+    ? 'Agen sudah mulai, tetapi sambungan ke model menolak format pesan yang dikirim. Ini masalah integrasi di sisiku; pekerjaannya belum selesai.'
+    : job.error==='subscription_sharing_usage_limit_exceeded'
+    ? 'Pekerjaan agen terhenti karena batas pemakaian ChatGPT untuk koneksi ini tercapai. Hasilnya belum tuntas.'
     : `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi terhenti karena gangguan saat menjalankan agen. Aku belum punya kesimpulan yang terverifikasi dari pekerjaan ini.`;
   if(job.state==='cancelled')return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi dibatalkan.`;
   const result=job.result;if(!result)return `${label==='CTF'?'Penyelidikan CTF':'Riset'} tadi belum menghasilkan jawaban yang bisa kupastikan.`;

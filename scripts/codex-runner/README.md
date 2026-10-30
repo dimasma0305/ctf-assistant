@@ -34,6 +34,30 @@ beyond the supplied starting pages. It makes no Discord writes. A passing trace
 proves execution and source traversal, not universal research accuracy; review
 the resulting claims and attribution separately.
 
+Native Codex subagents share the job's existing model/source budgets. The
+inference gateway admits three simultaneous model streams and queues up to
+eight more instead of rejecting a child while its parent is streaming. It
+translates local `agent_message` envelopes into attributed, untrusted text
+supported by the subscription endpoint, preserving visible findings and tool
+pairs. Opaque peer-state ciphertext is omitted; parent reasoning items are
+unchanged. Unknown peer payload formats fail explicitly. The final six
+investigation calls (two for CTF) disable new tools so agents can return their
+findings and the parent can finish within the original cap.
+
+Provider HTTP and streaming errors retain only bounded error codes, parameter,
+request ID and input type names in private job diagnostics. Raw provider error
+messages and prompts are not logged. Replay a private failed job without
+submitting or sending anything to Discord using the same auth environment:
+
+```sh
+bun benchmarks/hackerika-codex/replay-job.ts --job-file PRIVATE_JOB_JSON --out FRESH_PATH
+```
+
+This regression expects an investigation requesting native subagents. It checks
+peer-message compatibility, irai reference reads, inspected sources, citations
+and completion within the shared call limit. It records hashes and safe metrics,
+not the original Discord packet or internal agent messages.
+
 Completed answers retain their full text. Discord delivery splits them at
 paragraph or word boundaries, keeps citation links together, and sends exports
 with the final part. Successful parts are recognized on retry and use stable

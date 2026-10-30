@@ -1,0 +1,223 @@
+{
+  "originalJob": "7626ffe4-fa58-44ea-9b91-22e82db30709",
+  "originalError": "worker_failed",
+  "originalStats": {
+    "calls": 5,
+    "searches": 0,
+    "sourceReads": 0,
+    "visionReads": 0,
+    "inputChars": 438195,
+    "outputBytes": 286188,
+    "elapsedMs": 26808,
+    "attempts": 1
+  },
+  "scope": "Exact private packet replay in isolated workers; no production queue submission or Discord messages. Raw context, provider bodies, internal messages and reasoning are not exported.",
+  "variants": [
+    {
+      "label": "baseline",
+      "completed": false,
+      "stats": {
+        "calls": 5,
+        "searches": 2,
+        "sourceReads": 0,
+        "visionReads": 0,
+        "inputChars": 442025,
+        "outputBytes": 390718,
+        "elapsedMs": 0,
+        "attempts": 1
+      },
+      "httpErrors": [
+        {
+          "status": 400,
+          "code": "subscription_sharing_unsupported_capability",
+          "param": "input"
+        },
+        {
+          "status": 400,
+          "code": "subscription_sharing_unsupported_capability",
+          "param": "input"
+        }
+      ],
+      "unsupportedItemShapes": [],
+      "sources": [],
+      "summarySha256": null
+    },
+    {
+      "label": "shape",
+      "completed": false,
+      "stats": {
+        "calls": 5,
+        "searches": 2,
+        "sourceReads": 0,
+        "visionReads": 0,
+        "inputChars": 442879,
+        "outputBytes": 385858,
+        "elapsedMs": 0,
+        "attempts": 1
+      },
+      "httpErrors": [
+        {
+          "status": 400,
+          "code": "subscription_sharing_unsupported_capability",
+          "param": "input"
+        },
+        {
+          "status": 400,
+          "code": "subscription_sharing_unsupported_capability",
+          "param": "input"
+        }
+      ],
+      "unsupportedItemShapes": [
+        [
+          {
+            "type": "agent_message",
+            "keys": [
+              "type",
+              "id",
+              "author",
+              "recipient",
+              "content"
+            ],
+            "content": [
+              {
+                "type": "input_text",
+                "keys": [
+                  "type",
+                  "text"
+                ]
+              },
+              {
+                "type": "encrypted_content",
+                "keys": [
+                  "type",
+                  "encrypted_content"
+                ]
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "agent_message",
+            "keys": [
+              "type",
+              "id",
+              "author",
+              "recipient",
+              "content"
+            ],
+            "content": [
+              {
+                "type": "input_text",
+                "keys": [
+                  "type",
+                  "text"
+                ]
+              }
+            ]
+          }
+        ]
+      ],
+      "sources": [],
+      "summarySha256": null
+    },
+    {
+      "label": "candidate",
+      "completed": false,
+      "stats": {
+        "calls": 5,
+        "searches": 3,
+        "sourceReads": 0,
+        "visionReads": 0,
+        "inputChars": 442510,
+        "outputBytes": 549363,
+        "elapsedMs": 0,
+        "attempts": 1
+      },
+      "httpErrors": [],
+      "unsupportedItemShapes": [],
+      "sources": [],
+      "summarySha256": null
+    },
+    {
+      "label": "parallel",
+      "completed": false,
+      "stats": {
+        "calls": 36,
+        "searches": 10,
+        "sourceReads": 21,
+        "visionReads": 0,
+        "inputChars": 5050026,
+        "outputBytes": 4393185,
+        "elapsedMs": 0,
+        "attempts": 1,
+        "peerMessagesAdapted": 47
+      },
+      "httpErrors": [],
+      "unsupportedItemShapes": [],
+      "sources": [
+        {
+          "url": "https://alpacahack.com/challenges/dice-roll/solves",
+          "title": "Solves - dice roll - AlpacaHack"
+        },
+        {
+          "url": "https://pkg.go.dev/github.com/miraicantsleep/myits-event-be/service",
+          "title": "service package - github.com/miraicantsleep/myits-event-be/service - Go Packages"
+        },
+        {
+          "url": "https://hcs-team.com/blog/cve-2026-1605/",
+          "title": "CVE-2026-1605 - Heroes Cyber Security"
+        },
+        {
+          "url": "https://ctftime.org/team/70159",
+          "title": "CTFtime.org / HCS"
+        },
+        {
+          "url": "https://hcs-team.com/",
+          "title": "Heroes Cyber Security"
+        },
+        {
+          "url": "https://github.com/Heroes-Cyber-Security/research",
+          "title": "GitHub - Heroes-Cyber-Security/research \u00b7 GitHub"
+        },
+        {
+          "url": "https://hcs-team.com/members/",
+          "title": "Members - Heroes Cyber Security"
+        },
+        {
+          "url": "https://github.com/miraicantsleep/myits-event-be",
+          "title": "GitHub - miraicantsleep/myits-event-be \u00b7 GitHub"
+        }
+      ],
+      "summarySha256": null
+    },
+    {
+      "label": "budgeted",
+      "completed": true,
+      "stats": {
+        "calls": 32,
+        "searches": 2,
+        "sourceReads": 6,
+        "visionReads": 0,
+        "inputChars": 3928131,
+        "outputBytes": 3525675,
+        "elapsedMs": 0,
+        "attempts": 1,
+        "peerMessagesAdapted": 78
+      },
+      "httpErrors": [],
+      "unsupportedItemShapes": [],
+      "sources": [
+        {
+          "url": "https://pkg.go.dev/github.com/miraicantsleep/myits-event-be/command",
+          "title": "command package - github.com/miraicantsleep/myits-event-be/command - Go Packages"
+        },
+        {
+          "url": "https://ctftime.org/team/70159",
+          "title": "CTFtime.org / HCS"
+        }
+      ],
+      "summarySha256": "dfc738aaccb56353739c0eb868953870e1c0920e088e380da3b06035543a88fa"
+    }
+  ]
+}

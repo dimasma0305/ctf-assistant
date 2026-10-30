@@ -11,11 +11,13 @@ export interface SolverResult {
   summary: string; flags: string[]; findings: string[]; unresolved: string[]; needsStrongerModel: boolean;
 }
 export interface ExportedFileMeta { index: number; name: string; size: number; sha256: string }
+export interface InferenceFailure { code: string; status?: number; param?: string; requestId?: string; inputTypes: string[] }
 export interface Job {
   id: string; packet: Packet; state: 'pending'|'running'|'completed'|'failed'|'cancelled';
   createdAt: number; updatedAt: number; deliveredAt?: number; model?: string; result?: SolverResult; error?: string;
-  stats: { calls: number; searches: number; sourceReads: number; visionReads: number; inputChars: number; outputBytes: number; elapsedMs: number; attempts: number };
+  stats: { calls: number; searches: number; sourceReads: number; visionReads: number; inputChars: number; outputBytes: number; elapsedMs: number; attempts: number; peerMessagesAdapted?: number };
   receipts: { command: string; exitCode: number; output: string }[];
+  inferenceFailure?: InferenceFailure;
   sources: { url: string; title: string }[];
   exportedFiles?: ExportedFileMeta[];
 }
