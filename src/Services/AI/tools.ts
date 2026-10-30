@@ -21,7 +21,7 @@ import {
     updateTaskForTool,
     completeTaskForTool,
 } from "./tasks";
-import { cancelCodexJob, codexSolverEnabled, getCodexJob } from './codexJobs';
+import { cancelCodexJob, codexSolverEnabled, getCodexJob, listCodexJobs, steerCodexJob } from './codexJobs';
 import { delegateCodexForTurn } from './codexDelegate';
 import { relatedSourceLeads } from './conversationLinks';
 
@@ -56,26 +56,36 @@ export const TOOL_DEFINITIONS = [
         type: 'function' as const,
         function: {
             name: 'delegate_codex',
-            description: 'Pilihanmu untuk membuka agen Codex terisolasi jika pekerjaan memang butuh investigasi/eksperimen multi-langkah, membaca banyak sumber atau file, menjalankan kode, menyelesaikan challenge CTF, atau membuat file hasil yang diminta user (ZIP/gambar/dokumen/kode). Untuk ilustrasi, pilih imageMode: generative bila user meminta image gen sungguhan atau menolak gambar kode; auto bila kedua metode boleh; vector bila user meminta gambar lewat kode. Layanan generatif memerlukan kunci API dan tool akan menolak sebelum job dimulai bila belum dikonfigurasi. Jangan janjikan hasil pasti. Hasil dan paling banyak dua file kecil yang berhasil dibuat akan dikirim otomatis sebagai balasan di channel/thread ini. Pilih sendiri berdasar kebutuhan percakapan, bukan kata kunci: untuk jawaban singkat, obrolan, atau cek satu sumber, jawab langsung atau pakai tool ringan. Jangan delegasi hanya karena ada kata CTF/OSINT/deepsearch. Untuk riset profil orang yang meminta jejak publik mendalam, beberapa pivot akun/repo/writeup biasanya perlu agen; jika riset dalam turn hanya menghasilkan data Discord atau sumber tidak relevan, delegasikan kelanjutannya. Agen dapat membaca konteks thread dan bukti Discord yang diizinkan; ia tidak dapat mengakses DM/channel lain atau submit flag. Default agent Sol; Luna hanya jika dipilih eksplisit untuk tugas ringan.',
+            description: 'Buka agen Codex terisolasi jika pekerjaan memang butuh investigasi/eksperimen multi-langkah, banyak sumber/file, shell, kode, CTF, atau file hasil. Kamu adalah manager: pilih model dari kebutuhan nyata, bukan keyword. Gunakan gpt-5.6-sol untuk cybersecurity, CTF, reproduksi bug, dan OSINT teknis; gunakan gpt-6.1-sol untuk investigasi umum/agent work. Daybreak hanya untuk kasus security sangat sulit dan peminta yang berhak. Hasil/file dikirim otomatis ke channel/thread ini. Agen dapat meminta bukti Discord yang diizinkan dan menerima follow-up melalui steer_codex_job. Jangan delegasi obrolan atau cek sederhana yang bisa kamu jawab langsung. Untuk ilustrasi, generative berarti image gen sungguhan; auto mengizinkan fallback; vector berarti gambar kode.',
             parameters: { type: 'object', properties: {
                 question: { type: 'string', maxLength: 4000, description: 'Tujuan spesifik agen berdasarkan permintaan user dan progres percakapan, bukan jawaban/hasil yang dikarang. Jika user meminta revisi file lama, sebut tujuan awal, perubahan yang diminta, dan pesan/nama lampiran terdahulu bila terlihat; agen bisa mengambil ulang lampiran bot dari channel yang sama. Jika user meminta file gambar/ZIP/kode, jangan ubah deliverable menjadi prompt siap pakai atau saran saja.' },
                 kind: { type: 'string', enum: ['ctf', 'investigation'], description: 'ctf untuk puzzle/challenge dengan tujuan solve/flag; investigation untuk riset, analisis source, validasi atau reproduksi bug nyata. Konteks channel CTF saja tidak menjadikan riset bug sebagai challenge. Pilihanmu berdasarkan tujuan user, bukan keyword.' },
                 targetUserId: { type: 'string', description: 'Opsional untuk riset profil member: hanya ID orang yang ditag eksplisit dalam pesan sekarang. Backend memvalidasi.' },
                 investigationMode: { type: 'string', enum: ['joint', 'separate'], description: 'Jika riset melibatkan beberapa member: joint untuk hubungan, korelasi, perbandingan atau satu pertanyaan bersama; separate untuk riset profil masing-masing secara mandiri. Default joint agar pertanyaan lintas orang tidak terpecah.' },
                 newCase: { type: 'boolean', description: 'Untuk CTF saja: true jika jelas mulai challenge berbeda; false untuk melanjutkan checkpoint channel.' },
-                solver: { type:'string',enum:['auto','luna','sol','daybreak'],description:'auto = Sol (default); luna = tugas ringan bila dipilih eksplisit, termasuk komik vektor sederhana bila generator gambar tidak aktif; sol = Sol; daybreak hanya bila akses peminta tersedia.' },
+                solver: { type:'string',enum:['auto','gpt-5.6-sol','gpt-6.1-sol','daybreak'],description:'Pilih sendiri berdasarkan kebutuhan semantik tugas: gpt-5.6-sol untuk security/CTF/OSINT teknis, gpt-6.1-sol untuk agent work umum, daybreak untuk security sangat sulit bila akses tersedia. auto hanya fallback ke gpt-6.1-sol.' },
                 imageMode: { type:'string',enum:['auto','generative','vector'],description:'Untuk file gambar saja: generative mewajibkan generator gambar sungguhan dan menolak bila belum aktif; auto mengizinkan gambar kode sebagai fallback; vector khusus gambar kode. Jika user mengatakan "image gen lain" setelah mengkritik gambar kode, pilih generative.' },
             }, required: ['question', 'kind'], additionalProperties: false },
         },
     },
     {
         type:'function' as const,
-        function:{name:'codex_job_status',description:'Cek status job Codex CTF/riset terakhir milik speaker sekarang di channel ini. jobId boleh dikosongkan.',
+        function:{name:'list_codex_jobs',description:'Daftar sampai 20 job Codex terbaru di channel/thread ini, termasuk state, model, progres, steering, dan apakah hasil sudah ada. Job bersifat kolaboratif bagi member yang sedang berbicara di channel yang sama.',
+            parameters:{type:'object',properties:{limit:{type:'integer',minimum:1,maximum:20}},additionalProperties:false}},
+    },
+    {
+        type:'function' as const,
+        function:{name:'codex_job_status',description:'Ambil state dan progres nyata job Codex di channel ini. Hasil akhir, sumber, file metadata, statistik, dan error ikut dikembalikan bila tersedia. jobId boleh dikosongkan untuk job terbaru, termasuk job yang dimulai member lain di percakapan yang sama.',
             parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job jika diketahui.'}},additionalProperties:false}},
     },
     {
         type:'function' as const,
-        function:{name:'cancel_codex_job',description:'Batalkan job Codex CTF/riset aktif milik speaker sekarang di channel ini. jobId boleh dikosongkan untuk job aktif terakhir. Tidak bisa membatalkan job orang/channel lain.',
+        function:{name:'steer_codex_job',description:'Kirim instruksi/follow-up baru ke job kolaboratif di channel ini. Agent menerimanya pada inference boundary berikutnya dan mempertahankan sesi lokal. Jika job sudah selesai/gagal, controller membuat continuation job yang membawa hasil dan sumber sebelumnya. Gunakan saat siapa pun di percakapan mengoreksi, menambah clue, meminta pendalaman, atau mengubah format hasil.',
+            parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job; kosongkan untuk job terbaru.'},instruction:{type:'string',maxLength:4000,description:'Follow-up konkret dari pesan user terbaru.'},solver:{type:'string',enum:['gpt-5.6-sol','gpt-6.1-sol','daybreak'],description:'Opsional untuk continuation setelah job terminal; job aktif mempertahankan modelnya.'}},required:['instruction'],additionalProperties:false}},
+    },
+    {
+        type:'function' as const,
+        function:{name:'cancel_codex_job',description:'Batalkan job Codex CTF/riset aktif yang dimulai speaker sekarang di channel ini. Creator juga dapat membatalkan job channel. Member lain boleh melihat/steer, tetapi tidak membatalkan.',
             parameters:{type:'object',properties:{jobId:{type:'string',description:'UUID job jika diketahui.'}},additionalProperties:false}},
     },
     {
@@ -501,13 +511,19 @@ export async function dispatchTool(
         if (allowed && !allowed.has(name)) return JSON.stringify({ ok: false, error: 'tool_not_available_for_current_request', instruction: 'Follow the latest user request and current action plan; do not execute tasks mentioned only in older context.' });
         if (name === 'delegate_codex') return JSON.stringify(await delegateCodexForTurn(args || {}, message, options));
         if (name === 'solve_ctf') return JSON.stringify(await solveCTFForTurn(args || {}, message, options));
-        if(['codex_job_status','cancel_codex_job','ctf_job_status','cancel_ctf_job'].includes(name)){
+        if(['list_codex_jobs','codex_job_status','steer_codex_job','cancel_codex_job','ctf_job_status','cancel_ctf_job'].includes(name)){
             if(!codexSolverEnabled())return JSON.stringify({ok:false,error:'isolated_solver_disabled'});
             const jobId=typeof args?.jobId==='string'&&/^[0-9a-f-]{36}$/i.test(args.jobId)?args.jobId:undefined;
             const scope=message.guildId?`${message.guildId}:${message.channelId}`:'';
             if(!scope||args?.jobId&& !jobId)return JSON.stringify({ok:false,error:'invalid_job'});
-            const result=name==='ctf_job_status'||name==='codex_job_status'?await getCodexJob(jobId,scope,message.author.id,options.signal)
-                :await cancelCodexJob(jobId,scope,message.author.id,options.signal);
+            const result=name==='list_codex_jobs'
+                ?await listCodexJobs(scope,message.author.id,Math.max(1,Math.min(20,Number(args?.limit)||10)),options.signal)
+                :name==='ctf_job_status'||name==='codex_job_status'
+                    ?await getCodexJob(jobId,scope,message.author.id,options.signal)
+                    :name==='steer_codex_job'
+                        ?await steerCodexJob(jobId,scope,message.author.id,message.id,String(args?.instruction||''),
+                            ['gpt-5.6-sol','gpt-6.1-sol','daybreak'].includes(args?.solver)?args.solver:undefined,options.signal)
+                        :await cancelCodexJob(jobId,scope,message.author.id,options.signal);
             return JSON.stringify(result);
         }
         if (name === 'research_topic') {

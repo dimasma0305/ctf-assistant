@@ -12,7 +12,7 @@ class Bridge(http.server.BaseHTTPRequestHandler):
         length=int(self.headers.get('Content-Length','0'))
         if length<1 or length>32*1024*1024:
             self.send_error(413);return
-        conn=UnixHTTP('gateway',timeout=195 if self.path=='/images/generate' else 80)
+        conn=UnixHTTP('gateway',timeout=None)
         try:
             conn.request('POST',self.path,body=self.rfile.read(length),headers={'Content-Type':'application/json'})
             response=conn.getresponse();self.send_response(response.status)
@@ -55,7 +55,7 @@ for index,artifact in enumerate(packet['artifacts']):
 context={k:v for k,v in packet.items() if k not in ['artifacts','prompt','schema','model']};context['artifacts']=artifacts
 (root/'context.json').write_text(json.dumps(context,ensure_ascii=False))
 (root/'schema.json').write_text(json.dumps(packet['schema']))
-(root/'tooling.txt').write_text('Python 3 standard library; gcc/g++; gdb; binutils (strings, readelf, objdump); make; autoconf; bison; re2c; pkg-config; PHP build libraries; file; ripgrep; unzip; jq; curl; git; sqlite3; pdftotext; ffmpeg/ffprobe for video inspection and MP4 conversion; rsvg-convert for rasterizing a code-drawn SVG comic to PNG when generative image API is unavailable. Public TCP internet is available via the bounded SOCKS5 proxy configured for curl and git HTTPS; private and loopback targets are blocked. No reusable credentials are supplied. The reviewed irai skills ctf-deep-solve and resourceful-solve are available under /workspace/.agents/skills; select a relevant skill and read its SKILL.md and only needed references. Internet access does not grant permission to test unrelated targets or access private Discord, credentials, or server systems. Ask Hackerika for same-thread or same-channel Discord evidence: POST http://127.0.0.1:8118/discord/read JSON {"kind":"recent","limit":20,"includeImage":true,"describeImage":true} or {"kind":"message","messageId":"snowflake","includeImage":true,"describeImage":true}. Images arrive as base64 in images[].data; decode to /workspace. To resume work on a file previously attached by Hackerika in this same channel/thread, POST http://127.0.0.1:8118/discord/file JSON {"messageId":"bot message snowflake","fileName":"exact filename"}; save the binary response to /workspace and check the HTTP status before use. Only a bounded prior attachment sent by Hackerika is retrievable. imageObservation describes actual pixels via bounded Luna vision; use it instead of guessing from metadata or ASCII art. For a requested creative illustration, POST JSON {"prompt":"complete visual description"} to http://127.0.0.1:8118/images/generate and save the binary WebP response under /workspace/exports/; errors are JSON, not images. If image API is unavailable, a code-drawn SVG comic rasterized with rsvg-convert can still fulfill a stylized illustration request; verify the resulting PNG. Do not claim success unless the file exists. Public search: POST http://127.0.0.1:8118/sources/search JSON {"query":"public clue"}; CTF jobs at most two searches, investigation jobs at most six. Read cited or supplied sources: POST http://127.0.0.1:8118/sources/read JSON {"url":"public URL","query":"focus"}. For static slide sites, follow linked JS slide chunks; download a discovered public archive with POST http://127.0.0.1:8118/sources/download JSON {"url":"inspected archive URL"} and save the binary response to /workspace before inspecting it. If the user asks for a file, write up to two finished files under /workspace/exports/ with simple ASCII names. Each file must be <=4 MiB and the combined size <=6 MiB. Only top-level regular files are exported; the host sends them as Discord attachments in the original channel/thread. Do not put secrets, private Discord context, or unrequested source artifacts in exports.\n')
+(root/'tooling.txt').write_text('Python 3 standard library; gcc/g++; gdb; binutils (strings, readelf, objdump); make; autoconf; bison; re2c; pkg-config; PHP build libraries; file; ripgrep; unzip; jq; curl; git; sqlite3; pdftotext; ffmpeg/ffprobe for video inspection and MP4 conversion; rsvg-convert for rasterizing a code-drawn SVG comic to PNG when generative image API is unavailable. Public TCP internet is available via the bounded SOCKS5 proxy configured for curl and git HTTPS; private and loopback targets are blocked. No reusable credentials are supplied. The reviewed irai skills ctf-deep-solve and resourceful-solve are available under /workspace/.agents/skills; select a relevant skill and read its SKILL.md and only needed references. Internet access does not grant permission to test unrelated targets or access private Discord, credentials, or server systems. Ask Hackerika for same-thread or same-channel Discord evidence: POST http://127.0.0.1:8118/discord/read JSON {"kind":"recent","limit":20,"includeImage":true,"describeImage":true} or {"kind":"message","messageId":"snowflake","includeImage":true,"describeImage":true}. Images arrive as base64 in images[].data; decode to /workspace. To resume work on a file previously attached by Hackerika in this same channel/thread, POST http://127.0.0.1:8118/discord/file JSON {"messageId":"bot message snowflake","fileName":"exact filename"}; save the binary response to /workspace and check the HTTP status before use. Only a bounded prior attachment sent by Hackerika is retrievable. imageObservation describes actual pixels via Luna vision; use it instead of guessing from metadata or ASCII art. For a requested creative illustration, POST JSON {"prompt":"complete visual description"} to http://127.0.0.1:8118/images/generate and save the binary WebP response under /workspace/exports/; errors are JSON, not images. If image API is unavailable, a code-drawn SVG comic rasterized with rsvg-convert can still fulfill a stylized illustration request; verify the resulting PNG. Do not claim success unless the file exists. Public search: POST http://127.0.0.1:8118/sources/search JSON {"query":"public clue"}. Read cited or supplied sources: POST http://127.0.0.1:8118/sources/read JSON {"url":"public URL","query":"focus"}. The application imposes no count quota on model calls, searches, source reads, public downloads, or permission-checked same-channel Discord reads; keep working until the objective is resolved or a concrete blocker remains. For static slide sites, follow linked JS slide chunks; download a discovered public archive with POST http://127.0.0.1:8118/sources/download JSON {"url":"inspected archive URL"} and save the binary response to /workspace before inspecting it. Hackerika can steer this live job. New follow-up messages are injected at inference boundaries; after a candidate final answer, POST {} to http://127.0.0.1:8118/manager/steering and resume the same session when updates are returned. If the user asks for a file, write up to two finished files under /workspace/exports/ with simple ASCII names. Each file must be <=4 MiB and the combined size <=6 MiB. Only top-level regular files are exported; the host sends them as Discord attachments in the original channel/thread. Do not put secrets, private Discord context, or unrequested source artifacts in exports.\n')
 server=http.server.ThreadingHTTPServer(('127.0.0.1',8118),Bridge)
 threading.Thread(target=server.serve_forever,daemon=True).start()
 egress=EgressServer(('127.0.0.1',8119),EgressRelay)
@@ -66,7 +66,7 @@ proxy_env={'ALL_PROXY':'socks5h://127.0.0.1:8119','all_proxy':'socks5h://127.0.0
            'NO_PROXY':'127.0.0.1,localhost','no_proxy':'127.0.0.1,localhost'}
 provider_args=['-c','model_provider="hackerika"','-c','model_providers.hackerika.name="Hackerika job gateway"','-c','model_providers.hackerika.base_url="http://127.0.0.1:8118/v1"',
  '-c','model_providers.hackerika.wire_api="responses"','-c','model_providers.hackerika.requires_openai_auth=false','-c','model_providers.hackerika.supports_websockets=false',
- '-c','model_reasoning_effort="medium"' if packet.get('kind')=='investigation' else 'model_reasoning_effort="low"','-c','web_search="disabled"','-c','features.multi_agent=false']
+ '-c','model_reasoning_effort="xhigh"','-c','web_search="disabled"','-c','features.multi_agent=true']
 args=['/usr/local/bin/codex','exec','--ignore-user-config','--ignore-rules','--skip-git-repo-check','--color','never','--json','--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],
  *provider_args,
  '--output-schema','/workspace/schema.json','--output-last-message','/workspace/final.json']
@@ -82,24 +82,51 @@ try:
     environment={**os.environ,**proxy_env,'CODEX_HOME':'/tmp/codex'}
     code=subprocess.call(args,cwd='/workspace',env=environment)
     final=root/'final.json'
+    # Subscription/provider streams can occasionally close after substantial
+    # work. Resume the same local Codex session instead of discarding all
+    # evidence. Bound only consecutive transport recovery attempts so a
+    # persistent outage still terminates and can be reported honestly.
+    recovery_attempts=0
+    while code!=0 and recovery_attempts<3:
+        recovery_attempts+=1;final.unlink(missing_ok=True);time.sleep(recovery_attempts)
+        recovery=['/usr/local/bin/codex','exec','resume','--last','--ignore-user-config','--ignore-rules','--skip-git-repo-check','--json',
+            '--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],*provider_args,
+            '--output-schema','/workspace/schema.json','--output-last-message','/workspace/final.json','--',
+            'The previous inference transport was interrupted. Continue the same objective from the evidence and local files already in this session. Do not restart completed research. Produce the strongest evidence-backed final JSON, or continue the remaining concrete work.']
+        code=subprocess.call(recovery,cwd='/workspace',env=environment)
     final_bytes=final.read_bytes() if final.is_file() and final.stat().st_size<=65536 else None
+    def manager_updates():
+        connection=http.client.HTTPConnection('127.0.0.1',8118,timeout=20)
+        try:
+            connection.request('POST','/manager/steering',body='{}',headers={'Content-Type':'application/json'})
+            response=connection.getresponse()
+            parsed=json.loads(response.read(1024*1024)) if response.status==200 else {}
+            return parsed.get('updates',[]) if isinstance(parsed,dict) and isinstance(parsed.get('updates',[]),list) else []
+        except Exception:return []
+        finally:connection.close()
     seen_steps=set()
-    for _ in range(2):
+    while True:
         if code!=0 or not final_bytes:break
         try: next_step=json.loads(final_bytes).get('nextStep','')
         except (ValueError,TypeError):break
-        if not isinstance(next_step,str) or not next_step.strip() or len(next_step)>200:break
-        step=next_step.strip()
-        if step.casefold() in seen_steps or time.monotonic()-started>=(420 if packet.get('kind')=='investigation' else 240):break
-        seen_steps.add(step.casefold())
-        # A Codex Goal is thread-scoped; this isolated job keeps the same
-        # local thread and resumes for at most two distinct evidence steps.
-        # The whole container still obeys the host job deadline.
+        updates=manager_updates()
+        if updates:
+            step='\n'.join(str(item.get('instruction','')).strip() for item in updates if isinstance(item,dict) and str(item.get('instruction','')).strip())
+            key='steer:'+','.join(str(item.get('id','')) for item in updates if isinstance(item,dict))
+            resume_instruction='The original Discord requestor sent this live follow-up: '+json.dumps(step)+'. Treat it as the latest user direction within the existing scope. '
+        else:
+            if not isinstance(next_step,str) or not next_step.strip() or len(next_step)>200:break
+            step=next_step.strip();key='next:'+step.casefold()
+            resume_instruction='The previous answer identified one possible next action: '+json.dumps(step)+'. '
+        if not step or key in seen_steps:break
+        seen_steps.add(key)
+        # Keep the same disposable Codex thread so follow-ups and evidence
+        # steps retain the exact local state produced earlier in this job.
         final.unlink(missing_ok=True)
         resume=['/usr/local/bin/codex','exec','resume','--last','--ignore-user-config','--ignore-rules','--skip-git-repo-check','--json',
             '--dangerously-bypass-approvals-and-sandbox','--model',packet['model'],*provider_args,
             '--output-schema','/workspace/schema.json','--output-last-message','/workspace/final.json','--',
-            'Continue the same bounded objective. The previous answer identified one possible next action: '+json.dumps(step)+'. '
+            'Continue the same objective. '+resume_instruction+
             'Check whether it is still useful and within scope, then perform it if feasible. Do not repeat exhausted paths. '
             'Return the strongest evidence-backed final JSON. Set nextStep only for a different concrete untried action; otherwise use an empty string.']
         resumed=subprocess.call(resume,cwd='/workspace',env=environment)

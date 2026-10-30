@@ -28,7 +28,6 @@ const snowflake = (value: unknown): value is string => typeof value === 'string'
  * the worker can only ask for bounded reads within its original job channel. */
 export class DiscordContextBroker {
   private pending = new Map<string, Pending>();
-  private counts = new Map<string, number>();
 
   async ask(job: Job, query: DiscordReadQuery, signal: AbortSignal): Promise<unknown> {
     if (job.state !== 'running' || signal.aborted) return { ok: false, error: 'job_closed' };
@@ -39,9 +38,6 @@ export class DiscordContextBroker {
     if (query.includeFile && (query.kind!=='message'||!snowflake(query.messageId)
       || query.fileName!==undefined&&(typeof query.fileName!=='string'||!query.fileName||query.fileName.length>160)))
       return {ok:false,error:'invalid_file_query'};
-    const count = (this.counts.get(job.id) || 0) + 1;
-    if (count > 6) return { ok: false, error: 'discord_read_budget' };
-    this.counts.set(job.id, count);
     const request: DiscordReadRequest = { id: randomUUID(), jobId: job.id, guildId: job.packet.guildId,
       channelId: job.packet.channelId, userId: job.packet.userId, sourceMessageId: job.packet.messageId,
       kind: query.kind, ...(query.messageId ? { messageId: query.messageId } : {}),
@@ -71,6 +67,5 @@ export class DiscordContextBroker {
 
   clearJob(jobId: string): void {
     for (const item of this.pending.values()) if (item.request.jobId === jobId) item.finish({ ok: false, error: 'job_closed' });
-    this.counts.delete(jobId);
   }
 }

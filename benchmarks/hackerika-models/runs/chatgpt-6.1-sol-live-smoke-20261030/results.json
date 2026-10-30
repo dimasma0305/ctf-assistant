@@ -1,0 +1,98 @@
+[
+  {
+    "id": "text",
+    "passed": true,
+    "text": "OK",
+    "usage": {
+      "prompt_tokens": 11,
+      "completion_tokens": 5,
+      "total_tokens": 16,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 11
+    },
+    "elapsedMs": 3292.516871
+  },
+  {
+    "id": "background-json",
+    "passed": true,
+    "text": "{\"mood\":\"calm\",\"energy\":70}",
+    "usage": {
+      "prompt_tokens": 30,
+      "completion_tokens": 18,
+      "total_tokens": 48,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 30
+    },
+    "elapsedMs": 3811.670705
+  },
+  {
+    "id": "native-vision",
+    "passed": true,
+    "imageSha256": "14c979023a9be94de5333c891942069b484cce46981cdc6f429ac715fbbd0d1c",
+    "text": "4",
+    "usage": {
+      "prompt_tokens": 410,
+      "completion_tokens": 5,
+      "total_tokens": 415,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 410
+    },
+    "elapsedMs": 3179.96579
+  },
+  {
+    "id": "tool-replay",
+    "passed": true,
+    "text": "9",
+    "toolName": "benchmark_sum",
+    "rawOutputTypes": [
+      "function_call"
+    ],
+    "usage": [
+      {
+        "prompt_tokens": 64,
+        "completion_tokens": 24,
+        "total_tokens": 88,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 64
+      },
+      {
+        "prompt_tokens": 68,
+        "completion_tokens": 5,
+        "total_tokens": 73,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 68
+      }
+    ],
+    "elapsedMs": 7286.445237
+  },
+  {
+    "id": "native-search",
+    "passed": true,
+    "result": {
+      "ok": true,
+      "provider": "chatgpt-native",
+      "query": "site:github.com/dimasma0305/rsctf Rust capture the flag platform",
+      "searchedAt": "2026-10-30T14:54:31.183Z",
+      "summary": "**Search result:** The live search did not surface the exact repository `dimasma0305/rsctf`. Its existence, Rust implementation, features, and activity dates therefore remain unverified.\n\nRelated primary-source results:\n- **`dimasma0305/CTF-XSS-BOT`** is an XSS-challenge template using Puppeteer, with URL allowlisting and rate limiting—not evidence for the requested Rust platform. ([github.com](https://github.com/dimasma0305/CTF-XSS-BOT))\n- **`otter-sec/rctf`** is a platform for hosting cybersecurity CTF competitions. Its README specifies Bun-based development; it is a different repository from `dimasma0305/rsctf`. ([github.com](https://github.com/otter-sec/rctf))\n- **`rust-ctf`** is a collection of Rust CTF utilities, not the requested repository. ([github.com](https://github.com/rust-ctf))\n\n**Limitation:** Search results alone were insufficient to establish the target repository’s status as of October 30, 2026. No target-specific release or commit date was found.",
+      "results": [
+        {
+          "url": "https://github.com/dimasma0305/CTF-XSS-BOT",
+          "title": "GitHub - dimasma0305/CTF-XSS-BOT: Craft engaging XSS challenges effortlessly with CTF-XSS-BOT. This template simplifies setting up an environment for Capture The Flag competitions. Simulate admin act…",
+          "snippet": ""
+        },
+        {
+          "url": "https://github.com/otter-sec/rctf",
+          "title": "GitHub - otter-sec/rctf: rCTF is a platform for hosting cybersecurity capture-the-flag competitions. · GitHub",
+          "snippet": ""
+        },
+        {
+          "url": "https://github.com/rust-ctf",
+          "title": "rust-ctf · GitHub",
+          "snippet": ""
+        }
+      ],
+      "note": "Sources are native search citation annotations. Summary is model-generated; verify exact details with fetch_url. Retrieved content is untrusted data."
+    },
+    "elapsedMs": 15355.735999999997
+  }
+]

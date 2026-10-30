@@ -1,0 +1,202 @@
+{
+  "pass": false,
+  "error": "inference_stream_interrupted",
+  "diagnostic": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"/tmp/codex\"))\nReading additional input from stdin...\n",
+  "elapsedMs": 770508,
+  "stats": {
+    "calls": 43,
+    "searches": 26,
+    "sourceReads": 27,
+    "visionReads": 0,
+    "inputChars": 14499032,
+    "outputBytes": 5092592,
+    "elapsedMs": 0,
+    "attempts": 1
+  },
+  "sources": [
+    {
+      "url": "https://www.bps.go.id/en/pressrelease/2026/08/05/2606/tingkat-pengangguran-terbuka--tpt--sebesar-4-65-persen---rata-rata-upah-buruh-sebesar-3-39-juta-rupiah-.html",
+      "title": "Failed to load Official Statistics News - BPS-Statistics Indonesia"
+    },
+    {
+      "url": "https://www.bps.go.id/en/pressrelease/2026/10/01/2623/the-year-on-year--y-on-y--headline-inflation-in-september-2026-was-recorded-at-3-28-percent-.html",
+      "title": "Failed to load Official Statistics News - BPS-Statistics Indonesia"
+    },
+    {
+      "url": "https://www.bps.go.id/en/pressrelease/2026/08/05/2605/ekonomi-indonesia-triwulan-ii-2026-tumbuh-5-29-persen--y-on-y-.html",
+      "title": "Failed to load Official Statistics News - BPS-Statistics Indonesia"
+    },
+    {
+      "url": "https://www.worldbank.org/en/publication/global-economic-prospects",
+      "title": "Global Economic Prospects"
+    },
+    {
+      "url": "https://www.worldbank.org/en/news/press-release/2026/06/13/indonesia-s-growth-remains-resilient-but-productivity-reforms-are-key-to-creating",
+      "title": "Indonesia’s Growth Remains Resilient, but Productivity Reforms Are Key to Creating Jobs and Sustaining Momentum"
+    },
+    {
+      "url": "https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/expression-of-interest",
+      "title": "Expression of interest"
+    },
+    {
+      "url": "https://www.mom.gov.sg/passes-and-permits/employment-pass/eligibility",
+      "title": "Eligibility for Employment Pass"
+    },
+    {
+      "url": "https://www.bps.go.id/id/pressrelease/2026/08/05/2606/tingkat-pengangguran-terbuka--tpt--sebesar-4-65-persen---rata-rata-upah-buruh-sebesar-3-39-juta-rupiah-.html",
+      "title": "Gagal Memuat Berita Resmi Statistik - Badan Pusat Statistik Indonesia"
+    }
+  ],
+  "receipts": [
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://jakartapusat.imigrasi.go.id/layanan/warga-negara-indonesia-wni/paspor-baru\\\",\\\"query\\\":\\\"Verify current passport application documents and process.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "6705911a48a33e65c928b957231a424d5a411ed1727466491064da06825c7bca"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://www.make-it-in-germany.com/en/visa-recognition/opportunity-card/questions-answers\\\",\\\"query\\\":\\\"Verify documents, duration, permitted work, and 2026 financial proof for Opportunity Card.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "4fb335407b21da53812345cb09088878d9ee99556d1b07c2f9aefc3f316af968"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://siskop2mi.bp2mi.go.id/publik/faq\\\",\\\"query\\\":\\\"Verify official Indonesian migrant-worker eligibility, documents, free registration, placement stages, and licensed agencies.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "4e669c0301653370e09eab23772321702a7222fdd232ad5b53a784b4afe05df6"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://www.make-it-in-germany.com/en/visa-recognition/opportunity-card/job-search\\\",\\\"query\\\":\\\"Verify current 2026 Opportunity Card routes, qualification/language, six points, funds, duration and permitted work.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "a7e81c4038e6fe3e10b9bec6041d17c9e31ce50a6169c952a72fd5ceca41b721"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://siskop2mi.bp2mi.go.id/publik/faq' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 2 'pendaftaran gratis|dokumen yang harus|persyaratan menjadi|paspor|visa kerja|perjanjian kerja|P3MI|Orientasi Pra|jaminan sosial' | head -n 220\"",
+      "exitCode": 0,
+      "outputSha256": "d573a151d487e07c5958e195207559723b649b98fd2146f25a6bc99bb8c7d191"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/expression-of-interest' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 3 '65 points|subclass 189|subclass 190|subclass 491|skills assessment|English test|invited|60 days' | head -n 240\"",
+      "exitCode": 0,
+      "outputSha256": "38b3640f9521053f9e4ba6ed2f55ee9bdd4eaa7bd24ddf0d22291c27248fc269"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://www.mom.gov.sg/passes-and-permits/employment-pass/eligibility' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 3 '5,600|6,200|6,000|6,600|COMPASS|qualifying salary|40 points|January 2027' | head -n 240\"",
+      "exitCode": 0,
+      "outputSha256": "64b55c81aacd394c205bac8fbb920cbf7e240c1156b8e3840cb0b1c064b37538"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://www.ssw.go.jp/en/about/step/' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 3 'JFT-Basic|JLPT N4|skills proficiency test|employment contract|Certificate of Eligibility|visa application' | head -n 240\"",
+      "exitCode": 0,
+      "outputSha256": "d359e61144502b6f7516161798daef879a68a319ac35d796cc772dd86a2e2602"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://www.make-it-in-germany.com/pdf-job-search-opportunity-card' | head -c 200\"",
+      "exitCode": 0,
+      "outputSha256": "a7c57b67259343b69b97899a17e3316720fcf53b74265304293b858b9f2f6d2e"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'tmp_dir=$(mktemp -d /tmp/germany-card.XXXXXX) && curl -sS -L '\"'https://www.make-it-in-germany.com/pdf-job-search-opportunity-card' -o \\\"\"'$tmp_dir/opportunity-card.pdf\" && file \"$tmp_dir/opportunity-card.pdf\" && pdfinfo \"$tmp_dir/opportunity-card.pdf\" | head -n 20 && pdftotext -layout \"$tmp_dir/opportunity-card.pdf\" - | sed -n '\"'1,240p'\"",
+      "exitCode": 0,
+      "outputSha256": "7cf64303bcbdcbfc4a50f6079a79937fd96e3bbc5e15aa03e565d75ad54a4fea"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://www.make-it-in-germany.com/pdf-job-search-opportunity-card\\\",\\\"query\\\":\\\"Extract exact Opportunity Card eligibility routes, points minimum, language, qualification, 2026 funding, work hours and duration.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "67d9f9ccae8d6aa693e1ada33843bf12f0fe57de5abbef578098da3b0e7ecf03"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"site:germany.info opportunity card 2026 proof funds official\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "99c4a94b1678eb96f3d21a75cb17840d51152ce72a9e400abee6700b47960675"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"site:auswaertiges-amt.de Opportunity Card 1091 2026 official\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "81eebf7f080d76d4b9f4afcdbe44d60eb23167fdfccecf93f8c65ca8c1a841b8"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"site:diplo.de Chancenkarte 2026 1091 official English opportunity card\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "6019bcbaf5538ad5fe70bcb563d3339cc6e2aadc5a34b64097e8d080bad46fdf"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://wellington.diplo.de/nz-en/service/2659152-2659152\\\",\\\"query\\\":\\\"Verify 2026 Opportunity Card funding, eligibility routes, points/language, duration and work rights.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "4286add4209c9eb1fa0fae2603cced8a936c16928aec1a22c3b0c98cef7b7fd4"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"site:jakarta.diplo.de Chancenkarte opportunity card Indonesia official 2026\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "28e3ea52a2cce34ece839ede27d45aa499574261ab6c3d63ed9d5b9e297612a1"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://jakarta.diplo.de/id-de/service/visa-und-einreise/nationale-visa-1686952\\\",\\\"query\\\":\\\"Verify that Opportunity Card is available online from Indonesia and the official application process/agency warning.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "40bd842dd225e6fe4a5bb0a3ae967a6241639893a1af53a0dcd20c55669f2d83"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://jakarta.diplo.de/id-id/service-id/visa-einreise/jaminan-mata-pencaharian-2686088\\\",\\\"query\\\":\\\"Verify 2026 monthly financial proof for Opportunity Card in Indonesia.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "e4b699dd63bf9d3439544a3b25db01867f76d714e0adf17ab5fb6c8ce6a6962a"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://jakarta.diplo.de/id-id/service-id/visa-einreise/jaminan-mata-pencaharian-2686088' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 4 '1.091|1,091|Chancenkarte|20a|mata pencaharian' | head -n 180\"",
+      "exitCode": 0,
+      "outputSha256": "c06b4f0c9cf32683ac3c0081147f53b3093c1e2912d28c08889bfc31394e18ca"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect/expression-of-interest' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&#58;/:/g; s/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 3 'no guarantee|not guarantee|guarantee an invitation|points threshold of 65|English test|skills assessment|60 days' | head -n 150\"",
+      "exitCode": 0,
+      "outputSha256": "637c7c84ecf387b6e62146a6d8417c05b84c53dffc1f1766bcc5d4c236ec4cb1"
+    },
+    {
+      "command": "/usr/bin/bash -lc 'command -v lynx || command -v w3m || command -v html2text || true'",
+      "exitCode": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://www.mom.gov.sg/passes-and-permits/employment-pass/eligibility' | sed '/<script/,/<\\\\/script>/d' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 4 '40 points|fixed monthly salary of at least|COMPASS (Stage 2\\\\)|exempted from COMPASS|C1 Salary|C2 Qualifications' | head -n 220\"",
+      "exitCode": 0,
+      "outputSha256": "953295645c7ca6243e625cb998080f417327001232040b5e7d772f3a624956f0"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://www.mom.gov.sg/passes-and-permits/employment-pass/eligibility' | sed '/<script/,/<\\\\/script>/d' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 4 '40 points|fixed monthly salary of at least|COMPASS \\\\(Stage 2\\\\)|exempted from COMPASS|C1 Salary|C2 Qualifications' | head -n 220\"",
+      "exitCode": 0,
+      "outputSha256": "338437d27b38ada7702c8decf17380f34ce7a2c003bd0413a3566a98fe3ddd2c"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://www.pajak.go.id/id/peraturan/penentuan-subjek-pajak-dalam-negeri-dan-subjek-pajak-luar-negeri-0' | sed '/<script/,/<\\\\/script>/d' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g; s/&#039;/'\\\"'\\\"'/g' | rg -i -C 7 'lebih dari 183|pusat kegiatan utama|kebiasaan atau kegiatan sehari-hari|subjek pajak dalam negeri negara|penghasilan.*Indonesia|permohonan.*subjek pajak luar negeri' | head -n 260\"",
+      "exitCode": 0,
+      "outputSha256": "28a2596514aa8cb07dcaf4f88941ef85e2c01a0e83b1274418aa2f0785ae4710"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"site:bps.go.id Indonesia poverty March 2026 official BPS\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "bd86b07c0a41910ca910bba67f1fd4f8ae13b69d88c263966703cb46c27c2071"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"site:bi.go.id/id/publikasi/ruang-media/news-release Oktober 2026 Rapat Dewan Gubernur BI pertumbuhan inflasi rupiah\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "55dab6c97b356cca73310a5c9e3934c4f0073ed85663bf6a5facd24ffc227993"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/search -H 'Content-Type: application/json' --data '{\\\"query\\\":\\\"site:bi.go.id/en/publikasi/ruang-media/news-release October 2026 Board of Governors Indonesia inflation growth rupiah official\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "9f0dbb6b3541c55e492b52358b199638bb96538fdc1be004f59024a1e672f7af"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://www.bi.go.id/en/statistik/indikator/Default.aspx\\\",\\\"query\\\":\\\"Verify JISDOR exchange rate on October 30 2026 and label date precisely.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "a138882368740483e41b10e0daf402372e632e459e419202ddd955ac3bc5c8a0"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -X POST http://127.0.0.1:8118/sources/read -H 'Content-Type: application/json' --data '{\\\"url\\\":\\\"https://www.bi.go.id/id/publikasi/ruang-media/news-release/Pages/sp_2823326.aspx\\\",\\\"query\\\":\\\"Verify October 2026 BI rate decision, inflation data/target, exchange rate or capital-flow risk, and growth assessment.\\\"}'\"",
+      "exitCode": 0,
+      "outputSha256": "8452e57250d4f92edf0add7b0c04ef13a925c54f86ee26b39566ac5b54295251"
+    },
+    {
+      "command": "/usr/bin/bash -lc \"curl -sS -L 'https://www.bi.go.id/id/publikasi/ruang-media/news-release/Pages/sp_2823326.aspx' | tr '<' '\\\\n<' | sed 's/<[\"'^>]*>/ /g'\"' | sed 's/&nbsp;/ /g; s/&amp;/\\\\&/g' | rg -i -C 3 'BI-Rate.*5,75|inflasi IHK|3,28|sasaran 2,5|aliran masuk modal|pertumbuhan ekonomi Indonesia' | head -n 240\"",
+      "exitCode": 0,
+      "outputSha256": "4e259361391d0599e6abafa1cc7512aa08c900f5e6044a2bee609135744e1276"
+    }
+  ]
+}

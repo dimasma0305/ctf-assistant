@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-30T14:53:58.243Z",
+  "model": "gpt-6.1-sol",
+  "reasoningEffort": "low",
+  "cases": [
+    {
+      "id": "text",
+      "expected": "Exactly OK"
+    },
+    {
+      "id": "background-json",
+      "expected": "Valid JSON with the requested calm mood and numeric energy"
+    },
+    {
+      "id": "native-vision",
+      "expected": "Four red squares; distinguish blue circles"
+    },
+    {
+      "id": "tool-replay",
+      "expected": "Required namespaced function, original call ID and full response replay, final answer 9"
+    },
+    {
+      "id": "native-search",
+      "expected": "Completed hosted search and at least one public source citation"
+    }
+  ],
+  "scriptHash": "069a1652d61533f444698dff9b8a66d4a338fc1c81035052c80a0b32b8f03aa2",
+  "maxModelRequests": 6,
+  "noRealDiscordMessagesOrDatabaseWrites": true,
+  "scope": "Live OAuth/Responses transport checks. Synthetic content and tool result; image fixture shared with prior vision suite. This is not a persona-quality comparison."
+}

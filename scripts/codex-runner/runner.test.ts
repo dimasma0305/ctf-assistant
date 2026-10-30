@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
+import { canCollaborateOnJob, chooseModel, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
 import { deleteExportedFiles, exportDirectory, readExportedFile, saveExportedFiles } from './exports';
 import { workerArgs } from './executor';
 import { startGateway } from './gateway';
@@ -17,13 +17,14 @@ import { SafeFetchError } from '../../src/utils/urlGuard';
 const packet=()=>({scope:'555555555555555555:700000000000000001',guildId:'555555555555555555',channelId:'700000000000000001',
   messageId:'800000000000000001',userId:'663394727688798231',question:'solve pwn exploit ini',context:'thread evidence',route:'auto' as const,artifacts:[]});
 
-test('model route defaults to Sol, preserves explicit Luna, and gates Daybreak',()=>{
+test('manager routes general work to GPT-6.1 Sol, security work to GPT-5.6 Sol, and gates Daybreak',()=>{
   const valid=validatePacket(packet());
-  expect(chooseModel(valid,new Set(),new Set(['gpt-6-sol']))).toBe('gpt-6-sol');
-  expect(chooseModel(valid,new Set([valid.userId]),new Set(['gpt-6-sol','gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-6-sol');
+  expect(chooseModel(valid,new Set(),new Set(['gpt-6.1-sol']))).toBe('gpt-6.1-sol');
+  expect(chooseModel({...valid,route:'gpt-5.6-sol'},new Set(),new Set(['gpt-5.6-sol']))).toBe('gpt-5.6-sol');
+  expect(chooseModel(valid,new Set([valid.userId]),new Set(['gpt-6.1-sol','gpt-daybreak-blue-latest']))).toBe('gpt-6.1-sol');
   expect(chooseModel({...valid,route:'luna'},new Set(),new Set(['gpt-6-luna']))).toBe('gpt-6-luna');
   expect(()=>chooseModel(valid,new Set(),new Set(['gpt-6-luna']))).toThrow('model_not_verified');
-  expect(chooseModel({...valid,route:'daybreak'},new Set([valid.userId]),new Set(['gpt-6-sol','gpt-6-luna','gpt-daybreak-blue-latest']))).toBe('gpt-daybreak-blue-latest');
+  expect(chooseModel({...valid,route:'daybreak'},new Set([valid.userId]),new Set(['gpt-6.1-sol','gpt-daybreak-blue-latest']))).toBe('gpt-daybreak-blue-latest');
   expect(chooseModel({...valid,route:'sol'},new Set(),new Set(['gpt-6-luna','gpt-6-sol']))).toBe('gpt-6-sol');
   expect(()=>chooseModel({...valid,route:'daybreak'},new Set(),new Set(['gpt-6-luna','gpt-daybreak-blue-latest']))).toThrow('daybreak_not_enabled');
   expect(validatePacket({...packet(),kind:'investigation'}).kind).toBe('investigation');
@@ -39,6 +40,15 @@ test('multi-person investigation batch shares one request but keeps separate job
   expect(()=>validateInvestigationBatch({packets:[first,{...second,messageId:'800000000000000002'}]})).toThrow('invalid_job_batch');
   expect(()=>validateInvestigationBatch({packets:[first,{...second,kind:'ctf'}]})).toThrow('invalid_job_batch');
   expect(()=>validateInvestigationBatch({packets:[first]})).toThrow('invalid_job_batch');
+});
+
+test('same-channel members can inspect and steer a collaborative job without gaining owner cancellation rights',()=>{
+  const job=newJob(validatePacket(packet()));
+  expect(ownsJob(job,job.packet.scope,job.packet.userId)).toBe(true);
+  expect(ownsJob(job,job.packet.scope,'899999999999999999')).toBe(false);
+  expect(canCollaborateOnJob(job,job.packet.scope,'899999999999999999')).toBe(true);
+  expect(canCollaborateOnJob(job,'555555555555555555:700000000000000099','899999999999999999')).toBe(false);
+  expect(canCollaborateOnJob(job,job.packet.scope,'not-a-user')).toBe(false);
 });
 
 test('hourly job cap gives trusted requestors more room and a precise retry delay',()=>{
@@ -83,6 +93,7 @@ test('public job output hides challenge bytes and formats only validated solver 
   const job=newJob(validatePacket({...packet(),context:'PRIVATE-CONTEXT',artifacts:[{name:'x.txt',data:Buffer.from('PRIVATE-BYTES').toString('base64'),image:false,sourceMessageId:packet().messageId}]}));
   job.state='completed';job.model='gpt-6-luna';job.result=resultFromText(JSON.stringify({summary:'selesai',flags:['LabCTF{ok}','not-a-flag'],findings:['python verified'],unresolved:[],needsStrongerModel:false}));
   const exposed=JSON.stringify(publicJob(job));expect(exposed).not.toContain('PRIVATE');expect(exposed).not.toContain('data');
+  expect(publicJob(job).objective).toBe(job.packet.question);
   const rendered=formatCodexResult(publicJob(job));expect(rendered).toContain('LabCTF{ok}');expect(rendered).not.toContain('not-a-flag');expect(rendered).toContain('belum dicek remote');
 });
 
@@ -279,7 +290,7 @@ test('bot control client communicates over a Unix socket without a TCP listener'
 
 test('isolated source gateway rejects flags and bounds public searches before network access',async()=>{
   const directory=await mkdtemp(join(tmpdir(),'codex-source-test-')),socket=join(directory,'source.sock');
-  const gateway=await startGateway(socket,newJob(validatePacket(packet())),'gpt-6-luna',new AbortController().signal);
+  const gateway=await startGateway(socket,newJob(validatePacket(packet())),'gpt-6-luna',new AbortController().signal,{maxSearches:2});
   try{
     await expect(codexRequest('/sources/search',{query:'LabCTF{private_flag}'},{socketPath:socket})).rejects.toThrow('invalid_or_private_query');
     await expect(codexRequest('/sources/search',{query:'Bearer secret'},{socketPath:socket})).rejects.toThrow('invalid_or_private_query');
@@ -287,7 +298,7 @@ test('isolated source gateway rejects flags and bounds public searches before ne
   }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
 });
 
-test('investigation gateway has enough calls for deep research and reports an exact budget failure',async()=>{
+test('production investigation gateway does not impose a model-call count quota',async()=>{
   const directory=await mkdtemp(join(tmpdir(),'codex-research-budget-test-')),socket=join(directory,'source.sock');
   const job=newJob(validatePacket({...packet(),kind:'investigation'}));
   const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal,{
@@ -298,11 +309,30 @@ test('investigation gateway has enough calls for deep research and reports an ex
   const request=()=>fetch('http://localhost/v1/responses',{unix:socket,method:'POST',
     headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'gpt-6-luna'})} as RequestInit & {unix:string});
   try{
-    for(let i=0;i<36;i++){const response=await request();expect(response.status).toBe(200);await response.text();}
-    expect(job.stats.calls).toBe(36);
-    const rejected=await request();expect(rejected.status).toBe(429);
-    expect(await rejected.json()).toEqual({error:'model_call_budget'});
-    expect(gateway.failureReason()).toBe('model_call_budget');
+    for(let i=0;i<40;i++){const response=await request();expect(response.status).toBe(200);await response.text();}
+    expect(job.stats.calls).toBe(40);
+    const next=await request();expect(next.status).toBe(200);await next.text();
+    expect(job.stats.calls).toBe(41);expect(gateway.failureReason()).toBe('');
+  }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
+});
+
+test('live manager steering is injected as the latest user direction on the next inference boundary',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-steering-test-')),socket=join(directory,'source.sock');
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));
+  const updates=[{id:'steer-1',createdAt:Date.now(),messageId:'800000000000000002',instruction:'Fokus ke patch upstream dan uji versi 8.6.'}];
+  let forwarded:any;
+  const gateway=await startGateway(socket,job,'gpt-6.1-sol',new AbortController().signal,{
+    credentials:async()=>({access_token:'fixture'}),consumeSteering:async()=>updates.splice(0),
+    fetcher:(async(_url,init)=>{forwarded=JSON.parse(String(init?.body));return new Response('data: {"type":"response.completed"}\n\n',
+      {headers:{'Content-Type':'text/event-stream'}});}) as typeof fetch});
+  try{
+    const response=await fetch('http://localhost/v1/responses',{unix:socket,method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'gpt-6.1-sol',input:[{role:'user',content:'Initial objective'}]})} as RequestInit&{unix:string});
+    expect(response.status).toBe(200);await response.text();
+    const serialized=JSON.stringify(forwarded.input);
+    expect(serialized).toContain('New follow-up from the original Discord requestor');
+    expect(serialized).toContain('Fokus ke patch upstream');
+    expect(updates).toHaveLength(0);
   }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
 });
 

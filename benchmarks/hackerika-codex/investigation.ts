@@ -12,20 +12,21 @@ const option=(name:string)=>{const index=process.argv.indexOf(name);return index
 const out=option('--out');
 if(!out||await Bun.file(join(out,'protocol.json')).exists())throw Error('Use --out FRESH_PATH');
 const image=process.env.CODEX_WORKER_IMAGE||WORKER_IMAGE;
+const model=option('--model')||'gpt-5.6-sol';
 const question='Riset situasi Indonesia dan dunia sekarang, lebih baik pindah ke luar negeri atau tetap tinggal di sini? Jika pindah, apa yang harus disiapkan?';
 const date=new Date().toISOString().slice(0,10);
 const job=newJob({scope:'555555555555555555:700000000000009001',guildId:'555555555555555555',channelId:'700000000000009001',
-  messageId:'800000000000009001',userId:'663394727688798231',kind:'investigation',route:'auto',question,
+  messageId:'800000000000009001',userId:'663394727688798231',kind:'investigation',route:model==='gpt-5.6-sol'?'gpt-5.6-sol':'gpt-6.1-sol',question,
   context:`Tanggal permintaan: ${date}. User belum menyebut negara tujuan, pekerjaan, anggaran, atau tanggungan. Beri kerangka keputusan bersyarat dan persiapan praktis dari sumber primer yang diperiksa. Jangan mengasumsikan profil pribadi atau mengarang angka terkini.`,artifacts:[]});
 await mkdir(out,{recursive:true});
-await writeFile(join(out,'protocol.json'),JSON.stringify({date,model:'gpt-6-sol',image,question,
+await writeFile(join(out,'protocol.json'),JSON.stringify({date,model,image,question,
   promptSha256:createHash('sha256').update(INVESTIGATION_PROMPT).digest('hex'),
   scope:'Real isolated worker, inference and public web research; synthetic Discord IDs; no Discord sends or production job submission.',
   acceptance:'Completed research with successful evidence commands, at least three inspected source URLs across at least two domains, and a cited answer covering conditional stay/move tradeoffs and practical preparation. Human review required for factual quality.'},null,2));
 const root=await mkdtemp(join(tmpdir(),'hr-research-'));const start=Date.now();let diagnostic='';
 try{
   await ensureWorkerImage(image);
-  const output=await executeJob(job,'gpt-6-sol',root,AbortSignal.timeout(900_000),{image,
+  const output=await executeJob(job,model,root,AbortSignal.timeout(900_000),{image,
     onDiagnostic:text=>{diagnostic=(diagnostic+text).slice(-3000);},
     onEvent:event=>{if(event.type==='item.completed'&&event.item?.type==='command_execution')
       console.log(JSON.stringify({commandCompleted:true,exit:event.item.exit_code,calls:job.stats.calls,searches:job.stats.searches,reads:job.stats.sourceReads}));}});

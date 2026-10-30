@@ -1,7 +1,7 @@
 import { chmod, chown, mkdir, open, readdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { chooseModel, hourlyLimitRetryAfterSeconds, newJob, publicJob, validateInvestigationBatch, validatePacket, type Job } from './protocol';
+import { canCollaborateOnJob, chooseModel, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, validateInvestigationBatch, validatePacket, type Job } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { createWorkerImageReadiness } from './workerImage';
@@ -14,11 +14,14 @@ const runtimeRoot = process.env.CODEX_JOB_RUNTIME_ROOT || '/run/hackerika-codex-
 const image = process.env.CODEX_WORKER_IMAGE || WORKER_IMAGE;
 const workerImage = createWorkerImageReadiness(image);
 const maxQueued = Math.max(1, Math.min(16, Number(process.env.CODEX_MAX_QUEUED) || 8));
+const maxChannelJobs = Math.max(1, Math.min(8, Number(process.env.CODEX_MAX_CHANNEL_JOBS) || 4));
 const hourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_JOBS_PER_USER_HOUR) || 3));
-const trustedHourlyLimit = Math.max(3, Math.min(30, Number(process.env.CODEX_TRUSTED_JOBS_PER_USER_HOUR) || 12));
+const trustedLimitValue = Number(process.env.CODEX_TRUSTED_JOBS_PER_USER_HOUR ?? 0);
+const trustedHourlyLimit = trustedLimitValue === 0 ? Infinity : Math.max(3, Math.min(100, trustedLimitValue || 12));
+const jobTimeoutMs = Math.max(0, Number(process.env.CODEX_JOB_TIMEOUT_MS) || 0);
 const ttlMs = 24 * 60 * 60_000;
 const daybreakUsers = new Set((process.env.CODEX_DAYBREAK_USER_IDS || '').split(',').map(s=>s.trim()).filter(Boolean));
-const verified = new Set((process.env.CODEX_VERIFIED_MODELS || 'gpt-6-sol,gpt-6-luna').split(',').map(s=>s.trim()).filter(Boolean));
+const verified = new Set((process.env.CODEX_VERIFIED_MODELS || 'gpt-5.6-sol,gpt-6.1-sol,gpt-daybreak-blue-latest').split(',').map(s=>s.trim()).filter(Boolean));
 const jobs = new Map<string, Job>();
 const queue: string[] = [];
 const aborters = new Map<string, AbortController>();
@@ -58,7 +61,8 @@ async function load() {
 }
 function response(value: unknown, status=200) { return Response.json(value,{status,headers:{'Cache-Control':'no-store'}}); }
 async function json(request:Request){const text=await request.text();if(text.length>30*1024*1024)throw Error('body_too_large');return JSON.parse(text||'{}');}
-function owner(body:any,job:Job){return body?.scope===job.packet.scope&&body?.userId===job.packet.userId;}
+function owner(body:any,job:Job){return ownsJob(job,body?.scope,body?.userId);}
+function participant(body:any,job:Job){return canCollaborateOnJob(job,body?.scope,body?.userId);}
 async function cleanup(){
   const cutoff=Date.now()-ttlMs;
   for(const [id,job] of jobs) if(job.updatedAt<cutoff&&!['pending','running'].includes(job.state)){
@@ -76,12 +80,17 @@ async function runNext(){
     await persist(job);
     const model=chooseModel(job.packet,daybreakUsers,verified);
     await workerImage.ensure();
-    const deadline=AbortSignal.any([controller.signal,AbortSignal.timeout(job.packet.kind==='investigation'?900_000:600_000)]);
+    const deadline=jobTimeoutMs>0?AbortSignal.any([controller.signal,AbortSignal.timeout(jobTimeoutMs)]):controller.signal;
     let result:Awaited<ReturnType<typeof executeJob>>|undefined;
     let evidenceRetry=false;
     for(let attempt=0;attempt<2;attempt++){
       try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry:attempt===1&&!evidenceRetry,evidenceRetry:attempt===1&&evidenceRetry,
-        gateway:{discordRead:query=>discord.ask(job,query,deadline)}});break;}
+        gateway:{discordRead:query=>discord.ask(job,query,deadline),consumeSteering:async()=>{
+          const pending=(job.steering||[]).filter(item=>!item.consumedAt);
+          if(!pending.length)return [];
+          const now=Date.now();for(const item of pending)item.consumedAt=now;
+          await persist(job);return pending;
+        }}});break;}
       catch(error:any){
         const reason=String(error?.message);
         if(attempt!==0||deadline.aborted||job.stats.calls>=8
@@ -145,11 +154,12 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
       }
       const packet=packets[0];await cleanup();
       const outstanding=[...jobs.values()].filter(j=>j.packet.scope===packet.scope&&['pending','running'].includes(j.state));
-      if(outstanding.length)return response({ok:false,error:'channel_job_active',job:publicJob(outstanding[0])},409);
+      if(outstanding.length+packets.length>maxChannelJobs)
+        return response({ok:false,error:'channel_job_limit',limit:maxChannelJobs,job:publicJob(outstanding[0])},409);
       if(queue.length+(running?1:0)+packets.length>maxQueued)return response({ok:false,error:'queue_full'},429);
       const key=`${packet.guildId}:${packet.userId}`,recent=(submissions.get(key)||[]).filter(t=>t>Date.now()-60*60_000);
       const limit=daybreakUsers.has(packet.userId)?trustedHourlyLimit:hourlyLimit;
-      const retryAfterSeconds=hourlyLimitRetryAfterSeconds(recent,packets.length,limit,Date.now());
+      const retryAfterSeconds=Number.isFinite(limit)?hourlyLimitRetryAfterSeconds(recent,packets.length,limit,Date.now()):null;
       if(retryAfterSeconds!==null){
         return response({ok:false,error:'user_hourly_limit',limit,retryAfterSeconds},429);
       }
@@ -166,12 +176,49 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
       schedule();
       return response(path==='/jobs/batch'?{ok:true,jobs:created.map(publicJob)}:{ok:true,job:publicJob(created[0])},202);
     }
-    const matching=[...jobs.values()].filter(candidate=>owner(body,candidate)).sort((a,b)=>b.createdAt-a.createdAt);
+    const owned=[...jobs.values()].filter(candidate=>owner(body,candidate)).sort((a,b)=>b.createdAt-a.createdAt);
+    const scoped=[...jobs.values()].filter(candidate=>participant(body,candidate)).sort((a,b)=>b.createdAt-a.createdAt);
+    const collaborative=['/jobs/list','/jobs/get','/jobs/steer'].includes(path);
+    const matching=collaborative?scoped:owned;
     const job=typeof body?.jobId==='string'&&body.jobId?jobs.get(body.jobId)
-      :path==='/jobs/cancel'?matching.find(candidate=>['pending','running'].includes(candidate.state)):matching[0];
-    if(path==='/jobs/get')return job&&owner(body,job)?response({ok:true,job:publicJob(job)}):response({ok:false,error:'not_found'},404);
+      :path==='/jobs/cancel'?owned.find(candidate=>['pending','running'].includes(candidate.state)):matching[0];
+    if(path==='/jobs/list'){
+      const limit=Math.max(1,Math.min(20,Number(body?.limit)||10));
+      return response({ok:true,jobs:matching.slice(0,limit).map(publicJob)});
+    }
+    if(path==='/jobs/get')return job&&participant(body,job)?response({ok:true,job:publicJob(job)}):response({ok:false,error:'not_found'},404);
+    if(path==='/jobs/steer'){
+      if(!job||!participant(body,job))return response({ok:false,error:'not_found'},404);
+      const instruction=typeof body?.instruction==='string'?body.instruction.trim():'';
+      const messageId=typeof body?.messageId==='string'&&/^\d{17,20}$/.test(body.messageId)?body.messageId:'';
+      if(!instruction||instruction.length>4000||!messageId)return response({ok:false,error:'invalid_steering'},400);
+      if(job.state==='pending'||job.state==='running'){
+        job.steering ||= [];
+        if(job.steering.filter(item=>!item.consumedAt).length>=32)return response({ok:false,error:'steering_queue_full'},429);
+        const steering={id:randomUUID(),createdAt:Date.now(),messageId,instruction};job.steering.push(steering);
+        await persist(job);return response({ok:true,job:publicJob(job),steeringId:steering.id},202);
+      }
+      if(queue.length+(running?1:0)+1>maxQueued)return response({ok:false,error:'queue_full'},429);
+      const outstanding=[...jobs.values()].filter(candidate=>candidate.packet.scope===job.packet.scope&&['pending','running'].includes(candidate.state));
+      if(outstanding.length>=maxChannelJobs)
+        return response({ok:false,error:'channel_job_limit',limit:maxChannelJobs,job:publicJob(outstanding[0])},409);
+      const key=`${job.packet.guildId}:${body.userId}`,recent=(submissions.get(key)||[]).filter(t=>t>Date.now()-60*60_000);
+      const limit=daybreakUsers.has(body.userId)?trustedHourlyLimit:hourlyLimit;
+      const retryAfterSeconds=Number.isFinite(limit)?hourlyLimitRetryAfterSeconds(recent,1,limit,Date.now()):null;
+      if(retryAfterSeconds!==null)return response({ok:false,error:'user_hourly_limit',limit,retryAfterSeconds},429);
+      const route=typeof body?.route==='string'?body.route:job.packet.route;
+      const previous={jobId:job.id,state:job.state,result:job.result,sources:job.sources,error:job.error};
+      const packet=validatePacket({...job.packet,messageId,userId:body.userId,route,artifacts:[],
+        question:`Follow-up user untuk job ${job.id.slice(0,8)}: ${instruction}`.slice(0,8000),
+        context:`${job.packet.context}\n[previous job outcome] ${JSON.stringify(previous)}`.slice(-50_000),
+        checkpoint:previous});
+      chooseModel(packet,daybreakUsers,verified);
+      const continued=newJob(packet);continued.steering=[{id:randomUUID(),createdAt:Date.now(),messageId,instruction,consumedAt:Date.now()}];
+      jobs.set(continued.id,continued);queue.push(continued.id);submissions.set(key,[...recent,continued.createdAt]);
+      await persist(continued);schedule();return response({ok:true,job:publicJob(continued),steeringId:continued.steering[0].id},202);
+    }
     if(path==='/jobs/cancel'){
-      if(!job||!owner(body,job))return response({ok:false,error:'not_found'},404);
+      if(!job||!(owner(body,job)||participant(body,job)&&daybreakUsers.has(body.userId)))return response({ok:false,error:'not_found'},404);
       if(job.state==='pending'){job.state='cancelled';job.packet.artifacts=[];const i=queue.indexOf(job.id);if(i>=0)queue.splice(i,1);await persist(job);return response({ok:true,job:publicJob(job)});}
       if(job.state==='running'){aborters.get(job.id)?.abort();return response({ok:true,job:publicJob(job)},202);}
       return response({ok:false,error:'not_active',job:publicJob(job)},409);

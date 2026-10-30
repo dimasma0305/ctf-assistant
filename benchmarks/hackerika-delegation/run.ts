@@ -11,13 +11,14 @@ const botId = '800000000000000001', memberId = '800000000000000002';
 const cases = [
   { id: 'casual', text: `<@${botId}> wkwk tadi lucu banget`, expected: ['none', 'finish_turn', 'react_to_message'] },
   { id: 'ctf_definition', text: `<@${botId}> CTF itu apa sih?`, expected: ['none'] },
-  { id: 'puzzle_without_ctf_keyword', text: `<@${botId}> bantu pecahkan file ELF dan cari string rahasianya, ada binary aslinya di lampiran`, expected: ['delegate_codex:ctf'] },
-  { id: 'explicit_challenge', text: `<@${botId}> solve challenge wordpress ini dari source dan attachment thread sampai ketemu flag`, expected: ['delegate_codex:ctf'] },
+  { id: 'puzzle_without_ctf_keyword', text: `<@${botId}> bantu pecahkan file ELF dan cari string rahasianya, ada binary aslinya di lampiran`, expected: ['delegate_codex:ctf'], expectedSolver:'gpt-5.6-sol' },
+  { id: 'explicit_challenge', text: `<@${botId}> solve challenge wordpress ini dari source dan attachment thread sampai ketemu flag`, expected: ['delegate_codex:ctf'], expectedSolver:'gpt-5.6-sol' },
   { id: 'simple_public_lookup', text: `<@${botId}> cek versi terbaru Bun saat ini dari dokumentasi resminya`, expected: ['web_search', 'research_topic'] },
-  { id: 'multi_source_research', text: `<@${botId}> bandingkan implementasi first blood dan webhook di https://github.com/otter-sec/rctf https://github.com/dimasma0305/rsctf dan https://github.com/CTFd/CTFd. baca konfigurasi dan kode, bukan README doang, lalu kasih tabel sumbernya`, expected: ['delegate_codex:investigation', 'research_topic'] },
-  { id: 'profile_deep_research', text: `<@${botId}> deep search profil CTF publik <@${memberId}>: cek tautan akun yang dia klaim sendiri dan karya teknisnya, bedakan yang belum terverifikasi`, expected: ['delegate_codex:investigation', 'get_discord_profile', 'research_topic'] },
-  { id: 'bare_profile_deepsearch', text: `<@${botId}> deepsearch <@${memberId}>`, expected: ['delegate_codex:investigation'] },
-  { id: 'shallow_research_retry', text: `<@${botId}> risetmu tadi tentang https://github.com/dimasma0305/rsctf cuma baca satu halaman lalu jawab "bagian lain perlu dicek". Lanjutkan investigasi kode/docs beberapa sumber, ikuti tautannya, lalu jawab rinci dengan bukti`, expected: ['delegate_codex:investigation'] },
+  { id: 'multi_source_research', text: `<@${botId}> bandingkan implementasi first blood dan webhook di https://github.com/otter-sec/rctf https://github.com/dimasma0305/rsctf dan https://github.com/CTFd/CTFd. baca konfigurasi dan kode, bukan README doang, lalu kasih tabel sumbernya`, expected: ['delegate_codex:investigation', 'research_topic'], expectedSolver:'gpt-5.6-sol' },
+  { id: 'profile_deep_research', text: `<@${botId}> deep search profil CTF publik <@${memberId}>: cek tautan akun yang dia klaim sendiri dan karya teknisnya, bedakan yang belum terverifikasi`, expected: ['delegate_codex:investigation', 'get_discord_profile', 'research_topic'], expectedSolver:'gpt-5.6-sol' },
+  { id: 'bare_profile_deepsearch', text: `<@${botId}> deepsearch <@${memberId}>`, expected: ['delegate_codex:investigation'], expectedSolver:'gpt-5.6-sol' },
+  { id: 'shallow_research_retry', text: `<@${botId}> risetmu tadi tentang https://github.com/dimasma0305/rsctf cuma baca satu halaman lalu jawab "bagian lain perlu dicek". Lanjutkan investigasi kode/docs beberapa sumber, ikuti tautannya, lalu jawab rinci dengan bukti`, expected: ['delegate_codex:investigation'], expectedSolver:'gpt-5.6-sol' },
+  { id: 'general_agent_report', text: `<@${botId}> riset mendalam opsi kuliah master di lima negara, bandingkan biaya, visa, dan beasiswa dari sumber resmi, lalu buatkan file CSV hasilnya`, expected:['delegate_codex:investigation'], expectedSolver:'gpt-6.1-sol' },
   { id: 'small_calculation', text: `<@${botId}> 17 kali 23 berapa?`, expected: ['none'] },
 ] as const;
 const out = process.argv[process.argv.indexOf('--out') + 1];
@@ -75,9 +76,12 @@ for (const item of cases) {
   const profileTargetValid = !['profile_deep_research', 'bare_profile_deepsearch'].includes(item.id)
     || (choice !== 'delegate_codex:investigation' || toolArgs?.targetUserId === memberId)
       && (followup !== 'delegate_codex:investigation' || followupArgs?.targetUserId === memberId);
+  const selectedArgs=choice.startsWith('delegate_codex:')?toolArgs:followup.startsWith('delegate_codex:')?followupArgs:undefined;
+  const solverValid=!('expectedSolver' in item)||selectedArgs?.solver===item.expectedSolver;
   const row = { id: item.id, legacy, legacyCtfEligible: eligible, actual: choice, ...(followup ? { followup } : {}), expected: item.expected,
     pass: (item.expected.includes(choice as never) || choice === 'get_discord_profile' && item.expected.includes(followup as never))
-      && profileArgsValid && profileTargetValid, ...(toolArgs ? { toolArgs } : {}), ...(followupArgs ? { followupArgs } : {}), ...(error ? { error } : {}) };
+      && profileArgsValid && profileTargetValid&&solverValid,...('expectedSolver' in item?{expectedSolver:item.expectedSolver,solverValid}:{}),
+      ...(toolArgs ? { toolArgs } : {}), ...(followupArgs ? { followupArgs } : {}), ...(error ? { error } : {}) };
   results.push(row);
   await writeFile(`${out}/results.json`, JSON.stringify(results, null, 2));
   console.log(JSON.stringify({ id: row.id, legacy, actual: choice, pass: row.pass }));

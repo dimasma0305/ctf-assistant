@@ -26,7 +26,7 @@ try{
 finally{await rm(root,{recursive:true,force:true});job.stats.elapsedMs=Date.now()-started;}
 const checks={completed:!!result,peerCompatibilityUsed:(job.stats.peerMessagesAdapted||0)>0,
   researchSkillRead:skillReads.has('resourceful-solve/SKILL.md'),profileReferenceRead:skillReads.has('person-osint.md'),
-  sources:job.sources.length>=3,citedAnswer:/https?:\/\//.test(result?.result.summary||''),withinCallBudget:job.stats.calls<=36};
+  sources:job.sources.length>=3,citedAnswer:/https?:\/\//.test(result?.result.summary||''),modelCallsRecorded:job.stats.calls>0};
 const pass=Object.values(checks).every(Boolean);
 // Do not publish the original Discord packet, private chat, provider bodies,
 // or internal reasoning. The report identifies the unchanged input by hash.

@@ -42,7 +42,7 @@ export async function delegateCodexForTurn(args: {
         profiles.push(profile);
     }
     const artifacts = await collectCodexArtifacts(gathered.originals, signal, message.id);
-    const route: CodexRoute = ['auto', 'luna', 'sol', 'daybreak'].includes(args.solver || '') ? args.solver! : 'auto';
+    const route: CodexRoute = ['auto', 'gpt-5.6-sol', 'gpt-6.1-sol', 'daybreak', 'luna', 'sol'].includes(args.solver || '') ? args.solver! : 'auto';
     const packetBase = { kind: 'investigation' as const, scope: `${message.guildId}:${message.channelId}`,
         guildId: message.guildId, channelId: message.channelId, messageId: message.id, userId: message.author.id,
         route, ...(args.imageMode?{imageMode:args.imageMode}:{}), artifacts };

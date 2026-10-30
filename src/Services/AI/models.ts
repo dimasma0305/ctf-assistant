@@ -9,10 +9,10 @@
  */
 import { config } from 'dotenv';
 config();
-// GPT-6 Luna is the economical ChatGPT-plan target; account access is checked
-// by the sign-in/preflight CLI before enabling this provider in production.
+// GPT-6.1 Sol is the general ChatGPT-plan target. Deep security/OSINT work is
+// delegated to the isolated runner where the manager chooses its model.
 export const DEFAULT_MODEL = process.env.AI_PROVIDER === 'chatgpt'
-    ? process.env.CHATGPT_MODEL?.trim() || 'gpt-6-luna' : 'deepseek-flash';
+    ? process.env.CHATGPT_MODEL?.trim() || 'gpt-6.1-sol' : 'deepseek-flash';
 
 export const MODELS = {
     /** Main user-facing agentic chat loop: native tool-calling + full persona. */

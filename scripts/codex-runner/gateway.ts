@@ -12,14 +12,16 @@ import { inferenceBudget, inferenceFailure, streamFailureObserver, subscriptionI
 import { inferenceSlots } from './inferenceSlots';
 export async function startGateway(socket: string, job: Job, model: string, signal: AbortSignal, dependencies: {
   credentials?: () => Promise<{access_token:string}>; fetcher?:typeof fetch; maxCalls?:number; maxInputChars?:number;
+  maxSearches?:number;maxSourceReads?:number;maxDownloads?:number;maxVisionReads?:number;
   imageKey?:string; imageFetcher?:typeof fetch;
   discordRead?: (query: DiscordReadQuery) => Promise<unknown>;
+  consumeSteering?: () => Promise<{id:string;createdAt:number;messageId:string;instruction:string}[]>;
 }={}) {
   const auth=new ChatGPTAuth(), credentials=dependencies.credentials||(()=>auth.credentials(signal));
   const fetcher=dependencies.fetcher||fetch;let failureReason='';let failureCall=0;const sources:any[]=[];
   const slots=inferenceSlots();
-  const maxCalls=dependencies.maxCalls??(job.packet.kind==='investigation'?36:14);
-  const maxInputChars=dependencies.maxInputChars??(job.packet.kind==='investigation'?6_000_000:2_000_000);
+  const maxCalls=dependencies.maxCalls;
+  const maxInputChars=dependencies.maxInputChars;
   const visionCache=new Map<string,string>();
   job.stats.searches ||= 0;job.stats.sourceReads ||= 0;job.stats.visionReads ||= 0;
   let downloads=0;
@@ -107,7 +109,9 @@ export async function startGateway(socket: string, job: Job, model: string, sign
             const key=createHash('sha256').update(bytes).digest('hex');
             const cached=visionCache.get(key);
             if(cached)return Response.json({...result,imageObservation:{ok:true,text:cached,model:'gpt-6-luna',cached:true}});
-            if(++job.stats.visionReads>2)return Response.json({...result,imageObservation:{ok:false,error:'vision_budget'}});
+            job.stats.visionReads++;
+            if(dependencies.maxVisionReads!==undefined&&job.stats.visionReads>dependencies.maxVisionReads)
+              return Response.json({...result,imageObservation:{ok:false,error:'vision_budget'}});
             const token=await credentials();
             const visionSignal=AbortSignal.any([signal,AbortSignal.timeout(45_000)]);
             const vision=await fetcher(`${CHATGPT_RESOURCE}/responses`,{method:'POST',redirect:'error',signal:visionSignal,
@@ -123,8 +127,15 @@ export async function startGateway(socket: string, job: Job, model: string, sign
             return Response.json({...result,imageObservation:observation?{ok:true,text:observation,model:'gpt-6-luna'}:{ok:false,error:'empty_vision'}});
           }catch{return Response.json({...result,imageObservation:{ok:false,error:'vision_unavailable'}});}
         }
+        if(path==='/manager/steering'){
+          const updates=dependencies.consumeSteering?await dependencies.consumeSteering():[];
+          return Response.json({ok:true,updates:updates.map(item=>({id:item.id,createdAt:item.createdAt,
+            messageId:item.messageId,instruction:item.instruction}))});
+        }
         if(path==='/sources/search'){
-          if(++job.stats.searches>(job.packet.kind==='investigation'?6:2))return Response.json({error:'search_budget'},{status:429});
+          job.stats.searches++;
+          if(dependencies.maxSearches!==undefined&&job.stats.searches>dependencies.maxSearches)
+            return Response.json({error:'search_budget'},{status:429});
           const x=await request.json() as any;const query=String(x?.query||'').trim();
           if(!query||query.length>350||/[\w-]+\{[^}]*\}|%7[bBdD]|\b(?:sk-[\w-]+|Bearer\s+\S+)|<@!?\d+>|(?:password|api.?key|token)\s*[:=]/i.test(query))
             return Response.json({error:'invalid_or_private_query'},{status:400});
@@ -133,7 +144,9 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           return Response.json(result);
         }
         if(path==='/sources/read'){
-          if(++job.stats.sourceReads>(job.packet.kind==='investigation'?16:8))return Response.json({error:'source_budget'},{status:429});
+          job.stats.sourceReads++;
+          if(dependencies.maxSourceReads!==undefined&&job.stats.sourceReads>dependencies.maxSourceReads)
+            return Response.json({error:'source_budget'},{status:429});
           const x=await request.json() as any;const url=publicResearchUrl(x?.url);
           if(!url||!knownSource(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))return Response.json({error:'invalid_or_private_source'},{status:400});
           let doc;
@@ -149,10 +162,12 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           // different domain. The guarded reader still checks each requested
           // destination and redirect before making a network request.
           for(const link of doc.links||[]){const next=publicResearchUrl(link.url);if(next)allowSource(next);}
-          sources.push({url:doc.url,title:doc.title,content:doc.content.slice(0,12000)});return Response.json(doc);
+          if(sources.length<256)sources.push({url:doc.url,title:doc.title,content:doc.content.slice(0,12000)});return Response.json(doc);
         }
         if(path==='/sources/download'){
-          if(++downloads>3)return Response.json({error:'download_budget'},{status:429});
+          downloads++;
+          if(dependencies.maxDownloads!==undefined&&downloads>dependencies.maxDownloads)
+            return Response.json({error:'download_budget'},{status:429});
           const x=await request.json() as any;const url=publicResearchUrl(x?.url);
           if(!url||!knownSource(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))
             return Response.json({error:'invalid_or_private_source'},{status:400});
@@ -174,23 +189,29 @@ export async function startGateway(socket: string, job: Job, model: string, sign
         let release:()=>void;
         try{release=await slots.acquire(requestSignal);}
         catch(error){return rejectRequest(error instanceof Error?error.message:'inference_queue_full',requestSignal.aborted?499:429);}
-        // Count only admitted calls. All subagents share the same existing
-        // per-job call, input, output and time budgets.
-        if(job.stats.calls>=maxCalls){release();failureReason='model_call_budget';failureCall=job.stats.calls+1;return Response.json({error:failureReason},{status:429});}
+        // Production jobs have no application-level model-call quota. Tests
+        // may supply an explicit cap to exercise queue/finalization behavior.
+        if(maxCalls!==undefined&&job.stats.calls>=maxCalls){release();failureReason='model_call_budget';failureCall=job.stats.calls+1;return Response.json({error:failureReason},{status:429});}
         job.stats.inputChars+=JSON.stringify(body,(_key,value)=>typeof value==='string'&&value.startsWith('data:image/')?'[inline image]':value).length;
-        if(job.stats.inputChars>maxInputChars){release();failureReason='input_budget';failureCall=job.stats.calls+1;return Response.json({error:failureReason},{status:429});}
+        if(maxInputChars!==undefined&&job.stats.inputChars>maxInputChars){release();failureReason='input_budget';failureCall=job.stats.calls+1;return Response.json({error:failureReason},{status:429});}
         const call=++job.stats.calls;
         try{
           const token=await credentials();
-          const budget=inferenceBudget(subscriptionInput(body.input),{call,maxCalls,
-            searchesLeft:(job.packet.kind==='investigation'?6:2)-job.stats.searches,
-            readsLeft:(job.packet.kind==='investigation'?16:8)-job.stats.sourceReads,investigation:job.packet.kind==='investigation'});
-          const forwarded:any={...body,input:budget.input,model,store:false,stream:true,max_output_tokens:Math.min(Number(body.max_output_tokens)||4096,4096),
+          const normalized=subscriptionInput(body.input);
+          const budget=maxCalls===undefined?{input:normalized,finalize:false}:inferenceBudget(normalized,{call,maxCalls,
+            searchesLeft:Math.max(0,(dependencies.maxSearches??Number.MAX_SAFE_INTEGER)-job.stats.searches),
+            readsLeft:Math.max(0,(dependencies.maxSourceReads??Number.MAX_SAFE_INTEGER)-job.stats.sourceReads),investigation:job.packet.kind==='investigation'});
+          const steering=dependencies.consumeSteering?await dependencies.consumeSteering():[];
+          const steeringItem=steering.length?{role:'user',content:[{type:'input_text',text:
+            `New follow-up from the original Discord requestor while this job is active. Treat it as the latest user direction within the existing authorization and scope:\n${steering.map(item=>item.instruction).join('\n')}`}]}:null;
+          const baseInput=typeof budget.input==='string'?[{role:'user',content:budget.input}]:Array.isArray(budget.input)?budget.input:[];
+          const forwarded:any={...body,input:steeringItem?[...baseInput,steeringItem]:budget.input,model,store:false,stream:true,
+            max_output_tokens:Math.min(Number(body.max_output_tokens)||16384,32768),
             ...(budget.finalize?{tool_choice:'none',tools:[]}: {})};
           const peerMessages=Array.isArray(body.input)?body.input.filter((item:any)=>item?.type==='agent_message').length:0;
           if(peerMessages)job.stats.peerMessagesAdapted=(job.stats.peerMessagesAdapted||0)+peerMessages;
           delete forwarded.previous_response_id;delete forwarded.background;
-          const response=await fetcher(`${CHATGPT_RESOURCE}/responses`,{method:'POST',redirect:'error',signal:AbortSignal.any([requestSignal,AbortSignal.timeout(65000)]),
+          const response=await fetcher(`${CHATGPT_RESOURCE}/responses`,{method:'POST',redirect:'error',signal:requestSignal,
             headers:{Authorization:`Bearer ${token.access_token}`,'Content-Type':'application/json'},body:JSON.stringify(forwarded)});
           const recordFailure=(details:unknown,fallback:string)=>{
             const failure=inferenceFailure(details,response.status,response.headers.get('x-request-id'),forwarded.input,fallback);
@@ -214,7 +235,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           });
           const reader=response.body.getReader();let bytes=0;
           return new Response(new ReadableStream({async pull(controller){try{const item=await reader.read();if(item.done){release();if(!terminal)recordFailure(undefined,'inference_stream_interrupted');controller.close();return;}bytes+=item.value.byteLength;job.stats.outputBytes+=item.value.byteLength;
-            if(bytes>2*1024*1024||job.stats.outputBytes>8*1024*1024)throw Error('output_budget');observeFailure(item.value);controller.enqueue(item.value);}catch(error){
+            if(bytes>2*1024*1024)throw Error('output_budget');observeFailure(item.value);controller.enqueue(item.value);}catch(error){
               release();if(!failureReason)recordFailure(undefined,error instanceof Error&&error.message==='output_budget'?'output_budget':'inference_stream_interrupted');
               await reader.cancel().catch(()=>{});controller.error(Error('model_stream_failed'));}},async cancel(){release();await reader.cancel().catch(()=>{});}}),{headers:{'Content-Type':'text/event-stream'}});
         }catch(error){
