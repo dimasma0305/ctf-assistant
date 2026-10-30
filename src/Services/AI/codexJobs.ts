@@ -43,8 +43,16 @@ export async function codexRequest<T>(path:string,body:unknown,options:{socketPa
 export const submitCodexJob=(packet:CodexPacket,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs',packet,{signal});
 export const submitCodexJobBatch=(packets:CodexPacket[],signal?:AbortSignal)=>codexRequest<{ok:true;jobs:CodexPublicJob[]}>('/jobs/batch',{packets},{signal});
 export const getCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/get',{jobId,scope,userId},{signal});
-export const listCodexJobs=(scope:string,userId:string,limit=10,state:CodexJobStateFilter='all',signal?:AbortSignal)=>
-  codexRequest<{ok:true;state:CodexJobStateFilter;count:number;jobs:CodexPublicJob[]}>('/jobs/list',{scope,userId,limit,state},{signal});
+export function normalizeCodexJobList(response:{ok:true;state?:CodexJobStateFilter;count?:number;jobs:CodexPublicJob[]},state:CodexJobStateFilter){
+  const jobs=state==='all'?response.jobs:state==='active'
+    ?response.jobs.filter(job=>job.state==='pending'||job.state==='running')
+    :response.jobs.filter(job=>job.state===state);
+  return {ok:true as const,state,count:Number.isFinite(response.count)?response.count as number:jobs.length,jobs};
+}
+export async function listCodexJobs(scope:string,userId:string,limit=10,state:CodexJobStateFilter='all',signal?:AbortSignal){
+  const response=await codexRequest<{ok:true;state?:CodexJobStateFilter;count?:number;jobs:CodexPublicJob[]}>('/jobs/list',{scope,userId,limit,state},{signal});
+  return normalizeCodexJobList(response,state);
+}
 export const steerCodexJob=(jobId:string|undefined,scope:string,userId:string,messageId:string,instruction:string,route?:CodexRoute,signal?:AbortSignal)=>
   codexRequest<{ok:true;job:CodexPublicJob;steeringId:string}>('/jobs/steer',{jobId,scope,userId,messageId,instruction,...(route?{route}:{})},{signal});
 export const cancelCodexJob=(jobId:string|undefined,scope:string,userId:string,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs/cancel',{jobId,scope,userId},{signal});
