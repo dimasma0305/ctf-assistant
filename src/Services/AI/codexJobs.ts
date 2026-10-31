@@ -25,7 +25,21 @@ export interface CodexDiscordReadRequest {
 const socket=()=>process.env.CODEX_CONTROL_SOCKET||'/run/hackerika-codex/control.sock';
 export const codexSolverEnabled=()=>['1','true','yes','on'].includes((process.env.CODEX_SOLVER_ENABLED||'').trim().toLowerCase());
 
-export async function codexRequest<T>(path:string,body:unknown,options:{socketPath?:string;signal?:AbortSignal;maxResponseBytes?:number}={}):Promise<T>{
+const controllerRecoveryDelays=[150,400,1_000,2_000] as const;
+function unavailableControllerSocket(error:unknown):boolean{
+  const code=(error as NodeJS.ErrnoException)?.code;
+  return code==='FailedToOpenSocket'||code==='ENOENT'||code==='ECONNREFUSED';
+}
+async function recoveryDelay(ms:number,signal?:AbortSignal){
+  if(signal?.aborted)throw signal.reason instanceof Error?signal.reason:Error('codex_request_aborted');
+  await new Promise<void>((resolve,reject)=>{
+    const timer=setTimeout(done,ms);timer.unref?.();
+    function done(){signal?.removeEventListener('abort',abort);resolve();}
+    function abort(){clearTimeout(timer);signal?.removeEventListener('abort',abort);reject(signal?.reason instanceof Error?signal.reason:Error('codex_request_aborted'));}
+    signal?.addEventListener('abort',abort,{once:true});
+  });
+}
+async function codexRequestOnce<T>(path:string,body:unknown,options:{socketPath?:string;signal?:AbortSignal;maxResponseBytes?:number}):Promise<T>{
   const payload=Buffer.from(JSON.stringify(body));
   if(payload.length>30*1024*1024)throw Error('codex_request_too_large');
   return await new Promise<T>((resolve,reject)=>{
@@ -39,6 +53,15 @@ export async function codexRequest<T>(path:string,body:unknown,options:{socketPa
     options.signal?.addEventListener('abort',abort,{once:true});
     request.on('close',()=>{clearTimeout(timeout);options.signal?.removeEventListener('abort',abort);});request.on('error',reject);request.end(payload);
   });
+}
+export async function codexRequest<T>(path:string,body:unknown,options:{socketPath?:string;signal?:AbortSignal;maxResponseBytes?:number;recoveryDelays?:readonly number[]}={}):Promise<T>{
+  const delays=options.recoveryDelays||controllerRecoveryDelays;
+  for(let attempt=0;;attempt++)try{return await codexRequestOnce<T>(path,body,options);}
+  catch(error){
+    if(!unavailableControllerSocket(error)||attempt>=delays.length)
+      throw unavailableControllerSocket(error)?Object.assign(Error('codex_controller_unavailable'),{code:'CODEX_CONTROLLER_UNAVAILABLE',cause:error}):error;
+    await recoveryDelay(delays[attempt],options.signal);
+  }
 }
 export const submitCodexJob=(packet:CodexPacket,signal?:AbortSignal)=>codexRequest<{ok:true;job:CodexPublicJob}>('/jobs',packet,{signal});
 export const submitCodexJobBatch=(packets:CodexPacket[],signal?:AbortSignal)=>codexRequest<{ok:true;jobs:CodexPublicJob[]}>('/jobs/batch',{packets},{signal});

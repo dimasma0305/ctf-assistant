@@ -86,6 +86,8 @@ export async function delegateCodexForTurn(args: {
         if (['worker_preparing', 'worker_image_unavailable'].includes(error?.message)) return { ok: false, error: error.message,
             retryAfterSeconds: error.retryAfterSeconds,
             note: 'Agen belum siap dan job belum diterima. Untuk riset web tanpa kebutuhan eksekusi/file, pakai research_topic jika belum dipakai; jika sudah, lanjutkan web_search/fetch_url dari bukti yang tersedia. Jangan mengklaim job berjalan atau menyuruh user mengulang pertanyaan tanpa menjelaskan gangguan.' };
+        if (error?.message === 'codex_controller_unavailable') return { ok: false, error: error.message, retryAfterSeconds: 5,
+            note: 'Controller agent sedang dipulihkan otomatis dan job belum diterima. Jangan tampilkan error URL/port atau mengklaim job berjalan.' };
         return { ok: false, error: String(error?.message || 'codex_unavailable').slice(0, 120) };
     }
 }

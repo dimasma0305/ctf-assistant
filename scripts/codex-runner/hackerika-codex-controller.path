@@ -1,0 +1,10 @@
+[Unit]
+Description=Recover Hackerika Codex controller when Docker is available
+After=docker.socket
+
+[Path]
+PathExists=/run/docker.sock
+Unit=hackerika-codex-controller.service
+
+[Install]
+WantedBy=multi-user.target

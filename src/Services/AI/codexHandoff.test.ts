@@ -40,3 +40,10 @@ test('unavailable worker labels inline research as a fallback after answer groun
   }
   expect(groundCodexHandoff(evidence, undefined, true)).toBe(evidence);
 });
+
+test('controller startup failure is explained without leaking the socket URL hint', () => {
+  const result=JSON.stringify({ok:false,error:'codex_controller_unavailable',retryAfterSeconds:5});
+  const grounded=groundCodexHandoff('deepsearch-nya gagal mulai karena backend error URL/port.',result,false);
+  expect(grounded).toBe('Controller agen sedang pulih otomatis, tetapi job ini belum sempat diterima.');
+  expect(grounded).not.toContain('URL');
+});

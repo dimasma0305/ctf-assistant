@@ -4,12 +4,14 @@ export function groundCodexHandoff(modelReply: string, toolResult: string | unde
   if (!toolResult) return modelReply;
   let result: any;
   try { result = JSON.parse(toolResult); } catch { return modelReply; }
-  if (result?.ok === false && ['worker_preparing', 'worker_image_unavailable', 'isolated_agent_unavailable'].includes(result.error)) {
+  if (result?.ok === false && ['worker_preparing', 'worker_image_unavailable', 'isolated_agent_unavailable', 'codex_controller_unavailable'].includes(result.error)) {
     // Run after research grounding: its profile formatter otherwise discards
     // the manager's explanation and makes the fallback look like agent output.
-    const status = hasInlineResearch
-      ? 'Agen riset sedang tidak tersedia; berikut hasil penelusuran web sementara.'
-      : 'Agen riset sedang tidak tersedia, jadi tugasnya belum mulai.';
+    const status = result.error === 'codex_controller_unavailable'
+      ? 'Controller agen sedang pulih otomatis, tetapi job ini belum sempat diterima.'
+      : hasInlineResearch
+        ? 'Agen riset sedang tidak tersedia; berikut hasil penelusuran web sementara.'
+        : 'Agen riset sedang tidak tersedia, jadi tugasnya belum mulai.';
     return hasInlineResearch && modelReply.trim() ? `${status}\n\n${modelReply}` : status;
   }
   if (result?.ok !== true || !['queued', 'busy'].includes(result.status)) return modelReply;

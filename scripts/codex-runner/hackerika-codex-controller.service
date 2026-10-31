@@ -12,7 +12,7 @@ WorkingDirectory=/root/app/ctf-assistant
 EnvironmentFile=/etc/hackerika-codex-controller.env
 Environment=AI_PROVIDER=chatgpt
 ExecStart=/root/.bun/bin/bun /root/app/ctf-assistant/scripts/codex-runner/controller.ts
-Restart=on-failure
+Restart=always
 RestartSec=3
 UMask=0077
 RuntimeDirectory=hackerika-codex hackerika-codex-jobs
@@ -35,4 +35,4 @@ RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE CAP_FOWNER
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target docker.service
