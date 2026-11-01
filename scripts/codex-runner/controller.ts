@@ -1,7 +1,7 @@
 import { chmod, chown, mkdir, open, readdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, retryableWorkerBootFailure, retryableWorkerRuntimeFailure, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, retryableWorkerBootFailure, retryableWorkerRuntimeFailure, runtimeRecoveryCheckpoint, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { createWorkerImageReadiness } from './workerImage';
@@ -225,7 +225,9 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
       const retryAfterSeconds=Number.isFinite(limit)?hourlyLimitRetryAfterSeconds(recent,1,limit,Date.now()):null;
       if(retryAfterSeconds!==null)return response({ok:false,error:'user_hourly_limit',limit,retryAfterSeconds},429);
       const route=typeof body?.route==='string'?body.route:job.packet.route;
-      const previous={jobId:job.id,state:job.state,result:job.result,sources:job.sources,error:job.error};
+      const recoverableProgress=!job.result&&job.stats.calls>0;
+      const previous={jobId:job.id,state:job.state,result:job.result,error:job.error,
+        ...(recoverableProgress?{recovery:runtimeRecoveryCheckpoint(job,job.error||'terminal_continuation')}:{sources:job.sources})};
       const packet=validatePacket({...job.packet,messageId,userId:body.userId,route,artifacts:[],
         question:`Follow-up user untuk job ${job.id.slice(0,8)}: ${instruction}`.slice(0,8000),
         context:`${job.packet.context}\n[previous job outcome] ${JSON.stringify(previous)}`.slice(-50_000),

@@ -85,6 +85,17 @@ test('transient mid-run failures recover from a bounded evidence checkpoint',()=
   expect(JSON.stringify(checkpoint).length).toBeLessThanOrEqual(24_000);
 });
 
+test('a failed historical job checkpoint remains valid for a terminal continuation',()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));
+  job.state='failed';job.error='inference_stream_interrupted';job.stats.calls=62;job.stats.attempts=1;
+  job.sources=Array.from({length:8},(_,i)=>({url:`https://example.com/source-${i}`,title:`Source ${i}`}));
+  job.receipts=Array.from({length:30},(_,i)=>({command:`inspect source ${i}`,exitCode:0,output:`evidence ${i}`.repeat(20)}));
+  const previous={jobId:job.id,state:job.state,result:job.result,error:job.error,
+    recovery:runtimeRecoveryCheckpoint(job,job.error)};
+  expect(()=>validatePacket({...job.packet,messageId:'800000000000000002',checkpoint:previous,artifacts:[],
+    question:'continue the interrupted investigation'})).not.toThrow();
+});
+
 test('hourly job cap gives trusted requestors more room and a precise retry delay',()=>{
   const now=2_000_000_000;
   const recent=[now-30*60_000,now-20*60_000,now-10*60_000];
