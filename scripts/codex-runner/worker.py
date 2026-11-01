@@ -41,11 +41,20 @@ class EgressRelay(socketserver.BaseRequestHandler):
 class EgressServer(socketserver.ThreadingTCPServer):
     allow_reuse_address=True
     daemon_threads=True
+root=pathlib.Path('/workspace')
+def prepare_workspace():
+    root.mkdir(exist_ok=True)
+    (root/'exports').mkdir(mode=0o700,exist_ok=True)
+    pathlib.Path('/tmp/codex').mkdir(mode=0o700,parents=True,exist_ok=True)
+    shutil.copytree('/opt/irai-skills',root/'.agents'/'skills',dirs_exist_ok=True)
+if os.environ.get('HACKERIKA_WORKER_PREFLIGHT')=='1':
+    prepare_workspace()
+    subprocess.run(['/usr/local/bin/codex','--version'],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+                   env={**os.environ,'CODEX_HOME':'/tmp/codex'})
+    print('HACKERIKA_WORKER_READY',flush=True)
+    sys.exit(0)
 packet=json.loads(sys.stdin.buffer.readline(32*1024*1024))
-root=pathlib.Path('/workspace');root.mkdir(exist_ok=True)
-(root/'exports').mkdir(mode=0o700,exist_ok=True)
-pathlib.Path('/tmp/codex').mkdir(mode=0o700,parents=True,exist_ok=True)
-shutil.copytree('/opt/irai-skills',root/'.agents'/'skills',dirs_exist_ok=True)
+prepare_workspace()
 artifacts=[];images=[]
 for index,artifact in enumerate(packet['artifacts']):
     name='A'+str(index+1)+'-'+''.join(c for c in artifact['name'] if c.isascii() and (c.isalnum() or c in '._-'))[-100:]

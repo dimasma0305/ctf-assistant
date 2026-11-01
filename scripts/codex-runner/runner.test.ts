@@ -3,9 +3,9 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, retryableWorkerBootFailure, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
 import { deleteExportedFiles, exportDirectory, readExportedFile, saveExportedFiles } from './exports';
-import { workerArgs } from './executor';
+import { workerArgs,workerFailureReason } from './executor';
 import { startGateway } from './gateway';
 import { generateJobImage } from './imageGeneration';
 import { DiscordContextBroker } from './discordBroker';
@@ -61,6 +61,15 @@ test('job state filters count running work independently from terminal history',
   expect(filterJobsByState(items,'all')).toEqual(items);
 });
 
+test('pre-inference worker boot failures are classified and retried only once',()=>{
+  const job=newJob(validatePacket(packet()));
+  expect(workerFailureReason("shutil.Error: Permission denied: '/opt/irai-skills/ctf-deep-solve'" )).toBe('worker_boot_permissions');
+  expect(retryableWorkerBootFailure(job,Error('worker_boot_permissions'),0)).toBe(true);
+  expect(retryableWorkerBootFailure(job,Error('worker_boot_permissions'),1)).toBe(false);
+  job.stats.calls=1;
+  expect(retryableWorkerBootFailure(job,Error('worker_failed'),0)).toBe(false);
+});
+
 test('hourly job cap gives trusted requestors more room and a precise retry delay',()=>{
   const now=2_000_000_000;
   const recent=[now-30*60_000,now-20*60_000,now-10*60_000];
@@ -80,7 +89,7 @@ test('Docker worker has no network and receives only per-job model and public-eg
 
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
-  const dependencies={inspect:async()=>present,build:async()=>{builds++;present=true;return true;}};
+  const dependencies={inspect:async()=>present,probe:async()=>present,build:async()=>{builds++;present=true;return true;}};
   await ensureWorkerImage('hackerika-codex-worker:0.166.0-1',dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
   await ensureWorkerImage('hackerika-codex-worker:0.166.0-1',dependencies);

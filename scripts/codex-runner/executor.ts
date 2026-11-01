@@ -14,6 +14,13 @@ export function workerArgs(image:string,socket:string,egressSocket:string,name:s
     '--mount',`type=bind,src=${socket},dst=/run/inference.sock,readonly`,
     '--mount',`type=bind,src=${egressSocket},dst=/run/egress.sock,readonly`,image];
 }
+export function workerFailureReason(stderr:string,gatewayReason=''):string{
+  if(gatewayReason)return gatewayReason;
+  if(/Permission denied[^\n]*irai-skills|shutil\.Error:[^\n]*irai-skills/i.test(stderr))return 'worker_boot_permissions';
+  if(/No space left on device/i.test(stderr))return 'worker_storage_unavailable';
+  if(/sandbox|Operation not permitted|bwrap/i.test(stderr))return 'worker_sandbox_unavailable';
+  return 'worker_failed';
+}
 export async function executeJob(job:Job,model:string,root:string,signal:AbortSignal,options:{image?:string;verificationRetry?:boolean;evidenceRetry?:boolean;onEvent?:(event:any)=>void;onDiagnostic?:(text:string)=>void;gateway?:Parameters<typeof startGateway>[4]}={}){
   const directory=join(root,job.id+'-attempt-'+job.stats.attempts);await mkdir(directory,{mode:0o700});
   const socket=join(directory,'model.sock'),egressSocket=join(directory,'egress.sock');
@@ -62,7 +69,7 @@ export async function executeJob(job:Job,model:string,root:string,signal:AbortSi
       buffer+=decoder.decode(chunk,{stream:true});let end;while((end=buffer.indexOf('\n'))>=0){consume(buffer.slice(0,end));buffer=buffer.slice(end+1);}}
     if(buffer)consume(buffer);const exit=await proc.exited;await errors;signal.throwIfAborted();
     if(exit!==0)throw Error(job.packet.imageMode==='generative'&&gateway.imageResult()
-      ?gateway.imageResult():gateway.failureReason()||(/sandbox|Operation not permitted|bwrap/i.test(stderr)?'worker_sandbox_unavailable':'worker_failed'));
+      ?gateway.imageResult():workerFailureReason(stderr,gateway.failureReason()));
     if(!final)throw Error('solver_result_missing');const parsed=resultFromText(final);
     if(job.packet.kind==='investigation'&&!job.receipts.length&&!gateway.sources.length
       &&!job.packet.artifacts.some(artifact=>artifact.image))throw Error('investigation_without_execution_receipt');

@@ -26,6 +26,11 @@ export interface Job {
   exportedFiles?: ExportedFileMeta[];
 }
 export type JobStateFilter = Job['state']|'active'|'all';
+export function retryableWorkerBootFailure(job:Job,error:unknown,retries:number):boolean{
+  const reason=String((error as Error)?.message||error);
+  return retries<1&&job.stats.calls===0&&job.receipts.length===0&&(job.sources||[]).length===0
+    &&['worker_failed','worker_boot_permissions','worker_storage_unavailable','worker_sandbox_unavailable'].includes(reason);
+}
 export function filterJobsByState(items:Job[],state:JobStateFilter):Job[]{
   if(state==='all')return items;
   if(state==='active')return items.filter(job=>job.state==='pending'||job.state==='running');

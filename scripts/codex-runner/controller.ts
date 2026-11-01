@@ -1,7 +1,7 @@
 import { chmod, chown, mkdir, open, readdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, retryableWorkerBootFailure, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { createWorkerImageReadiness } from './workerImage';
@@ -82,9 +82,10 @@ async function runNext(){
     await workerImage.ensure();
     const deadline=jobTimeoutMs>0?AbortSignal.any([controller.signal,AbortSignal.timeout(jobTimeoutMs)]):controller.signal;
     let result:Awaited<ReturnType<typeof executeJob>>|undefined;
-    let evidenceRetry=false;
-    for(let attempt=0;attempt<2;attempt++){
-      try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry:attempt===1&&!evidenceRetry,evidenceRetry:attempt===1&&evidenceRetry,
+    let evidenceRetry=false,verificationRetry=false;
+    let bootRetries=0;
+    for(let attempt=0;attempt<3;attempt++){
+      try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry,evidenceRetry,
         gateway:{discordRead:query=>discord.ask(job,query,deadline),consumeSteering:async()=>{
           const pending=(job.steering||[]).filter(item=>!item.consumedAt);
           if(!pending.length)return [];
@@ -92,10 +93,16 @@ async function runNext(){
           await persist(job);return pending;
         }}});break;}
       catch(error:any){
+        if(retryableWorkerBootFailure(job,error,bootRetries)){
+          bootRetries++;
+          await workerImage.ensure();
+          continue;
+        }
         const reason=String(error?.message);
-        if(attempt!==0||deadline.aborted||job.stats.calls>=8
+        if(verificationRetry||evidenceRetry||deadline.aborted||job.stats.calls>=8
           ||!['flag_without_matching_execution_receipt','investigation_without_execution_receipt'].includes(reason))throw error;
         evidenceRetry=reason==='investigation_without_execution_receipt';
+        verificationRetry=!evidenceRetry;
       }
     }
     if(!result)throw Error('solver_result_missing');
