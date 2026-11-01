@@ -1,7 +1,7 @@
 import { chmod, chown, mkdir, open, readdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, retryableWorkerBootFailure, retryableWorkerRuntimeFailure, runtimeRecoveryCheckpoint, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, prepareJobAfterControllerRestart, publicJob, retryableWorkerBootFailure, retryableWorkerRuntimeFailure, runtimeRecoveryCheckpoint, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { createWorkerImageReadiness } from './workerImage';
@@ -40,13 +40,15 @@ async function persist(job: Job) {
 async function load() {
   await mkdir(stateRoot,{recursive:true,mode:0o700});await chmod(stateRoot,0o700);
   await mkdir(runtimeRoot,{recursive:true,mode:0o700});await chmod(runtimeRoot,0o700);
+  const recovered:Job[]=[];
   for(const name of await readdir(stateRoot).catch(()=>[])) {
     if(!/^[0-9a-f-]{36}\.json$/.test(name)) continue;
     try {
       const job=JSON.parse(await readFile(join(stateRoot,name),'utf8')) as Job;
       if(Date.now()-job.updatedAt>ttlMs){await rm(join(stateRoot,name),{force:true});await deleteExportedFiles(stateRoot,name.slice(0,-5));continue;}
       if(job.state==='pending'||job.state==='running'){
-        job.state='failed';job.error='controller_restarted';job.packet.artifacts=[];await persist(job);
+        if(prepareJobAfterControllerRestart(job))recovered.push(job);
+        await persist(job);
       }
       jobs.set(job.id,job);
     } catch { await rm(join(stateRoot,name),{force:true}); }
@@ -58,6 +60,7 @@ async function load() {
   const ps=Bun.spawn(['docker','ps','-aq','--filter','label=hackerika.solver=true'],{stdout:'pipe',stderr:'ignore'});
   const ids=(await new Response(ps.stdout).text()).trim().split(/\s+/).filter(Boolean);await ps.exited;
   if(ids.length) await Bun.spawn(['docker','rm','-f',...ids],{stdout:'ignore',stderr:'ignore'}).exited;
+  recovered.sort((a,b)=>a.createdAt-b.createdAt);queue.push(...recovered.map(job=>job.id));
 }
 function response(value: unknown, status=200) { return Response.json(value,{status,headers:{'Cache-Control':'no-store'}}); }
 async function json(request:Request){const text=await request.text();if(text.length>30*1024*1024)throw Error('body_too_large');return JSON.parse(text||'{}');}
@@ -74,8 +77,15 @@ function schedule(){if(!running)void runNext().catch(error=>console.error('[Code
 async function runNext(){
   const id=queue.shift();if(!id){running=false;return;}running=true;
   const job=jobs.get(id);if(!job||job.state!=='pending'){running=false;schedule();return;}
-  const controller=new AbortController();aborters.set(id,controller);job.state='running';
+  const controller=new AbortController();aborters.set(id,controller);
+  const resumedAfterRestart=job.controllerRecovery?.resumePending===true;
+  if(job.controllerRecovery)job.controllerRecovery.resumePending=false;
+  job.state='running';
   const started=Date.now();
+  let heartbeatWrite=Promise.resolve();
+  const heartbeat=setInterval(()=>{heartbeatWrite=heartbeatWrite.then(()=>persist(job)).catch(error=>
+    console.warn(`[CodexController] job=${job.id} checkpoint failed:`,String(error?.message||error).slice(0,120)));},5_000);
+  heartbeat.unref?.();
   try{
     await persist(job);
     const model=chooseModel(job.packet,daybreakUsers,verified);
@@ -83,7 +93,7 @@ async function runNext(){
     const deadline=jobTimeoutMs>0?AbortSignal.any([controller.signal,AbortSignal.timeout(jobTimeoutMs)]):controller.signal;
     let result:Awaited<ReturnType<typeof executeJob>>|undefined;
     let evidenceRetry=false,verificationRetry=false;
-    let bootRetries=0,runtimeRetries=0,runtimeRecoveryReason='';
+    let bootRetries=0,runtimeRetries=0,runtimeRecoveryReason=resumedAfterRestart&&job.stats.calls>0?'controller_restarted':'';
     for(let attempt=0;attempt<5;attempt++){
       try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry,evidenceRetry,
         ...(runtimeRecoveryReason?{runtimeRecoveryReason}:{}),
@@ -128,6 +138,7 @@ async function runNext(){
       +(job.inferenceFailure?` inference=${JSON.stringify(job.inferenceFailure)}`:''));
   }
   finally{
+    clearInterval(heartbeat);await heartbeatWrite;
     discord.clearJob(id);job.stats.elapsedMs+=Date.now()-started;job.packet.artifacts=[];aborters.delete(id);
     try{await persist(job);await cleanup();}finally{running=false;schedule();}
   }
@@ -252,6 +263,7 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
   }catch(error:any){return response({ok:false,error:String(error?.message||'request_failed').slice(0,120)},400);}
 }});
 await chmod(socket,0o660);if(process.getuid?.()===0)await chown(socket,0,socketGid);
+schedule();
 setInterval(()=>void cleanup().catch(error=>console.warn('[CodexController] cleanup failed:',String(error?.message||error).slice(0,120))),60*60_000).unref?.();
 for(const signal of ['SIGINT','SIGTERM'] as const)process.on(signal,()=>{for(const abort of aborters.values())abort.abort();server.stop(true);process.exit(0);});
 console.log(`[CodexController] listening socket=${socket}; checking worker image`);

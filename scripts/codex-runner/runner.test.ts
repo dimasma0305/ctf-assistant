@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, retryableWorkerBootFailure, retryableWorkerRuntimeFailure, runtimeRecoveryCheckpoint, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, prepareJobAfterControllerRestart, promoteReceiptCandidates, publicJob, resultFromText, retryableWorkerBootFailure, retryableWorkerRuntimeFailure, runtimeRecoveryCheckpoint, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
 import { deleteExportedFiles, exportDirectory, readExportedFile, saveExportedFiles } from './exports';
 import { workerArgs,workerFailureReason } from './executor';
 import { startGateway } from './gateway';
@@ -83,6 +83,28 @@ test('transient mid-run failures recover from a bounded evidence checkpoint',()=
   expect(checkpoint.runtimeRecovery.sources[0].url).toBe('https://example.com/research');
   expect(checkpoint.runtimeRecovery.receipts[0].output).toContain('verified');
   expect(JSON.stringify(checkpoint).length).toBeLessThanOrEqual(24_000);
+});
+
+test('controller restarts resume safe work but bound retries and never duplicate image generation',()=>{
+  const pending=newJob(validatePacket(packet()));
+  expect(prepareJobAfterControllerRestart(pending,1000)).toBe(true);
+  expect(pending.state).toBe('pending');
+
+  const running=newJob(validatePacket({...packet(),kind:'investigation',artifacts:[{name:'clue.txt',data:Buffer.from('clue').toString('base64'),image:false,sourceMessageId:packet().messageId}]}));
+  running.state='running';running.error='worker_failed';running.stats.calls=4;
+  expect(prepareJobAfterControllerRestart(running,2000)).toBe(true);
+  expect(running.state).toBe('pending');expect(running.error).toBeUndefined();
+  expect(running.packet.artifacts).toHaveLength(1);
+  expect(running.controllerRecovery).toEqual({count:1,lastAt:2000,resumePending:true});
+
+  running.state='running';running.controllerRecovery={count:3,lastAt:2000,resumePending:false};
+  expect(prepareJobAfterControllerRestart(running,3000)).toBe(false);
+  expect(running.state).toBe('failed');expect(running.error).toBe('controller_restarted');
+  expect(running.packet.artifacts).toEqual([]);
+
+  const image=newJob(validatePacket({...packet(),kind:'investigation',imageMode:'generative'}));image.state='running';
+  expect(prepareJobAfterControllerRestart(image,4000)).toBe(false);
+  expect(image.state).toBe('failed');
 });
 
 test('a failed historical job checkpoint remains valid for a terminal continuation',()=>{

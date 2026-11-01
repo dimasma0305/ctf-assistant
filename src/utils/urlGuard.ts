@@ -145,6 +145,12 @@ async function pinnedFetch(urlStr: string, init: RequestInit, resolvedHost: stri
   const body = await requestBodyBuffer(init.body);
   const headers = new Headers(init.headers);
   if (body && !headers.has("content-length")) headers.set("content-length", String(body.byteLength));
+  // Connect to the already-approved address directly. Supplying a custom
+  // lookup callback to Bun's node:http compatibility layer can leave a second
+  // Happy-Eyeballs connection attempt alive after the request has rejected;
+  // that late socket error escapes the request promise and can terminate the
+  // whole controller. Host and TLS SNI still use the original public name.
+  if (!headers.has("host")) headers.set("host", url.host);
   const family = isIP(resolvedHost);
   if (family !== 4 && family !== 6) throw new SafeFetchError("dns_lookup_failed", urlStr);
 
@@ -152,25 +158,14 @@ async function pinnedFetch(urlStr: string, init: RequestInit, resolvedHost: stri
     const requestFn = url.protocol === "https:" ? httpsRequest : httpRequest;
     const req = requestFn({
       protocol: url.protocol,
-      hostname: url.hostname,
+      hostname: resolvedHost,
       port: url.port || undefined,
       path: `${url.pathname}${url.search}`,
       method: init.method || "GET",
       headers: Object.fromEntries(headers.entries()),
       signal: init.signal || undefined,
       servername: url.hostname,
-      lookup: (
-        _hostname: string,
-        options: { all?: boolean } | undefined,
-        callback: Function,
-      ) => {
-        if (options?.all) {
-          callback(null, [{ address: resolvedHost, family }]);
-          return;
-        }
-
-        callback(null, resolvedHost, family);
-      },
+      family,
     } as any, (incoming) => {
       // Remote sites can send nonstandard statuses (for example HTTP 999).
       // Exceptions in this event callback do not reject the enclosing promise:

@@ -24,6 +24,7 @@ export interface Job {
   inferenceFailure?: InferenceFailure;
   sources: { url: string; title: string }[];
   exportedFiles?: ExportedFileMeta[];
+  controllerRecovery?: { count: number; lastAt: number; resumePending: boolean };
 }
 export type JobStateFilter = Job['state']|'active'|'all';
 export function retryableWorkerBootFailure(job:Job,error:unknown,retries:number):boolean{
@@ -45,6 +46,22 @@ export function runtimeRecoveryCheckpoint(job:Job,reason:string){
       sources:(job.sources||[]).slice(-8).map(source=>({url:source.url.slice(0,800),title:source.title.slice(0,160)})),
       receipts:job.receipts.slice(-8).map(receipt=>({command:receipt.command.slice(0,400),exitCode:receipt.exitCode,output:receipt.output.slice(-800)}))},
   };
+}
+/** Requeue read-only agent work after a controller crash. Image work is kept
+ * terminal because a previous process may already have incurred a generation
+ * charge, and repeated controller crashes are bounded to avoid a restart loop. */
+export function prepareJobAfterControllerRestart(job:Job,now=Date.now()):boolean{
+  if(job.state!=='pending'&&job.state!=='running')return false;
+  if(job.state==='pending')return true;
+  const count=job.controllerRecovery?.count||0;
+  if(job.packet.imageMode||count>=3){
+    job.state='failed';job.error='controller_restarted';job.packet.artifacts=[];
+    job.controllerRecovery={count,lastAt:now,resumePending:false};
+    return false;
+  }
+  job.state='pending';delete job.error;
+  job.controllerRecovery={count:count+1,lastAt:now,resumePending:true};
+  return true;
 }
 export function filterJobsByState(items:Job[],state:JobStateFilter):Job[]{
   if(state==='all')return items;
