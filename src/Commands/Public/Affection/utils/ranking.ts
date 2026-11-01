@@ -66,7 +66,10 @@ export function rankingEntries(profiles: any[], socialStates: any[], now = new D
 }
 
 export function sortRanking(entries: RankingEntry[], metric: RankingMetric): RankingEntry[] {
-  return entries.filter(entry => entry.metrics[metric] > 0).sort((a, b) =>
+  // Zero means there is no established signal for this metric. Positive and
+  // negative scores are both real relationship judgments and belong on the
+  // board; hiding the latter made a cooled relationship look nonexistent.
+  return entries.filter(entry => entry.metrics[metric] !== 0).sort((a, b) =>
     b.metrics[metric] - a.metrics[metric] || b.lastInteractionAt - a.lastInteractionAt || a.userId.localeCompare(b.userId));
 }
 
@@ -92,7 +95,7 @@ export function buildRankingEmbeds(ranked: RankingEntry[], metric: RankingMetric
     const score = metric === 'change' ? delta(entry.metrics[metric]) : entry.metrics[metric];
     return `${position} <@${entry.userId}> — **${score}**\n${formatRankingMetrics(entry)}`;
   });
-  if (!rows.length) rows.push(`Belum ada member dengan skor ${label(metric)} di atas 0.\nCoba pilih metrik lain atau ngobrol dulu sama aku 😼`);
+  if (!rows.length) rows.push(`Belum ada member dengan skor ${label(metric)} selain 0.\nCoba pilih metrik lain atau ngobrol dulu sama aku 😼`);
   const ownIndex = ranked.findIndex(entry => entry.userId === requesterId);
   if (ownIndex >= 0) rows.push(`👉 Kamu: **#${ownIndex + 1}** dari ${ranked.length}\n${formatRankingMetrics(ranked[ownIndex])}`);
 
@@ -141,7 +144,10 @@ export function buildRankingCommand(name: 'rank' | 'ranking'): SubCommand {
       const profileMetric = metric === 'interactions' ? 'interactionCount'
         : ['affection', 'trust', 'respect', 'comfort', 'chemistry'].includes(metric) ? metric : null;
       const sort = profileMetric ? { [profileMetric]: -1, lastInteractionAt: -1, userId: 1 } : { lastInteractionAt: -1, userId: 1 };
-      const profiles = await UserProfileModel.find({}).sort(sort as any).limit(CANDIDATE_CAP).select(PROFILE_FIELDS).lean();
+      // For stored numeric metrics, omit neutral records before the cap so
+      // negative members cannot be pushed out by hundreds of zero profiles.
+      const profileFilter = profileMetric ? { [profileMetric]: { $exists: true, $ne: 0 } } : {};
+      const profiles = await UserProfileModel.find(profileFilter).sort(sort as any).limit(CANDIDATE_CAP).select(PROFILE_FIELDS).lean();
       let partial = profiles.length === CANDIDATE_CAP;
       const memberIds = new Set<string>([interaction.user.id]);
       const unresolved: string[] = [];

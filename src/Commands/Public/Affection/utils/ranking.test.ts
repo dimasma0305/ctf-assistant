@@ -14,7 +14,7 @@ test('trust ranking includes a trusted person with cold affection and sorts dete
   const entries = rankingEntries([profile('300', { affection: 90, trust: 5 }),
     profile('200', { affection: -8, trust: 80 }), profile('100', { trust: 80 }), profile('400', { trust: 0 })], [], now);
   expect(sortRanking(entries, 'trust').map(entry => entry.userId)).toEqual(['100', '200', '300']);
-  expect(sortRanking(entries, 'affection').map(entry => entry.userId)).toEqual(['300']);
+  expect(sortRanking(entries, 'affection').map(entry => entry.userId)).toEqual(['300', '200']);
   expect(entries.map(entry => entry.userId)).toEqual(['300', '200', '100', '400']);
 });
 
@@ -111,20 +111,29 @@ test('command keeps outsiders/bots off a trust board and only selects numeric so
   expect(calls.private).toHaveLength(0); expect(write).not.toHaveBeenCalled();
 });
 
-test('an empty board still sends all requester metrics privately and aliases share cooldown', async () => {
+test('negative scores remain public ranking entries and aliases share cooldown', async () => {
   const projections: string[] = [];
   spyOn(UserProfileModel, 'find').mockImplementation(() => fakeQuery([profile('self', { affection: -4, trust: -2, interactionCount: 12 })], projections));
   spyOn(SocialStateModel, 'find').mockImplementation(() => fakeQuery([], projections));
   const { interaction, calls } = fakeInteraction('empty-guild', 'affection');
   await rankCommand.execute!(interaction, {} as any);
-  expect(calls.edits[0].embeds[0].toJSON().description).toContain('Belum ada member');
-  expect(calls.edits[0].embeds[0].toJSON().description).not.toContain('Afeksi -4');
-  expect(calls.private[0].flags).toEqual(['Ephemeral']);
-  expect(calls.private[0].content).toContain('Afeksi -4');
-  expect(calls.private[0].content).toContain('Trust -2');
-  expect(calls.private[0].content).toContain('Interaksi 12');
+  const visible = calls.edits[0].embeds[0].toJSON().description || '';
+  expect(visible).not.toContain('Belum ada member');
+  expect(visible).toContain('<@self>');
+  expect(visible).toContain('Afeksi -4');
+  expect(visible).toContain('Trust -2');
+  expect(visible).toContain('Interaksi 12');
+  expect(calls.private).toHaveLength(0);
   await rankingCommand.execute!(interaction, {} as any);
   expect(calls.edits).toHaveLength(1); expect(calls.replies[0].flags).toEqual(['Ephemeral']);
+});
+
+test('a zero-only metric remains an empty board', () => {
+  const entries = rankingEntries([profile('neutral')], [], now);
+  const ranked = sortRanking(entries, 'affection');
+  expect(ranked).toEqual([]);
+  expect(buildRankingEmbeds(ranked, 'affection', 10, 'neutral', false)[0].toJSON().description)
+    .toContain('selain 0');
 });
 
 test('member resolution is batched at 100 IDs with a bounded timeout', async () => {
