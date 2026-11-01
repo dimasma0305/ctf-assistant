@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, retryableWorkerBootFailure, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, parseWorkerExport, promoteReceiptCandidates, publicJob, resultFromText, retryableWorkerBootFailure, retryableWorkerRuntimeFailure, runtimeRecoveryCheckpoint, validImageExport, validateInvestigationBatch, validatePacket } from './protocol';
 import { deleteExportedFiles, exportDirectory, readExportedFile, saveExportedFiles } from './exports';
 import { workerArgs,workerFailureReason } from './executor';
 import { startGateway } from './gateway';
@@ -68,6 +68,21 @@ test('pre-inference worker boot failures are classified and retried only once',(
   expect(retryableWorkerBootFailure(job,Error('worker_boot_permissions'),1)).toBe(false);
   job.stats.calls=1;
   expect(retryableWorkerBootFailure(job,Error('worker_failed'),0)).toBe(false);
+});
+
+test('transient mid-run failures recover from a bounded evidence checkpoint',()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation'}));
+  job.stats.calls=62;job.stats.attempts=1;
+  job.sources=[{url:'https://example.com/research','title':'Research'}];
+  job.receipts=[{command:'curl source',exitCode:0,output:'verified public evidence'}];
+  expect(retryableWorkerRuntimeFailure(job,Error('inference_stream_interrupted'),0)).toBe(true);
+  expect(retryableWorkerRuntimeFailure(job,Error('inference_stream_interrupted'),2)).toBe(false);
+  expect(retryableWorkerRuntimeFailure(job,Error('subscription_sharing_usage_limit_exceeded'),0)).toBe(false);
+  const checkpoint=runtimeRecoveryCheckpoint(job,'inference_stream_interrupted');
+  expect(checkpoint.runtimeRecovery).toMatchObject({reason:'inference_stream_interrupted',modelCalls:62,previousAttempts:1});
+  expect(checkpoint.runtimeRecovery.sources[0].url).toBe('https://example.com/research');
+  expect(checkpoint.runtimeRecovery.receipts[0].output).toContain('verified');
+  expect(JSON.stringify(checkpoint).length).toBeLessThanOrEqual(24_000);
 });
 
 test('hourly job cap gives trusted requestors more room and a precise retry delay',()=>{

@@ -1,7 +1,7 @@
 import { chmod, chown, mkdir, open, readdir, readFile, rename, rm, unlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, retryableWorkerBootFailure, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
+import { canCollaborateOnJob, chooseModel, filterJobsByState, hourlyLimitRetryAfterSeconds, newJob, ownsJob, publicJob, retryableWorkerBootFailure, retryableWorkerRuntimeFailure, validateInvestigationBatch, validatePacket, type Job, type JobStateFilter } from './protocol';
 import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { createWorkerImageReadiness } from './workerImage';
@@ -83,9 +83,10 @@ async function runNext(){
     const deadline=jobTimeoutMs>0?AbortSignal.any([controller.signal,AbortSignal.timeout(jobTimeoutMs)]):controller.signal;
     let result:Awaited<ReturnType<typeof executeJob>>|undefined;
     let evidenceRetry=false,verificationRetry=false;
-    let bootRetries=0;
-    for(let attempt=0;attempt<3;attempt++){
+    let bootRetries=0,runtimeRetries=0,runtimeRecoveryReason='';
+    for(let attempt=0;attempt<5;attempt++){
       try{result=await executeJob(job,model,runtimeRoot,deadline,{image,verificationRetry,evidenceRetry,
+        ...(runtimeRecoveryReason?{runtimeRecoveryReason}:{}),
         gateway:{discordRead:query=>discord.ask(job,query,deadline),consumeSteering:async()=>{
           const pending=(job.steering||[]).filter(item=>!item.consumedAt);
           if(!pending.length)return [];
@@ -99,6 +100,12 @@ async function runNext(){
           continue;
         }
         const reason=String(error?.message);
+        if(retryableWorkerRuntimeFailure(job,error,runtimeRetries)&&!deadline.aborted){
+          runtimeRetries++;runtimeRecoveryReason=reason;
+          await persist(job);
+          await Bun.sleep(5_000*runtimeRetries);
+          continue;
+        }
         if(verificationRetry||evidenceRetry||deadline.aborted||job.stats.calls>=8
           ||!['flag_without_matching_execution_receipt','investigation_without_execution_receipt'].includes(reason))throw error;
         evidenceRetry=reason==='investigation_without_execution_receipt';

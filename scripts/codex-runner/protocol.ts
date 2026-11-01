@@ -31,6 +31,21 @@ export function retryableWorkerBootFailure(job:Job,error:unknown,retries:number)
   return retries<1&&job.stats.calls===0&&job.receipts.length===0&&(job.sources||[]).length===0
     &&['worker_failed','worker_boot_permissions','worker_storage_unavailable','worker_sandbox_unavailable'].includes(reason);
 }
+export function retryableWorkerRuntimeFailure(job:Job,error:unknown,retries:number):boolean{
+  const reason=String((error as Error)?.message||error);
+  const transient=['inference_stream_interrupted','inference_stream_failed','inference_unavailable','solver_result_missing','worker_failed'].includes(reason)
+    ||/^inference_http_5\d\d$/.test(reason);
+  return retries<2&&!job.packet.imageMode&&job.stats.calls>0&&!job.result&&transient;
+}
+export function runtimeRecoveryCheckpoint(job:Job,reason:string){
+  const prior=JSON.stringify(job.packet.checkpoint??null);
+  return {
+    ...(prior.length<=4000?{prior:job.packet.checkpoint}:{}),
+    runtimeRecovery:{reason:reason.slice(0,120),previousAttempts:job.stats.attempts,modelCalls:job.stats.calls,
+      sources:(job.sources||[]).slice(-8).map(source=>({url:source.url.slice(0,800),title:source.title.slice(0,160)})),
+      receipts:job.receipts.slice(-8).map(receipt=>({command:receipt.command.slice(0,400),exitCode:receipt.exitCode,output:receipt.output.slice(-800)}))},
+  };
+}
 export function filterJobsByState(items:Job[],state:JobStateFilter):Job[]{
   if(state==='all')return items;
   if(state==='active')return items.filter(job=>job.state==='pending'||job.state==='running');
