@@ -45,6 +45,7 @@ export async function startGateway(socket: string, job: Job, model: string, sign
         if(signal.aborted)return Response.json({error:'job_closed'},{status:410});
         if(request.method!=='POST')return Response.json({error:'method_not_allowed'},{status:405});
         if(path==='/images/generate'){
+          if(job.packet.imageMode==='template')return Response.json({error:'image_mode_disallows_generation'},{status:409});
           if(++imageGenerations>1)return Response.json({error:'image_generation_budget'},{status:429});
           if(Number(request.headers.get('content-length')||0)>7000)return Response.json({error:'invalid_image_prompt'},{status:413});
           const raw=await request.text();

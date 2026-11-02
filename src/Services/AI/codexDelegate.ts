@@ -13,7 +13,7 @@ export const hasCodexDelegation = (turn: object) => delegated.has(turn);
 export async function delegateCodexForTurn(args: {
     question?: string; kind?: 'ctf' | 'investigation'; targetUserId?: string;
     newCase?: boolean; solver?: CodexRoute; investigationMode?: 'joint' | 'separate';
-    imageMode?: 'auto'|'generative'|'vector';
+    imageMode?: 'auto'|'generative'|'vector'|'template';
 }, message: Turn, options: { signal?: AbortSignal } = {}) {
     if (delegated.has(message)) return { ok: false, error: 'already_delegated_this_turn' };
     if (args.kind !== 'ctf' && args.kind !== 'investigation') return { ok: false, error: 'invalid_kind' };

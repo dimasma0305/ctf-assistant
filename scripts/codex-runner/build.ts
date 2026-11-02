@@ -20,6 +20,8 @@ try{
     copyFile(codex,join(directory,'codex')),
     copyFile(host,join(directory,'codex-code-mode-host')),
   ]);
+  await cp(join(import.meta.dir,'skills','local'),join(directory,'skills'),{
+    recursive:true,filter:source=>!source.endsWith('__pycache__')&&!source.endsWith('.pyc')});
   await Promise.all([chmod(join(directory,'worker.py'),0o600),chmod(join(directory,'codex'),0o700),chmod(join(directory,'codex-code-mode-host'),0o700)]);
   const build=Bun.spawn(['docker','build','--pull=false','-t',tag,directory],{
     stdin:'ignore',stdout:'inherit',stderr:'inherit',env:{...process.env,DOCKER_CONFIG:dockerConfig}});

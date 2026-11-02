@@ -13,7 +13,7 @@ export const CODEX_RELEASE = {
     'codex-code-mode-host': '657f4e902726e05867c937b583049d5997e057f8cd0ab40450633c9c9ef8d630',
   },
 };
-export const WORKER_IMAGE = 'hackerika-codex-worker:0.166.0-1';
+export const WORKER_IMAGE = 'hackerika-codex-worker:0.166.0-2';
 
 async function valid(directory: string, release: typeof CODEX_RELEASE): Promise<boolean> {
   try {

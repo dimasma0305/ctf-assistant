@@ -4,7 +4,7 @@ export type CodexRoute = 'auto'|'gpt-5.6-sol'|'gpt-6.1-sol'|'daybreak'|'luna'|'s
 export type CodexJobStateFilter='pending'|'running'|'completed'|'failed'|'cancelled'|'active'|'all';
 export interface CodexArtifact { name:string;data:string;image:boolean;sourceMessageId:string }
 export interface CodexPublicJob {
-  id:string;kind?:'ctf'|'investigation';imageMode?:'auto'|'generative'|'vector';state:'pending'|'running'|'completed'|'failed'|'cancelled';createdAt:number;updatedAt:number;deliveredAt?:number;model?:string;
+  id:string;kind?:'ctf'|'investigation';imageMode?:'auto'|'generative'|'vector'|'template';state:'pending'|'running'|'completed'|'failed'|'cancelled';createdAt:number;updatedAt:number;deliveredAt?:number;model?:string;
   objective:string;
   result?:{summary:string;flags:string[];findings:string[];unresolved:string[];needsStrongerModel:boolean};error?:string;
   stats:{calls:number;searches:number;sourceReads:number;visionReads:number;inputChars:number;outputBytes:number;elapsedMs:number;attempts:number};receiptCount:number;
@@ -15,7 +15,7 @@ export interface CodexPublicJob {
 }
 export interface CodexPacket {
   scope:string;guildId:string;channelId:string;messageId:string;userId:string;question:string;context:string;checkpoint?:unknown;kind?:'ctf'|'investigation';
-  route:CodexRoute;imageMode?:'auto'|'generative'|'vector';artifacts:CodexArtifact[];
+  route:CodexRoute;imageMode?:'auto'|'generative'|'vector'|'template';artifacts:CodexArtifact[];
 }
 export interface CodexDiscordReadRequest {
   id:string;jobId:string;guildId:string;channelId:string;userId:string;sourceMessageId:string;

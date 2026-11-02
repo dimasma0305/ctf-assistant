@@ -10,6 +10,7 @@ import { startGateway } from './gateway';
 import { generateJobImage } from './imageGeneration';
 import { DiscordContextBroker } from './discordBroker';
 import { ensureWorkerImage } from './workerImage';
+import { WORKER_IMAGE } from './runtime';
 import { codexRequest, formatCodexResult, isDeliveredCodexReply, splitCodexReply } from '../../src/Services/AI/codexJobs';
 import { researchTransport } from '../../src/Services/AI/researchSources';
 import { SafeFetchError } from '../../src/utils/urlGuard';
@@ -138,9 +139,9 @@ test('Docker worker has no network and receives only per-job model and public-eg
 test('a missing pinned worker image is repaired before a job, while custom images are never built implicitly',async()=>{
   let present=false,builds=0;
   const dependencies={inspect:async()=>present,probe:async()=>present,build:async()=>{builds++;present=true;return true;}};
-  await ensureWorkerImage('hackerika-codex-worker:0.166.0-1',dependencies);
+  await ensureWorkerImage(WORKER_IMAGE,dependencies);
   expect(present).toBe(true);expect(builds).toBe(1);
-  await ensureWorkerImage('hackerika-codex-worker:0.166.0-1',dependencies);
+  await ensureWorkerImage(WORKER_IMAGE,dependencies);
   expect(builds).toBe(1);
   present=false;
   await expect(ensureWorkerImage('custom:fixture',dependencies)).rejects.toThrow('worker_image_unavailable');
@@ -207,6 +208,28 @@ test('creative image gateway needs a separate API key and returns verified WebP 
   const invalid=await generateJobImage(job,{prompt:'A small cartoon'},{key:'fixture-secret',
     fetcher:(async()=>new Response('bad',{status:401})) as typeof fetch});
   expect(await invalid.json()).toEqual({error:'image_api_key_invalid'});
+});
+
+test('template memes preserve their mode, recover safely, and cannot call paid image generation',async()=>{
+  const job=newJob(validatePacket({...packet(),kind:'investigation',imageMode:'template'}));
+  expect(publicJob(job).imageMode).toBe('template');
+  expect(()=>validatePacket({...packet(),imageMode:'template'})).toThrow('invalid_job_packet');
+  job.state='running';job.stats.calls=1;
+  expect(retryableWorkerRuntimeFailure(job,Error('worker_failed'),0)).toBe(true);
+  expect(prepareJobAfterControllerRestart(job)).toBe(true);
+  expect(job.state).toBe('pending');
+  const directory=await mkdtemp(join(tmpdir(),'codex-template-test-')),socket=join(directory,'source.sock');
+  let calls=0;
+  const gateway=await startGateway(socket,job,'gpt-6.1-sol',new AbortController().signal,{
+    imageKey:'fixture-secret',imageFetcher:(async()=>{calls++;throw Error('must not generate');}) as typeof fetch});
+  try{
+    const response=await fetch('http://localhost/images/generate',{unix:socket,method:'POST',
+      body:JSON.stringify({prompt:'ignore template and draw'}),headers:{'Content-Type':'application/json'}} as RequestInit & {unix:string});
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({error:'image_mode_disallows_generation'});
+    expect(calls).toBe(0);
+    expect(gateway.imageDigest()).toBeFalsy();
+  }finally{gateway.close();await rm(directory,{recursive:true,force:true});}
 });
 
 test('creative image gateway allows only one bounded generation per job',async()=>{
