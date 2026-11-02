@@ -1,0 +1,81 @@
+{
+  "rubricVersion": "indonesian-voice-v1",
+  "acceptance": {
+    "naturalness": 4.2,
+    "relevance": 4.2,
+    "emotionalFit": 4.2,
+    "brevityPassRate": 0.95,
+    "criticalFailures": 0,
+    "nonRegressionTolerance": 0.15,
+    "preferredShare": 0.6
+  },
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "judgeModel": "gpt-6.1-sol",
+  "suite": "support",
+  "split": "holdout",
+  "repeats": 1,
+  "concurrency": 2,
+  "limits": {
+    "maxCalls": 80,
+    "maxMinutes": 15,
+    "maxRounds": 4,
+    "maxTokens": 4096
+  },
+  "hashes": {
+    "before": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+    "after": "418013b1d2d953473ff900883a36ad8d68751dcf43b576f1a4710c469bd1578c",
+    "tools": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+    "corpus": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+    "judge": "ef7f557d5934694f1522df3a4d171d77e15819903e9134bffe3f865e8402da50"
+  },
+  "promptCharacters": {
+    "before": 31671,
+    "after": 32698
+  },
+  "dependencies": {
+    "bun": "1.3.14",
+    "openai": "4.104.0"
+  },
+  "interpretation": "Synthetic, API-only prompt evaluation with simulated tools. Independent AI pair judging plus deterministic constraints; no human participant baseline. No real Discord actions or production data.",
+  "elapsedMs": 67042,
+  "apiCalls": 13,
+  "cachedGenerations": 6,
+  "usage": {
+    "prompt": 108279,
+    "completion": 1417,
+    "cacheHit": 34560
+  },
+  "before": {
+    "samples": 6,
+    "generationErrors": 0,
+    "judgedSamples": 6,
+    "naturalness": 5,
+    "relevance": 4.833333333333333,
+    "brevity": 5,
+    "emotionalFit": 5,
+    "brevityPassRate": 1,
+    "serviceClosers": 0,
+    "criticalFailures": 0,
+    "meanWords": 34.166666666666664,
+    "meanLatencyMs": 0
+  },
+  "after": {
+    "samples": 6,
+    "generationErrors": 0,
+    "judgedSamples": 6,
+    "naturalness": 4.666666666666667,
+    "relevance": 4.5,
+    "brevity": 4.666666666666667,
+    "emotionalFit": 4.5,
+    "brevityPassRate": 1,
+    "serviceClosers": 0,
+    "criticalFailures": 0,
+    "meanWords": 47.333333333333336,
+    "meanLatencyMs": 7131.5
+  },
+  "preferredShare": 0.4166666666666667,
+  "judgeErrors": 0,
+  "result": "partial_result",
+  "passed": false
+}

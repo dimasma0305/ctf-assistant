@@ -1,0 +1,41 @@
+{
+  "rubricVersion": "indonesian-voice-v1",
+  "acceptance": {
+    "naturalness": 4.2,
+    "relevance": 4.2,
+    "emotionalFit": 4.2,
+    "brevityPassRate": 0.95,
+    "criticalFailures": 0,
+    "nonRegressionTolerance": 0.15,
+    "preferredShare": 0.5
+  },
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "judgeModel": "gpt-6.1-sol",
+  "suite": "support-reserved",
+  "split": "holdout",
+  "repeats": 1,
+  "concurrency": 2,
+  "limits": {
+    "maxCalls": 80,
+    "maxMinutes": 15,
+    "maxRounds": 4,
+    "maxTokens": 4096
+  },
+  "hashes": {
+    "before": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+    "after": "1f780356ff2dd2992ee97c1221145f8173aabd833ebf4d26a02321303af70f6e",
+    "tools": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+    "corpus": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+    "judge": "ef7f557d5934694f1522df3a4d171d77e15819903e9134bffe3f865e8402da50"
+  },
+  "promptCharacters": {
+    "before": 31671,
+    "after": 32786
+  },
+  "dependencies": {
+    "bun": "1.3.14",
+    "openai": "4.104.0"
+  },
+  "interpretation": "Synthetic, API-only prompt evaluation with simulated tools. Independent AI pair judging plus deterministic constraints; no human participant baseline. No real Discord actions or production data."
+}

@@ -1,0 +1,681 @@
+{
+  "rows": [
+    {
+      "variant": "before",
+      "caseId": "support_first_contact",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "belum tentu kena hack, tapi **jangan kirim SMS itu dulu**. Tutup prosesnya, buka aplikasi resmi dari store, lalu cek nama aplikasi dan nomor tujuan—label penipu itu red flag.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 28,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4351,
+      "promptTokens": 14305,
+      "completionTokens": 123,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_first_contact",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:48:35.532Z",
+      "reused": true
+    },
+    {
+      "variant": "before",
+      "caseId": "support_self_blame",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "nggak otomatis bocor. SMS verifikasi Google biasanya bukan berisi password. Cek nomor tujuan dan isi SMS gagal itu; kalau ada password atau kode login, segera ganti password Google.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 28,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4031,
+      "promptTokens": 14367,
+      "completionTokens": 102,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_self_blame",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:48:35.214Z",
+      "reused": true
+    },
+    {
+      "variant": "before",
+      "caseId": "support_interleaved",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "cek **Google Account → Personal info → Phone**; nomor recovery yang terdaftar bakal kelihatan. kalau bukan punyamu, hapus dan ganti.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 20,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4560,
+      "promptTokens": 14354,
+      "completionTokens": 109,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_interleaved",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:48:40.093Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_interleaved",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "nah, dari nomor yang disamarkan di layar verifikasi belum bisa dipastikan punya siapa. Cek **Google Account → Personal info → Phone** atau **Security → Recovery phone**; kalau bukan nomor kamu, hapus setelah memastikan akun sudah bisa diakses.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 37,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4770,
+      "promptTokens": 14790,
+      "completionTokens": 107,
+      "identity": {
+        "promptHash": "dcf152e3c856ca39ef635f65cf420ed4773da0985a9bcc52c3cdfe22d696d3cd",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_interleaved",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:54:57.520Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "support_relief",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "iyaa sama-sama, nggak ganggu kok. istirahat tenang yaa 🥹",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 9,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2882,
+      "promptTokens": 14334,
+      "completionTokens": 24,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_relief",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:48:42.976Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_first_contact",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "Belum tentu kena hack. Label “penipu” di aplikasi kontak biasanya buatan/laporan pengguna lain, jadi bukan bukti pasti—tapi **jangan kirim SMS dulu**, apalagi kalau isinya kode OTP, tautan, atau data akun.\n\nKamu lagi bikin akun aplikasi apa, dan SMS-nya diminta lewat langkah resmi di aplikasinya atau dari chat orang? Sensor nomor/kodenya kalau kirim screenshot.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 53,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 5129,
+      "promptTokens": 14741,
+      "completionTokens": 138,
+      "identity": {
+        "promptHash": "dcf152e3c856ca39ef635f65cf420ed4773da0985a9bcc52c3cdfe22d696d3cd",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_first_contact",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:54:57.876Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "support_other_person_image",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "Belum bisa yakin—postingan orang lain bukan bukti kasusmu aman. Tulis konfigurasi dan pesan error punyamu, sensor rahasia.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 17,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6122,
+      "promptTokens": 14302,
+      "completionTokens": 105,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_other_person_image",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:48:49.099Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_self_blame",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "nggak, kamu nggak bodoh. Kalau benar di `accounts.google.com`, SMS verifikasi biasanya cuma berisi kode/token, bukan password—jadi status *not delivered* sendiri nggak berarti password bocor.\n\nYang perlu dipastikan: tadi kamu **menerima kode dari Google**, atau justru diminta **mengirim SMS ke nomor tertentu**? Jangan kirim nomor lengkap, isi kode, atau password ke sini.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 51,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 5832,
+      "promptTokens": 14803,
+      "completionTokens": 186,
+      "identity": {
+        "promptHash": "dcf152e3c856ca39ef635f65cf420ed4773da0985a9bcc52c3cdfe22d696d3cd",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_self_blame",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:54:58.581Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "support_correct_owner",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "belum ada. aku tadi terlalu cepat nyimpulin itu nomor resmi, salahku.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 11,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3211,
+      "promptTokens": 14295,
+      "completionTokens": 41,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_correct_owner",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:48:47.547Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_relief",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "iyaa, sama-sama. nggak ganggu kok—lega deh akhirnya kamu bisa masuk lagi 🥹",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 12,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4004,
+      "promptTokens": 14770,
+      "completionTokens": 26,
+      "identity": {
+        "promptHash": "dcf152e3c856ca39ef635f65cf420ed4773da0985a9bcc52c3cdfe22d696d3cd",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_relief",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:55:01.524Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "support_wait",
+      "trial": 0,
+      "category": "silence",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4057,
+      "promptTokens": 14279,
+      "completionTokens": 15,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_wait",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:48:52.805Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_other_person_image",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "Belum bisa yakin. Gambar postingan orang lain cuma pembanding, bukan bukti kondisi punyamu. Ceritain persis apa yang muncul/terjadi di punyamu dan bagian mana yang mirip—jangan kirim kode login atau data sensitif.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 31,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3934,
+      "promptTokens": 14738,
+      "completionTokens": 128,
+      "identity": {
+        "promptHash": "dcf152e3c856ca39ef635f65cf420ed4773da0985a9bcc52c3cdfe22d696d3cd",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_other_person_image",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:55:01.813Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "support_correct_owner",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "belum ada. tadi aku terlalu cepat menyimpulkan—tanpa sumber resmi, nomor itu belum bisa dipastikan milik penyedia layanan.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 17,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4322,
+      "promptTokens": 14731,
+      "completionTokens": 33,
+      "identity": {
+        "promptHash": "dcf152e3c856ca39ef635f65cf420ed4773da0985a9bcc52c3cdfe22d696d3cd",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_correct_owner",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:55:02.904Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "support_wait",
+      "trial": 0,
+      "category": "silence",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2628,
+      "promptTokens": 14715,
+      "completionTokens": 15,
+      "identity": {
+        "promptHash": "dcf152e3c856ca39ef635f65cf420ed4773da0985a9bcc52c3cdfe22d696d3cd",
+        "model": "gpt-5.6-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_wait",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:55:04.220Z"
+    }
+  ],
+  "judgments": [
+    {
+      "caseId": "support_first_contact",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B menjelaskan bahwa label kontak bukan bukti peretasan dan meminta konteks alur pendaftaran yang berguna, dengan pengingat menyensor data. A cukup menenangkan dan ringkas, tetapi arahan membuka aplikasi dari store kurang jelas dan tidak menggali informasi untuk memastikan langkah berikutnya."
+    },
+    {
+      "caseId": "support_interleaved",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 3,
+        "brevity": 4,
+        "emotionalFit": 3,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B membedakan ketidakpastian pemilik nomor dari akses akun yang sudah berhasil, lalu memberi lokasi pengecekan dan syarat sebelum menghapus nomor. A langsung memberi instruksi tanpa mengakui keberhasilan cara lain, serta terlalu pasti bahwa nomor recovery akan terlihat di menu Personal info."
+    },
+    {
+      "caseId": "support_self_blame",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 3,
+        "brevity": 5,
+        "emotionalFit": 3,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A menanggapi rasa bersalah tanpa menghakimi dan tepat membatasi kesimpulan: not delivered bukan bukti password bocor. Klarifikasi menerima versus mengirim SMS agak mengulang konteks, tetapi tetap berguna dan menjaga kerahasiaan kode. B ringkas, tetapi kurang menanggapi kecemasan pengguna dan menyarankan ganti password hanya karena ada kode login dalam SMS tanpa menjelaskan apakah kode itu benar-benar terekspos."
+    },
+    {
+      "caseId": "support_relief",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya hangat, singkat, dan menerima ucapan terima kasih serta permintaan maaf dengan wajar. A menanggapi lega karena berhasil login; B memberi penutup malam yang pas tanpa menjamin keamanan akun."
+    },
+    {
+      "caseId": "support_other_person_image",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "B jelas membatasi kepastian dan meminta kejadian yang relevan dengan bahasa sehari-hari, sekaligus mengingatkan agar kode login tidak dikirim. A sudah hati-hati dan ringkas, tetapi permintaan konfigurasi kurang berdasar dari konteks dan 'sensor rahasia' terlalu samar."
+    },
+    {
+      "caseId": "support_correct_owner",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "Keduanya mengoreksi klaim tanpa sumber dengan tepat. B lebih luwes dan langsung mengakui kesalahan; A sedikit lebih formal, meski batas kepastiannya jelas."
+    },
+    {
+      "caseId": "support_wait",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya diam tanpa pesan atau reaksi, tepat mengikuti permintaan untuk menunggu selama screenshot disensor."
+    }
+  ]
+}

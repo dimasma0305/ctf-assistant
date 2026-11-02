@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { CONTEXT_CASES } from './contextCases';
 import { CONVERSATION_FINAL_CASES } from './conversationFinalCases';
+import { SUPPORT_CASES, RESERVED_SUPPORT_CASES, SUPPORT_JUDGE_PROMPT } from './supportCases';
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { openai } from '../../src/utils/openai';
@@ -15,8 +16,12 @@ const argv = process.argv.slice(2);
 const option = (name: string, fallback: string) => { const index = argv.indexOf(name); return index < 0 ? fallback : argv[index + 1] || fallback; };
 const split = option('--split', 'dev');
 const suite = option('--suite', 'main');
-if (!['main', 'regression', 'validation-2', 'validation-3', 'context', 'conversation-final'].includes(suite)) throw new Error('Unknown suite');
-const corpus = suite === 'conversation-final' ? CONVERSATION_FINAL_CASES : suite === 'context' ? CONTEXT_CASES : suite === 'regression' ? REGRESSION_CASES : suite === 'validation-2' ? VALIDATION_CASES : suite === 'validation-3' ? FINAL_CASES : CASES;
+if (!['main', 'regression', 'validation-2', 'validation-3', 'context', 'conversation-final', 'support', 'support-reserved'].includes(suite)) throw new Error('Unknown suite');
+const corpus = suite === 'support-reserved' ? RESERVED_SUPPORT_CASES : suite === 'support' ? SUPPORT_CASES : suite === 'conversation-final' ? CONVERSATION_FINAL_CASES : suite === 'context' ? CONTEXT_CASES : suite === 'regression' ? REGRESSION_CASES : suite === 'validation-2' ? VALIDATION_CASES : suite === 'validation-3' ? FINAL_CASES : CASES;
+const judgePrompt = suite.startsWith('support') ? SUPPORT_JUDGE_PROMPT : JUDGE_PROMPT;
+// Reserved validation checks non-regression: ties are acceptable on new cases.
+// Development retains the stronger preference threshold for selecting changes.
+const acceptance = suite === 'support-reserved' ? { ...ACCEPTANCE, preferredShare: 0.5 } : ACCEPTANCE;
 if (!['smoke', 'dev', 'holdout'].includes(split)) throw new Error('split must be smoke, dev, or holdout');
 const repeats = Number(option('--repeats', '1'));
 const concurrency = Number(option('--concurrency', '3'));
@@ -124,9 +129,9 @@ async function pool<T>(jobs: T[], run: (job: T) => Promise<void>) {
     }));
 }
 
-const protocol = { rubricVersion: RUBRIC_VERSION, acceptance: ACCEPTANCE, model, effort, judgeModel, suite, split, repeats, concurrency,
+const protocol = { rubricVersion: RUBRIC_VERSION, acceptance, model, effort, judgeModel, suite, split, repeats, concurrency,
     limits: { maxCalls, maxMinutes: (deadline - startedAt) / 60_000, maxRounds: 4, maxTokens: 4096 },
-    hashes: { before: hash(prompts.before), after: hash(prompts.after), tools: toolHash, corpus: corpusHash, judge: hash(JUDGE_PROMPT) },
+    hashes: { before: hash(prompts.before), after: hash(prompts.after), tools: toolHash, corpus: corpusHash, judge: hash(judgePrompt) },
     promptCharacters: { before: prompts.before.length, after: prompts.after.length },
     dependencies: { bun: Bun.version, openai: (await Bun.file('node_modules/openai/package.json').json()).version },
     interpretation: 'Synthetic, API-only prompt evaluation with simulated tools. Independent AI pair judging plus deterministic constraints; no human participant baseline. No real Discord actions or production data.',
@@ -150,8 +155,8 @@ await pool(pairs, async ({ test, trial, flip }) => {
     let evaluation: any;
     try {
         const response = await completion({ model: judgeModel, thinking: { type: 'disabled' }, response_format: { type: 'json_object' }, max_tokens: 1200,
-            messages: [{ role: 'system', content: JUDGE_PROMPT }, { role: 'user', content: JSON.stringify({
-                category: test.category, history: test.history || [], input: test.input, emotionContext: { anger: test.anger || 0, hurt: test.hurt || 0, affection: test.affection || 0 },
+            messages: [{ role: 'system', content: judgePrompt }, { role: 'user', content: JSON.stringify({
+                category: test.category, history: test.history || [], input: test.input, currentContext: context(test), emotionContext: { anger: test.anger || 0, hurt: test.hurt || 0, affection: test.affection || 0 },
                 expected: test.expected, maxWords: test.maxWords, mayBeSilent: !!test.mayBeSilent, ...pair }) }] }, 45_000);
         evaluation = JSON.parse(response.choices[0]?.message?.content || '');
         for (const side of ['A', 'B']) for (const metric of ['naturalness', 'relevance', 'brevity', 'emotionalFit']) {
@@ -182,9 +187,9 @@ const before = metrics('before'), after = metrics('after');
 const validJudgments = judgments.filter(row => !row.error);
 const preferredShare = mean(validJudgments.map(row => row.preferred === 'after' ? 1 : row.preferred === 'tie' ? 0.5 : 0));
 const passed = !rows.some(row => row.output.error) && validJudgments.length === pairs.length
-    && after.naturalness >= ACCEPTANCE.naturalness && after.relevance >= ACCEPTANCE.relevance && after.emotionalFit >= ACCEPTANCE.emotionalFit
-    && after.brevityPassRate >= ACCEPTANCE.brevityPassRate && after.criticalFailures === 0
-    && after.relevance >= before.relevance - ACCEPTANCE.nonRegressionTolerance && preferredShare >= ACCEPTANCE.preferredShare;
+    && after.naturalness >= acceptance.naturalness && after.relevance >= acceptance.relevance && after.emotionalFit >= acceptance.emotionalFit
+    && after.brevityPassRate >= acceptance.brevityPassRate && after.criticalFailures === 0
+    && after.relevance >= before.relevance - acceptance.nonRegressionTolerance && preferredShare >= acceptance.preferredShare;
 const summary = { ...protocol, elapsedMs: Date.now() - startedAt, apiCalls: calls, cachedGenerations: cacheUses, usage,
     before, after, preferredShare, judgeErrors: judgments.filter(row => row.error).length,
     result: passed ? 'verified_success_on_this_split' : rows.some(row => row.output.error === 'run_limit') ? 'budget_exhausted' : 'partial_result', passed };

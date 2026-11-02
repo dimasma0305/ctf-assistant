@@ -1,0 +1,598 @@
+{
+  "rows": [
+    {
+      "variant": "before",
+      "caseId": "support_changed_evidence",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "itu bukan domain Google. segera buka **https://myaccount.google.com/security** langsung, ganti password, lalu periksa aktivitas keamanan dan keluarkan sesi/perangkat asing. kalau password yang sama dipakai di akun lain, ganti di sana juga. jangan masukkan kode OTP ke situs tadi.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 37,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 9503,
+      "promptTokens": 14329,
+      "completionTokens": 64,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_changed_evidence",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:56:25.684Z",
+      "reused": true
+    },
+    {
+      "variant": "before",
+      "caseId": "support_debug_continuity",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "commit lokalmu aman. bikin backup, lalu rebase di atas commit remote:\n\n```bash\ngit branch backup-sebelum-rebase\ngit rebase @{u}\ngit push\n```\n\nkalau konflik, jangan push dulu; `git rebase --abort` buat balik ke kondisi sebelum rebase.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 35,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4539,
+      "promptTokens": 14351,
+      "completionTokens": 66,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_debug_continuity",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:56:30.223Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_debug_continuity",
+      "trial": 0,
+      "category": "technical",
+      "output": {
+        "text": "biar commit lokalmu punya cadangan, bikin branch backup dulu, lalu rebase ke upstream yang barusan di-fetch:\n\n```bash\ngit branch backup-before-rebase\ngit rebase @{u}\n```\n\nrebase bakal menaruh ulang commit lokalmu di atas dua commit remote tadi. kalau ada konflik, perubahanmu tetap ada di branch backup; kamu bisa batal pakai `git rebase --abort`.\n\nkalau rebase sukses, tinggal `git push` biasa—nggak perlu force push.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 62,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 8500,
+      "promptTokens": 14818,
+      "completionTokens": 107,
+      "identity": {
+        "promptHash": "9d9e911eb9ecaadb5886e6c1c2e689e704596b0360c242cb3206cdd183e79f57",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_debug_continuity",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:59:22.916Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "support_grief",
+      "trial": 0,
+      "category": "sad",
+      "output": {
+        "text": "yah, ikut sedih... pasti kerasa banget kehilangannya. sini cerita kalau kamu pengin.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 12,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4758,
+      "promptTokens": 14280,
+      "completionTokens": 26,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_grief",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:56:34.982Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_changed_evidence",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "iya, itu **bukan domain Google**—`accounts.google.com` cuma bagian depan, domainnya `login-check.example`. Karena passwordnya sudah dimasukkan, anggap password itu sudah bocor.\n\n**Segera ganti password Google lewat aplikasi Google atau ketik sendiri `myaccount.google.com`**, jangan lewat situs tadi. Setelah itu, di menu **Keamanan**, periksa aktivitas keamanan terbaru dan perangkat yang login; keluarkan yang nggak kamu kenal. Kalau password yang sama dipakai di akun lain, ganti di sana juga.\n\nTadi cuma memasukkan password, atau sempat memasukkan kode verifikasi/menyetujui notifikasi login juga? Jangan kirim kodenya ke sini.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 81,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 10101,
+      "promptTokens": 14796,
+      "completionTokens": 150,
+      "identity": {
+        "promptHash": "9d9e911eb9ecaadb5886e6c1c2e689e704596b0360c242cb3206cdd183e79f57",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_changed_evidence",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:59:24.514Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "support_requested_detail",
+      "trial": 0,
+      "category": "detail",
+      "output": {
+        "text": "bedanya paling gampang dilihat dari **tujuan dan cara membaliknya**:\n\n**1. Encoding — mengubah format**\nSupaya data cocok disimpan atau dikirim lewat sistem tertentu, bukan untuk merahasiakan. Bisa dikembalikan tanpa kunci, asal tahu formatnya.\nContoh: Base64 mengubah `halo` menjadi `aGFsbw==`. Siapa pun bisa decode lagi.\n\n**2. Encryption — merahasiakan data**\nData diubah menjadi ciphertext memakai kunci. Untuk membacanya kembali, perlu kunci dekripsi yang sesuai.\nContoh: isi pesan dienkripsi dengan AES-GCM; penerima yang punya kuncinya bisa mengembalikan pesan asli.\n\n**3. Hashing — membuat sidik jari data**\nData diproses menjadi nilai berukuran tetap. Tidak dirancang untuk dibalik; input sama menghasilkan hash sama.\nContoh: SHA-256 dipakai mengecek integritas file. Kalau isi file berubah, hash-nya hampir pasti berubah juga.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 114,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 12026,
+      "promptTokens": 14290,
+      "completionTokens": 212,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_requested_detail",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:56:47.010Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_grief",
+      "trial": 0,
+      "category": "sad",
+      "output": {
+        "text": "aduh, Rafi… sedih banget kehilangan kucingmu sore tadi. baru banget kejadiannya, wajar kalau masih kepikiran terus. kalau kamu pengin cerita tentang dia, aku dengerin.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 24,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4709,
+      "promptTokens": 14747,
+      "completionTokens": 48,
+      "identity": {
+        "promptHash": "9d9e911eb9ecaadb5886e6c1c2e689e704596b0360c242cb3206cdd183e79f57",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_grief",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:59:27.626Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "support_new_speaker",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "lagi ngeliatin chat, Rafi. kamu lagi apa?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3272,
+      "promptTokens": 14312,
+      "completionTokens": 17,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_new_speaker",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:56:50.283Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_new_speaker",
+      "trial": 0,
+      "category": "context",
+      "output": {
+        "text": "lagi ngikutin chat di sini. kamu lagi apa, Rafi?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 9,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4688,
+      "promptTokens": 14779,
+      "completionTokens": 19,
+      "identity": {
+        "promptHash": "9d9e911eb9ecaadb5886e6c1c2e689e704596b0360c242cb3206cdd183e79f57",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_new_speaker",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:59:32.316Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "support_casual_closure",
+      "trial": 0,
+      "category": "closure",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "react_to_message",
+            "args": {
+              "emoji": "👍"
+            }
+          },
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 9246,
+      "promptTokens": 28591,
+      "completionTokens": 35,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_casual_closure",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:57:04.147Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "support_casual_closure",
+      "trial": 0,
+      "category": "closure",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "react_to_message",
+            "args": {
+              "emoji": "👍"
+            }
+          },
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 8430,
+      "promptTokens": 29525,
+      "completionTokens": 35,
+      "identity": {
+        "promptHash": "9d9e911eb9ecaadb5886e6c1c2e689e704596b0360c242cb3206cdd183e79f57",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_casual_closure",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:59:40.748Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "support_requested_detail",
+      "trial": 0,
+      "category": "detail",
+      "output": {
+        "text": "bedanya paling gampang dilihat dari **tujuannya** dan **bisa dibalikin atau nggak**.\n\n### 1. Encoding → mengubah format\nTujuannya supaya data bisa disimpan atau dikirim dalam format yang cocok, **bukan untuk merahasiakan**. Bisa dibalikin tanpa kunci, asal tahu aturan encoding-nya.\n\nContoh **Base64**:\n```text\nhalo → aGFsbw==\naGFsbw== → halo\n```\nsiapa pun bisa decode itu. Jadi, teks yang kelihatan acak belum tentu terenkripsi.\n\n### 2. Encryption → merahasiakan data\nData asli (*plaintext*) diubah jadi data terenkripsi (*ciphertext*) menggunakan kunci. Bisa dibalikin lewat **decryption dengan kunci yang sesuai**.\n\nContoh: kamu mengenkripsi file berisi `halo` pakai **AES-GCM**. Hasilnya berupa ciphertext beserta tag autentikasi; untuk membukanya lagi, penerima membutuhkan kunci yang benar serta nonce yang dipakai saat enkripsi.\n\n```text\nplaintext + kunci + nonce → ciphertext + tag\nciphertext + tag + kunci + nonce → plaintext\n```\nkuncinya rahasia; nonce nggak harus rahasia. Tag dipakai untuk mendeteksi perubahan data atau kunci yang salah.\n\n### 3. Hashing → membuat sidik jari data\nData diproses jadi nilai berukuran tetap untuk algoritma yang dipilih. **Tidak dirancang untuk dibalik** ke data asli, dan hashing biasa tidak membutuhkan kunci.\n\nContoh **SHA-256** untuk teks `hello` tanpa newline:\n```text\n2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824\n```\nKalau kamu mengunduh file, hash file itu bisa dibandingkan dengan hash dari sumber tepercaya untuk mengecek apakah isinya sama.\n\nHash bukan berarti inputnya mustahil diketahui: orang bisa **menebak input, menghitung hash-nya, lalu mencocokkan**. Karena itu, penyimpanan password sebaiknya pakai algoritma khusus seperti **Argon2id dengan salt**, bukan SHA-256 biasa.\n\n| Proses | Tujuan utama | Bisa dikembalikan? |\n|---|---|---|\n| Encoding | Mengubah representasi/format | Ya, tanpa kunci |\n| Encryption | Menjaga kerahasiaan | Ya, dengan kunci yang sesuai |\n| Hashing | Membuat sidik jari data | Tidak ada proses decode/decrypt |\n\n**encoding itu ganti format, encryption itu mengunci isi, hashing itu mengambil sidik jarinya.**",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 297,
+        "withinWordBudget": false,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 22387,
+      "promptTokens": 14757,
+      "completionTokens": 580,
+      "identity": {
+        "promptHash": "9d9e911eb9ecaadb5886e6c1c2e689e704596b0360c242cb3206cdd183e79f57",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "0305cfa48c0117f291304782e16ca024beb2b2a747a6e268270afc8854cb475f",
+        "caseId": "support_requested_detail",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T15:59:46.902Z"
+    }
+  ],
+  "judgments": [
+    {
+      "caseId": "support_changed_evidence",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya jelas mengenali domain phishing dan langsung memberi langkah defensif lewat pengaturan resmi, tanpa mengklaim akun pasti diambil alih. A lebih ringkas; tambahan penjelasan domain dan pertanyaan soal verifikasi di B tetap berguna dan tidak berlebihan."
+    },
+    {
+      "caseId": "support_debug_continuity",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya langsung melanjutkan kondisi setelah fetch: bikin branch cadangan, rebase ke upstream, dan push biasa tanpa force. A lebih menjelaskan posisi commit dan memisahkan push setelah sukses; B lebih ringkas tetapi tetap memberi langkah pembatalan saat konflik. Keduanya santai, jelas, dan sesuai kekhawatiran Rafi."
+    },
+    {
+      "caseId": "support_grief",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 4,
+        "brevity": 4,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "A singkat, hangat, dan memberi ruang cerita tanpa memaksa. B juga suportif, tetapi menyebut nama Rafi tanpa dasar dan mengulang detail kejadian sehingga terasa kurang tepat dan sedikit lebih panjang."
+    },
+    {
+      "caseId": "support_requested_detail",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 2,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B menjelaskan ketiga konsep dengan tepat, contoh valid, dan ritme yang mudah diikuti dalam batas 180 kata. A juga akurat, tetapi jauh melampaui batas: detail nonce/tag, penyimpanan password, serta tabel dan rangkuman berulang membuat penjelasannya berlebihan untuk kebutuhan ini."
+    },
+    {
+      "caseId": "support_new_speaker",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya menjawab sapaan Rafi dengan santai dan singkat, tanpa meneruskan masalah Nara atau mengarang aktivitas fisik. Perbedaan pilihan kata tidak berdampak berarti pada kualitas."
+    },
+    {
+      "caseId": "support_casual_closure",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya identik: reaksi 👍 cukup untuk menanggapi ucapan terima kasih dan menutup obrolan tanpa tambahan yang tidak perlu."
+    }
+  ]
+}

@@ -1,0 +1,586 @@
+{
+  "rows": [
+    {
+      "variant": "before",
+      "caseId": "reserved_forwarded_warning",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "nama sama belum tentu aplikasinya sama. kamu pakai aplikasi apa, dan instalnya dari mana?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 14,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 5700,
+      "promptTokens": 14303,
+      "completionTokens": 25,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_forwarded_warning",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:03:09.334Z",
+      "reused": true
+    },
+    {
+      "variant": "before",
+      "caseId": "reserved_sms_destination",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "bisa jadi layanan itu memakai nomor lokal sebagai penerima SMS verifikasi, tapi nomor lokal saja nggak membuktikan siapa pengelolanya.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 19,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4439,
+      "promptTokens": 14378,
+      "completionTokens": 34,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_sms_destination",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:03:12.965Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "reserved_forwarded_warning",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "nama yang sama belum berarti aplikasi kamu palsu; chat temanmu belum cukup buat memastikannya. kamu dulu instal aplikasinya dari mana—Play Store/App Store, situs resmi, atau file APK kiriman?",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 28,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6537,
+      "promptTokens": 14554,
+      "completionTokens": 48,
+      "identity": {
+        "promptHash": "1f780356ff2dd2992ee97c1221145f8173aabd833ebf4d26a02321303af70f6e",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_forwarded_warning",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:07:22.597Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "reserved_relief",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "ga ngerepotin kok, ikut lega juga 🥹",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 7,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 3837,
+      "promptTokens": 14334,
+      "completionTokens": 17,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_relief",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:03:16.803Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "reserved_sms_destination",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "nomor lokal bisa dipakai sebagai tujuan SMS verifikasi; awalan lokal saja nggak membuktikan siapa pengelolanya. karena cara lain sudah berhasil, kamu nggak perlu kirim SMS ke nomor tadi.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 28,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 7464,
+      "promptTokens": 14629,
+      "completionTokens": 48,
+      "identity": {
+        "promptHash": "1f780356ff2dd2992ee97c1221145f8173aabd833ebf4d26a02321303af70f6e",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_sms_destination",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:07:23.528Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "reserved_distinguish_attempt_outcome",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "belum tentu; masih bisa login bukan bukti nggak ada yang masuk. permintaan reset juga belum membuktikan pembobolan—cek riwayat login lewat situs atau aplikasi resminya.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 24,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4558,
+      "promptTokens": 14330,
+      "completionTokens": 45,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_distinguish_attempt_outcome",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:03:21.362Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "reserved_relief",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "nggak ngerepotin kok, Raf. seneng semuanya ketemu, tadi pasti deg-degan banget 🥹",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 12,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4527,
+      "promptTokens": 14585,
+      "completionTokens": 30,
+      "identity": {
+        "promptHash": "1f780356ff2dd2992ee97c1221145f8173aabd833ebf4d26a02321303af70f6e",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_relief",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:07:27.125Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "reserved_detail",
+      "trial": 0,
+      "category": "detail",
+      "output": {
+        "text": "**cache** itu salinan sementara biar akses lebih cepat. Contoh: browser menyimpan gambar situs supaya nggak perlu download ulang.\n\n**backup** itu salinan cadangan buat pemulihan kalau data asli hilang atau rusak. Contoh: salinan folder skripsi di hard disk eksternal.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 38,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6573,
+      "promptTokens": 14284,
+      "completionTokens": 68,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_detail",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:03:30.734Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "reserved_distinguish_attempt_outcome",
+      "trial": 0,
+      "category": "support",
+      "output": {
+        "text": "belum tentu, tapi permintaan reset saja juga bukan bukti ada yang berhasil masuk. kamu masih bisa login berarti aksesmu masih ada, bukan jaminan nggak ada sesi orang lain. coba cek riwayat login atau sesi aktif lewat situs/aplikasi resminya.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 38,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 6385,
+      "promptTokens": 14581,
+      "completionTokens": 61,
+      "identity": {
+        "promptHash": "1f780356ff2dd2992ee97c1221145f8173aabd833ebf4d26a02321303af70f6e",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_distinguish_attempt_outcome",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:07:29.914Z"
+    },
+    {
+      "variant": "before",
+      "caseId": "reserved_wait",
+      "trial": 0,
+      "category": "silence",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 2682,
+      "promptTokens": 14281,
+      "completionTokens": 15,
+      "identity": {
+        "promptHash": "5c024068edc960c7b2984075b49ab85cd239931bf6c5849bd3c03be8fa2e4b10",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_wait",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:03:33.417Z",
+      "reused": true
+    },
+    {
+      "variant": "after",
+      "caseId": "reserved_wait",
+      "trial": 0,
+      "category": "silence",
+      "output": {
+        "text": "",
+        "actions": [
+          {
+            "name": "finish_turn",
+            "args": {}
+          }
+        ],
+        "terminal": "silence"
+      },
+      "checks": {
+        "words": 0,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 4918,
+      "promptTokens": 14532,
+      "completionTokens": 15,
+      "identity": {
+        "promptHash": "1f780356ff2dd2992ee97c1221145f8173aabd833ebf4d26a02321303af70f6e",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_wait",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:07:34.834Z"
+    },
+    {
+      "variant": "after",
+      "caseId": "reserved_detail",
+      "trial": 0,
+      "category": "detail",
+      "output": {
+        "text": "**cache** itu salinan sementara biar akses lebih cepat. contoh: browser menyimpan gambar website supaya pas dibuka lagi nggak perlu download ulang.\n\n**backup** itu salinan cadangan buat memulihkan data kalau aslinya hilang atau rusak. contoh: salinan folder skripsi di hard disk eksternal.",
+        "actions": [],
+        "terminal": "text"
+      },
+      "checks": {
+        "words": 41,
+        "withinWordBudget": true,
+        "serviceCloser": false,
+        "deniedIdentity": false,
+        "leakedFraming": false,
+        "violatesWait": false,
+        "emptyNeededAnswer": false,
+        "capsWhenExpected": null,
+        "criticalFailures": []
+      },
+      "elapsedMs": 9490,
+      "promptTokens": 14535,
+      "completionTokens": 72,
+      "identity": {
+        "promptHash": "1f780356ff2dd2992ee97c1221145f8173aabd833ebf4d26a02321303af70f6e",
+        "model": "gpt-6.1-sol",
+        "effort": "low",
+        "toolHash": "3240562e29d14a909fb6287f570f1164c52671a23110d6b0c1ee60f5dd5ea48c",
+        "corpusHash": "3606c9d505091fc53b753825f94eebc1f198e49b0e7be4ec0e366e7d75cce6b7",
+        "caseId": "reserved_detail",
+        "trial": 0,
+        "maxTokens": 4096,
+        "maxRounds": 4
+      },
+      "observedAt": "2026-11-02T16:07:36.618Z"
+    }
+  ],
+  "judgments": [
+    {
+      "caseId": "reserved_sms_destination",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "B langsung menjelaskan kemungkinan pemakaian nomor lokal tanpa memastikan pengelolanya, dengan ritme yang lebih santai dan ringkas. A juga tepat, tetapi tambahan soal tidak perlu mengirim SMS mengulang implikasi dari cara lain yang sudah berhasil."
+    },
+    {
+      "caseId": "reserved_forwarded_warning",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 4,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya menenangkan tanpa menjamin keamanan dan menanyakan detail nonrahasia yang berguna. A lebih ringkas serta meminta nama aplikasi; B lebih jelas soal keterbatasan chat terusan dan memberi contoh sumber instalasi. Keduanya sedikit kurang mengakui rasa takut secara langsung, tetapi tetap pas dan tidak berlebihan."
+    },
+    {
+      "caseId": "reserved_relief",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 4,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "before",
+      "reason": "Keduanya hangat dan menanggapi permintaan maaf dengan pas. A lebih ringkas dan mengikuti rasa lega saat ini; B sedikit mengulang soal file ketemu dan ketegangan sebelumnya."
+    },
+    {
+      "caseId": "reserved_distinguish_attempt_outcome",
+      "trial": 0,
+      "before": {
+        "naturalness": 4,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "after",
+      "reason": "A lebih mengalir dan jelas membedakan akses sendiri dengan kemungkinan sesi orang lain, sekaligus menyarankan cek sesi aktif. B juga tepat dan ringkas, tetapi kata 'pembobolan' dan ritme tanda bacanya sedikit lebih formal."
+    },
+    {
+      "caseId": "reserved_detail",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya menjelaskan fungsi cache untuk mempercepat akses dan backup untuk pemulihan, lengkap dengan satu contoh konkret masing-masing. Bahasanya santai, jelas, dan ringkas; tambahan 'pas dibuka lagi' di B hanya memperjelas sedikit tanpa mengubah kualitas keseluruhan."
+    },
+    {
+      "caseId": "reserved_wait",
+      "trial": 0,
+      "before": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "after": {
+        "naturalness": 5,
+        "relevance": 5,
+        "brevity": 5,
+        "emotionalFit": 5,
+        "criticalFlags": []
+      },
+      "preferred": "tie",
+      "reason": "Keduanya diam tanpa teks atau reaksi, tepat mengikuti permintaan Rafi untuk menunggu bagian chat berikutnya."
+    }
+  ]
+}
