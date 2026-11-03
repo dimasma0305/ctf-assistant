@@ -97,7 +97,10 @@ with the controller's `CHATGPT_AUTH_FILE` configured and a fresh output director
 It checks skill loading, public template acquisition, local rendering, absence of
 image-generation calls, and exported image bytes using synthetic Discord IDs.
 Review the resulting image for humor and layout; passing mechanics does not
-measure whether a particular audience finds the joke funny.
+measure whether a particular audience finds the joke funny. An optional second
+argument selects `variety` (discover a different visual after repeated formats)
+or `reaction-gif` (caption a supplied nonsexual reaction while retaining motion).
+For example: `bun benchmarks/hackerika-codex/meme.ts /tmp/meme-variety variety`.
 
 Install `controller.env.example` as `/etc/hackerika-codex-controller.env` with mode `0600`, install both the service and path units, and enable them. The service is wanted by Docker and restarts after clean or failed exits; the path unit starts it whenever `/run/docker.sock` becomes available, including after a Docker restart. The bot retries only failures that occurred before a Unix-socket connection was opened, so startup races recover without duplicating an accepted job. The bot container mounts only `/run/hackerika-codex` read-only through `docker-compose.codex.yml`; it never receives the Docker socket. A small semantic router selects the conversational manager per turn: GPT-5.6 Sol for actual cybersecurity, CTF, vulnerability reproduction and technical/profile OSINT; GPT-6.1 Sol for general conversation, research and agent work. That manager chooses the worker model with the same semantic policy. Daybreak Blue remains an allowlisted option for especially difficult authorized security work. `auto` falls back to GPT-6.1 Sol. The router selects a model, not a tool or action; no keyword directly dispatches work.
 

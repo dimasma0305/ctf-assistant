@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Place fitted literal captions on an existing local meme template. No network."""
+"""Caption an existing local image/GIF, optionally with text bands. No network."""
 import argparse
 import json
 import math
@@ -9,6 +9,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 Image.MAX_IMAGE_PIXELS = 20_000_000
 DEFAULT_FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf'
+MAX_FRAMES = 200
+MAX_DECODED_PIXELS = 80_000_000
 
 
 def wrap(text, draw, font, width, stroke):
@@ -61,19 +63,45 @@ def caption_layer(spec, width, height, font_path):
 
 
 def render(template, layout, output, font_path=DEFAULT_FONT):
+    if not isinstance(layout, dict):
+        raise ValueError('Layout must be an object')
     boxes = layout.get('boxes')
     if not isinstance(boxes, list) or not 1 <= len(boxes) <= 12:
         raise ValueError('Provide 1..12 caption boxes')
-    if Path(output).suffix.lower() != '.png':
-        raise ValueError('Output must be a PNG')
+    extension = Path(output).suffix.lower()
+    if extension not in ('.png', '.gif'):
+        raise ValueError('Output must be a PNG or GIF')
     if Path(template).resolve() == Path(output).resolve():
         raise ValueError('Keep the original template; use a different output path')
+    padding = layout.get('padding', {})
+    if not isinstance(padding, dict):
+        raise ValueError('padding must be an object')
+    top, bottom = padding.get('top', 0), padding.get('bottom', 0)
+    if any(type(value) is not int or not 0 <= value <= 1200 for value in (top, bottom)):
+        raise ValueError('Padding must be 0..1200 integer pixels')
+    frames, durations = [], []
     with Image.open(template) as source:
-        if getattr(source, 'n_frames', 1) != 1:
-            raise ValueError('Animated templates need a frame-aware renderer')
+        count = getattr(source, 'n_frames', 1)
+        if count > 1 and extension != '.gif':
+            raise ValueError('Animated templates require GIF output; refusing to drop frames')
+        if count > MAX_FRAMES:
+            raise ValueError('Animation exceeds 200 frames; trim it deliberately first')
         if source.width * source.height > Image.MAX_IMAGE_PIXELS:
             raise ValueError('Template exceeds 20 megapixels')
-        canvas = ImageOps.exif_transpose(source).convert('RGBA')
+        loop = source.info.get('loop')
+        for index in range(count):
+            source.seek(index)
+            frame = ImageOps.exif_transpose(source).convert('RGBA')
+            width, height = frame.width, frame.height + top + bottom
+            if width * height > Image.MAX_IMAGE_PIXELS or width * height * count > MAX_DECODED_PIXELS:
+                raise ValueError('Decoded animation/canvas too large; resize or trim it first')
+            canvas = Image.new('RGBA', (width, height), padding.get('color', 'white'))
+            # Unmasked paste retains the original alpha, including transparent
+            # GIF areas. Only the added bands receive the padding color.
+            canvas.paste(frame, (0, top))
+            frames.append(canvas)
+            durations.append(source.info.get('duration', 100))
+    canvas = frames[0]
     for spec in boxes:
         box = spec.get('box') if isinstance(spec, dict) else None
         if not isinstance(box, list) or len(box) != 4 or any(type(v) is not int for v in box):
@@ -82,13 +110,31 @@ def render(template, layout, output, font_path=DEFAULT_FONT):
         if min(x, y) < 0 or min(width, height) < 1 or x + width > canvas.width or y + height > canvas.height:
             raise ValueError('Caption box is outside the template')
         layer = caption_layer(spec, width, height, font_path)
-        canvas.alpha_composite(layer, (x + (width - layer.width) // 2, y + (height - layer.height) // 2))
+        position = (x + (width - layer.width) // 2, y + (height - layer.height) // 2)
+        for frame in frames:
+            frame.alpha_composite(layer, position)
     Path(output).parent.mkdir(parents=True, exist_ok=True)
-    canvas.save(output, optimize=True)
+    if extension == '.gif':
+        encoded = []
+        for frame in frames:
+            # Reserve one palette entry for transparency on every full frame;
+            # disposal=2 prevents stale pixels from trailing moving characters.
+            paletted = frame.convert('RGB').quantize(colors=255)
+            palette = paletted.getpalette() or []
+            paletted.putpalette((palette + [0] * 768)[:768])
+            paletted.paste(255, mask=frame.getchannel('A').point(lambda alpha: 255 if alpha < 128 else 0))
+            encoded.append(paletted)
+        encoded[0].save(output, save_all=True, append_images=encoded[1:], duration=durations,
+                        disposal=2, transparency=255, optimize=False,
+                        **({'loop': loop} if loop is not None else {}))
+    else:
+        canvas.save(output, optimize=True)
     with Image.open(output) as check:
+        saved_frames = getattr(check, 'n_frames', 1)
         check.verify()
     return {'file': str(output), 'width': canvas.width, 'height': canvas.height,
-            'bytes': Path(output).stat().st_size, 'captions': len(boxes)}
+            'bytes': Path(output).stat().st_size, 'captions': len(boxes),
+            'frames': saved_frames, **({'duration_ms': sum(durations)} if extension == '.gif' else {})}
 
 
 if __name__ == '__main__':

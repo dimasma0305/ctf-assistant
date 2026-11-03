@@ -4,7 +4,9 @@
 
 `local/meme-craft` is maintained in this repository, separately from the irai
 snapshot. It teaches template selection, Indonesian caption writing, attribution,
-and visual review, and includes a local Pillow caption renderer. It uses existing
+and visual review, and includes a local Pillow caption renderer for PNG/GIF and
+optional caption bands. Its discovery reference covers named/niche reactions,
+search beyond popular catalogs, and avoiding recently repeated formats. It uses existing
 image templates, not an image generator. The worker image installs Pillow and
 DejaVu fonts; `imageMode: "template"` explicitly selects this workflow and disables
 the image-generation endpoint for that job. Template choices and captions are

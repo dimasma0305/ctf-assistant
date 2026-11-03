@@ -1,6 +1,6 @@
 ---
 name: meme-craft
-description: Create or revise memes using existing image templates and short, context-aware captions, especially Indonesian Discord banter. Use for a finished meme image, template selection, or meme caption writing; not for explaining an existing meme or generating original illustrations.
+description: Create or revise still and animated memes using real templates, reaction images, screenshots and short Indonesian captions. Discover niche or requested references and avoid repeating recent formats. Use for meme files, template selection or captions; not for explaining an existing meme or generating original illustrations.
 ---
 
 # Meme craft
@@ -22,17 +22,18 @@ request from the user. Caption-only requests need only text, not a file job.
    effort, a suspiciously specific excuse, or two choices revealing the same
    weakness. Draft a few short alternatives privately and pick the strongest.
    Specific detail usually beats generic "AI bad" or "programmer tired" jokes.
-3. Choose the format that makes the punchline visible. Examples, not routing rules:
-
-   | Format | Visual function | Common failure |
-   | --- | --- | --- |
-   | Two Buttons | Sweating over choices that expose an embarrassing dilemma | Two ordinary options with no comic reason to panic |
-   | Drake | Reject something reasonable, embrace an absurd alternative | Two long paragraphs or reversed panel meaning |
-   | Distracted Boyfriend | Temptation distracts from an obligation | Labels over faces; unclear who is distracted |
-   | Disaster Girl / This Is Fine | Smug responsibility / denial amid chaos | A literal disaster description with no twist |
-
-   These are starting points, not a closed catalog. Use another template when it
-   fits better; retain a template explicitly requested by the user.
+3. Choose the visible action or expression that carries the punchline: an awkward
+   glance, exaggerated admiration, instant regret, misplaced confidence, a slow
+   reveal, or an absurd literal reading. The image should add the joke, not merely
+   decorate a caption that already explains everything. A wordplay such as
+   "jilat atasan" can use either flattery or harmless literal absurdity; do not
+   dismiss a relevant visual suggestion just because it changes the first reading.
+   Read [template-discovery.md](references/template-discovery.md) when choosing an
+   image, interpreting a named reference, or revising a repetitive meme.
+   Retain a suitable template explicitly requested by the user. If they ask for
+   more variety, inspect the recent meme/context and change its visual mechanism,
+   not just the wording on the same template. Do not default to Drake/Two Buttons
+   because they appear first in a catalog. Do not ban them when explicitly wanted.
 4. Write like the conversation: natural Indonesian, compact phrasing, occasional
    code-switching if it helps. Put the surprise at the end. Caps can emphasize a
    punchline; random caps, emoji, "wkwk", or insults do not create one. Avoid
@@ -41,10 +42,13 @@ request from the user. Caption-only requests need only text, not a file job.
 
 ## Acquire and inspect a real template
 
-- Prefer the supplied image. Otherwise discover blank templates from a public
-  catalog, for example `https://api.imgflip.com/get_memes` (no login needed), or
-  inspect the template page the user names. Read the returned names and URLs;
-  do not guess an image URL or use a caption API that uploads the conversation.
+- Prefer the supplied image or a specifically requested reference. Otherwise use
+  public search for the action/expression, aliases, character or scene. Imgflip's
+  `https://api.imgflip.com/get_memes` is a popular starting set, not the universe
+  of templates. Check relevant template pages, original public posts, reaction
+  GIFs or anime screenshots too. Compare plausible alternatives before picking
+  one when no template was specified. Read actual names and image URLs; never
+  guess a CDN path or upload the conversation to a captioning service.
 - Download only the selected public image with `curl --fail --location`, a
   timeout, and a size bound; check that the result decodes as an image. Record
   the source URL in internal findings. Keep creator marks/credits in the image.
@@ -54,6 +58,11 @@ request from the user. Caption-only requests need only text, not a file job.
   order, empty caption areas, faces, gestures, and dimensions. When local image
   viewing is unavailable, do not claim visual inspection; use a verified layout
   or report the precise missing capability.
+- Use nonsexual anime reactions. Do not use sexual/fetish depictions of children
+  or school-age characters; offer a nonsexual version or another suitable visual.
+  A body-part word or crude pun alone is not a reason to reject a harmless joke:
+  assess the actual scene and context. Do not silently substitute another image
+  while claiming to have used the requested reference.
 
 ## Render locally
 
@@ -79,10 +88,18 @@ with a dark outline on photos. The renderer wraps and fits text, but refuses
 overflow at the minimum size. Shorten the caption or change its box instead of
 shrinking into unreadable text. Do not reuse example coordinates blindly.
 
-For a specialized layout, adapt with Pillow; preserve the real template rather
-than rebuilding its artwork. If the user explicitly wants an animated meme,
-use available ffmpeg tooling and check timing/format separately. The renderer
-handles still images only and rejects animated inputs instead of dropping frames.
+For an image with no empty caption area, add an optional band:
+`"padding":{"top":100,"bottom":0,"color":"white"}`. Coordinates refer to the
+finished canvas, so the original image starts at y=100 in this example. The
+renderer leaves the source pixels and proportions intact; do not cover a face
+or gesture to force text onto it.
+
+For a reaction GIF, use a `.gif` output: the renderer applies the caption to all
+frames while retaining timing, looping and transparency. Inspect several frames
+across the animation, not just its thumbnail. Animated input to `.png` is rejected
+rather than silently flattened. Large animations may need an explicit, reviewed
+resize/trim with Pillow or ffmpeg before captioning. For specialized layouts,
+adapt with Pillow while preserving the actual template artwork.
 
 ## Check and deliver
 
