@@ -8,20 +8,16 @@ export function groundCodexHandoff(modelReply: string, toolResult: string | unde
     // Run after research grounding: its profile formatter otherwise discards
     // the manager's explanation and makes the fallback look like agent output.
     const status = result.error === 'codex_controller_unavailable'
-      ? 'Controller agen sedang pulih otomatis, tetapi job ini belum sempat diterima.'
+      ? 'Aku belum bisa mulai karena ada gangguan koneksi.'
       : hasInlineResearch
         ? 'Agen riset sedang tidak tersedia; berikut hasil penelusuran web sementara.'
         : 'Agen riset sedang tidak tersedia, jadi tugasnya belum mulai.';
     return hasInlineResearch && modelReply.trim() ? `${status}\n\n${modelReply}` : status;
   }
   if (result?.ok !== true || !['queued', 'busy'].includes(result.status)) return modelReply;
-  const ids = [result.job?.id, ...(Array.isArray(result.jobs) ? result.jobs.map((job: any) => job?.id) : [])]
-    .filter((id: unknown): id is string => typeof id === 'string' && /^[0-9a-f-]{36}$/i.test(id))
-    .map(id => id.slice(0, 8)).slice(0, 3);
-  const marker = ids.length ? ' job: ' + ids.map(id => '`' + id + '`').join(', ') : '';
+  // IDs stay in tool receipts for status/resume; acknowledgements are ordinary
+  // chat, not an execution log. Replace drafts that may also repeat those IDs.
   return result.status === 'busy'
-    ? 'Masih ada job yang jalan di channel ini; hasilnya menyusul.' + marker
-    : (result.job?.kind === 'investigation' || result.jobs?.length && result.jobs.every((job: any) => job.kind === 'investigation'))
-    ? 'Aku kerjakan dulu. Hasilnya nanti kukirim di sini.' + marker
-    : 'Oke, aku mulai kerjakan di lab terisolasi. Hasilnya menyusul di sini.' + marker;
+    ? 'Masih ada yang kukerjakan di sini; hasilnya menyusul.'
+    : 'Aku kerjakan dulu. Hasilnya nanti kukirim di sini.';
 }

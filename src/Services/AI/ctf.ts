@@ -2,6 +2,7 @@ import { mergeTeamProgress } from './ctfProgress';
 import type { ThreadSnapshot } from './threadContext';
 import { collectCTFInputs, collectCodexArtifacts } from './ctfInputs';
 import { codexSolverEnabled, submitCodexJob, type CodexPublicJob, type CodexRoute } from './codexJobs';
+import { groundCodexHandoff } from './codexHandoff';
 import { createHash } from 'node:crypto';
 import { openai } from '../../utils/openai';
 import { MODELS } from './models';
@@ -288,7 +289,7 @@ async function investigate(args: { question?: string; newCase?: boolean; solver?
  * must not drop the provenance that made an OSINT candidate defensible. */
 export function groundCTFReply(text: string, report?: CTFReport): string {
   if (!report) return text;
-  if(report.status==='queued'&&report.job){const id=report.job.id.slice(0,8);return text.includes(id)?text:`${text.trim()}\njob: \`${id}\` — hasilnya bakal kukirim lagi ke channel ini pas selesai.`;}
+  if (report.status === 'queued' && report.job) return groundCodexHandoff(text, JSON.stringify(report));
   const ids = new Set(report.notes.findings.flatMap(f => f.evidence.map(e => e.sourceId)));
   const sources = report.notes.sources.filter(s => ids.has(s.id) && s.kind !== 'search');
   const missing = sources.filter(s => !text.includes(s.url)).slice(0, 2);

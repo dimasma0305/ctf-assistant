@@ -1,12 +1,13 @@
 import { expect, test } from 'bun:test';
 import { groundCodexHandoff } from './codexHandoff';
 
-test('an accepted Codex job overrides an immediate false refusal and shows its status', () => {
+test('an accepted Codex job overrides an immediate false refusal without exposing internal IDs', () => {
   const id = '7bae9e20-1804-4ba6-8be5-eb4580dc2fb2';
   const modelReply = 'Aku belum bisa bikin PoC atau memverifikasinya di serverku.';
   const answer = groundCodexHandoff(modelReply, JSON.stringify({ ok: true, status: 'queued', job: { id } }));
-  expect(answer).toContain('mulai kerjakan');
-  expect(answer).toContain('7bae9e20');
+  expect(answer).toContain('kerjakan');
+  expect(answer).not.toContain('7bae9e20');
+  expect(answer).not.toContain('job');
   expect(answer).not.toContain('belum bisa');
 });
 
@@ -15,16 +16,19 @@ test('a rejected delegation keeps the manager explanation, while a busy job is n
   expect(groundCodexHandoff(original, JSON.stringify({ ok: false, error: 'user_hourly_limit' }))).toBe(original);
   const busy = groundCodexHandoff(original, JSON.stringify({ ok: true, status: 'busy',
     job: { id: '7bae9e20-1804-4ba6-8be5-eb4580dc2fb2' } }));
-  expect(busy).toContain('Masih ada job');
-  expect(busy).not.toContain('mulai kerjakan');
+  expect(busy).toContain('Masih ada');
+  expect(busy).not.toContain('job');
+  expect(busy).not.toContain('7bae9e20');
+  expect(busy).not.toContain('Aku kerjakan dulu');
 });
 
 test('a queued investigation acknowledges the task without lab jargon or claiming findings',()=>{
-  const answer=groundCodexHandoff('Ini hasil riset lengkapnya',JSON.stringify({ok:true,status:'queued',
+  const answer=groundCodexHandoff('Ini hasil riset lengkapnya, job: `7bae9e20`',JSON.stringify({ok:true,status:'queued',
     job:{id:'7bae9e20-1804-4ba6-8be5-eb4580dc2fb2',kind:'investigation',state:'pending'}}));
   expect(answer).toContain('Hasilnya nanti');
   expect(answer).not.toContain('lab terisolasi');
   expect(answer).not.toContain('hasil riset lengkap');
+  expect(answer).not.toContain('7bae9e20');
 });
 
 test('unavailable worker labels inline research as a fallback after answer grounding', () => {
@@ -44,6 +48,8 @@ test('unavailable worker labels inline research as a fallback after answer groun
 test('controller startup failure is explained without leaking the socket URL hint', () => {
   const result=JSON.stringify({ok:false,error:'codex_controller_unavailable',retryAfterSeconds:5});
   const grounded=groundCodexHandoff('deepsearch-nya gagal mulai karena backend error URL/port.',result,false);
-  expect(grounded).toBe('Controller agen sedang pulih otomatis, tetapi job ini belum sempat diterima.');
+  expect(grounded).toContain('belum bisa mulai');
+  expect(grounded).not.toContain('Controller');
+  expect(grounded).not.toContain('job');
   expect(grounded).not.toContain('URL');
 });
