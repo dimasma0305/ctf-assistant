@@ -4,7 +4,7 @@ export function groundCodexHandoff(modelReply: string, toolResult: string | unde
   if (!toolResult) return modelReply;
   let result: any;
   try { result = JSON.parse(toolResult); } catch { return modelReply; }
-  if (result?.ok === false && ['worker_preparing', 'worker_image_unavailable', 'isolated_agent_unavailable', 'codex_controller_unavailable'].includes(result.error)) {
+  if (result?.ok === false && ['worker_preparing', 'worker_image_unavailable', 'egress_interface_inspection_failed', 'isolated_agent_unavailable', 'codex_controller_unavailable'].includes(result.error)) {
     // Run after research grounding: its profile formatter otherwise discards
     // the manager's explanation and makes the fallback look like agent output.
     const status = result.error === 'codex_controller_unavailable'

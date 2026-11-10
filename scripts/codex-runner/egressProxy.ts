@@ -21,9 +21,19 @@ export function isLocalNetworkTarget(address: string): boolean {
     entry.address === address || (entry.family === 'IPv4' && !!entry.cidr && inIpv4Cidr(address, entry.cidr)));
 }
 
+/** This must work inside the controller's systemd sandbox, not only a shell. */
+export function egressEnvironmentStatus(inspect = networkInterfaces): {ready: boolean; error?: string} {
+  try {
+    if (!Object.values(inspect()).some(entries => entries?.length)) throw Error('no_interfaces');
+    return {ready: true};
+  } catch { return {ready: false, error: 'egress_interface_inspection_failed'}; }
+}
+
 /** Per-job SOCKS5 egress for ordinary curl/git HTTPS commands. The worker
  * still has no Docker network: every TCP dial is DNS-pinned and checked here. */
 export async function startEgressProxy(path: string, signal: AbortSignal) {
+  const readiness = egressEnvironmentStatus();
+  if (!readiness.ready) throw Error(readiness.error);
   const server = net.createServer();
   const sockets = new Set<Socket>();
   let connections = 0;

@@ -1,0 +1,101 @@
+{
+  "source": "https://www.mediafire.com/file/3ishryh2n93h1e5/FlipperPC+(2).zip/file",
+  "baseline": {
+    "stats": {
+      "calls": 35,
+      "searches": 6,
+      "sourceReads": 7,
+      "visionReads": 0,
+      "inputChars": 8251984,
+      "outputBytes": 5406951,
+      "elapsedMs": 589155,
+      "attempts": 1
+    },
+    "outcome": "No sample acquired; source admission denied the discovered download URL; curl received SOCKS5 code 2."
+  },
+  "diagnosis": {
+    "sourceParsing": "Download anchor was inside a form removed before link discovery.",
+    "egress": "getifaddrs fails under RestrictAddressFamilies without AF_NETLINK. Reproduced in transient systemd units; adding AF_NETLINK restored public curl HTTP 200.",
+    "size": "Gateway default was 8 MiB; sample is 91,224,773 bytes.",
+    "integrity": "Bun finalized an errored Response stream as complete. Final gateway stages bounded bytes before serving; truncation returns HTTP 502."
+  },
+  "independentAcquisition": {
+    "source": "https://www.mediafire.com/file/3ishryh2n93h1e5/FlipperPC+(2).zip/file",
+    "bytes": 91224773,
+    "sha256": "d53d221199feaa6a4d6a1b0ea0132e43f53aa0a300dec68b6c8121b813ea287f",
+    "entries": [
+      {
+        "name": "FlipperPC (2)/",
+        "size": 0,
+        "compressed": 0,
+        "encrypted": false
+      },
+      {
+        "name": "FlipperPC (2)/build.bat",
+        "size": 509,
+        "compressed": 299,
+        "encrypted": false
+      },
+      {
+        "name": "FlipperPC (2)/flipper_pc.py",
+        "size": 77112,
+        "compressed": 22390,
+        "encrypted": false
+      },
+      {
+        "name": "FlipperPC (2)/TUTORIAL.mp4",
+        "size": 280017526,
+        "compressed": 91201306,
+        "encrypted": false
+      }
+    ],
+    "executedSample": false
+  },
+  "workerScan": {
+    "pass": true,
+    "checks": {
+      "sampleHashMatches": true,
+      "reportedHash": true
+    },
+    "image": "hackerika-codex-worker:0.166.0-4",
+    "model": "gpt-5.6-sol",
+    "stats": {
+      "calls": 25,
+      "searches": 0,
+      "sourceReads": 1,
+      "visionReads": 0,
+      "inputChars": 5351624,
+      "outputBytes": 4500782,
+      "elapsedMs": 442199,
+      "attempts": 1
+    },
+    "result": {
+      "summary": "Kesimpulan: analisis statis tidak menemukan indikator malware eksplisit, obfuscation, persistence, pencurian kredensial, penghapusan file, atau endpoint C2/upload dalam sampel dari https://www.mediafire.com/file/3ishryh2n93h1e5/FlipperPC+(2).zip/file. Namun, hasil ini bukan jaminan bahwa arsip aman dijalankan.\n\nSHA-256 arsip ZIP (91.224.773 byte): `d53d221199feaa6a4d6a1b0ea0132e43f53aa0a300dec68b6c8121b813ea287f`. Uji CRC berhasil, tidak ada enkripsi, symlink, path traversal, maupun data setelah central directory. Arsip berisi:\n\n- `build.bat` — 509 byte — `e7c99ad91eef0a7dc749923c6d856f1561f91e36b948797fb523e3c74ee04274`\n- `flipper_pc.py` — 77.112 byte — `a40a92bfc73afdf9c9110bb11038610e1a908b4effbc80950230ef1f746e4474`\n- `TUTORIAL.mp4` — 280.017.526 byte — `9ba7a8937472cdc4adfb105a86a4a076f551e196ba30e50519bf0730070d9956`\n\nUkuran total setelah ekstraksi 280.095.147 byte, sekitar 3,07× ukuran terkompresi—tidak menyerupai zip bomb. MP4 mempunyai struktur lengkap `ftyp/uuid/mdat/moov`, tanpa data trailing atau stream lampiran; metadata menunjukkan H.264 1920×1198 30 fps dan AAC, berdurasi 227,27 detik.\n\nTemuan penting pada kode:\n\n- `build.bat` memasang versi terbaru `bleak`, `sounddevice`, `numpy`, dan `pyinstaller` tanpa pin versi atau hash, lalu membuat EXE. Ini risiko supply-chain utama karena paket dan dependensi yang kelak diunduh tidak termasuk dalam sampel yang diperiksa.\n- Program memang dirancang melakukan pemindaian Wi-Fi/Bluetooth, memakai mikrofon untuk spektrum, mengirim ping/DNS, mengontrol TV melalui LAN/ADB, dan dapat meminta elevasi UAC untuk menjalankan `netsh` guna mengaktifkan atau mematikan Wi-Fi.\n- Pemanggilan proses memakai daftar argumen tanpa `shell=True`; input hostname dan nama adaptor juga divalidasi. Tidak ditemukan `eval`, `exec`, payload besar tersandi, PowerShell, autorun, registry persistence, atau kode pengunduh mandiri.\n- Token TV dan Sony PSK disimpan tanpa enkripsi di `%APPDATA%\\FlipperPC\\tv.json`. Beberapa protokol TV memakai HTTP/WebSocket tanpa enkripsi, sementara koneksi TLS menonaktifkan validasi sertifikat. Kredensial/perintah dapat terpapar atau dimanipulasi oleh penyerang di LAN yang sama.\n- Kode jaringan mengarah ke alamat perangkat yang dipilih pengguna atau multicast lokal; `google.com` hanya muncul sebagai contoh input. Tidak terlihat tujuan upload tetap.\n\nBatas analisis: sampel tidak pernah dijalankan dan tidak diunggah ke pihak ketiga. Lab tidak menyediakan database antivirus/ClamAV atau YARA, video tidak ditonton atau didekode penuh, dan steganografi di dalam media tidak dapat disingkirkan hanya dari struktur kontainer. Dependensi yang akan diambil oleh `pip` juga belum dapat dinilai karena versinya tidak dikunci. Sebaiknya jangan menjalankan `build.bat` pada host utama; jika benar-benar diperlukan, pin serta verifikasi hash dependensi dan gunakan VM tanpa kredensial, hak admin, atau akses LAN sensitif.",
+      "flags": [],
+      "findings": [
+        "Akuisisi menghasilkan ZIP valid 91.224.773 byte dengan SHA-256 d53d221199feaa6a4d6a1b0ea0132e43f53aa0a300dec68b6c8121b813ea287f; CRC seluruh entri lolos.",
+        "Arsip memiliki tiga file, tanpa path traversal, symlink, enkripsi, atau data trailing.",
+        "AST Python valid, tanpa pemanggilan builtin eval/exec/compile, literal payload besar, persistence, atau fungsi upload yang terlihat.",
+        "Risiko nyata berasal dari dependensi pip tanpa pin, elevasi UAC untuk netsh, penyimpanan token/PSK plaintext, dan protokol LAN dengan TLS tidak tervalidasi atau tanpa enkripsi.",
+        "MP4 memiliki ukuran dan susunan top-level box konsisten serta tidak memuat stream lampiran yang terdeteksi."
+      ],
+      "unresolved": [
+        "Tidak ada mesin signature antivirus atau YARA lokal untuk pemeriksaan berbasis database.",
+        "Isi visual/audio MP4 dan kemungkinan steganografi tidak dianalisis.",
+        "Versi serta kode dependensi yang kelak diunduh build.bat tidak ditentukan dan tidak termasuk dalam sampel."
+      ],
+      "needsStrongerModel": false
+    },
+    "note": "Synthetic IDs; no Discord messages. Static-only instruction; human review of receipts required."
+  },
+  "validation": {
+    "bunTests": 89,
+    "pythonBridgeTests": 5,
+    "sampleExecuted": false,
+    "sampleUploaded": false,
+    "signatureAntivirusRun": false,
+    "agentRunImageDigest": "sha256:4a93aee1756527647c2c95f425f849cb19ec0ede234e9e0247a8fce902459cb2",
+    "finalTransportImageDigest": "sha256:5e3af633e55dcf15896ba74aee94fedea9667928bd07efc8b6e94a3ca480b785",
+    "note": "Agent completed on initial acquisition fix. Subsequent transfer-integrity hardening was rechecked with the real final gateway and worker bridge against the same ZIP/hash. No Discord messages were sent by tests. Commands were manually reviewed; sample source was read/parsed, not executed."
+  }
+}

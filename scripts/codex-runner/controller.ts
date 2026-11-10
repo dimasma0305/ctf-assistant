@@ -6,6 +6,7 @@ import { executeJob } from './executor';
 import { DiscordContextBroker } from './discordBroker';
 import { createWorkerImageReadiness } from './workerImage';
 import { WORKER_IMAGE } from './runtime';
+import { egressEnvironmentStatus } from './egressProxy';
 import { deleteExportedFiles, readExportedFile, saveExportedFiles } from './exports';
 
 const socket = process.env.CODEX_CONTROL_SOCKET || '/run/hackerika-codex/control.sock';
@@ -149,8 +150,8 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
   try{
     const path=new URL(request.url).pathname;
     if(request.method==='GET'&&path==='/health'){
-      const worker=workerImage.status();
-      return response({ok:worker.ready,queued:queue.length,running,worker,verified:[...verified]},worker.ready?200:503);
+      const worker=workerImage.status(),egress=egressEnvironmentStatus(),ready=worker.ready&&egress.ready;
+      return response({ok:ready,queued:queue.length,running,worker,egress,verified:[...verified]},ready?200:503);
     }
     if(request.method!=='POST')return response({ok:false,error:'method_not_allowed'},405);
     const body=await json(request);
@@ -177,6 +178,8 @@ const server=Bun.serve({unix:socket,maxRequestBodySize:30*1024*1024,async fetch(
         void workerImage.ensure().catch(()=>{});
         return response({ok:false,error:readiness.state==='unavailable'?'worker_image_unavailable':'worker_preparing',retryAfterSeconds:30},503);
       }
+      const egress=egressEnvironmentStatus();
+      if(!egress.ready)return response({ok:false,error:egress.error},503);
       const packet=packets[0];await cleanup();
       const outstanding=[...jobs.values()].filter(j=>j.packet.scope===packet.scope&&['pending','running'].includes(j.state));
       if(outstanding.length+packets.length>maxChannelJobs)

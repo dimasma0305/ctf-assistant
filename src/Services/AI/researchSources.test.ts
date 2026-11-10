@@ -18,6 +18,42 @@ test('HTML reader keeps useful main-content links and ignores navigation noise',
   expect(result.links).toEqual([{ url: 'https://example.com/config/mail', title: 'Mail guide' }]);
 });
 
+test('download anchors and file metadata survive form cleanup without keeping input values', async () => {
+  restores.push(spyOn(researchTransport, 'fetch').mockResolvedValue(new Response(
+    '<main><form><input value="not evidence"><textarea>not evidence</textarea><div>Archive (87 MB)</div>' +
+    '<a id="downloadButton" href="https://cdn.example/opaque/sample.zip">Download</a></form></main>',
+    {headers:{'content-type':'text/html'}})));
+  const result = await new ResearchSourceReader(AbortSignal.timeout(1000)).read('https://files.example/share');
+  expect(result.links).toEqual([{url:'https://cdn.example/opaque/sample.zip',title:'Download'}]);
+  expect(result.content).toContain('Archive (87 MB)');
+  expect(result.content).not.toContain('not evidence');
+});
+
+test('streamed downloads enforce size without Content-Length and cancel their upstream', async () => {
+  let cancelled = false;
+  restores.push(spyOn(researchTransport, 'fetch').mockResolvedValue(new Response(new ReadableStream({
+    pull(controller) { controller.enqueue(new Uint8Array(6)); },
+    cancel() { cancelled = true; },
+  }))));
+  const file = await new ResearchSourceReader(AbortSignal.timeout(1000)).downloadStream('https://files.example/archive', 10);
+  await expect(new Response(file.body).arrayBuffer()).rejects.toThrow('source_file_too_large');
+  expect(cancelled).toBe(true);
+});
+
+test('truncated upstream files cannot be mistaken for successful complete downloads', async () => {
+  restores.push(spyOn(researchTransport, 'fetch').mockResolvedValue(new Response('short', {headers:{'content-length':'20'}})));
+  const file = await new ResearchSourceReader(AbortSignal.timeout(1000)).downloadStream('https://files.example/archive');
+  await expect(new Response(file.body).arrayBuffer()).rejects.toThrow('source_incomplete_download');
+});
+
+test('cancelling a downstream download cancels the upstream body', async () => {
+  let cancelled = false;
+  restores.push(spyOn(researchTransport, 'fetch').mockResolvedValue(new Response(new ReadableStream({cancel() { cancelled = true; }}))));
+  const file = await new ResearchSourceReader(AbortSignal.timeout(1000)).downloadStream('https://files.example/archive');
+  await file.body.cancel();
+  expect(cancelled).toBe(true);
+});
+
 test('HTML reader follows portfolio routes kept only in the header without treating nav text as evidence', async () => {
   restores.push(spyOn(researchTransport, 'fetch').mockResolvedValue(new Response('<header><nav><a href="/about">About</a><a href="/ctf">CTF</a></nav></header><main><h1>Profile</h1><p>Public security notes.</p></main>', { headers: { 'content-type': 'text/html' } })));
   const result = await new ResearchSourceReader(AbortSignal.timeout(1000)).read('https://example.com/profile', 'security');

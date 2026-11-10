@@ -27,6 +27,29 @@ If no retained copy and no matching seed remain, preparation fails explicitly.
 When the bot uses inline research after worker preparation fails, its reply
 labels that result as a temporary fallback rather than implying an irai run.
 
+The service needs `AF_NETLINK` for `getifaddrs`, which the egress guard uses to
+exclude host/Docker networks. Without it, even public curl/git connections were
+denied. This grants interface inspection, not `CAP_NET_ADMIN`. `/health` reports
+`egress.ready` and rejects new work with `egress_interface_inspection_failed` if
+that local prerequisite is broken; it is not a remote connectivity test.
+
+File-host download anchors inside forms survive source extraction. Follow the
+exact inspected link through `/sources/download`; it streams up to 128 MiB with
+a three-minute transfer timeout. Both declared and actual byte counts are
+bounded; a private temporary file verifies transfer completion before delivery
+without buffering the sample in host RAM. Errors distinguish local admission, oversized files and fetch failures;
+HTTP framing keeps interrupted downloads visibly incomplete in the worker.
+The buffered reader retains its smaller default for ordinary in-process callers.
+Inspect downloaded type/size/hash before use; an HTML landing page is not an
+archive. Static inspection does not require executing a suspicious sample.
+
+For an opt-in static scan smoke using synthetic Discord IDs, run
+`bun benchmarks/hackerika-codex/file-scan.ts NEW_OUTPUT PUBLIC_URL INDEPENDENT_SHA256`
+with the controller auth environment. Compare the worker's hash with a separate
+acquisition, and review its command receipts and analysis limits. It sends no
+Discord messages. `python3 scripts/codex-runner/worker_bridge_test.py` checks
+transfer framing and truncation without a model, Docker, or external network.
+
 To verify public-profile research, run `bun benchmarks/hackerika-codex/profile-depth.ts --out FRESH_PATH`
 with the same auth environment as the investigation benchmark below. It records
 completed shell reads of both irai research references and inspected sources

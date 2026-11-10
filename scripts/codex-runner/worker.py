@@ -16,11 +16,22 @@ class Bridge(http.server.BaseHTTPRequestHandler):
         try:
             conn.request('POST',self.path,body=self.rfile.read(length),headers={'Content-Type':'application/json'})
             response=conn.getresponse();self.send_response(response.status)
-            self.send_header('Content-Type',response.getheader('Content-Type','application/json'));self.send_header('Connection','close');self.end_headers()
+            self.send_header('Content-Type',response.getheader('Content-Type','application/json'))
+            # Bun may choose chunked framing for the staged file. Its verified
+            # byte count is still available for framing the downstream transfer.
+            length=response.getheader('X-Artifact-Size') or response.getheader('Content-Length')
+            chunked=length is None
+            self.send_header('Transfer-Encoding' if chunked else 'Content-Length','chunked' if chunked else length)
+            disposition=response.getheader('Content-Disposition')
+            if disposition:self.send_header('Content-Disposition',disposition)
+            self.send_header('Connection','close');self.end_headers()
             while True:
                 data=response.read1(8192)
                 if not data:break
-                self.wfile.write(data);self.wfile.flush()
+                self.wfile.write((('%x\r\n'%len(data)).encode()+data+b'\r\n') if chunked else data);self.wfile.flush()
+            # A failed upstream stream must remain visibly incomplete to curl;
+            # closing an unframed response used to report truncated files as OK.
+            if chunked:self.wfile.write(b'0\r\n\r\n');self.wfile.flush()
         except Exception: pass
         finally:conn.close();self.close_connection=True
 class EgressRelay(socketserver.BaseRequestHandler):

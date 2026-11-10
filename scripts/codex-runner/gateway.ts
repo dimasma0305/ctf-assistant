@@ -1,8 +1,12 @@
-import { chmod } from 'node:fs/promises';
+import { chmod, mkdtemp, open, rm, stat } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { Readable } from 'node:stream';
 import { createHash } from 'node:crypto';
 import { ChatGPTAuth, CHATGPT_RESOURCE } from '../../src/Services/AI/chatgptAuth';
 import { completedResponse } from '../../src/Services/AI/chatgptClient';
-import { ResearchSourceReader, publicResearchUrl } from '../../src/Services/AI/researchSources';
+import { ResearchSourceReader, publicResearchUrl, MAX_DOWNLOAD_BYTES } from '../../src/Services/AI/researchSources';
 import { webSearchForTool } from '../../src/Services/AI/web';
 import type { Job } from './protocol';
 import type { DiscordReadQuery } from './discordBroker';
@@ -172,9 +176,40 @@ export async function startGateway(socket: string, job: Job, model: string, sign
           const x=await request.json() as any;const url=publicResearchUrl(x?.url);
           if(!url||!knownSource(url)||/[\w-]+\{[^}]+\}|%7[bBdD]|(?:token|password|secret|authorization)=/i.test(url))
             return Response.json({error:'invalid_or_private_source'},{status:400});
-          const file=await new ResearchSourceReader(signal).download(url);
-          return new Response(new Uint8Array(file.data),{headers:{'Content-Type':'application/octet-stream',
-            'Content-Disposition':`attachment; filename="${file.name}"`,'Cache-Control':'no-store'}});
+          let staging:string|undefined;
+          try {
+            staging=await mkdtemp(join(tmpdir(),'hackerika-download-'));
+            const file=await new ResearchSourceReader(signal).downloadStream(url);
+            const path=join(staging,'payload');
+            // Bun can terminate an errored Response stream with a successful
+            // final HTTP chunk. Verify upstream completion on bounded disk
+            // before serving bytes, so truncated samples never become HTTP 200.
+            const handle=await open(path,'wx',0o600),reader=file.body.getReader();
+            try {
+              for(;;){
+                signal.throwIfAborted();
+                const chunk=await reader.read();if(chunk.done)break;
+                await handle.writeFile(chunk.value);
+              }
+            } finally { await reader.cancel().catch(()=>{});reader.releaseLock();await handle.close(); }
+            signal.throwIfAborted();
+            const size=(await stat(path)).size;
+            const input=createReadStream(path),directory=staging;
+            const cleanup=()=>{void rm(directory,{recursive:true,force:true});};
+            input.once('close',cleanup);
+            const abort=()=>input.destroy(Error('job_closed'));
+            signal.addEventListener('abort',abort,{once:true});
+            input.once('close',()=>signal.removeEventListener('abort',abort));
+            staging=undefined;
+            return new Response(Readable.toWeb(input) as ReadableStream,{headers:{'Content-Type':file.contentType,
+              'Content-Length':String(size),'X-Artifact-Size':String(size),
+              'Content-Disposition':`attachment; filename="${file.name}"`,'Cache-Control':'no-store'}});
+          } catch(error) {
+            const reason=error instanceof SafeFetchError?error.code
+              :error instanceof Error&&/^source_[a-z_0-9]+$/.test(error.message)?error.message:'source_fetch_failed';
+            return Response.json({error:'source_unavailable',reason,maxBytes:MAX_DOWNLOAD_BYTES},
+              {status:reason==='source_file_too_large'?413:502});
+          } finally { if(staging)await rm(staging,{recursive:true,force:true}); }
         }
         if(path!=='/v1/responses')return Response.json({error:'route_not_found'},{status:404});
         const text=await request.text();const body=JSON.parse(text);

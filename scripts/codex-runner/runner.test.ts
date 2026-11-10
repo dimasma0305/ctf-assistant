@@ -519,6 +519,59 @@ test('source gateway downloads only a discovered Slidev archive as exact binary 
   }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
 });
 
+test('gateway streams an 87 MiB sample discovered inside a form and explains oversized downloads',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-file-host-')),socket=join(directory,'source.sock');
+  const originalFetch=researchTransport.fetch;
+  const chunk=Buffer.alloc(1024*1024,0x5a), size=87*chunk.length;
+  const expected=createHash('sha256');for(let i=0;i<87;i++)expected.update(chunk);
+  researchTransport.fetch=async url=>{
+    if(String(url)==='https://files.example/share')return new Response(
+      '<main><form><a href="https://cdn.example/sample.zip">Download (87 MB)</a>'+
+      '<a href="https://cdn.example/too-big.zip">Large</a></form></main>',{headers:{'content-type':'text/html'}});
+    if(String(url).endsWith('too-big.zip'))return new Response(null,{headers:{'content-length':String(129*chunk.length)}});
+    let sent=0;
+    return new Response(new ReadableStream({pull(controller){
+      if(sent++===87){controller.close();return;}controller.enqueue(chunk);
+    }}),{headers:{'content-type':'application/zip','content-length':String(size)}});
+  };
+  const job=newJob(validatePacket({...packet(),question:'Scan https://files.example/share',kind:'investigation'}));
+  const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal);
+  const download=(url:string)=>fetch('http://localhost/sources/download',{unix:socket,method:'POST',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+  try{
+    expect((await download('https://cdn.example/sample.zip')).status).toBe(400);
+    await codexRequest('/sources/read',{url:'https://files.example/share'},{socketPath:socket});
+    const response=await download('https://cdn.example/sample.zip');
+    expect(response.status).toBe(200);expect(response.headers.get('content-type')).toBe('application/zip');
+    // Bun may choose HTTP chunk framing for a streaming Response.
+    expect(response.headers.get('content-length')===String(size)||response.headers.get('transfer-encoding')==='chunked').toBe(true);
+    const digest=createHash('sha256');let actual=0;
+    for await(const bytes of response.body!){digest.update(bytes);actual+=bytes.length;}
+    expect(actual).toBe(size);expect(digest.digest('hex')).toBe(expected.digest('hex'));
+    const oversized=await download('https://cdn.example/too-big.zip');
+    expect(oversized.status).toBe(413);
+    expect(await oversized.json()).toEqual({error:'source_unavailable',reason:'source_file_too_large',maxBytes:128*chunk.length});
+    expect((await download('https://cdn.example/unknown.zip')).status).toBe(400);
+  }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
+});
+
+test('gateway does not turn a truncated upstream body into a complete download',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'codex-partial-file-')),socket=join(directory,'source.sock');
+  const originalFetch=researchTransport.fetch;
+  researchTransport.fetch=async()=>new Response(new ReadableStream({async start(controller){
+    controller.enqueue(new Uint8Array(4096));
+    await new Promise(resolve=>setTimeout(resolve,20));controller.close();
+  }}),{headers:{'content-type':'application/zip','content-length':'8192'}});
+  const job=newJob(validatePacket({...packet(),question:'Scan https://files.example/partial.zip',kind:'investigation'}));
+  const gateway=await startGateway(socket,job,'gpt-6-luna',new AbortController().signal);
+  try{
+    const response=await fetch('http://localhost/sources/download',{unix:socket,method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'https://files.example/partial.zip'})});
+    expect(response.status).toBe(502);
+    expect(await response.json()).toMatchObject({error:'source_unavailable',reason:'source_incomplete_download'});
+  }finally{gateway.close();researchTransport.fetch=originalFetch;await rm(directory,{recursive:true,force:true});}
+});
+
 test('worker can repeatedly request only scoped Discord reads through the bot broker',async()=>{
   const job=newJob(validatePacket(packet()));job.state='running';
   const broker=new DiscordContextBroker(),signal=new AbortController();

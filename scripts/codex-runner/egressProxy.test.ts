@@ -4,7 +4,14 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { networkInterfaces } from 'node:os';
-import { isLocalNetworkTarget, startEgressProxy } from './egressProxy';
+import { egressEnvironmentStatus, isLocalNetworkTarget, startEgressProxy } from './egressProxy';
+
+test('failed interface inspection is an infrastructure failure, not a private destination verdict', () => {
+  expect(egressEnvironmentStatus(() => { throw Error('getifaddrs returned an error'); }))
+    .toEqual({ready:false,error:'egress_interface_inspection_failed'});
+  expect(egressEnvironmentStatus(() => ({}))).toEqual({ready:false,error:'egress_interface_inspection_failed'});
+  expect(egressEnvironmentStatus().ready).toBe(true);
+});
 
 test('host-connected Docker subnet is not treated as public egress', () => {
   const bridge = Object.entries(networkInterfaces()).find(([name, entries]) =>

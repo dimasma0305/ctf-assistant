@@ -16,6 +16,8 @@ export interface RepositorySnapshot {
 export const researchTransport = { fetch: safeFetch };
 const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_FILE_BYTES = 512 * 1024;
+// Large samples stream to the disposable worker instead of occupying host RAM.
+export const MAX_DOWNLOAD_BYTES = 128 * 1024 * 1024;
 const snapshotCache = new Map<string, { at: number; data: Promise<any> }>();
 const words = (text: string) => [...new Set(text.toLowerCase().match(/[a-z][a-z0-9_-]{2,}/g) || [])]
   .filter(word => !/^(the|and|for|from|with|this|that|what|how|are|repo|repository|github|com|https|yang|dan|dari|ini|itu|apa|cara|cek|pakai|tolong|bisa)$/.test(word)).slice(0, 35);
@@ -98,7 +100,10 @@ function parsePage(raw: string, url: string, html: boolean): { title: string; te
   // Portfolio and documentation sites often put their only About/Projects
   // routes in the header. Keep a small link frontier before dropping nav text.
   $('nav a[href], header a[href]').slice(0, 12).each((_i, element) => addLink($(element).attr('href'), $(element).text().trim()));
-  $('script,style,noscript,svg,nav,header,footer,form,button').remove();
+  // File hosts put ordinary download anchors and file metadata inside forms.
+  // Drop input controls, not the surrounding content/link container.
+  $('button a[href]').each((_i, element) => addLink($(element).attr('href'), $(element).text().trim()));
+  $('script,style,noscript,svg,nav,header,footer,input,select,textarea,button').remove();
   const main = $('main').first().length ? $('main').first() : $('article').first().length ? $('article').first() : $('body');
   main.find('a[href]').each((_i, element) => addLink($(element).attr('href'), $(element).text().trim()));
   main.find('br').replaceWith('\n');
@@ -155,32 +160,49 @@ export class ResearchSourceReader {
     return { url: page.url, title: parsed.title, kind: 'page', ...excerpt, links: parsed.links };
   }
 
-  async download(urlValue: string, maxBytes = 8 * 1024 * 1024): Promise<{ url: string; name: string; data: Buffer }> {
+  async downloadStream(urlValue: string, maxBytes = MAX_DOWNLOAD_BYTES) {
+    if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > MAX_DOWNLOAD_BYTES)
+      throw new Error('invalid_download_limit');
     const url = publicResearchUrl(urlValue);
     if (!url) throw new Error('invalid_source_url');
     const response = await researchTransport.fetch(url, { method: 'GET',
-      signal: AbortSignal.any([this.signal, AbortSignal.timeout(25_000)]),
+      signal: AbortSignal.any([this.signal, AbortSignal.timeout(180_000)]),
       headers: { 'User-Agent': 'Hackerika-Research/1' } });
     if (!response.ok) { await response.body?.cancel(); throw new Error(`source_http_${response.status}`); }
-    const length = Number(response.headers.get('content-length'));
-    if (Number.isFinite(length) && length > maxBytes) { await response.body?.cancel(); throw new Error('source_file_too_large'); }
-    const chunks: Buffer[] = []; let size = 0;
+    const lengthHeader = response.headers.get('content-length');
+    const length = lengthHeader !== null && /^\d+$/.test(lengthHeader) ? Number(lengthHeader) : undefined;
+    if (length !== undefined && length > maxBytes) { await response.body?.cancel(); throw new Error('source_file_too_large'); }
+    let size = 0;
     const reader = response.body?.getReader();
     if (!reader) throw new Error('source_empty_body');
-    try {
-      for (;;) {
-        const { done, value } = await reader.read(); if (done) break;
-        size += value.byteLength;
-        if (size > maxBytes) { await reader.cancel(); throw new Error('source_file_too_large'); }
-        chunks.push(Buffer.from(value));
-      }
-    } finally { reader.releaseLock(); }
+    const body = new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        try {
+          const { done, value } = await reader.read();
+          if (done) {
+            if (length !== undefined && size !== length) throw new Error('source_incomplete_download');
+            reader.releaseLock(); controller.close(); return;
+          }
+          size += value.byteLength;
+          if (size > maxBytes) throw new Error('source_file_too_large');
+          controller.enqueue(value);
+        } catch (error) {
+          await reader.cancel().catch(() => {}); reader.releaseLock(); controller.error(error);
+        }
+      },
+      async cancel(reason) { try { await reader.cancel(reason); } finally { reader.releaseLock(); } },
+    });
     const finalUrl = response.url || url;
     const finalSegment = new URL(finalUrl).pathname.split('/').at(-1) || 'download.bin';
     let decodedName = finalSegment;
     try { decodedName = decodeURIComponent(finalSegment); } catch { /* Keep the URL-encoded name. */ }
     const name = decodedName.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 80) || 'download.bin';
-    return { url: finalUrl, name, data: Buffer.concat(chunks, size) };
+    return { url: finalUrl, name, body, length, contentType: response.headers.get('content-type') || 'application/octet-stream' };
+  }
+
+  async download(urlValue: string, maxBytes = 8 * 1024 * 1024): Promise<{ url: string; name: string; data: Buffer }> {
+    const file = await this.downloadStream(urlValue, maxBytes);
+    return { url: file.url, name: file.name, data: Buffer.from(await new Response(file.body).arrayBuffer()) };
   }
 
   private async snapshot(repo: string, ref?: string): Promise<any> {

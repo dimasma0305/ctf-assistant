@@ -33,7 +33,7 @@ test('a queued investigation acknowledges the task without lab jargon or claimin
 
 test('unavailable worker labels inline research as a fallback after answer grounding', () => {
   const evidence = 'Situs tim mengkredit handle tersebut. [Sumber](https://example.com/team)';
-  for (const error of ['worker_preparing', 'worker_image_unavailable', 'isolated_agent_unavailable']) {
+  for (const error of ['worker_preparing', 'worker_image_unavailable', 'egress_interface_inspection_failed', 'isolated_agent_unavailable']) {
     const answer = groundCodexHandoff(evidence, JSON.stringify({ ok: false, error }), true);
     expect(answer).toStartWith('Agen riset sedang tidak tersedia;');
     expect(answer).toContain(evidence);

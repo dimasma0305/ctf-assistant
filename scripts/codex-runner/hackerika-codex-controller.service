@@ -31,7 +31,9 @@ ProtectKernelModules=true
 ProtectControlGroups=true
 RestrictSUIDSGID=true
 LockPersonality=true
-RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+# getifaddrs uses netlink to identify host/Docker subnets for the egress guard.
+# CAP_NET_ADMIN remains absent; workers still have --network none.
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
 CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE CAP_FOWNER
 
 [Install]
